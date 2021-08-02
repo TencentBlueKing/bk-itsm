@@ -1,0 +1,136 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "department_list", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "Success", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56decode"
+        }, 
+        "data": {
+          "items": {
+            "required": [
+              "name", 
+              "parent", 
+              "has_children", 
+              "children", 
+              "order", 
+              "id", 
+              "ancestor_name"
+            ], 
+            "type": "object", 
+            "description": "", 
+            "properties": {
+              "name": {
+                "default": "PAAS\u5f00\u53d1\u7ec4", 
+                "type": "string", 
+                "description": "\u90e8\u95e8\u540d\u79f0"
+              }, 
+              "parent": {
+                "default": 2, 
+                "type": "number", 
+                "description": "\u4e0a\u7ea7\u90e8\u95e8ID"
+              }, 
+              "has_children": {
+                "default": false, 
+                "type": "boolean", 
+                "description": "\u662f\u5426\u6709\u5b50\u90e8\u95e8"
+              }, 
+              "children": {
+                "type": "array", 
+                "description": "\u5b50\u90e8\u95e8"
+              }, 
+              "order": {
+                "default": 2, 
+                "type": "number", 
+                "description": ""
+              }, 
+              "id": {
+                "default": 4, 
+                "type": "number", 
+                "description": "\u90e8\u95e8ID"
+              }, 
+              "ancestor_name": {
+                "default": "\u603b\u516c\u53f8/\u84dd\u9cb8/PAAS\u5f00\u53d1\u7ec4", 
+                "type": "string", 
+                "description": "\u90e8\u95e8\u8def\u5f84"
+              }
+            }
+          }, 
+          "type": "array", 
+          "description": "\u8fd4\u56de\u6570\u636e"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "c9484e31ea6041b2bfb67b999ac12f5c", 
+          "type": "string", 
+          "description": "\u8bf7\u6c42ID"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/usermanage/department_list/", 
+    "is_builtin": false,
+    "req_params": [
+      {
+        "is_necessary": 0, 
+        "sample": "", 
+        "name": "type", 
+        "value": "", 
+        "desc": "\u9ed8\u8ba4\u4ec5\u8fd4\u56de\u6839\u90e8\u95e8\uff0ctype=all \u65f6, \u8fd4\u56de\u5168\u90e8\u90e8\u95e8\u5217\u8868"
+      }
+    ], 
+    "desc": "\u67e5\u8be2\u5168\u90e8\u90e8\u95e8\u5217\u8868",
+      "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u5168\u90e8\u90e8\u95e8\u5217\u8868", 
+    "is_activated": true, 
+    "remote_system": 9, 
+    "system_info": {
+      "cookies": [], 
+      "code": "usermanage", 
+      "is_deleted": false, 
+      "name": "\u7528\u6237\u7ba1\u7406", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 12, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u7528\u6237\u7ba1\u7406", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

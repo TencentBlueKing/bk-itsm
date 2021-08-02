@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+# 工程预装模块
+# 需要额外的python包，可直接在文件后面添加
+# 请确保指定的包和版本号，可通过pip安装
+
+-r requirements.txt
+
+# 本地开发
+isort==4.3.4
+django-silk==2.0.0
+django_extensions==2.1.0
+django-reset-migrations==0.3.1
+django-debug-panel==0.8.3
+coverage==5.0.3
+pytest-django==3.8.0
+mock==3.0.5

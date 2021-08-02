@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | 管理{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">蓝鲸智云应用后台管理</h1>
+{% endblock %}
+
+{% block userlinks %}
+    {% if site_url %}
+        <a href="{{ site_url }}">蓝鲸智云应用</a> /
+    {% endif %}
+    <a href="{{LOGOUT_URL}}">注销</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+{
+  "name": "itsm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd pc/ && npm run build && cd ../weixin && npm run build"
+  },
+  "author": "",
+  "license": "ISC"
+}

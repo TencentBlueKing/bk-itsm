@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "clean other version's files"
+rm -rf blueapps
+rm -rf blueking
+
+echo "update requirements.txt"
+# cat requirements_ieodbeta.txt >> requirements.txt
+cat requirements_ieod.txt >> requirements.txt

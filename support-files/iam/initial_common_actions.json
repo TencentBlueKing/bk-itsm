@@ -1,0 +1,59 @@
+[
+    {
+        "name": "服务管理员",
+        "name_en": "service_superuser",
+        "actions": [
+            {
+                "id": "project_view"
+            },
+            {
+                "id": "service_create"
+            },
+            {
+                "id": "workflow_create"
+            },
+            {
+                "id": "flow_element_manage"
+            },
+            {
+                "id": "role_create"
+            }
+        ]
+    },
+    {
+        "name": "系统配置管理",
+        "name_en": "system_manager",
+        "actions": [
+            {
+                "id": "project_view"
+            },
+            {
+                "id": "system_settings_manage"
+            },
+            {
+                "id": "knowledge_manage"
+            }
+        ]
+    },
+    {
+        "name": "单据查看",
+        "name_en": "ticket_view",
+        "actions": [
+            {
+                "id": "ticket_view"
+            }
+        ]
+    },
+    {
+        "name": "统计信息查看",
+        "name_en": "operational_data_view",
+        "actions": [
+            {
+                "id": "ticket_view"
+            },
+            {
+                "id": "operational_data_view"
+            }
+        ]
+    }
+]

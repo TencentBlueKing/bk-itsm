@@ -1,0 +1,161 @@
+[
+    {
+        "req_params": [],
+        "is_deleted": false,
+        "name": "Agent\u5fc3\u8df3\u4fe1\u606f\u67e5\u8be2",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "hosts",
+                "bk_supplier_account"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "hosts": {
+                    "items": {
+                        "required": [
+                            "ip",
+                            "bk_cloud_id"
+                        ],
+                        "type": "object",
+                        "description": "",
+                        "properties": {
+                            "ip": {
+                                "default": "",
+                                "type": "string",
+                                "description": "IP\u5730\u5740"
+                            },
+                            "bk_cloud_id": {
+                                "default": "",
+                                "type": "number",
+                                "description": "\u4e91\u533a\u57dfID"
+                            }
+                        }
+                    },
+                    "type": "array",
+                    "description": "\u4e3b\u673a\u5217\u8868"
+                },
+                "bk_supplier_account": {
+                    "default": "",
+                    "type": "string",
+                    "description": "\u5f00\u53d1\u5546\u8d26\u53f7"
+                }
+            }
+        },
+        "func_name": "get_agent_info",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "message",
+                "code",
+                "data",
+                "result",
+                "request_id",
+                "msg"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": "\u8fd4\u56de\u7801"
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": "\u63a5\u53e3\u8bf7\u6c42\u72b6\u6001"
+                },
+                "request_id": {
+                    "default": "307c49f38d75479d869a8c700f93a16f",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "success",
+                    "type": "string",
+                    "description": "\u4fe1\u606f"
+                },
+                "data": {
+                    "required": [
+                        "0:127.0.0.1"
+                    ],
+                    "type": "object",
+                    "description": "\u8fd4\u56de\u6570\u636e",
+                    "properties": {
+                        "0:127.0.0.1": {
+                            "required": [
+                                "parent_port",
+                                "version",
+                                "parent_ip",
+                                "bk_cloud_id",
+                                "ip"
+                            ],
+                            "type": "object",
+                            "description": "",
+                            "properties": {
+                                "parent_port": {
+                                    "default": 48668,
+                                    "type": "number",
+                                    "description": "agent\u7684\u4e0a\u7ea7\u8282\u70b9\u7aef\u53e3"
+                                },
+                                "version": {
+                                    "default": "1.60.53",
+                                    "type": "string",
+                                    "description": "\u7248\u672c"
+                                },
+                                "parent_ip": {
+                                    "default": "127.0.0.1",
+                                    "type": "string",
+                                    "description": "\tagent\u7684\u4e0a\u7ea7\u8282\u70b9ip"
+                                },
+                                "bk_cloud_id": {
+                                    "default": 0,
+                                    "type": "number",
+                                    "description": "\u4e91\u533a\u57dfid"
+                                },
+                                "ip": {
+                                    "default": "127.0.0.1",
+                                    "type": "string",
+                                    "description": "ip\u5730\u5740"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "remote_system": 18,
+        "system_info": {
+            "cookies": [],
+            "code": "gse",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u7ba1\u63a7\u5e73\u53f0",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 3,
+            "headers": [],
+            "is_builtin": true,
+            "desc": "\u84dd\u9cb8\u7ba1\u63a7\u5e73\u53f0",
+            "updated_by": ""
+        },
+        "method": "POST",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/gse/get_agent_info/",
+        "is_builtin": false,
+        "desc": "\u67e5\u8be2agent\u5fc3\u8df3\u8be6\u7ec6\u4fe1\u606f\u3002\u6570\u636e\u975e\u5b9e\u65f6\uff0c\u5ef6\u65f61\u5206\u949f\u5185\u3002",
+        "updated_by": "system"
+    }
+]

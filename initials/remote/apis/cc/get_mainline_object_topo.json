@@ -1,0 +1,137 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "get_mainline_object_topo", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56decode"
+        }, 
+        "data": {
+          "items": {
+            "required": [
+              "bk_pre_obj_name", 
+              "bk_obj_name", 
+              "bk_next_obj", 
+              "bk_next_name", 
+              "bk_obj_id", 
+              "bk_supplier_account", 
+              "bk_pre_obj_id"
+            ], 
+            "type": "object", 
+            "description": "", 
+            "properties": {
+              "bk_pre_obj_name": {
+                "default": "\u6a21\u5757", 
+                "type": "string", 
+                "description": "\u5f53\u524d\u6a21\u578b\u7684\u524d\u4e00\u4e2a\u6a21\u578b\u7684\u540d\u79f0"
+              }, 
+              "bk_obj_name": {
+                "default": "\u4e3b\u673a", 
+                "type": "string", 
+                "description": "\u6a21\u578b\u540d\u79f0"
+              }, 
+              "bk_next_obj": {
+                "default": "", 
+                "type": "string", 
+                "description": "\u5f53\u524d\u6a21\u578b\u7684\u4e0b\u4e00\u4e2a\u6a21\u578b\u552f\u4e00ID"
+              }, 
+              "bk_next_name": {
+                "default": "", 
+                "type": "string", 
+                "description": "\u5f53\u524d\u6a21\u578b\u7684\u4e0b\u4e00\u4e2a\u6a21\u578b\u540d\u79f0"
+              }, 
+              "bk_obj_id": {
+                "default": "host", 
+                "type": "string", 
+                "description": "\u6a21\u578b\u7684\u552f\u4e00ID"
+              }, 
+              "bk_supplier_account": {
+                "default": "0", 
+                "type": "string", 
+                "description": "\u5f00\u53d1\u5546\u5e10\u6237\u540d\u79f0"
+              }, 
+              "bk_pre_obj_id": {
+                "default": "module", 
+                "type": "string", 
+                "description": "\u5f53\u524d\u6a21\u578b\u7684\u524d\u4e00\u4e2a\u6a21\u578b\u7684\u552f\u4e00ID"
+              }
+            }
+          }, 
+          "type": "array", 
+          "description": "\u8fd4\u56de\u6570\u636e"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "a483380ef75e41ceac7cf8f0a04b7b67", 
+          "type": "string", 
+          "description": "\u8bf7\u6c42ID"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/cc/get_mainline_object_topo/", 
+    "is_builtin": false,
+    "req_params": [
+      {
+        "is_necessary": 1, 
+        "sample": "0", 
+        "name": "bk_supplier_account", 
+        "value": "", 
+        "desc": "\u5f00\u53d1\u5546ID"
+      }
+    ], 
+    "desc": "\u67e5\u8be2\u4e3b\u7ebf\u6a21\u578b\u7684\u4e1a\u52a1\u62d3\u6251",
+      "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u4e3b\u7ebf\u6a21\u578b\u7684\u4e1a\u52a1\u62d3\u6251", 
+    "is_activated": true, 
+    "remote_system": 5, 
+    "system_info": {
+      "cookies": [], 
+      "code": "cc", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 2, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

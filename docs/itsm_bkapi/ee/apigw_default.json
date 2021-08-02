@@ -1,0 +1,156 @@
+[
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_tickets",
+        "description": "\u83b7\u53d6\u5355\u636e\u5217\u8868",
+        "timeout": 10,
+        "path": "/v2/itsm/get_tickets/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/get_tickets/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "create_ticket",
+        "description": "\u521b\u5efa\u5355\u636e",
+        "timeout": 10,
+        "path": "/v2/itsm/create_ticket/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/create_ticket/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "operate_ticket",
+        "description": "\u5904\u7406\u5355\u636e",
+        "timeout": 10,
+        "path": "/v2/itsm/operate_ticket/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/operate_ticket/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "operate_node",
+        "description": "\u5904\u7406\u5355\u636e\u8282\u70b9",
+        "timeout": 10,
+        "path": "/v2/itsm/operate_node/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/operate_node/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_ticket_info",
+        "description": "\u5355\u636e\u8be6\u60c5\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_ticket_info/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/get_ticket_info/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "ticket_approval_result",
+        "description": "\u5ba1\u6279\u7ed3\u679c\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/ticket_approval_result/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/ticket_approval_result/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "token_verify",
+        "description": "\u4ee4\u724c\u6821\u9a8c",
+        "timeout": 10,
+        "path": "/v2/itsm/token/verify/",
+        "registed_http_method": "POST",
+        "dest_http_method": "POST",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/token/verify/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "callback_failed_ticket",
+        "description": "\u56de\u8c03\u5931\u8d25\u7684\u5de5\u5355",
+        "timeout": 10,
+        "path": "/v2/itsm/callback_failed_ticket/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/callback_failed_ticket/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_ticket_logs",
+        "description": "\u5355\u636e\u65e5\u5fd7\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_ticket_logs/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/get_ticket_logs/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_ticket_status",
+        "description": "\u5355\u636e\u72b6\u6001\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_ticket_status/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/ticket/get_ticket_status/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_services",
+        "description": "\u670d\u52a1\u5217\u8868\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_services/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/service/get_services/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_service_detail",
+        "description": "\u670d\u52a1\u8be6\u60c5\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_service_detail/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/service/get_service_detail/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_service_catalogs",
+        "description": "\u670d\u52a1\u76ee\u5f55\u67e5\u8be2",
+        "timeout": 10,
+        "path": "/v2/itsm/get_service_catalogs/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/service/get_service_catalogs/"
+    },
+    {
+        "resource_classification": "\u65e0\u5206\u7c7b",
+        "headers": {},
+        "resource_name": "get_service_roles",
+        "description": "\u83b7\u53d6\u6d41\u7a0b\u89d2\u8272",
+        "timeout": 10,
+        "path": "/v2/itsm/get_service_roles/",
+        "registed_http_method": "GET",
+        "dest_http_method": "GET",
+        "dest_url": "http://{stageVariables.domain}/openapi/service/get_service_roles/"
+    }
+]

@@ -1,0 +1,5 @@
+{{ prep.method | safe }} {{ prep.url | safe }} HTTP/1.1
+Host: {{ host | safe }}
+{% for k, v in prep.headers.iteritems %}{{ k | safe }}: {{ v | safe }}
+{% endfor %}
+{% ifequal prep.body None %}{% else %}{{ prep.body | safe }}{% endifequal %}

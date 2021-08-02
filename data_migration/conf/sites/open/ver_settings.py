@@ -1,0 +1,140 @@
+# -*- coding: utf-8 -*-
+"""
+Tencent is pleased to support the open source community by making BK-ITSM 蓝鲸流程服务 available.
+
+Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+
+BK-ITSM 蓝鲸流程服务 is licensed under the MIT License.
+
+License for BK-ITSM 蓝鲸流程服务:
+--------------------------------------------------------------------
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
+USER_ADDITIONAL_PROPERTY = [
+    'chname',
+    'company',
+    'qq',
+    'phone',
+    'email',
+    'wx_userid',
+    'profile'
+]
+
+USER_FIELDS_MAP = {
+    'id': 'id',
+    'username': 'username',
+    'nickname': 'chname',
+    'is_staff': 'is_staff',
+    'date_joined': 'date_joined',
+    'is_superuser': 'is_superuser',
+}
+
+CONSTRAINT_MIGRATIONS = [
+    {
+        'table': 'django_admin_log',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                # 'new_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+                'ref_field': 'id'
+            }
+        ]
+    },
+    {
+        'table': 'service_favorite',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                # 'new_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+                'ref_field': 'id',
+            }
+        ]
+    },
+    {
+        'table': 'wiki_attachments_attachment',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'wiki_attachments_attachmentrevision',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'wiki_article',
+        'columns': [
+            {
+                'origin_name': 'owner_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'wiki_revisionpluginrevision',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'wiki_articlerevision',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'nyt_notification',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+    {
+        'table': 'nyt_settings',
+        'columns': [
+            {
+                'origin_name': 'user_id',
+                'origin_ref_table': 'account_bkuser',
+                'new_ref_table': 'account_user',
+            }
+        ]
+    },
+]

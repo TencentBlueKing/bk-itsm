@@ -1,0 +1,40 @@
+[flake8]
+exclude = 
+    .git,
+    __pycache__,
+    *migrations*,
+    *.pyc,
+    docs,
+    build,
+    pipeline,
+    *weixin/core/*,
+    account,
+    blueking,
+    tests,
+    wiki,
+    frontend/*,
+    django_signal_valve,
+    business_rules,
+    requests_tracker,
+    blueapps,
+    flower,
+    monitors,
+    sops_proxy,
+    itsm/tests/,
+    itsm/ticket/views/sql_file.py,
+    
+max-line-length = 120
+max-complexity = 25
+format=pylint      
+show_source = True    
+statistics = True    
+count = True
+select = C,E,F,W,B,B950
+ignore =
+    F405,
+    F9,
+    E203,
+    E231,
+    W503,
+    W291,
+    C901,

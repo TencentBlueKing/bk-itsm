@@ -1,0 +1,34 @@
+{
+    "bk_app_secret": "ca5abdd4-5641-4799-aed7-422a374b8008",
+    "bk_app_code": "bk_itsm",
+    "bk_username": "admin",
+    "service_id": 2,
+    "creator": "admin",
+    "fields": [
+        {
+            "id": 6,
+            "key": "title",
+            "value": "ABC"
+        },
+        {
+            "id": 8,
+            "key": "WENBEN",
+            "value": "WENBEN"
+        },
+        {
+            "id": 7,
+            "key": "LIEBIAO",
+            "value": "NAN"
+        },
+        {
+            "id": 4,
+            "key": "RIQI",
+            "value": "RIQI"
+        },
+        {
+            "id": 3,
+            "key": "DUOXUAN",
+            "value": "HAO"
+        }
+    ]
+}

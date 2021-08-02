@@ -1,0 +1,223 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "get_job_instance_log", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "code", 
+        "result", 
+        "request_id", 
+        "msg", 
+        "message", 
+        "data"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56de\u7801"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "c1be585648cc4b738628355127de8a70", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "msg": {
+          "default": "success", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u4fe1\u606f"
+        }, 
+        "data": {
+          "items": {
+            "required": [
+              "status", 
+              "step_results", 
+              "is_finished", 
+              "step_instance_id", 
+              "name"
+            ], 
+            "type": "object", 
+            "description": "", 
+            "properties": {
+              "status": {
+                "default": 4, 
+                "type": "number", 
+                "description": "\u4f5c\u4e1a\u72b6\u6001\u7801: 1.\u672a\u6267\u884c; 2.\u6b63\u5728\u6267\u884c; 3.\u6267\u884c\u6210\u529f; 4.\u6267\u884c\u5931\u8d25; 5.\u8df3\u8fc7; 6.\u5ffd\u7565\u9519\u8bef; 7.\u7b49\u5f85\u7528\u6237; 8.\u624b\u52a8\u7ed3\u675f; 9.\u72b6\u6001\u5f02\u5e38; 10.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u4e2d; 11.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u6210\u529f; 12.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u5931\u8d25"
+              }, 
+              "step_results": {
+                "items": {
+                  "required": [
+                    "tag", 
+                    "ip_logs", 
+                    "ip_status"
+                  ], 
+                  "type": "object", 
+                  "description": "", 
+                  "properties": {
+                    "tag": {
+                      "default": "", 
+                      "type": "string", 
+                      "description": "\u811a\u672c\u7528 job_success/job_fail \u51fd\u6570\u8fd4\u56de\u7684\u6807\u7b7e\u5185\u5bb9"
+                    }, 
+                    "ip_logs": {
+                      "items": {
+                        "required": [
+                          "total_time", 
+                          "ip", 
+                          "start_time", 
+                          "log_content", 
+                          "exit_code", 
+                          "bk_cloud_id", 
+                          "retry_count", 
+                          "end_time", 
+                          "error_code"
+                        ], 
+                        "type": "object", 
+                        "description": "", 
+                        "properties": {
+                          "total_time": {
+                            "default": 0.436, 
+                            "type": "number", 
+                            "description": ""
+                          }, 
+                          "ip": {
+                            "default": "127.0.0.1", 
+                            "type": "string", 
+                            "description": ""
+                          }, 
+                          "start_time": {
+                            "default": "2019-07-30 10:26:52 +0800", 
+                            "type": "string", 
+                            "description": ""
+                          }, 
+                          "log_content": {
+                            "default": "/tmp/bkjob/root/stepInstanceId_1170329.sh: line 1: greep: command not found\n", 
+                            "type": "string", 
+                            "description": ""
+                          }, 
+                          "exit_code": {
+                            "default": 127, 
+                            "type": "number", 
+                            "description": ""
+                          }, 
+                          "bk_cloud_id": {
+                            "default": 0, 
+                            "type": "number", 
+                            "description": ""
+                          }, 
+                          "retry_count": {
+                            "default": 0, 
+                            "type": "number", 
+                            "description": ""
+                          }, 
+                          "end_time": {
+                            "default": "2019-07-30 10:26:53 +0800", 
+                            "type": "string", 
+                            "description": ""
+                          }, 
+                          "error_code": {
+                            "default": 0, 
+                            "type": "number", 
+                            "description": ""
+                          }
+                        }
+                      }, 
+                      "type": "array", 
+                      "description": "ip \u65e5\u5fd7\u5185\u5bb9"
+                    }, 
+                    "ip_status": {
+                      "default": 104, 
+                      "type": "number", 
+                      "description": "\u4e3b\u673a\u4efb\u52a1\u72b6\u6001\u7801\uff0c1.Agent\u5f02\u5e38; 3.\u4e0a\u6b21\u5df2\u6210\u529f; 5.\u7b49\u5f85\u6267\u884c; 7.\u6b63\u5728\u6267\u884c; 9.\u6267\u884c\u6210\u529f; 11.\u4efb\u52a1\u5931\u8d25; 12.\u4efb\u52a1\u4e0b\u53d1\u5931\u8d25; 13.\u4efb\u52a1\u8d85\u65f6; 15.\u4efb\u52a1\u65e5\u5fd7\u9519\u8bef; 101.\u811a\u672c\u6267\u884c\u5931\u8d25; 102.\u811a\u672c\u6267\u884c\u8d85\u65f6; 103.\u811a\u672c\u6267\u884c\u88ab\u7ec8\u6b62; 104.\u811a\u672c\u8fd4\u56de\u7801\u975e\u96f6; 202.\u6587\u4ef6\u4f20\u8f93\u5931\u8d25; 203.\u6e90\u6587\u4ef6\u4e0d\u5b58\u5728; 310.Agent\u5f02\u5e38; 311.\u7528\u6237\u540d\u4e0d\u5b58\u5728; 320.\u6587\u4ef6\u83b7\u53d6\u5931\u8d25; 321.\u6587\u4ef6\u8d85\u51fa\u9650\u5236; 329.\u6587\u4ef6\u4f20\u8f93\u9519\u8bef; 399.\u4efb\u52a1\u6267\u884c\u51fa\u9519"
+                    }
+                  }
+                }, 
+                "type": "array", 
+                "description": "\u5f53\u524d\u6b65\u9aa4\u4e0b\u6240\u6709ip\u7684\u65e5\u5fd7\uff0c\u6309tag\u5206\u7c7b\u6216ip\u7684\u6267\u884c\u72b6\u6001(ip_status)\u5f52\u7c7b\u5b58\u653e"
+              }, 
+              "is_finished": {
+                "default": true, 
+                "type": "boolean", 
+                "description": "\u4f5c\u4e1a\u662f\u5426\u7ed3\u675f"
+              }, 
+              "step_instance_id": {
+                "default": 1170329, 
+                "type": "number", 
+                "description": "\u4f5c\u4e1a\u6b65\u9aa4\u5b9e\u4f8bID"
+              }, 
+              "name": {
+                "default": "API Quick execution script1564453612524", 
+                "type": "string", 
+                "description": "\u4f5c\u4e1a\u5b9e\u4f8b\u540d\u79f0"
+              }
+            }
+          }, 
+          "type": "array", 
+          "description": "\u8fd4\u56de\u6570\u636e"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/job/get_job_instance_log/", 
+    "is_builtin": false, 
+    "req_params": [
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "bk_biz_id", 
+        "value": "", 
+        "desc": "\u4e1a\u52a1ID"
+      }, 
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "job_instance_id", 
+        "value": "", 
+        "desc": "\u4f5c\u4e1a\u5b9e\u4f8bID"
+      }
+    ], 
+    "desc": "\u6839\u636e\u4f5c\u4e1a\u5b9e\u4f8bID\u67e5\u8be2\u4f5c\u4e1a\u6267\u884c\u65e5\u5fd7", 
+    "is_deleted": false, 
+    "name": "\u6839\u636e\u4f5c\u4e1a\u5b9e\u4f8bID\u67e5\u8be2\u4f5c\u4e1a\u6267\u884c\u65e5\u5fd7", 
+    "is_activated": true, 
+    "remote_system": 8, 
+    "system_info": {
+      "cookies": [], 
+      "code": "job", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u4f5c\u4e1a\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 4, 
+      "headers": [], 
+      "is_builtin": true, 
+      "desc": "\u4f5c\u4e1a\u5e73\u53f0\uff08Job\uff09\u662f\u4e00\u5957\u57fa\u4e8e\u84dd\u9cb8\u667a\u4e91\u7ba1\u63a7\u5e73\u53f0Agent\u7ba1\u9053\u4e4b\u4e0a\u7684\u57fa\u7840\u64cd\u4f5c\u5e73\u53f0\uff0c\u5177\u5907\u5927\u5e76\u53d1\u5904\u7406\u80fd\u529b\uff1b\u9664\u4e86\u652f\u6301\u811a\u672c\u6267\u884c\u3001\u6587\u4ef6\u62c9\u53d6/\u5206\u53d1\u3001\u5b9a\u65f6\u4efb\u52a1\u7b49\u4e00\u7cfb\u5217\u53ef\u5b9e\u73b0\u7684\u57fa\u7840\u8fd0\u7ef4\u573a\u666f\u4ee5\u5916\uff0c\u8fd8\u8fd0\u7528\u6d41\u7a0b\u5316\u7684\u7406\u5ff5\u5f88\u597d\u7684\u5c06\u96f6\u788e\u7684\u5355\u4e2a\u4efb\u52a1\u7ec4\u88c5\u6210\u4e00\u4e2a\u4f5c\u4e1a\u6d41\u7a0b\uff1b\u800c\u6bcf\u4e2a\u4efb\u52a1\u90fd\u53ef\u505a\u4e3a\u4e00\u4e2a\u539f\u5b50\u8282\u70b9\uff0c\u63d0\u4f9b\u7ed9\u5176\u5b83\u7cfb\u7edf\u548c\u5e73\u53f0\u8c03\u5ea6\uff0c\u5b9e\u73b0\u8c03\u5ea6\u81ea\u52a8\u5316\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

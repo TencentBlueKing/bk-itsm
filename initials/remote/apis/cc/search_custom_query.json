@@ -1,0 +1,140 @@
+[
+    {
+        "read_only": true,
+        "req_params": [],
+        "is_deleted": false,
+        "name": "\u67e5\u8be2\u81ea\u5b9a\u4e49API",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "bk_biz_id",
+                "start",
+                "limit"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "bk_biz_id": {
+                    "default": "",
+                    "type": "number",
+                    "description": "\u4e1a\u52a1ID"
+                },
+                "start": {
+                    "default": "",
+                    "type": "number",
+                    "description": "\u8bb0\u5f55\u5f00\u59cb\u4f4d\u7f6e"
+                },
+                "limit": {
+                    "default": "",
+                    "type": "number",
+                    "description": "\u6bcf\u9875\u9650\u5236\u6761\u6570,\u6700\u5927200"
+                },
+                "condition": {
+                    "required": [
+                        "name"
+                    ],
+                    "type": "object",
+                    "description": "\u67e5\u8be2\u6761\u4ef6\uff0ccondition \u5b57\u6bb5\u4e3a\u81ea\u5b9a\u4e49api\u7684\u5c5e\u6027\u5b57\u6bb5, \u53ef\u4ee5\u662fcreate_user,modify_user, name",
+                    "properties": {
+                        "name": {
+                            "default": "",
+                            "type": "string",
+                            "description": "api\u540d\u79f0"
+                        }
+                    }
+                },
+                "bk_supplier_account": {
+                    "default": "0",
+                    "type": "string",
+                    "description": "\u5f00\u53d1\u5546\u8d26\u53f7"
+                }
+            }
+        },
+        "func_name": "search_custom_query",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "code",
+                "result",
+                "request_id",
+                "msg",
+                "message",
+                "data"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": ""
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": ""
+                },
+                "request_id": {
+                    "default": "9f4d8266a70f470c8f52a9fd9346407f",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "data": {
+                    "required": [
+                        "count",
+                        "info"
+                    ],
+                    "type": "object",
+                    "description": "",
+                    "properties": {
+                        "count": {
+                            "default": 0,
+                            "type": "number",
+                            "description": "\u8bb0\u5f55\u6761\u6570"
+                        },
+                        "info": {
+                            "type": "array",
+                            "description": "\u81ea\u5b9a\u4e49api\u6570\u636e"
+                        }
+                    }
+                }
+            }
+        },
+        "remote_system": 26,
+        "system_info": {
+            "cookies": [],
+            "code": "cc",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 2,
+            "headers": [],
+            "is_builtin": false,
+            "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002",
+            "updated_by": ""
+        },
+        "method": "POST",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/cc/search_custom_query/",
+        "is_builtin": false,
+        "desc": "\u67e5\u8be2\u81ea\u5b9a\u4e49api",
+        "updated_by": "system"
+    }
+]

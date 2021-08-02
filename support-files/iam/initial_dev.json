@@ -1,0 +1,2499 @@
+{
+    "system_id": "itsm",
+    "operations": [
+        {
+            "operation": "upsert_system",
+            "data": {
+                "id": "itsm",
+                "name": "流程服务-DEBUG",
+                "name_en": "ITSM_DEBUG",
+                "description": "",
+                "description_en": "",
+                "clients": "itsm",
+                "provider_config": {
+                    "host": "",
+                    "auth": "basic"
+                }
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "project",
+                "name": "项目",
+                "name_en": "Project",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "operational_data",
+                "name": "运营数据",
+                "name_en": "Operational Data",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "service",
+                "name": "服务",
+                "name_en": "Service",
+                "description": "服务的查看、修改、删除",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "sla",
+                "name": "服务协议管理",
+                "name_en": "SLA",
+                "description": "包含服务模式，服务协议，优先级，单据状态的管理（增删改查）",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "workflow",
+                "name": "流程",
+                "name_en": "Workflow",
+                "description": "流程设计",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "flow_version",
+                "name": "流程版本",
+                "name_en": "Workflow Version",
+                "description": "有流程部署产生的版本管理",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "role",
+                "name": "通用角色",
+                "name_en": "General Role",
+                "description": "通用角色",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "flow_element",
+                "name": "流程元素",
+                "name_en": "Workflow Elements",
+                "description": "流程设计的基础元素：API，基础模型，公共字段，任务模板，公共触发器，数据字典",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "system_settings",
+                "name": "系统配置",
+                "name_en": "System Settings",
+                "description": "系统级别的配置：服务目录管理，系统配置管理",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "ticket",
+                "name": "工单",
+                "name_en": "Ticket",
+                "description": "工单",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "knowledge",
+                "name": "知识库",
+                "name_en": "Knowledge",
+                "description": "知识库",
+                "description_en": "Knowledge",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "project_list",
+                "name": "项目",
+                "name_en": "Project",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "service_list",
+                "name": "服务列表",
+                "name_en": "Service List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "service"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "workflow_list",
+                "name": "流程实例",
+                "name_en": "Workflow List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "workflow"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "flow_version_list",
+                "name": "流程版本列表",
+                "name_en": "Workflow Version List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "flow_version"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "role_list",
+                "name": "角色列表",
+                "name_en": "Project and Common Flow",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "role"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "project_create",
+                "name": "创建项目",
+                "name_en": "Create Project",
+                "description": "项目的新建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "project_view",
+                "name": "项目查看",
+                "name_en": "Project View",
+                "description": "查看项目的详情",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "project_edit",
+                "name": "项目编辑",
+                "name_en": "Project Edit",
+                "description": "编辑项目内容",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "service_create",
+                "name": "服务创建",
+                "name_en": "Create Service",
+                "description": "服务的新建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "service_manage",
+                "name": "服务管理",
+                "name_en": "Manage Service",
+                "description": "对某个服务资源实例的查看、修改、删除",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "service",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "service_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_manage",
+                "name": "服务协议管理",
+                "name_en": "Manage SLA",
+                "description": "包含服务模式，服务协议，优先级，单据状态的管理（增删改查）",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "workflow_create",
+                "name": "流程创建",
+                "name_en": "Create Workflow",
+                "description": "对应创建流程，版本还原，导入操作",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "workflow_manage",
+                "name": "流程管理",
+                "name_en": "Manage Workflow",
+                "description": "流程的编辑，预览，导出，删除的权限",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "workflow",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "workflow_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "workflow_deploy",
+                "name": "流程部署",
+                "name_en": "Deploy Workflow",
+                "description": "流程部署版本权限",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "workflow",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "workflow_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "flow_version_restore",
+                "name": "流程版本还原",
+                "name_en": "Restore Workflow Version",
+                "description": "还原指定流程版本资源实例到流程设计阶段",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "flow_version",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "flow_version_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "flow_version_manage",
+                "name": "流程版本管理",
+                "name_en": "Manage Workflow Version",
+                "description": "流程版本资源的删除和查看详情",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "flow_version",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "flow_version_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "flow_element_manage",
+                "name": "流程元素管理",
+                "name_en": "Manage Workflow Element",
+                "description": "对流程中用到的基础资源进行管理，如：API，基础模型，公共字段，任务模板，公共触发器，数据字典。",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "system_settings_manage",
+                "name": "系统配置管理",
+                "name_en": "Manage System Settings",
+                "description": "全局基础配置管理。如不同模块的启停配置，接口日志查看，附件存储目录管理。",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "role_create",
+                "name": "角色创建",
+                "name_en": "Create Role",
+                "description": "创建通用角色",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "role_manage",
+                "name": "角色管理",
+                "name_en": "Manage Role",
+                "description": "具体的用户角色的编辑，删除和查看",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "role",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "role_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_view",
+                "name": "工单查看",
+                "name_en": "View Ticket",
+                "description": "查看某个服务资源下工单的权限",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "service",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "service_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_manage",
+                "name": "工单管理",
+                "name_en": "Manage Ticket",
+                "description": "管理某个服务资源下工单的权限",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "knowledge_manage",
+                "name": "知识管理",
+                "name_en": "Manage Knowledge",
+                "description": "对知识库中所有文章进行编辑,删除和管理。",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "operational_data_view",
+                "name": "运营数据查看",
+                "name_en": "View Operational Data",
+                "description": "查看运营数据的权限",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "add_resource_creator_actions",
+            "data": {
+                "config": [
+                    {
+                        "id": "project",
+                        "actions": [
+                            {
+                                "id": "project_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "project_view",
+                                "required": true
+                            },
+                            {
+                                "id": "service_create",
+                                "required": true
+                            },
+                            {
+                                "id": "workflow_create",
+                                "required": true
+                            },
+                            {
+                                "id": "role_create",
+                                "required": true
+                            },
+                            {
+                                "id": "catalog_create",
+                                "required": true
+                            },
+                            {
+                                "id": "catalog_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "catalog_delete",
+                                "required": true
+                            },
+                            {
+                                "id": "field_create",
+                                "required": true
+                            },
+                            {
+                                "id": "user_group_create",
+                                "required": true
+                            },
+                            {
+                                "id": "triggers_create",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_calendar_create",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_agreement_create",
+                                "required": true
+                            },
+                            {
+                                "id": "settings_view",
+                                "required": true
+                            },
+                            {
+                                "id": "settings_manage",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "user_group",
+                        "actions": [
+                            {
+                                "id": "user_group_view",
+                                "required": true
+                            },
+                            {
+                                "id": "user_group_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "user_group_delete",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "task_template",
+                        "actions": [
+                            {
+                                "id": "task_template_view",
+                                "required": true
+                            },
+                            {
+                                "id": "task_template_manage",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "sla_calendar",
+                        "actions": [
+                            {
+                                "id": "sla_calendar_view",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_calendar_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_calendar_delete",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "sla_agreement",
+                        "actions": [
+                            {
+                                "id": "sla_agreement_view",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_agreement_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "sla_agreement_delete",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "trigger",
+                        "actions": [
+                            {
+                                "id": "triggers_view",
+                                "required": true
+                            },
+                            {
+                                "id": "triggers_manage",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "service",
+                        "actions": [
+                            {
+                                "id": "service_manage",
+                                "required": true
+                            },
+                            {
+                                "id": "ticket_view",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "workflow",
+                        "actions": [
+                            {
+                                "id": "workflow_manage",
+                                "required": true
+                            },
+                            {
+                                "id": "workflow_deploy",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "flow_version",
+                        "actions": [
+                            {
+                                "id": "flow_version_restore",
+                                "required": true
+                            },
+                            {
+                                "id": "flow_version_manage",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "role",
+                        "actions": [
+                            {
+                                "id": "role_manage",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "field",
+                        "actions": [
+                            {
+                                "id": "field_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "field_delete",
+                                "required": true
+                            },
+                            {
+                                "id": "field_view",
+                                "required": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "public_field",
+                        "actions": [
+                            {
+                                "id": "public_field_view",
+                                "required": true
+                            },
+                            {
+                                "id": "public_field_edit",
+                                "required": true
+                            },
+                            {
+                                "id": "public_field_delete",
+                                "required": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "field",
+                "name": "字段",
+                "name_en": "Field",
+                "description": "项目下的字段信息",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "field_list",
+                "name": "字段列表",
+                "name_en": "Field List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "field"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "field_create",
+                "name": "字段新建",
+                "name_en": "Create Field",
+                "description": "对应项目字段创建操作",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "field_view",
+                "name": "字段查看",
+                "name_en": "View Field",
+                "description": "对应项目字段创建操作",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "field_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "field_edit",
+                "name": "字段编辑",
+                "name_en": "Edit Field",
+                "description": "对应项目字段编辑操作",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "field_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "field_delete",
+                "name": "字段删除",
+                "name_en": "Delete Field",
+                "description": "对应项目字段删除操作",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "field_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "trigger",
+                "name": "触发器",
+                "name_en": "Trigger",
+                "description": "项目下的触发器",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "trigger_list",
+                "name": "触发器列表",
+                "name_en": "Trigger List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "trigger"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "triggers_create",
+                "name": "触发器新建",
+                "name_en": "Create tiggers",
+                "description": "对应项目触发器创建操作",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "triggers_view",
+                "name": "触发器查看",
+                "name_en": "View tiggers",
+                "description": "对应项目触发器查看操作",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "trigger",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "trigger_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "triggers_manage",
+                "name": "触发器管理",
+                "name_en": "Manager tiggers",
+                "description": "对应项目触发器管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "trigger",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "trigger_list",
+                                "ignore_iam_path": true
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "settings_view",
+                "name": "设置查看",
+                "name_en": "View Settings",
+                "description": "项目设置查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "settings_manage",
+                "name": "设置管理",
+                "name_en": "Manage Settings",
+                "description": "项目设置管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "catalog",
+                "name": "服务目录",
+                "name_en": "Catalog",
+                "description": "项目下的服务目录",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "catalog_create",
+                "name": "目录新建",
+                "name_en": "Catalog Create",
+                "description": "对应项目目录创建操作",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "catalog_edit",
+                "name": "目录编辑",
+                "name_en": "Catalog Edit",
+                "description": "对应项目目录创建操作",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "catalog_delete",
+                "name": "目录删除",
+                "name_en": "Catalog Delete",
+                "description": "对应项目目录创建操作",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "user_group",
+                "name": "用户组",
+                "name_en": "User Group",
+                "description": "用户组",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "user_group_list",
+                "name": "用户组列表",
+                "name_en": "User Group List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "user_group"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "user_group_create",
+                "name": "用户组新建",
+                "name_en": "Create User Group",
+                "description": "项目内用户组新建的权限",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "user_group_view",
+                "name": "用户组查看",
+                "name_en": "View User Group",
+                "description": "项目内用户组查看的权限",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "user_group",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "user_group_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "user_group_edit",
+                "name": "用户组编辑",
+                "name_en": "Edit User Group",
+                "description": "项目内用户组编辑的权限",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "user_group",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "user_group_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "user_group_delete",
+                "name": "用户组删除",
+                "name_en": "Delete User Group",
+                "description": "项目内用户组删除的权限",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "user_group",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "user_group_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "service_view",
+                "name": "服务查看",
+                "name_en": "View Service",
+                "description": "对某个服务资源实例的查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "service",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "service_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "sla_agreement",
+                "name": "SLA 服务协议",
+                "name_en": "SLA Agreement",
+                "description": "sla 服务协议",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "sla_calendar",
+                "name": "SLA 服务模式",
+                "name_en": "SLA Calendar",
+                "description": "sla 服务模式",
+                "description_en": "",
+                "parents": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    }
+                ],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "sla_agreement_list",
+                "name": "SLA服务协议列表",
+                "name_en": "Sla Agreement List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_agreement"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "sla_calendar_list",
+                "name": "SLA服务模式列表",
+                "name_en": "Sla Calendar List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project"
+                    },
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_calendar"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_calendar_view",
+                "name": "SLA 服务模式查看",
+                "name_en": "View SLA Calendar",
+                "description": "Sla 服务模式查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_calendar",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_calendar_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_calendar_create",
+                "name": "SLA 服务模式新建",
+                "name_en": "Create SLA Calendar",
+                "description": "Sla 服务模式新建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_calendar_edit",
+                "name": "SLA 服务模式编辑",
+                "name_en": "Edit SLA Calendar",
+                "description": "Sla 服务模式编辑",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_calendar",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_calendar_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_calendar_delete",
+                "name": "SLA 服务模式删除",
+                "name_en": "Delete SLA Calendar",
+                "description": "Sla 服务模式删除",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_calendar",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_calendar_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_agreement_view",
+                "name": "SLA 服务协议查看",
+                "name_en": "View SLA agreement",
+                "description": "Sla 服务协议查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_agreement",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_agreement_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_agreement_create",
+                "name": "SLA 服务模式创建",
+                "name_en": "Create SLA agreement",
+                "description": "Sla 服务模式创建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_agreement_edit",
+                "name": "SLA 服务协议编辑",
+                "name_en": "Edit SLA agreement",
+                "description": "SLA 服务协议编辑",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_agreement",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_agreement_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_agreement_delete",
+                "name": "SLA 服务协议删除",
+                "name_en": "Delete SLA agreement",
+                "description": "Sla 服务协议删除",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "sla_agreement",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "sla_agreement_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_priority_view",
+                "name": "SLA 优先级查看",
+                "name_en": "View SLA Priority",
+                "description": "Sla 优先级查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "sla_priority_manage",
+                "name": "SLA 优先级管理",
+                "name_en": "Manage SLA Priority",
+                "description": "Sla 优先级管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "public_field",
+                "name": "公共字段",
+                "name_en": "Public Field",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "public_field_list",
+                "name": "公共字段列表",
+                "name_en": "Public Field List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_field"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_field_view",
+                "name": "公共字段查看",
+                "name_en": "View Public Field",
+                "description": "公共字段查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "public_field_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_field_edit",
+                "name": "公共字段编辑",
+                "name_en": "Eidt Public Field",
+                "description": "公共字段编辑",
+                "description_en": "",
+                "type": "edit",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "public_field_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_field_delete",
+                "name": "公共字段删除",
+                "name_en": "Delete Public Field",
+                "description": "公共字段删除",
+                "description_en": "",
+                "type": "delete",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_field",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "public_field_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_field_create",
+                "name": "公共字段创建",
+                "name_en": "Create Public Field",
+                "description": "公共字段创建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "global_settings_view",
+                "name": "全局设置查看",
+                "name_en": "View Global Settings",
+                "description": "全局设置查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "global_settings_manage",
+                "name": "全局设置管理",
+                "name_en": "Manage Global Settings",
+                "description": "全局设置管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "notification_view",
+                "name": "通知配置查看",
+                "name_en": "View Notification Setting",
+                "description": "通知配置查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "notification_manage",
+                "name": "通知配置管理",
+                "name_en": "Manage Notification Setting",
+                "description": "通知配置管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "service_type",
+                "name": "服务类型",
+                "name_en": "Service Type",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "service_type_list",
+                "name": "服务类型列表",
+                "name_en": "Service Type List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "service_type"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_state_view",
+                "name": "单据状态查看",
+                "name_en": "View Ticket State",
+                "description": "单据状态查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_state_manage",
+                "name": "单据状态管理",
+                "name_en": "Manage Ticket State",
+                "description": "单据状态查看",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "task_template",
+                "name": "任务模板",
+                "name_en": "Task Template",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "task_template_list",
+                "name": "任务模板列表",
+                "name_en": "Task Template List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "task_template"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "task_template_view",
+                "name": "任务模板查看",
+                "name_en": "View Task Template",
+                "description": "任务模板查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "task_template",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "task_template_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "task_template_manage",
+                "name": "任务模板管理",
+                "name_en": "Manage Task Template",
+                "description": "任务模板管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "task_template",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "task_template_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "task_template_create",
+                "name": "任务模板创建",
+                "name_en": "Create Task Template",
+                "description": "任务模板创建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_resource_type",
+            "data": {
+                "id": "public_api",
+                "name": "公共API",
+                "name_en": "Public API",
+                "description": "",
+                "description_en": "",
+                "parents": [],
+                "provider_config": {
+                    "path": "/api/iam/resources/v1/"
+                },
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_instance_selection",
+            "data": {
+                "id": "public_api_list",
+                "name": "公共API 列表",
+                "name_en": "Public API List",
+                "resource_type_chain": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_api"
+                    }
+                ]
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_api_create",
+                "name": "公共API 新建",
+                "name_en": "Create Public API",
+                "description": "公共API 新建",
+                "description_en": "",
+                "type": "create",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_api_view",
+                "name": "公共API 查看",
+                "name_en": "View Public API",
+                "description": "公共API 查看",
+                "description_en": "",
+                "type": "view",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_api",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "public_api_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "public_api_manage",
+                "name": "公共API 管理",
+                "name_en": "Manage Public API",
+                "description": "公共API 管理",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "public_api",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "public_api_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "platform_manage_access",
+                "name": "平台管理访问",
+                "name_en": "Access Platform Access",
+                "description": "平台管理访问",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action_groups",
+            "data": [
+                {
+                    "name": "项目",
+                    "name_en": "Project",
+                    "actions": [
+                        {
+                            "id": "project_create"
+                        },
+                        {
+                            "id": "project_view"
+                        },
+                        {
+                            "id": "project_edit"
+                        },
+                        {
+                            "id": "system_settings_manage"
+                        }
+                    ],
+                    "sub_groups": [
+                        {
+                            "name": "服务",
+                            "name_en": "Service",
+                            "actions": [
+                                {
+                                    "id": "service_create"
+                                },
+                                {
+                                    "id": "service_manage"
+                                },
+                                {
+                                    "id": "service_view"
+                                },
+                                {
+                                    "id": "ticket_view"
+                                },
+                                {
+                                    "id": "ticket_manage"
+                                },
+                                {
+                                    "id": "sla_manage"
+                                },
+                                {
+                                    "id": "catalog_create"
+                                },
+                                {
+                                    "id": "catalog_edit"
+                                },
+                                {
+                                    "id": "catalog_delete"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "元素",
+                            "name_en": "Element",
+                            "actions": [
+                                {
+                                    "id": "field_create"
+                                },
+                                {
+                                    "id": "field_view"
+                                },
+                                {
+                                    "id": "field_edit"
+                                },
+                                {
+                                    "id": "field_delete"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "管理",
+                            "name_en": "Management",
+                            "actions": [
+                                {
+                                    "id": "user_group_create"
+                                },
+                                {
+                                    "id": "user_group_edit"
+                                },
+                                {
+                                    "id": "user_group_delete"
+                                },
+                                {
+                                    "id": "user_group_view"
+                                },
+                                {
+                                    "id": "triggers_create"
+                                },
+                                {
+                                    "id": "triggers_view"
+                                },
+                                {
+                                    "id": "triggers_manage"
+                                },
+                                {
+                                    "id": "ticket_state_view"
+                                },
+                                {
+                                    "id": "ticket_state_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SLA",
+                            "name_en": "SLA",
+                            "actions": [
+                                {
+                                    "id": "sla_calendar_view"
+                                },
+                                {
+                                    "id": "sla_calendar_create"
+                                },
+                                {
+                                    "id": "sla_calendar_edit"
+                                },
+                                {
+                                    "id": "sla_calendar_delete"
+                                },
+                                {
+                                    "id": "sla_agreement_view"
+                                },
+                                {
+                                    "id": "sla_agreement_create"
+                                },
+                                {
+                                    "id": "sla_agreement_edit"
+                                },
+                                {
+                                    "id": "sla_agreement_delete"
+                                },
+                                {
+                                    "id": "sla_priority_view"
+                                },
+                                {
+                                    "id": "sla_priority_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "流程",
+                            "name_en": "Flow",
+                            "actions": [
+                                {
+                                    "id": "workflow_create"
+                                },
+                                {
+                                    "id": "workflow_manage"
+                                },
+                                {
+                                    "id": "workflow_deploy"
+                                },
+                                {
+                                    "id": "flow_version_restore"
+                                },
+                                {
+                                    "id": "flow_version_manage"
+                                },
+                                {
+                                    "id": "flow_element_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "角色",
+                            "name_en": "Role",
+                            "actions": [
+                                {
+                                    "id": "role_create"
+                                },
+                                {
+                                    "id": "role_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "设置",
+                            "name_en": "Setting",
+                            "actions": [
+                                {
+                                    "id": "settings_view"
+                                },
+                                {
+                                    "id": "settings_manage"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "其他",
+                    "name_en": "Others",
+                    "actions": [
+                        {
+                            "id": "knowledge_manage"
+                        },
+                        {
+                            "id": "operational_data_view"
+                        },
+                        {
+                            "id": "platform_manage_access"
+                        }
+                    ]
+                },
+                {
+                    "name": "平台",
+                    "name_en": "Administration",
+                    "actions": [],
+                    "sub_groups": [
+                        {
+                            "name": "公共字段",
+                            "name_en": "Public Fields",
+                            "actions": [
+                                {
+                                    "id": "public_field_create"
+                                },
+                                {
+                                    "id": "public_field_edit"
+                                },
+                                {
+                                    "id": "public_field_delete"
+                                },
+                                {
+                                    "id": "public_field_view"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "公共API",
+                            "name_en": "Public API",
+                            "actions": [
+                                {
+                                    "id": "public_api_view"
+                                },
+                                {
+                                    "id": "public_api_manage"
+                                },
+                                {
+                                    "id": "public_api_create"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "全局设置",
+                            "name_en": "Global Settings",
+                            "actions": [
+                                {
+                                    "id": "global_settings_view"
+                                },
+                                {
+                                    "id": "global_settings_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "通知配置",
+                            "name_en": "Notifications",
+                            "actions": [
+                                {
+                                    "id": "notification_view"
+                                },
+                                {
+                                    "id": "notification_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "任务模板",
+                            "name_en": "Task Template",
+                            "actions": [
+                                {
+                                    "id": "task_template_view"
+                                },
+                                {
+                                    "id": "task_template_create"
+                                },
+                                {
+                                    "id": "task_template_manage"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

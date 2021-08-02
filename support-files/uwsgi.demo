@@ -1,0 +1,26 @@
+[uwsgi]
+# socket = /opt/app/run/uwsgi.sock
+http-socket = :8000
+pidfile2 = /opt/app/run/uwsgi.pid
+logto2 = /opt/app/logs/itsm/uwsgi.log
+
+logdate = true
+log-format = [%(addr)] [%(ctime)] [%(method)] [%(uri)] [%(proto)] [%(status)] [%(msecs)] [%(referer)] [%(uagent)]
+
+memory-report = true
+
+master = true
+vacuum = true
+
+home = /Users/.virtualenvs/py36/
+chdir = /opt/app/code/
+module = wsgi:application
+cpu_cores = %k
+workers = %(cpu_cores * 2 + 1)
+
+#gevent = 1000
+
+buffer-size = 8192
+post-buffering = 8192
+
+max-requests = 1024

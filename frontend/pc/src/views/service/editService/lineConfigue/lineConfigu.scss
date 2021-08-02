@@ -1,0 +1,221 @@
+@import '../../../../scss/mixins/clearfix.scss';
+
+.bk-configu-line {
+    padding: 20px 20px 0px 20px;
+    .bk-line-graph {
+        height: 70px;
+        background-color: #F0F1F5;
+        margin-bottom: 20px;
+        padding-top: 10px;
+        text-align: center;
+        position: relative;
+    }
+
+    .bk-line-div {
+        @include clearfix;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 540px;
+        &.bk-line-small {
+            width: 320px;
+        }
+        &.bk-line-big {
+            width: 430px;
+        }
+    }
+
+    .bk-line-style {
+        float: left;
+        width: 230px;
+        position: relative;
+        margin-right: 7px;
+        height: 40px;
+
+        .bk-line-word {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #C4C6CC;
+            border-radius: 11px;
+            height: 20px;
+            line-height: 18px;
+            padding: 0 15px;
+            background-color: #fff;
+            color: #979BA5;
+            font-size: 12px;
+            z-index: 2;
+        }
+
+        .bk-line-line {
+            position: absolute;
+            height: 10px;
+            width: 100%;
+            background-color: #F0F1F5;
+            top: 16px;
+            left: 0;
+            z-index: 1;
+
+            .bk-line-info {
+                position: absolute;
+                top: 4px;
+                right: 0;
+                height: 1px;
+                width: 100%;
+                background-color: #C4C6CC;
+            }
+        }
+
+        .bk-line-squrea {
+            position: absolute;
+            top: 17px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background-color: #C4C6CC;
+            -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+    }
+}
+
+/* 表单 */
+.bk-add-between {
+    color: #3A84FF;
+    cursor: pointer;
+    line-height: 20px;
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+    .bk-icon {
+        position: absolute;
+        top: 3px;
+        left: 0;
+    }
+}
+.bk-line-form {
+    .bk-form-content {
+        margin-bottom: 10px;
+        margin-left: 0px;
+    }
+
+    .bk-between-title {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .bk-between-info {
+        padding: 16px 22px;
+        border: 1px solid #DCDEE5;
+        background-color: #fafbfd;
+        position: relative;
+
+        .bk-between-span {
+            color: #666;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .bk-between-form {
+            @include clearfix;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            .bk-width100,
+            .bk-width210,
+            .bk-width195 {
+                width: 100px;
+                float: left;
+                margin-right: 10px;
+                margin-top: 0;
+            }
+            .bk-width210 {
+                width: 210px;
+            }
+            .bk-width195 {
+                width: 195px;
+                position: relative;
+                display: inline-block;
+                height: 32px;
+                line-height: 32px;
+
+                .buttonIcon{
+                    position: absolute;
+                    display: inline-flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 30px;
+                    width: 30px;
+                    right: 1px;
+                    top: 2px;
+                    color: #63656e;
+                    font-size: 12px;
+                    border-left: 1px solid #c4c6cc;
+                    background: #f2f4f8;
+                }
+            }
+        }
+
+        .bk-between-operat {
+            float: right;
+            line-height: 36px;
+            font-size: 18px;
+            .bk-itsm-icon {
+                color: #C4C6CC;
+                margin-right: 9px;
+                &:hover {
+                    color: #979BA5;
+                }
+                &.bk-no-delete{
+                    color: #DCDEE5;
+                    cursor: not-allowed;
+                    &:hover {
+                        color: #DCDEE5;
+                    }
+                }
+                cursor: pointer;
+            }
+        }
+
+        .icon-close {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            color: #c4c6cc;
+            &:hover {
+                background-color: #dcdee5;
+                color: #fff;
+                border-radius: 50%;
+            }
+        }
+    }
+}
+.bk-line-padding {
+    padding-bottom: 60px;
+}
+
+/* 按钮 */
+.bk-line-btn {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 700px;
+    padding: 9px 20px;
+    border-top: 1px solid #DCDEE5;
+    background-color: #F0F1F5;
+    z-index: 1;
+}
+/* 错误提示 */
+.bk-error-msg {
+    color: #ff5656;
+    font-size: 12px;
+    line-height: 19px;
+    text-align: left;
+}
+

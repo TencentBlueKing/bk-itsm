@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>ITSM</title>
+    <!-- font-awesome -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/fontawesome/css/font-awesome.css"
+          rel="stylesheet">
+    <!-- 蓝鲸提供的移动端公用样式库 -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/css/bkui.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://img.ybl-group.com/mescroll/1.4.0/mescroll.min.css">
+
+    <link rel="stylesheet" href="${WEIXIN_STATIC_URL}css/index.css">
+    <style>
+        .mescroll {
+            position: fixed;
+            top: 44px;
+            bottom: 0;
+            height: auto; /*如设置bottom:50px,则需height:auto才能生效*/
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        var weixin_site_url = "${WEIXIN_SITE_URL}";
+        var weixin_static_url = "${WEIXIN_STATIC_URL}";
+    </script>
+</head>
+<body>
+<!--HTML-->
+<div class="bkui-title bkui-font-sm bkui-spacing">
+    待办列表
+</div>
+<div id="mescroll" class="mescroll bkui-list">
+    <div id="newsList">
+        ##<a class="bkui-list-item" href="#">
+        ## <span class="bkui-list-fl">丝路精神</span>
+        ## <i class="fa fa-angle-right bkui-list-fr bkui-list-fricon"></i>
+        ##</a>
+    </div>
+    <!--HTML-->
+    <div class="bkui-spacing hidden" id="error-block">
+        <div class="bkui-result-view">
+            <div class="bkui-result-icon">
+                <span class="fa fa-ban bkui-color-danger"></span>
+            </div>
+            <p class="bkui-result-text">系统错误码：<label id="error-label"></label></p>
+            <p class="bkui-tip" id="error-text"></p>
+        </div>
+        ##<a href="javascript:;" class="bkui-btn bkui-btn-success bkui-mb15" id="error-refresh">
+        ## 重新加载
+        ##</a>
+    </div>
+    <div id="nodata-block"></div>
+</div>
+</body>
+
+
+<!-- 引入jQuery2.0 -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/js/jquery-2.0.0.min.js"></script>
+<!-- 引入蓝鲸提供的公用js -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/js/bkui.js"></script>
+<script src="https://img.ybl-group.com/mescroll/1.4.0/mescroll.min.js" charset="utf-8"></script>
+<script src="${WEIXIN_STATIC_URL}js/index.js"></script>
+<script>
+    $(function () {
+
+        //下拉刷新的回调
+        function downCallback() {
+            alert('downCallback');
+            $.ajax({
+                url: weixin_site_url + 'ticket/get_tickets/',
+                success: function (data) {
+                    //联网成功的回调,隐藏下拉刷新的状态;
+                    mescroll.endSuccess(); //无参. 注意结束下拉刷新是无参的
+                    //设置数据
+                    //setXxxx(data);//自行实现 TODO
+                },
+                error: function (data) {
+                    //联网失败的回调,隐藏下拉刷新的状态
+                    mescroll.endErr();
+                }
+            });
+        }
+
+        /*设置列表数据*/
+        function setListData(curPageData, isAppend) {
+            for (var i = 0; i < curPageData.length; i++) {
+                var newObj = curPageData[i];
+
+                var newItem = '    <div class="bk-other">\n' +
+                    '        <span>' + newObj.creator + '</span>\n' +
+                    '        <span>' + newObj.create_at + '</span>\n' +
+                    '        <span>' + newObj.service + '</span>\n' +
+                    '    </div>\n' +
+                    '    <a class="bkui-list-item" href="${WEIXIN_SITE_URL}ticket/' + newObj.id + '/">\n' +
+                    '        <span class="bkui-list-fl">' + newObj.title + '</span>\n' +
+                    '        <i class="fa fa-angle-right bkui-list-fr bkui-list-fricon"></i>\n' +
+                    '    </a>\n';
+
+                if (isAppend) {
+                    $("#newsList").append(newItem)
+                } else {
+                    $("#newsList").prepend(newItem)
+                }
+            }
+        }
+
+        //上拉加载的回调 page = {num:1, size:10}; num:当前页 默认从1开始, size:每页数据条数,默认10
+        function upCallback(page) {
+            $.ajax({
+                url: weixin_site_url + 'ticket/get_tickets/?num=' + page.num + "&size=" + page.size, //如何修改page.num从0开始 ?
+                success: function (curPageData) {
+                    //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
+                    //mescroll会根据传的参数,自动判断列表如果无任何数据,则提示空,显示empty配置的内容;
+                    //列表如果无下一页数据,则提示无更多数据,(注意noMoreSize的配置)
+
+                    //方法一(推荐): 后台接口有返回列表的总页数 totalPage
+                    //必传参数(当前页的数据个数, 总页数)
+                    //mescroll.endByPage(curPageData.length, totalPage);
+                    //方法二(推荐): 后台接口有返回列表的总数据量 totalSize
+
+                    //必传参数(当前页的数据个数, 总数据量)
+                    //mescroll.endBySize(curPageData.length, totalSize);
+
+                    //设置列表数据
+                    if (curPageData.result) {
+                        $("#error-block").addClass("hidden");
+                        mescroll.endByPage(curPageData.data.items.length, curPageData.data.num_pages);
+                        setListData(curPageData.data.items, true);
+                    } else {
+                        mescroll.endByPage(1);
+                        $("#error-block").removeClass("hidden");
+                        $("#error-text").html(curPageData.message);
+                        $("#error-label").html(curPageData.code);
+                    }
+                },
+                error: function (e) {
+                    //联网失败的回调,隐藏下拉刷新和上拉加载的状态
+                    mescroll.endErr();
+                }
+            });
+        }
+
+        var mescroll = new MeScroll("mescroll", {
+            //第一个参数"mescroll"对应上面布局结构div的id (1.3.5版本支持传入dom对象)
+            //如果您的下拉刷新是重置列表数据,那么down完全可以不用配置,具体用法参考第一个基础案例
+            //解析: down.callback默认调用mescroll.resetUpScroll(),而resetUpScroll会将page.num=1,再触发up.callback
+            down: {
+                use: false,
+                callback: downCallback //下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
+            },
+            up: {
+                callback: upCallback, //上拉加载的回调
+                //以下是一些常用的配置,当然不写也可以的.
+                page: {
+                    num: 0, //当前页 默认0,回调之前会加1; 即callback(page)会从1开始
+                    size: 10 //每页数据条数,默认10
+                },
+                htmlNodata: '<p class="upwarp-nodata-block">已加载全部工单</p>',
+                noMoreSize: 5, //如果列表已无数据,可设置列表的总数量要大于5才显示无更多数据;
+                //避免列表数据过少(比如只有一条数据),显示无更多数据会不好看
+                //这就是为什么无更多数据有时候不显示的原因.
+                toTop: {
+                    //回到顶部按钮
+                    src: weixin_static_url + "img/mescroll-totop.png", //图片路径,默认null,支持网络图
+                    offset: 500 //列表滚动1000px才显示回到顶部按钮	
+                },
+                empty: {
+                    //列表第一页无任何数据时,显示的空提示布局; 需配置warpId才显示
+                    warpId: "nodata-block", //父布局的id (1.3.5版本支持传入dom元素)
+                    // icon: weixin_static_url + "img/mescroll-empty.png", //图标,默认null,支持网络图
+                    tip: "暂无待办单据~" //提示
+                },
+                lazyLoad: {
+                    use: true, // 是否开启懒加载,默认false
+                    attr: 'imgurl' // 标签中网络图的属性名 : <img imgurl='网络图  src='占位图''/>
+                }
+            }
+        });
+
+    });
+
+
+</script>
+</html>

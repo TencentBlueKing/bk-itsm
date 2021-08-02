@@ -1,0 +1,256 @@
+// 对bk.scss进行扩展 覆盖
+@charset 'utf-8';
+// @import 'conf';
+@import 'mixins/scroller';
+@import 'mixins/clearfix';
+
+/* tree/select外壳样式 */
+.bk-search-tree {
+    position: relative;
+    width: 100%;
+    .bk-search-tree-wrapper {
+        border: 1px solid #c4c6cc;
+        width: 100%;
+        height: 32px;
+        line-height: 32px;
+        cursor: pointer;
+        color: #c3cdd7;
+        position: relative;
+        padding: 0 32px 0 10px;
+        font-size: 12px;
+        &:hover {
+            border-color: #0082ff;
+            color: #3c96ff;
+        }
+        &.bkdisabled{
+            color: #c3cdd7;
+            background-color: #fafbfd !important;
+            cursor: not-allowed;
+            border-color: #dcdee5 !important;
+        }
+        .bk-select-angle {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+        }
+    }
+    .bk-search-tree-content {
+        width: 100%;
+        height: 207px;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        box-shadow: 0 0 8px 1px rgba(0,0,0,0.1);
+        background-color: #fff;
+        z-index: 100;
+        overflow-y: auto;
+        border-radius: 2px;
+    }
+    .bk-color-tree {
+        color: #63656e!important;
+        font-size: 12px;
+    }
+}
+/* 错误信息的样式调整 */
+.bk-border-error {
+    .bk-date-picker-rel .bk-date-picker-editor,
+    .bk-tag-selector .bk-tag-input,
+    .bk-textarea-wrapper,
+    .bk-search-tree-wrapper {
+        border-color: #ea3636;
+    }
+}
+
+/* 设置select背景颜色不随父级变化 */
+.bk-select {
+    background-color: #fff;
+}
+/* 设置date-picker的宽度随父元素变化 */
+.bk-date-picker {
+    width: 100%;
+}
+/* 设置siderlider滑动样式 */
+.bk-sideslider-content {
+    max-height: auto!important;
+    height: calc(100% - 60px);
+}
+/* 去除dropdown中的button存在间隙的问题 */
+.bk-dropdown-trigger {
+    @include clearfix;
+    .bk-button {
+        float: left;
+    }
+}
+.bk-reminder-content {
+    .bk-form-content {
+        @include clearfix;
+        .bk-form-control {
+            float: left;
+        }
+    }
+}
+/* 额外表单样式 */
+.bk-form-content {
+    @include clearfix;
+}
+.bk-remindway-form {
+    textarea {
+        height: 94px;
+        padding: 0 10px;
+        line-height: 25px !important;
+        min-height: 200px;
+        resize: vertical;
+    }
+}
+/* 树组件样式 */
+.tree-singe {
+    line-height: 26px;
+}
+
+.bk-has-border-tree li.single:after {
+    top: 12px;
+}
+
+.bk-tree .node-icon {
+    top: 1px;
+}
+/* dialog预览弹窗 */
+.bk-preview-overflow {
+    .bk-dialog-body {
+        height: 377px;
+        overflow: auto;
+    }
+}
+.bk-dialog-wrapper .bk-info-box .bk-dialog-type-sub-header .header {
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+}
+/* textarea样式 */
+.bk-tanble-height {
+    height: 60px;
+    .bk-textarea-tanble {
+        overflow: hidden;
+        position: absolute;
+        height: 32px;
+        min-height: 32px;
+        padding: 3px 10px;
+        float: left;
+        width: 225px;
+        line-height: 24px!important;
+        &:focus {
+            height: 90px;
+            z-index: 10;
+        }
+    }
+}
+.bk-normal-textarea {
+    .bk-textarea-tanble {
+        overflow: hidden;
+        position: absolute;
+        height: 32px;
+        min-height: 32px;
+        padding: 3px 10px;
+        float: left;
+        width: 225px;
+        line-height: 24px!important;
+        &:focus {
+            height: 90px!important;
+            z-index: 10;
+        }
+    }
+}
+/* table的额外样式 */
+.bk-status-color {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #2DCB56;
+}
+.bk-status-gray {
+    background-color: #C4C6CC;
+}
+.bk-status-primary {
+    background-color: #3a84ff;
+}
+.bk-lable-primary {
+    color: #3a84ff;
+    cursor: pointer;
+}
+.bk-label-disabled {
+    color: #dcdee5;
+    cursor: not-allowed;
+    font-size: 12px;
+    padding: 0 6px;
+    outline: none;
+}
+.bk-outline-none {
+    outline: none;
+}
+.bk-table-upgraded {
+    background-color: #FEF2DF!important;
+}
+.bk-table-violated {
+    background-color: #FDEAEA!important;
+}
+.bk-table {
+    .cell {
+        height: 16px;
+        margin: 0 auto;
+        .bk-button-text {
+            padding: 0 5px;
+        }
+    }
+}
+/* 可编辑表格不overflow */
+.bk-editor-table {
+    overflow: visible;
+    .bk-table-body-wrapper {
+        overflow: visible;
+    }
+}
+/* tooltip样式 */
+.bk-current-step {
+    .bk-tooltip {
+        height: 20px;
+        width: 100%;
+        .bk-tooltip-ref {
+            width: 100%;
+        }
+    }
+}
+/* upload */
+.bk-field {
+    .bk-upload .tip {
+        margin: 0;
+    }
+}
+/* input框/int类型 */
+.bk-form-int {
+    .bk-form-control {
+        display: block;
+    }
+}
+
+.bk-line-height {
+    .bk-form-content {
+        line-height: 32px;
+    }
+}
+
+/* 对嵌套的bk-tab的border进行处理 */
+.bk-send-message {
+    .bk-tab-section {
+        border: none;
+    }
+    .bk-tab.bk-tab-border-card .bk-tab-header {
+        border-left: none;
+        border-right: none;
+    }
+}
+
+/* info subtitle 居中 */
+.bk-dialog-header-inner{
+    text-align: left;
+}

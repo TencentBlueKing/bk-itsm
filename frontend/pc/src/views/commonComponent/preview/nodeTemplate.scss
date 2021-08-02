@@ -1,0 +1,265 @@
+@import '../../../scss/mixins/clearfix.scss';
+
+.bk-flow-location {
+    position: relative;
+}
+
+.bk-is-draft {
+    background-color: #C4C6CC !important;
+}
+
+.startpoint,
+.endpoint {
+    width: 40px;
+    height: 40px;
+    line-height: 37px;
+    border-radius: 50%;
+    border: 2px solid #C9CACB;
+    text-align: center;
+    color: #63656E;
+    background-color: #F0F1F5;
+    font-size: 12px;
+    box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
+}
+
+.common-branch {
+    border: 1px solid #C4C6CC;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: #FFF;
+    position: relative;
+    box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+        .bk-node-delete {
+            display: block;
+        }
+    }
+
+    .bk-itsm-icon {
+        font-size: 25px;
+        color: #737987;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.common-node {
+    width: 150px;
+    height: 40px;
+    line-height: 38px;
+    text-align: center;
+    background-color: #fff;
+    padding-left: 40px;
+    color: #63656E;
+    font-size: 14px;
+    position: relative;
+    border-radius: 25px;
+    box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
+    border: 1px solid #DCDEE5;
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+        border: 1px solid #3A84FF;
+        border-radius: 20px;
+        color: #3A84FF;
+
+        .bk-node-delete {
+            display: block;
+        }
+
+        .bk-toop-info {
+            color: #63656E;
+        }
+    }
+
+    .common-auto-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 16px;
+        width: 40px;
+        height: 38px;
+        line-height: 38px;
+        color: #fff;
+        background-color: #3A84FF;
+        border-radius: 25px 0 0 25px;
+        box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
+
+        .bk-itsm-icon {
+            position: absolute;
+            top: 49%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.74, 0.74);
+        }
+    }
+
+    .bk-toop-info {
+        position: absolute;
+        top: -65px;
+        left: -28px;
+        padding: 10px;
+        border: 1px solid #DCDEE5;
+        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.09);
+        line-height: 20px;
+        background-color: #fff;
+        width: 210px;
+        text-align: left;
+
+        span {
+            font-weight: bold;
+        }
+
+        .icon-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            padding: 5px;
+            border-radius: 50%;
+
+            &:hover {
+                background-color: #DCDEE5;
+                color: #fff;
+            }
+        }
+
+        .bk-squrae {
+            position: absolute;
+            bottom: -5px;
+            right: 100px;
+            transform: rotate(-45deg);
+            width: 10px;
+            height: 10px;
+            border-left: 1px solid #DCDEE5;
+            border-bottom: 1px solid #DCDEE5;
+            background-color: #fff;
+        }
+    }
+}
+
+.bk-more-word {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 110px;
+    padding: 0 10px 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bk-node-delete {
+    position: absolute;
+    top: -8px;
+    right: -4px;
+    display: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #D8D8D8;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    line-height: 17px;
+    z-index: 2;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #979BA5;
+    }
+}
+
+.bk-flow-fast {
+    position: absolute;
+    top: 30px;
+    right: -178px;
+    background-color: #fff;
+    border: 1px solid #DDE4EB;
+    box-shadow: 0px 2px 4px 0px rgba(218, 218, 218, 0.5);
+    border-radius: 2px;
+    z-index: 100;
+
+    .bk-engine-node {
+        width: 140px;
+
+        ul {
+            @include clearfix;
+            cursor: pointer;
+
+            .bk-tool-normal {
+                display: inline-block;
+                width: 30px;
+                height: 22px;
+                border: 1px solid #737987;
+            }
+
+            .tool {
+                float: left;
+                font-size: 30px;
+                width: 33.33%;
+                line-height: 42px;
+                height: 42px;
+                text-align: center;
+                color: #737987;
+
+                &:hover {
+                    color: #3A84FF;
+
+                    .bk-tool-normal {
+                        border-color: #3c96ff;
+                    }
+                }
+
+                .icon-copy-new, .icon-icon-artificial, .icon-api-node, .icon-task-icon, .icon-flow-branch, .icon-flow-convergence {
+                    &:hover {
+                        &::before {
+                            color: #3A84FF;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .bk-engine-word {
+        color: #63656E;
+        line-height: 28px;
+        font-size: 12px;
+        padding: 0 10px;
+        border-top: 1px solid #E9EDF1;
+        cursor: pointer;
+        @include clearfix;
+
+        .bk-engine-configur {
+            float: left;
+            width: 50%;
+            padding-left: 15px;
+
+            &:hover {
+                color: #3A84FF;
+            }
+        }
+
+        .bk-engine-delete {
+            float: left;
+            width: 50%;
+            text-align: right;
+            padding-right: 15px;
+
+            &:hover {
+                color: #3A84FF;
+            }
+        }
+
+        .bk-engine-builtin {
+            cursor: not-allowed;
+            color: #C6CFD9 !important;
+        }
+    }
+}

@@ -1,0 +1,261 @@
+@charset "UTF-8";
+/* 初始化设置 */
+html{
+    min-width: 1200px;
+    font-family: "Microsoft YaHei","微软雅黑","\xe8\x93\x9d\xe9\xb2\xb8\xe6\x99\xba\xe8\x90\xa5";
+}
+body {
+    overflow-x: auto;
+    min-width: 1200px;
+    min-height: 620px;
+    font-family: "Microsoft YaHei","微软雅黑","\xe8\x93\x9d\xe9\xb2\xb8\xe6\x99\xba\xe8\x90\xa5";
+}
+a:hover {
+    text-decoration: none;
+}
+img {
+    vertical-align: middle;
+}
+/*nav*/
+.container {
+    width:auto; 
+    width: 1100px!important;
+}
+.navbar.navbar-mt0{
+	margin-bottom: 0!important; 
+}
+.navbar .avatar .crown {
+    position: absolute;
+    width: 12px;
+    height: 11px;
+    display: inline-block;
+    background: url(../img/crown.png);
+    margin-left: -29px;
+}
+.avatar-img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.avatar {
+    color: #898989;
+    font-size: 14px;
+    line-height: 48px;
+    padding: 0 15px;
+}
+/*中间部分*/
+.page-arrow{
+	position: absolute;
+	margin:auto;
+	width: 100%;
+	background: #1d91ec;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.page-arrow .frame-explain{
+    margin: auto;  
+    position: absolute;  
+    top: 20%; 
+    left: 0; 
+    bottom: 0; 
+    right: 0; 
+}
+.page-arrow .title-word{
+	font-size: 24px;
+	color:#ffffff;
+}
+.page-arrow .title-word-second{
+	margin-top: 60px;
+}
+.page-arrow .title-word-second p{
+	color:#ffffff;
+	font-size: 42px;
+}
+.page-arrow .title-word-second p>small{
+	color:#ffffff;
+	font-size: 42px;
+	font-weight: bold;	
+}
+.page-arrow .cutting-line{
+	width: 160px;
+	border-top: 4px solid #eee;
+	margin-top:55px;
+	margin-bottom:55px;
+}
+.page-arrow .frame-explain-text{
+	color: #b3d6fe;
+	position: relative;
+}
+.page-arrow .developer-center{
+	color: #ffce0c;
+	font-size: 14px;
+}
+/*footer*/
+.foot {
+    padding: 14px 0;
+    color: #636363;
+    text-align: center;   
+}
+.foot ul li a{
+	color: #1d91ec;
+}
+.ft .links {
+    font-size: 14px;
+}
+.ft p {
+    margin: 0;
+}
+/* 首页 */
+.home-page{
+    min-height: calc(100% - 149px);
+    position: relative;
+    background: #1d91ec;
+}
+
+/*dev-guide.html*/
+/*bnner*/
+.getheadimg-box{
+    min-height: 200px;
+    background: url(../img/dev-guide.png) no-repeat center center;
+    background-size: auto 100%;
+}
+.page_index {
+    min-height: calc(100% - 360px);
+}
+.king-step3 li .step-num-top-line:before{
+    content: '';
+    position: absolute;
+    width: 3px;
+    background: #4a9bff;
+    top: -50px;
+    height: 47px;
+    left: 24px;
+}
+.page_index .king-step3 li .step-text:before{
+    background: #4a9bff;
+    width: 3px;
+    content: '';
+    position: absolute;
+    top: 53px;
+    bottom: 2px;
+    left: -65px
+}
+.page_index .king-step3.king-step-primary .process-doing .step-num {
+    background-color: #4a9bff;
+    border-color: #4a9bff;
+    color: #fff !important;
+}
+.page_index .king-step3 li .step-num {
+    float: left;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50%;
+    -moz-border-radius: 50%; /* Firefox */
+    -webkit-border-radius: 50%; /* Safari 和 Chrome */
+    border-radius: 50%; /* Opera 10.5+, 以及使用了IE-CSS3的IE浏览器 */
+    font-size: 30px;
+    text-align: center;
+    color: #aaa;
+    border: 1px solid #aaa;
+}
+.page_index .king-step3 li .step-text-button-line{
+    float: left;
+    position: relative;
+    font-size: 14px;
+    color: #333333;
+    margin-left: 40px;
+}
+.guide-cutting-line{
+    border-top: 1px solid #eee;
+}
+.getheadimg-box .guide-banner-title{
+    font-size: 46px;
+    color:#fded62;
+    text-align: center;
+    padding-top: 40px;
+    font-weight: bold;
+
+}
+.getheadimg-box .guide-banner-word{
+    font-size: 20px;
+    color:#fff;
+    text-align: center;
+    margin-bottom: 0;
+    
+}
+.page_index .king-step3 li h4{
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+}
+.page_index .king-step3 li .text-notice{
+    color: #ff1818;
+}
+.page_index .king-step3 li .step-text{
+    font-size: 14px;
+    color: #333333;
+    margin-left: 40px;
+}
+.outer-circle{
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border: 1px solid #4C9CFF;
+    border-radius: 50%;
+    -moz-border-radius: 50%; /* Firefox */
+    -webkit-border-radius: 50%; /* Safari 和 Chrome */
+    border-radius: 50%; /* Opera 10.5+, 以及使用了IE-CSS3的IE浏览器 */
+    left: -3px;
+    top: -3px;
+}
+.container ul.king-step3 li {
+    text-align: left;
+    position: relative;
+    overflow: visible;
+}
+/*contactus.html*/  
+.page-contactus{
+    min-height: calc(100% - 231px)
+}
+.comtactus-detail{
+    position: absolute;
+    top: 20%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    font-size: 14px;
+    color: #626262;
+}
+.dbi{
+    display: inline-block;
+}
+.border-right{
+    border-right: 1px dashed #ddd;
+}
+.comtactus-way-arrow{
+    margin-top: 75px;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+.comtactus-way-arrow .img-arrow{
+    height: 90px;
+    line-height: 90px;
+}
+.comtactus-way-arrow .address-pa{
+    position: absolute;
+    left: -187px;
+}
+.comtactus-way-arrow .mailbox-pa{
+    position: absolute;
+    right: -257px;
+}
+#contactus{
+    position: absolute;
+    width: 1100px;
+    padding-bottom: 20px;
+    left: 50%;
+    top: 45%;
+    margin-left: -550px;
+    margin-top: -195px;
+}

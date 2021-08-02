@@ -1,0 +1,56 @@
+@charset "UTF-8";
+
+// 存放常用动画
+// $animationDuration: 0.3s;
+$animations: './animation/animations';
+
+// mixin
+@import "animation/make-transitions";
+
+// animations
+@import "animation/animations/fading/all";
+// @import "./animation/animations/sliding/all";
+@import "animation/animations/bouncing/all";
+@import "animation/animations/zooming/all";
+// @import "./animation/animations/sliding/all";
+
+// 用法
+// <transition name="slideDown">
+// xxxx
+// </transition>
+
+// 支持动画
+// Bounce
+
+// bounce
+// bounceDown
+// bounceLeft
+// bounceRight
+// bounceUp
+// Fade
+
+// fade
+// fadeDown
+// fadeDownBig
+// fadeLeft
+// fadeLeftBig
+// fadeRight
+// fadeRightBig
+// fadeUp
+// fadeUpBig
+
+// zoom
+// zoomDown
+// zoomLeft
+// zoomRight
+// zoomUp
+
+.common-fade-leave-active, .common-fade-enter-active{
+    transition: all 0.3s ease;
+}
+.common-fade-leave-active,.common-fade-enter{
+    height: 0px!important;
+}
+.common-fade-leave,.common-fade-enter-active{
+    height: 207px;
+}

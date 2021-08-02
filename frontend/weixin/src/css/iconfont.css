@@ -1,0 +1,73 @@
+@font-face {
+	font-family: "itsm-mobile";
+	src: url("../assets/font/iconcool.svg#iconcool") format("svg"),
+url("../assets/font/iconcool.ttf") format("truetype"),
+url("../assets/font/iconcool.woff") format("woff"),
+url("../assets/font/iconcool.eot?#iefix") format("embedded-opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.itsm-mobile-icon {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'itsm-mobile' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  text-align: center;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-info-line:before {
+	content: "\e104";
+}
+.icon-arrows-up:before {
+	content: "\e102";
+}
+.icon-arrows-down:before {
+	content: "\e103";
+}
+.icon-folder-open-shape:before {
+	content: "\e115";
+}
+.icon-folder-shape:before {
+	content: "\e114";
+}
+.icon-favorite-o:before {
+	content: "\e106";
+}
+.icon-copy:before {
+	content: "\e107";
+}
+.icon-chehui:before {
+	content: "\e10e";
+}
+.icon-cuiban:before {
+	content: "\e10d";
+}
+.icon-naozhong:before {
+	content: "\e10f";
+}
+.icon-daiban:before {
+	content: "\e110";
+}
+.icon-tidan:before {
+	content: "\e111";
+}
+.icon-kong:before {
+	content: "\e112";
+}
+.icon-quanxian:before {
+	content: "\e116";
+}
+.icon-user:before {
+	content: "\e117";
+}
+.icon-index:before {
+	content: "\e11c";
+}

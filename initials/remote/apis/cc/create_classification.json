@@ -1,0 +1,139 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "create_classification", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56decode"
+        }, 
+        "data": {
+          "required": [
+            "bk_classification_id", 
+            "bk_classification_icon", 
+            "bk_classification_type", 
+            "bk_supplier_account", 
+            "bk_classification_name", 
+            "id"
+          ], 
+          "type": "object", 
+          "description": "\u8fd4\u56de\u6570\u636e", 
+          "properties": {
+            "bk_classification_id": {
+              "default": "cs_test", 
+              "type": "string", 
+              "description": "\u5206\u7c7bid\uff0c\u82f1\u6587\u63cf\u8ff0\u7528\u4e8e\u7cfb\u7edf\u5185\u90e8\u4f7f\u7528"
+            }, 
+            "bk_classification_icon": {
+              "default": "icon-cc-business", 
+              "type": "string", 
+              "description": "\u6a21\u578b\u5206\u7c7b\u7684\u56fe\u6807"
+            }, 
+            "bk_classification_type": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u5206\u7c7b\u7c7b\u578b"
+            }, 
+            "bk_supplier_account": {
+              "default": "0", 
+              "type": "string", 
+              "description": "\u5f00\u53d1\u5546\u8d26\u6237ID"
+            }, 
+            "bk_classification_name": {
+              "default": "test_name", 
+              "type": "string", 
+              "description": "\u5206\u7c7b\u540d"
+            }, 
+            "id": {
+              "default": 25, 
+              "type": "number", 
+              "description": "\u65b0\u589e\u6570\u636e\u8bb0\u5f55\u7684ID"
+            }
+          }
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "4ca5d4540ee6439d95e8619fabb0b5f9", 
+          "type": "string", 
+          "description": "\u8bf7\u6c42ID"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/cc/create_classification/", 
+    "is_builtin": false,
+    "req_params": [], 
+    "desc": "\u6dfb\u52a0\u6a21\u578b\u5206\u7c7b",
+      "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u6dfb\u52a0\u6a21\u578b\u5206\u7c7b", 
+    "is_activated": true, 
+    "remote_system": 5, 
+    "system_info": {
+      "cookies": [], 
+      "code": "cc", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 2, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "POST", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "bk_classification_id", 
+        "bk_classification_name"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "bk_classification_name": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5206\u7c7b\u540d"
+        }, 
+        "bk_classification_id": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5206\u7c7bID\uff0c\u82f1\u6587\u63cf\u8ff0\u7528\u4e8e\u7cfb\u7edf\u5185\u90e8\u4f7f\u7528"
+        }, 
+        "bk_classification_icon": {
+          "default": "icon-cc-business", 
+          "type": "string", 
+          "description": "\u6a21\u578b\u5206\u7c7b\u7684\u56fe\u6807\uff0c\u53d6\u503c\u53ef\u53c2\u8003\uff0c\u53d6\u503c\u53ef\u53c2\u8003(classIcon.json)"
+        }
+      }
+    }
+  }
+]

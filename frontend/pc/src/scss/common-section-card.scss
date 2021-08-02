@@ -1,0 +1,39 @@
+.common-section-card-block {
+  padding: 20px;
+  display: flex;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+  .common-section-card-label {
+      width: 138px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      color: #63656e;
+      line-height: 19px;
+      flex-shrink: 0;
+      .common-section-card-desc {
+          margin-top: 4px;
+          width: 120px;
+          font-size: 12px;
+          color: #979ba5;
+          line-height: 16px;
+          word-break: break-all;
+      }
+  }
+  .common-section-card-body {
+      flex: 1;
+  }
+}
+
+.more-configuration {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #3a84ff;
+  cursor: pointer;
+  .bk-icon {
+      padding: 0 5px;
+      margin-right: 6px;
+  }
+}

@@ -1,0 +1,119 @@
+[
+    {
+        "req_params": [
+            {
+                "is_necessary": 0,
+                "sample": "itsm",
+                "name": "target_app_code",
+                "value": "itsm",
+                "desc": "target_app_code \u8868\u793a\u5e94\u7528 ID\uff0c\u591a\u4e2a ID \u4ee5\u82f1\u6587\u5206\u53f7\u5206\u9694\uff0ctarget_app_code \u4e3a\u7a7a\u5219\u8868\u793a\u6240\u6709\u5e94\u7528"
+            },
+            {
+                "is_necessary": 0,
+                "sample": "bk_app_code;bk_app_name",
+                "name": "fields",
+                "value": "bk_app_code;bk_app_name",
+                "desc": "fields \u9700\u8981\u8fd4\u56de\u7684\u5b57\u6bb5\uff0c\u591a\u4e2a\u5b57\u6bb5\u4ee5\u82f1\u6587\u5206\u53f7\u5206\u5272\uff0c\u5982\u679c\u4e0d\u4f20\u6216\u4f20\u5165 \"\"\uff0c\u5219\u8fd4\u56de\u5e94\u7528\u7684 bk_app_code\u3001bk_app_name \u5b57\u6bb5\u3002\u53ef\u9009\u7684\u5b57\u6bb5\u6709\uff1abk_app_code\uff08\u5e94\u7528ID\uff09\uff0cbk_app_name\uff08\u5e94\u7528\u540d\uff09\uff0cintroduction\uff08\u5e94\u7528\u7b80\u4ecb\uff09\uff0ccreator\uff08\u521b\u5efa\u8005\uff09\uff0cdeveloper\uff08\u5f00\u53d1\u4eba\u5458\uff09"
+            }
+        ],
+        "is_deleted": false,
+        "name": "\u83b7\u53d6\u5e94\u7528\u4fe1\u606f",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {}
+        },
+        "func_name": "get_app_info",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "message",
+                "code",
+                "data",
+                "result",
+                "request_id",
+                "msg"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": "\u8fd4\u56de\u7801"
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": "\u63a5\u53e3\u8bf7\u6c42\u72b6\u6001"
+                },
+                "request_id": {
+                    "default": "9e3fdc32569640519f045581c51486f0",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "",
+                    "type": "string",
+                    "description": "\u4fe1\u606f"
+                },
+                "data": {
+                    "items": {
+                        "required": [
+                            "bk_app_code",
+                            "bk_app_name"
+                        ],
+                        "type": "object",
+                        "description": "",
+                        "properties": {
+                            "bk_app_code": {
+                                "default": "itsm",
+                                "type": "string",
+                                "description": "\u5e94\u7528ID"
+                            },
+                            "bk_app_name": {
+                                "default": "itsm",
+                                "type": "string",
+                                "description": "\u5e94\u7528"
+                            }
+                        }
+                    },
+                    "type": "array",
+                    "description": "\u8fd4\u56de\u6570\u636e"
+                }
+            }
+        },
+        "remote_system": 14,
+        "system_info": {
+            "cookies": [],
+            "code": "bk_paas",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u5f00\u53d1\u8005\u4e2d\u5fc3",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 7,
+            "headers": [],
+            "is_builtin": true,
+            "desc": "\u84dd\u9cb8\u5f00\u53d1\u8005\u4e2d\u5fc3",
+            "updated_by": ""
+        },
+        "method": "GET",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/bk_paas/get_app_info/",
+        "is_builtin": false,
+        "desc": "\u83b7\u53d6\u5e94\u7528\u4fe1\u606f\uff0c\u652f\u6301\u6279\u91cf\u83b7\u53d6",
+        "updated_by": "system"
+    }
+]

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+    <meta charset="utf-8">
+    % if CUSTOM_TITLE:
+    <title>${CUSTOM_TITLE}</title>
+    % else:
+    <title>ITSM|蓝鲸智云</title>
+    % endif
+    <style>
+        .bk-exception {
+            text-align: center;
+            width: 100%;
+            margin: 50px auto 0;
+            overflow: hidden;
+            box-sizing: border-box
+        }
+
+        .bk-exception .exception-text {
+            font-size: 16px;
+            color: #63656e;
+            margin: 11px 0;
+            font-weight: 700;
+            padding: 0 1em
+        }
+
+        .bk-exception.bk-exception-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            margin: 0
+        }
+    </style>
+</head>
+<script>
+    var weixin_site_url = "${WEIXIN_SITE_URL}";
+    var weixin_static_url = "${WEIXIN_STATIC_URL}";
+    window.site = "${WEIXIN_SITE_URL}api/";
+    window.isweixin = true;
+</script>
+<body>
+<div id="app">
+    <div class="bk-exception bk-exception-center">
+        <img src="${WEIXIN_STATIC_URL}images/error.png">
+        <h2 class="exception-text">请先到蓝鲸【个人中心】中绑定微信，然后在PC端访问一次ITSM，以完成账号绑定</h2>
+    </div>
+</div>
+</body>
+</html>

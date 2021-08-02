@@ -1,0 +1,109 @@
+@import '../../../../scss/mixins/clearfix.scss';
+
+.bk-normal-search {
+    margin-top: 10px;
+    @include clearfix;
+    .bk-search-key {
+        float: right;
+        width: 220px;
+        margin-right: 22px;
+    }
+}
+.bk-none-content {
+    margin-top: 176px;
+    line-height: 20px;
+    color: #63656E;
+    text-align: center;
+    font-size: 14px;
+    .bk-icon {
+        font-size: 18px;
+        color: #979BA5;
+        margin-right: 8px;
+    }
+    .bk-primary {
+        color: #3A84FF;
+        cursor: pointer;
+    }
+}
+.bk-trigger-content {
+    margin-top: 10px;
+    @include clearfix;
+    .li-transition{
+        width: calc(50% - 22px)!important;
+    }
+    &>li {
+        float: left;
+        width: calc(25% - 22px);
+        margin-right: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #DCDEE5;
+        border-radius: 2px;
+        height: 50px;
+        line-height: 50px;
+        background-color: #fff;
+        @include clearfix;
+        &:hover {
+            border-color: #3A84FF;
+            .bk-trigger-icon {
+                color: #fff;
+                background-color: #3A84FF;
+            }
+            .bk-trigger-delete {
+                display: block;
+                color: #3A84FF;
+            }
+        }
+    }
+    .bk-trigger-icon {
+        float: left;
+        width: 50px;
+        height: 48px;
+        line-height: 48px;
+        font-size: 16px;
+        color: #979BA5;
+        text-align: center;
+        background-color: #F0F1F5;
+        border-right: 1px solid #DCDEE5;
+    }
+    .bk-trigger-name {
+        float: left;
+        line-height: 48px;
+        font-size: 14px;
+        width: calc(100% - 100px);
+        padding-left: 14px;
+        color: #63656E;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        cursor: pointer;
+    }
+    .bk-trigger-delete {
+        display: none;
+        float: left;
+        cursor: pointer;
+        margin-left: 15px;
+        font-size: 18px;
+    }
+}
+/* 响应式布局宽度 */
+@media screen and (min-width: 960px) and (max-width: 1380px) {
+    .bk-trigger-content {
+        &>li {
+            width: calc(33.33% - 10px);
+        }
+    }
+}
+@media screen and (min-width: 1380px) and (max-width: 1680px) {
+    .bk-trigger-content {
+      &>li {
+            width: calc(25% - 10px);
+        }
+    }
+}
+@media screen and (min-width: 1680px) {
+    .bk-trigger-content {
+      &>li {
+            width: calc(20% - 10px);
+        }
+    }
+}

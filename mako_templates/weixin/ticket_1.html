@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>单据处理</title>
+    <!-- font-awesome -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/fontawesome/css/font-awesome.css"
+          rel="stylesheet">
+    <!-- 蓝鲸提供的移动端公用样式库 -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/css/bkui.css" rel="stylesheet">
+    <link rel="stylesheet" href="${WEIXIN_STATIC_URL}css/index.css">
+
+</head>
+<body>
+<!--HTML-->
+<form class="bkui-form bkui-form-group">
+    <div class="bkui-title bkui-font-sm bkui-spacing">
+        组合表单
+    </div>
+    <label class="bkui-group-cell">
+        <span>账户</span>
+        <input class="bkui-input" placeholder="用户名/QQ号码/手机号码" />
+    </label>
+    <label class="bkui-group-cell">
+        <span>密码</span>
+        <input class="bkui-input" type="password" placeholder="仅可由数字、字母、下划线组成" />
+    </label>
+    <label class="bkui-group-cell">
+        <span>地区</span>
+        <select class="bkui-select" placeholder="下拉选框">
+            <option value="深圳">深圳</option>
+            <option value="广州">广州</option>
+            <option value="珠海">珠海</option>
+        </select>
+    </label>
+    <label class="bkui-group-cell">
+        <span>生日</span>
+        <input class="bkui-date" type="date" name="user_date" placeholder="请选择您的生日" />
+    </label>
+ 
+    <div class="bkui-title bkui-font-sm bkui-spacing">
+        兴趣爱好
+    </div>
+    <div class="bkui-choice bkui-checkbox">
+        <label class="bkui-form-cell" for="s21">
+            <div class="bkui-form-hd">
+                <input type="checkbox" name="checkbox1" class="bkui-check" id="s21">
+                <span class="bkui-choice-icon"></span>
+            </div>
+            <div class="bkui-form-bd">运动</div>
+        </label>
+        <label class="bkui-form-cell" for="s22">
+            <div class="bkui-form-hd">
+                <input type="checkbox" name="checkbox22" class="bkui-check" id="s22">
+                <span class="bkui-choice-icon"></span>
+            </div>
+            <div class="bkui-form-bd">音乐</div>
+        </label>
+        <label class="bkui-form-cell" for="s23">
+            <div class="bkui-form-hd">
+                <input type="checkbox" name="checkbox23" class="bkui-check" id="s23">
+                <span class="bkui-choice-icon"></span>
+            </div>
+            <div class="bkui-form-bd">上网</div>
+        </label>
+    </div>
+    <div class="bkui-title bkui-font-sm bkui-spacing">
+        性别
+    </div>
+    <div class="bkui-choice bkui-radio">
+        <label class="bkui-form-cell" for="x21">
+            <div class="bkui-form-hd">
+                <input type="radio" class="bkui-check" name="radio21" id="x21">
+                <span class="bkui-choice-icon"></span>
+            </div>
+            <div class="bkui-form-bd">男</div>
+        </label>
+        <label class="bkui-form-cell bkui-check-label" for="x22">
+            <div class="bkui-form-hd">
+                <input type="radio" name="radio21" class="bkui-check" id="x22" checked="checked">
+                <span class="bkui-choice-icon"></span>
+            </div>
+            <div class="bkui-form-bd">女</div>
+        </label>
+    </div>
+ 
+ 
+    <div class="bkui-title bkui-font-sm bkui-spacing">
+        简介
+    </div>
+    <div class="bkui-cell">
+        <textarea class="bkui-textarea" placeholder="请输入简介"></textarea>
+    </div>
+ 
+    <div class="bkui-cell bkui-spacing">
+        <a class="bkui-btn bkui-btn-success bkui-mt20">提交</a>
+    </div>
+</form>
+</body>
+
+
+<!-- 引入jQuery2.0 -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/js/jquery-2.0.0.min.js"></script>
+<!-- 引入蓝鲸提供的公用js -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/js/bkui.js"></script>
+<script src="${WEIXIN_STATIC_URL}js/ticket.js"></script>
+</html>

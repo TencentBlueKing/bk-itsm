@@ -1,0 +1,25 @@
+@keyframes rotation {
+  from {
+      -webkit-transform: rotate(0deg);
+  }
+  to {
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes rotation {
+  from {
+      -webkit-transform: rotate(0deg);
+  }
+  to {
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+@mixin rotation ($second: 1.5) {
+    animation: rotation #{$second}s linear infinite;
+    -webkit-transform: rotate(360deg);
+    -moz-animation: rotation #{$second}s linear infinite;
+    -webkit-animation: rotation #{$second}s linear infinite;
+    -o-animation: rotation #{$second}s linear infinite;
+}

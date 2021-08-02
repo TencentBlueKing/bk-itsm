@@ -1,0 +1,55 @@
+@mixin required {
+  position: relative;
+	&::after {
+    position: absolute;
+    right: -10px;
+    top: 0;
+    content: "*";
+    line-height: 1.7em;
+		font-size: 14px;
+		color: #EA3636;
+	}
+}
+
+.base-info {
+  overflow: hidden;
+  .setion-title {
+      margin: 0;
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #63656e;
+  }
+  .basic-list {
+      display: flex;
+      flex-wrap: wrap;
+      .basic-item {
+          display: flex;
+          width: 50%;
+          font-size: 12px;
+          line-height: 22px;
+          .basic-name {
+              display: inline-block;
+              width: 72px;
+              color: #979BA5;
+              flex-shrink: 0;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              font-size: 12px;
+          }
+          .basic-value {
+              color: #313238;
+              word-break: break-all;
+              white-space: initial;
+              font-size: 12px;
+          }
+      }
+      &.block {
+        display: block;
+        .basic-item {
+          width: 100%;
+        }
+      }
+  }
+}

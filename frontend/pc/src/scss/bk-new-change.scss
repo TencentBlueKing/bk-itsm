@@ -1,0 +1,148 @@
+@import './scss/mixins/scroller.scss';
+
+/* app 样式 */
+.isColsed {
+    left: 6%!important;
+    width: 94% !important;
+}
+.input-required {
+    color: red;
+}
+.input-border {
+    border-color: red;
+}
+.bk-common-right .bk-log-flow{
+    .bk-timeline-time {
+        cursor: auto!important;
+    }
+}
+
+/* 修改jsflow样式 */
+.bk-second-flow {
+    .jsflow .palette-panel-wrap {
+        height: auto;
+        border-right: 1px solid #DDE4EB;
+        width: 60px;
+        height: 100%;
+        background-color: #fff;
+    }
+    .jsflow {
+        border: none;
+        .tool-panel-wrap {
+            top: 9px;
+            right: 14px;
+            left: auto;
+            height: 32px;
+            background: rgba(196, 198, 204, 0.5);
+            box-shadow: 0px 0px 4px 0px rgba(220, 222, 229, 0.8);
+            border-radius: 18px;
+            padding: 0 15px;
+            line-height: 34px;
+            overflow: hidden;
+            .tool-panel {
+                height: 32px;
+            }
+            .tool-item {
+                line-height: 32px;
+                padding: 0 10px;
+                color: #fff;
+                float: left;
+                &:hover {
+                    background-color: rgba(196, 198, 204, 0.8);
+                }
+            }
+            .actived {
+                color: #3a84ff;
+            }
+        }
+        .jtk-endpoint {
+            z-index: 103;
+            cursor: default;
+        }
+        .jsflow-node {
+            z-index: 101;
+        }
+        .icon-choose-node {
+            font-size: 20px;
+        }
+    }
+    .label-test {
+        padding: 20px;
+        &:hover {
+            .bk-label-test-delete {
+                opacity: 1;
+            }
+        }
+    }
+    .bk-label-test-name {
+        padding: 0 20px;
+        display: inline-block;
+        border: 1px solid #C4C6CC;
+        border-radius: 11px;
+        color: #979BA5;
+        font-size: 12px;
+        padding: 0 8px;
+        line-height: 22px;
+        background-color: #fff;
+        white-space: nowrap;
+        cursor: pointer;
+        &:hover {
+            border: 1px solid #3A84FF;
+            color: #3A84FF;
+        }
+    }
+    .bk-label-test-delete {
+        font-size: 14px;
+        color: #ff5757;
+        background: #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        background-color: #ff5757;
+        line-height: 15px;
+        color: #fff;
+        float: left;
+        opacity: 0;
+        text-align: center;
+        cursor: pointer;
+    }
+    .label-test {
+        z-index: 20;
+    }
+    .label-success {
+        border-color: #2DCB56;
+        color: #2DCB56;
+    }
+
+    .canvas-flow-wrap .selected .common-node,
+    .canvas-flow-wrap .selected .common-branch,
+    .canvas-flow-wrap .selected .startpoint,
+    .canvas-flow-wrap .selected .endpoint {
+        border: 1px dashed #3A84FF;
+    }
+    .canvas-flow-wrap .bk-error-flow .common-node,
+    .canvas-flow-wrap .bk-error-flow .common-branch,
+    .canvas-flow-wrap .bk-error-flow .startpoint,
+    .canvas-flow-wrap .bk-error-flow .endpoint {
+        border: 1.5px dashed #ff5656;
+    }
+}
+.bk-preview-flow {
+    .jtk-endpoint {
+        display: none!important;
+    }
+    .jsflow {
+        .tool-panel-wrap {
+            position: absolute;
+            top: -36px;
+            right: 35px;
+            background-color: #fff;
+            box-shadow: none;
+            padding: 0;
+            .tool-item {
+                margin-right: 10px;
+                color: #979BA5;
+            }
+        }
+    }
+}

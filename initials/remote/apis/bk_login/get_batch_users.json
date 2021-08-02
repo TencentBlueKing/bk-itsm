@@ -1,0 +1,164 @@
+[
+    {
+        "req_params": [],
+        "is_deleted": false,
+        "name": "\u6279\u91cf\u83b7\u53d6\u7528\u6237\u4fe1\u606f",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "bk_username_list"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "bk_username_list": {
+                    "items": {
+                        "default": "",
+                        "type": "string",
+                        "description": "\u7528\u6237\u540d"
+                    },
+                    "type": "array",
+                    "description": "\u7528\u6237\u540d\u5217\u8868"
+                }
+            }
+        },
+        "func_name": "get_batch_users",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "message",
+                "code",
+                "data",
+                "result",
+                "request_id",
+                "msg"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": "\u8fd4\u56de\u7801"
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": "\u63a5\u53e3\u8bf7\u6c42\u72b6\u6001"
+                },
+                "request_id": {
+                    "default": "9c8657ab8cb5411686a3bd0551918bbd",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "\u7528\u6237\u4fe1\u606f\u83b7\u53d6\u6210\u529f",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "\u7528\u6237\u4fe1\u606f\u83b7\u53d6\u6210\u529f",
+                    "type": "string",
+                    "description": "\u4fe1\u606f"
+                },
+                "data": {
+                    "required": [
+                        "admin"
+                    ],
+                    "type": "object",
+                    "description": "\u8fd4\u56de\u6570\u636e",
+                    "properties": {
+                        "admin": {
+                            "required": [
+                                "qq",
+                                "wx_userid",
+                                "language",
+                                "bk_username",
+                                "time_zone",
+                                "bk_role",
+                                "phone",
+                                "email",
+                                "chname"
+                            ],
+                            "type": "object",
+                            "description": "",
+                            "properties": {
+                                "qq": {
+                                    "default": "",
+                                    "type": "string",
+                                    "description": "\u7528\u6237QQ"
+                                },
+                                "bk_username": {
+                                    "default": "admin",
+                                    "type": "string",
+                                    "description": "\u7528\u6237\u540d"
+                                },
+                                "language": {
+                                    "default": "zh-cn",
+                                    "type": "string",
+                                    "description": "\u8bed\u8a00"
+                                },
+                                "wx_userid": {
+                                    "default": "",
+                                    "type": "string",
+                                    "description": "\u4f01\u4e1a\u53f7\u7528\u6237USERID/\u516c\u4f17\u53f7\u7528\u6237OPENID"
+                                },
+                                "time_zone": {
+                                    "default": "Asia/Shanghai",
+                                    "type": "string",
+                                    "description": "\u65f6\u533a"
+                                },
+                                "bk_role": {
+                                    "default": 1,
+                                    "type": "number",
+                                    "description": "\u7528\u6237\u89d2\u8272"
+                                },
+                                "phone": {
+                                    "default": "13719164519",
+                                    "type": "string",
+                                    "description": "\u624b\u673a\u53f7"
+                                },
+                                "email": {
+                                    "default": "wl@abc.com",
+                                    "type": "string",
+                                    "description": "\u90ae\u7bb1"
+                                },
+                                "chname": {
+                                    "default": "admin",
+                                    "type": "string",
+                                    "description": "\u4e2d\u6587\u540d"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "remote_system": 13,
+        "system_info": {
+            "cookies": [],
+            "code": "bk_login",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 1,
+            "headers": [],
+            "is_builtin": true,
+            "desc": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55\uff0c\u7ba1\u7406\u7528\u6237\u767b\u5f55\u9a8c\u8bc1\uff0c\u53ca\u7528\u6237\u4fe1\u606f",
+            "updated_by": ""
+        },
+        "method": "POST",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/bk_login/get_batch_users/",
+        "is_builtin": false,
+        "desc": "\u6279\u91cf\u83b7\u53d6\u7528\u6237\u4fe1\u606f",
+        "updated_by": "system"
+    }
+]

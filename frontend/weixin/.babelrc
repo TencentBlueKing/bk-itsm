@@ -1,0 +1,26 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "modules": false,
+                "corejs": 3,
+                "targets": {
+                    "browsers": [
+                        "> 1%",
+                        "last 2 version",
+                        "IE 11"
+                    ]
+                },
+                "debug": false,
+                "useBuiltIns": "usage"
+            }
+        ],
+        ["@babel/typescript"]
+    ],
+    "plugins": [
+        "@babel/plugin-transform-runtime",
+        "@babel/plugin-proposal-object-rest-spread",
+        "@babel/plugin-transform-async-to-generator"
+    ]
+}

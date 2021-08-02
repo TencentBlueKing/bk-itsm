@@ -1,0 +1,3 @@
+{% for k, v in response.headers.iteritems %}{{ k | safe }}: {{ v | safe }}
+{% endfor %}
+{% ifequal response.text None %}{% else %}{{ response.text | safe }}{% endifequal %}

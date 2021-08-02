@@ -1,0 +1,63 @@
+/* vant checkbox field 样式调整 */
+.vant-checkbox-correct {
+  > .van-cell__title {
+    width: 4.2em;
+    flex: inherit !important;
+  }
+  > .van-cell__value {
+    .van-field__control {
+      .van-checkbox-group {
+        margin-top: -10px;
+        justify-content: inherit;
+        > .van-checkbox {
+          margin-top: 10px;
+          margin-right: 40px;
+          width: auto;
+          > .van-checkbox__icon {
+            align-self: flex-start;
+            margin-top: 4px;
+          }
+          > .van-checkbox__label {
+            overflow: auto;
+            text-overflow: inherit;
+            word-break: break-all;
+            white-space: inherit;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* vant radio field 样式调整 */
+.vant-radio-correct {
+  > .van-cell__title {
+    width: 4.2em;
+    flex: inherit !important;
+  }
+  > .van-cell__value {
+    .van-field__control {
+      .van-radio-group {
+        margin-top: -10px;
+        justify-content: inherit;
+        > .van-radio {
+          margin-top: 10px;
+          margin-right: 40px;
+          width: auto;
+          > .van-radio__icon {
+            align-self: flex-start;
+            margin-top: 4px;
+          }
+          > .van-radio__label {
+            overflow: auto;
+            text-overflow: inherit;
+            word-break: break-all;
+            white-space: inherit;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+}

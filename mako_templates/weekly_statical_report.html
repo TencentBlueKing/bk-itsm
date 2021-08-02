@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>流程服务每周统计</title>
+    
+    <style>
+        table,table tr th, table tr td { border:1px solid #0094ff; }
+        table { width: 200px; min-height: 25px; line-height: 25px; text-align: center; border-collapse: collapse;}   
+    </style>
+    
+</head>
+<body>
+
+
+
+<div>
+    <span>
+        按照服务维度TOP20，总服务数量：${len(tickets_group_by_service)}, 总单量：${total_tickets_count}
+    </span>
+    <hr/>
+<table class="my-table" name="tickets_group_by_service">
+    <thead>
+    <tr>
+        <th>服务</th>
+        <th>单量</th>
+    </tr>
+    </thead>
+    <tbody>
+    %for service_ticket in  tickets_group_by_service[:20]:
+    <tr>
+        <td>
+            ${all_services.get(service_ticket.service_id) or all_services_include_deleted.get(service_ticket.service_id, service_ticket.service_id)}
+        </td>
+        <td>
+            ${service_ticket.ticket_count}
+        </td>
+    </tr>
+    %endfor
+    </tbody>
+</table>
+
+</div>
+
+
+
+<div>
+    <span>
+        按照业务维度TOP20，总业务数量：${len(tickets_group_by_biz)}
+    </span>
+    <hr/>
+<table class="my-table" name="tickets_group_by_biz">
+    <thead>
+    <tr>
+        <th>业务名称</th>
+        <th>业务ID</th>
+        <th>单量</th>
+    </tr>
+    </thead>
+    <tbody>
+    %for biz_ticket in  tickets_group_by_biz[:20]:
+    <tr>
+        <td>
+            ${all_bizs.get(biz_ticket.bk_biz_id, "--")}
+        </td>
+        <td>
+        ${biz_ticket.bk_biz_id}
+        </td>
+        <td>
+            ${biz_ticket.ticket_count}
+        </td>
+    </tr>
+    %endfor
+    </tbody>
+</table>
+
+</div>
+
+
+<div>
+    <span>
+        一周服务维度top20，上周提单关联服务数量：${len(tickets_group_by_service_of_last_week)}, 总单量：${total_tickets_count_of_last_week}
+    </span>
+    <hr/>
+<table class="my-table" name="tickets_group_by_service_of_last_week">
+    <thead>
+    <tr>
+        <th>服务</th>
+        <th>单量</th>
+    </tr>
+    </thead>
+    <tbody>
+    %for service_ticket in  tickets_group_by_service_of_last_week[:20]:
+    <tr>
+        <td>
+           ${all_services.get(service_ticket.service_id) or all_services_include_deleted.get(service_ticket.service_id, service_ticket.service_id)}
+        </td>
+        <td>
+            ${service_ticket.ticket_count}
+        </td>
+    </tr>
+    %endfor
+    </tbody>
+</table>
+
+</div>
+
+
+<div>
+    <span>
+        一周业务维度TOP20，提单业务数量：${len(tickets_group_by_biz_of_last_week)}
+    </span>
+    <hr/>
+<table class="my-table" name="tickets_group_by_biz_of_last_week">
+    <thead>
+    <tr>
+        <th>业务名称</th>
+        <th>业务ID</th>
+        <th>单量</th>
+    </tr>
+    </thead>
+    <tbody>
+    %for biz_ticket in  tickets_group_by_biz_of_last_week[:20]:
+    <tr>
+        <td>
+            ${all_bizs.get(biz_ticket.bk_biz_id, "--")}
+        </td>
+        <td>
+        ${biz_ticket.bk_biz_id}
+        </td>
+        <td>
+            ${biz_ticket.ticket_count}
+        </td>
+    </tr>
+    %endfor
+    </tbody>
+</table>
+
+</div>
+
+
+<div>
+    <span>
+       一周新增业务和服务数量
+    </span>
+    
+<hr/>
+<table class="my-table" name="tickets_group_by_biz">
+    <thead>
+    <tr>
+        <th width="200px">新增项</th>
+        <th width="300px">新增内容</th>
+        <th width="200px">新增数量</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr name = "service">
+        <td>
+            新增服务
+        </td>
+        <td>
+            ${",".join(new_services) or "--"}
+        </td>
+        <td>
+            ${len(new_services)}
+        </td>
+    </tr>
+    
+    <tr name = "biz">
+        <td>
+            新增业务
+        </td>
+        <td>
+            ${",".join(new_bizs) or "--"}
+        </td>
+        <td>
+            ${len(new_bizs)}
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE>
+
+<html>
+
+<head>
+  <title>cytoscape-dagre.js demo</title>
+
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+  <!-- for testing with local version of cytoscape.js -->
+  <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
+
+  <script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script>
+  <script src="cytoscape-dagre.js"></script>
+
+  <style>
+    body {
+      font-family: helvetica;
+      font-size: 14px;
+    }
+
+    #cy {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 999;
+    }
+
+    h1 {
+      opacity: 0.5;
+      font-size: 1em;
+    }
+  </style>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+
+      var cy = window.cy = cytoscape({
+        container: document.getElementById('cy'),
+
+        boxSelectionEnabled: false,
+        autounselectify: true,
+
+        layout: {
+          name: 'dagre'
+        },
+
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'background-color': '#11479e'
+            }
+          },
+
+          {
+            selector: 'edge',
+            style: {
+              'width': 4,
+              'target-arrow-shape': 'triangle',
+              'line-color': '#9dbaea',
+              'target-arrow-color': '#9dbaea',
+              'curve-style': 'bezier'
+            }
+          }
+        ],
+
+        elements: {
+          nodes: [
+            {
+              "data": {
+                "id": "开始"
+              }
+            },
+            {
+              "data": {
+                "id": "提单"
+              }
+            },
+            {
+              "data": {
+                "id": "结束"
+              }
+            },
+            {
+              "data": {
+                "id": "准备材料"
+              }
+            },
+            {
+              "data": {
+                "id": "验收"
+              }
+            },
+            {
+              "data": {
+                "id": "准备机器"
+              }
+            },
+            {
+              "data": {
+                "id": "并行后汇聚网关"
+              }
+            },
+            {
+              "data": {
+                "id": "审核后并行网关"
+              }
+            },
+            {
+              "data": {
+                "id": "生产调试"
+              }
+            },
+            {
+              "data": {
+                "id": "验收机器"
+              }
+            },
+            {
+              "data": {
+                "id": "审核"
+              }
+            },
+            {
+              "data": {
+                "id": "验收材料"
+              }
+            }
+          ],
+          edges: [
+            {
+              "data": {
+                "source": "开始",
+                "target": "提单"
+              }
+            },
+            {
+              "data": {
+                "source": "提单",
+                "target": "审核"
+              }
+            },
+            {
+              "data": {
+                "source": "审核",
+                "target": "审核后并行网关"
+              }
+            },
+            {
+              "data": {
+                "source": "审核",
+                "target": "结束"
+              }
+            },
+            {
+              "data": {
+                "source": "审核后并行网关",
+                "target": "准备材料"
+              }
+            },
+            {
+              "data": {
+                "source": "审核后并行网关",
+                "target": "准备机器"
+              }
+            },
+            {
+              "data": {
+                "source": "准备材料",
+                "target": "验收材料"
+              }
+            },
+            {
+              "data": {
+                "source": "准备机器",
+                "target": "验收机器"
+              }
+            },
+            {
+              "data": {
+                "source": "验收机器",
+                "target": "准备机器"
+              }
+            },
+            {
+              "data": {
+                "source": "验收机器",
+                "target": "并行后汇聚网关"
+              }
+            },
+            {
+              "data": {
+                "source": "验收材料",
+                "target": "准备材料"
+              }
+            },
+            {
+              "data": {
+                "source": "验收材料",
+                "target": "并行后汇聚网关"
+              }
+            },
+            {
+              "data": {
+                "source": "并行后汇聚网关",
+                "target": "生产调试"
+              }
+            },
+            {
+              "data": {
+                "source": "生产调试",
+                "target": "验收"
+              }
+            },
+            {
+              "data": {
+                "source": "验收",
+                "target": "生产调试"
+              }
+            },
+            {
+              "data": {
+                "source": "验收",
+                "target": "结束"
+              }
+            }
+          ]
+        }
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+<h1>cytoscape-dagre demo</h1>
+
+<div id="cy"></div>
+
+</body>
+
+</html>

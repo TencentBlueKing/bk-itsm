@@ -1,0 +1,124 @@
+#! /bin/bash
+
+unset HASTTY
+
+red_echo ()      { [ "$HASTTY" == 1 ] && echo -e "\033[031;1m$@\033[0m" || echo "$@"; }
+blue_echo ()     { [ "$HASTTY" == 1 ] && echo -e "\033[034;1m$@\033[0m" || echo "$@"; }
+green_echo ()    { [ "$HASTTY" == 1 ] && echo -e "\033[032;1m$@\033[0m" || echo "$@"; }
+bblue_echo ()    { [ "$HASTTY" == 1 ] && echo -e "\033[044;1m$@\033[0m" || echo "$@"; }
+
+log () {
+   # 打印消息, 并记录到日志, 日志文件由 LOG_FILE 变量定义
+   local retval=$?
+   local timestamp=$(date +%Y%m%d-%H%M%S)
+   local level=INFO
+   local func_seq=$(echo ${FUNCNAME[@]} | sed 's/ /-/g')
+   local logfile=${LOG_FILE:=/tmp/bkc.log}
+
+   echo "[$(blue_echo $LAN_IP)]$timestamp $BASH_LINENO   $@"
+   echo "[$(blue_echo $LAN_IP)]$timestamp $level|$BASH_LINENO|${func_seq} $@" >>$logfile
+   return $retval
+}
+
+ok () {
+   local timestamp=$(date +%Y%m%d-%H%M%S)
+   local level=INFO
+   local func_seq=$(echo ${FUNCNAME[@]} | sed 's/ /-/g')
+   local logfile=${LOG_FILE:=/tmp/bkc.log}
+
+   echo "$timestamp $BASH_LINENO   $(green_echo $@)"
+   echo "$timestamp $level|$BASH_LINENO|${func_seq} $@" >> $logfile
+
+   return 0
+}
+
+fail () {
+   local timestamp=$(date +%Y%m%d-%H%M%S)
+   local level=FATAL
+   local retval=${2:-1}
+   local func_seq=$(echo ${FUNCNAME[@]} | sed 's/ /-/g')
+   local logfile=${LOG_FILE:=/tmp/bkc.log}
+
+   echo "$timestamp $BASH_LINENO   $(red_echo $@)"
+   echo "$timestamp $level|$BASH_LINENO|${func_seq} $@" >> $logfile
+
+   exit $retval
+}
+
+assert () {
+    local check_ret=$?
+    local msg="$1"
+    local err="$2"
+
+    if [ $check_ret -eq 0 ]; then
+        ok "$msg"
+    else
+        fail "$err"
+    fi
+}
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin
+exec 2>&1
+
+export LC_ALL=en_US.UTF-8
+
+CODE_PATH=${APP_CONTAINER_PATH}"code"
+CONF_PATH=${APP_CONTAINER_PATH}"conf"
+CONF_BACKUP_PATH=${APP_CONTAINER_PATH}"conf_backup"
+RUN_PATH=${APP_CONTAINER_PATH}"run"
+LOG_PATH=${APP_CONTAINER_PATH}"logs"
+
+PYTHON_BIN_PATH="/cache/.bk/env/bin/"
+NOW=$(date +%Y%m%d_%H%M%S)
+
+merge_conf () {
+    # merge app's conf and paasagent's envs
+
+    log "pre_starter: replace envs and app_code of uwsgi and supervisord conf"
+    envs=$(awk -F " = " '$1 == "environment" {print $2}' $CONF_BACKUP_PATH/supervisord.conf | head -n1)    
+    # envs may has '/s'(sed: -e expression #1, char 39: unknown option to `s')
+    sed -i "s#<ENV>#${envs}#g" $CONF_PATH/supervisord.conf || return 1;
+    sed -i "s/<APP_CODE>/${APP_CODE}/g" $CONF_PATH/supervisord.conf || return 1;
+    sed -i "s/<APP_CODE>/${APP_CODE}/g" $CONF_PATH/$APP_CODE.ini || return 1;
+
+    ok "pre_starter: merge conf successfully"
+    return 0
+}
+
+
+log "------pre_starter: check if support-files exists ------"
+
+if [ -d $CODE_PATH/support-files ]; then
+    log "pre_starter: find support-files in $APP_CODE"
+    cd $CODE_PATH/support-files/
+    if [[ -f uwsgi.ini && -f supervisord.conf ]]; then
+
+        log "pre_starter: find uwsgi and supervisord conf in support-files"
+        log "pre_starter: backup $CONF_PATH to $CONF_BACKUP_PATH"
+        rm -rf $CONF_BACKUP_PATH && mv $CONF_PATH $CONF_BACKUP_PATH
+        mkdir -p $CONF_PATH
+    
+        log "pre_starter: copy $CODE_PATH/support-files/ to $CONF_PATH"
+        cd $CONF_PATH
+        cp -r $CODE_PATH/support-files/* ./
+        mv uwsgi.ini $APP_CODE.ini
+
+        if [ "$IS_MASTER" = "true" ]; then
+            log "pre_starter: This node is not master node, add celery beat first"
+            cat ./super_celerybeat.conf >> ./supervisord.conf
+        else
+            log "pre_starter: This node is not master node, skip add celery beat"
+        fi
+        
+        merge_conf
+        if [ "$?" -ne 0 ]; then
+            log "pre_starter: merge conf failed, rollback $CONF_PATH"
+            rm -rf $CONF_PATH.failed.*
+            mv $CONF_PATH $CONF_PATH.failed.$NOW
+            mv $CONF_BACKUP_PATH $CONF_PATH
+        fi 
+
+    fi
+fi
+
+ok "------pre_starter: finished------"

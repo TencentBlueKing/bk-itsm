@@ -1,0 +1,337 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "get_job_instance_status", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id", 
+        "msg"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56de\u7801"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "fabe768e7fd04c18afbb0b96107898cb", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "msg": {
+          "default": "success", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u4fe1\u606f"
+        }, 
+        "data": {
+          "required": [
+            "job_instance", 
+            "is_finished", 
+            "blocks"
+          ], 
+          "type": "object", 
+          "description": "\u8fd4\u56de\u6570\u636e", 
+          "properties": {
+            "job_instance": {
+              "required": [
+                "job_instance_id", 
+                "bk_biz_id", 
+                "name", 
+                "start_way", 
+                "start_time", 
+                "operator", 
+                "bk_job_id", 
+                "create_time", 
+                "status", 
+                "end_time", 
+                "total_time", 
+                "current_step_instance_id"
+              ], 
+              "type": "object", 
+              "description": "\u4f5c\u4e1a\u5b9e\u4f8b\u57fa\u672c\u4fe1\u606f", 
+              "properties": {
+                "job_instance_id": {
+                  "default": 1170216, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "bk_biz_id": {
+                  "default": 2, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "total_time": {
+                  "default": 1.21, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "name": {
+                  "default": "API Quick execution script1564453612524", 
+                  "type": "string", 
+                  "description": ""
+                }, 
+                "start_way": {
+                  "default": 2, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "start_time": {
+                  "default": "2019-07-30 10:26:52 +0800", 
+                  "type": "string", 
+                  "description": ""
+                }, 
+                "bk_job_id": {
+                  "default": -1, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "create_time": {
+                  "default": "2019-07-30 10:26:52 +0800", 
+                  "type": "string", 
+                  "description": ""
+                }, 
+                "status": {
+                  "default": 4, 
+                  "type": "number", 
+                  "description": ""
+                }, 
+                "end_time": {
+                  "default": "2019-07-30 10:26:53 +0800", 
+                  "type": "string", 
+                  "description": ""
+                }, 
+                "operator": {
+                  "default": "admin", 
+                  "type": "string", 
+                  "description": ""
+                }, 
+                "current_step_instance_id": {
+                  "default": 1170329, 
+                  "type": "number", 
+                  "description": ""
+                }
+              }
+            }, 
+            "is_finished": {
+              "default": true, 
+              "type": "boolean", 
+              "description": "\u4f5c\u4e1a\u662f\u5426\u7ed3\u675f"
+            }, 
+            "blocks": {
+              "items": {
+                "required": [
+                  "block_name", 
+                  "type", 
+                  "block_order", 
+                  "step_instances"
+                ], 
+                "type": "object", 
+                "description": "", 
+                "properties": {
+                  "block_name": {
+                    "default": "API Quick execution script1564453612524", 
+                    "type": "string", 
+                    "description": "\u6b65\u9aa4\u5757\u540d\u79f0"
+                  }, 
+                  "type": {
+                    "default": 1, 
+                    "type": "number", 
+                    "description": "\u6b65\u9aa4\u5757\u7c7b\u578b\uff1a1.\u811a\u672c\u6b65\u9aa4; 2.\u6587\u4ef6\u6b65\u9aa4; 4.SQL\u6b65\u9aa4"
+                  }, 
+                  "block_order": {
+                    "default": 1, 
+                    "type": "number", 
+                    "description": "\u6b65\u9aa4\u5757\u987a\u5e8f"
+                  }, 
+                  "step_instances": {
+                    "items": {
+                      "required": [
+                        "status", 
+                        "total_time", 
+                        "pause", 
+                        "operation_list", 
+                        "name", 
+                        "start_time", 
+                        "step_instance_id", 
+                        "retry_count", 
+                        "create_time", 
+                        "end_time", 
+                        "operator", 
+                        "step_id", 
+                        "type", 
+                        "order"
+                      ], 
+                      "type": "object", 
+                      "description": "", 
+                      "properties": {
+                        "status": {
+                          "default": 4, 
+                          "type": "number", 
+                          "description": "\u4f5c\u4e1a\u6b65\u9aa4\u72b6\u6001\u7801: 1.\u672a\u6267\u884c; 2.\u6b63\u5728\u6267\u884c; 3.\u6267\u884c\u6210\u529f; 4.\u6267\u884c\u5931\u8d25; 5.\u8df3\u8fc7; 6.\u5ffd\u7565\u9519\u8bef; 7.\u7b49\u5f85\u7528\u6237; 8.\u624b\u52a8\u7ed3\u675f; 9.\u72b6\u6001\u5f02\u5e38; 10.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u4e2d; 11.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u6210\u529f; 12.\u6b65\u9aa4\u5f3a\u5236\u7ec8\u6b62\u5931\u8d25"
+                        }, 
+                        "total_time": {
+                          "default": 1.21, 
+                          "type": "number", 
+                          "description": "\u603b\u8017\u65f6\uff0c\u79d2"
+                        }, 
+                        "pause": {
+                          "default": 0, 
+                          "type": "number", 
+                          "description": "0.\u6267\u884c\u5b8c\u6210\u540e\u4e0d\u6682\u505c(\u9ed8\u8ba4); 1.\u6267\u884c\u5b8c\u6210\u540e\u6682\u505c"
+                        }, 
+                        "operation_list": {
+                          "items": {
+                            "required": [
+                              "operation_code", 
+                              "operation_name"
+                            ], 
+                            "type": "object", 
+                            "description": "", 
+                            "properties": {
+                              "operation_code": {
+                                "default": 2, 
+                                "type": "number", 
+                                "description": "\u64cd\u4f5c\u547d\u4ee4\u7f16\u7801\uff0c\u547d\u4ee4\u6807\u8bc6"
+                              }, 
+                              "operation_name": {
+                                "default": "\u5931\u8d25IP\u91cd\u505a", 
+                                "type": "string", 
+                                "description": "\u64cd\u4f5c\u547d\u4ee4\u540d\u79f0, \u6bd4\u5982'\u5f3a\u5236\u7ec8\u6b62'"
+                              }
+                            }
+                          }, 
+                          "type": "array", 
+                          "description": "\u5f53\u524d\u6b65\u9aa4\u53ef\u64cd\u4f5c\u7684\u6307\u4ee4"
+                        }, 
+                        "name": {
+                          "default": "API Quick execution script1564453612524", 
+                          "type": "string", 
+                          "description": "\u4f5c\u4e1a\u5b9e\u4f8b\u540d\u79f0"
+                        }, 
+                        "start_time": {
+                          "default": "2019-07-30 10:26:52 +0800", 
+                          "type": "string", 
+                          "description": "\u5f00\u59cb\u6267\u884c\u65f6\u95f4\uff0cYYYY-MM-DD HH:mm:ss\u683c\u5f0f"
+                        }, 
+                        "step_instance_id": {
+                          "default": 1170329, 
+                          "type": "number", 
+                          "description": "\u4f5c\u4e1a\u6b65\u9aa4\u5b9e\u4f8bID"
+                        }, 
+                        "retry_count": {
+                          "default": 0, 
+                          "type": "number", 
+                          "description": "\u6b65\u9aa4\u91cd\u8bd5\u6b21\u6570"
+                        }, 
+                        "create_time": {
+                          "default": "2019-07-30 10:26:52 +0800", 
+                          "type": "string", 
+                          "description": "\u521b\u5efa\u65f6\u95f4\uff0cYYYY-MM-DD HH:mm:ss\u683c\u5f0f"
+                        }, 
+                        "end_time": {
+                          "default": "2019-07-30 10:26:53 +0800", 
+                          "type": "string", 
+                          "description": "\u6267\u884c\u7ed3\u675f\u65f6\u95f4\uff0cYYYY-MM-DD HH:mm:ss\u683c\u5f0f"
+                        }, 
+                        "operator": {
+                          "default": "admin", 
+                          "type": "string", 
+                          "description": "\u4f5c\u4e1a\u6267\u884c\u4eba\u5e10\u53f7"
+                        }, 
+                        "step_id": {
+                          "default": -1, 
+                          "type": "number", 
+                          "description": "\u4f5c\u4e1a\u6a21\u677f\u6b65\u9aa4ID\uff0c\u5982\u679c\u4e0d\u662f\u4ece\u4f5c\u4e1a\u6a21\u677f\u542f\u52a8\u7684\u5219\u4e3a-1"
+                        }, 
+                        "type": {
+                          "default": 1, 
+                          "type": "number", 
+                          "description": "\t\u6b65\u9aa4\u7c7b\u578b\uff1a1.\u811a\u672c\u6b65\u9aa4; 2.\u6587\u4ef6\u6b65\u9aa4; 4.SQL\u6b65\u9aa4"
+                        }, 
+                        "order": {
+                          "default": 1, 
+                          "type": "number", 
+                          "description": "\u5f53\u524d\u6b65\u9aa4\u5728\u6b65\u9aa4\u5757\u4e2d\u7684\u987a\u5e8f"
+                        }
+                      }
+                    }, 
+                    "type": "array", 
+                    "description": "\u6b65\u9aa4\u5757\u4e2d\u5305\u542b\u7684\u5404\u4e2a\u6b65\u9aa4\u5bf9\u8c61"
+                  }
+                }
+              }, 
+              "type": "array", 
+              "description": "\t\u4f5c\u4e1a\u6b65\u9aa4\u5757\u6570\u7ec4"
+            }
+          }
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/job/get_job_instance_status/", 
+    "is_builtin": false, 
+    "req_params": [
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "bk_biz_id", 
+        "value": "2", 
+        "desc": "\u4e1a\u52a1ID"
+      }, 
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "job_instance_id", 
+        "value": "1170216", 
+        "desc": "\u4f5c\u4e1a\u5b9e\u4f8bID"
+      }
+    ], 
+    "desc": "\u6839\u636e\u4f5c\u4e1a\u5b9e\u4f8b ID \u67e5\u8be2\u4f5c\u4e1a\u6267\u884c\u72b6\u6001", 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u4f5c\u4e1a\u6267\u884c\u72b6\u6001", 
+    "is_activated": true, 
+    "remote_system": 8, 
+    "system_info": {
+      "cookies": [], 
+      "code": "job", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u4f5c\u4e1a\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 4, 
+      "headers": [], 
+      "is_builtin": true, 
+      "desc": "\u4f5c\u4e1a\u5e73\u53f0\uff08Job\uff09\u662f\u4e00\u5957\u57fa\u4e8e\u84dd\u9cb8\u667a\u4e91\u7ba1\u63a7\u5e73\u53f0Agent\u7ba1\u9053\u4e4b\u4e0a\u7684\u57fa\u7840\u64cd\u4f5c\u5e73\u53f0\uff0c\u5177\u5907\u5927\u5e76\u53d1\u5904\u7406\u80fd\u529b\uff1b\u9664\u4e86\u652f\u6301\u811a\u672c\u6267\u884c\u3001\u6587\u4ef6\u62c9\u53d6/\u5206\u53d1\u3001\u5b9a\u65f6\u4efb\u52a1\u7b49\u4e00\u7cfb\u5217\u53ef\u5b9e\u73b0\u7684\u57fa\u7840\u8fd0\u7ef4\u573a\u666f\u4ee5\u5916\uff0c\u8fd8\u8fd0\u7528\u6d41\u7a0b\u5316\u7684\u7406\u5ff5\u5f88\u597d\u7684\u5c06\u96f6\u788e\u7684\u5355\u4e2a\u4efb\u52a1\u7ec4\u88c5\u6210\u4e00\u4e2a\u4f5c\u4e1a\u6d41\u7a0b\uff1b\u800c\u6bcf\u4e2a\u4efb\u52a1\u90fd\u53ef\u505a\u4e3a\u4e00\u4e2a\u539f\u5b50\u8282\u70b9\uff0c\u63d0\u4f9b\u7ed9\u5176\u5b83\u7cfb\u7edf\u548c\u5e73\u53f0\u8c03\u5ea6\uff0c\u5b9e\u73b0\u8c03\u5ea6\u81ea\u52a8\u5316\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

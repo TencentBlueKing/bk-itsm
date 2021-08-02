@@ -1,0 +1,23 @@
+#listen              443 ssl;
+#ssl                 on;
+#证书文件，相对nginx默认配置文件路径
+ssl_certificate     sites-enabled/itsm.crt;
+#私钥文件
+ssl_certificate_key sites-enabled/itsm.key;
+#配置会话超时时间
+ssl_session_timeout  10m;
+#配置共享会话缓存大小，根据站点访问情况设定
+ssl_session_cache shared:SSL:10m;
+ssl_protocols TLSv1 TLSv1.1 TLSv1.2; #按照这个协议配置
+ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;#按照这个套件配置
+#优先采取服务器算法
+ssl_prefer_server_ciphers on;
+
+# 设置长连接
+keepalive_timeout 75;
+#减少点击劫持
+add_header X-Frame-Options DENY;
+#禁止服务器自动解析资源类型
+add_header X-Content-Type-Options nosniff;
+#防XSS攻击
+add_header X-Xss-Protection 1;

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>单据处理</title>
+    <!-- font-awesome -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/fontawesome/css/font-awesome.css"
+          rel="stylesheet">
+    <!-- 蓝鲸提供的移动端公用样式库 -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/css/bkui.css" rel="stylesheet">
+    <link rel="stylesheet" href="${WEIXIN_STATIC_URL}css/index.css">
+    <script>
+        var weixin_site_url = "${WEIXIN_SITE_URL}";
+        var weixin_static_url = "${WEIXIN_STATIC_URL}";
+    </script>
+</head>
+<body>
+<!--HTML-->
+% if supported:
+<form class="bkui-form bkui-spacing" id="ticket-form" data-ticket="${tk.pk}" data-state_id="${tk.current_state_id}">
+    <div class="bkui-title bkui-font-md" style="text-align: center; height: 2.5rem;">
+        ${tk.value_of_field('title', '--')}
+    </div>
+    <div class="bkui-title bkui-font-sm" style="text-align: center; height: 2rem; font-size: 1rem">
+        ${tk.sn}
+    </div>
+    % for f in fields:
+        <div class="bkui-title bkui-font-sm" data-validate="${f['validate_type']}">
+            ${f['name']}${'（<label style="color: red">*</label>）' if f['validate_type'] == 'REQUIRE' else ''}：
+        </div>
+    
+        % if f['type'] == 'STRING':
+        <div class="bkui-cell">
+            <input type="text" class="bkui-input field" placeholder="${f['desc']}" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}"/>
+        </div>
+        % elif f['type'] == 'INT':
+            <div class="bkui-cell">
+            <input type="number" class="bkui-input field" placeholder="${f['desc']}" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}"/>
+        </div>
+        % elif f['type'] == 'TEXT':
+        <div class="bkui-cell">
+            <textarea class="bkui-textarea field" placeholder="${f['desc']}" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}"></textarea>
+        </div>
+        % elif f['type'] == 'DATE':
+        <div class="bkui-cell">
+            <input class="bkui-date field" type="date" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}"/>
+        </div>
+        % elif f['type'] == 'DATETIME':
+        <div class="bkui-cell">
+            <input class="bkui-date field" type="datetime-local" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}"/>
+        </div>
+        % elif f['type'] == 'SELECT':
+        <div class="bkui-cell">
+            <select class="bkui-select field" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}">
+                % for c in f['choice']:
+                <option value="${c['key']}">${c['name']}</option>
+                % endfor
+            </select>
+        </div>
+        % elif f['type'] == 'CHECKBOX':
+        <div class="bkui-choice bkui-checkbox field"  data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}">
+            % for c in f['choice']:
+            <label class="bkui-form-cell" for="${c['key']}">
+                <div class="bkui-form-hd">
+                    <input type="checkbox" class="bkui-check" name="checkbox1" id="${c['key']}" value="${c['key']}" data-name="${c['name']}" data-key="${c['key']}"/>
+                    <span class="bkui-choice-icon"></span>
+                </div>
+                <div class="bkui-form-bd">${c['name']}</div>
+            </label>
+            % endfor
+        </div>
+        % elif f['type'] == 'RADIO':
+        <div class="bkui-choice bkui-radio field" data-id="${f['id']}" data-key="${f['key']}" data-type="${f['type']}">
+            % for c in f['choice']:
+            <label class="bkui-form-cell" for="${c['key']}">
+                <div class="bkui-form-hd">
+                    <input type="radio" class="bkui-check" name="radio1" id="${c['key']}" value="${c['key']}" data-name="${c['name']}" data-key="${c['key']}"/>
+                    <span class="bkui-choice-icon"></span>
+                </div>
+                <div class="bkui-form-bd">${c['name']}</div>
+            </label>
+            % endfor
+        </div>
+        % else:
+        %endif
+    % endfor
+    
+    <div class="bkui-cell bkui-spacing" style="margin: 0">
+         <div class="bkui-btn-area" id="btn-area">
+            % if is_terminable:
+                <a href="javascript:;" class="bkui-btn bkui-btn-mini bkui-btn-danger bkui-mt15" data-tid="terminate">终止</a>
+            % endif
+            % for t in transitions:
+                % if t['direction'] == 'FORWARD':
+                <a href="javascript:;" class="bkui-btn bkui-btn-mini bkui-btn-success bkui-mt15" data-tid="${t['id']}" data-direction="${t['direction']}">${t['name']}</a>
+                % elif t['direction'] == 'BACK':
+                <a href="javascript:;" class="bkui-btn bkui-btn-mini bkui-btn-warning bkui-mt15" data-tid="${t['id']}" data-direction="${t['direction']}">打回到${t['name']}</a>
+                % endif
+            % endfor
+            ## <a href="javascript:;" class="bkui-btn bkui-btn-mini bkui-btn-default bkui-mt15">白色按钮</a>
+        </div>
+    </div>
+</form>
+% else:
+<div class="bkui-spacing">
+    <div class="bkui-result-view">
+        <div class="bkui-result-icon">
+            <span class="fa fa-exclamation-circle text-warning"></span>
+        </div>
+        <p class="bkui-result-text">暂不支持在企业微信处理此工单</p>
+        <p class="bkui-tip">说明：此工单需填写一些复杂的内容，比如富文本、表格等，暂时不支持移动端操作，请移步PC端处理</p>
+    </div>
+    <a href="${WEIXIN_SITE_URL}" class="bkui-btn bkui-btn-default">
+        返回我的待办
+    </a>
+</div>
+% endif
+
+</body>
+
+
+<!-- 引入jQuery2.0 -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/js/jquery-2.0.0.min.js"></script>
+<!-- 引入蓝鲸提供的公用js -->
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/js/bkui.js"></script>
+<script src="https://magicbox.bk.tencent.com/static_api/v3/bk_mobile/assets/bkdialog-1.0/js/bkdialog.min.js"></script>
+<script src="${WEIXIN_STATIC_URL}js/csrftoken.js"></script>
+<script src="${WEIXIN_STATIC_URL}js/ticket.js"></script>
+</html>

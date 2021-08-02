@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="16px" viewBox="0 0 15 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>g-1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Dashborad" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Dashborad-1" transform="translate(-1019.000000, -607.000000)" fill="#4DC470">
+            <g id="整体工单视图" transform="translate(280.000000, 81.000000)">
+                <g id="图表">
+                    <g id="单量top10" transform="translate(571.000000, 440.126812)">
+                        <g id="数据组一" transform="translate(168.500000, 84.802548)">
+                            <g id="g-1" transform="translate(0.000000, 1.000000)">
+                                <circle id="Oval-9" cx="7" cy="9" r="7"></circle>
+                                <polygon id="Path-13" points="1 4 1 -1.70530257e-13 4 2"></polygon>
+                                <polygon id="Path-13" transform="translate(11.500000, 2.000000) scale(-1, -1) translate(-11.500000, -2.000000) " points="10 4 10 -1.70530257e-13 13 2"></polygon>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

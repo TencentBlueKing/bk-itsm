@@ -1,0 +1,154 @@
+[
+    {
+        "req_params": [
+            {
+                "is_necessary": 0,
+                "sample": "0",
+                "name": "bk_role",
+                "value": "0",
+                "desc": "\u7528\u6237\u89d2\u8272\uff0c0\uff1a\u666e\u901a\u7528\u6237\uff0c1\uff1a\u8d85\u7ea7\u7ba1\u7406\u5458\uff0c2\uff1a\u5f00\u53d1\u8005\uff0c3\uff1a\u804c\u80fd\u5316\u7528\u6237\uff0c4\uff1a\u5ba1\u8ba1\u5458"
+            }
+        ],
+        "is_deleted": false,
+        "name": "\u83b7\u53d6\u6240\u6709\u7528\u6237",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {}
+        },
+        "func_name": "get_all_users",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "message",
+                "code",
+                "data",
+                "result",
+                "request_id",
+                "msg"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": "\u8fd4\u56de\u7801"
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": "\u63a5\u53e3\u8bf7\u6c42\u72b6\u6001"
+                },
+                "request_id": {
+                    "default": "b49a616eef6e4d1d98c9c2c2d4d87b1b",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "\u7528\u6237\u4fe1\u606f\u83b7\u53d6\u6210\u529f",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "\u7528\u6237\u4fe1\u606f\u83b7\u53d6\u6210\u529f",
+                    "type": "string",
+                    "description": "\u4fe1\u606f"
+                },
+                "data": {
+                    "items": {
+                        "required": [
+                            "qq",
+                            "wx_userid",
+                            "language",
+                            "bk_username",
+                            "time_zone",
+                            "bk_role",
+                            "phone",
+                            "email",
+                            "chname"
+                        ],
+                        "type": "object",
+                        "description": "",
+                        "properties": {
+                            "qq": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u7528\u6237QQ"
+                            },
+                            "bk_username": {
+                                "default": "miyatou",
+                                "type": "string",
+                                "description": "\u7528\u6237\u540d"
+                            },
+                            "language": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u8bed\u8a00"
+                            },
+                            "wx_userid": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u4f01\u4e1a\u53f7\u7528\u6237USERID/\u516c\u4f17\u53f7\u7528\u6237OPENID"
+                            },
+                            "time_zone": {
+                                "default": "",
+                                "type": "string",
+                                "description": "\u65f6\u533a"
+                            },
+                            "bk_role": {
+                                "default": 0,
+                                "type": "number",
+                                "description": "\u7528\u6237\u89d2\u8272"
+                            },
+                            "phone": {
+                                "default": "1234567890",
+                                "type": "string",
+                                "description": "\u624b\u673a"
+                            },
+                            "email": {
+                                "default": "aa@qq.com",
+                                "type": "string",
+                                "description": "\u90ae\u7bb1"
+                            },
+                            "chname": {
+                                "default": "abcd",
+                                "type": "string",
+                                "description": "\u4e2d\u6587\u540d"
+                            }
+                        }
+                    },
+                    "type": "array",
+                    "description": "\u8fd4\u56de\u6570\u636e"
+                }
+            }
+        },
+        "remote_system": 13,
+        "system_info": {
+            "cookies": [],
+            "code": "bk_login",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 1,
+            "headers": [],
+            "is_builtin": true,
+            "desc": "\u84dd\u9cb8\u7edf\u4e00\u767b\u5f55\uff0c\u7ba1\u7406\u7528\u6237\u767b\u5f55\u9a8c\u8bc1\uff0c\u53ca\u7528\u6237\u4fe1\u606f",
+            "updated_by": ""
+        },
+        "method": "GET",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/bk_login/get_all_users/",
+        "is_builtin": false,
+        "desc": "\u83b7\u53d6\u84dd\u9cb8\u6240\u6709\u7528\u6237\u4fe1\u606f",
+        "updated_by": "system"
+    }
+]

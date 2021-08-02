@@ -1,0 +1,332 @@
+.bk-docs-slider {
+    width: 260px;
+    background-color: #182132;
+    height: 100%;
+    padding-bottom: 113px;
+    font-size: 14px;
+    transition: all 300ms;
+}
+
+/* logo样式 */
+.bk-itsm-icon-logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    .bk-icon-logo {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        font-size: 52px;
+        width: 60px;
+        height: 60px;
+        background-color: #182132;
+        color: #2286ff;
+        text-align: center;
+        line-height: 60px;
+    }
+
+    .bk-itsm-content-logo {
+        position: absolute;
+        top: 0;
+        left: 60px;
+        z-index: 2;
+        width: 200px;
+        background-color: #182132;
+        color: #a3acb9;
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: width 300ms;
+    }
+
+    .bk-other-content-logo {
+        position: absolute;
+        top: 0;
+        left: 60px;
+        z-index: 3;
+        width: 200px;
+        background-color: #182132;
+        color: #a3acb9;
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: width 300ms;
+    }
+
+    .bk-itsm-content-logo-english {
+        font-size: 15px;
+    }
+    //.icon-logName{
+    //    display: inline-block;
+    //    width: 100%;
+    //    transform: translateX(-50px);
+    //}
+    //.logName-none {
+    //    font-size: 15px;
+    //    width: 0;
+    //    overflow: hidden;
+    //}
+
+    .bk-itsm-none {
+        width: 0px;
+        padding: 0px;
+    }
+}
+
+/* 底部操作按钮 */
+.bk-silder-back {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 220px;
+    padding-left: 23px;
+    font-size: 14px;
+    color: #b2bfd2;
+    line-height: 42px;
+    border-top: 1px solid #232c3c;
+    cursor: pointer;
+    background-color: #182132;
+    z-index: 2;
+    transition: all 300ms;
+}
+
+/* content */
+.bk-nav {
+    height: 100%;
+    overflow: auto;
+    @include scroller(#e6e9ea, 0px);
+    transition: all 300ms;
+}
+
+.bk-nav-child {
+    font-size: 14px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 300ms;
+}
+
+.bk-nav-a {
+    display: block;
+    color: #96A2B9;
+    height: 42px;
+    white-space: nowrap;
+    position: relative;
+
+    &:hover {
+        background-color: #253047;
+    }
+
+    .bk-icon-color {
+        font-size: 16px;
+        position: absolute;
+        top: 13px;
+        left: 23px;
+    }
+
+    .icon-arrow-right,
+    .icon-arrow-bottom {
+        font-size: 16px;
+        position: absolute;
+        top: 16px;
+        right: 20px;
+    }
+
+    .bk-nav-span {
+        position: absolute;
+        top: 12px;
+        left: 68px;
+        overflow: hidden;
+    }
+
+    .bk-point {
+        width: 4px;
+        height: 4px;
+        display: inline-block;
+        border-radius: 50%;
+        background-color: #737987;
+        margin: 20px 0 2px 28px;
+    }
+}
+
+.bk-nav-a-child {
+    display: block;
+    color: #96A2B9;
+    height: 42px;
+    white-space: nowrap;
+    position: relative;
+
+    &:hover {
+        color: #FFFFFF;
+        background-color: #253047;
+
+        .bk-point {
+            background-color: #FFFFFF;
+        }
+    }
+
+    .bk-icon-color {
+        font-size: 16px;
+        position: absolute;
+        top: 13px;
+        left: 23px;
+    }
+
+    .bk-nav-span {
+        position: absolute;
+        top: 12px;
+        left: 68px;
+        overflow: hidden;
+    }
+
+    .bk-point {
+        width: 4px;
+        height: 4px;
+        display: inline-block;
+        border-radius: 50%;
+        background-color: #3E4655;
+        margin: 20px 0 2px 28px;
+    }
+}
+
+.bk-nav-active {
+    color: #B3BDD5;
+    background-color: #3F87FF;
+
+    a {
+        color: #FFFFFF;
+
+        .bk-icon-color::before {
+            color: #FFFFFF;
+        }
+
+        .bk-point {
+            background-color: #FFFFFF;
+        }
+    }
+
+    &:hover {
+        .bk-nav-a,.bk-nav-a-child{
+            background-color: #3F87FF;
+        }
+    }
+}
+
+.bk-nav-show {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 后台管理样式 */
+.bk-line-a {
+    text-align: center;
+    line-height: 42px;
+    color: rgba(176, 189, 213, 0.3);
+    font-size: 12px;
+    cursor: default;
+
+    &:hover {
+        background-color: #182132;
+    }
+}
+
+.bk-left-line,
+.bk-right-line {
+    position: absolute;
+    height: 1px;
+    background-color: #FFFFFF;
+    opacity: 0.05;
+    width: 80px;
+    top: 22px;
+}
+
+.bk-left-line {
+    left: 7px;
+}
+
+.bk-right-line {
+    right: 7px;
+}
+
+/* 小屏宽度 */
+.bk-docs-width {
+    width: 60px !important;
+}
+
+.bk-hover-width {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 260px !important;
+}
+
+
+.collapse-transition {
+    -webkit-transition: .2s height ease-in-out, .2s padding-top ease-in-out, .2s padding-bottom ease-in-out;
+    -moz-transition: .2s height ease-in-out, .2s padding-top ease-in-out, .2s padding-bottom ease-in-out;
+    transition: .2s height ease-in-out, .2s padding-top ease-in-out, .2s padding-bottom ease-in-out;
+}
+
+/* 左右布局 */
+/*.bk-itsm-icon {
+    float: left;
+    .bk-itsm-icon-logo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        background-color: #182132;
+        width: 60px;
+        height: 60px;
+        .bk-icon-logo {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 52px;
+            color: #2286ff;
+        }
+    }
+    .bk-itsm-icon-back {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        text-align: center;
+        font-size: 14px;
+        color: #b2bfd2;
+        line-height: 42px;
+        border-top: 1px solid #232c3c;
+    }
+    .bk-itsm-icon-content {
+        width: 60px;
+    }
+}
+.bk-itsm-content-info {
+    float: left;
+    width: 160px;
+    .bk-itsm-content-logo {
+        position: fixed;
+        top: 0;
+        left: 60px;
+        z-index: 2;
+        width: 160px;
+        background-color: #182132;
+        color: #a3acb9;
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 10px;
+    }
+}*/

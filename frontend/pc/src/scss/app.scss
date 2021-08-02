@@ -1,0 +1,473 @@
+// 整个站点样式
+
+@charset 'utf-8';
+@import 'conf';
+@import 'mixins/clearfix';
+@import 'mixins/scroller';
+@import 'mixins/ellipsis';
+@import './icon/iconfont';
+// @import 'bk-patch';
+@import './animation';
+
+* {
+	box-sizing: border-box;
+    outline: none;
+}
+
+html,
+body {
+    min-width: 1180px;
+	height: 100%;
+	font-family: "Microsoft Yahei", "PingFangSC-Regular";
+	background-color: #fafbfd;
+}
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+    background-color: #fff !important;
+}
+
+pre {
+  margin: 0px;
+  font-family: "Microsoft Yahei", "PingFangSC-Regular";
+}
+
+/* 整体页面样式 */
+.itsm-page-content {
+    padding: 20px;
+}
+.bk-itsm-box {
+    width: 100%;
+    height: 100%;
+    @include scroller;
+    overflow: auto;
+}
+.bk-itsm-service {
+    width: 100%;
+    height: 100%;
+    @include scroller;
+    overflow: auto;
+    padding-top: 53px;
+    .bk-form-textarea {
+        padding: 5px 0px 0px 10px;
+    }
+}
+.bk-border-error {
+    border-color: #ea3636;
+}
+.bk-task-error {
+    font-size: 12px;
+    color: #ea3636;
+    line-height: 18px;
+    margin: 2px 0 0;
+}
+/* 带有步骤的样式统一 */
+.bk-design-step {
+    height: calc(100vh - 165px);
+    overflow: auto;
+    @include scroller;
+}
+/* 搜索样式统一 */
+.bk-only-btn {
+	padding: 12px 10px;
+	border: 1px solid #dfe0e5;
+	border-bottom: none;
+    .bk-only-search {
+        float: right;
+        width: 260px;
+    }
+}
+.bk-more-search {
+    width: 100%;
+    .bk-search-name {
+        float: right;
+        @include clearfix;
+        .bk-search-content {
+            width: 230px;
+            float: left;
+        }
+        .bk-button {
+            padding: 0;
+            width: 32px;
+            text-align: center;
+        }
+    }
+}
+/* 配置标题统一 */
+.bk-service-name {
+    position: relative;
+    margin-bottom: 20px;
+    h1 {
+        font-size: 14px;
+        color: #444444;
+        margin: 0;
+        position: relative;
+        padding-left: 17px;
+    }
+    .is-outline {
+        position: absolute;
+        top: 3px;
+        left: 0;
+        background-color: #3A84FF;
+        width: 4px;
+        height: 14px;
+    }
+}
+
+/* 节点配置-高级设置 */
+.bk-more-configuration {
+    width: 100%;
+    background: white;
+    cursor: pointer;
+    &:hover{
+        background: #F4F8FF;
+    }
+    p{
+        color: #3a84ff;
+        width: fit-content;
+        margin: 0 auto;
+        line-height: 32px;
+        margin-bottom: 20px;
+
+        i {
+            font-size: 20px;
+            &::before{
+                color: #3a84ff;
+            }
+        }
+        span {
+            color: #3a84ff;
+            font-size: 12px;
+        }
+    }
+}
+.bk-revoke-span {
+    font-size: 12px;
+    color: #A0ADB9;
+}
+/* button里面嵌套input上传 */
+.bk-btn-file {
+    position: relative;
+    cursor: pointer;
+    .bk-input-file {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 68px;
+        height: 36px;
+        overflow: hidden;
+        opacity: 0;
+        cursor: pointer;
+    }
+}
+/* 部分布局的统一 */
+.bk-display-big {
+    width: 100%;
+    margin-right: 0%;
+    float: left
+}
+.bk-display-small {
+    width: 49%;
+    margin-right: 2%;
+}
+
+/* 页面解释语句样式 */
+.bk-itsm-version {
+    line-height: 28px;
+    background-color: #F0F8FF;
+    padding: 0 30px 0 16px;
+    border-radius: 2px;
+    border: 1px solid #A3C5FD;
+    font-size: 12px;
+    color: #63656E;
+    margin: 10px 0;
+    position: relative;
+
+    .icon-info-circle {
+        margin-right: 8px;
+        font-size: 14px;
+        color: #3A84FF;
+        float: left;
+        margin-top: 8px;
+    }
+
+    .icon-close {
+        cursor: pointer;
+        position: absolute;
+        top: 6px;
+        right: 9px;
+        font-size: 18px
+    }
+}
+
+/* 面包屑样式 */
+.is-title {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 20;
+    padding: 0 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #dcdee5;
+    h1 {
+        font-size: 16px;
+        color: #737987;
+        font-weight: normal;
+        margin: 0;
+        padding: 0;
+    }
+    .bk-come-back {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        height: 52px;
+        .bk-icon {
+            color: #3c96ff;
+            font-weight: bold;
+            margin-right: 5px;
+            font-size: 24px;
+        }
+    }
+}
+.bk-title-left {
+    left: 80px;
+}
+.bk-border-error {
+    .bk-form-input {
+        border-color: #ff5656;
+        color: #ff5656;
+    }
+}
+
+/* 流程步骤树 */
+.bk-itsm-tree {
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    border-bottom: 1px solid #DDE4EB;
+    @include clearfix;
+
+    .bk-tree-content {
+        float: left;
+        height: 60px;
+        @include clearfix;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+.bk-tree-first {
+    font-size: 14px;
+    float: left;
+    height: 60px;
+    line-height: 60px;
+
+    .bk-tree-shadow {
+        display: inline-block;
+        padding: 0 15px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #dfeeff;
+        }
+    }
+
+    .bk-tree-step {
+        width: 30px;
+        height: 30px;
+        color: #fff;
+        text-align: center;
+        line-height: 30px;
+        display: inline-block;
+        background-color: #DDE4EB;
+        border-radius: 50%;
+        margin-right: 12px;
+        font-weight: bold;
+
+        .bk-icon {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 30px;
+        }
+    }
+
+    .bk-tree-normal {
+        color: #ced4da;
+    }
+
+    .bk-tree-info {
+        color: #424951;
+    }
+
+    .bk-tree-line {
+        width: 108px;
+        height: 1px;
+        display: inline-block;
+        margin-left: 15px;
+        background-color: #ced4da;
+        margin: 0 35px;
+        margin-bottom: 5px;
+    }
+
+    .bk-tree-primary,
+    .bk-tree-success,
+    .bk-tree-error {
+        color: #fff;
+        border: none;
+    }
+
+    .bk-tree-primary {
+        background-color: #3c96ff;
+    }
+
+    .bk-tree-success {
+        background-color: #fff;
+        border: 1px solid #3c96ff;
+        color: #3c96ff;
+    }
+
+    .bk-tree-error {
+        background-color: #ff5555;
+    }
+
+    .bk-tree-cursor {
+        cursor: pointer;
+    }
+}
+@media screen and (min-width: 960px) and (max-width: 1380px) {
+    .bk-tree-first {
+        .bk-tree-line {
+            width: 32px;
+        }
+    }
+}
+@media screen and (min-width: 1380px) and (max-width: 1680px) {
+    .bk-tree-first {
+        .bk-tree-line {
+            width: 60px;
+        }
+    }
+}
+@media screen and (min-width: 1680px) {
+    .bk-tree-first {
+        .bk-tree-line {
+            width: 108px;
+        }
+    }
+}
+
+
+/* 富文本样式 */
+.tui-editor-defaultUI .te-mode-switch-section {
+    line-height: 20px;
+}
+
+/* icon的样式部分统一 */
+.icon-flow-add,
+.icon-flow-reduce {
+    color: #c4c6cc;
+    &:hover {
+        color: #979ba5;
+    }
+}
+.icon-check-1,
+.icon-edit2 {
+    font-size: 18px!important;
+}
+
+/* 会签节点处理人tooltip样式特殊处理 */
+.bk-processor-wrapper{
+    /deep/ .light-theme{
+        box-shadow:0 0 5px 0 rgba(0,0,0,0.09);
+        border:1px solid rgba(220,222,229,1);
+    }
+    /deep/ .light-theme[x-placement^=top] .tippy-arrow {
+        border-top: 1px solid rgba(220,222,229,1)!important;
+        border-right: 1px solid rgba(220,222,229,1)!important;
+        border-bottom: 1px solid transparent!important;
+        border-left: 1px solid transparent!important;
+        background: white;
+        width: 8px;
+        height: 8px;
+        transform: rotate(135deg);
+        bottom: -11px;
+    }
+    /deep/ .light-theme[x-placement^=bottom] .tippy-arrow {
+        border-top: 1px solid transparent!important;
+        border-right: 1px solid transparent!important;
+        border-bottom: 1px solid rgba(220,222,229,1)!important;
+        border-left: 1px solid rgba(220,222,229,1)!important;
+        background: white;
+        width: 8px;
+        height: 8px;
+        transform: rotate(135deg);
+        top: -12px;
+    }
+}
+
+/* tui-editor 的 li 样式被 reset.css 规则覆盖了 */
+.tui-editor-contents {
+    li {
+        list-style: inherit;
+    }
+}
+
+//tooltip换行
+.wrap-tooltip{
+    word-break: break-all;
+    max-width: 240px;
+}
+
+.cursor-element {
+    width: 12px;
+    height: 16px;
+    background: url('~@/images/lock.svg') no-repeat !important;
+}
+
+// 无权限按钮统一样式
+.btn-permission-disable {
+    &:not(.bk-button-text) {
+        background-color: #fafafa !important;
+    }
+    border-color: #e6e6e6 !important;
+    color: #cccccc !important;
+    cursor: pointer !important;
+}
+// 无权限文本统一样式
+.text-permission-disable {
+    color: #cccccc !important;
+    cursor: pointer !important;
+}
+.checkbox-permission-disable {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #dcdee5;
+    border-radius: 2px;
+    background-color: #fafafa;
+    cursor: pointer;
+}
+.radio-permission-disable {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+    padding-left: 21px;
+    font-size: 14px;
+    line-height: 20px;
+    min-height: 20px;
+    color: #cccccc;
+    cursor: pointer;
+    &::before {
+        position: absolute;
+        left: 0px;
+        top: 2px;
+        content: '';
+        width: 16px;
+        height: 16px;
+        border: 1px solid #e6e6e6;
+        border-radius: 50%;
+        background-color: #fafafa;
+        box-sizing: border-box;
+    }
+}

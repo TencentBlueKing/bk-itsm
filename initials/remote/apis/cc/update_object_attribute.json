@@ -1,0 +1,153 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "update_object_attribute", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "result", 
+        "request_id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56decode"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "c4546585fb6a4fee9aa94793e38d25f3", 
+          "type": "string", 
+          "description": "\u8bf7\u6c42ID"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/cc/update_object_attribute/", 
+    "is_builtin": false,
+    "req_params": [], 
+    "desc": "\u66f4\u65b0\u5bf9\u8c61\u6a21\u578b\u5c5e\u6027",
+      "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u66f4\u65b0\u5bf9\u8c61\u6a21\u578b\u5c5e\u6027", 
+    "is_activated": true, 
+    "remote_system": 5, 
+    "system_info": {
+      "cookies": [], 
+      "code": "cc", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 2, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "POST", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "description": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u6570\u636e\u7684\u63cf\u8ff0\u4fe1\u606f"
+        }, 
+        "isreadonly": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u8868\u660e\u662f\u5426\u53ea\u8bfb"
+        }, 
+        "bk_property_type": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5b9a\u4e49\u7684\u5c5e\u6027\u5b57\u6bb5\u7528\u4e8e\u5b58\u50a8\u6570\u636e\u7684\u6570\u636e\u7c7b\u578b\uff08singlechar,longchar,int,enum,date,time,objuser,singleasst,multiasst,timezone,bool)"
+        }, 
+        "bk_asst_obj_id": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5982\u679c\u6709\u5173\u8054\u5176\u5b83\u7684\u6a21\u578b\uff0c\u90a3\u4e48\u5c31\u5fc5\u9700\u8bbe\u7f6e\u6b64\u5b57\u6bb5\uff0c\u5426\u5219\u5c31\u4e0d\u9700\u8981\u8bbe\u7f6e"
+        }, 
+        "isrequired": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u8868\u660e\u662f\u5426\u5fc5\u586b"
+        }, 
+        "bk_property_group": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5b57\u6bb5\u5206\u680f\u7684\u540d\u5b57"
+        }, 
+        "isonly": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u8868\u660e\u552f\u4e00\u6027"
+        }, 
+        "bk_property_name": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u6a21\u578b\u5c5e\u6027\u540d\uff0c\u7528\u4e8e\u5c55\u793a"
+        }, 
+        "placeholder": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u7528\u6237\u63d0\u793a"
+        }, 
+        "id": {
+          "default": "", 
+          "type": "number", 
+          "description": "\u76ee\u6807\u6570\u636e\u7684\u8bb0\u5f55ID"
+        }, 
+        "unit": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u5355\u4f4d"
+        }, 
+        "option": {
+          "required": [
+            "max", 
+            "min"
+          ], 
+          "type": "object", 
+          "description": "\u7528\u6237\u81ea\u5b9a\u4e49\u5185\u5bb9\uff0c\u5b58\u50a8\u7684\u5185\u5bb9\u53ca\u683c\u5f0f\u7531\u8c03\u7528\u65b9\u51b3\u5b9a, \u4ee5\u6570\u5b57\u5185\u5bb9\u4e3a\u4f8b", 
+          "properties": {
+            "max": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u6700\u5927\u503c"
+            }, 
+            "min": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u6700\u5c0f\u503c"
+            }
+          }
+        }
+      }
+    }
+  }
+]

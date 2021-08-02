@@ -1,0 +1,126 @@
+[
+    {
+        "read_only": true,
+        "req_params": [
+            {
+                "is_necessary": 1,
+                "sample": "",
+                "name": "bk_host_id",
+                "value": "",
+                "desc": "\u4e3b\u673aID"
+            },
+            {
+                "is_necessary": 0,
+                "sample": "0",
+                "name": "bk_supplier_account",
+                "value": "",
+                "desc": "\u5f00\u53d1\u5546\u8d26\u53f7"
+            }
+        ],
+        "is_deleted": false,
+        "name": "\u83b7\u53d6\u4e3b\u673a\u8be6\u60c5",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {}
+        },
+        "func_name": "get_host_base_info",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "code",
+                "result",
+                "request_id",
+                "msg",
+                "message",
+                "data"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": ""
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": ""
+                },
+                "request_id": {
+                    "default": "ded67d4591de44d89afad08dc2612105",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "data": {
+                    "items": {
+                        "required": [
+                            "bk_property_value",
+                            "bk_property_id",
+                            "bk_property_name"
+                        ],
+                        "type": "object",
+                        "description": "",
+                        "properties": {
+                            "bk_property_value": {
+                                "default": 196,
+                                "type": "number",
+                                "description": "\u5c5e\u6027\u503c"
+                            },
+                            "bk_property_id": {
+                                "default": "bk_disk",
+                                "type": "string",
+                                "description": "\u5c5e\u6027id"
+                            },
+                            "bk_property_name": {
+                                "default": "\u78c1\u76d8\u5bb9\u91cf",
+                                "type": "string",
+                                "description": "\u5c5e\u6027\u540d\u79f0"
+                            }
+                        }
+                    },
+                    "type": "array",
+                    "description": ""
+                }
+            }
+        },
+        "remote_system": 26,
+        "system_info": {
+            "cookies": [],
+            "code": "cc",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 2,
+            "headers": [],
+            "is_builtin": false,
+            "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002",
+            "updated_by": ""
+        },
+        "method": "GET",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/cc/get_host_base_info/",
+        "is_builtin": false,
+        "desc": "\u83b7\u53d6\u4e3b\u673a\u8be6\u60c5",
+        "updated_by": "system"
+    }
+]

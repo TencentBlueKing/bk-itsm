@@ -1,0 +1,7 @@
+@import './reset.css';
+@import './iconfont.css';
+@import './vant-correct.css';
+
+#app-container {
+  height: 100%;
+}

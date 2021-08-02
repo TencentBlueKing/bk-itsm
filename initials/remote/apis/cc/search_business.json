@@ -1,0 +1,215 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "search_business", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56decode"
+        }, 
+        "data": {
+          "required": [
+            "count", 
+            "info"
+          ], 
+          "type": "object", 
+          "description": "\u8fd4\u56de\u6570\u636e", 
+          "properties": {
+            "count": {
+              "default": 59, 
+              "type": "number", 
+              "description": "\u4e1a\u52a1\u6570\u91cf"
+            }, 
+            "info": {
+              "items": {
+                "required": [
+                  "bk_biz_id", 
+                  "language", 
+                  "life_cycle", 
+                  "bk_biz_developer", 
+                  "bk_biz_maintainer", 
+                  "bk_biz_tester", 
+                  "time_zone", 
+                  "default", 
+                  "create_time", 
+                  "bk_biz_productor", 
+                  "bk_supplier_account", 
+                  "bk_biz_name", 
+                  "bk_supplier_id"
+                ], 
+                "type": "object", 
+                "description": "", 
+                "properties": {
+                  "bk_biz_id": {
+                    "default": 90, 
+                    "type": "number", 
+                    "description": "\u4e1a\u52a1ID"
+                  }, 
+                  "language": {
+                    "default": "1", 
+                    "type": "string", 
+                    "description": "\u8bed\u8a00"
+                  }, 
+                  "life_cycle": {
+                    "default": "2", 
+                    "type": "string", 
+                    "description": "\u751f\u547d\u5468\u671f"
+                  }, 
+                  "bk_biz_developer": {
+                    "default": "admin", 
+                    "type": "string", 
+                    "description": "\u5f00\u53d1\u4eba\u5458"
+                  }, 
+                  "bk_biz_maintainer": {
+                    "default": "admin", 
+                    "type": "string", 
+                    "description": "\u8fd0\u7ef4\u4eba\u5458"
+                  }, 
+                  "bk_biz_tester": {
+                    "default": "admin", 
+                    "type": "string", 
+                    "description": "\u6d4b\u8bd5\u4eba\u5458"
+                  }, 
+                  "time_zone": {
+                    "default": "Asia/Shanghai", 
+                    "type": "string", 
+                    "description": "\u65f6\u533a"
+                  }, 
+                  "default": {
+                    "default": 0, 
+                    "type": "number", 
+                    "description": ""
+                  }, 
+                  "create_time": {
+                    "default": "2019-08-09T10:20:57.137+08:00", 
+                    "type": "string", 
+                    "description": "\u521b\u5efa\u65f6\u95f4"
+                  }, 
+                  "bk_biz_productor": {
+                    "default": "admin", 
+                    "type": "string", 
+                    "description": "\u4ea7\u54c1\u4eba\u5458"
+                  }, 
+                  "bk_supplier_account": {
+                    "default": "0", 
+                    "type": "string", 
+                    "description": "\u5f00\u53d1\u5546\u8d26\u6237"
+                  }, 
+                  "bk_biz_name": {
+                    "default": "cctest", 
+                    "type": "string", 
+                    "description": "\u4e1a\u52a1\u540d\u79f0"
+                  }, 
+                  "bk_supplier_id": {
+                    "default": 0, 
+                    "type": "number", 
+                    "description": "\u5f00\u53d1\u5546\u8d26\u6237ID"
+                  }
+                }
+              }, 
+              "type": "array", 
+              "description": "\u4e1a\u52a1\u5217\u8868"
+            }
+          }
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "50e80f1def5a4d608a7e8186bda4b9ed", 
+          "type": "string", 
+          "description": "\u8bf7\u6c42ID"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/cc/search_business/",
+      "is_builtin": false, 
+    "req_params": [], 
+    "desc": "\u67e5\u8be2\u4e1a\u52a1", 
+    "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u4e1a\u52a1", 
+    "is_activated": true, 
+    "remote_system": 1, 
+    "system_info": {
+      "cookies": [], 
+      "code": "cc", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 2, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "POST", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "fields": {
+          "type": "array", 
+          "description": "\u6307\u5b9a\u67e5\u8be2\u7684\u5b57\u6bb5\uff0c\u53c2\u6570\u4e3a\u4e1a\u52a1\u7684\u4efb\u610f\u5c5e\u6027\uff0c\u5982\u679c\u4e0d\u586b\u5199\u5b57\u6bb5\u4fe1\u606f\uff08\u586b\u5199\u8bf7\u5148\u5230API\u914d\u7f6e\u6dfb\u52a0\u4e00\u4e2a\u9009\u9879\uff09\uff0c\u7cfb\u7edf\u4f1a\u8fd4\u56de\u4e1a\u52a1\u7684\u6240\u6709\u5b57\u6bb5"
+        }, 
+        "page": {
+          "required": [
+            "start", 
+            "limit"
+          ], 
+          "type": "object", 
+          "description": "\u5206\u9875\u6761\u4ef6", 
+          "properties": {
+            "sort": {
+              "default": "bk_biz_id", 
+              "type": "string", 
+              "description": "\u6392\u5e8f\u5b57\u6bb5\uff0c\u901a\u8fc7\u5728\u5b57\u6bb5\u524d\u9762\u589e\u52a0 -\uff0c\u5982 sort:\"-field\" \u53ef\u4ee5\u8868\u793a\u6309\u7167\u5b57\u6bb5 field\u964d\u5e8f"
+            }, 
+            "start": {
+              "default": 0, 
+              "type": "number", 
+              "description": "\u8bb0\u5f55\u5f00\u59cb\u4f4d\u7f6e"
+            }, 
+            "limit": {
+              "default": 200, 
+              "type": "number", 
+              "description": "\u6bcf\u9875\u9650\u5236\u6761\u6570,\u6700\u5927200"
+            }
+          }
+        }, 
+        "condition": {
+          "type": "object", 
+          "description": "\u67e5\u8be2\u6761\u4ef6\uff0c\u53c2\u6570\u4e3a\u4e1a\u52a1\u7684\u4efb\u610f\u5c5e\u6027\uff0c\u5982\u679c\u4e0d\u5199\u4ee3\u8868\u641c\u7d22\u5168\u90e8\u6570\u636e\uff08\u586b\u5199\u8bf7\u5148\u5230API\u914d\u7f6e\u6dfb\u52a0\u9009\u9879\uff09", 
+          "properties": {}
+        }
+      }
+    }
+  }
+]

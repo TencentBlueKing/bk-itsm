@@ -1,0 +1,170 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "department", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result", 
+        "request_id", 
+        "msg"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56de\u7801"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u7ed3\u679c"
+        }, 
+        "request_id": {
+          "default": "85357a6f8ab94a60aa9e25cc71b9da28", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "msg": {
+          "default": "Success", 
+          "type": "string", 
+          "description": ""
+        }, 
+        "message": {
+          "default": "Success", 
+          "type": "string", 
+          "description": "\u4fe1\u606f"
+        }, 
+        "data": {
+          "required": [
+            "name", 
+            "has_children", 
+            "children", 
+            "order", 
+            "id", 
+            "ancestor_name"
+          ], 
+          "type": "object", 
+          "description": "\u8fd4\u56de\u6570\u636e", 
+          "properties": {
+            "name": {
+              "default": "\u603b\u516c\u53f8", 
+              "type": "string", 
+              "description": "\u90e8\u95e8\u540d\u79f0"
+            }, 
+            "has_children": {
+              "default": true, 
+              "type": "boolean", 
+              "description": "\u662f\u5426\u6709\u5b50\u90e8\u95e8"
+            }, 
+            "children": {
+              "items": {
+                "required": [
+                  "name", 
+                  "has_children", 
+                  "order", 
+                  "parent", 
+                  "id"
+                ], 
+                "type": "object", 
+                "description": "", 
+                "properties": {
+                  "name": {
+                    "default": "\u84dd\u9cb8", 
+                    "type": "string", 
+                    "description": "\u90e8\u95e8\u540d\u79f0"
+                  }, 
+                  "has_children": {
+                    "default": true, 
+                    "type": "boolean", 
+                    "description": "\u662f\u5426\u6709\u5b50\u90e8\u95e8"
+                  }, 
+                  "order": {
+                    "default": 1, 
+                    "type": "number", 
+                    "description": "\u5e8f\u53f7"
+                  }, 
+                  "parent": {
+                    "default": 1, 
+                    "type": "number", 
+                    "description": "\u4e0a\u7ea7\u90e8\u95e8"
+                  }, 
+                  "id": {
+                    "default": 2, 
+                    "type": "number", 
+                    "description": ""
+                  }
+                }
+              }, 
+              "type": "array", 
+              "description": "\u5b50\u90e8\u95e8"
+            }, 
+            "order": {
+              "default": 1, 
+              "type": "number", 
+              "description": "\u5e8f\u53f7"
+            }, 
+            "id": {
+              "default": 1, 
+              "type": "number", 
+              "description": "ID"
+            }, 
+            "ancestor_name": {
+              "default": "\u603b\u516c\u53f8", 
+              "type": "string", 
+              "description": ""
+            }
+          }
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/usermanage/department/", 
+    "is_builtin": false, 
+    "req_params": [
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "id", 
+        "value": "1", 
+        "desc": "\u90e8\u95e8 ID"
+      }
+    ], 
+    "desc": "\u67e5\u8be2\u6307\u5b9a\u90e8\u95e8\u4fe1\u606f", 
+    "read_only": false, 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u6307\u5b9a\u90e8\u95e8\u4fe1\u606f", 
+    "is_activated": true, 
+    "remote_system": 9, 
+    "system_info": {
+      "cookies": [], 
+      "code": "usermanage", 
+      "is_deleted": false, 
+      "name": "\u7528\u6237\u7ba1\u7406", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 12, 
+      "headers": [], 
+      "is_builtin": true, 
+      "desc": "\u7528\u6237\u7ba1\u7406", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

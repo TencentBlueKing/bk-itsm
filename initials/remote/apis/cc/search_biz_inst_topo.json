@@ -1,0 +1,365 @@
+[
+    {
+        "read_only": true,
+        "req_params": [
+            {
+                "is_necessary": 1,
+                "sample": "",
+                "name": "bk_biz_id",
+                "value": "2",
+                "desc": "\u4e1a\u52a1id"
+            },
+            {
+                "is_necessary": 0,
+                "sample": "0",
+                "name": "bk_supplier_account",
+                "value": "0",
+                "desc": "\u5f00\u53d1\u5546\u8d26\u53f7"
+            },
+            {
+                "is_necessary": 0,
+                "sample": "2",
+                "name": "level",
+                "value": "2",
+                "desc": "\u62d3\u6251\u7684\u5c42\u7ea7\u7d22\u5f15\uff0c\u7d22\u5f15\u53d6\u503c\u4ece0\u5f00\u59cb\uff0c\u9ed8\u8ba4\u503c\u4e3a2\uff0c\u5f53\u8bbe\u7f6e\u4e3a -1 \u7684\u65f6\u5019\u4f1a\u8bfb\u53d6\u5b8c\u6574\u7684\u4e1a\u52a1\u5b9e\u4f8b\u62d3\u6251"
+            }
+        ],
+        "is_deleted": false,
+        "name": "\u67e5\u8be2\u4e1a\u52a1\u5b9e\u4f8b\u62d3\u6251",
+        "creator": "system",
+        "req_body": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {}
+        },
+        "func_name": "search_biz_inst_topo",
+        "rsp_data": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "required": [
+                "message",
+                "code",
+                "data",
+                "result",
+                "request_id",
+                "msg"
+            ],
+            "type": "object",
+            "description": "\u521d\u59cb\u5316\u6570\u636e",
+            "properties": {
+                "code": {
+                    "default": 0,
+                    "type": "number",
+                    "description": ""
+                },
+                "result": {
+                    "default": true,
+                    "type": "boolean",
+                    "description": ""
+                },
+                "request_id": {
+                    "default": "7ed2b154009d4534b2408c887b381b97",
+                    "type": "string",
+                    "description": ""
+                },
+                "msg": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "message": {
+                    "default": "success",
+                    "type": "string",
+                    "description": ""
+                },
+                "data": {
+                    "items": {
+                        "required": [
+                            "default",
+                            "bk_obj_name",
+                            "bk_obj_id",
+                            "child",
+                            "bk_inst_id",
+                            "bk_inst_name"
+                        ],
+                        "type": "object",
+                        "description": "",
+                        "properties": {
+                            "default": {
+                                "default": 0,
+                                "type": "number",
+                                "description": ""
+                            },
+                            "bk_obj_name": {
+                                "default": "\u4e1a\u52a1",
+                                "type": "string",
+                                "description": ""
+                            },
+                            "bk_obj_id": {
+                                "default": "biz",
+                                "type": "string",
+                                "description": ""
+                            },
+                            "child": {
+                                "items": {
+                                    "required": [
+                                        "default",
+                                        "bk_obj_name",
+                                        "bk_obj_id",
+                                        "child",
+                                        "bk_inst_id",
+                                        "bk_inst_name"
+                                    ],
+                                    "type": "object",
+                                    "description": "",
+                                    "properties": {
+                                        "default": {
+                                            "default": 0,
+                                            "type": "number",
+                                            "description": ""
+                                        },
+                                        "bk_obj_name": {
+                                            "default": "\u5e02\u5c40",
+                                            "type": "string",
+                                            "description": ""
+                                        },
+                                        "bk_obj_id": {
+                                            "default": "city",
+                                            "type": "string",
+                                            "description": ""
+                                        },
+                                        "child": {
+                                            "items": {
+                                                "required": [
+                                                    "default",
+                                                    "bk_obj_name",
+                                                    "bk_obj_id",
+                                                    "child",
+                                                    "bk_inst_id",
+                                                    "bk_inst_name"
+                                                ],
+                                                "type": "object",
+                                                "description": "",
+                                                "properties": {
+                                                    "default": {
+                                                        "default": 0,
+                                                        "type": "number",
+                                                        "description": ""
+                                                    },
+                                                    "bk_obj_name": {
+                                                        "default": "\u9879\u76ee",
+                                                        "type": "string",
+                                                        "description": ""
+                                                    },
+                                                    "bk_obj_id": {
+                                                        "default": "project",
+                                                        "type": "string",
+                                                        "description": ""
+                                                    },
+                                                    "child": {
+                                                        "items": {
+                                                            "required": [
+                                                                "default",
+                                                                "bk_obj_name",
+                                                                "bk_obj_id",
+                                                                "child",
+                                                                "bk_inst_id",
+                                                                "bk_inst_name"
+                                                            ],
+                                                            "type": "object",
+                                                            "description": "",
+                                                            "properties": {
+                                                                "default": {
+                                                                    "default": 0,
+                                                                    "type": "number",
+                                                                    "description": ""
+                                                                },
+                                                                "bk_obj_name": {
+                                                                    "default": "\u7f51\u5385",
+                                                                    "type": "string",
+                                                                    "description": ""
+                                                                },
+                                                                "bk_obj_id": {
+                                                                    "default": "test",
+                                                                    "type": "string",
+                                                                    "description": ""
+                                                                },
+                                                                "child": {
+                                                                    "items": {
+                                                                        "required": [
+                                                                            "default",
+                                                                            "bk_obj_name",
+                                                                            "bk_obj_id",
+                                                                            "child",
+                                                                            "bk_inst_id",
+                                                                            "bk_inst_name"
+                                                                        ],
+                                                                        "type": "object",
+                                                                        "description": "",
+                                                                        "properties": {
+                                                                            "default": {
+                                                                                "default": 0,
+                                                                                "type": "number",
+                                                                                "description": ""
+                                                                            },
+                                                                            "bk_obj_name": {
+                                                                                "default": "\u96c6\u7fa4",
+                                                                                "type": "string",
+                                                                                "description": ""
+                                                                            },
+                                                                            "bk_obj_id": {
+                                                                                "default": "set",
+                                                                                "type": "string",
+                                                                                "description": ""
+                                                                            },
+                                                                            "child": {
+                                                                                "items": {
+                                                                                    "required": [
+                                                                                        "default",
+                                                                                        "bk_obj_name",
+                                                                                        "bk_obj_id",
+                                                                                        "child",
+                                                                                        "bk_inst_id",
+                                                                                        "bk_inst_name"
+                                                                                    ],
+                                                                                    "type": "object",
+                                                                                    "description": "",
+                                                                                    "properties": {
+                                                                                        "default": {
+                                                                                            "default": 0,
+                                                                                            "type": "number",
+                                                                                            "description": ""
+                                                                                        },
+                                                                                        "bk_obj_name": {
+                                                                                            "default": "\u6a21\u5757",
+                                                                                            "type": "string",
+                                                                                            "description": ""
+                                                                                        },
+                                                                                        "bk_obj_id": {
+                                                                                            "default": "module",
+                                                                                            "type": "string",
+                                                                                            "description": ""
+                                                                                        },
+                                                                                        "child": {
+                                                                                            "type": "array",
+                                                                                            "description": ""
+                                                                                        },
+                                                                                        "bk_inst_id": {
+                                                                                            "default": 53,
+                                                                                            "type": "number",
+                                                                                            "description": ""
+                                                                                        },
+                                                                                        "bk_inst_name": {
+                                                                                            "default": "gse_task",
+                                                                                            "type": "string",
+                                                                                            "description": ""
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                "type": "array",
+                                                                                "description": ""
+                                                                            },
+                                                                            "bk_inst_id": {
+                                                                                "default": 9,
+                                                                                "type": "number",
+                                                                                "description": ""
+                                                                            },
+                                                                            "bk_inst_name": {
+                                                                                "default": "\u7ba1\u63a7\u5e73\u53f0",
+                                                                                "type": "string",
+                                                                                "description": ""
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "type": "array",
+                                                                    "description": ""
+                                                                },
+                                                                "bk_inst_id": {
+                                                                    "default": 50,
+                                                                    "type": "number",
+                                                                    "description": ""
+                                                                },
+                                                                "bk_inst_name": {
+                                                                    "default": "\u7f51\u5385",
+                                                                    "type": "string",
+                                                                    "description": ""
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "array",
+                                                        "description": ""
+                                                    },
+                                                    "bk_inst_id": {
+                                                        "default": 2,
+                                                        "type": "number",
+                                                        "description": ""
+                                                    },
+                                                    "bk_inst_name": {
+                                                        "default": "\u9879\u76ee",
+                                                        "type": "string",
+                                                        "description": ""
+                                                    }
+                                                }
+                                            },
+                                            "type": "array",
+                                            "description": ""
+                                        },
+                                        "bk_inst_id": {
+                                            "default": 132,
+                                            "type": "number",
+                                            "description": ""
+                                        },
+                                        "bk_inst_name": {
+                                            "default": "\u5e02\u5c40",
+                                            "type": "string",
+                                            "description": ""
+                                        }
+                                    }
+                                },
+                                "type": "array",
+                                "description": ""
+                            },
+                            "bk_inst_id": {
+                                "default": 2,
+                                "type": "number",
+                                "description": ""
+                            },
+                            "bk_inst_name": {
+                                "default": "\u84dd\u9cb8",
+                                "type": "string",
+                                "description": ""
+                            }
+                        }
+                    },
+                    "type": "array",
+                    "description": ""
+                }
+            }
+        },
+        "remote_system": 26,
+        "system_info": {
+            "cookies": [],
+            "code": "cc",
+            "is_deleted": false,
+            "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0",
+            "creator": "",
+            "admin": "admin",
+            "variables": [],
+            "contact_information": "",
+            "is_activated": true,
+            "system_id": 2,
+            "headers": [],
+            "is_builtin": false,
+            "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002",
+            "updated_by": ""
+        },
+        "method": "GET",
+        "is_activated": true,
+        "version": "v2",
+        "req_headers": [],
+        "path": "/api/c/compapi/v2/cc/search_biz_inst_topo/",
+        "is_builtin": false,
+        "desc": "\u67e5\u8be2\u4e1a\u52a1\u5b9e\u4f8b\u62d3\u6251",
+        "updated_by": "system"
+    }
+]

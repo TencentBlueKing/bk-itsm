@@ -1,0 +1,76 @@
+@mixin table ($max-width: auto) {
+    .bk-draggable-table {
+        width: 100%;
+        max-width: 100%;
+        font-size: 12px;
+        color: #63656e;
+        border: 1px solid #dfe0e5;
+        border-radius: 2px;
+        border-collapse:collapse;
+        thead {
+            color: #63656e;
+            font-weight: bold;
+            table-layout: fixed;
+            border-collapse: separate;
+            th {
+                background-color: #fafbfd;
+                height: 42px;
+                padding: 0 15px;
+                min-width: 0;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                text-overflow: ellipsis;
+                vertical-align: middle;
+                position: relative;
+                text-align: left;
+                &:hover {
+                    background-color: #f0f1f5;
+                }
+            }
+        }
+
+        tr {
+            background-color: #fff;
+            &:hover {
+                background-color: #f0f1f5;
+            }
+        }
+
+        th, td {
+            height: 42px;
+            padding: 0 15px;
+            min-width: 0;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            position: relative;
+            text-align: left;
+            border-bottom: 1px solid #dfe0e5;
+            .bk-button-text {
+                font-size: 12px;
+            }
+        }
+        .bk-none-content {
+            text-align: center;
+            height: 200px;
+            .bk-table-empty-icon {
+                font-size: 65px;
+                color: #c3cdd7;
+            }
+            .bk-none-info {
+                color: #63656e;
+            }
+        }
+        .bk-overflow-line {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-all;
+            padding-left: 15px;
+            padding-right: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+    }
+}

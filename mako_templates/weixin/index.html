@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+    <meta charset="utf-8">
+    % if CUSTOM_TITLE:
+    <title>${CUSTOM_TITLE}</title>
+    % else:
+    <title>ITSM|蓝鲸智云</title>
+    % endif
+    <link href="${WEIXIN_STATIC_URL}css/app.css?version=${STATIC_VERSION}" rel="stylesheet">
+</head>
+<script>
+    var weixin_site_url = "${WEIXIN_SITE_URL}";
+    var weixin_static_url = "${WEIXIN_STATIC_URL}";
+
+    window.site = "${WEIXIN_SITE_URL}api/";
+    window.isweixin = true;
+    window.username = '${getattr(request.user, "username")}';
+    window.chname = '${getattr(request.user, "chname", "")}';
+    window.fullname = '${getattr(request.user, "username")}(${getattr(request.user, "chname", "")})';
+    window.share_url = "${share_url}";
+</script>
+
+<body>
+<div id="app"></div>
+<script type="text/javascript" src="${WEIXIN_STATIC_URL}js/vendor.js?version=${STATIC_VERSION}"></script>
+<script type="text/javascript" src="${WEIXIN_STATIC_URL}js/app.js?version=${STATIC_VERSION}"></script>
+
+% if RUN_MODE != 'PRODUCT':
+<script type="text/javascript" src="${WEIXIN_STATIC_URL}js/vconsole.min.js?version=${STATIC_VERSION}"></script>
+<script>
+    // init vConsole
+    var vConsole = new VConsole();
+    console.log('Hello world');
+</script>
+% endif
+
+</body>
+</html>

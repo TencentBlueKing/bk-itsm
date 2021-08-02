@@ -1,0 +1,134 @@
+@import '../../scss/mixins/scroller.scss';
+// .my-ticket-page {
+//     min-height: 400px;
+//     /deep/ .bk-tab-section {
+//         padding: 0;
+//     }
+// }
+.ticket-table-wrap {
+    padding: 14px 18px 15px 22px;
+    height: calc(100vh - 146px);
+    overflow: auto;
+    @include scroller;
+    .advanced-search {
+        .export {
+            width: 86px;
+        }
+    }
+    .ticket-table {
+        margin-top: 15px;
+        background: #ffffff;
+    }
+}
+
+.table-link {
+    color: #3a84ff;
+    vertical-align: baseline;
+    /deep/ .bk-link-text {
+        font-size: 12px;
+    }
+}
+/deep/ .bk-tab-label-item {
+    .panel-name,
+    .panel-count {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 3px;
+    }
+    .panel-count {
+        min-width: 24px;
+        height: 16px;
+        padding: 0 4px ;
+        line-height: 16px;
+        border-radius: 8px;
+        text-align: center;
+        font-style: normal;
+        font-size: 12px;
+        font-weight: bold;
+        font-family: Helvetica, Arial;
+        color: #979ba5;
+        background-color: #f0f1f5;
+    }
+    &.active {
+        .panel-count {
+            background: #e1ecff;
+            color: #3a84ff;
+        }
+    }
+    .red-dot {
+        position: absolute;
+        top: 6px;
+        right: 20px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ea3536;
+    }
+}
+.bk-status-color-info {
+    margin-top: 3px;
+    padding: 0 6px;
+    display: inline-block;
+    text-align: center;
+    color: #3c96ff;
+    border-radius: 2px;
+    border: 1px solid #3c96ff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 22px;
+    line-height: 20px;
+}
+.bk-priority-button {
+    margin-top: 3px;
+    min-width: 52px;
+    width: auto;
+    padding: 2px 4px;
+    display: inline-block;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 2px;
+    background-color: #EA3536;
+    color: rgba(255, 255, 255, 1);
+    max-width: 80px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+// 关注
+.bk-table-row {
+    &.hover-row {
+        .icon-rate {
+            display: block;
+        }
+    }
+}
+.attention-icon {
+    position: relative;
+    height: 16px;
+    width: 16px;
+    &:hover {
+        .icon-favorite {
+            display: block;
+            color: #ffb848;
+        }
+    }
+    .bk-itsm-icon {
+        position: absolute;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .icon-rate {
+        z-index: 9;
+        display: none;
+        color: #979ba5;
+    }
+    .icon-favorite {
+        z-index: 10;
+        display: none;
+        color: #fe9c00;
+        &.is-attention {
+            display: block;
+        }
+    }
+}

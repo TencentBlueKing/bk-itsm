@@ -1,0 +1,12 @@
+@mixin scroller($backgroundColor: #a5a5a5, $width: 4px, $height: 4px) {
+	&::-webkit-scrollbar {
+		width: $width;
+		height: $height;
+    	background-color: lighten($backgroundColor, 80%);
+	}
+	&::-webkit-scrollbar-thumb {
+		height: 2px;
+	    border-radius: 2px;
+	    background-color: $backgroundColor;
+	}
+}

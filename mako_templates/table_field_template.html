@@ -1,0 +1,20 @@
+<table class="my-table">
+    <thead>
+    <tr>
+        %for title in choice:
+        <th>${title["name"]}</th>
+        %endfor
+    </tr>
+    </thead>
+    <tbody>
+    %for td in value:
+    <tr>
+        %for index, item in enumerate(choice):
+        <td>
+            ${td.get(item["key"], "--")}
+        </td>
+        %endfor
+    </tr>
+    %endfor
+    </tbody>
+</table>

@@ -1,0 +1,91 @@
+# template-8c/16g
+# uwsgi: 2c+1=17
+# celery: 2c=16
+### celery-default: 4
+### celery-pipeline: 4 + 2 * 32
+### celery-ticket: 4 * 32
+
+[unix_http_server]
+file = /opt/app/run/supervisord.sock
+
+[supervisorctl]
+configuration = /opt/app/conf/supervisord.conf
+serverurl = unix:///opt/app/run/supervisord.sock
+
+[supervisord]
+pidfile = /opt/app/run/supervisord.pid
+logfile = /opt/app/logs/itsm/supervisord.log
+directory = /opt/app/
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+#[program: itsm_uwsgi]
+#command = uwsgi --ini /opt/app/conf/itsm.ini
+#stdout_logfile = /opt/app/logs/itsm/uwsgi.log
+#redirect_stderr = true
+#autorestart = true
+
+
+[program: itsm_celery]
+command = python /opt/app/code/manage.py celery worker -Q default -n default_worker -c 4 -l INFO --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+[program: itsm_celery_pipeline]
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority,pipeline_additional_task_priority -n pipeline_worker-0 -l INFO -c 4 --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+[program: itsm_celery_pipeline1]
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-1 -l INFO -P gevent -c 32 --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+[program: itsm_celery_pipeline2]
+command = python /opt/app/code/manage.py celery worker -Q pipeline_priority,service_schedule_priority -n pipeline_worker-2 -l INFO -P gevent -c 32 --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+[program: itsm_celery_ticket1]
+command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-1 -l INFO -P gevent -c 32 --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+[program: itsm_celery_ticket2]
+command = python /opt/app/code/manage.py celery worker -Q itsm_publish_ticket_priority -n ticket_worker-2 -l INFO -P gevent -c 32 --maxtasksperchild=128
+directory = /opt/app/code/
+stdout_logfile = /opt/app/logs/itsm/celery.log
+redirect_stderr = true
+stopwaitsecs = 10
+autorestart = true
+
+
+#[program:itsm_beat]
+#command = python /opt/app/code/manage.py celery beat
+#directory = /opt/app/code/
+#stdout_logfile =/opt/app/logs/itsm/celery.log
+#redirect_stderr = true
+#stopwaitsecs = 10
+#autorestart = true
+

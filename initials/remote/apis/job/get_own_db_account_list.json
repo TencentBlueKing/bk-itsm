@@ -1,0 +1,114 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "get_own_db_account_list", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "result", 
+        "code", 
+        "message", 
+        "data"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "success", 
+          "type": "string", 
+          "description": "\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u8fd4\u56de\u7801"
+        }, 
+        "data": {
+          "items": {
+            "required": [
+              "db_account_id", 
+              "db_alias"
+            ], 
+            "type": "object", 
+            "description": "", 
+            "properties": {
+              "db_alias": {
+                "default": "mysql", 
+                "type": "string", 
+                "description": "\u5e10\u53f7\u522b\u540d"
+              }, 
+              "db_account_id": {
+                "default": 1000, 
+                "type": "number", 
+                "description": "db\u5e10\u53f7ID,\u4e3b\u952e\uff0c\u6267\u884c\u811a\u672c\u6216\u4f5c\u4e1a\u7684\u63a5\u53e3\u8bf7\u6c42\u4f20\u9012\u53c2\u6570\u65f6\u7528\u6b64\u53c2\u6570"
+              }
+            }
+          }, 
+          "type": "array", 
+          "description": "\u8fd4\u56de\u6570\u636e"
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u7ed3\u679c"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/job/get_own_db_account_list/", 
+    "is_builtin": false, 
+    "req_params": [
+      {
+        "is_necessary": 1, 
+        "sample": "", 
+        "name": "bk_biz_id", 
+        "value": "2", 
+        "desc": "\u4e1a\u52a1ID"
+      }, 
+      {
+        "is_necessary": 0, 
+        "sample": "", 
+        "name": "start", 
+        "value": "", 
+        "desc": "\u9ed8\u8ba40\u8868\u793a\u4ece\u7b2c1\u6761\u8bb0\u5f55\u5f00\u59cb\u8fd4\u56de"
+      }, 
+      {
+        "is_necessary": 0, 
+        "sample": "", 
+        "name": "length", 
+        "value": "", 
+        "desc": "\u8fd4\u56de\u8bb0\u5f55\u6570\u91cf\uff0c\u4e0d\u4f20\u6b64\u53c2\u6570\u9ed8\u8ba4\u8fd4\u56de\u5168\u90e8"
+      }
+    ], 
+    "desc": "\u67e5\u8be2\u7528\u6237\u6709\u6743\u9650\u7684DB\u5e10\u53f7\u5217\u8868", 
+    "is_deleted": false, 
+    "name": "\u67e5\u8be2\u7528\u6237\u6709\u6743\u9650\u7684DB\u5e10\u53f7\u5217\u8868", 
+    "is_activated": true, 
+    "remote_system": 8, 
+    "system_info": {
+      "cookies": [], 
+      "code": "job", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u4f5c\u4e1a\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 4, 
+      "headers": [], 
+      "is_builtin": true, 
+      "desc": "\u4f5c\u4e1a\u5e73\u53f0\uff08Job\uff09\u662f\u4e00\u5957\u57fa\u4e8e\u84dd\u9cb8\u667a\u4e91\u7ba1\u63a7\u5e73\u53f0Agent\u7ba1\u9053\u4e4b\u4e0a\u7684\u57fa\u7840\u64cd\u4f5c\u5e73\u53f0\uff0c\u5177\u5907\u5927\u5e76\u53d1\u5904\u7406\u80fd\u529b\uff1b\u9664\u4e86\u652f\u6301\u811a\u672c\u6267\u884c\u3001\u6587\u4ef6\u62c9\u53d6/\u5206\u53d1\u3001\u5b9a\u65f6\u4efb\u52a1\u7b49\u4e00\u7cfb\u5217\u53ef\u5b9e\u73b0\u7684\u57fa\u7840\u8fd0\u7ef4\u573a\u666f\u4ee5\u5916\uff0c\u8fd8\u8fd0\u7528\u6d41\u7a0b\u5316\u7684\u7406\u5ff5\u5f88\u597d\u7684\u5c06\u96f6\u788e\u7684\u5355\u4e2a\u4efb\u52a1\u7ec4\u88c5\u6210\u4e00\u4e2a\u4f5c\u4e1a\u6d41\u7a0b\uff1b\u800c\u6bcf\u4e2a\u4efb\u52a1\u90fd\u53ef\u505a\u4e3a\u4e00\u4e2a\u539f\u5b50\u8282\u70b9\uff0c\u63d0\u4f9b\u7ed9\u5176\u5b83\u7cfb\u7edf\u548c\u5e73\u53f0\u8c03\u5ea6\uff0c\u5b9e\u73b0\u8c03\u5ea6\u81ea\u52a8\u5316\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "GET", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {}
+    }
+  }
+]

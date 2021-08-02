@@ -1,0 +1,126 @@
+[
+  {
+    "updated_by": "system", 
+    "creator": "system", 
+    "func_name": "update_set", 
+    "rsp_data": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "message", 
+        "code", 
+        "data", 
+        "result"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "message": {
+          "default": "", 
+          "type": "string", 
+          "description": "\u8fd4\u56de\u4fe1\u606f"
+        }, 
+        "code": {
+          "default": 0, 
+          "type": "number", 
+          "description": "\u9519\u8bef\u7801"
+        }, 
+        "data": {
+          "type": "object", 
+          "description": "\u8fd4\u56de\u6570\u636e", 
+          "properties": {}
+        }, 
+        "result": {
+          "default": true, 
+          "type": "boolean", 
+          "description": "\u8fd4\u56de\u7ed3\u679c"
+        }
+      }
+    }, 
+    "path": "/api/c/compapi/v2/cc/update_set/",
+      "is_builtin": false, 
+    "req_params": [], 
+    "desc": "\u66f4\u65b0\u96c6\u7fa4", 
+    "read_only": true, 
+    "is_deleted": false, 
+    "name": "\u66f4\u65b0\u96c6\u7fa4", 
+    "is_activated": true, 
+    "remote_system": 1, 
+    "system_info": {
+      "cookies": [], 
+      "code": "cc", 
+      "is_deleted": false, 
+      "name": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0", 
+      "creator": "", 
+      "admin": "admin", 
+      "variables": [], 
+      "contact_information": "", 
+      "is_activated": true, 
+      "system_id": 2, 
+      "headers": [], 
+      "is_builtin": false, 
+      "desc": "\u84dd\u9cb8\u914d\u7f6e\u5e73\u53f0\u662f\u4e00\u6b3e\u9762\u5411\u5e94\u7528\u7684CMDB\uff0c\u5728ITIL\u4f53\u7cfb\u91cc\uff0cCMDB\u662f\u6784\u5efa\u5176\u5b83\u6d41\u7a0b\u7684\u57fa\u77f3\uff0c\u800c\u5728\u84dd\u9cb8\u667a\u4e91\u4f53\u7cfb\u91cc\uff0c\u914d\u7f6e\u5e73\u53f0\u5c31\u626e\u6f14\u7740\u57fa\u77f3\u7684\u89d2\u8272\uff0c\u4e3a\u5e94\u7528\u63d0\u4f9b\u4e86\u5404\u79cd\u8fd0\u7ef4\u573a\u666f\u7684\u914d\u7f6e\u6570\u636e\u670d\u52a1\u3002", 
+      "updated_by": ""
+    }, 
+    "version": "v2", 
+    "req_headers": [], 
+    "method": "POST", 
+    "req_body": {
+      "$schema": "http://json-schema.org/draft-04/schema#", 
+      "required": [
+        "bk_biz_id", 
+        "bk_set_id", 
+        "data"
+      ], 
+      "type": "object", 
+      "description": "\u521d\u59cb\u5316\u6570\u636e", 
+      "properties": {
+        "bk_biz_id": {
+          "default": "", 
+          "type": "number", 
+          "description": "\u4e1a\u52a1ID"
+        }, 
+        "bk_set_id": {
+          "default": "", 
+          "type": "number", 
+          "description": "\u96c6\u7fa4ID"
+        }, 
+        "data": {
+          "type": "object", 
+          "description": "", 
+          "properties": {
+            "bk_set_name": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u96c6\u7fa4\u540d\u79f0"
+            }, 
+            "bk_service_status": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u670d\u52a1\u72b6\u6001\uff1a1-\u5f00\u653e;2-\u5173\u95ed"
+            }, 
+            "description": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u5907\u6ce8"
+            }, 
+            "bk_set_env": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u73af\u5883\u7c7b\u578b\uff1a1-\u6d4b\u8bd5;2-\u4f53\u9a8c;3-\u6b63\u5f0f"
+            }, 
+            "bk_set_desc": {
+              "default": "", 
+              "type": "string", 
+              "description": "\u96c6\u7fa4\u63cf\u8ff0"
+            }
+          }
+        }, 
+        "bk_supplier_account": {
+          "default": "0", 
+          "type": "string", 
+          "description": "\u5f00\u53d1\u5546\u8d26\u53f7"
+        }
+      }
+    }
+  }
+]
