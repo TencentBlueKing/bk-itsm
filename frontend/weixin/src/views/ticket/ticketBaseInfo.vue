@@ -161,13 +161,11 @@ export default defineComponent({
       try {
         await store.dispatch('ticket/addFollower', params)
         ticketDetail.value.hasAttention = isFollow
-        if (isFollow) {
-          Toast.success({
-            message: isFollow ? '添加关注成功' : '取消关注成功',
-            icon: 'passed',
-            className: 'common-toast'
-          })
-        }
+        Toast.success({
+          message: isFollow ? '添加关注成功' : '取消关注成功',
+          icon: 'passed',
+          className: 'common-toast'
+        })
       } catch (error) {
         console.error(error)
       } finally {

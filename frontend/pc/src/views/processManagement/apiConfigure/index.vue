@@ -108,7 +108,7 @@
                 pathList: [],
                 isBuiltinIdList: [],
                 isSelectedApiList: [],
-                showConetnt: false,
+                showContent: false,
                 customPaging: {
                     total_page: 1,
                     page: 1,

@@ -346,13 +346,13 @@
                     this.$parent.displayInfo['level_1'] = {}
                     this.$parent.displayInfo['level_0'] = item
                     // 展示 api列表
-                    // this.$parent.showConetnt = false
+                    // this.$parent.showContent = false
                     this.$parent.getTableList(item.id)
                     // this.$parent.getChannelPathList(item.system_id)
                 } else {
                     this.$parent.displayInfo['level_1'] = item
                     // 展示 单个api
-                    // this.$parent.showConetnt = true
+                    // this.$parent.showContent = true
                     this.$parent.getRemoteApiDetail(item.id)
                 }
                 this.treeList.forEach(tree => {
