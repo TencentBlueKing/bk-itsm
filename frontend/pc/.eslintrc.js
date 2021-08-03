@@ -66,9 +66,9 @@ module.exports = {
         // https://eslint.org/docs/rules/camelcase
         'camelcase': 'off',
 
-        // 缩进使用 2 个空格，并且 switch 语句中的 Case 需要缩进
+        // 缩进使用 4 个空格，并且 switch 语句中的 Case 需要缩进
         // https://eslint.org/docs/rules/indent
-        'indent': ['error', 2, {
+        'indent': ['error', 4, {
             'SwitchCase': 1,
             'flatTernaryExpressions': true
         }],
