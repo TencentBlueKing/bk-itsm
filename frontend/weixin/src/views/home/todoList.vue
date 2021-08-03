@@ -39,7 +39,7 @@
           loading-text="加载中..."
           @load="getTodoList('next')">
           <div v-if="type !== 'all'" class="specific-type-num">当前类别共有 {{ pagination.count }} 条单据 </div>
-          <div v-for="item in todoList" :key="item.sn" @click="goTicketDetial(item.id)">
+          <div v-for="item in todoList" :key="item.sn" @click="goTicketDetail(item.id)">
             <div class="ticket-card van-hairline--bottom">
               <h3 class="ticket-title">{{ item.title }}</h3>
               <p class="ticket-info">{{ item.sn }} | 提单人：{{ item.creator }}</p>
@@ -145,7 +145,7 @@ export default defineComponent({
       onRefresh()
     }
 
-    const goTicketDetial = (id: number): void => {
+    const goTicketDetail = (id: number): void => {
       router.push({
         name: 'ticket',
         params: {
@@ -163,7 +163,7 @@ export default defineComponent({
       firstPageLoading,
       onRefresh,
       handleSubmitted,
-      goTicketDetial
+      goTicketDetail
     }
   }
 })

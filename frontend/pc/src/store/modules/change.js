@@ -172,7 +172,7 @@ export default {
             })
         },
         // 获取模板列表数据
-        getTempalteList ({ commit, state, dispatch }, params) {
+        getTemplateList ({ commit, state, dispatch }, params) {
             return ajax.get(`ticket/templates/`, { params: params }).then(response => {
                 const res = response.data
                 return res
