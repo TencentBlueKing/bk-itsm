@@ -1,22 +1,36 @@
 default_stages: [commit]
 repos:
-  - repo: https://github.com/ambv/black
-    rev: master
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v1.21.0
     hooks:
-      - id: black
-#        args: [--line-length=120,  --target-version=py36, --safe]
-        args: [--line-length=120,  --skip-string-normalization, --safe]
-        language_version: python3.6
-        verbose: true
-        exclude: (\.idea|^blueapps/|^blueking/|^pipeline/|^flower/|^wiki|^iam/)
+      - id: pyupgrade
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.1.0
     hooks:
-      - id: flake8
-        entry: flake8 --config ./.flake8
+    - id: check-merge-conflict
+  - repo: https://github.com/psf/black
+    rev: stable
+    hooks:
+    - id: black
+      language_version: python3.6
+  - repo: https://github.com/pycqa/isort
+    rev: 5.5.4
+    hooks:
+      - id: isort
+        args: [ "--profile", "black" ]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.1.0
+    hooks:
+    - id: flake8
   - repo: local
     hooks:
-        - id: check-coverage
-          name: check coverage
-          entry: bash test_script/check.sh
-          language: system
+      - id: check-migrate
+        name: check migrate
+        entry: python scripts/check_migrate/check_migrate.py
+        language: system
+        types: [python]
+      - id: check-commit-message
+        name: Check commit message
+        entry: python scripts/check_commit_message.py
+        language: system
+        stages: [commit-msg]
