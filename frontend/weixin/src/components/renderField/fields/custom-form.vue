@@ -54,10 +54,6 @@ export default defineComponent({
       formData,
       context
     }
-    return {
-      // eslint-disable-next-line vue/no-dupe-keys
-      item
-    }
   }
 })
 </script>

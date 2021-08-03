@@ -250,7 +250,7 @@
                 const params = {
                     service: this.serviceId
                 }
-                return this.$store.dispatch('change/getTempalteList', params).then((res) => {
+                return this.$store.dispatch('change/getTemplateList', params).then((res) => {
                     this.templateList = res.data
                 }).catch((res) => {
                     errorHandler(res, this)
