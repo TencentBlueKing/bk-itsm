@@ -9,3 +9,6 @@ EOF
 ${SCRIPT_DIR}/prepare_services.sh
 
 ${SCRIPT_DIR}/install.sh
+
+cat ${SCRIPT_DIR}/code_quality.sh
+${SCRIPT_DIR}/code_quality.sh
