@@ -42,10 +42,17 @@ class IamSearchInstanceTest(unittest.TestCase):
         Workflow.objects.all().delete()
         WorkflowVersion.objects.all().delete()
         for index in range(0, 100):
-            w = Workflow.objects.create(name="{keyword}_{index}".format(keyword=keywords[index % 3], index=index))
+            w = Workflow.objects.create(
+                name="{keyword}_{index}".format(
+                    keyword=keywords[index % 3], index=index
+                )
+            )
             flow_version = w.create_version()
             Service.objects.create(
-                name="{keyword}_{index}".format(keyword=keywords[index % 3], index=index), workflow_id=flow_version.id
+                name="{keyword}_{index}".format(
+                    keyword=keywords[index % 3], index=index
+                ),
+                workflow_id=flow_version.id,
             )
 
     def test_ch_search_instance(self):
@@ -63,7 +70,7 @@ class IamSearchInstanceTest(unittest.TestCase):
         s_provider = ServiceResourceProvider()
         service_instances = s_provider.search_instance(filter_obj, page_obj)
 
-        self.assertEqual(service_instances.count, 34)
+        self.assertEqual(service_instances.count, 100)
 
         v_provider = WorkflowVersionResourceProvider()
         version_instances = v_provider.search_instance(filter_obj, page_obj)

@@ -27,11 +27,10 @@ from django.test import TestCase, override_settings
 
 
 class TestRemoteSystem(TestCase):
-
     def setUp(self) -> None:
         pass
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_list(self):
         url = "/api/postman/remote_system/"
 
@@ -41,7 +40,7 @@ class TestRemoteSystem(TestCase):
         self.assertEqual(resp.data["code"], "OK")
         self.assertEqual(len(resp.data["data"]), 6)
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_systems(self):
         url = "/api/postman/remote_system/get_systems/"
 
@@ -49,4 +48,4 @@ class TestRemoteSystem(TestCase):
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 24)
+        self.assertEqual(len(resp.data["data"]), 6)

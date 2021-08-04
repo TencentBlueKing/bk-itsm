@@ -53,18 +53,12 @@ class ServiceTest(TestCase):
         self.operator = "itsm_admin"
         self.data = {
             "name": "service_create_test_{}".format(
-                datetime.datetime.now().strftime("%Y-%m-%d %H:%M")),
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            ),
             "key": "test",
             "workflow": WorkflowVersion.objects.first(),
             "creator": self.operator,
         }
-
-    def test_create_service(self):
-        """
-        测试创建服务
-        """
-        self.service = Service.objects.create(**self.data)
-        self.assertTrue(isinstance(self.service, Service))
 
     def test_create_service_actions_auth(self):
         """
@@ -72,12 +66,14 @@ class ServiceTest(TestCase):
         """
         print(sys._getframe().f_code.co_name)
         self.service = Service.objects.create(**self.data)
-        resource_info = [{
-            "resource_id": str(self.service.id),
-            "resource_name": self.service.name,
-            "resource_type": self.service.auth_resource['resource_type'],
-        }]
-        apply_actions = ['service_manage']
+        resource_info = [
+            {
+                "resource_id": str(self.service.id),
+                "resource_name": self.service.name,
+                "resource_type": self.service.auth_resource["resource_type"],
+            }
+        ]
+        apply_actions = ["service_manage"]
 
         self.assertTrue(self.auth_result(apply_actions, resource_info))
 
@@ -85,17 +81,24 @@ class ServiceTest(TestCase):
     def auth_result(apply_actions, resource_info):
         iam_client = mock.MagicMock()
         actions_result = {action: True for action in apply_actions}
-        iam_client.resource_multi_actions_allowed.return_value = \
-            {str(resource['resource_id']): actions_result for resource in resource_info}
-        auth_actions = iam_client.resource_multi_actions_allowed(apply_actions, [resource_info])
+        iam_client.resource_multi_actions_allowed.return_value = {
+            str(resource["resource_id"]): actions_result for resource in resource_info
+        }
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info]
+        )
         denied_actions = []
         for action, result in auth_actions.items():
             if action in apply_actions and result is False:
                 denied_actions.append(action)
         return len(denied_actions) == 0
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_create_service(self) -> None:
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_create_service(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
         data = {
             "name": "测试服务",
@@ -113,24 +116,29 @@ class ServiceTest(TestCase):
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_import(self) -> None:
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_import(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
         resp = self.client.post(url, CREATE_SERVICE_DATA)
 
         service_id = resp.data["data"]["id"]
 
-        import_from_template_url = "/api/service/projects/" \
-                                   "{}/import_from_template/".format(service_id)
+        import_from_template_url = (
+            "/api/service/projects/" "{}/import_from_template/".format(service_id)
+        )
 
-        resp = self.client.post(import_from_template_url, {
-            "table_id": 8
-        })
+        resp = self.client.post(import_from_template_url, {"table_id": 8})
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
 
-        workflow = Workflow.objects.get(id=Service.objects.get(id=service_id).workflow.workflow_id)
+        workflow = Workflow.objects.get(
+            id=Service.objects.get(id=service_id).workflow.workflow_id
+        )
         version = workflow.create_version()
 
         # 判断字段是否成功导入
@@ -151,22 +159,23 @@ class ServiceTest(TestCase):
             "desc": "测试服务",
             "key": "request",
             "catalog_id": 2,
-            "project_key": "0"
+            "project_key": "0",
         }
         resp = self.client.post(url, data)
         service_id = resp.data["data"]["id"]
 
-        import_from_service_url = "/api/service/projects/" \
-                                  "{}/import_from_service/".format(service_id)
+        import_from_service_url = (
+            "/api/service/projects/" "{}/import_from_service/".format(service_id)
+        )
 
-        resp = self.client.post(import_from_service_url, {
-            "service_id": service.id
-        })
+        resp = self.client.post(import_from_service_url, {"service_id": service.id})
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
 
-        workflow = Workflow.objects.get(id=Service.objects.get(id=service_id).workflow.workflow_id)
+        workflow = Workflow.objects.get(
+            id=Service.objects.get(id=service_id).workflow.workflow_id
+        )
         version = workflow.create_version()
 
         # 判断字段是否成功导入
@@ -177,9 +186,12 @@ class ServiceTest(TestCase):
         self.assertEqual(fields[3]["name"], "申请内容")
         self.assertEqual(fields[4]["name"], "申请理由")
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_save_configs(self) -> None:
-
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_save_configs(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
         resp = self.client.post(url, CREATE_SERVICE_DATA)
 
@@ -187,24 +199,29 @@ class ServiceTest(TestCase):
 
         save_configs_url = "{}{}/save_configs/".format(url, service_id)
 
-        resp = self.client.post(save_configs_url, json.dumps(CONFIGS),
-                                content_type="application/json")
+        resp = self.client.post(
+            save_configs_url, json.dumps(CONFIGS), content_type="application/json"
+        )
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_favorite(self) -> None:
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_favorite(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         url = "/api/service/projects/"
         resp = self.client.post(url, CREATE_SERVICE_DATA)
 
         service_id = resp.data["data"]["id"]
 
-        operate_favorite_url = "/api/service/projects/{}/operate_favorite/".format(service_id)
+        operate_favorite_url = "/api/service/projects/{}/operate_favorite/".format(
+            service_id
+        )
 
-        resp = self.client.post(operate_favorite_url, {
-            "favorite": True
-        })
+        resp = self.client.post(operate_favorite_url, {"favorite": True})
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
