@@ -2,28 +2,27 @@ name: CodeCov
 on: [push, pull_request]
 jobs:
   run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
-      OS: ubuntu-latest
+      OS: ubuntu-18.04
       PYTHON: "3.6"
-      DJANGO_SETTINGS_MODULE: "settings"
-      DEBUG: true
-      BKPAAS_ENGINE_REGION: "open"
       RUN_ENV: "open"
       APP_CODE: "bk_itsm"
       APP_ID: "bk_itsm"
+      RUN_VER: "open"
       SECRET_KEY: "12345678-1234-5678-1234-123456789012"
       APP_TOKEN: "12345678-1234-5678-1234-123456789012"
-      BK_BACKEND_CONFIG: ""
       BK_PAAS_HOST: "http://127.0.0.1"
       BK_IAM_V3_INNER_HOST: "127.0.0.1"
-      BKAPP_BKNODEMAN_NGINX_URL: "127.0.0.1"
-      BKAPP_BACKEND_HOST: "http://127.0.0.1"
+      BK_IAM_INNER_HOST: "http://127.0.0.1:8080"
       BROKER_URL: "redis://localhost:6379/0"
+      USE_IAM: "false"
       BKAPP_REDIS_HOST: "localhost"
+      BKAPP_BK_IAM_SYSTEM_ID: "itsm"
+      BKAPP_IAM_INITIAL_FILE: "dev"
       BKAPP_REDIS_PORT: 6379
       BKAPP_REDIS_PASSWORD: ""
-      BK_MYSQL_NAME: "bk_nodeman"
+      BK_MYSQL_NAME: "bk_itsm"
       BK_MYSQL_USER: "root"
       BK_MYSQL_PASSWORD: "root"
       BK_MYSQL_HOST: "localhost"
@@ -56,10 +55,8 @@ jobs:
     - name: Setup Mysql
       run: |
         sudo systemctl start mysql.service
-    - name: Install Dependencies
+    - name: Generate Report
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run Tests
-      run: |
-        python manage.py test itsm.test
+        ./scripts/workflows/bk_ci.sh
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v1

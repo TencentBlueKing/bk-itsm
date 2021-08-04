@@ -23,29 +23,34 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.test import TestCase, override_settings
+import os
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        # 新版插件管理数据库
+        "NAME": os.getenv("BK_MYSQL_NAME"),  # 数据库名
+        "USER": os.getenv("BK_MYSQL_USER"),
+        "PASSWORD": os.getenv("BK_MYSQL_PASSWORD"),
+        "HOST": os.getenv("BK_MYSQL_HOST"),
+        "PORT": os.getenv("BK_MYSQL_PORT"),
+        "OPTIONS": {
+            # Tell MySQLdb to connect with 'utf8mb4' character set
+            "charset": "utf8",
+        },
+        "COLLATION": "utf8_general_ci",
+        "TEST": {
+            "NAME": os.getenv("BK_MYSQL_TEST_NAME"),
+            "CHARSET": "utf8",
+            "COLLATION": "utf8_general_ci",
+        },
+    },
+}
 
-class TestRemoteSystem(TestCase):
-    def setUp(self) -> None:
-        pass
+# 本地开发无需权限中心
+BK_IAM_SKIP = True
+USE_IAM = True if os.getenv("USE_IAM", "false").lower() == "true" else False
+if not USE_IAM:
+    BK_IAM_SKIP = True
 
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_list(self):
-        url = "/api/postman/remote_system/"
-
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.data["result"], True)
-        self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
-
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_get_systems(self):
-        url = "/api/postman/remote_system/get_systems/"
-
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.data["result"], True)
-        self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
+DEBUG = True

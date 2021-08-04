@@ -34,7 +34,7 @@ from django.test import TestCase, override_settings
 from django.core.cache import cache
 
 from itsm.service.models import CatalogService
-from itsm.ticket.models import Ticket, Status, AttentionUsers, Service
+from itsm.ticket.models import Ticket, Status, AttentionUsers
 from itsm.component.constants import APPROVAL_STATE
 
 
@@ -43,21 +43,29 @@ class TicketTest(TestCase):
         app.conf.update(CELERY_ALWAYS_EAGER=True)
         Ticket.objects.all().delete()
         AttentionUsers.objects.all().delete()
-        
-        CatalogService.objects.create(service_id=1, is_deleted=False, catalog_id=2, creator="admin")
+
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=2, creator="admin"
+        )
 
     def tearDown(self):
         Ticket.objects.all().delete()
         AttentionUsers.objects.all().delete()
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_create_ticket(self):
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -79,18 +87,28 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
         self.assertEqual(rsp.data["code"], "OK")
         self.assertEqual(rsp.data["message"], "success")
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_list(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_list(self, patch_get_user_departments):
+        patch_get_user_departments.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -112,23 +130,33 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
         ticket_id = rsp.data["data"]["id"]
         url = "/api/ticket/receipts/"
         list_rsp = self.client.get(url)
         self.assertEqual(list_rsp.data["code"], "OK")
         self.assertEqual(list_rsp.data["message"], "success")
         self.assertEqual(ticket_id, list_rsp.data["data"]["items"][0]["id"])
-        self.assertEqual(['admin'], list_rsp.data["data"]["items"][0]["followers"])
+        self.assertEqual(["admin"], list_rsp.data["data"]["items"][0]["followers"])
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideTestMiddleware',))
-    def test_list_follower(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideTestMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_list_follower(self, patch_get_user_departments):
+        patch_get_user_departments.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -150,14 +178,22 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
 
         data_test = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -178,23 +214,35 @@ class TicketTest(TestCase):
             "creator": "test",
             "attention": True,
         }
-        rsp = self.client.post(path=url, data=json.dumps(data_test), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data_test), content_type="application/json"
+        )
         ticket_id = rsp.data["data"]["id"]
         list_rsp = self.client.get(url)
         self.assertEqual(list_rsp.data["code"], "OK")
         self.assertEqual(list_rsp.data["message"], "success")
         self.assertEqual(2, len(list_rsp.data["data"]["items"]))
-        self.assertEqual(['test'], list_rsp.data["data"]["items"][0]["followers"])
+        self.assertEqual(["test"], list_rsp.data["data"]["items"][0]["followers"])
         self.assertEqual(ticket_id, list_rsp.data["data"]["items"][0]["id"])
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_retrieve(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_retrieve(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -216,7 +264,9 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
 
         ticket_id = rsp.data["data"]["id"]
         get_url = "/api/ticket/receipts/{}/".format(ticket_id)
@@ -226,14 +276,24 @@ class TicketTest(TestCase):
         self.assertEqual(["admin"], list_rsp.data["data"]["followers"])
         self.assertEqual(ticket_id, list_rsp.data["data"]["id"])
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_add_follower(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_add_follower(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -255,12 +315,18 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
         ticket_id = rsp.data["data"]["id"]
 
         add_url = "/api/ticket/receipts/{}/add_follower/".format(ticket_id)
-        add_rsp = self.client.post(path=add_url, data=json.dumps({"attention": True}), content_type="application/json")
+        add_rsp = self.client.post(
+            path=add_url,
+            data=json.dumps({"attention": True}),
+            content_type="application/json",
+        )
         self.assertEqual(add_rsp.data["code"], "OK")
         self.assertEqual(add_rsp.data["message"], "success")
         get_url = "/api/ticket/receipts/{}/".format(ticket_id)
@@ -270,14 +336,24 @@ class TicketTest(TestCase):
         self.assertEqual(["test", "admin"], list_rsp.data["data"]["followers"])
         self.assertEqual(ticket_id, list_rsp.data["data"]["id"])
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_delete_follower(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_delete_follower(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -299,12 +375,18 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
 
         ticket_id = rsp.data["data"]["id"]
 
         add_url = "/api/ticket/receipts/{}/add_follower/".format(ticket_id)
-        add_rsp = self.client.post(path=add_url, data=json.dumps({"attention": False}), content_type="application/json")
+        add_rsp = self.client.post(
+            path=add_url,
+            data=json.dumps({"attention": False}),
+            content_type="application/json",
+        )
         self.assertEqual(add_rsp.data["code"], "OK")
         self.assertEqual(add_rsp.data["message"], "success")
         get_url = "/api/ticket/receipts/{}/".format(ticket_id)
@@ -314,14 +396,24 @@ class TicketTest(TestCase):
         self.assertEqual([], list_rsp.data["data"]["followers"])
         self.assertEqual(ticket_id, list_rsp.data["data"]["id"])
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideTestMiddleware',))
-    def test_operate(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideTestMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_operate(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
         data = {
             "catalog_id": 3,
             "service_id": 1,
             "service_type": "request",
             "fields": [
-                {"type": "STRING", "id": 1, "key": "title", "value": "test_ticket", "choice": []},
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
                 {
                     "type": "STRING",
                     "id": 5,
@@ -343,7 +435,9 @@ class TicketTest(TestCase):
             "attention": True,
         }
         url = "/api/ticket/receipts/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
 
         ticket_id = rsp.data["data"]["id"]
         AttentionUsers.objects.create(ticket_id=ticket_id, follower="test")
@@ -360,39 +454,71 @@ class TicketTest(TestCase):
     @mock.patch.object(Status, "approval_result")
     @mock.patch.object(Status, "get_processor_in_sign_state")
     @mock.patch.object(Ticket, "activity_callback")
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_batch_approval_add_queue_success(self, mock_callback, mock_user, mock_result):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_batch_approval_add_queue_success(
+        self, mock_callback, mock_user, mock_result
+    ):
         mock_callback.return_value = type("MyResult", (object,), {"result": True})
         mock_user.return_value = "admin"
         mock_result.return_value = [
             {"id": 1, "key": "123", "value": "true"},
             {"id": 2, "key": "234", "value": "通过"},
         ]
-        ticket = Ticket.objects.create(sn="123", title="test", service_id='456', service_type="change")
-        status = Status.objects.create(ticket_id=ticket.id, state_id='111', status="RUNNING", type=APPROVAL_STATE)
+        ticket = Ticket.objects.create(
+            sn="123", title="test", service_id="456", service_type="change"
+        )
+        status = Status.objects.create(
+            ticket_id=ticket.id, state_id="111", status="RUNNING", type=APPROVAL_STATE
+        )
         ticket.node_status.add(status)
-        data = {"result": "true", "opinion": "xxxxx", "approval_list": [{"ticket_id": ticket.id}]}
+        data = {
+            "result": "true",
+            "opinion": "xxxxx",
+            "approval_list": [{"ticket_id": ticket.id}],
+        }
         url = "/api/ticket/receipts/batch_approval/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
         self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(cache.get("approval_status_{}_{}_{}".format("admin", ticket.id, '111')), "RUNNING")
+        self.assertEqual(
+            cache.get("approval_status_{}_{}_{}".format("admin", ticket.id, "111")),
+            "RUNNING",
+        )
 
     @mock.patch.object(Status, "approval_result")
     @mock.patch.object(Status, "get_processor_in_sign_state")
     @mock.patch.object(Ticket, "activity_callback")
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_batch_approval_add_queue_error(self, mock_callback, mock_user, mock_result):
-        mock_callback.return_value = type("MyResult", (object,), {"result": False, "message": "error_test"})
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_batch_approval_add_queue_error(
+        self, mock_callback, mock_user, mock_result
+    ):
+        mock_callback.return_value = type(
+            "MyResult", (object,), {"result": False, "message": "error_test"}
+        )
         mock_user.return_value = "admin"
         mock_result.return_value = [
             {"id": 1, "key": "123", "value": "true"},
             {"id": 2, "key": "234", "value": "通过"},
         ]
-        ticket = Ticket.objects.create(sn="123", title="test", service_id='456', service_type="change")
-        status = Status.objects.create(ticket_id=ticket.id, state_id='111', status="RUNNING", type=APPROVAL_STATE)
+        ticket = Ticket.objects.create(
+            sn="123", title="test", service_id="456", service_type="change"
+        )
+        status = Status.objects.create(
+            ticket_id=ticket.id, state_id="111", status="RUNNING", type=APPROVAL_STATE
+        )
         ticket.node_status.add(status)
-        data = {"result": "true", "opinion": "xxxxx", "approval_list": [{"ticket_id": ticket.id}]}
+        data = {
+            "result": "true",
+            "opinion": "xxxxx",
+            "approval_list": [{"ticket_id": ticket.id}],
+        }
         url = "/api/ticket/receipts/batch_approval/"
-        rsp = self.client.post(path=url, data=json.dumps(data), content_type="application/json")
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
         self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(cache.get("approval_status_{}_{}_{}".format("admin", ticket.id, '111')), None)
+        self.assertEqual(
+            cache.get("approval_status_{}_{}_{}".format("admin", ticket.id, "111")),
+            None,
+        )
