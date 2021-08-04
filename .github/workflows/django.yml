@@ -1,0 +1,65 @@
+name: CodeCov
+on: [push, pull_request]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      OS: ubuntu-latest
+      PYTHON: "3.6"
+      DJANGO_SETTINGS_MODULE: "settings"
+      DEBUG: true
+      BKPAAS_ENGINE_REGION: "open"
+      RUN_ENV: "open"
+      APP_CODE: "bk_itsm"
+      APP_ID: "bk_itsm"
+      SECRET_KEY: "12345678-1234-5678-1234-123456789012"
+      APP_TOKEN: "12345678-1234-5678-1234-123456789012"
+      BK_BACKEND_CONFIG: ""
+      BK_PAAS_HOST: "http://127.0.0.1"
+      BK_IAM_V3_INNER_HOST: "127.0.0.1"
+      BKAPP_BKNODEMAN_NGINX_URL: "127.0.0.1"
+      BKAPP_BACKEND_HOST: "http://127.0.0.1"
+      BROKER_URL: "redis://localhost:6379/0"
+      BKAPP_REDIS_HOST: "localhost"
+      BKAPP_REDIS_PORT: 6379
+      BKAPP_REDIS_PASSWORD: ""
+      BK_MYSQL_NAME: "bk_nodeman"
+      BK_MYSQL_USER: "root"
+      BK_MYSQL_PASSWORD: "root"
+      BK_MYSQL_HOST: "localhost"
+      BK_MYSQL_PORT: 3306
+      BK_MYSQL_TEST_NAME: "bk_itsm_test"
+      WORKFLOW_DIR: "scripts/workflows"
+      YUM_INSTALL_SERVICE: ""
+      CREATE_PYTHON_VENV: ""
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.6
+    - name: Setup Mysql
+      run: |
+        sudo systemctl start mysql.service
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests
+      run: |
+        python manage.py test itsm.test
