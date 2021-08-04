@@ -60,7 +60,7 @@ export BKAPP_IAM_INITIAL_FILE="dev"
 第二种方式，你可以直接修改项目的 settings 配置，先修改 `config/__init__.py` ，设置项目的基础信息
 
 ```python
-APP_ID = 'bk_sops'
+APP_ID = 'bk_itsm'
 APP_TOKEN = '{APP_TOKEN}'
 BK_PAAS_HOST = '{BK_PAAS_HOST}'
 ```

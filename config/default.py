@@ -27,7 +27,14 @@ from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
-from config import APP_CODE, BASE_DIR, BK_URL, PROJECT_ROOT, BK_PAAS_HOST, BK_PAAS_INNER_HOST
+from config import (
+    APP_CODE,
+    BASE_DIR,
+    BK_URL,
+    PROJECT_ROOT,
+    BK_PAAS_HOST,
+    BK_PAAS_INNER_HOST,
+)
 
 # 请在这里加入你的自定义 APP
 INSTALLED_APPS += (
@@ -77,10 +84,16 @@ INSTALLED_APPS += (
     "weixin",
     # 'flower',
     # 'monitors',
-    "iam",
-    'iam.contrib.iam_migration',
-    "itsm.auth_iam",
 )
+
+# IAM 开启开关
+USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
+if USE_IAM:
+    INSTALLED_APPS += (
+        "iam",
+        "iam.contrib.iam_migration",
+        "itsm.auth_iam",
+    )
 
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
@@ -107,7 +120,7 @@ MIDDLEWARE = (
     # 蓝鲸静态资源服务，内部依赖
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # 企业/微信登录中间件
-    'blueapps.account.middlewares.RioLoginRequiredMiddleware',
+    "blueapps.account.middlewares.RioLoginRequiredMiddleware",
     "weixin.core.middlewares.WeixinAuthenticationMiddleware",
     "weixin.core.middlewares.WeixinLoginMiddleware",
     # 'blueapps.account.middlewares.WeixinLoginRequiredMiddleware',
@@ -118,7 +131,7 @@ MIDDLEWARE = (
     "iam.contrib.django.middlewares.AuthFailedExceptionMiddleware",
     # enable nginx http-auth
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
-    'itsm.component.misc_middlewares.InstrumentProfilerMiddleware',
+    "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
     # 'pyinstrument.middleware.ProfilerMiddleware',
 )
 
@@ -138,7 +151,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # ln -s static static_root
 # python manage.py collectstatic
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles/')
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles/")
 
 # CELERY 开关，使用时请改为 True，修改项目目录下的 Procfile 文件，添加以下两行命令：
 # worker: python manage.py celery worker -l info
@@ -168,7 +181,9 @@ LOGGING = get_logging_config_dict(locals())
 # 初始化管理员列表，列表中的人员将拥有预发布环境和正式环境的管理员权限
 # 注意：请在首次提测和上线前修改，之后的修改将不会生效
 BKAPP_ITSM_ADMIN = os.environ.get("BKAPP_ITSM_ADMIN", "")
-INIT_SUPERUSER = set(["admin"] + [username for username in BKAPP_ITSM_ADMIN.split(",") if username])
+INIT_SUPERUSER = set(
+    ["admin"] + [username for username in BKAPP_ITSM_ADMIN.split(",") if username]
+)
 
 # BKUI是否使用了history模式
 IS_BKUI_HISTORY_MODE = False
@@ -181,11 +196,8 @@ IS_AJAX_PLAIN_MODE = True
 """
 
 if IS_USE_CELERY:
-    INSTALLED_APPS = locals().get('INSTALLED_APPS', [])
-    INSTALLED_APPS += (
-        'django_celery_beat',
-        'django_celery_results'
-    )
+    INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
+    INSTALLED_APPS += ("django_celery_beat", "django_celery_results")
 
     CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
     # 队列划分配置，勿动!
@@ -219,21 +231,20 @@ if locals().get("DISABLED_APPS"):
         if locals().get(_key) is None:
             continue
         locals()[_key] = tuple(
-            [_item for _item in locals()[_key] if not _item.startswith(_app + ".")])
+            [_item for _item in locals()[_key] if not _item.startswith(_app + ".")]
+        )
 
 # ==============================================================================
 # Django 项目配置 - i18n
 # ==============================================================================
-TIME_ZONE = 'Asia/Shanghai'
+TIME_ZONE = "Asia/Shanghai"
 LANGUAGE_CODE = os.environ.get("BKAPP_BACKEND_LANGUAGE", "zh_CN")
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 
 # 设定使用根目录的locale
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, "locale"),
-)
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
 LOCALEURL_USE_ACCEPT_LANGUAGE = True
 
@@ -260,18 +271,20 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     # 'DEFAULT_PAGINATION_CLASS': None,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.SessionAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+    ),
     "DEFAULT_FILTER_BACKENDS": (
         "itsm.component.drf.filters.OrderingFilter",
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
     "NON_FIELD_ERRORS_KEY": "params_error",
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.JSONParser',
-        'itsm.component.drf.parsers.ExtraJSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser',
+    "DEFAULT_PARSER_CLASSES": (
+        "rest_framework.parsers.JSONParser",
+        "itsm.component.drf.parsers.ExtraJSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
     ),
 }
 
@@ -279,11 +292,15 @@ REST_FRAMEWORK = {
 # CACHE SETTINGS
 # ==============================================================================
 CACHES = {
-    "default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache",
-                "LOCATION": "django_cache", },
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    },
     # this cache backend will be used by django-debug-panel
-    "debug-panel": {"BACKEND": "django.core.cache.backends.db.DatabaseCache",
-                    "LOCATION": "django_cache", },
+    "debug-panel": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    },
 }
 
 REDIS_HOST = os.environ.get("BKAPP_REDIS_HOST")
@@ -297,12 +314,16 @@ if IS_USE_REDIS:
     REDIS_SERVICE_NAME = os.environ.get("BKAPP_REDIS_SERVICE_NAME", "mymaster")
     REDIS_MODE = os.environ.get("BKAPP_REDIS_MODE", "single")
     REDIS_DB = os.environ.get("BKAPP_REDIS_DB", 0)
-    REDIS_SENTINEL_PASSWORD = os.environ.get("BKAPP_REDIS_SENTINEL_PASSWORD", REDIS_PASSWORD)
+    REDIS_SENTINEL_PASSWORD = os.environ.get(
+        "BKAPP_REDIS_SENTINEL_PASSWORD", REDIS_PASSWORD
+    )
     # 哨兵
     replication_caches = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "%s/%s:%s/%s" % (REDIS_SERVICE_NAME, REDIS_HOST, REDIS_PORT, REDIS_DB),
+            "LOCATION": "{}/{}:{}/{}".format(
+                REDIS_SERVICE_NAME, REDIS_HOST, REDIS_PORT, REDIS_DB
+            ),
             "OPTIONS": {
                 "CLIENT_CLASS": "itsm.component.data.sentinel.SentinelClient",
                 "PASSWORD": REDIS_PASSWORD,
@@ -314,9 +335,11 @@ if IS_USE_REDIS:
     single_caches = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB),
-            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",
-                        "PASSWORD": REDIS_PASSWORD, },
+            "LOCATION": "redis://{}:{}/{}".format(REDIS_HOST, REDIS_PORT, REDIS_DB),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "PASSWORD": REDIS_PASSWORD,
+            },
         },
     }
     CACHES_GETTER = {"replication": replication_caches, "single": single_caches}
@@ -324,8 +347,12 @@ if IS_USE_REDIS:
 
 # mysql cache backend
 else:
-    CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache",
-                          "LOCATION": "django_cache", }}
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "django_cache",
+        }
+    }
 
 # ==============================================================================
 # Django 项目配置 - 其他
@@ -342,7 +369,9 @@ MAKO_TEMPLATE_DIR = (
     os.path.join(BASE_DIR, MAKO_DIR_NAME),
     os.path.join(BASE_DIR, "static", "dist"),
 )
-MAKO_TEMPLATE_MODULE_DIR = os.path.join(os.path.dirname(BASE_DIR), "templates_module", APP_CODE)
+MAKO_TEMPLATE_MODULE_DIR = os.path.join(
+    os.path.dirname(BASE_DIR), "templates_module", APP_CODE
+)
 
 TEMPLATES = [
     {
@@ -507,7 +536,7 @@ if IS_USE_REDIS:
     PIPELINE_DATA_BACKEND = "pipeline.engine.core.data.redis_backend.RedisDataBackend"
     PIPELINE_DATA_CANDIDATE_BACKEND = os.getenv(
         "BKAPP_PIPELINE_DATA_CANDIDATE_BACKEND",
-        "pipeline.engine.core.data.mysql_backend.MySQLDataBackend"
+        "pipeline.engine.core.data.mysql_backend.MySQLDataBackend",
     )
 
     PIPELINE_DATA_BACKEND_AUTO_EXPIRE = True
@@ -595,11 +624,15 @@ try:
 except Exception:
     NEED_PROFILE = False
 PROFILE_TEST_PATH = [
-    {"path": path, "method": ["GET"]} for path in
-    os.environ.get("BKAPP_PROFILE_TEST_PATH", "").split(",") if path
+    {"path": path, "method": ["GET"]}
+    for path in os.environ.get("BKAPP_PROFILE_TEST_PATH", "").split(",")
+    if path
 ]
-PROFILE_OUTPUT = [output for output in os.environ.get("BKAPP_PROFILE_OUTPUT", "file").split(",") if
-                  output]
+PROFILE_OUTPUT = [
+    output
+    for output in os.environ.get("BKAPP_PROFILE_OUTPUT", "file").split(",")
+    if output
+]
 PROFILER = {
     "enable": NEED_PROFILE,
     "output": PROFILE_OUTPUT,
@@ -610,17 +643,17 @@ PROFILER = {
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 # try:
 #     import pymysql
-# 
+#
 #     def mysqldb_escape(value, conv_dict):
 #         from pymysql.converters import encoders
-# 
+#
 #         vtype = type(value)
 #         # note: you could provide a default:
 #         # PY2: encoder = encoders.get(vtype, escape_str)
 #         # PY3: encoder = encoders.get(vtype, escape_unicode)
 #         encoder = encoders.get(vtype)
 #         return encoder(value)
-# 
+#
 #     setattr(pymysql, "escape", mysqldb_escape)
 #     del pymysql
 # except ImportError as e:
@@ -633,25 +666,29 @@ PROFILER = {
 TEST_RUNNER = "itsm.tests.runner.ItsmTestRunner"
 
 # 标准运维页面服务地址
-SITE_URL_SOPS = '/o/bk_sops/'
+SITE_URL_SOPS = "/o/bk_sops/"
 
 # 统一转发前缀
-PREFIX_SOPS = ''
+PREFIX_SOPS = ""
 
 # 设置被代理的标准运维插件AJAX请求地址，比如API网关的接口
 # 'https://paasee-dev.XX.com/t/bk_sops/apigw/dispatch_plugin_query/'
-SOPS_PROXY_URL = os.environ.get('BKAPP_SOPS_PROXY_URL', '{}/o/bk_sops/'.format(BK_PAAS_INNER_HOST))
+SOPS_PROXY_URL = os.environ.get(
+    "BKAPP_SOPS_PROXY_URL", "{}/o/bk_sops/".format(BK_PAAS_INNER_HOST)
+)
 
 # 设置被代理的标准运维插件静态资源地址，比如标准运维的site_url或API网关接口
 # 'https://paasee-dev.XX.com/t/bk_sops'
-SOPS_SITE_URL = os.environ.get('BKAPP_SOPS_SITE_URL', '{}/o/bk_sops/'.format(BK_PAAS_HOST))
+SOPS_SITE_URL = os.environ.get(
+    "BKAPP_SOPS_SITE_URL", "{}/o/bk_sops/".format(BK_PAAS_HOST)
+)
 
 # 允许转发的非静态内容路径
 SOPS_ALLOW_ACCESS = ["/api/v3/component/", "/api/v3/variable/"]
 
-APIGW_APP_CODE = os.environ.get('BKAPP_APIGW_APP_CODE', '')
-APIGW_SECRET_KEY = os.environ.get('BKAPP_APIGW_SECRET_KEY', '')
-APIGW_USERNAME = os.environ.get('BKAPP_APIGW_USERNAME', '')
+APIGW_APP_CODE = os.environ.get("BKAPP_APIGW_APP_CODE", "")
+APIGW_SECRET_KEY = os.environ.get("BKAPP_APIGW_SECRET_KEY", "")
+APIGW_USERNAME = os.environ.get("BKAPP_APIGW_USERNAME", "")
 
 
 def my_before_proxy_func(request, json_data, request_headers):
@@ -665,32 +702,33 @@ BEFORE_PROXY_FUNC = my_before_proxy_func
 
 BK_API_USE_BKCLOUDS_FIRST = True
 
-DEFAULT_VARIABLE_NAME = 'variable_by_name'
+DEFAULT_VARIABLE_NAME = "variable_by_name"
 
 # IAM权限中心配置
 BK_IAM_SYSTEM_ID = os.getenv("BKAPP_BK_IAM_SYSTEM_ID", APP_CODE)
 BK_IAM_SYSTEM_NAME = os.getenv("BKAPP_BK_IAM_SYSTEM_NAME", "ITSM")
 
 # 本地开发需配置环境变量
-BK_IAM_INNER_HOST = os.environ.get('BK_IAM_V3_INNER_HOST', None)
+BK_IAM_INNER_HOST = os.environ.get("BK_IAM_V3_INNER_HOST", None)
 
 # 监控变量
-TAM_PROJECT_ID = os.environ.get('TAM_PROJECT_ID', "")
+TAM_PROJECT_ID = os.environ.get("TAM_PROJECT_ID", "")
 
 # 是否初始化蓝盾
-INIT_DEVOPS_TEMPLATE = os.environ.get('INIT_DEVOPS_TEMPLATE', False)
+INIT_DEVOPS_TEMPLATE = os.environ.get("INIT_DEVOPS_TEMPLATE", False)
 
 # 权限中心 SaaS host
 BK_IAM_APP_CODE = os.getenv("BK_IAM_V3_APP_CODE", "bk_iam")
-BK_IAM_SAAS_HOST = os.environ.get("BK_IAM_V3_SAAS_HOST",
-                                  urljoin(BK_PAAS_HOST, "/o/{}".format(BK_IAM_APP_CODE)))
+BK_IAM_SAAS_HOST = os.environ.get(
+    "BK_IAM_V3_SAAS_HOST", urljoin(BK_PAAS_HOST, "/o/{}".format(BK_IAM_APP_CODE))
+)
 
-SYSTEM_CALL_USER = 'admin'
+SYSTEM_CALL_USER = "admin"
 
 BK_DESKTOP_URL = os.environ.get("BK_DESKTOP_URL") or BK_PAAS_HOST
 
-BK_IAM_API_PREFIX = SITE_URL + 'openapi'
-BK_API_USE_TEST_ENV = True if os.environ.get("BK_API_USE_TEST_ENV") == 'True' else False
+BK_IAM_API_PREFIX = SITE_URL + "openapi"
+BK_API_USE_TEST_ENV = True if os.environ.get("BK_API_USE_TEST_ENV") == "True" else False
 BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", BK_PAAS_INNER_HOST)
 IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
@@ -702,25 +740,26 @@ FRONTEND_URL = os.environ.get("BKAPP_FRONTEND_URL") or os.path.join(
 
 MY_OA_CALLBACK_URL = os.environ.get("MY_OA_CALLBACK_URL", "")
 
-WEIXIN_APP_EXTERNAL_SHARE_HOST = '{}weixin/'.format(
-    os.environ.get("BKAPP_WEIXIN_APP_EXTERNAL_HOST", FRONTEND_URL))
+WEIXIN_APP_EXTERNAL_SHARE_HOST = "{}weixin/".format(
+    os.environ.get("BKAPP_WEIXIN_APP_EXTERNAL_HOST", FRONTEND_URL)
+)
 TICKET_NOTIFY_HOST = WEIXIN_APP_EXTERNAL_SHARE_HOST.replace("https", "http")
 
 FILE_CHARSET = "utf-8"
-LANGUAGE_CODE = 'zh-hans'
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+LANGUAGE_CODE = "zh-hans"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # celery允许接收的数据格式，可以是一个字符串，比如'json'
-CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+CELERY_ACCEPT_CONTENT = ["pickle", "json"]
 # 异步任务的序列化器，也可以是json
-CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_TASK_SERIALIZER = "pickle"
 # 任务结果的数据格式，也可以是json
-CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = "pickle"
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
-timezone = 'Asia/Shanghai'
+timezone = "Asia/Shanghai"
 
-CELERY_TIMEZONE = 'Asia/Shanghai'
+CELERY_TIMEZONE = "Asia/Shanghai"
 USE_TZ = False
 # 蓝盾
 DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
