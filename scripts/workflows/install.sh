@@ -13,7 +13,7 @@ cat "./config/local_settings.py"
 
 # 安装pip依赖
 pip install -r requirements.txt
-pip install -r requirements_dev.txt
+pip install -r requirements.dev.txt
 pip install black
 
 # 删除遗留数据库，并新建一个空的本地数据库
