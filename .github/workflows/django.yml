@@ -6,7 +6,6 @@ jobs:
     env:
       OS: ubuntu-latest
       PYTHON: "3.6"
-      DJANGO_SETTINGS_MODULE: "settings"
       RUN_ENV: "open"
       APP_CODE: "bk_itsm"
       APP_ID: "bk_itsm"
