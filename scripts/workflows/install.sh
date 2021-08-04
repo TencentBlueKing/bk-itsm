@@ -20,7 +20,7 @@ pip install black
 CREATE_DB_SQL="
 drop database if exists ${BK_MYSQL_NAME};
 drop database if exists ${BK_MYSQL_TEST_NAME};
-create database ${BK_MYSQL_NAME} default character set utf8mb4 collate utf8mb4_general_ci;
+create database ${BK_MYSQL_NAME} default character set utf8 collate utf8_general_ci;
 "
 
 if [ "$BK_MYSQL_PASSWORD" ]; then

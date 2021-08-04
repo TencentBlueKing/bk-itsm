@@ -36,13 +36,13 @@ DATABASES = {
         "PORT": os.getenv("BK_MYSQL_PORT"),
         "OPTIONS": {
             # Tell MySQLdb to connect with 'utf8mb4' character set
-            "charset": "utf8mb4",
+            "charset": "utf8",
         },
-        "COLLATION": "utf8mb4_general_ci",
+        "COLLATION": "utf8_general_ci",
         "TEST": {
             "NAME": os.getenv("BK_MYSQL_TEST_NAME"),
-            "CHARSET": "utf8mb4",
-            "COLLATION": "utf8mb4_general_ci",
+            "CHARSET": "utf8",
+            "COLLATION": "utf8_general_ci",
         },
     },
 }
