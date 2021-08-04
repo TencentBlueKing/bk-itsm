@@ -23,7 +23,7 @@ jobs:
       BKAPP_IAM_INITIAL_FILE: "dev"
       BKAPP_REDIS_PORT: 6379
       BKAPP_REDIS_PASSWORD: ""
-      BK_MYSQL_NAME: "bk_nodeman"
+      BK_MYSQL_NAME: "bk_itsm"
       BK_MYSQL_USER: "root"
       BK_MYSQL_PASSWORD: "root"
       BK_MYSQL_HOST: "localhost"
