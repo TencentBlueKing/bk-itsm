@@ -271,7 +271,6 @@
                 })
             },
             onSortChange (data) {
-                console.log(data)
                 const ordering = data.order ? (data.order === 'ascending' ? `-${data.prop}` : data.prop) : undefined
                 switch (this.activePanel) {
                     case 'todo':
