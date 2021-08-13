@@ -43,8 +43,9 @@ class BkOpsService(ItsmBaseService):
     def prepare_task_params(self, state, ticket):
 
         fields = ticket.fields.values_list("key", "_value")
-        variables = TicketGlobalVariable.objects.filter(ticket_id=ticket.id).values_list("key",
-                                                                                         "value")
+        variables = TicketGlobalVariable.objects.filter(
+            ticket_id=ticket.id
+        ).values_list("key", "value")
         values = dict(list(fields) + list(variables))
         sops_info = state["extras"]["sops_info"]
 
@@ -59,13 +60,17 @@ class BkOpsService(ItsmBaseService):
                 constant["value"] = values.get(constant["value"], "")
         constants = {constant["key"]: constant["value"] for constant in constants}
 
+        exclude_task_nodes_id = sops_info.get("exclude_task_nodes_id", [])
+        template_source = sops_info.get("template_source", "common")
+
         params = {
             "bk_biz_id": bk_biz_id,
             "template_id": str(sops_info["template_id"]),
             "flow_type": "common",
-            "template_source": "common",
+            "template_source": template_source,
             "name": "ITSM-" + state["name"],
             "constants": constants,
+            "exclude_task_nodes_id": exclude_task_nodes_id,
             # return raw response data
             "__raw": True,
         }
@@ -110,13 +115,17 @@ class BkOpsService(ItsmBaseService):
             {
                 "key": "api_info",
                 "name": "api信息",
-                "value": StatusSerializer.build_sops_info(state["extras"]["sops_info"],
-                                                          task_params),
+                "value": StatusSerializer.build_sops_info(
+                    state["extras"]["sops_info"], task_params
+                ),
                 "show_result": True,
             }
         ]
         current_node.create_action_log(
-            "system", "开始执行标准运维任务【{name}】", source=SYSTEM_OPERATE, action_type=SYSTEM_OPERATE,
+            "system",
+            "开始执行标准运维任务【{name}】",
+            source=SYSTEM_OPERATE,
+            action_type=SYSTEM_OPERATE,
             fields=api_info,
         )
         self.update_info(current_node, sops_result, task_params=task_params)
@@ -125,19 +134,27 @@ class BkOpsService(ItsmBaseService):
             create_result = client_backend.sops.create_task(task_params)
         except Exception as error:
             logger.info(
-                "create task error，error  info %s , task params %s", str(error), task_params,
+                "create task error，error  info %s , task params %s",
+                str(error),
+                task_params,
             )
-            self.update_info(current_node, sops_result, error_message=str(error), result=False)
+            self.update_info(
+                current_node, sops_result, error_message=str(error), result=False
+            )
 
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=str(error))
+            current_node.set_failed_status(
+                message=error_message_template, detail_message=str(error)
+            )
             return True
 
         if not create_result.get("result", False):
             detail_message = create_result.get("message") or "unknown"
-            self.update_info(current_node, sops_result, error_message=detail_message, result=False)
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=detail_message)
+            self.update_info(
+                current_node, sops_result, error_message=detail_message, result=False
+            )
+            current_node.set_failed_status(
+                message=error_message_template, detail_message=detail_message
+            )
             return True
 
         sops_task_id = create_result.get("data", {}).get("task_id")
@@ -146,7 +163,11 @@ class BkOpsService(ItsmBaseService):
         # second_step execute
         try:
             start_result = client_backend.sops.start_task(
-                {"__raw": True, "task_id": sops_task_id, "bk_biz_id": task_params["bk_biz_id"], }
+                {
+                    "__raw": True,
+                    "task_id": sops_task_id,
+                    "bk_biz_id": task_params["bk_biz_id"],
+                }
             )
             self.update_info(current_node, sops_result, task_url=task_url)
         except Exception as error:
@@ -155,15 +176,22 @@ class BkOpsService(ItsmBaseService):
                 str(error),
                 sops_task_id,
             )
-            self.update_info(current_node, sops_result, error_message=error_message, result=False)
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=error_message)
+            self.update_info(
+                current_node, sops_result, error_message=error_message, result=False
+            )
+            current_node.set_failed_status(
+                message=error_message_template, detail_message=error_message
+            )
             return True
 
         if not start_result.get("result", False):
             message = start_result.get("message", "未知错误")
-            self.update_info(current_node, sops_result, error_message=message, result=False)
-            current_node.set_failed_status(message=error_message_template, detail_message=message)
+            self.update_info(
+                current_node, sops_result, error_message=message, result=False
+            )
+            current_node.set_failed_status(
+                message=error_message_template, detail_message=message
+            )
             return True
 
         data.set_outputs("sops_task_id", sops_task_id)
@@ -191,11 +219,15 @@ class BkOpsService(ItsmBaseService):
         if not sops_task_id:
             data.outputs.ex_data = "invalid callback_data, sops_task_id is null"
             self.update_info(
-                current_node, sops_result,
-                error_message="invalid callback_data, sops_task_id is null", result=False,
+                current_node,
+                sops_result,
+                error_message="invalid callback_data, sops_task_id is null",
+                result=False,
             )
             self.finish_schedule()
-            current_node.set_failed_status(message="invalid callback_data, task_id is null")
+            current_node.set_failed_status(
+                message="invalid callback_data, task_id is null"
+            )
             return True
 
         try:
@@ -206,13 +238,17 @@ class BkOpsService(ItsmBaseService):
             }
             task_result = client_backend.sops.get_task_status(task_status_params)
         except Exception as error:
-            self.update_info(current_node, sops_result, error_message=str(error), result=False)
+            self.update_info(
+                current_node, sops_result, error_message=str(error), result=False
+            )
             current_node.set_failed_status(message=str(error))
             self.finish_schedule()
             return True
         if task_result.get("result", False) is False:
             self.update_info(
-                current_node, sops_result, error_message=task_result.get("message", ""),
+                current_node,
+                sops_result,
+                error_message=task_result.get("message", ""),
                 result=False,
             )
             current_node.set_failed_status(message=task_result.get("message", ""))
@@ -227,7 +263,9 @@ class BkOpsService(ItsmBaseService):
             return True
         if current_status in ["FAILED", "REVOKED"]:
             data.set_outputs("params_sops_result_%s" % state_id, False)
-            error_message = self.get_detail_message(task_status_params, task_info, current_node)
+            error_message = self.get_detail_message(
+                task_status_params, task_info, current_node
+            )
 
             current_node.set_failed_status(message=error_message)
             self.finish_schedule()
@@ -255,14 +293,20 @@ class BkOpsService(ItsmBaseService):
 
     @staticmethod
     def get_detail_message(task_params, task_info, task_node):
-        failed_children = [child for child in task_info.get("children", {}).values() if
-                           child["state"] == "FAILED"]
+        failed_children = [
+            child
+            for child in task_info.get("children", {}).values()
+            if child["state"] == "FAILED"
+        ]
         error_messages = []
         for child in failed_children:
             task_params.update({"__raw": True, "node_id": child["id"]})
             result = client_backend.sops.get_task_node_detail(task_params)
             error_messages.append(
-                u"{}:{}".format(child["name"], result.get("data", {}).get("ex_data") or u"未知错误"))
+                u"{}:{}".format(
+                    child["name"], result.get("data", {}).get("ex_data") or u"未知错误"
+                )
+            )
         return "\n".join(error_messages)
 
     def outputs_format(self):
