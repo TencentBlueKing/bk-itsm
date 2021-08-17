@@ -59,7 +59,7 @@ export default {
     actions: {
         getProjectInfo ({ commit }, params) {
             //  目前项目在 ITSM 是虚拟的，所以暂时默认为 0
-            // const project_id = 0
+            const project_id = 0
             return ajax.get(`/project/projects/${project_id}/info/`, params).then(response => {
                 // const res = response.data
                 // commit('setProjectInfo', res.data)

@@ -77,10 +77,15 @@
                         if (projectsWithViewPerm.length === 0) {
                             this.$router.replace({ name: 'ProjectGuide' })
                         } else {
-                            const projectId = this.$route.query.project_id || 0
-                            this.$store.commit('project/setProjectId', projectId)
-                            this.$store.dispatch('project/changeDefaultProject', projectId)
-                            this.$router.replace({ name: 'projectTicket', query: { project_id: projectId } })
+                            if (this.$route.query.project_id) {
+                                for (let index = 0; index < projectsWithViewPerm.length; index++) {
+                                    if (projectsWithViewPerm[index].key === this.$route.query.project_id) {
+                                        this.$store.commit('project/setProjectId', projectsWithViewPerm[index].key)
+                                        this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[index].key)
+                                        this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[index].key } })
+                                    }
+                                }
+                            }
                         }
                     }
                 } catch (e) {
