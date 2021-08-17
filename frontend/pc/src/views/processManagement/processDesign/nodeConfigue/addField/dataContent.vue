@@ -32,7 +32,7 @@
                     :clearable="true"
                     :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
                     v-model="item.name"
-                    :placeholder="$t(`m.treeinfo['请输入name']`)"
+                    :placeholder="$t(`m.treeinfo['请输入选项名']`)"
                     @blur="putChar(item, itemIndex)">
                 </bk-input>
                 <template v-if="formInfo.type === 'TABLE'">
@@ -46,7 +46,7 @@
                 <bk-input :ext-cls="'bk-custom-input'"
                     :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
                     v-model="item.key"
-                    :placeholder="$t(`m.treeinfo['请输入key']`)">
+                    :placeholder="$t(`m.treeinfo['请输入选项ID']`)">
                 </bk-input>
                 <div class="bk-custom-icon">
                     <i class="bk-itsm-icon icon-flow-add" :class="{ 'bk-no-delete': (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT') }" @click="addDataLine(item, itemIndex)"></i>

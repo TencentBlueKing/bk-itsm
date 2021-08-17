@@ -1343,6 +1343,8 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '请输入选项ID': 'Please enter the option ID',
+        '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
         '任何节点，提单人都可撤回单据': 'At any node, the ticket can withdraw',
         '提单后，单据未被处理流转前，提单人可以撤回': 'After the ticket of created, the tikcet of created can be withdrawn before the ticket is not processed',
