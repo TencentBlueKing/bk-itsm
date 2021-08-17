@@ -83,7 +83,6 @@
                                     class="ml10 filter-btn"
                                     @click="searchMore">
                                 </bk-button>
-                                <i style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
                             </div>
                         </div>
                         <search-info
@@ -193,30 +192,6 @@
                     </bk-table>
                 </template>
             </div>
-            <!-- 单据高亮设置 -->
-            <bk-dialog
-                v-model="isHighlightSetting"
-                width="560"
-                :draggable="false"
-                @confirm="HighlightSettingComfirm">
-                <p slot="header" style="text-align: left;">
-                    {{$t(`m.slaContent["单据高亮设置"]`)}}
-                </p>
-                <div class="bk-highlight-setting">
-                    <div class="bk-itsm-version">
-                        <i class="bk-icon icon-info-circle"></i>
-                        <span>{{ $t('m.slaContent["对特殊单据，如预警单和超时单设置颜色高亮提醒。"]') }}</span>
-                    </div>
-                    <div class="bk-color-box">
-                        <span>{{ $t('m.slaContent["预警单据背景颜色"]') }} :</span>
-                        <bk-color-picker v-model="highlightObj.reply_timeout_color"></bk-color-picker>
-                    </div>
-                    <div class="bk-color-box">
-                        <span>{{ $t('m.slaContent["超时单据背景颜色"]') }} :</span>
-                        <bk-color-picker v-model="highlightObj.handle_timeout_color"></bk-color-picker>
-                    </div>
-                </div>
-            </bk-dialog>
         </template>
         <!-- 新增/修改 -->
         <add-agreement
@@ -247,11 +222,6 @@
         mixins: [permission],
         data () {
             return {
-                isHighlightSetting: false,
-                highlightObj: {
-                    reply_timeout_color: '#FFF5E3',
-                    handle_timeout_color: '#FFECEC'
-                },
                 isDataLoading: true,
                 versionStatus: true,
                 secondClick: false,

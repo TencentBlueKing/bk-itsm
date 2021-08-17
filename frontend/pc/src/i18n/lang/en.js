@@ -1411,6 +1411,8 @@ export const m = {
         '格式：英文数字及下划线，长度1~32': 'Format: 32 chars includes a~z or A~Z or 0~9 or _',
         '失败': 'Failed ',
         '更新人': 'Updater ',
+        '最近更新人': 'Last updater',
+        '最近更新时间': 'Last updated',
         '派单人不能为空': 'Assigner is required ',
         '处理人不能为空': 'Processor is required ',
         '请输入参数值，换行分隔': 'Please enter the value of the parameter, which is separated by line breaks ',

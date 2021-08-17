@@ -77,9 +77,10 @@
                         if (projectsWithViewPerm.length === 0) {
                             this.$router.replace({ name: 'ProjectGuide' })
                         } else {
-                            this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key)
-                            this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key)
-                            this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
+                            const projectId = this.$route.query.project_id || 0
+                            this.$store.commit('project/setProjectId', projectId)
+                            this.$store.dispatch('project/changeDefaultProject', projectId)
+                            this.$router.replace({ name: 'projectTicket', query: { project_id: projectId } })
                         }
                     }
                 } catch (e) {
