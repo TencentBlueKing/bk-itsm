@@ -116,6 +116,9 @@
                 this.$emit('setConfigStatus', val)
             }
         },
+        created () {
+            this.$emit('setConfigStatus', this.isShowNodeConfig)
+        },
         mounted () {
             if (this.processId) {
                 this.getFlowChart()
