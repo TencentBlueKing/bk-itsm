@@ -126,7 +126,6 @@ export default defineComponent({
     const setItemRef = (el: any): void => {
       // 提前剔除隐藏字段 ref
       fieldRefs = fieldRefs.filter((fieldEl: any) => !!fieldEl.item.showFeild)
-      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
       if (el && el.item.showFeild) {
         const sameRefIndex = fieldRefs.findIndex((fieldEl: any) => fieldEl.item.id === el.item.id)
         // 已存在

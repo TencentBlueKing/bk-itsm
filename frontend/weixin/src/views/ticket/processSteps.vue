@@ -47,7 +47,7 @@ export default defineComponent({
   props: {
     nodeList: {
       type: Object as PropType<INodeInfo[]>,
-      default: () => ([])
+      default: () => ({})
     },
     ticket: {
       type: Object as PropType<ITicketDetail>,
