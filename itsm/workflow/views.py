@@ -79,7 +79,8 @@ from itsm.component.constants import (
     ONLY_BACKEND_SIGNALS,
     SOURCE_TICKET,
     SOURCE_TASK,
-    SOURCE_WORKFLOW, PUBLIC_PROJECT_PROJECT_KEY,
+    SOURCE_WORKFLOW,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import DynamicListModelMixin
@@ -108,7 +109,9 @@ from itsm.workflow.permissions import (
     BaseWorkflowElementIamAuth,
     WorkflowIamAuth,
     FlowVersionIamAuth,
-    VersionDeletePermit, TemplateFieldPermissionValidate, TaskSchemaPermit,
+    VersionDeletePermit,
+    TemplateFieldPermissionValidate,
+    TaskSchemaPermit,
 )
 from itsm.workflow.utils import translate_constant_2
 from itsm.workflow.validators import (
@@ -167,8 +170,9 @@ class BaseWorkflowElementViewSet(component_viewsets.ModelViewSet):
     permission_classes = (BaseWorkflowElementIamAuth,)
 
 
-class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
-                      component_viewsets.AuthModelViewSet):
+class WorkflowViewSet(
+    DynamicListModelMixin, PartialUpdateModelMixin, component_viewsets.AuthModelViewSet
+):
     """工作流视图集
     BEP: 这里有意思了，多重集成，哪个update生效了？
     + create
@@ -177,7 +181,7 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
     + list
     """
 
-    queryset = Workflow.objects.prefetch_related("notify").order_by('-update_at')
+    queryset = Workflow.objects.prefetch_related("notify").order_by("-update_at")
     serializer_class = WorkflowSerializer
     filter_fields = {
         "id": ["in"],
@@ -200,12 +204,15 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
         user = serializer.context.get("request").user
         username = getattr(user, "username", "guest")
 
-        serializer.save(creator=username, updated_by=username,
-                        engine_version=DEFAULT_ENGINE_VERSION)
+        serializer.save(
+            creator=username, updated_by=username, engine_version=DEFAULT_ENGINE_VERSION
+        )
 
     def perform_destroy(self, instance):
         """自定义删除前行为"""
-        Trigger.objects.filter(source_type=SOURCE_WORKFLOW, source_id=instance.id).delete()
+        Trigger.objects.filter(
+            source_type=SOURCE_WORKFLOW, source_id=instance.id
+        ).delete()
         super(WorkflowViewSet, self).perform_destroy(instance)
 
     @action(detail=False, methods=["get"])
@@ -255,7 +262,11 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
     def get_regex_choice(self, request):
         field_type = request.GET.get("type")
         regex_choice = REGEX_CHOICES.get(field_type, [("EMPTY", "")])
-        return Response({"regex_choice": [(i[0], _(i[1])) for i in regex_choice], })
+        return Response(
+            {
+                "regex_choice": [(i[0], _(i[1])) for i in regex_choice],
+            }
+        )
 
     @action(detail=True, methods=["get"])
     def variables(self, request, *args, **kwargs):
@@ -306,8 +317,11 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
         response = FileResponse(json.dumps([data], cls=JsonEncoder, indent=2))
         response["Content-Type"] = "application/octet-stream"
         # 中文文件名乱码问题
-        response["Content-Disposition"] = "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
-            escape_uri_path(workflow.name), create_version_number(),
+        response[
+            "Content-Disposition"
+        ] = "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
+            escape_uri_path(workflow.name),
+            create_version_number(),
         )
 
         return response
@@ -337,7 +351,9 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
             except Exception as e:
                 logger.exception("import workflow exception: %s" % e)
 
-        return Response({"success": len(workflows), "failed": len(data) - len(workflows)})
+        return Response(
+            {"success": len(workflows), "failed": len(data) - len(workflows)}
+        )
 
     @action(detail=True, methods=["get"])
     def table(self, request, *args, **kwargs):
@@ -345,11 +361,18 @@ class WorkflowViewSet(DynamicListModelMixin, PartialUpdateModelMixin,
         workflow = self.get_object()
         if not workflow.table:
             return Response(
-                {"message": "success", "code": "OK", "data": {"name": "", "desc": "", "fields": []},
-                 "result": True}
+                {
+                    "message": "success",
+                    "code": "OK",
+                    "data": {"name": "", "desc": "", "fields": []},
+                    "result": True,
+                }
             )
-        return Response(TableRetrieveSerializer(workflow.table, context={
-            "is_biz_needed": workflow.is_biz_needed}).data)
+        return Response(
+            TableRetrieveSerializer(
+                workflow.table, context={"is_biz_needed": workflow.is_biz_needed}
+            ).data
+        )
 
 
 class StateViewSet(BaseWorkflowElementViewSet):
@@ -374,13 +397,19 @@ class StateViewSet(BaseWorkflowElementViewSet):
     def perform_destroy(self, instance):
         """删除State的同时需要重连主流程状态"""
         super(StateViewSet, self).perform_destroy(instance)
-        signals.state_deleted.send(sender=State, flow_id=instance.workflow_id, state_id=instance.id)
+        signals.state_deleted.send(
+            sender=State, flow_id=instance.workflow_id, state_id=instance.id
+        )
 
     def perform_create(self, serializer):
         super(StateViewSet, self).perform_create(serializer)
         state = serializer.instance
-        signals.state_created.send(sender=State, flow_id=state.workflow_id, state_id=state.id,
-                                   state_type=state.type)
+        signals.state_created.send(
+            sender=State,
+            flow_id=state.workflow_id,
+            state_id=state.id,
+            state_type=state.type,
+        )
 
     @action(detail=True, methods=["get"])
     def variables(self, request, *args, **kwargs):
@@ -390,8 +419,9 @@ class StateViewSet(BaseWorkflowElementViewSet):
         resource_type = request.GET.get("resource_type", "both")
         exclude_self = request.GET.get("exclude_self", False)
 
-        valid_inputs = state.get_valid_inputs(exclude_self=exclude_self,
-                                              resource_type=resource_type, scope="state")
+        valid_inputs = state.get_valid_inputs(
+            exclude_self=exclude_self, resource_type=resource_type, scope="state"
+        )
 
         # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
         if not state.is_first_state:
@@ -403,7 +433,9 @@ class StateViewSet(BaseWorkflowElementViewSet):
     def sign_variables(self, request, *args, **kwargs):
         """获取会签节点输出变量"""
         state = self.get_object()
-        global_variables = GlobalVariable.objects.filter(state_id=state.id, is_valid=True)
+        global_variables = GlobalVariable.objects.filter(
+            state_id=state.id, is_valid=True
+        )
         serializer = GlobalVariableSerializer(global_variables, many=True)
         return Response(serializer.data)
 
@@ -422,7 +454,7 @@ class StateViewSet(BaseWorkflowElementViewSet):
         instance = self.get_object()
         posts = instance.get_post_states(
             contain_auto=request.query_params.get("contain_auto", "false"),
-            exclude_states=[instance.id]
+            exclude_states=[instance.id],
         )
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
@@ -440,8 +472,12 @@ class StateViewSet(BaseWorkflowElementViewSet):
     def clone(self, request, *args, **kwargs):
         state = self.get_object()
         state = state.clone()
-        signals.state_created.send(sender=State, flow_id=state.workflow_id, state_id=state.id,
-                                   state_type=state.type)
+        signals.state_created.send(
+            sender=State,
+            flow_id=state.workflow_id,
+            state_id=state.id,
+            state_type=state.type,
+        )
         return Response(self.serializer_class(state, many=False).data)
 
     @action(detail=True, methods=["post"])
@@ -454,8 +490,9 @@ class StateViewSet(BaseWorkflowElementViewSet):
 
         with transaction.atomic():
             # 重置节点的按钮组
-            Trigger.objects.filter(state_id=state.id, workflow_id=state.workflow_id,
-                                   type=STATE_BUTTON).delete()
+            Trigger.objects.filter(
+                state_id=state.id, workflow_id=state.workflow_id, type=STATE_BUTTON
+            ).delete()
             trigger_objs = []
             for state_action in state_actions:
                 state_action.update(state_id=state.id, workflow_id=state.workflow_id)
@@ -520,7 +557,9 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
         if file_type == "version":
             flow_id = request.GET.get("flow_id")
             try:
-                field_object = WorkflowVersion.objects.get(id=flow_id).get_field(kwargs["pk"])
+                field_object = WorkflowVersion.objects.get(id=flow_id).get_field(
+                    kwargs["pk"]
+                )
                 field_object = bunchify(field_object)
             except Service.DoesNotExist:
                 raise serializers.ValidationError(_("提供的流程版本信息错误！"))
@@ -530,8 +569,11 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
         if field_object.type != "FILE":
             raise serializers.ValidationError(_("当前字段非附件字段，无法下载附件文件！"))
         try:
-            files = field_object.choice if file_type in ["template", "version"] else json.loads(
-                field_object.value)
+            files = (
+                field_object.choice
+                if file_type in ["template", "version"]
+                else json.loads(field_object.value)
+            )
         except Exception:
             logger.exception("json解析错误")
             raise serializers.ValidationError(_("当前字段解析信息出错，请确认是否已进行数据升级！"))
@@ -545,12 +587,14 @@ class BaseFieldViewSet(component_viewsets.ModelViewSet):
 
         if not store.exists(file_path):
             raise serializers.ValidationError(
-                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(file_info['name']))
+                _("要下载的文件【{}】不存在, 可能已经被删除，请与管理员确认！").format(file_info["name"])
+            )
 
-        response = StreamingHttpResponse(FileWrapper(store.open(file_path, 'rb'), 512))
+        response = StreamingHttpResponse(FileWrapper(store.open(file_path, "rb"), 512))
         response["Content-Type"] = "application/octet-stream"
         response["Content-Disposition"] = "attachment; filename* = UTF-8''{}".format(
-            escape_uri_path(file_info["name"]))
+            escape_uri_path(file_info["name"])
+        )
         return response
 
 
@@ -607,9 +651,12 @@ class FieldViewSet(BaseFieldViewSet):
 
         if state_id:
             valid_fields = State.objects.fields_of_state(state_id)
-            ordering = "FIELD(`id`, {})".format(",".join(["'{}'".format(v) for v in valid_fields]))
-            queryset = queryset.filter(id__in=valid_fields).extra(select={"ordering": ordering},
-                                                                  order_by=["ordering"])
+            ordering = "FIELD(`id`, {})".format(
+                ",".join(["'{}'".format(v) for v in valid_fields])
+            )
+            queryset = queryset.filter(id__in=valid_fields).extra(
+                select={"ordering": ordering}, order_by=["ordering"]
+            )
 
         serializer_data = self.get_serializer(queryset, many=True).data
 
@@ -646,8 +693,14 @@ class FieldViewSet(BaseFieldViewSet):
     @action(detail=True, methods=["post"])
     def update_layout(self, request, *args, **kwargs):
         field_object = self.get_object()
-        for key in ['layout', 'show_conditions', "show_type", "validate_type", "default",
-                    "regex_config"]:
+        for key in [
+            "layout",
+            "show_conditions",
+            "show_type",
+            "validate_type",
+            "default",
+            "regex_config",
+        ]:
             setattr(field_object, key, request.data.get(key, ""))
         field_object.save()
         return Response()
@@ -679,7 +732,7 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
             self.pagination_class = None
         query_set = super(TemplateFieldViewSet, self).get_queryset()
         return query_set
-    
+
     def get_list_queryset(self, request, queryset):
         """
         集中处理 queryset
@@ -708,8 +761,10 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
         """
 
         queryset = self.filter_queryset(self.get_queryset())
-        
-        project_key = self.request.query_params.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
+
+        project_key = self.request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
 
         queryset = queryset.filter(Q(project_key=project_key))
 
@@ -722,16 +777,18 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-    
+
     @action(methods=["get"], detail=False)
     def mix_list(self, request, *args, **kwargs):
-        
+
         queryset = self.filter_queryset(self.get_queryset())
 
-        project_key = self.request.query_params.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
-        
-        queryset = queryset.filter(Q(project_key=project_key) and 
-                                   Q(project_key=PUBLIC_PROJECT_PROJECT_KEY))
+        project_key = self.request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
+        queryset = queryset.filter(
+            Q(project_key=project_key) | Q(project_key=PUBLIC_PROJECT_PROJECT_KEY)
+        )
 
         queryset = self.get_list_queryset(request, queryset)
 
@@ -752,7 +809,9 @@ class TemplateFieldViewSet(component_viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class WorkflowVersionViewSet(DynamicListModelMixin, component_viewsets.AuthModelViewSet):
+class WorkflowVersionViewSet(
+    DynamicListModelMixin, component_viewsets.AuthModelViewSet
+):
     """流程版本视图集合"""
 
     queryset = WorkflowVersion.objects.all().order_by("-create_at")
@@ -790,13 +849,17 @@ class WorkflowVersionViewSet(DynamicListModelMixin, component_viewsets.AuthModel
         try:
             obj = WorkflowVersion._objects.get(id=pk)
         except WorkflowVersion.DoesNotExist:
-            raise Http404('No %s matches the given query.' % self.queryset.model._meta.object_name)
+            raise Http404(
+                "No %s matches the given query." % self.queryset.model._meta.object_name
+            )
         self.check_object_permissions(self.request, obj)
         return obj
 
     def perform_destroy(self, instance):
         """自定义删除前行为"""
-        Trigger.objects.filter(source_type=SOURCE_TICKET, source_id=instance.id).delete()
+        Trigger.objects.filter(
+            source_type=SOURCE_TICKET, source_id=instance.id
+        ).delete()
         super(WorkflowVersionViewSet, self).perform_destroy(instance)
 
     @action(detail=True, methods=["get"])
@@ -895,7 +958,9 @@ class WorkflowVersionViewSet(DynamicListModelMixin, component_viewsets.AuthModel
         from_state_id = str(self.request.data.get("from_state_id"))
         to_state_id = str(self.request.data.get("to_state_id"))
         state_exists_validate(from_state_id, to_state_id)
-        path = flow.get_transition_path(from_state_id=from_state_id, to_state_id=to_state_id)
+        path = flow.get_transition_path(
+            from_state_id=from_state_id, to_state_id=to_state_id
+        )
         return Response(path)
 
     @action(detail=True, methods=["get"])
@@ -1008,12 +1073,18 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         if task_fields and task_fields.get("task_field_ids"):
             # task_fields正确格式: {"stage": "CREATE", "task_field_ids": [1, 2, 3]}
             if not (
-                isinstance(task_fields, dict) and isinstance(task_fields["task_field_ids"], list)):
+                isinstance(task_fields, dict)
+                and isinstance(task_fields["task_field_ids"], list)
+            ):
                 raise serializers.ValidationError(_("任务字段排序参数不合法，请联系管理员"))
 
             ordering = "FIELD(`id`, {})".format(
-                ",".join(["'{}'".format(task_field_id) for task_field_id in
-                          task_fields["task_field_ids"]])
+                ",".join(
+                    [
+                        "'{}'".format(task_field_id)
+                        for task_field_id in task_fields["task_field_ids"]
+                    ]
+                )
             )
             task_fields_schema = TaskFieldSchema.objects.filter(
                 task_schema_id=instance.id, stage=task_fields.get("stage")
@@ -1025,7 +1096,7 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
 
         return super(TaskSchemaViewSet, self).update(request, *args, **kwargs)
 
-    @action(methods=['post'], detail=True)
+    @action(methods=["post"], detail=True)
     def clone(self, request, *args, **kwargs):
         """
         复制一个任务模版
@@ -1040,7 +1111,7 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         Trigger.objects.filter(source_type=SOURCE_TASK, source_id=instance.id).delete()
         super(TaskSchemaViewSet, self).perform_destroy(instance)
 
-    @action(methods=['get'], detail=True)
+    @action(methods=["get"], detail=True)
     def variables(self, request, *args, **kwargs):
         """
         获取当前任务的参数
@@ -1056,10 +1127,13 @@ class TaskFieldSchemaViewSet(BaseFieldViewSet):
     任务模版视图
     """
 
-    queryset = TaskFieldSchema.objects.all().order_by('sequence')
+    queryset = TaskFieldSchema.objects.all().order_by("sequence")
 
     serializer_class = TaskFieldSchemaSerializer
     # permission_classes = (IamAuthWithoutResourcePermit,)
-    filter_fields = {"name": ["exact", "in", "contains"], "stage": ["exact"],
-                     "task_schema_id": ["exact"]}
+    filter_fields = {
+        "name": ["exact", "in", "contains"],
+        "stage": ["exact"],
+        "task_schema_id": ["exact"],
+    }
     pagination_class = None
