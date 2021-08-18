@@ -21,7 +21,6 @@ profiles
 debug
 static_root
 config/local_settings.py
-frontend/pc/build/webpack.dev.conf.js
 /scripts/check_migrate/
 #blueking/
 #blueapps/
