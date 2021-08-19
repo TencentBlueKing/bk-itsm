@@ -94,7 +94,7 @@
                         </template>
                         <template v-else>
                             <bk-checkbox
-                                v-bk-tooltips.top="{
+                                v-bk-tooltips.right="{
                                     content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
                                     disabled: !props.row.bounded_catalogs[0],
                                     boundary: 'window',

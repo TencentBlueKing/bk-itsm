@@ -297,7 +297,7 @@
         methods: {
             // 获取已有字段（公共字段）
             getPublicFieldList () {
-                this.$store.dispatch('publicField/get_template_fields', { project_key: this.$store.state.project.id }).then((res) => {
+                this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
                     this.publicFields = res.data
                 }).catch(res => {
                     errorHandler(res, this)

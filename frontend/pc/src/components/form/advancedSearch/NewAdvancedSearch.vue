@@ -257,6 +257,7 @@
                             message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
                             theme: 'success'
                         })
+                        // window.location.reload()
                     } else {
                         this.getTicketHighlight()
                     }

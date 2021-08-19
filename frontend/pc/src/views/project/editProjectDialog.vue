@@ -47,7 +47,7 @@
                     <bk-input
                         v-model="projectForm.key"
                         :disabled="!!project.key"
-                        :placeholder="$t(`m['请输入50个英文字符以内的项目代号']`)">
+                        :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
                     </bk-input>
                 </bk-form-item>
                 <bk-form-item property="desc" :label="$t(`m['项目说明']`)">
@@ -111,13 +111,13 @@
                             trigger: 'blur'
                         },
                         {
-                            max: 50,
-                            message: '不能多于50个字符',
+                            max: 28,
+                            message: '不能多于28个字符',
                             trigger: 'blur'
                         },
                         {
-                            regex: /^[a-zA-Z]*$/,
-                            message: '只能包含英文字符',
+                            regex: /^[a-z][a-z0-9-_]+$/,
+                            message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
                             trigger: 'blur'
                         }
                     ],

@@ -290,7 +290,7 @@
             },
             getPublicFieldList () {
                 this.addLoading = true
-                this.$store.dispatch('publicField/get_template_fields', {}).then((res) => {
+                this.$store.dispatch('publicField/get_template_common_fields', {}).then((res) => {
                     this.publicList = res.data
                 }).catch(res => {
                     errorHandler(res, this)

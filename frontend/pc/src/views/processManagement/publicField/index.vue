@@ -134,6 +134,7 @@
                     </bk-table-column>
                     <bk-table-column
                         sortable
+                        :sort-orders="['descending', 'ascending', null]"
                         :label="$t(`m.treeinfo['最近更新时间']`)" width="150">
                         <template slot-scope="props">
                             <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
@@ -354,7 +355,7 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    order_by: this.ordering
+                    ordering: this.ordering
                 }
                 params.project_key = this.projectId || 'public'
                 // 过滤条件
@@ -391,10 +392,8 @@
             // 分页过滤数据
             handleSortChange (data) {
                 const { order } = data
-                if (order === 'ascending') {
+                if (order === 'descending') {
                     this.ordering = '-update_at'
-                } else if (order === 'descending') {
-                    this.ordering = 'update_at'
                 } else {
                     this.ordering = undefined
                 }
