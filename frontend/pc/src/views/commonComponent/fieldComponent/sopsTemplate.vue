@@ -383,18 +383,11 @@
                     this.previewSopsTaskUrl = res.data.task_url
                     const constants = []
                     for (const key in res.data.constants) {
-                        const constantItem = this.item.sopsContent.find(item => item.key === key)
-                        if (constantItem) {
-                            constants.push(Object.assign(constantItem, res.data.constants[key]))
-                        }
+                        constants.push(res.data.constants[key])
                     }
+                    constants.sort((a, b) => a - b)
                     this.item.sopsContent.constants = constants
                     this.item.sopsContent.sopsTask.template_id = res.data.template_id
-                    this.item.sopsContent.constants.forEach(item => {
-                        if (this.item.value) {
-                            item.value = deepClone(this.item.sopsContent.formData[item.key])
-                        }
-                    })
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -511,6 +504,8 @@
             },
             handleCreateWayChange (value) {
                 this.clearTaskNameAndDisable()
+                this.item.sopsContent.id = ''
+                this.item.sopsContent.planId = ''
                 this.item.sopsContent.constants = []
                 this.item.sopsContent.sopsTask.id = ''
                 if (value === 'task' || value === 'started_task') {
