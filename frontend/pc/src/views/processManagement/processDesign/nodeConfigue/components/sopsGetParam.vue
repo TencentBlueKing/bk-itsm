@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-get-param">
-        <bk-table :ext-cls="'bk-editor-table'"
+        <!-- <bk-table :ext-cls="'bk-editor-table'"
             :data="paramTableShow"
             :size="'small'">
             <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
@@ -75,7 +75,17 @@
                     </template>
                 </template>
             </bk-table-column>
-        </bk-table>
+        </bk-table> -->
+        <div class="sops-form">
+            <render-form
+                ref="renderForm"
+                :form-option="formOptions"
+                :constants="constants"
+                :context="context"
+                :key="renderKey"
+                v-model="formData">
+            </render-form>
+        </div>
         <div class="bk-add-slider" v-if="sliderInfo.show && isStatic === false">
             <bk-sideslider
                 :is-show.sync="sliderInfo.show"
@@ -105,6 +115,18 @@
             addField
         },
         props: {
+            context: {
+                type: Object,
+                default () {
+                    return {}
+                }
+            },
+            constants: {
+                type: Array,
+                default () {
+                    return []
+                }
+            },
             paramTableData: {
                 type: Array,
                 default () {
@@ -146,6 +168,16 @@
         },
         data () {
             return {
+                renderKey: '',
+                formData: {},
+                formOptions: {
+                    showRequired: true,
+                    showGroup: true,
+                    showLabel: true,
+                    showHook: false,
+                    showDesc: true
+                },
+                fieldList: [],
                 checkInfo: {
                     name: '',
                     road: ''
@@ -238,6 +270,9 @@
                     }
                 },
                 deep: false
+            },
+            constants () {
+                this.renderKey = new Date().getTime()
             }
         },
         mounted () {

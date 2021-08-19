@@ -1343,6 +1343,14 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '请选择执行方案': 'Please select the execution scheme',
+        '关联业务：': 'Associated business',
+        '流程类型：': 'Process type',
+        '流程模板：': 'Process templates',
+        '执行方案：': 'Implementation scheme',
+        '请选择关联业务': 'Select the associated business',
+        '请选择流程类型': 'Select the process type',
+        '请选择流程模板': 'Select the process templates',
         '请输入选项ID': 'Please enter the option ID',
         '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
