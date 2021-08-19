@@ -11,7 +11,7 @@ test/unit/coverage
 *.bak*
 .vscode/
 # package-lock.json
-
+package-lock.json
 # Editor directories and files
 .idea
 *.suo

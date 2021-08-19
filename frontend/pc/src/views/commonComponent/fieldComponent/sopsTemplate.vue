@@ -66,6 +66,7 @@
                         :disabled="disabled"
                         ext-cls="form-item-inline-width mr0"
                         :placeholder="' '"
+                        multiple
                         @selected="onplanSelect">
                         <bk-option v-for="option in planList"
                             :key="option.id"
@@ -483,12 +484,27 @@
                     this.loading.plan = false
                 })
             },
-            onplanSelect (id) {
-                const plan = this.planList.find(plan => plan.id === id)
-                const planNodeIdList = plan.data ? JSON.parse(plan.data) : []
-                this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => {
-                    return !planNodeIdList.includes(nodeId)
-                })
+            onplanSelect (ids) {
+                const planList = []
+                this.item.sopsContent.exclude_task_nodes_id = []
+                if (ids.indexOf('') !== -1) {
+                    this.item.sopsContent.exclude_task_nodes_id = []
+                } else {
+                    ids.forEach(item => {
+                        const plan = this.planList.find(plan => plan.id === item)
+                        if (plan.data) {
+                            const twPlanList = JSON.parse(plan.data)
+                            for (let index = 0; index < twPlanList.length; index++) {
+                                if (planList.indexOf(twPlanList[index]) === -1) {
+                                    planList.push(twPlanList[index])
+                                }
+                            }
+                        }
+                    })
+                    this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => {
+                        return !planList.includes(nodeId)
+                    })
+                }
             },
             jumpToSops () {
                 window.open(this.previewSopsTaskUrl)

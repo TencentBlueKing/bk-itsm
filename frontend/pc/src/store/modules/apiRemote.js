@@ -34,6 +34,12 @@ export default {
                 return res
             })
         },
+        get_user_project_list ({ commit, state, dispatch }) {
+            return ajax.get(`gateway/sops/get_user_project_list/`).then(response => {
+                let res = response.data
+                return res
+            })
+        },
         // 获取级联字段数据源 （工单）
         get_data ({ commit, state, dispatch }, params) {
             return ajax.post(`ticket/fields/${params.id}/api_field_choices/`, params).then(response => {

@@ -33,7 +33,11 @@ from common.log import logger
 from itsm.component.constants import CACHE_5MIN, PREFIX_KEY, CACHE_30MIN
 from itsm.component.decorators import fbv_exception_handler
 from itsm.component.esb.esbclient import client_backend, client
-from itsm.component.exceptions import ComponentCallError, IamPermissionDenied, RemoteCallError
+from itsm.component.exceptions import (
+    ComponentCallError,
+    IamPermissionDenied,
+    RemoteCallError,
+)
 from itsm.component.constants import ResponseCodeStatus
 from itsm.component.constants.iam import HTTP_499_IAM_FORBIDDEN
 from itsm.component.utils.basic import build_tree
@@ -60,14 +64,17 @@ def get_token(request):
 
 def get_batch_users(request):
     """ 批量获取用户信息 """
-    users = request.GET.get("users") or request.GET.get("exact_lookups") or request.GET.get(
-        "fuzzy_lookups")
+    users = (
+        request.GET.get("users")
+        or request.GET.get("exact_lookups")
+        or request.GET.get("fuzzy_lookups")
+    )
     properties = request.GET.get("properties", "")
     callback_func_name = request.GET.get("callback")
 
     page_params = {
         "page": int(request.GET.get("page", 1)),
-        "page_size": int(request.GET.get("page_size", 20))
+        "page_size": int(request.GET.get("page_size", 20)),
     }
 
     # 是否启用精准匹配，默认为True
@@ -83,10 +90,15 @@ def get_batch_users(request):
     try:
         res = adapter_api.get_batch_users(users, properties, is_exact, page_params)
         if callback_func_name:
-            response = {'result': True, 'message': "success",
-                        'data': {"results": res, "count": len(res)},
-                        'code': 0}
-            return HttpResponse("{}({})".format(callback_func_name, json.dumps(response)))
+            response = {
+                "result": True,
+                "message": "success",
+                "data": {"results": res, "count": len(res)},
+                "code": 0,
+            }
+            return HttpResponse(
+                "{}({})".format(callback_func_name, json.dumps(response))
+            )
         return Success(res).json()
     except Exception as error:
         logger.warning(_("批量获取用户信息出错，%s"), str(error))
@@ -175,7 +187,11 @@ def get_departments(request):
     try:
         # 获取所有部门的扁平化列表信息
         res = client_backend.usermanage.list_departments(
-            {"fields": "id,name,parent,level,order", "no_page": True, })
+            {
+                "fields": "id,name,parent,level,order",
+                "no_page": True,
+            }
+        )
 
         # 转换成树状结构
         res = build_tree(res, "parent", need_route=True)
@@ -193,7 +209,12 @@ def get_department_users(request):
         recursive = request.GET.get("recursive") == "true"
 
         res = client_backend.usermanage.list_department_profiles(
-            {"id": department_id, "recursive": recursive, "detail": True, "no_page": True, }
+            {
+                "id": department_id,
+                "recursive": recursive,
+                "detail": True,
+                "no_page": True,
+            }
         )
 
     except ComponentCallError as e:
@@ -207,7 +228,11 @@ def get_department_info(request):
     """获取部门详情"""
     try:
         department_id = request.GET.get("id")
-        res = client_backend.usermanage.retrieve_department({"id": department_id, })
+        res = client_backend.usermanage.retrieve_department(
+            {
+                "id": department_id,
+            }
+        )
     except ComponentCallError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_DEPARTMENT_INFO").json()
 
@@ -219,11 +244,26 @@ def get_user_info(request):
     """获取人员所属部门"""
     try:
         username = request.GET.get("username", request.user.username)
-        res = client_backend.usermanage.list_profile_departments({"id": username, })
+        res = client_backend.usermanage.list_profile_departments(
+            {
+                "id": username,
+            }
+        )
     except ComponentCallError as e:
         return Fail(str(e), "BK_USER_MANAGE.GET_USER_INFO").json()
 
     return Success(res).json()
+
+
+def get_user_project_list(request):
+    """
+    获取标准运维用户有权限的项目
+    """
+    try:
+        res = client.sops.get_user_project_list({})
+        return Success(res).json()
+    except ComponentCallError as e:
+        return Fail(str(e), "SOPS.GET_USER_PROJECT_LIST").json()
 
 
 def get_template_list(request):
@@ -234,13 +274,14 @@ def get_template_list(request):
     """
 
     bk_biz_id = request.GET.get("bk_biz_id", None)
-    with_common = request.GET.get("with_common", None) == 'true'
+    with_common = request.GET.get("with_common", None) == "true"
     params = {"operator": request.user.username}
 
     try:
         if bk_biz_id:
             res = client.sops.get_template_list(
-                {"bk_biz_id": bk_biz_id, "operator": request.user.username})
+                {"bk_biz_id": bk_biz_id, "operator": request.user.username}
+            )
             if with_common:
                 res_com = client_backend.sops.get_common_template_list(**params)
                 res.extend(res_com)
@@ -259,6 +300,15 @@ def get_template_detail(request):
 
     def get_constants(data):
         return list(data["pipeline_tree"]["constants"].values())
+
+    def get_all_ids(data):
+        """
+        获取标准运维某个流程下的所有节点id
+        """
+        all_ids = []
+        for node_id, content in data["pipeline_tree"]["activities"].items():
+            all_ids.append(node_id)
+        return all_ids
 
     def get_option_ids(data):
         option_keys = []
@@ -279,16 +329,20 @@ def get_template_detail(request):
             res = client_backend.sops.get_template_info(params)
         else:
             res = client_backend.sops.get_common_template_info(params)
-        result = {"constants": get_constants(res), "optional_ids": get_option_ids(res)}
+        result = {
+            "constants": get_constants(res),
+            "optional_ids": get_option_ids(res),
+            "all_ids": get_all_ids(res),
+        }
 
         return Success(result).json()
 
     except IamPermissionDenied as error:
 
         data = {
-            'result': False,
-            'code': ResponseCodeStatus.PERMISSION_DENIED,
-            'message': error.detail,
+            "result": False,
+            "code": ResponseCodeStatus.PERMISSION_DENIED,
+            "message": error.detail,
             "data": [],
             "permission": error.data,  # 具体的权限信息
         }
@@ -301,7 +355,9 @@ def get_template_detail(request):
 def get_unfinished_sops_tasks(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
-        res = client_backend.sops.get_task_list({"bk_biz_id": bk_biz_id, "is_started": False})
+        res = client_backend.sops.get_task_list(
+            {"bk_biz_id": bk_biz_id, "is_started": False}
+        )
         return Success(res).json()
     except ComponentCallError as e:
         return Fail(str(e), "SOPS.GET_UNFINISHED_SOPS_TASKS").json()
@@ -329,7 +385,9 @@ def get_sops_tasks_detail(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
         task_id = request.GET.get("task_id")
-        res = client_backend.sops.get_task_detail({"bk_biz_id": bk_biz_id, "task_id": task_id})
+        res = client_backend.sops.get_task_detail(
+            {"bk_biz_id": bk_biz_id, "task_id": task_id}
+        )
         return Success(res).json()
     except ComponentCallError as e:
         return Fail(str(e), "SOPS.GET_SOPS_TASKS_DETAIL").json()
@@ -342,7 +400,8 @@ def get_sops_template_schemes(request):
         if bk_biz_id:
             template_id = request.GET.get("template_id")
             res = client_backend.sops.get_template_schemes(
-                {"bk_biz_id": bk_biz_id, "template_id": template_id})
+                {"bk_biz_id": bk_biz_id, "template_id": template_id}
+            )
         return Success(res).json()
     except ComponentCallError as e:
         return Fail(str(e), "SOPS.GET_SOPS_TEMPLATE_SCHEMES").json()
@@ -356,7 +415,7 @@ def get_sops_preview_task_tree(request):
             "exclude_task_nodes_id": request.POST.get("exclude_task_nodes_id", []),
         }
         if bk_biz_id:
-            data['bk_biz_id'] = bk_biz_id
+            data["bk_biz_id"] = bk_biz_id
         res = client_backend.sops.preview_task_tree(data)
         return Success(res).json()
     except ComponentCallError as e:
@@ -371,7 +430,7 @@ def get_sops_preview_common_task_tree(request):
             "exclude_task_nodes_id": request.POST.get("exclude_task_nodes_id", []),
         }
         if bk_biz_id:
-            data['bk_biz_id'] = bk_biz_id
+            data["bk_biz_id"] = bk_biz_id
         res = client_backend.sops.preview_common_task_tree(data)
         return Success(res).json()
     except ComponentCallError as e:

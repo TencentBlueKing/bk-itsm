@@ -149,7 +149,7 @@
                         </template>
                     </template>
                 </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
+                <!-- <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
                     <template slot-scope="props">
                         <span class="bk-lable-primary"
                             @click="processShow(props.row)"
@@ -157,12 +157,7 @@
                             {{ props.row.workflow_name }} ({{ props.row.version_number }})
                         </span>
                     </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['服务负责人']`)" min-width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.owners || '--'">{{ props.row.owners || '--' }}</span>
-                    </template>
-                </bk-table-column>
+                </bk-table-column> -->
                 <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
                     <template slot-scope="props">
                         <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>

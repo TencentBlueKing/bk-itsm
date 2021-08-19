@@ -72,7 +72,7 @@
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectList')
                     this.$store.commit('project/setProjectList', res.data.items)
-                    if (!this.$store.state.projectId) {
+                    if (!this.$store.state.project.id) {
                         const projectsWithViewPerm = res.data.items.filter(item => item.auth_actions.includes('project_view'))
                         if (projectsWithViewPerm.length === 0) {
                             this.$router.replace({ name: 'ProjectGuide' })
