@@ -2338,5 +2338,13 @@ export const m = {
     '在这里，你可以按需定制化设计服务流程，来满足不同场景的 IT服务诉求，设置 SLA 保障流程的质量把控，帮助企业规范、高效的管理各种应用场景的流程。': 'Here, you can customize the design of the service process as needed to meet the IT service demands of different scenarios, set the quality control of the SLA guarantee process, and help the enterprise manage the processes of various application scenarios in a standardized and efficient manner.',
     '第一次使用流程服务？ 一键带你快速入门': 'Use process service for the first time? One-click to get you started',
     '了解更详细的流程服务产品架构和功能介绍，点击查阅产品白皮书': 'To understand more detailed process service product architecture and function introduction, click to view the product white paper',
-    '申请项目权限': 'Apply for project permissions'
+    '申请项目权限': 'Apply for project permissions',
+    '请选择执行方案': 'Please select the execution scheme',
+    '关联业务：': 'Associated business',
+    '流程类型：': 'Process type',
+    '流程模板：': 'Process templates',
+    '执行方案：': 'Implementation scheme',
+    '请选择关联业务': 'Select the associated business',
+    '请选择流程类型': 'Select the process type',
+    '请选择流程模板': 'Select the process templates'
 }
