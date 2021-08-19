@@ -416,9 +416,9 @@
                     workflow.extras = {}
                     workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams()
                 }
-                await this.saveAndActionService(params)
+                const checkResult = await this.saveAndActionService(params)
                 
-                const checkResult = await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
+                await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
                 if (!checkResult.result) {
                     this.slaValidateMsg = checkResult.data.messages
                     this.slaValidateDialogShow = true
