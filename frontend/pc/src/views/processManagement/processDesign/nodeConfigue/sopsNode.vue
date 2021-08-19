@@ -30,11 +30,11 @@
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['关联业务：']`)" :required="true">
+                <bk-form-item :label="$t(`m['关联业务：']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         v-model="projectId"
                         :clearable="false"
-                        :placeholder="$t(`m.treeinfo['请选择关联业务']`)"
+                        :placeholder="$t(`m['请选择关联业务']`)"
                         searchable
                         @selected="onProjectSelect">
                         <bk-option v-for="project in projectList"
@@ -44,11 +44,11 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['流程类型：']`)" :required="true">
+                <bk-form-item :label="$t(`m['流程类型：']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         v-model="processType"
                         :clearable="false"
-                        :placeholder="$t(`m.treeinfo['请选择流程类型']`)"
+                        :placeholder="$t(`m['请选择流程类型']`)"
                         searchable
                         @selected="getTemplateList">
                         <bk-option v-for="process in processOptions"
@@ -58,11 +58,11 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['流程模板：']`)" :required="true">
+                <bk-form-item :label="$t(`m['流程模板：']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         v-model="templateId"
                         :clearable="false"
-                        :placeholder="$t(`m.treeinfo['请选择流程模板']`)"
+                        :placeholder="$t(`m['请选择流程模板']`)"
                         searchable
                         :disabled="disable"
                         :loading="processesLoading"
@@ -74,10 +74,10 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['执行方案：']`)" :required="true">
+                <bk-form-item :label="$t(`m['执行方案：']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         :disabled="disable"
-                        :placeholder="$t(`m.treeinfo['请选择执行方案']`)"
+                        :placeholder="$t(`m['请选择执行方案']`)"
                         v-model="planId"
                         multiple
                         :clearable="false"
