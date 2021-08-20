@@ -296,7 +296,6 @@
                     return
                 }
                 const relateValid = this.relatedRegex(this.fieldList, this.fieldList)
-                debugger
                 if (!relateValid.result) {
                     relateValid.validList.forEach(item => {
                         if (!item.result) {
