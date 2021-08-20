@@ -43,6 +43,7 @@
                                         ref="advancedSearch"
                                         :forms="searchForms"
                                         @search="handleSearch"
+                                        @onChangeHihtLight="onChangeHihtLight"
                                         @formChange="handleSearchFormChange"
                                         @clear="handleClearSearch">
                                         <div class="slot-content">
@@ -231,6 +232,7 @@
         },
         created () {
             this.initData()
+            console.log(this)
         },
         methods: {
             async initData () {
@@ -407,6 +409,7 @@
                     item.value = item.multiSelect ? [] : ''
                 })
                 const service = this.serviceList.find(item => item.name === val)
+                console.log(service)
                 this.sereveType = service.key
                 this.getServiceTree()
                 this.getAllTicketList(service.key)
@@ -449,6 +452,9 @@
                     }
                 }
             },
+            onChangeHihtLight (val) {
+                this.getAllTicketList()
+            },
             // 分页过滤数据
             handlePageLimitChange (limit) {
                 this.pagination.current = 1
@@ -465,7 +471,7 @@
                 this.getAllTicketList(this.sereveType)
             },
             // 评价成功回调
-            evaluationSubmitSuccess () {
+            evaluationSubmitSuccess (val) {
                 this.getAllTicketList()
             }
         }

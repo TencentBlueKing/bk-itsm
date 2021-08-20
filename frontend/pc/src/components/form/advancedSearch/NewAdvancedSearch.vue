@@ -195,6 +195,9 @@
                 immediate: true
             }
         },
+        created () {
+            this.getTicketHighlight()
+        },
         methods: {
             // 过滤参数
             getParams () {
@@ -257,7 +260,7 @@
                             message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
                             theme: 'success'
                         })
-                        // window.location.reload()
+                        this.$emit('onChangeHihtLight', true)
                     } else {
                         this.getTicketHighlight()
                     }
