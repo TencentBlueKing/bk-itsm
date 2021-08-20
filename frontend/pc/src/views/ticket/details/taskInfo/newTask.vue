@@ -274,7 +274,7 @@
                                 params.fields[item.key].id = sopsContent.sopsTask.template_id
                             }
                             // 标准运维排除执行节点
-                            if (sopsContent.planId) {
+                            if (sopsContent.planId && sopsContent.planId.length > 0) {
                                 params.exclude_task_nodes_id = sopsContent.exclude_task_nodes_id
                             }
                             // 标准运维任务参数
@@ -285,7 +285,6 @@
                             params.fields.sub_task_params.pipeline_id = item.devopsContent.pipeline_id
                         } else {
                             params.fields[item.key] = item.value
-                            params.exclude_task_nodes_id = []
                         }
                     })
                     if (!params.source) {
@@ -297,6 +296,7 @@
                     return
                 }
                 const relateValid = this.relatedRegex(this.fieldList, this.fieldList)
+                debugger
                 if (!relateValid.result) {
                     relateValid.validList.forEach(item => {
                         if (!item.result) {
