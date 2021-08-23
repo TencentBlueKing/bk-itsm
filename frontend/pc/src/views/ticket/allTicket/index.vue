@@ -43,7 +43,7 @@
                                         ref="advancedSearch"
                                         :forms="searchForms"
                                         @search="handleSearch"
-                                        @onChangeHighlight="onChangeHighlight"
+                                        @onChangeHighlight="getAllTicketList()"
                                         @formChange="handleSearchFormChange"
                                         @clear="handleClearSearch">
                                         <div class="slot-content">
@@ -272,6 +272,7 @@
             },
             // 获取所有单据列表
             getAllTicketList (type = this.sereveType) {
+                console.log('5555555')
                 this[`${type}Loading`] = true
                 const fixParams = {
                     page_size: this.pagination.limit,
@@ -450,9 +451,6 @@
                     }
                 }
             },
-            onChangeHighlight (val) {
-                this.getAllTicketList()
-            },
             // 分页过滤数据
             handlePageLimitChange (limit) {
                 this.pagination.current = 1
@@ -469,7 +467,7 @@
                 this.getAllTicketList(this.sereveType)
             },
             // 评价成功回调
-            evaluationSubmitSuccess (val) {
+            evaluationSubmitSuccess () {
                 this.getAllTicketList()
             }
         }
