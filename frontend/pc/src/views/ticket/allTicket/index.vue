@@ -43,7 +43,7 @@
                                         ref="advancedSearch"
                                         :forms="searchForms"
                                         @search="handleSearch"
-                                        @onChangeHighLight="onChangeHighLight"
+                                        @onChangeHighlight="onChangeHighlight"
                                         @formChange="handleSearchFormChange"
                                         @clear="handleClearSearch">
                                         <div class="slot-content">
@@ -450,7 +450,7 @@
                     }
                 }
             },
-            onChangeHighLight (val) {
+            onChangeHighlight (val) {
                 this.getAllTicketList()
             },
             // 分页过滤数据
