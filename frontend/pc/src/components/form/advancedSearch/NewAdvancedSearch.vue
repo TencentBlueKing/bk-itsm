@@ -129,7 +129,7 @@
             v-model="isHighlightSetting"
             width="560"
             :draggable="false"
-            @confirm="HighlightSettingComfirm">
+            @confirm="highLightSettingComfirm">
             <p slot="header" style="text-align: left;">
                 {{$t(`m.slaContent["单据高亮设置"]`)}}
             </p>
@@ -252,7 +252,7 @@
                     })
                 })
             },
-            HighlightSettingComfirm () {
+            highLightSettingComfirm () {
                 this.isHighlightSetting = false
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
@@ -260,7 +260,7 @@
                             message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
                             theme: 'success'
                         })
-                        this.$emit('onChangeHihtLight', true)
+                        this.$emit('onChangeHighLight', true)
                     } else {
                         this.getTicketHighlight()
                     }
