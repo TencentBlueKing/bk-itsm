@@ -43,6 +43,7 @@
                                         ref="advancedSearch"
                                         :forms="searchForms"
                                         @search="handleSearch"
+                                        @onChangeHighlight="getAllTicketList()"
                                         @formChange="handleSearchFormChange"
                                         @clear="handleClearSearch">
                                         <div class="slot-content">

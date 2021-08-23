@@ -587,4 +587,9 @@
 .filter-btn /deep/ .icon-search-more {
     font-size: 14px;
 }
+.bk-form-checkbox {
+    padding: 0;
+    width: 16px;
+    margin: 0 auto;
+}
 </style>

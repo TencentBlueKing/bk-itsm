@@ -422,7 +422,6 @@
                             }
                         }
                     })
-                    console.log(constants)
                     this.item.sopsContent.constants = constants
                     this.optionalNodeIdList = res.data.optional_ids
                 }).catch(res => {
