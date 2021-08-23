@@ -44,7 +44,9 @@ from itsm.component.constants import (
     SHOW_DIRECTLY,
     SOURCE_CHOICES,
     TABLE,
-    VALIDATE_CHOICES, LEN_SHORT, PUBLIC_PROJECT_PROJECT_KEY,
+    VALIDATE_CHOICES,
+    LEN_SHORT,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.utils.basic import get_pinyin_key
 from itsm.postman.models import RemoteApi, RemoteApiInstance
@@ -94,11 +96,17 @@ class TemplateFieldSerializer(AuthModelSerializer):
     """字段库序列化"""
 
     name = serializers.CharField(
-        required=True, max_length=LEN_NORMAL, error_messages={"max_length": _("字段显示名称不能超过64个字符")},
+        required=True,
+        max_length=LEN_NORMAL,
+        error_messages={"max_length": _("字段显示名称不能超过64个字符")},
     )
     key = serializers.CharField(required=True, max_length=LEN_MIDDLE)
-    default = serializers.CharField(required=False, max_length=LEN_XX_LONG, allow_blank=True)
-    desc = serializers.CharField(required=False, allow_blank=True, max_length=LEN_MIDDLE)
+    default = serializers.CharField(
+        required=False, max_length=LEN_XX_LONG, allow_blank=True
+    )
+    desc = serializers.CharField(
+        required=False, allow_blank=True, max_length=LEN_MIDDLE
+    )
     validate_type = serializers.ChoiceField(choices=VALIDATE_CHOICES)
     regex = serializers.ChoiceField(choices=REGEX_CHOICES_LIST)
     regex_config = JSONField(required=False, initial={})
@@ -117,33 +125,33 @@ class TemplateFieldSerializer(AuthModelSerializer):
     class Meta:
         model = TemplateField
         fields = (
-                     "id",
-                     "key",
-                     "name",
-                     "source_type",
-                     "source_uri",
-                     "type",
-                     "desc",
-                     "is_builtin",
-                     "is_readonly",
-                     "meta",
-                     "api_instance_id",
-                     "related_fields",
-                     "layout",
-                     "validate_type",
-                     "regex",
-                     "regex_config",
-                     "custom_regex",
-                     "choice",
-                     "kv_relation",
-                     "default",
-                     "api_info",
-                     "is_tips",
-                     "tips",
-                     "show_type",
-                     "show_conditions",
-                     "project_key"
-                 ) + model.FIELDS
+            "id",
+            "key",
+            "name",
+            "source_type",
+            "source_uri",
+            "type",
+            "desc",
+            "is_builtin",
+            "is_readonly",
+            "meta",
+            "api_instance_id",
+            "related_fields",
+            "layout",
+            "validate_type",
+            "regex",
+            "regex_config",
+            "custom_regex",
+            "choice",
+            "kv_relation",
+            "default",
+            "api_info",
+            "is_tips",
+            "tips",
+            "show_type",
+            "show_conditions",
+            "project_key",
+        ) + model.FIELDS
         read_only_fields = ("is_builtin", "key") + model.FIELDS
 
     def __init__(self, *args, **kwargs):
@@ -174,12 +182,16 @@ class TemplateFieldSerializer(AuthModelSerializer):
         """
         new_meta = data.get("meta", {})
         for column in new_meta.get("columns", []):
-            column.update(key=get_pinyin_key(column.get("name")), )
+            column.update(
+                key=get_pinyin_key(column.get("name")),
+            )
             # 忽略展现形式不是下拉框的类型
             if column.get("display") in ["select", "multiselect"]:
                 column.update(
-                    choice=[{"name": value, "key": get_pinyin_key(value)} for value in
-                            column.get("choice", [])]
+                    choice=[
+                        {"name": value, "key": get_pinyin_key(value)}
+                        for value in column.get("choice", [])
+                    ]
                 )
         return new_meta
 
@@ -197,8 +209,10 @@ class TemplateFieldSerializer(AuthModelSerializer):
         new_choices = data.get("choice", [])
 
         if not self.instance:
-            new_choices = [{"name": choice, "key": get_pinyin_key(choice)} for choice in
-                           new_choices]
+            new_choices = [
+                {"name": choice, "key": get_pinyin_key(choice)}
+                for choice in new_choices
+            ]
         else:
             # update exist options
             name2key = {item["name"]: item["key"] for item in self.instance.choice}
@@ -221,7 +235,9 @@ class TemplateFieldSerializer(AuthModelSerializer):
 
         if data.get("type") == "CUSTOMTABLE":
             # 复杂表格支持：更新meta中每一列的values的key
-            data.update(meta=self.get_new_meta(data), )
+            data.update(
+                meta=self.get_new_meta(data),
+            )
         if data.get("source_type") == "API":
             data["api_info"].pop("remote_system_id", None)
 
@@ -234,7 +250,7 @@ class TemplateFieldSerializer(AuthModelSerializer):
         data = super(TemplateFieldSerializer, self).to_representation(instance)
         if instance.source_type == "API" and instance.api_instance:
             data["api_info"] = ApiInstanceSerializer(instance.api_instance).data
-        
+
         # 默认初始化的时候没有request
         if "request" not in self.context:
             return data
@@ -262,10 +278,12 @@ class TemplateFieldSerializer(AuthModelSerializer):
             "resource_type_name": "公共字段",
         }
         apply_actions = self.Meta.model.public_field_resource_operations
-        auth_actions = iam_client.batch_resource_multi_actions_allowed(apply_actions,
-                                                                       [filed_info]).get(
-            str(instance.id), {})
-        auth_actions = [action_id for action_id, result in auth_actions.items() if result]
+        auth_actions = iam_client.batch_resource_multi_actions_allowed(
+            apply_actions, [filed_info]
+        ).get(str(instance.id), {})
+        auth_actions = [
+            action_id for action_id, result in auth_actions.items() if result
+        ]
         data["auth_actions"] = auth_actions
         return data
 
@@ -291,7 +309,9 @@ class TemplateFieldSerializer(AuthModelSerializer):
         api_instance = RemoteApiInstance.objects.create(**api_info)
         validated_data["api_instance_id"] = api_instance.id
 
-        validated_data["related_fields"] = self.get_related_fields(api_instance, validated_data)
+        validated_data["related_fields"] = self.get_related_fields(
+            api_instance, validated_data
+        )
 
         return validated_data
 
@@ -303,38 +323,38 @@ class FieldSerializer(TemplateFieldSerializer):
         model = Field
         # 此处'workflow', 'workflow_id'，'state', 'state_id',兼容数据，方便前端处理
         fields = (
-                     "workflow",
-                     "workflow_id",
-                     "state",
-                     "state_id",
-                     "id",
-                     "key",
-                     "name",
-                     "source_type",
-                     "source_uri",
-                     "type",
-                     "desc",
-                     "is_builtin",
-                     "is_readonly",
-                     "meta",
-                     "api_instance_id",
-                     "related_fields",
-                     "layout",
-                     "validate_type",
-                     "regex",
-                     "regex_config",
-                     "custom_regex",
-                     "choice",
-                     "kv_relation",
-                     "default",
-                     "api_info",
-                     "is_tips",
-                     "tips",
-                     "show_type",
-                     "show_conditions",
-                     "source",
-                     "display",
-                 ) + model.FIELDS
+            "workflow",
+            "workflow_id",
+            "state",
+            "state_id",
+            "id",
+            "key",
+            "name",
+            "source_type",
+            "source_uri",
+            "type",
+            "desc",
+            "is_builtin",
+            "is_readonly",
+            "meta",
+            "api_instance_id",
+            "related_fields",
+            "layout",
+            "validate_type",
+            "regex",
+            "regex_config",
+            "custom_regex",
+            "choice",
+            "kv_relation",
+            "default",
+            "api_info",
+            "is_tips",
+            "tips",
+            "show_type",
+            "show_conditions",
+            "source",
+            "display",
+        ) + model.FIELDS
         read_only_fields = ("is_builtin", "key") + model.FIELDS
 
     def __init__(self, *args, **kwargs):
@@ -358,8 +378,9 @@ class FieldSerializer(TemplateFieldSerializer):
     def get_related_fields(self, api_instance, validated_data):
         related_fields = []
         api_config = api_instance.get_config()
-        for key in Field.objects.filter(workflow_id=validated_data["workflow"]).values_list("key",
-                                                                                            flat=True):
+        for key in Field.objects.filter(
+            workflow_id=validated_data["workflow"]
+        ).values_list("key", flat=True):
             if "${params_%s}" % key in json.dumps(api_config["query_params"]):
                 related_fields.append(key)
         return {"rely_on": related_fields}
@@ -382,8 +403,13 @@ class ConditionsFieldSerializer(serializers.Serializer):
 class TemplateFieldFilterSerializer(serializers.Serializer):
     """模板库过滤字段序列化"""
 
-    update_at__gte = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
-    update_at__lte = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
+    update_at__gte = serializers.DateTimeField(
+        required=False, format="%Y-%m-%d %H:%M:%S"
+    )
+    update_at__lte = serializers.DateTimeField(
+        required=False, format="%Y-%m-%d %H:%M:%S"
+    )
+    order_by = serializers.CharField(required=False)
 
 
 class TableSerializer(AuthModelSerializer):
@@ -392,10 +418,13 @@ class TableSerializer(AuthModelSerializer):
     name = serializers.CharField(
         required=True,
         max_length=LEN_MIDDLE,
-        validators=[UniqueValidator(queryset=Table.objects.all(), message=_("基础模型名称已经存在，请重新输入"))],
+        validators=[
+            UniqueValidator(queryset=Table.objects.all(), message=_("基础模型名称已经存在，请重新输入"))
+        ],
     )
-    desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True,
-                                 allow_null=True)
+    desc = serializers.CharField(
+        required=False, max_length=LEN_LONG, allow_blank=True, allow_null=True
+    )
     fields = serializers.PrimaryKeyRelatedField(
         required=True,
         queryset=TemplateField.objects.all(),
@@ -422,7 +451,8 @@ class TableSerializer(AuthModelSerializer):
     def to_representation(self, instance):
         data = super(TableSerializer, self).to_representation(instance)
         ordering = "FIELD(`id`, %s)" % ",".join(
-            [str(field_id) for field_id in data["fields_order"]])
+            [str(field_id) for field_id in data["fields_order"]]
+        )
         data["fields"] = TemplateFieldSerializer(
             TemplateField.objects.filter(id__in=data["fields"]).extra(
                 select={"ordering": ordering}, order_by=("ordering",)
@@ -461,8 +491,10 @@ class TableRetrieveSerializer(AuthModelSerializer):
             query_set = query_set.exclude(key=FIELD_BIZ)
 
         ordering = "FIELD(`id`, %s)" % ",".join(
-            [str(field_id) for field_id in instance.fields_order])
+            [str(field_id) for field_id in instance.fields_order]
+        )
         data["fields"] = TemplateFieldSerializer(
-            query_set.extra(select={"ordering": ordering}, order_by=("ordering",)), many=True,
+            query_set.extra(select={"ordering": ordering}, order_by=("ordering",)),
+            many=True,
         ).data
         return data

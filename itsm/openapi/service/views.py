@@ -33,14 +33,17 @@ from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.exceptions import ServicePartialError
 from itsm.component.exceptions import ObjectNotExist
-from itsm.openapi.service.serializers import ServiceRetrieveSerializer, ServiceSerializer
+from itsm.openapi.service.serializers import (
+    ServiceRetrieveSerializer,
+    ServiceSerializer,
+)
 from itsm.service.models import CatalogService, Service, ServiceCatalog
 from itsm.workflow.models import Workflow
-from itsm.component.constants import role
+from itsm.component.constants import role, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.role.models import UserRole
 
 
-@method_decorator(login_exempt, name='dispatch')
+@method_decorator(login_exempt, name="dispatch")
 class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
     """
     服务项视图集合
@@ -48,90 +51,127 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
     queryset = Service.objects.filter(is_valid=True)
     serializer_class = ServiceSerializer
-    permission_free_actions = ("get_services", "get_service_detail", "get_service_catalogs")
+    permission_free_actions = (
+        "get_services",
+        "get_service_detail",
+        "get_service_catalogs",
+    )
 
-    @action(detail=False, methods=['get'], serializer_class=ServiceSerializer)
+    @action(detail=False, methods=["get"], serializer_class=ServiceSerializer)
     def get_services(self, request):
         """
         服务项列表
         """
 
-        queryset = self.queryset.all()
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+        queryset = self.queryset.filter(project_key=project_key).all()
 
-        catalog_id = request.query_params.get('catalog_id')
+        catalog_id = request.query_params.get("catalog_id")
         if catalog_id:
             queryset = queryset.filter(
-                id__in=CatalogService.objects.filter(catalog_id=catalog_id).values_list('service', flat=True)
+                id__in=CatalogService.objects.filter(catalog_id=catalog_id).values_list(
+                    "service", flat=True
+                )
             )
 
-        service_type = request.query_params.get('service_type')
+        service_type = request.query_params.get("service_type")
         if service_type:
             queryset = queryset.filter(key=service_type)
 
-        display_type = request.query_params.get('display_type')
+        display_type = request.query_params.get("display_type")
         if display_type:
             queryset = queryset.filter(display_type=display_type)
 
-        display_role = request.query_params.get('display_role')
+        display_role = request.query_params.get("display_role")
         if display_role:
             queryset = queryset.filter(display_role__contains=dotted_name(display_role))
 
         return Response(self.serializer_class(queryset, many=True).data)
 
-    @action(detail=False, methods=['get'], serializer_class=ServiceRetrieveSerializer)
+    @action(detail=False, methods=["get"], serializer_class=ServiceRetrieveSerializer)
     def get_service_detail(self, request):
         """
         服务项详情
         """
-
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
         try:
-            service = self.queryset.get(pk=request.query_params.get('service_id'))
+            service = self.queryset.get(
+                pk=request.query_params.get("service_id"), project_key=project_key
+            )
         except Service.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': ObjectNotExist.ERROR_CODE_INT,
-                    'data': None,
-                    'message': ObjectNotExist.MESSAGE,
+                    "result": False,
+                    "code": ObjectNotExist.ERROR_CODE_INT,
+                    "data": None,
+                    "message": ObjectNotExist.MESSAGE,
                 }
             )
 
         return Response(self.serializer_class(service).data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_service_catalogs(self, request):
         """
         服务目录
         """
-        has_service = request.query_params.get('has_service')
-        service_key = request.query_params.get('service_key')
+
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+
+        has_service = request.query_params.get("has_service")
+        service_key = request.query_params.get("service_key")
 
         # 返回绑定服务项或者根据service_key过滤
-        if has_service == 'true' or service_key:
-            return Response(ServiceCatalog.open_api_tree_data(service_key=service_key))
+        if has_service == "true" or service_key:
+            return Response(
+                ServiceCatalog.open_api_tree_data(
+                    service_key=service_key, project_key=project_key
+                )
+            )
 
-        roots = ServiceCatalog.objects.filter(level=0, is_deleted=False)
+        roots = ServiceCatalog.objects.filter(
+            level=0, is_deleted=False, project_key=project_key
+        )
         return Response([ServiceCatalog.open_api_subtree(root) for root in roots])
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_service_roles(self, request):
         """
         服务目录
         """
-        service_id = request.query_params.get('service_id')
-        ticket_creator = request.query_params.get('ticket_creator')
-        states = self.queryset.get(id=service_id).workflow.states
+
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+
+        service_id = request.query_params.get("service_id")
+        ticket_creator = request.query_params.get("ticket_creator")
+        states = self.queryset.get(
+            id=service_id, project_key=project_key
+        ).workflow.states
+
         states_roles = []
         for state in states.values():
             if state["processors_type"] == role.OPEN:
                 continue
 
-            use_creator = state["processors_type"] in [role.STARTER_LEADER, role.STARTER]
+            use_creator = state["processors_type"] in [
+                role.STARTER_LEADER,
+                role.STARTER,
+            ]
             members = ticket_creator if use_creator else state["processors"]
             if not members:
                 processors = ""
             else:
-                processors = ",".join(UserRole.get_users_by_type(-1, state["processors_type"], members))
+                processors = ",".join(
+                    UserRole.get_users_by_type(-1, state["processors_type"], members)
+                )
             states_roles.append(
                 {
                     "id": state["id"],
@@ -144,12 +184,12 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
         return Response(sorted(states_roles, key=lambda x: x["id"]))
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def insert_service(self, requests):
         """
         插入或新服务和流程
-        :param requests: 
-        :return: 
+        :param requests:
+        :return:
         """
         services = requests.data.get("services", [])
         flows = requests.data.get("flows", [])
