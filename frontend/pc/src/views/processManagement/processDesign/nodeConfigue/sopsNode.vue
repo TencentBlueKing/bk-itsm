@@ -248,7 +248,7 @@
                             }
                         })
                     })
-                    if (this.excludeTaskNodesId.length !== 0 && this.excludeTaskNodesId.length !== this.optionalNodeIdList.length) {
+                    if (this.excludeTaskNodesId.length !== 0) {
                         this.planList.forEach(item => {
                             if (item.data) {
                                 this.optionalNodeIdList.filter(ite => {

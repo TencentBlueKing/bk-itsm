@@ -232,7 +232,6 @@
         },
         created () {
             this.initData()
-            console.log(this)
         },
         methods: {
             async initData () {
@@ -409,7 +408,6 @@
                     item.value = item.multiSelect ? [] : ''
                 })
                 const service = this.serviceList.find(item => item.name === val)
-                console.log(service)
                 this.sereveType = service.key
                 this.getServiceTree()
                 this.getAllTicketList(service.key)
