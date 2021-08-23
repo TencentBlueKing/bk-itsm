@@ -272,7 +272,6 @@
             },
             // 获取所有单据列表
             getAllTicketList (type = this.sereveType) {
-                console.log('5555555')
                 this[`${type}Loading`] = true
                 const fixParams = {
                     page_size: this.pagination.limit,
