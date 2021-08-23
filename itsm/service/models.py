@@ -51,7 +51,8 @@ from itsm.component.constants import (
     SERVICE_CATEGORY,
     LEN_XX_LONG,
     TIME_DELTA,
-    SERVICE_SOURCE_CHOICES, DEFAULT_PROJECT_PROJECT_KEY
+    SERVICE_SOURCE_CHOICES,
+    DEFAULT_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.exceptions import DeleteError, ParamError, SlaParamError
@@ -80,7 +81,9 @@ class Model(models.Model):
     end_at = models.DateTimeField(_("结束时间"), null=True)
     is_deleted = models.BooleanField(_("是否软删除"), default=False)
     is_builtin = models.BooleanField(_("是否内置"), default=False)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     class Meta:
         abstract = True
@@ -104,8 +107,9 @@ class Favorite(models.Model):
     服务收藏配置
     """
 
-    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, help_text=_("收藏的用户"),
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, help_text=_("收藏的用户"), on_delete=models.CASCADE
+    )
     name = models.CharField(_("收藏名称"), max_length=LEN_LONG)
     service = models.CharField(_("服务类型"), max_length=LEN_NORMAL)
     data = jsonfield.JSONField(_("收藏数据"), default=EMPTY_LIST)
@@ -166,8 +170,9 @@ class ServiceCategory(Model):
 
         print("init service data")
         for k, v in SERVICE_CATEGORY.items():
-            cls.objects.get_or_create(defaults={"name": v, "desc": "{}类相关服务".format(v)},
-                                      **{"key": k})
+            cls.objects.get_or_create(
+                defaults={"name": v, "desc": "{}类相关服务".format(v)}, **{"key": k}
+            )
 
     @classmethod
     def get_service_keys(cls, upper=False):
@@ -196,8 +201,9 @@ class OldSla(Model):
     level = models.IntegerField(_("级别"), choices=level_choices, default=1)
     resp_time = models.CharField(_("响应时间要求"), max_length=LEN_NORMAL)
     deal_time = models.CharField(_("解决时间要求"), max_length=LEN_NORMAL)
-    desc = models.CharField(_("描述"), max_length=LEN_LONG, null=True, blank=True,
-                            default=EMPTY_STRING)
+    desc = models.CharField(
+        _("描述"), max_length=LEN_LONG, null=True, blank=True, default=EMPTY_STRING
+    )
 
     objects = managers.SlaManager()
 
@@ -239,21 +245,32 @@ class Service(ObjectManagerMixin, Model):
     name = models.CharField(_("服务名称"), max_length=LEN_LONG)
     desc = models.CharField(_("服务描述"), max_length=LEN_LONG, default=EMPTY_STRING)
 
-    workflow = models.ForeignKey("workflow.WorkflowVersion", related_name="services",
-                                 help_text=_("关联流程版本"), on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflow.WorkflowVersion",
+        related_name="services",
+        help_text=_("关联流程版本"),
+        on_delete=models.CASCADE,
+    )
 
     owners = models.TextField(help_text=_("服务负责人"), default=ADMIN)
 
     can_ticket_agency = models.BooleanField(_("是否可以代提单"), default=False)
     is_valid = models.BooleanField(_("是否有效"), default=True)
 
-    display_type = models.CharField(_("可见范围类型"), max_length=LEN_SHORT, choices=DISPLAY_CHOICES,
-                                    default="OPEN")
-    display_role = models.CharField(_("可见范围"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                    blank=True)
+    display_type = models.CharField(
+        _("可见范围类型"), max_length=LEN_SHORT, choices=DISPLAY_CHOICES, default="OPEN"
+    )
+    display_role = models.CharField(
+        _("可见范围"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
 
-    source = models.CharField(_("来源"), max_length=LEN_SHORT, choices=SERVICE_SOURCE_CHOICES,
-                              null=True, default=None)
+    source = models.CharField(
+        _("来源"),
+        max_length=LEN_SHORT,
+        choices=SERVICE_SOURCE_CHOICES,
+        null=True,
+        default=None,
+    )
     objects = managers.ServiceManager()
 
     need_auth_grant = True
@@ -309,8 +326,9 @@ class Service(ObjectManagerMixin, Model):
         获取第一个节点的字段，提供给open api使用
         """
 
-        return WorkflowVersionFirstStateFieldSerializer(self.workflow.get_first_state_fields(),
-                                                        many=True).data
+        return WorkflowVersionFirstStateFieldSerializer(
+            self.workflow.get_first_state_fields(), many=True
+        ).data
 
     @property
     def sla(self):
@@ -331,13 +349,17 @@ class Service(ObjectManagerMixin, Model):
 
         # 组织角色
         for organization in UserRole.get_user_roles(username)["organization"]:
-            conditions.append(Q(display_type="ORGANIZATION") & Q(
-                display_role__contains=dotted_name(organization)))
+            conditions.append(
+                Q(display_type="ORGANIZATION")
+                & Q(display_role__contains=dotted_name(organization))
+            )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):
-            conditions.append(Q(display_type=role["role_type"]) & Q(
-                display_role__contains=dotted_name(role["id"])))
+            conditions.append(
+                Q(display_type=role["role_type"])
+                & Q(display_role__contains=dotted_name(role["id"]))
+            )
 
         return conditions
 
@@ -368,7 +390,9 @@ class Service(ObjectManagerMixin, Model):
         return CatalogService.bind_service_to_catalog(self.id, catalog_id)
 
     def add_favorite(self, username):
-        exist = FavoriteService.objects.filter(service_id=self.id, user=username).exists()
+        exist = FavoriteService.objects.filter(
+            service_id=self.id, user=username
+        ).exists()
         if not exist:
             FavoriteService.objects.create(service_id=self.id, user=username)
 
@@ -387,13 +411,14 @@ class Service(ObjectManagerMixin, Model):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(**data)
-                .extra(select={"date_str": data_str})
-                .values("date_str")
-                .annotate(count=Count("id"))
-                .order_by("date_str")
+            .extra(select={"date_str": data_str})
+            .values("date_str")
+            .annotate(count=Count("id"))
+            .order_by("date_str")
         )
-        dates_range = fill_time_dimension(data["create_at__gte"], data["create_at__lte"], info,
-                                          time_delta)
+        dates_range = fill_time_dimension(
+            data["create_at__gte"], data["create_at__lte"], info, time_delta
+        )
         return dates_range
 
     def update_service_sla(self, sla_tasks):
@@ -413,11 +438,14 @@ class Service(ObjectManagerMixin, Model):
 
     def sla_validate(self):
         from itsm.workflow.models import Workflow
+
         for sla in self.sla:
             start_node_id = sla.start_node_id
             end_node_id = sla.end_node_id
             workflow = Workflow.objects.get(id=self.workflow.workflow_id)
-            state_count = workflow.states.filter(id__in=[start_node_id, end_node_id]).count()
+            state_count = workflow.states.filter(
+                id__in=[start_node_id, end_node_id]
+            ).count()
             if state_count != 2:
                 ServiceSla.objects.filter(service_id=self.id).delete()
                 raise SlaParamError("检测到您的流程节点发生改变，请您重新配置sla")
@@ -451,12 +479,14 @@ class BaseMpttModel(MPTTModel):
 
     FIELDS = ("creator", "create_at", "updated_by", "update_at", "end_at")
 
-    creator = models.CharField(_("创建人"), max_length=LEN_NORMAL, null=True, blank=True,
-                               default="system")
+    creator = models.CharField(
+        _("创建人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
+    )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
-    updated_by = models.CharField(_("修改人"), max_length=LEN_NORMAL, null=True, blank=True,
-                                  default="system")
+    updated_by = models.CharField(
+        _("修改人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
+    )
     end_at = models.DateTimeField(_("结束时间"), null=True, blank=True)
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
@@ -480,16 +510,23 @@ class ServiceCatalog(BaseMpttModel):
 
     key = models.CharField(_("目录关键字"), max_length=LEN_LONG, unique=True)
     name = models.CharField(_("目录名称"), max_length=LEN_NORMAL)
-    desc = models.CharField(_("目录描述"), max_length=LEN_LONG, null=True, blank=True,
-                            default=EMPTY_STRING)
+    desc = models.CharField(
+        _("目录描述"), max_length=LEN_LONG, null=True, blank=True, default=EMPTY_STRING
+    )
     order = models.IntegerField(_("节点顺序"), default=FIRST_ORDER)
     xt_only = models.BooleanField(_("特殊过滤"), default=False)
     parent = TreeForeignKey(
-        "self", on_delete=models.CASCADE, verbose_name=_("上级目录"), null=True, blank=True,
+        "self",
+        on_delete=models.CASCADE,
+        verbose_name=_("上级目录"),
+        null=True,
+        blank=True,
         related_name="children",
     )
     route = jsonfield.JSONField(_("前置路径集合"), default=EMPTY_LIST)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     objects = managers.ServiceCatalogManager()
 
@@ -518,12 +555,17 @@ class ServiceCatalog(BaseMpttModel):
 
         # get_ancestors不能用于未创建的实例
         if self.parent:
-            self.route = list(self.parent.get_ancestors(include_self=True).values("id", "name"))
+            self.route = list(
+                self.parent.get_ancestors(include_self=True).values("id", "name")
+            )
 
         return super(ServiceCatalog, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        if not self.is_leaf_node() and self.get_children().filter(is_deleted=False).exists():
+        if (
+            not self.is_leaf_node()
+            and self.get_children().filter(is_deleted=False).exists()
+        ):
             raise DeleteError(_("请先删除【{}】下的子目录").format(self.name))
 
         super(ServiceCatalog, self).delete(*args, **kwargs)
@@ -550,11 +592,12 @@ class ServiceCatalog(BaseMpttModel):
         """获取目录树下的services数目（去重）"""
         return (
             CatalogService.objects.filter(
-                catalog__in=self.get_descendants(include_self=True), service__is_deleted=False,
+                catalog__in=self.get_descendants(include_self=True),
+                service__is_deleted=False,
             )
-                .values("service")
-                .distinct()
-                .count()
+            .values("service")
+            .distinct()
+            .count()
         )
 
     @classmethod
@@ -582,32 +625,39 @@ class ServiceCatalog(BaseMpttModel):
             node_children = node_children.filter(id__in=catalogs)
 
         # 递归查询，sql查询次数过多 TODO
-        children = [node.subtree(child, catalogs, show_deleted) for child in node_children]
+        children = [
+            node.subtree(child, catalogs, show_deleted) for child in node_children
+        ]
 
         data = {
-            'id': node.id,
-            'key': node.key,
-            'name': _("{} (已删除)").format(node.name) if node.is_deleted else node.name,
-            'is_deleted': node.is_deleted,
-            'level': node.level,
-            'desc': node.desc,
-            'parent_id': getattr(node.parent, 'id', ''),
-            'parent_name': getattr(node.parent, 'name', ''),
+            "id": node.id,
+            "key": node.key,
+            "name": _("{} (已删除)").format(node.name) if node.is_deleted else node.name,
+            "is_deleted": node.is_deleted,
+            "level": node.level,
+            "desc": node.desc,
+            "parent_id": getattr(node.parent, "id", ""),
+            "parent_name": getattr(node.parent, "name", ""),
             # 默认展开一级
-            'expanded': node.level == 0,
-            'children': children,
-            'route': node.route,
+            "expanded": node.level == 0,
+            "children": children,
+            "route": node.route,
             # 配合前端，设置图标
-            'openedIcon': 'icon-folder-open',
-            'closedIcon': 'icon-folder',
-            'icon': 'icon-folder',
+            "openedIcon": "icon-folder-open",
+            "closedIcon": "icon-folder",
+            "icon": "icon-folder",
         }
 
         return data
 
     @classmethod
-    def tree_data(cls, request, key="", show_deleted=False,
-                  project_key=DEFAULT_PROJECT_PROJECT_KEY):
+    def tree_data(
+        cls,
+        request,
+        key="",
+        show_deleted=False,
+        project_key=DEFAULT_PROJECT_PROJECT_KEY,
+    ):
         """
         服务目录树
         根据服务编码过滤服务目录
@@ -615,34 +665,38 @@ class ServiceCatalog(BaseMpttModel):
 
         def _catalog_services_filter(key, request, show_deleted):
             if key == "global":
-                catalog_services = CatalogService._objects.select_related("service",
-                                                                          "catalog").filter(
-                    project_key=project_key)
+                catalog_services = CatalogService._objects.select_related(
+                    "service", "catalog"
+                ).filter(project_key=project_key)
             else:
-                catalog_services = CatalogService._objects.select_related("service",
-                                                                          "catalog").filter(
-                    service__key=key, project_key=project_key)
+                catalog_services = CatalogService._objects.select_related(
+                    "service", "catalog"
+                ).filter(service__key=key, project_key=project_key)
 
             # 支持：服务被移除或者被删除后，仍然需要查看历史目录并查询单据
             if not show_deleted:
-                catalog_services = catalog_services.filter(is_deleted=False,
-                                                           service__is_deleted=False)
+                catalog_services = catalog_services.filter(
+                    is_deleted=False, service__is_deleted=False
+                )
 
             # 服务展示过滤
-            if UserRole.is_itsm_superuser(request.user.username) or UserRole.is_statics_manager(
-                request.user.username):
+            if UserRole.is_itsm_superuser(
+                request.user.username
+            ) or UserRole.is_statics_manager(request.user.username):
                 return catalog_services
 
             c_s = catalog_services.filter(service__is_valid=True)
 
             # 根据组织架构/通用角色过滤服务
             service_ids = Service.get_valid_and_permission_service(
-                request.user.username).values_list("id", flat=True)
+                request.user.username
+            ).values_list("id", flat=True)
             c_s = c_s.filter(service_id__in=service_ids)
 
             # 特殊过滤
-            if request.META.get("HTTP_X_TIF_UID", "NO_HEADER") == request.COOKIES.get("xt_uid",
-                                                                                      "NO_COOKIE"):
+            if request.META.get("HTTP_X_TIF_UID", "NO_HEADER") == request.COOKIES.get(
+                "xt_uid", "NO_COOKIE"
+            ):
                 return c_s.filter(catalog__xt_only=True)
 
             return c_s.filter(catalog__xt_only=False)
@@ -658,8 +712,9 @@ class ServiceCatalog(BaseMpttModel):
         if key and not catalogs:
             return []
 
-        roots = cls.objects.filter(level=0, is_deleted=False, project_key=project_key).order_by(
-            "order")
+        roots = cls.objects.filter(
+            level=0, is_deleted=False, project_key=project_key
+        ).order_by("order")
         if catalogs:
             roots = roots.filter(id__in=catalogs)
 
@@ -696,8 +751,11 @@ class ServiceCatalog(BaseMpttModel):
             key = get_random_key(name)
 
         new_catalog, _ = cls._objects.get_or_create(
-            defaults={"name": name, "parent": parent, }, **{"key": key, "is_deleted": is_deleted,
-                                                            "project_key": project_key}
+            defaults={
+                "name": name,
+                "parent": parent,
+            },
+            **{"key": key, "is_deleted": is_deleted, "project_key": project_key}
         )
 
         return new_catalog
@@ -707,7 +765,9 @@ class ServiceCatalog(BaseMpttModel):
     def open_api_subtree(cls, node, catalogs=None):
         """获取以node为根的子树"""
 
-        node_children = node.get_children().filter(is_deleted=False).order_by("-create_at")
+        node_children = (
+            node.get_children().filter(is_deleted=False).order_by("-create_at")
+        )
 
         if catalogs:
             node_children = node_children.filter(id__in=catalogs).order_by("-create_at")
@@ -726,15 +786,19 @@ class ServiceCatalog(BaseMpttModel):
         return data
 
     @classmethod
-    def open_api_tree_data(cls, service_key=None):
+    def open_api_tree_data(
+        cls, service_key=None, project_key=DEFAULT_PROJECT_PROJECT_KEY
+    ):
         """
         服务目录树
         根据服务编码过滤服务目录
         """
 
-        catalog_services = CatalogService.objects.all()
+        catalog_services = CatalogService.objects.filter(project_key=project_key).all()
         if service_key:
-            catalog_services = CatalogService.objects.filter(service__key=service_key)
+            catalog_services = CatalogService.objects.filter(
+                service__key=service_key, project_key=project_key
+            )
 
         catalogs = set()
         for cs in catalog_services:
@@ -760,8 +824,12 @@ class ServiceCatalog(BaseMpttModel):
 class CatalogService(Model):
     """服务关联目录"""
 
-    catalog = models.ForeignKey("ServiceCatalog", help_text=_("关联服务目录"), on_delete=models.CASCADE)
-    service = models.ForeignKey("Service", help_text=_("关联服务条目"), on_delete=models.CASCADE)
+    catalog = models.ForeignKey(
+        "ServiceCatalog", help_text=_("关联服务目录"), on_delete=models.CASCADE
+    )
+    service = models.ForeignKey(
+        "Service", help_text=_("关联服务条目"), on_delete=models.CASCADE
+    )
     order = models.IntegerField("service序列", default=FIRST_ORDER)
 
     objects = managers.CatalogServiceManager()
@@ -785,7 +853,11 @@ class CatalogService(Model):
     def bounded_relations(cls, service):
         """服务绑定了目录"""
         return [
-            {"bond_id": cs.id, "catalog_id": cs.catalog.id, "catalog_name": cs.catalog.name, }
+            {
+                "bond_id": cs.id,
+                "catalog_id": cs.catalog.id,
+                "catalog_name": cs.catalog.name,
+            }
             for cs in cls.objects.filter(service=service)
         ]
 
@@ -800,7 +872,9 @@ class CatalogService(Model):
         # 解除服务和其他目录的绑定
         cls.objects.filter(service_id=service_id).delete()
 
-        obj, created = cls.objects.update_or_create(service_id=service_id, catalog_id=catalog_id)
+        obj, created = cls.objects.update_or_create(
+            service_id=service_id, catalog_id=catalog_id
+        )
 
         return {"result": True, "created": created, "message": "目录绑定成功"}
 
@@ -810,12 +884,15 @@ class SysDict(ObjectManagerMixin, Model):
 
     key = models.CharField(_("编码"), max_length=LEN_LONG)
     name = models.CharField(_("名称"), max_length=LEN_LONG)
-    desc = models.CharField(_("描述"), max_length=LEN_LONG, null=True, blank=True,
-                            default=EMPTY_STRING)
+    desc = models.CharField(
+        _("描述"), max_length=LEN_LONG, null=True, blank=True, default=EMPTY_STRING
+    )
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
     is_enabled = models.BooleanField(_("是否启用"), default=True)
     is_readonly = models.BooleanField(_("是否只读"), default=False)
-    is_show = models.BooleanField(_("是否显示"), default=True)  # 应用场景: 部分系统内置数据字典, 不在数据字段管理页面显示
+    is_show = models.BooleanField(
+        _("是否显示"), default=True
+    )  # 应用场景: 部分系统内置数据字典, 不在数据字段管理页面显示
     objects = managers.SysDictManager()
 
     auth_resource = {"resource_type": "flow_element", "resource_name": _("流程元素")}
@@ -832,13 +909,14 @@ class SysDict(ObjectManagerMixin, Model):
     def delete(self, *args, **kwargs):
         from itsm.workflow.models import Field
 
-        field_values = Field.objects.filter(is_deleted=False, source_uri=self.key).values_list(
-            "workflow__name", "state__name", "name"
-        )
+        field_values = Field.objects.filter(
+            is_deleted=False, source_uri=self.key
+        ).values_list("workflow__name", "state__name", "name")
         if field_values.exists():
             raise DeleteError(
                 _("以下流程模板中正在使用该字典，请先删除：{}").format(
-                    ",".join(["->".join(field) for field in field_values]))
+                    ",".join(["->".join(field) for field in field_values])
+                )
             )
 
         self.dict_data.all().update(is_deleted=True)
@@ -860,12 +938,20 @@ class SysDict(ObjectManagerMixin, Model):
         """
         fields = ["id", "key", "name"] if fields is None else fields
 
-        dict_datas = SysDict.objects.get(key=key).dict_data.filter(is_deleted=False).order_by(
-            "order")
+        dict_datas = (
+            SysDict.objects.get(key=key)
+            .dict_data.filter(is_deleted=False)
+            .order_by("order")
+        )
 
         return [
-            dict([(field, getattr(dict_data, field)) for field in fields if
-                  hasattr(dict_data, field)])
+            dict(
+                [
+                    (field, getattr(dict_data, field))
+                    for field in fields
+                    if hasattr(dict_data, field)
+                ]
+            )
             for dict_data in dict_datas
         ]
 
@@ -898,15 +984,23 @@ class SysDict(ObjectManagerMixin, Model):
 class DictData(BaseMpttModel):
     """字典数据"""
 
-    dict_table = models.ForeignKey(to=SysDict, related_name="dict_data", help_text=_("关联字典项"),
-                                   on_delete=models.CASCADE)
+    dict_table = models.ForeignKey(
+        to=SysDict,
+        related_name="dict_data",
+        help_text=_("关联字典项"),
+        on_delete=models.CASCADE,
+    )
     key = models.CharField(_("编码"), max_length=LEN_LONG)
     name = models.CharField(_("名称"), max_length=LEN_LONG)
     order = models.IntegerField(_("顺序"), default=EMPTY_INT)
     is_readonly = models.BooleanField(_("是否只读（不可编辑）"), default=False)
     is_builtin = models.BooleanField(_("是否内置（不可删除）"), default=False)
     parent = TreeForeignKey(
-        "self", on_delete=models.CASCADE, verbose_name=_("上级目录"), null=True, blank=True,
+        "self",
+        on_delete=models.CASCADE,
+        verbose_name=_("上级目录"),
+        null=True,
+        blank=True,
         related_name="children",
     )
 
@@ -917,7 +1011,10 @@ class DictData(BaseMpttModel):
         return "{}({})".format(self.name, self.key)
 
     def delete(self, *args, **kwargs):
-        if not self.is_leaf_node() and self.get_children().filter(is_deleted=False).count() > 0:
+        if (
+            not self.is_leaf_node()
+            and self.get_children().filter(is_deleted=False).count() > 0
+        ):
             raise DeleteError(_("请先删除【{}】下的子数据项").format(self.name))
 
         super(DictData, self).delete(*args, **kwargs)
@@ -946,7 +1043,14 @@ class DictData(BaseMpttModel):
     @classmethod
     @transaction.atomic
     def create_item(
-        cls, dict_table, key, name, order=0, parent=None, is_deleted=False, is_readonly=False,
+        cls,
+        dict_table,
+        key,
+        name,
+        order=0,
+        parent=None,
+        is_deleted=False,
+        is_readonly=False,
         is_builtin=False,
     ):
         """
@@ -964,7 +1068,10 @@ class DictData(BaseMpttModel):
                 "is_readonly": is_readonly,
                 "is_builtin": is_builtin,
             },
-            **{"key": key, "dict_table": dict_table, }
+            **{
+                "key": key,
+                "dict_table": dict_table,
+            }
         )
 
         return new_item
@@ -1016,8 +1123,9 @@ class DictData(BaseMpttModel):
         """批量激活字典"""
 
         for key in keys:
-            cls._objects.update_or_create(defaults={"is_deleted": False}, key=key,
-                                          dict_table=dict_table)
+            cls._objects.update_or_create(
+                defaults={"is_deleted": False}, key=key, dict_table=dict_table
+            )
 
 
 # deprecated models
@@ -1027,15 +1135,23 @@ class ServiceProperty(Model):
     相当于数据库中的表 - Table
     """
 
-    service_category = models.ForeignKey(ServiceCategory, help_text=_("关联服务类别"),
-                                         related_name="properties", on_delete=models.CASCADE)
+    service_category = models.ForeignKey(
+        ServiceCategory,
+        help_text=_("关联服务类别"),
+        related_name="properties",
+        on_delete=models.CASCADE,
+    )
     key = models.CharField(_("默认为名称拼音，唯一存在，如果有一样的，则通过拼音+随机字符匹配"), max_length=LEN_SHORT)
     pk_key = models.CharField(_("fields中的主键的key"), max_length=LEN_SHORT, default="")
-    cascade_key = models.CharField(_("fields中的级联外键的key"), max_length=LEN_SHORT, default="")
+    cascade_key = models.CharField(
+        _("fields中的级联外键的key"), max_length=LEN_SHORT, default=""
+    )
     is_cascade = models.BooleanField(_("判断是否为级联属性"), default=False)
     name = models.CharField(_("服务属性名称"), default="", max_length=LEN_LONG)
     desc = models.CharField(_("属性描述"), max_length=LEN_LONG)
-    fields = jsonfield.JSONField(_("属性包含的字段"), default=EMPTY_LIST, null=True, blank=True)
+    fields = jsonfield.JSONField(
+        _("属性包含的字段"), default=EMPTY_LIST, null=True, blank=True
+    )
 
     class Meta:
         app_label = "service"
@@ -1109,20 +1225,31 @@ class PropertyRecord(Model):
     """
 
     display_role_choice = (("all", _("全部")), ("xt", _("协同办公")))
-    service_property = models.ForeignKey(ServiceProperty, help_text=_("关联服务属性"),
-                                         related_name="records", on_delete=models.CASCADE)
+    service_property = models.ForeignKey(
+        ServiceProperty,
+        help_text=_("关联服务属性"),
+        related_name="records",
+        on_delete=models.CASCADE,
+    )
     key = models.CharField(_("对应的唯一属性key"), max_length=LEN_LONG)
     pk_value = models.CharField(
-        _("对应的主键名，为属性设置的主键信息"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True,
+        _("对应的主键名，为属性设置的主键信息"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
+        null=True,
+        blank=True,
     )
-    flows = jsonfield.JSONField(_("关联了对应属性的workflow的id集合"), default=EMPTY_LIST, null=True,
-                                blank=True)
+    flows = jsonfield.JSONField(
+        _("关联了对应属性的workflow的id集合"), default=EMPTY_LIST, null=True, blank=True
+    )
     # 记录中tickets长度大于4G(longtext)时会触发问题
-    tickets = jsonfield.JSONField(_("关联了对应属性的ticket的id集合"), default=EMPTY_LIST, null=True,
-                                  blank=True)
+    tickets = jsonfield.JSONField(
+        _("关联了对应属性的ticket的id集合"), default=EMPTY_LIST, null=True, blank=True
+    )
     data = jsonfield.JSONField(_("对应属性字段的值"), null=True, blank=True)
-    display_role = MultiSelectField(_("可展示的用户"), default=["all"], max_length=LEN_NORMAL,
-                                    choices=display_role_choice)
+    display_role = MultiSelectField(
+        _("可展示的用户"), default=["all"], max_length=LEN_NORMAL, choices=display_role_choice
+    )
 
     # objects = managers.Manager()
 
