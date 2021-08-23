@@ -276,6 +276,8 @@
                             // 标准运维排除执行节点
                             if (sopsContent.planId && sopsContent.planId.length > 0) {
                                 params.exclude_task_nodes_id = sopsContent.exclude_task_nodes_id
+                            } else {
+                                params.exclude_task_nodes_id = []
                             }
                             // 标准运维任务参数
                             params.source = sopsContent.createWay

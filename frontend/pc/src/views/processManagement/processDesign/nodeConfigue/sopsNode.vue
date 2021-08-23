@@ -74,10 +74,10 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m['执行方案：']`)" :required="true">
+                <bk-form-item :label="$t(`m.treeinfo['执行方案：']`)">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         :disabled="disable"
-                        :placeholder="$t(`m['请选择执行方案']`)"
+                        :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
                         v-model="planId"
                         multiple
                         :clearable="false"
@@ -290,8 +290,7 @@
                 this.getTempaltePlanList(id)
                 await this.$store.dispatch('getTemplateDetail', params).then(res => {
                     this.constants = res.data.constants
-                    this.optionalNodeIdList = res.data.all_ids || []
-                    this.planId = ['']
+                    this.optionalNodeIdList = res.data.all_ids
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -309,10 +308,6 @@
                 }
                 this.$store.dispatch('getTemplatePlanList', params).then(res => {
                     this.planList = res.data
-                    this.planList.push({
-                        id: '',
-                        name: this.$t('m.treeinfo["默认"]')
-                    })
                     this.onplanSelect(this.planId)
                 }).catch(res => {
                     errorHandler(res, this)
@@ -321,14 +316,9 @@
             onProjectSelect () {
                 this.processType = ''
             },
-            onplanSelect (ids) {
+            async onplanSelect (ids) {
                 const planList = []
-                this.excludeTaskNodesId = []
-                if (ids.indexOf('') !== -1) {
-                    this.excludeTaskNodesId = []
-                } else {
-                    console.log(this.optionalNodeIdList)
-                    const allIdLength = this.optionalNodeIdList.length
+                if (ids.length > 0) {
                     ids.forEach(item => {
                         const plan = this.planList.find(plan => plan.id === item)
                         if (plan.data) {
@@ -343,9 +333,29 @@
                     this.excludeTaskNodesId = this.optionalNodeIdList.filter(nodeId => {
                         return !planList.includes(nodeId)
                     })
-                    if (this.excludeTaskNodesId.length === allIdLength) {
-                        this.excludeTaskNodesId = []
+                } else {
+                    this.excludeTaskNodesId = []
+                }
+                const template = this.templateList.find(item => item.id === this.templateId)
+                try {
+                    this.sopsFormLoading = true
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
+                        bk_biz_id: template.bk_biz_id,
+                        template_id: template.id,
+                        exclude_task_nodes_id: this.excludeTaskNodesId
+                    })
+                    const constants = []
+                    for (const key in res.data.pipeline_tree.constants) {
+                        if (res.data.pipeline_tree.constants[key].show_type === 'show') {
+                            constants.push(res.data.pipeline_tree.constants[key])
+                        }
                     }
+                    constants.sort((a, b) => a.index - b.index)
+                    this.constants = constants
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    this.sopsFormLoading = false
                 }
             },
             async getRelatedFields () {

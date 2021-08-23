@@ -66,7 +66,7 @@
                         :disabled="disabled"
                         multiple
                         ext-cls="form-item-inline-width mr0"
-                        :placeholder="' '"
+                        :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
                         @selected="onplanSelect">
                         <bk-option v-for="option in planList"
                             :key="option.id"
@@ -383,7 +383,9 @@
                     this.previewSopsTaskUrl = res.data.task_url
                     const constants = []
                     for (const key in res.data.constants) {
-                        constants.push(res.data.constants[key])
+                        if (res.data.constants[key].show_type === 'show') {
+                            constants.push(res.data.constants[key])
+                        }
                     }
                     constants.sort((a, b) => a - b)
                     this.item.sopsContent.constants = constants
@@ -404,18 +406,23 @@
                     const constants = []
                     res.data.constants.forEach(item => {
                         const constantItem = this.item.sopsContent.constants.find(cons => cons.key === item.key)
-                        if (constantItem) {
-                            item = Object.assign(constantItem, item)
+                        if (!this.editTask || constantItem) {
+                            if (constantItem) {
+                                item = Object.assign(constantItem, item)
+                            }
+                            if (item.is_meta) {
+                                item.meta = deepClone(item)
+                            }
+                            if (this.item.value) {
+                                item.value = deepClone(this.item.sopsContent.formData[item.key])
+                            }
+                            this.constantDefaultValue[item.key] = deepClone(item.value)
+                            if (item.show_type === 'show') {
+                                constants.push(item)
+                            }
                         }
-                        if (item.is_meta) {
-                            item.meta = deepClone(item)
-                        }
-                        if (this.item.value) {
-                            item.value = deepClone(this.item.sopsContent.formData[item.key])
-                        }
-                        this.constantDefaultValue[item.key] = deepClone(item.value)
-                        constants.push(item)
                     })
+                    console.log(constants)
                     this.item.sopsContent.constants = constants
                     this.optionalNodeIdList = res.data.optional_ids
                 }).catch(res => {
@@ -467,22 +474,15 @@
                 }
                 await this.$store.dispatch('getTemplatePlanList', params).then(res => {
                     this.planList = res.data
-                    this.planList.push({
-                        id: '',
-                        name: this.$t('m.treeinfo["默认"]')
-                    })
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
                     this.loading.plan = false
                 })
             },
-            onplanSelect (ids) {
+            async onplanSelect (ids) {
                 const planList = []
-                this.item.sopsContent.exclude_task_nodes_id = []
-                if (ids.indexOf('') !== -1) {
-                    this.item.sopsContent.exclude_task_nodes_id = []
-                } else {
+                if (ids.length > 0) {
                     ids.forEach(item => {
                         const plan = this.planList.find(plan => plan.id === item)
                         if (plan.data) {
@@ -497,6 +497,29 @@
                     this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => {
                         return !planList.includes(nodeId)
                     })
+                } else {
+                    this.item.sopsContent.exclude_task_nodes_id = []
+                }
+                const template = this.templateList.find(item => item.id === this.item.sopsContent.id)
+                try {
+                    this.formLoading = true
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
+                        bk_biz_id: template.bk_biz_id,
+                        template_id: template.id,
+                        exclude_task_nodes_id: this.item.sopsContent.exclude_task_nodes_id
+                    })
+                    const constants = []
+                    for (const key in res.data.pipeline_tree.constants) {
+                        if (res.data.pipeline_tree.constants[key].show_type === 'show') {
+                            constants.push(res.data.pipeline_tree.constants[key])
+                        }
+                    }
+                    constants.sort((a, b) => a.index - b.index)
+                    this.item.sopsContent.constants = constants
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    this.formLoading = false
                 }
             },
             jumpToSops () {
