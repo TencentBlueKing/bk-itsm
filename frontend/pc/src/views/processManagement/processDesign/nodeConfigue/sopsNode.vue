@@ -237,10 +237,10 @@
                     this.projectId = this.configur.extras.sops_info.bk_biz_id.value
                     this.constants = this.configur.extras.sops_info.constants
                     this.processType = this.configur.extras.sops_info.template_source
-                    this.templateId = this.configur.extras.sops_info.template_id
                     this.excludeTaskNodesId = this.configur.extras.sops_info.exclude_task_nodes_id || []
                     await this.getTemplateList(this.processType)
-                    await this.getTemplateDetail(this.templateId)
+                    await this.getTemplateDetail(this.configur.extras.sops_info.template_id)
+                    this.templateId = this.configur.extras.sops_info.template_id
                     this.constants.forEach(item => {
                         this.configur.extras.sops_info.constants.filter(ite => {
                             if (item.key === ite.key) {
@@ -248,7 +248,7 @@
                             }
                         })
                     })
-                    if (this.excludeTaskNodesId.length !== 0 && this.excludeTaskNodesId.length !== this.optionalNodeIdList.length) {
+                    if (this.excludeTaskNodesId.length !== 0) {
                         this.planList.forEach(item => {
                             if (item.data) {
                                 this.optionalNodeIdList.filter(ite => {
@@ -327,8 +327,6 @@
                 if (ids.indexOf('') !== -1) {
                     this.excludeTaskNodesId = []
                 } else {
-                    console.log(this.optionalNodeIdList)
-                    const allIdLength = this.optionalNodeIdList.length
                     ids.forEach(item => {
                         const plan = this.planList.find(plan => plan.id === item)
                         if (plan.data) {
@@ -343,9 +341,6 @@
                     this.excludeTaskNodesId = this.optionalNodeIdList.filter(nodeId => {
                         return !planList.includes(nodeId)
                     })
-                    if (this.excludeTaskNodesId.length === allIdLength) {
-                        this.excludeTaskNodesId = []
-                    }
                 }
             },
             async getRelatedFields () {

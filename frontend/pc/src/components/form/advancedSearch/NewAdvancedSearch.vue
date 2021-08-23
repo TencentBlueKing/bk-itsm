@@ -129,7 +129,7 @@
             v-model="isHighlightSetting"
             width="560"
             :draggable="false"
-            @confirm="HighlightSettingComfirm">
+            @confirm="highlightSettingConfirm">
             <p slot="header" style="text-align: left;">
                 {{$t(`m.slaContent["单据高亮设置"]`)}}
             </p>
@@ -195,6 +195,9 @@
                 immediate: true
             }
         },
+        created () {
+            this.getTicketHighlight()
+        },
         methods: {
             // 过滤参数
             getParams () {
@@ -249,7 +252,7 @@
                     })
                 })
             },
-            HighlightSettingComfirm () {
+            highlightSettingConfirm () {
                 this.isHighlightSetting = false
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
@@ -257,7 +260,7 @@
                             message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
                             theme: 'success'
                         })
-                        // window.location.reload()
+                        this.$emit('onChangeHighlight')
                     } else {
                         this.getTicketHighlight()
                     }
