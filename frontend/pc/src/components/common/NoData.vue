@@ -39,7 +39,7 @@
         },
         data () {
             return {
-                imgUrl: require('../../images/box.png')
+                imgUrl: require('@/images/box.png')
             }
         }
     }
