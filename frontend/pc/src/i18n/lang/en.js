@@ -2346,5 +2346,6 @@ export const m = {
     '执行方案：': 'Implementation scheme',
     '请选择关联业务': 'Select the associated business',
     '请选择流程类型': 'Select the process type',
-    '请选择流程模板': 'Select the process templates'
+    '请选择流程模板': 'Select the process templates',
+    '请输入表单参数': 'Please enter form parameters'
 }

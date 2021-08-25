@@ -23,7 +23,7 @@
 <template>
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules">
+            <bk-form :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'">
                 <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
                     <bk-input
                         :ext-cls="'bk-form-width'"
@@ -221,6 +221,16 @@
                 templateDisable: false,
                 planDisable: false,
                 processDisable: false,
+                renderFormValidate: false,
+                biz: [
+                    {
+                        name: this.$t(`m.treeinfo["业务"]`),
+                        custom_type: '',
+                        source_type: 'custom',
+                        value: '--',
+                        key: 1
+                    }
+                ],
                 rules: {
                     name: [
                         {
@@ -313,8 +323,8 @@
             async getTemplateList (key) {
                 const isCommonProcess = key === 'common'
                 const params = isCommonProcess ? {} : { bk_biz_id: this.basicsFormData.projectId }
-                this.basicsFormData.templateId = ''
                 if (!isCommonProcess) this.basicsFormData.projectId = ''
+                this.basicsFormData.templateId = ''
                 this.basicsFormData.planId = []
                 this.templateDisable = !isCommonProcess
                 this.planDisable = !isCommonProcess
@@ -431,63 +441,76 @@
                 this.$parent.closeConfigur()
             },
             submit () {
+                if (this.$refs.getParam) {
+                    this.renderFormValidate = this.$refs.getParam.getRenderFormValidate()
+                    if (!this.renderFormValidate) {
+                        this.$bkMessage({
+                            message: this.$t(`m['请输入表单参数']`),
+                            theme: 'error'
+                        })
+                    }
+                } else {
+                    this.renderFormValidate = true
+                }
                 this.$refs.basicsForm.validate().then(_ => {
-                    const formData = []
-                    this.$refs.getParam.paramTableShow.forEach((item, index) => {
-                        const vt = item.source_type === 'custom' ? 'custom' : 'variable'
-                        const ite = {
-                            value: this.basicsFormData.projectId,
-                            name: item.name,
-                            key: item.key || 1,
-                            value_type: vt,
-                            type: item.custom_type
-                        }
-                        formData.push(ite)
-                    })
-                    const biz = formData.splice(0, 1)[0]
-                    this.constants.map(item => {
-                        // renderForm的formData与constant匹配的key
-                        const formKey = Object.keys(this.$refs.getParam.formData).filter(key => key === item.key)
-                        const vt = item.source_type === 'custom' ? 'custom' : 'variable'
-                        const { name, key } = item
-                        if (item.show_type === 'show') {
-                            const formTeamlate = {
-                                value: this.$refs.getParam.formData[formKey],
-                                name,
-                                key: key || 1,
+                    if (this.renderFormValidate) {
+                        const formData = []
+                        this.biz.forEach(item => {
+                            const vt = item.source_type === 'custom' ? 'custom' : 'variable'
+                            const ite = {
+                                value: this.basicsFormData.projectId,
+                                name: item.name,
+                                key: item.key || 1,
                                 value_type: vt,
                                 type: item.custom_type
                             }
-                            formData.push(formTeamlate)
-                        }
-                    })
-                    const params = {
-                        'extras': {
-                            'sops_info': {
-                                'bk_biz_id': biz,
-                                'template_id': this.basicsFormData.templateId,
-                                'constants': formData,
-                                'exclude_task_nodes_id': this.excludeTaskNodesId,
-                                'template_source': this.basicsFormData.processType
-                            }
-                        },
-                        'is_draft': false,
-                        'is_terminable': false,
-                        'name': this.configur.name,
-                        'type': 'TASK-SOPS',
-                        'workflow': this.configur.workflow
-                    }
-                    const stateId = this.configur.id
-                    this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then((res) => {
-                        this.$bkMessage({
-                            message: this.$t(`m.treeinfo["保存成功"]`),
-                            theme: 'success'
+                            formData.push(ite)
                         })
-                        this.$parent.closeConfigur()
-                    }, (res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                    })
+                        const biz = formData.splice(0, 1)[0]
+                        this.constants.map(item => {
+                            // renderForm的formData与constant匹配的key
+                            const formKey = Object.keys(this.$refs.getParam.formData).filter(key => key === item.key)
+                            const vt = item.source_type === 'custom' ? 'custom' : 'variable'
+                            const { name, key } = item
+                            if (item.show_type === 'show') {
+                                const formTeamlate = {
+                                    value: this.$refs.getParam.formData[formKey],
+                                    name,
+                                    key: key || 1,
+                                    value_type: vt,
+                                    type: item.custom_type
+                                }
+                                formData.push(formTeamlate)
+                            }
+                        })
+                        const params = {
+                            'extras': {
+                                'sops_info': {
+                                    'bk_biz_id': biz,
+                                    'template_id': this.basicsFormData.templateId,
+                                    'constants': formData,
+                                    'exclude_task_nodes_id': this.excludeTaskNodesId,
+                                    'template_source': this.basicsFormData.processType
+                                }
+                            },
+                            'is_draft': false,
+                            'is_terminable': false,
+                            'name': this.configur.name,
+                            'type': 'TASK-SOPS',
+                            'workflow': this.configur.workflow
+                        }
+                        const stateId = this.configur.id
+                        this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then((res) => {
+                            this.$bkMessage({
+                                message: this.$t(`m.treeinfo["保存成功"]`),
+                                theme: 'success'
+                            })
+                            this.$parent.closeConfigur()
+                        }, (res) => {
+                            errorHandler(res, this)
+                        }).finally(() => {
+                        })
+                    }
                 })
             }
         }
@@ -507,6 +530,9 @@
         padding-bottom: 20px;
         border-bottom: 1px solid #E9EDF1;
         margin-bottom: 20px;
+    }
+    .bk-form {
+        width: 520px;
     }
     .bk-form-width {
         width: 340px;
