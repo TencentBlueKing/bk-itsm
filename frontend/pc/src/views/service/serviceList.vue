@@ -343,7 +343,8 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
+                    ordering: '-update_at'
                 }
 
                 this.moreSearch.forEach(item => {
