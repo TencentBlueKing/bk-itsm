@@ -305,17 +305,6 @@
                             }
                         })
                     })
-                    if (this.excludeTaskNodesId.length !== 0) {
-                        this.planList.forEach(item => {
-                            if (item.data) {
-                                this.optionalNodeIdList.filter(ite => {
-                                    if (!JSON.parse(item.data).includes(ite)) {
-                                        this.basicsFormData.planId.push(item.id)
-                                    }
-                                })
-                            }
-                        })
-                    }
                 }
                 this.isLoading = false
             },
@@ -368,11 +357,10 @@
                 }
                 this.constants = []
                 this.sopsFormLoading = true
-                this.getTempaltePlanList(id)
                 await this.$store.dispatch('getTemplateDetail', params).then(res => {
                     this.constants = res.data.constants
                     this.optionalNodeIdList = res.data.all_ids || []
-                    this.basicsFormData.planId = ['']
+                    this.getTempaltePlanList(id)
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -391,10 +379,17 @@
                 this.planLoading = true
                 this.$store.dispatch('getTemplatePlanList', params).then(res => {
                     this.planList = res.data
-                    this.planList.push({
-                        id: '',
-                        name: this.$t('m.treeinfo["默认"]')
-                    })
+                    if (this.excludeTaskNodesId.length !== 0) {
+                        res.data.forEach(item => {
+                            if (item.data) {
+                                this.excludeTaskNodesId.filter(ite => {
+                                    if (!JSON.parse(item.data).includes(ite)) {
+                                        this.basicsFormData.planId.push(item.id)
+                                    }
+                                })
+                            }
+                        })
+                    }
                     this.onplanSelect(this.basicsFormData.planId)
                 }).catch(res => {
                     errorHandler(res, this)
@@ -443,12 +438,6 @@
             submit () {
                 if (this.$refs.getParam) {
                     this.renderFormValidate = this.$refs.getParam.getRenderFormValidate()
-                    if (!this.renderFormValidate) {
-                        this.$bkMessage({
-                            message: this.$t(`m['请输入表单参数']`),
-                            theme: 'error'
-                        })
-                    }
                 } else {
                     this.renderFormValidate = true
                 }
