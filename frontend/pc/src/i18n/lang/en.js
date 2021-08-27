@@ -2347,5 +2347,6 @@ export const m = {
     '请选择关联业务': 'Select the associated business',
     '请选择流程类型': 'Select the process type',
     '请选择流程模板': 'Select the process templates',
-    '选择执行方案，默认选择全部任务节点': 'Select the execution scheme. By default, all task nodes are selected'
+    '选择执行方案，默认选择全部任务节点': 'Select the execution scheme. By default, all task nodes are selected',
+    '请输入表单参数': 'Please enter form parameters'
 }

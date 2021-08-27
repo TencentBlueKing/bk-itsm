@@ -225,7 +225,7 @@
         },
         data () {
             return {
-                ordering: undefined,
+                ordering: '-update_at',
                 secondClick: false,
                 isDataLoading: false,
                 // 列表数据
