@@ -1126,6 +1126,7 @@
                             params.api_info = this.apiInfo.api_info
                             params.kv_relation = this.apiInfo.kv_relation
                         } else if (this.formInfo.source_type === 'DATADICT') {
+                            params.choice = []
                             params.source_uri = this.dictionaryData.check
                         }
                     }

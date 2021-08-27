@@ -53,6 +53,7 @@
                         :placeholder="$t(`m['请选择关联业务']`)"
                         searchable
                         :disabled="processDisable"
+                        @clear="onClearProcess"
                         @selected="getProjectTemplateList">
                         <bk-option
                             v-for="project in projectList"
@@ -335,6 +336,7 @@
                 }
                 if (this.basicsFormData.processType !== 'common') {
                     this.processesLoading = true
+                    this.basicsFormData.templateId = ''
                     const res = await this.$store.dispatch('getTemplateList', params)
                     if (res.result) {
                         this.templateList = res.data
@@ -357,6 +359,7 @@
                 }
                 this.constants = []
                 this.sopsFormLoading = true
+                this.basicsFormData.planId = []
                 await this.$store.dispatch('getTemplateDetail', params).then(res => {
                     this.constants = res.data.constants
                     this.optionalNodeIdList = res.data.all_ids || []
@@ -370,7 +373,6 @@
             // 获取模板任务列表
             getTempaltePlanList (id) {
                 const template = this.templateList.find(template => template.id === id)
-                this.basicsFormData.planId = []
                 this.planList = []
                 const params = {
                     bk_biz_id: template.bk_biz_id,
@@ -432,6 +434,13 @@
                 }).finally(() => {
                 })
             },
+            onClearProcess () {
+                this.templateList = []
+                this.basicsFormData.templateId = ''
+                this.planList = []
+                this.templateDisable = true
+                this.planDisable = true
+            },
             closeNode () {
                 this.$parent.closeConfigur()
             },
@@ -484,7 +493,7 @@
                             },
                             'is_draft': false,
                             'is_terminable': false,
-                            'name': this.configur.name,
+                            'name': this.basicsFormData.name,
                             'type': 'TASK-SOPS',
                             'workflow': this.configur.workflow
                         }
