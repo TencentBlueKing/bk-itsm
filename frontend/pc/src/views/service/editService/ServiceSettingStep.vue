@@ -317,7 +317,7 @@
                     this.formData.notify_freq = Number(notifyFreq) / 3600
                 }
                 this.supervisePerson = {
-                    type: superviseType || 'STARTER',
+                    type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
                     value: supervisor
                 }
             },

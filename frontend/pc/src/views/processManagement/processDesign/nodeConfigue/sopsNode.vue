@@ -71,6 +71,7 @@
                         searchable
                         :disabled="templateDisable"
                         :loading="processesLoading"
+                        @clear="onClearTemplate"
                         @selected="getTemplateDetail">
                         <bk-option
                             v-for="template in templateList"
@@ -419,7 +420,7 @@
                 } else {
                     this.excludeTaskNodesId = []
                 }
-                const template = this.templateList.find(item => item.id === this.templateId)
+                const template = this.templateList.find(item => item.id === this.basicsFormData.templateId)
                 try {
                     this.sopsFormLoading = true
                     const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
@@ -455,11 +456,20 @@
                 })
             },
             onClearProcess () {
+                if (this.basicsFormData.processType !== 'common') {
+                    this.templateDisable = true
+                    this.planDisable = true
+                    this.constants = []
+                }
                 this.templateList = []
                 this.basicsFormData.templateId = ''
                 this.planList = []
-                this.templateDisable = true
-                this.planDisable = true
+            },
+            onClearTemplate () {
+                this.basicsFormData.planId = []
+                this.basicsFormData.templateId = ''
+                this.constants = []
+                this.planList = []
             },
             closeNode () {
                 this.$parent.closeConfigur()
