@@ -84,7 +84,7 @@
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         :disabled="planDisable"
-                        :placeholder="$t(`m['请选择执行方案']`)"
+                        :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
                         v-model="basicsFormData.planId"
                         multiple
                         :clearable="true"
@@ -399,12 +399,9 @@
                     this.planLoading = false
                 })
             },
-            onplanSelect (ids) {
+            async onplanSelect (ids) {
                 const planList = []
-                this.excludeTaskNodesId = []
-                if (ids.indexOf('') !== -1) {
-                    this.excludeTaskNodesId = []
-                } else {
+                if (ids.length > 0) {
                     ids.forEach(item => {
                         const plan = this.planList.find(plan => plan.id === item)
                         if (plan.data) {
@@ -419,6 +416,29 @@
                     this.excludeTaskNodesId = this.optionalNodeIdList.filter(nodeId => {
                         return !planList.includes(nodeId)
                     })
+                } else {
+                    this.excludeTaskNodesId = []
+                }
+                const template = this.templateList.find(item => item.id === this.templateId)
+                try {
+                    this.sopsFormLoading = true
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
+                        bk_biz_id: template.bk_biz_id,
+                        template_id: template.id,
+                        exclude_task_nodes_id: this.excludeTaskNodesId
+                    })
+                    const constants = []
+                    for (const key in res.data.pipeline_tree.constants) {
+                        if (res.data.pipeline_tree.constants[key].show_type === 'show') {
+                            constants.push(res.data.pipeline_tree.constants[key])
+                        }
+                    }
+                    constants.sort((a, b) => a.index - b.index)
+                    this.constants = constants
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    this.sopsFormLoading = false
                 }
             },
             async getRelatedFields () {
