@@ -124,6 +124,7 @@
                         :tippy-options="{
                             hideOnClick: false
                         }"
+                        :disabled="!serviceTemplateDisable"
                         :on-show="createServicePopoverShow"
                         :on-hide="createServicePopoverHide">
                         <span class="dropdown-trigger-text">
@@ -143,7 +144,21 @@
                     <li class="create-way-item" v-for="way in serviceFormCreateWays" :key="way.key">
                         <i class="bk-icon" :class="way.icon"></i>
                         <p class="create-way-desc">{{ way.name }}</p>
-                        <bk-button ext-cls="button-item" theme="default" @click="onCreateFormWayCLick(way)">{{ $t(`m.tickets['选择']`) }}</bk-button>
+                        <div class="button-tips"
+                            v-bk-tooltips.top="{
+                                content: $t(`m['请先创建服务后再进行操作']`),
+                                boundary: 'window',
+                                disabled: serviceTemplateDisable,
+                                always: true
+                            }">
+                            <bk-button
+                                :disabled="!serviceTemplateDisable"
+                                ext-cls="button-item"
+                                theme="default"
+                                @click="onCreateFormWayCLick(way)">
+                                {{ $t(`m.tickets['选择']`) }}
+                            </bk-button>
+                        </div>
                     </li>
                 </ul>
                 <div v-else class="create-service-form" v-bkloading="{ isLoading: formLoading }">
@@ -258,7 +273,9 @@
                 pending: {
                     deleteField: false,
                     saveField: false
-                }
+                },
+                serviceTemplateDisable: false
+
             }
         },
         computed: {
@@ -280,6 +297,7 @@
             this.rules.key = this.checkCommonRules('required').required
             this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source
             this.isBasicFormEditting = this.type === 'new'
+            this.serviceTemplateDisable = this.serviceId !== ''
         },
         async mounted () {
             this.getPublicFieldList()
@@ -850,8 +868,10 @@
                 font-size: 14px;
                 color: #737987;
             }
-            .button-item {
-                margin-top: 25px;
+            .button-tips {
+                .button-item {
+                    margin-top: 25px;
+                }
             }
         }
     }
