@@ -336,6 +336,7 @@
                 }
                 if (this.basicsFormData.processType !== 'common') {
                     this.processesLoading = true
+                    this.basicsFormData.templateId = ''
                     const res = await this.$store.dispatch('getTemplateList', params)
                     if (res.result) {
                         this.templateList = res.data
