@@ -395,11 +395,11 @@
                     const { type, value } = this.$refs.supervisePerson.getValue()
                     workflow.supervise_type = type
                     workflow.supervisor = value
-                } else {
-                    workflow.supervise_type = 'EMPTY'
-                    workflow.supervisor = ''
+                    if (type === 'STARTER') {
+                        workflow.supervise_type = 'EMPTY'
+                        workflow.supervisor = ''
+                    }
                 }
-
                 // 通知方式
                 workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
                 const canNotice = !!notify.length
