@@ -39,10 +39,18 @@ from itsm.component.constants import (
     LEN_MIDDLE,
     LEN_NORMAL,
     LEN_XX_LONG,
-    SERVICE_CHOICE, LEN_SHORT,
-    DEFAULT_ENGINE_VERSION, NOTIFY_RULE_CHOICES, PROCESSOR_CHOICES, OPEN, SERVICE_SOURCE_CHOICES
+    SERVICE_CHOICE,
+    LEN_SHORT,
+    DEFAULT_ENGINE_VERSION,
+    NOTIFY_RULE_CHOICES,
+    PROCESSOR_CHOICES,
+    OPEN,
+    SERVICE_SOURCE_CHOICES,
 )
-from itsm.component.drf.serializers import DynamicFieldsModelSerializer, AuthModelSerializer
+from itsm.component.drf.serializers import (
+    DynamicFieldsModelSerializer,
+    AuthModelSerializer,
+)
 from itsm.component.exceptions import ServiceCatalogValidateError
 from itsm.component.utils.basic import dotted_name, list_by_separator, normal_name
 from itsm.component.utils.misc import transform_single_username
@@ -66,7 +74,9 @@ from itsm.workflow.serializers import NotifySerializer
 class FavoriteSerializer(serializers.ModelSerializer):
     """收藏序列化"""
 
-    name = serializers.CharField(required=False, initial=EMPTY_STRING, max_length=LEN_LONG)
+    name = serializers.CharField(
+        required=False, initial=EMPTY_STRING, max_length=LEN_LONG
+    )
     service = serializers.CharField(required=True, max_length=LEN_NORMAL)
     data = JSONField(required=True, initial=EMPTY_LIST)
 
@@ -80,7 +90,10 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
         instance, created = Favorite.objects.update_or_create(
             defaults={"data": validated_data.pop("data")},
-            **{"user": validated_data.pop("user"), "service": validated_data.pop("service"), }
+            **{
+                "user": validated_data.pop("user"),
+                "service": validated_data.pop("service"),
+            }
         )
 
         return instance
@@ -103,14 +116,20 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
 
     level = serializers.IntegerField(required=False, min_value=0)
     name = serializers.CharField(
-        required=True, error_messages={"blank": _("名称不能为空")}, validators=[name_validator],
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        validators=[name_validator],
         max_length=LEN_NORMAL,
     )
     # allow_blank -> 允许字段为空字符串
     desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
 
-    parent__id = serializers.CharField(required=False, allow_blank=True, source="parent.id")
-    parent__name = serializers.CharField(required=False, allow_blank=True, source="parent.name")
+    parent__id = serializers.CharField(
+        required=False, allow_blank=True, source="parent.id"
+    )
+    parent__name = serializers.CharField(
+        required=False, allow_blank=True, source="parent.name"
+    )
 
     parent_key = serializers.CharField(required=False, allow_blank=True)
     parent_name = serializers.CharField(required=False, allow_blank=True)
@@ -156,8 +175,12 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
 
         # 同级下目录名不能重复
         if self.context["view"].action == "create":
-            if parent_object and parent_object.get_children().filter(is_deleted=False,
-                                                                     name=attrs["name"]).exists():
+            if (
+                parent_object
+                and parent_object.get_children()
+                .filter(is_deleted=False, name=attrs["name"])
+                .exists()
+            ):
                 raise ServiceCatalogValidateError(_("同级下目录名不能重复，请修改后提交"))
         if self.context["view"].action == "update":
             if (
@@ -186,7 +209,7 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
             "parent__name",
             "name",
             "desc",
-            "project_key"
+            "project_key",
         )
         # 只读字段在创建和更新时均被忽略
         read_only_fields = (
@@ -202,7 +225,9 @@ class ServiceCatalogSerializer(serializers.ModelSerializer):
 class ServiceCatalogShortcutSerializer(serializers.ModelSerializer):
     """服务目录简化序列化"""
 
-    parent_id = serializers.CharField(required=False, allow_blank=True, source="parent.id")
+    parent_id = serializers.CharField(
+        required=False, allow_blank=True, source="parent.id"
+    )
     parent_name = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
@@ -224,14 +249,21 @@ class SlaSerializer(serializers.ModelSerializer):
         required=True,
         error_messages={"blank": _("名称为必填项")},
         max_length=8,
-        validators=[UniqueValidator(queryset=OldSla.objects.all(), message=_("服务级别名已存在，请重新输入")),
-                    name_validator],
+        validators=[
+            UniqueValidator(queryset=OldSla.objects.all(), message=_("服务级别名已存在，请重新输入")),
+            name_validator,
+        ],
     )
     key = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
-    level = serializers.ChoiceField(choices=OldSla.level_choices,
-                                    error_messages={"invalid_choice": _("选项不合法")})
-    resp_time = serializers.CharField(required=True, error_messages={"blank": _("响应时间为必填项")})
-    deal_time = serializers.CharField(required=True, error_messages={"blank": _("处理时间为必填项")})
+    level = serializers.ChoiceField(
+        choices=OldSla.level_choices, error_messages={"invalid_choice": _("选项不合法")}
+    )
+    resp_time = serializers.CharField(
+        required=True, error_messages={"blank": _("响应时间为必填项")}
+    )
+    deal_time = serializers.CharField(
+        required=True, error_messages={"blank": _("处理时间为必填项")}
+    )
     desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
 
     class Meta:
@@ -271,8 +303,9 @@ class SlaSerializer(serializers.ModelSerializer):
 class ServiceSlaSerializer(serializers.ModelSerializer):
     """服务与SLA关联表序列化"""
 
-    name = serializers.CharField(required=True, error_messages={"blank": _("协议名称不能为空")},
-                                 max_length=LEN_LONG)
+    name = serializers.CharField(
+        required=True, error_messages={"blank": _("协议名称不能为空")}, max_length=LEN_LONG
+    )
     service_id = serializers.IntegerField(required=False, allow_null=True)
     lines = JSONField(required=False, initial=EMPTY_LIST)
     states = JSONField(required=False, initial=EMPTY_LIST)
@@ -295,12 +328,16 @@ class ServiceSerializer(AuthModelSerializer):
         ],
     )
     key = serializers.CharField(
-        required=True, error_messages={"blank": _("编码不能为空")}, max_length=LEN_LONG,
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_LONG,
         validators=[key_validator],
     )
     workflow_name = serializers.CharField(source="workflow.name", required=False)
     workflow = serializers.IntegerField(required=False, source="workflow.id")
-    version_number = serializers.CharField(source="workflow.version_number", required=False)
+    version_number = serializers.CharField(
+        source="workflow.version_number", required=False
+    )
     desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
     is_valid = serializers.BooleanField(required=False)
     display_type = serializers.ChoiceField(required=False, choices=DISPLAY_CHOICES)
@@ -308,32 +345,34 @@ class ServiceSerializer(AuthModelSerializer):
     catalog_id = serializers.IntegerField(required=False)
     project_key = serializers.CharField(required=True, max_length=LEN_SHORT)
     source = serializers.ChoiceField(required=False, choices=SERVICE_SOURCE_CHOICES)
-    owners = serializers.CharField(required=False, error_messages={"blank": _("服务负责人不能为空")})
+    owners = serializers.CharField(
+        required=False, error_messages={"blank": _("服务负责人不能为空")}
+    )
     # TODO sla开始节点结束节点交叉校验
     sla = ServiceSlaSerializer(required=False, many=True)
 
     class Meta:
         model = Service
         fields = (
-                     "id",
-                     "key",
-                     "name",
-                     "desc",
-                     "workflow",
-                     "workflow_name",
-                     "version_number",
-                     "bounded_catalogs",
-                     "bounded_relations",
-                     "catalog_id",
-                     "is_valid",
-                     "display_type",
-                     "display_role",
-                     "owners",
-                     "can_ticket_agency",
-                     "sla",
-                     "source",
-                     "project_key",
-                 ) + model.DISPLAY_FIELDS
+            "id",
+            "key",
+            "name",
+            "desc",
+            "workflow",
+            "workflow_name",
+            "version_number",
+            "bounded_catalogs",
+            "bounded_relations",
+            "catalog_id",
+            "is_valid",
+            "display_type",
+            "display_role",
+            "owners",
+            "can_ticket_agency",
+            "sla",
+            "source",
+            "project_key",
+        ) + model.DISPLAY_FIELDS
         read_only_fields = model.DISPLAY_FIELDS
 
     def __init__(self, instance=None, data=empty, **kwargs):
@@ -342,12 +381,16 @@ class ServiceSerializer(AuthModelSerializer):
 
     def get_favorite_users(self):
         services = (
-            [self.instance] if isinstance(self.instance,
-                                          Service) else [] if self.instance is None else self.instance
+            [self.instance]
+            if isinstance(self.instance, Service)
+            else []
+            if self.instance is None
+            else self.instance
         )
         service_ids = [service.id for service in services]
-        users = FavoriteService.objects.filter(service_id__in=service_ids).values("service_id",
-                                                                                  "user")
+        users = FavoriteService.objects.filter(service_id__in=service_ids).values(
+            "service_id", "user"
+        )
         service_user_map = {}
         for user in users:
             service_user_map.setdefault(user["service_id"], []).append(user["user"])
@@ -435,8 +478,10 @@ class ServiceSerializer(AuthModelSerializer):
         data["first_state_id"] = workflow_instance.first_state.id
         data["workflow_id"] = instance.workflow.workflow_id
         data["is_biz_needed"] = workflow_instance.is_biz_needed
-        data["notify"] = [{"type": notify.type, "name": notify.name} for notify in
-                          workflow_instance.notify.all()]
+        data["notify"] = [
+            {"type": notify.type, "name": notify.name}
+            for notify in workflow_instance.notify.all()
+        ]
         data["notify_rule"] = workflow_instance.notify_rule
         data["notify_freq"] = workflow_instance.notify_freq
         data["is_supervise_needed"] = workflow_instance.is_supervise_needed
@@ -447,12 +492,91 @@ class ServiceSerializer(AuthModelSerializer):
         return self.update_auth_actions(instance, data)
 
 
+class ServiceListSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        max_length=LEN_MIDDLE,
+        validators=[
+            UniqueValidator(queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")),
+            # name_validator
+        ],
+    )
+    key = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_LONG,
+        validators=[key_validator],
+    )
+
+    def __init__(self, instance=None, data=empty, **kwargs):
+        super(ServiceListSerializer, self).__init__(instance, data, **kwargs)
+        service_ids = self.get_service_ids()
+        self.favorite_service = self.get_favorite_users(service_ids)
+        self.service_catalogs_map = self.get_service_catalogs(service_ids)
+
+    def get_service_ids(self):
+        """
+        一次性获取所有的service.id,方便后面的查询
+        return [service.id]
+        """
+        services = (
+            [self.instance]
+            if isinstance(self.instance, Service)
+            else []
+            if self.instance is None
+            else self.instance
+        )
+        return [service["id"] for service in services]
+
+    def get_service_catalogs(self, service_ids):
+        """
+        获取用户所有部门的catalogs
+        """
+        service_catalogs_map = {
+            cs.service_id: [cs.catalog.name]
+            for cs in CatalogService.objects.filter(service_id__in=service_ids)
+        }
+        return service_catalogs_map
+
+    def get_favorite_users(self, service_ids):
+        """
+        获取用户最喜欢的服务
+        """
+        users = FavoriteService.objects.filter(service_id__in=service_ids).values(
+            "service_id", "user"
+        )
+        service_user_map = {}
+        for user in users:
+            service_user_map.setdefault(user["service_id"], []).append(user["user"])
+        return service_user_map
+
+    def to_representation(self, instance):
+        data = super(ServiceListSerializer, self).to_representation(instance)
+        username = self.context["request"].user.username
+        data["favorite"] = username in self.favorite_service.get(instance["id"], [])
+        data["bounded_catalogs"] = self.service_catalogs_map.get(instance["id"], [])
+        return data
+
+    class Meta:
+        model = Service
+        fields = (
+            "id",
+            "key",
+            "name",
+        )
+
+
 class CatalogServiceSerializer(serializers.ModelSerializer):
     """服务目录关联序列化"""
 
     class Meta:
         model = CatalogService
-        fields = ("id", "catalog", "service",) + model.DISPLAY_FIELDS
+        fields = (
+            "id",
+            "catalog",
+            "service",
+        ) + model.DISPLAY_FIELDS
         read_only_fields = model.DISPLAY_FIELDS
 
 
@@ -494,11 +618,16 @@ class DictDataSerializer(serializers.ModelSerializer):
     """数据字典数据项序列化"""
 
     key = serializers.CharField(
-        required=True, error_messages={"blank": _("编码不能为空")}, max_length=LEN_MIDDLE,
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_MIDDLE,
         validators=[key_validator],
     )
-    name = serializers.CharField(required=True, error_messages={"blank": _("名称不能为空")},
-                                 max_length=LEN_MIDDLE, )
+    name = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        max_length=LEN_MIDDLE,
+    )
     # validators=[name_validator])
     order = serializers.IntegerField(required=False, min_value=1)
 
@@ -517,8 +646,14 @@ class DictDataSerializer(serializers.ModelSerializer):
             "is_builtin",
             "dict_table",
         )
-        read_only_fields = ("id", "level", "is_readonly", "is_builtin", "parent_key",
-                            "parent_name",) + model.FIELDS
+        read_only_fields = (
+            "id",
+            "level",
+            "is_readonly",
+            "is_builtin",
+            "parent_key",
+            "parent_name",
+        ) + model.FIELDS
 
 
 class SysDictSerializer(DynamicFieldsModelSerializer):
@@ -528,18 +663,32 @@ class SysDictSerializer(DynamicFieldsModelSerializer):
         required=True,
         error_messages={"blank": _("编码不能为空")},
         max_length=LEN_MIDDLE,
-        validators=[UniqueValidator(queryset=SysDict.objects.all(), message=_("编码已存在，请重新输入")),
-                    key_validator, ],
+        validators=[
+            UniqueValidator(queryset=SysDict.objects.all(), message=_("编码已存在，请重新输入")),
+            key_validator,
+        ],
     )
-    name = serializers.CharField(required=True, error_messages={"blank": _("名称不能为空")},
-                                 max_length=LEN_MIDDLE, )
-    owners = serializers.CharField(required=False, max_length=LEN_XX_LONG, allow_blank=True)
+    name = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        max_length=LEN_MIDDLE,
+    )
+    owners = serializers.CharField(
+        required=False, max_length=LEN_XX_LONG, allow_blank=True
+    )
     desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
 
     class Meta:
         model = SysDict
-        fields = ("id", "key", "name", "owners", "desc", "is_enabled",
-                  "is_readonly",) + model.DISPLAY_FIELDS
+        fields = (
+            "id",
+            "key",
+            "name",
+            "owners",
+            "desc",
+            "is_enabled",
+            "is_readonly",
+        ) + model.DISPLAY_FIELDS
 
         read_only_fields = model.DISPLAY_FIELDS
 
@@ -558,11 +707,15 @@ class SysDictSerializer(DynamicFieldsModelSerializer):
 
 class DictKeySerializer(serializers.Serializer):
     key = serializers.CharField(
-        required=True, error_messages={"blank": _("编码不能为空")}, max_length=LEN_MIDDLE,
-        validators=[key_validator]
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_MIDDLE,
+        validators=[key_validator],
     )
     service = serializers.ChoiceField(required=False, choices=SERVICE_CHOICE)
-    view_type = serializers.ChoiceField(required=False, choices=["list", "tree", "sets"])
+    view_type = serializers.ChoiceField(
+        required=False, choices=["list", "tree", "sets"]
+    )
 
 
 class WorkFlowConfigSerializer(serializers.Serializer):
@@ -570,12 +723,15 @@ class WorkFlowConfigSerializer(serializers.Serializer):
     revoke_config = serializers.DictField(required=True)
     notify = NotifySerializer(required=True, allow_null=True, many=True)
     notify_freq = serializers.IntegerField(required=False)  # 重试间隔
-    notify_rule = serializers.ChoiceField(required=False, allow_blank=True,
-                                          choices=NOTIFY_RULE_CHOICES)  # 重试规则
+    notify_rule = serializers.ChoiceField(
+        required=False, allow_blank=True, choices=NOTIFY_RULE_CHOICES
+    )  # 重试规则
     extras = serializers.JSONField(required=False)
     is_supervise_needed = serializers.BooleanField(required=True)
     supervise_type = serializers.ChoiceField(required=True, choices=PROCESSOR_CHOICES)
-    supervisor = serializers.CharField(required=True, max_length=LEN_LONG, allow_blank=True)
+    supervisor = serializers.CharField(
+        required=True, max_length=LEN_LONG, allow_blank=True
+    )
 
 
 class ServiceConfigSerializer(serializers.Serializer):

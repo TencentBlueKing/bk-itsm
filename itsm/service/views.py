@@ -77,6 +77,7 @@ from itsm.service.serializers import (
     SysDictSerializer,
     DictKeySerializer,
     ServiceConfigSerializer,
+    ServiceListSerializer,
 )
 from itsm.sla.models import PriorityMatrix
 from mptt.exceptions import InvalidMove
@@ -424,10 +425,10 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     @action(detail=False, methods=["get"], permission_classes=())
     def all(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        serializer_class = self.get_serializer_class()
+        serializer_class = ServiceListSerializer
         queryset = Service.objects.filter(
             display_type__in=[OPEN, GENERAL, ORGANIZATION], is_valid=True
-        )
+        ).values("id", "key", "name")
         conditions = Service.permission_filter(request.user.username)
         queryset = queryset.filter(reduce(operator.or_, conditions))
         serializer = serializer_class(queryset, many=True, context=context)
