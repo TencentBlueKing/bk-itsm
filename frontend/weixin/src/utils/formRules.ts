@@ -22,7 +22,7 @@
 
 export interface IValidator {
   message: string;
-  validator (val: string): boolean;
+  validator: boolean;
 }
 
 export const LINK_REG = /(http|https):\/\/([\w.]+\/?)\S*/

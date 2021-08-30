@@ -1343,6 +1343,8 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '请输入选项ID': 'Please enter the option ID',
+        '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
         '任何节点，提单人都可撤回单据': 'At any node, the ticket can withdraw',
         '提单后，单据未被处理流转前，提单人可以撤回': 'After the ticket of created, the tikcet of created can be withdrawn before the ticket is not processed',
@@ -1411,6 +1413,8 @@ export const m = {
         '格式：英文数字及下划线，长度1~32': 'Format: 32 chars includes a~z or A~Z or 0~9 or _',
         '失败': 'Failed ',
         '更新人': 'Updater ',
+        '最近更新人': 'Last updater',
+        '最近更新时间': 'Last updated',
         '派单人不能为空': 'Assigner is required ',
         '处理人不能为空': 'Processor is required ',
         '请输入参数值，换行分隔': 'Please enter the value of the parameter, which is separated by line breaks ',
@@ -2334,5 +2338,16 @@ export const m = {
     '在这里，你可以按需定制化设计服务流程，来满足不同场景的 IT服务诉求，设置 SLA 保障流程的质量把控，帮助企业规范、高效的管理各种应用场景的流程。': 'Here, you can customize the design of the service process as needed to meet the IT service demands of different scenarios, set the quality control of the SLA guarantee process, and help the enterprise manage the processes of various application scenarios in a standardized and efficient manner.',
     '第一次使用流程服务？ 一键带你快速入门': 'Use process service for the first time? One-click to get you started',
     '了解更详细的流程服务产品架构和功能介绍，点击查阅产品白皮书': 'To understand more detailed process service product architecture and function introduction, click to view the product white paper',
-    '申请项目权限': 'Apply for project permissions'
+    '申请项目权限': 'Apply for project permissions',
+    '请选择执行方案': 'Please select the execution scheme',
+    '关联业务：': 'Associated business',
+    '流程类型：': 'Process type',
+    '流程模板：': 'Process templates',
+    '执行方案：': 'Implementation scheme',
+    '请选择关联业务': 'Select the associated business',
+    '请选择流程类型': 'Select the process type',
+    '请选择流程模板': 'Select the process templates',
+    '选择执行方案，默认选择全部任务节点': 'Select the execution scheme. By default, all task nodes are selected',
+    '请输入表单参数': 'Please enter form parameters',
+    '请先创建服务后再进行操作': 'Create the service before performing the operation'
 }

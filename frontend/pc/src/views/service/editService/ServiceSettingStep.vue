@@ -317,7 +317,7 @@
                     this.formData.notify_freq = Number(notifyFreq) / 3600
                 }
                 this.supervisePerson = {
-                    type: superviseType || 'STARTER',
+                    type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
                     value: supervisor
                 }
             },
@@ -395,11 +395,11 @@
                     const { type, value } = this.$refs.supervisePerson.getValue()
                     workflow.supervise_type = type
                     workflow.supervisor = value
-                } else {
-                    workflow.supervise_type = 'EMPTY'
-                    workflow.supervisor = ''
+                    if (type === 'STARTER') {
+                        workflow.supervise_type = 'EMPTY'
+                        workflow.supervisor = ''
+                    }
                 }
-
                 // 通知方式
                 workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
                 const canNotice = !!notify.length
@@ -416,9 +416,9 @@
                     workflow.extras = {}
                     workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams()
                 }
-                await this.saveAndActionService(params)
+                const checkResult = await this.saveAndActionService(params)
                 
-                const checkResult = await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
+                await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
                 if (!checkResult.result) {
                     this.slaValidateMsg = checkResult.data.messages
                     this.slaValidateDialogShow = true

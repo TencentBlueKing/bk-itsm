@@ -41,6 +41,7 @@
                     class="ml10 filter-btn"
                     @click="onShowSearchMore">
                 </bk-button>
+                <i style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
             </div>
         </div>
         <!-- 高级搜索 -->
@@ -123,6 +124,30 @@
                 </div>
             </div>
         </collapse-transition>
+        <!-- 单据高亮设置 -->
+        <bk-dialog
+            v-model="isHighlightSetting"
+            width="560"
+            :draggable="false"
+            @confirm="highlightSettingConfirm">
+            <p slot="header" style="text-align: left;">
+                {{$t(`m.slaContent["单据高亮设置"]`)}}
+            </p>
+            <div class="bk-highlight-setting">
+                <div class="bk-itsm-version">
+                    <i class="bk-icon icon-info-circle"></i>
+                    <span>{{ $t('m.slaContent["对特殊单据，如预警单和超时单设置颜色高亮提醒。"]') }}</span>
+                </div>
+                <div class="bk-color-box">
+                    <span>{{ $t('m.slaContent["预警单据背景颜色"]') }} :</span>
+                    <bk-color-picker v-model="highlightObj.reply_timeout_color"></bk-color-picker>
+                </div>
+                <div class="bk-color-box">
+                    <span>{{ $t('m.slaContent["超时单据背景颜色"]') }} :</span>
+                    <bk-color-picker v-model="highlightObj.handle_timeout_color"></bk-color-picker>
+                </div>
+            </div>
+        </bk-dialog>
     </div>
 </template>
 
@@ -151,6 +176,11 @@
         },
         data () {
             return {
+                isHighlightSetting: false,
+                highlightObj: {
+                    reply_timeout_color: '#FFF5E3',
+                    handle_timeout_color: '#FFECEC'
+                },
                 showMore: false,
                 searchWord: '',
                 searchForms: []
@@ -164,6 +194,9 @@
                 deep: true,
                 immediate: true
             }
+        },
+        created () {
+            this.getTicketHighlight()
         },
         methods: {
             // 过滤参数
@@ -208,6 +241,35 @@
             // change 事件，执行 form 中的回调函数
             onFormChange (val, form) {
                 this.$emit('formChange', form.key, val, this.searchForms)
+            },
+            getTicketHighlight () {
+                this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
+                    this.highlightObj = data.items[0]
+                }).catch(res => {
+                    this.$bkMessage({
+                        message: res.data.msg,
+                        theme: 'error'
+                    })
+                })
+            },
+            highlightSettingConfirm () {
+                this.isHighlightSetting = false
+                this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
+                    if (result) {
+                        this.$bkMessage({
+                            message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
+                            theme: 'success'
+                        })
+                        this.$emit('onChangeHighlight')
+                    } else {
+                        this.getTicketHighlight()
+                    }
+                }).catch(res => {
+                    this.$bkMessage({
+                        message: res.data.msg,
+                        theme: 'error'
+                    })
+                })
             }
         }
     }
@@ -284,6 +346,24 @@
         .bk-filter {
             .bk-filter-line {
                 width: 25%;
+            }
+        }
+    }
+    .bk-highlight-setting {
+        position: relative;
+        padding-top: 14px;
+        .bk-itsm-version {
+            position: absolute;
+            left: 0;
+            top: -26px;
+            width: 100%;
+        }
+        .bk-color-box {
+            padding-left: 20px;
+            color: #63656E;
+            margin-top: 30px;
+            span {
+                margin-right: 8px;
             }
         }
     }

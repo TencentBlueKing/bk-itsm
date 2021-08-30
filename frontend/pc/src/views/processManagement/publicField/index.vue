@@ -86,6 +86,7 @@
                     :data="dataList"
                     :size="'small'"
                     :pagination="pagination"
+                    @sort-change="handleSortChange"
                     @page-change="handlePageChange"
                     @page-limit-change="handlePageLimitChange">
                     <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
@@ -126,9 +127,17 @@
                             <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['更新人']`)" width="150">
+                    <bk-table-column :label="$t(`m.treeinfo['最近更新人']`)" width="150">
                         <template slot-scope="props">
                             <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column
+                        sortable
+                        :sort-orders="['descending', 'ascending', null]"
+                        :label="$t(`m.treeinfo['最近更新时间']`)" width="150">
+                        <template slot-scope="props">
+                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
@@ -216,6 +225,7 @@
         },
         data () {
             return {
+                ordering: '-update_at',
                 secondClick: false,
                 isDataLoading: false,
                 // 列表数据
@@ -344,7 +354,8 @@
                 }
                 const params = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
+                    ordering: this.ordering
                 }
                 params.project_key = this.projectId || 'public'
                 // 过滤条件
@@ -379,6 +390,15 @@
                 })
             },
             // 分页过滤数据
+            handleSortChange (data) {
+                const { order } = data
+                if (order === 'descending') {
+                    this.ordering = '-update_at'
+                } else {
+                    this.ordering = undefined
+                }
+                this.getList()
+            },
             handlePageLimitChange () {
                 this.pagination.limit = arguments[0]
                 this.getList()

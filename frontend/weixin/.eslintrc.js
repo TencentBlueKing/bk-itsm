@@ -26,7 +26,7 @@
  */
 
 module.exports = {
-    parser:  'vue-eslint-parser',
+    parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
         ecmaVersion: 2018,
@@ -39,8 +39,7 @@ module.exports = {
     },
     extends: [
         'plugin:vue/vue3-recommended',
-        '@tencent/eslint-config-tencent',
-        '@tencent/eslint-config-tencent/ts'
+        'eslint-config-tencent'
     ],
     env: {
         browser: true,
@@ -65,10 +64,6 @@ module.exports = {
         'linebreak-style': ["off", "windows"],
         "no-param-reassign": [2, { "props": false }],
         "newline-per-chained-call": ["warn", { "ignoreChainWithDepth": 5 }],
-        'camelcase': ["off"],
-        // ts
-        "@typescript-eslint/indent": ['error', 2],
-        "@typescript-eslint/semi": ["error", "never"],
-        "@typescript-eslint/naming-convention": ["off"]
+        'camelcase': ["off"]
     }
 }

@@ -94,7 +94,7 @@
                         </template>
                         <template v-else>
                             <bk-checkbox
-                                v-bk-tooltips.top="{
+                                v-bk-tooltips.right="{
                                     content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
                                     disabled: !props.row.bounded_catalogs[0],
                                     boundary: 'window',
@@ -149,7 +149,7 @@
                         </template>
                     </template>
                 </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
+                <!-- <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
                     <template slot-scope="props">
                         <span class="bk-lable-primary"
                             @click="processShow(props.row)"
@@ -157,12 +157,7 @@
                             {{ props.row.workflow_name }} ({{ props.row.version_number }})
                         </span>
                     </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['服务负责人']`)" min-width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.owners || '--'">{{ props.row.owners || '--' }}</span>
-                    </template>
-                </bk-table-column>
+                </bk-table-column> -->
                 <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
                     <template slot-scope="props">
                         <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>
@@ -348,7 +343,8 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
+                    ordering: '-update_at'
                 }
 
                 this.moreSearch.forEach(item => {
@@ -591,5 +587,10 @@
 }
 .filter-btn /deep/ .icon-search-more {
     font-size: 14px;
+}
+.bk-form-checkbox {
+    padding: 0;
+    width: 16px;
+    margin: 0 auto;
 }
 </style>

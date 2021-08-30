@@ -116,6 +116,9 @@
                 this.$emit('setConfigStatus', val)
             }
         },
+        created () {
+            this.$emit('setConfigStatus', this.isShowNodeConfig)
+        },
         mounted () {
             if (this.processId) {
                 this.getFlowChart()
@@ -142,12 +145,10 @@
                 this.isShowNodeConfig = true
                 this.configur = data
             },
-            closeConfigur (update) {
+            closeConfigur () {
                 this.isShowNodeConfig = false
                 this.configur = {}
-                if (update) {
-                    this.$emit('updateFlowInfo')
-                }
+                this.$emit('updateFlowInfo')
             },
             // 保存节点位置
             submitFlow () {
@@ -183,6 +184,7 @@
                         this.$refs.flowInfo.errorNodes(this.errorList)
                     }
                     errorHandler(res, this)
+                    return { data: { result: false } }
                 })
             },
             validate () {

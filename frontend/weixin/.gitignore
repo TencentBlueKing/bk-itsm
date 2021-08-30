@@ -9,3 +9,4 @@ node_modules/
 *.sln
 
 dist/
+package-lock.json

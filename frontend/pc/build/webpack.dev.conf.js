@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 // 本地代理地址
 const HOST = ''
 const ORIGIN = `http://${HOST}`
-const SET_URL = '/t/itsm/'
+const SET_URL = ''
 
 module.exports = merge(webpackBase, {
     mode: 'development',

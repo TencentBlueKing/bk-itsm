@@ -28,8 +28,14 @@ export default {
     mutations: {},
     actions: {
         // 获取公共字段列表
-        get_template_fields ({ commit, state, dispatch }, params) {
+        get_template_common_fields ({ commit, state, dispatch }, params) {
             return ajax.get(`workflow/template_fields/mix_list/`, { params: params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        get_template_fields ({ commit, state, dispatch }, params) {
+            return ajax.get(`workflow/template_fields/`, { params: params }).then(response => {
                 let res = response.data
                 return res
             })

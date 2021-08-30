@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-get-param">
-        <bk-table :ext-cls="'bk-editor-table'"
+        <!-- <bk-table :ext-cls="'bk-editor-table'"
             :data="paramTableShow"
             :size="'small'">
             <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
@@ -75,7 +75,17 @@
                     </template>
                 </template>
             </bk-table-column>
-        </bk-table>
+        </bk-table> -->
+        <div class="sops-form">
+            <render-form
+                ref="renderForm"
+                :form-option="formOptions"
+                :constants="constants"
+                :context="context"
+                :key="renderKey"
+                v-model="formData">
+            </render-form>
+        </div>
         <div class="bk-add-slider" v-if="sliderInfo.show && isStatic === false">
             <bk-sideslider
                 :is-show.sync="sliderInfo.show"
@@ -105,7 +115,13 @@
             addField
         },
         props: {
-            paramTableData: {
+            context: {
+                type: Object,
+                default () {
+                    return {}
+                }
+            },
+            constants: {
                 type: Array,
                 default () {
                     return []
@@ -146,11 +162,20 @@
         },
         data () {
             return {
+                renderKey: '',
+                formData: {},
+                formOptions: {
+                    showRequired: true,
+                    showGroup: true,
+                    showLabel: true,
+                    showHook: false,
+                    showDesc: true
+                },
+                fieldList: [],
                 checkInfo: {
                     name: '',
                     road: ''
                 },
-                paramTableShow: [],
                 biz: [
                     {
                         name: this.$t(`m.treeinfo["业务"]`),
@@ -200,60 +225,53 @@
         },
         computed: {},
         watch: {
-            paramTableData: {
-                handler (newValue) {
-                    this.paramTableShow = []
-                    this.paramTableShow = this.paramTableShow.concat(this.biz, newValue)
-                    this.paramTableShow.forEach(item => {
-                        item.value = ''
-                        if (item.source_type === 'component_outputs') {
-                            item.source_type = 'component_inputs'
-                        }
-                    })
-                    if (this.configur.extras
-                        && this.configur.extras.sops_info
-                        && this.configur.extras.sops_info.template_id) {
-                        this.paramTableShow.forEach(
-                            (item, index) => {
-                                if (!index && this.configur.extras.sops_info.bk_biz_id) {
-                                    item.source_type = this.configur.extras.sops_info.bk_biz_id['value_type']
+            // paramTableData: {
+            //     handler (newValue) {
+            //         this.paramTableShow = []
+            //         this.paramTableShow = this.paramTableShow.concat(this.biz, newValue)
+            //         this.paramTableShow.forEach(item => {
+            //             item.value = ''
+            //             if (item.source_type === 'component_outputs') {
+            //                 item.source_type = 'component_inputs'
+            //             }
+            //         })
+            //         if (this.configur.extras
+            //             && this.configur.extras.sops_info
+            //             && this.configur.extras.sops_info.template_id) {
+            //             this.paramTableShow.forEach(
+            //                 (item, index) => {
+            //                     if (!index && this.configur.extras.sops_info.bk_biz_id) {
+            //                         item.source_type = this.configur.extras.sops_info.bk_biz_id['value_type']
 
-                                    item.value = this.configur.extras.sops_info.bk_biz_id['value']
-                                } else {
-                                    const current = this.configur.extras.sops_info.constants.filter(
-                                        ite => {
-                                            return ite.key === item.key
-                                        }
-                                    )[0]
-                                    if (current) {
-                                        item.source_type = current['value_type']
-                                        item.value = current['value']
-                                    }
-                                }
-                                if (item.source_type === 'variable') {
-                                    item.source_type = 'component_inputs'
-                                }
-                            }
-                        )
-                    }
-                },
-                deep: false
-            }
-        },
-        mounted () {
-            this.paramTableShow = this.paramTableShow.concat(this.biz, this.paramTableData)
-            if (this.isStatic === true) {
-                this.paramTableShow = []
-                this.isStaticData.forEach((item) => {
-                    const ite = {
-                        name: item.name,
-                        value: item.value
-                    }
-                    this.paramTableShow.push(ite)
-                })
+            //                         item.value = this.configur.extras.sops_info.bk_biz_id['value']
+            //                     } else {
+            //                         const current = this.configur.extras.sops_info.constants.filter(
+            //                             ite => {
+            //                                 return ite.key === item.key
+            //                             }
+            //                         )[0]
+            //                         if (current) {
+            //                             item.source_type = current['value_type']
+            //                             item.value = current['value']
+            //                         }
+            //                     }
+            //                     if (item.source_type === 'variable') {
+            //                         item.source_type = 'component_inputs'
+            //                     }
+            //                 }
+            //             )
+            //         }
+            //     },
+            //     deep: false
+            // },
+            constants () {
+                this.renderKey = new Date().getTime()
             }
         },
         methods: {
+            getRenderFormValidate () {
+                return this.$refs.renderForm.validate()
+            },
             getRelatedFields () {
                 this.$parent.getRelatedFields()
             },
