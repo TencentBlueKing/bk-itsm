@@ -414,7 +414,7 @@ module.exports = {
 
         // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/space-infix-ops.md
         // 二元操作符两边要有空格
-        'vue/space-infix-ops': 'error',
+        'vue/space-infix-ops': 'off',
 
         // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/space-unary-ops.md
         // new, delete, typeof, void, yield 等后面必须有空格，一元操作符 -, +, --, ++, !, !! 禁止有空格
