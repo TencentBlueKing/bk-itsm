@@ -425,6 +425,7 @@
             // 切换项目
             onSelectProject (val) {
                 this.selectedProject = val
+                window.DEFAULT_PROJECT = val
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
                 this.$router.push({ name: this.$route.name, query: { project_id: val } })
