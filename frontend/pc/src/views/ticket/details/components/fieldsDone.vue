@@ -96,7 +96,7 @@
             <span class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right"
                 :title="item.display_value">
-                <pre>{{item.display_value || item.value || '--'}}</pre>
+                {{item.display_value || item.value || '--'}}
             </span>
         </div>
         <!-- 链接 -->
@@ -140,7 +140,7 @@
     import RenderView from '@/components/renderview/RenderView'
     import { appendTargetAttrToHtml } from '@/utils/util'
     import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils'
-
+    
     export default {
         name: 'fieldsDone',
         components: {

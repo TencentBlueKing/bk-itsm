@@ -247,7 +247,8 @@
                     // 单号/标题 keyword
                     keyword: this.searchInfo.keyword.replace(/(^\s*)|(\s*$)/g, ''),
                     access: 'true',
-                    exclude_ticket_id__in: this.ticketInfo.id
+                    exclude_ticket_id__in: this.ticketInfo.id,
+                    project_key: this.ticketInfo.project_key
                 }
                 let resUrl = ''
                 this.getUrlInfo = ''
