@@ -80,7 +80,7 @@ from itsm.component.constants import (
     PROCESSOR_CHOICES,
     OPEN,
     GENERAL,
-    ORGANIZATION, DEFAULT_PROJECT_PROJECT_KEY,
+    ORGANIZATION,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -95,7 +95,11 @@ from itsm.component.exceptions import (
 from itsm.component.notify import EmailNotifier, SmsNotifier
 from itsm.component.utils.basic import better_time_or_none, dictfetchall, group_by, now
 from itsm.component.utils.client_backend_query import get_bk_users
-from itsm.iadmin.contants import ACTION_CHOICES_DICT, SUPERVISE_MESSAGE, SUPERVISE_OPERATE
+from itsm.iadmin.contants import (
+    ACTION_CHOICES_DICT,
+    SUPERVISE_MESSAGE,
+    SUPERVISE_OPERATE,
+)
 from itsm.iadmin.models import CustomNotice
 from itsm.postman.models import RemoteApiInstance
 from itsm.service.models import Service, ServiceCatalog
@@ -116,7 +120,10 @@ from itsm.ticket.models import (
     TicketToTicket,
     SignTask,
 )
-from itsm.ticket.permissions import TicketPermissionValidate, SuperuserPermissionValidate
+from itsm.ticket.permissions import (
+    TicketPermissionValidate,
+    SuperuserPermissionValidate,
+)
 from itsm.ticket.serializers import (
     FieldSerializer,
     MasterProxyTicketSerializer,
@@ -137,7 +144,10 @@ from itsm.ticket.serializers import (
     TicketList,
 )
 from itsm.ticket.tasks import clone_pipeline, start_pipeline
-from itsm.ticket.utils import translate_constant_2, translate_constant_export_fields_dict
+from itsm.ticket.utils import (
+    translate_constant_2,
+    translate_constant_export_fields_dict,
+)
 from itsm.ticket.validators import (
     bind_derive_tickets_validate,
     days_validate,
@@ -162,14 +172,14 @@ class ModelViewSet(component_viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """创建时补充基础Model中的字段"""
-        user = serializer.context.get('request').user
-        username = getattr(user, 'username', 'guest')
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
         return serializer.save(creator=username, updated_by=username)
 
     def perform_update(self, serializer):
         """更新时补充基础Model中的字段"""
-        user = serializer.context.get('request').user
-        username = getattr(user, 'username', 'guest')
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
         serializer.save(updated_by=username)
 
 
@@ -179,19 +189,23 @@ class TicketOrderingFilter(object):
     @staticmethod
     def current_status_order(reverse, request):
         """单据状态排序"""
-        service_type = request.query_params.get('service_type')
-        order_name = '-order' if reverse else 'order'
+        service_type = request.query_params.get("service_type")
+        order_name = "-order" if reverse else "order"
         if service_type:
             ticket_status_keys = (
                 TicketStatus.objects.filter(service_type=service_type)
-                    .order_by(order_name)
-                    .values_list('key', flat=True)
+                .order_by(order_name)
+                .values_list("key", flat=True)
             )
         else:
-            ticket_status_keys = TicketStatus.objects.all().order_by(order_name).values_list('key',
-                                                                                             flat=True)
-        ordering = 'FIELD(`current_status`, {})'.format(
-            ','.join(["'{}'".format(key) for key in ticket_status_keys]))
+            ticket_status_keys = (
+                TicketStatus.objects.all()
+                .order_by(order_name)
+                .values_list("key", flat=True)
+            )
+        ordering = "FIELD(`current_status`, {})".format(
+            ",".join(["'{}'".format(key) for key in ticket_status_keys])
+        )
 
         return ordering
 
@@ -202,8 +216,8 @@ class TicketOrderingFilter(object):
         if reverse:
             priorities.reverse()
 
-        ordering = 'FIELD(`priority_key`, {})'.format(
-            ','.join(["'{}'".format(priority['key']) for priority in priorities])
+        ordering = "FIELD(`priority_key`, {})".format(
+            ",".join(["'{}'".format(priority["key"]) for priority in priorities])
         )
         return ordering
 
@@ -226,7 +240,7 @@ class TicketModelViewSet(ModelViewSet):
         "create_at": ["lte", "gte"],
         "bk_biz_id": ["exact", "in"],
     }
-    ordering_fields = ('create_at', 'priority_order', 'current_status_order')
+    ordering_fields = ("create_at", "priority_order", "current_status_order")
 
     def get_object(self):
         ticket = super(TicketModelViewSet, self).get_object()
@@ -238,7 +252,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return ticket
 
-    @action(detail=False, methods=['GET'])
+    @action(detail=False, methods=["GET"])
     def total_count(self, request, *args, **kwargs):
         my_todo_queryset = Ticket.objects.get_todo_tickets(
             self.filter_queryset(self.get_queryset()), request.user.username
@@ -265,7 +279,7 @@ class TicketModelViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         """单据详情"""
         instance = self.get_object()
-        is_master_proxy = getattr(instance, 'is_master_proxy', False)
+        is_master_proxy = getattr(instance, "is_master_proxy", False)
 
         # 初始化serializer的上下文
         context = self.get_serializer_context()
@@ -294,19 +308,24 @@ class TicketModelViewSet(ModelViewSet):
         # 初始化serializer的上下文
         queryset = self.custom_filter_queryset(request)
 
-        project_key = request.query_params.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
-        queryset = queryset.filter(project_key=project_key)
+        project_key = request.query_params.get("project_key", None)
+        if project_key is not None:
+            queryset = queryset.filter(project_key=project_key)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
             data = TicketList(
-                page, username=request.user.username, token=request.query_params.get("token", "")
+                page,
+                username=request.user.username,
+                token=request.query_params.get("token", ""),
             ).to_client_representation()
             return self.get_paginated_response(data)
 
         # BEP: get_serializer instead of serializer class directly
         data = TicketList(
-            queryset, username=request.user.username, token=request.query_params.get("token", "")
+            queryset,
+            username=request.user.username,
+            token=request.query_params.get("token", ""),
         ).to_client_representation()
         return Response(data)
 
@@ -317,8 +336,9 @@ class TicketModelViewSet(ModelViewSet):
             filter_serializer = TicketFilterSerializer(data=request.query_params)
             filter_serializer.is_valid(raise_exception=True)
             kwargs = filter_serializer.validated_data
-
-            queryset = Ticket.objects.get_tickets(request.user.username, queryset, **kwargs)
+            queryset = Ticket.objects.get_tickets(
+                request.user.username, queryset, **kwargs
+            )
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -326,26 +346,28 @@ class TicketModelViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        service = Service.objects.get(id=data['service_id'])
-        print('----- create ticket get service')
+        service = Service.objects.get(id=data["service_id"])
+        print("----- create ticket get service")
 
         # 是否开启代提单
-        meta = data.get('meta', {})
+        meta = data.get("meta", {})
         if service.can_ticket_agency:
-            username = getattr(request.user, 'username', 'guest')
-            if username != data.get('creator'):
+            username = getattr(request.user, "username", "guest")
+            if username != data.get("creator"):
                 meta = dict(meta, ticket_agent=username)
 
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
         instance = serializer.save(meta=meta)
-        print('----- create ticket do_after_create begin')
-        instance.do_after_create(request.data['fields'], request.data.get("from_ticket_id", None))
-        print('----- create ticket do_after_create end')
+        print("----- create ticket do_after_create begin")
+        instance.do_after_create(
+            request.data["fields"], request.data.get("from_ticket_id", None)
+        )
+        print("----- create ticket do_after_create end")
         start_pipeline.apply_async([instance])
-        print('----- create ticket start_pipeline end')
+        print("----- create ticket start_pipeline end")
         return Response({"sn": instance.sn, "id": instance.id}, status=201)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_ticket_output(self, request, *args, **kwargs):
         """
         获取单据输出
@@ -353,19 +375,19 @@ class TicketModelViewSet(ModelViewSet):
         instance = self.get_object()
         return Response(instance.get_ticket_global_output(display_type="list"))
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_first_state_fields(self, request, *args, **kwargs):
         """
         获取提单节点字段
         """
-        service_id = request.query_params.get('service_id', None)
+        service_id = request.query_params.get("service_id", None)
         if not service_id:
-            raise ValidationError(_('请输入service_id'))
+            raise ValidationError(_("请输入service_id"))
 
         # 获取对应的流程版本
         service, catalog_services = service_validate(service_id)
-        field_ids = service.workflow.first_state['fields']
-        state_id = service.workflow.first_state['id']
+        field_ids = service.workflow.first_state["fields"]
+        state_id = service.workflow.first_state["id"]
 
         fields = []
         for field_id in field_ids:
@@ -375,62 +397,78 @@ class TicketModelViewSet(ModelViewSet):
                 continue
 
             field = copy.deepcopy(version_field)
-            default = field.get('default')
-            old_value = field.get('value')
+            default = field.get("default")
+            old_value = field.get("value")
             field.update(
-                state_id=state_id, version_id=service.workflow.id,
+                state_id=state_id,
+                version_id=service.workflow.id,
                 value=default if old_value is None else old_value,
             )
             fields.append(field)
 
         return Response(fields)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def api_field_choices(self, request):
         """
         提单节点获取api选项，保持与单据相同权限
         """
         try:
-            api_instance = RemoteApiInstance._objects.get(id=request.data.get('api_instance_id'))
+            api_instance = RemoteApiInstance._objects.get(
+                id=request.data.get("api_instance_id")
+            )
         except RemoteApiInstance.DoesNotExist:
             return Response(
-                {'result': False, 'code': ResponseCodeStatus.OK, 'message': _('对应的api配置不存在，请查询'),
-                 'data': [], }
+                {
+                    "result": False,
+                    "code": ResponseCodeStatus.OK,
+                    "message": _("对应的api配置不存在，请查询"),
+                    "data": [],
+                }
             )
-        kv_relation = request.data.pop('kv_relation', None)
-        params = {'params_%s' % key: value for key, value in
-                  list(request.data.get('fields', {}).items())}
+        kv_relation = request.data.pop("kv_relation", None)
+        params = {
+            "params_%s" % key: value
+            for key, value in list(request.data.get("fields", {}).items())
+        }
 
         return Response(api_instance.get_api_choice(kv_relation, params))
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     @cache_response(CACHE_5MIN, key_func=ticket_cache_key)
     def get_my_ticket_status(self, request, *args, **kwargs):
         """我的当前单据（我的待办+我的历史+我的申请单）的状态分布"""
 
-        service_type = request.query_params.get('service_type')
+        service_type = request.query_params.get("service_type")
         if not service_type:
-            raise ParamError(_('服务类型参数必填'))
+            raise ParamError(_("服务类型参数必填"))
 
         ticket_status = list(
-            TicketStatus.objects.filter(service_type=service_type).values_list('key', flat=True))
+            TicketStatus.objects.filter(service_type=service_type).values_list(
+                "key", flat=True
+            )
+        )
 
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(service_type=service_type)
         if not queryset.exists():
             return Response({status: 0 for status in ticket_status})
 
-        queryset = Ticket.objects.get_tickets(request.user.username, queryset=queryset,
-                                              ignore_superuser=True, **kwargs)
+        queryset = Ticket.objects.get_tickets(
+            request.user.username, queryset=queryset, ignore_superuser=True, **kwargs
+        )
 
-        queryset = queryset.values('current_status').annotate(cnt=Count('current_status')).order_by(
-            'current_status')
+        queryset = (
+            queryset.values("current_status")
+            .annotate(cnt=Count("current_status"))
+            .order_by("current_status")
+        )
 
-        data = {item['current_status']: item['cnt'] for item in queryset}
+        data = {item["current_status"]: item["cnt"] for item in queryset}
 
         return Response(data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     @cache_response(CACHE_5MIN, key_func=ticket_cache_key)
     def get_my_deal_tickets(self, request):
         """我处理过的单据统计视图"""
@@ -438,32 +476,38 @@ class TicketModelViewSet(ModelViewSet):
         days = request.query_params.get("days", 1)
         days = days_validate(days)
 
-        operate_at__gte = (datetime.datetime.now() - datetime.timedelta(days=days)).date().strftime(
-            "%Y-%m-%d %H:%M:%S")
-        data = dictfetchall(connection, get_my_deal_tickets_sql, request.user.username,
-                            operate_at__gte)
-        exist_services = map(lambda x: x['service'], data)
+        operate_at__gte = (
+            (datetime.datetime.now() - datetime.timedelta(days=days))
+            .date()
+            .strftime("%Y-%m-%d %H:%M:%S")
+        )
+        data = dictfetchall(
+            connection, get_my_deal_tickets_sql, request.user.username, operate_at__gte
+        )
+        exist_services = map(lambda x: x["service"], data)
         for service in SERVICE_LIST:
             if service in exist_services:
                 continue
-            data.append({'service': service, 'count': 0})
+            data.append({"service": service, "count": 0})
 
         return Response(data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def send_sms(self, request, *args, **kwargs):
         """通过电话号码发送短信"""
 
         ticket = self.get_object()
         invitor = request.user.username
-        receiver = request.data.get('receiver', '')
-        numbers = receiver.split(',')
+        receiver = request.data.get("receiver", "")
+        numbers = receiver.split(",")
 
         sms_invite_validate(ticket, numbers, invitor)
 
         # 发送逻辑
         custom_notify = CustomNotice.objects.get(action=INVITE_OPERATE, notify_type=SMS)
-        content_template = custom_notify.title_template + '：' + custom_notify.content_template
+        content_template = (
+            custom_notify.title_template + "：" + custom_notify.content_template
+        )
         context = ticket.get_notify_context()
         context.update(action=ACTION_CHOICES_DICT.get(INVITE_OPERATE))
 
@@ -473,7 +517,7 @@ class TicketModelViewSet(ModelViewSet):
         title = Template(custom_notify.title_template).render(**context)
         for number in numbers:
             code = TicketCommentInvite.get_unique_code()
-            ticket_url = '{}{}'.format(OUT_LINK, code)
+            ticket_url = "{}{}".format(OUT_LINK, code)
             context.update(ticket_url=ticket_url)
             links.append(ticket_url)
 
@@ -486,30 +530,33 @@ class TicketModelViewSet(ModelViewSet):
 
             try:
                 notifier.send()
-                TicketCommentInvite.objects.create(receiver=number, comment_id=ticket.comment_id,
-                                                   code=code)
+                TicketCommentInvite.objects.create(
+                    receiver=number, comment_id=ticket.comment_id, code=code
+                )
             except ComponentCallError as e:
                 fail_numbers.append(number)
-                logger.warning('send_sms[{}] exception: {}'.format(number, e))
+                logger.warning("send_sms[{}] exception: {}".format(number, e))
 
         return Response(
             {
-                'result': len(fail_numbers) == 0,
-                'message': _('【{}】发送短信失败，请检查电话号码是否正确或联系管理员！').format(','.join(fail_numbers))
+                "result": len(fail_numbers) == 0,
+                "message": _("【{}】发送短信失败，请检查电话号码是否正确或联系管理员！").format(
+                    ",".join(fail_numbers)
+                )
                 if fail_numbers
-                else 'success',
-                'data': links,
-                'code': 'SEND_SMS_FAILED',
+                else "success",
+                "data": links,
+                "code": "SEND_SMS_FAILED",
             }
         )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def send_email(self, request, *args, **kwargs):
         """通过邮件邀请评价"""
 
         ticket = self.get_object()
         invitor = request.user.username
-        receiver = request.data.get('receiver', '')
+        receiver = request.data.get("receiver", "")
 
         email_invite_validate(ticket, invitor, receiver)
 
@@ -524,9 +571,13 @@ class TicketModelViewSet(ModelViewSet):
         )
 
         # 发送逻辑
-        custom_notify = CustomNotice.objects.get(action=INVITE_OPERATE, notify_type=EMAIL)
+        custom_notify = CustomNotice.objects.get(
+            action=INVITE_OPERATE, notify_type=EMAIL
+        )
 
-        ticket_url = ticket.ticket_url + '&token={token}&invite=email'.format(token=code)
+        ticket_url = ticket.ticket_url + "&token={token}&invite=email".format(
+            token=code
+        )
         context.update(ticket_url=ticket_url)
         notifier = EmailNotifier(
             title=Template(custom_notify.title_template).render(**context),
@@ -535,87 +586,101 @@ class TicketModelViewSet(ModelViewSet):
         )
         try:
             notifier.send()
-            TicketCommentInvite.objects.create(receiver=receiver, comment_id=ticket.comment_id,
-                                               code=code)
-            return Response({'result': True, 'message': 'success', 'data': ticket_url,
-                             'code': ResponseCodeStatus.OK, })
-        except ComponentCallError as error:
-            logger.warning('send email execption: %s' % error)
+            TicketCommentInvite.objects.create(
+                receiver=receiver, comment_id=ticket.comment_id, code=code
+            )
             return Response(
                 {
-                    'result': False,
-                    'message': _('【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！').format(receiver),
-                    'data': ticket_url,
-                    'code': 'SEND_EMAIL_FAILED',
+                    "result": True,
+                    "message": "success",
+                    "data": ticket_url,
+                    "code": ResponseCodeStatus.OK,
+                }
+            )
+        except ComponentCallError as error:
+            logger.warning("send email execption: %s" % error)
+            return Response(
+                {
+                    "result": False,
+                    "message": _("【{}】发送邮件失败，请检查用户邮件配置是否正确或联系管理员！").format(receiver),
+                    "data": ticket_url,
+                    "code": "SEND_EMAIL_FAILED",
                 }
             )
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def export_excel(self, request, *args, **kwargs):
         from itsm.ticket.serializers import FieldExportSerializer
 
-        export_fields = request.query_params.get('export_fields')
+        export_fields = request.query_params.get("export_fields")
         if not export_fields:
-            raise ValidationError(_('请选择需要导出的字段'))
+            raise ValidationError(_("请选择需要导出的字段"))
 
-        export_fields = export_fields.split(',')
+        export_fields = export_fields.split(",")
 
         queryset = self.custom_filter_queryset(request)
 
         fields = copy.deepcopy(EXPORT_FIELDS)
-        head_fields = [field for field in fields if field['id'] in export_fields]
+        head_fields = [field for field in fields if field["id"] in export_fields]
         ticket_fields = FieldExportSerializer(
-            TicketField.objects.filter(ticket_id__in=queryset.values_list('id', flat=True))
-                .exclude(key__in=['bk_biz_id', 'title'])
-                .order_by('-create_at'),
+            TicketField.objects.filter(
+                ticket_id__in=queryset.values_list("id", flat=True)
+            )
+            .exclude(key__in=["bk_biz_id", "title"])
+            .order_by("-create_at"),
             many=True,
         ).data
-        ticket_releate_fields = group_by(ticket_fields, ['ticket_id'], dict_result=True)
+        ticket_releate_fields = group_by(ticket_fields, ["ticket_id"], dict_result=True)
         field_filter_conditions = set(
             [
-                '{}({})'.format(field_obj['name'], field_obj['state_name'])
-                if field_obj['state_name']
-                else field_obj['name']
+                "{}({})".format(field_obj["name"], field_obj["state_name"])
+                if field_obj["state_name"]
+                else field_obj["name"]
                 for field_obj in ticket_fields
             ]
         )
-        relate_head_fields = [{'id': item, 'name': item} for item in field_filter_conditions]
-        head_fields.extend(sorted(relate_head_fields, key=lambda x: x.get('name')))
+        relate_head_fields = [
+            {"id": item, "name": item} for item in field_filter_conditions
+        ]
+        head_fields.extend(sorted(relate_head_fields, key=lambda x: x.get("name")))
 
         ticket_values_list = TicketExportSerializer(queryset, many=True).data
         for ticket_values in ticket_values_list:
-            fields = ticket_releate_fields.get(ticket_values['id'], [])
+            fields = ticket_releate_fields.get(ticket_values["id"], [])
             for field in fields:
                 field_name = (
-                    '{}({})'.format(field['name'], field['state_name']) if field['state_name'] else
-                    field['name']
+                    "{}({})".format(field["name"], field["state_name"])
+                    if field["state_name"]
+                    else field["name"]
                 )
-                ticket_values[field_name] = field['display_value']
+                ticket_values[field_name] = field["display_value"]
 
         # 构造xls并返回
         return self.generate_csv(head_fields, ticket_values_list)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def export_group_by_service(self, request, *args, **kwargs):
         from itsm.ticket.serializers import FieldExportSerializer
 
         # 单据的公共字段设置内容
-        export_fields = request.query_params.get('export_fields')
+        export_fields = request.query_params.get("export_fields")
         if not export_fields:
-            raise ValidationError(_('请选择需要导出的字段'))
+            raise ValidationError(_("请选择需要导出的字段"))
 
-        export_fields = export_fields.split(',')
+        export_fields = export_fields.split(",")
 
         fields = copy.deepcopy(EXPORT_FIELDS)
-        head_fields = [field for field in fields if field['id'] in export_fields]
+        head_fields = [field for field in fields if field["id"] in export_fields]
 
         queryset = self.custom_filter_queryset(request)
 
         # 这里建议用base64编码
 
-        service_fields = request.query_params.get('service_fields')
+        service_fields = request.query_params.get("service_fields")
         try:
-            service_fields = json.loads(base64.b64decode(service_fields)) if service_fields else {}
+            service_fields = (
+                json.loads(base64.b64decode(service_fields)) if service_fields else {}
+            )
         except BaseException:
             raise ValidationError(_("解析导出的提单字段异常：请检查请求参数内容，提单字段需要通过base64编码。"))
 
@@ -630,16 +695,17 @@ class TicketModelViewSet(ModelViewSet):
                 return []
 
             started_states = [
-                service_inst.first_state_id for service_inst in
-                Service.objects.filter(id__in=service_fields.keys())
+                service_inst.first_state_id
+                for service_inst in Service.objects.filter(id__in=service_fields.keys())
             ]
 
             # 获取导出的所有字段内容 -- 当前的id如果较多，这里大量拉取，估计有点问题
             all_service_field_keys.append("bk_biz_id")
             return FieldExportSerializer(
                 TicketField.objects.filter(
-                    ticket_id__in=queryset.filter(service_id__in=service_fields.keys()).values_list(
-                        'id', flat=True),
+                    ticket_id__in=queryset.filter(
+                        service_id__in=service_fields.keys()
+                    ).values_list("id", flat=True),
                     type__in=EXPORT_SUPPORTED_TYPE,
                     state_id__in=started_states,
                     key__in=all_service_field_keys,
@@ -649,22 +715,27 @@ class TicketModelViewSet(ModelViewSet):
 
         ticket_fields = get_service_ticket_fields()
         # 按照ticket_id分组
-        ticket_relate_fields = group_by(ticket_fields, ['ticket_id'], dict_result=True)
+        ticket_relate_fields = group_by(ticket_fields, ["ticket_id"], dict_result=True)
 
         field_filter_conditions = set(
-            [field_obj['name'] for field_obj in ticket_fields if
-             field_obj['key'] in all_service_field_keys]
+            [
+                field_obj["name"]
+                for field_obj in ticket_fields
+                if field_obj["key"] in all_service_field_keys
+            ]
         )
 
-        relate_head_fields = [{'id': item, 'name': item} for item in field_filter_conditions]
-        head_fields.extend(sorted(relate_head_fields, key=lambda x: x.get('name')))
+        relate_head_fields = [
+            {"id": item, "name": item} for item in field_filter_conditions
+        ]
+        head_fields.extend(sorted(relate_head_fields, key=lambda x: x.get("name")))
 
         ticket_values_list = TicketExportSerializer(queryset, many=True).data
 
         for ticket_values in ticket_values_list:
-            fields = ticket_relate_fields.get(ticket_values['id'], [])
+            fields = ticket_relate_fields.get(ticket_values["id"], [])
             for field in fields:
-                ticket_values[field['name']] = field['display_value']
+                ticket_values[field["name"]] = field["display_value"]
 
         # 构造csv并返回
         return self.generate_csv(head_fields, ticket_values_list)
@@ -673,33 +744,41 @@ class TicketModelViewSet(ModelViewSet):
     def generate_xls(head_fields, ticket_values_list, service_type):
 
         """生成文档"""
-        service_type_name = SERVICE_DICT.get(service_type) or 'ALL'
-        sheet_name = service_type_name + '_' + datetime.datetime.now().strftime('%Y%m%d%H%M')
-        work_book = xlwt.Workbook(encoding='utf-8')
+        service_type_name = SERVICE_DICT.get(service_type) or "ALL"
+        sheet_name = (
+            service_type_name + "_" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        )
+        work_book = xlwt.Workbook(encoding="utf-8")
         work_sheet = work_book.add_sheet(sheet_name)
 
         for index, value in enumerate(head_fields):
             work_sheet.col(index).width = 256 * 20
-            work_sheet.write(0, index, value['name'])
+            work_sheet.write(0, index, value["name"])
 
         for row, ticket_values in enumerate(ticket_values_list):
-            for index, key in enumerate([value['id'] for value in head_fields]):
-                work_sheet.write(row + 1, index, ticket_values.get(key, '--'))
+            for index, key in enumerate([value["id"] for value in head_fields]):
+                work_sheet.write(row + 1, index, ticket_values.get(key, "--"))
 
         output = io.BytesIO()
         work_book.save(output)
         output.seek(0)
 
-        response = HttpResponse(output.getvalue(), content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment;filename="{}.xls"'.format(settings.APP_CODE)
+        response = HttpResponse(
+            output.getvalue(), content_type="application/vnd.ms-excel"
+        )
+        response["Content-Disposition"] = 'attachment;filename="{}.xls"'.format(
+            settings.APP_CODE
+        )
         return response
 
     @staticmethod
     def generate_csv(head_fields, ticket_values_list):
         # 新增csv导出方式
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment;filename={}.csv'.format(settings.APP_CODE)
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = "attachment;filename={}.csv".format(
+            settings.APP_CODE
+        )
         response.write(codecs.BOM_UTF8)
 
         writer = csv.writer(response)
@@ -709,13 +788,13 @@ class TicketModelViewSet(ModelViewSet):
 
         for row, ticket_values in enumerate(ticket_values_list):
             fields = [row + 1]
-            for index, key in enumerate([value['id'] for value in head_fields]):
-                fields.append(ticket_values.get(key, '--'))
+            for index, key in enumerate([value["id"] for value in head_fields]):
+                fields.append(ticket_values.get(key, "--"))
             writer.writerow(fields)
 
         return response
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def print_ticket(self, request, *args, **kwargs):
         """
         返回单据打印信息，默认到从提单节点到当前节点
@@ -728,38 +807,41 @@ class TicketModelViewSet(ModelViewSet):
             state_list = ticket.get_old_ticket_state_list()
 
         print_data = {
-            'sn': ticket.sn,
-            'print_date': datetime.date.today(),
-            'print_person': request.user.username,
-            'type': ticket.service_type_name,
-            'status': ticket.current_status_display,
-            'state': state_list,
-            'cata_log': ticket.catalog_fullname,
-            'service': '{}工单'.format(ticket.service_type_name),
-            'create_at': ticket.create_at,
+            "sn": ticket.sn,
+            "print_date": datetime.date.today(),
+            "print_person": request.user.username,
+            "type": ticket.service_type_name,
+            "status": ticket.current_status_display,
+            "state": state_list,
+            "cata_log": ticket.catalog_fullname,
+            "service": "{}工单".format(ticket.service_type_name),
+            "create_at": ticket.create_at,
         }
 
         return Response(print_data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_global_choices(self, request):
         """查询全局选项列表信息"""
 
-        ticket_status = TicketStatus.objects.all().values('service_type', 'key', 'name')
+        ticket_status = TicketStatus.objects.all().values("service_type", "key", "name")
         return Response(
             {
-                'export_fields': translate_constant_export_fields_dict(EXPORT_FIELDS),
-                'ticket_status': group_by(ticket_status, key_or_index_tuple=('service_type',),
-                                          dict_result=True),
+                "export_fields": translate_constant_export_fields_dict(EXPORT_FIELDS),
+                "ticket_status": group_by(
+                    ticket_status,
+                    key_or_index_tuple=("service_type",),
+                    dict_result=True,
+                ),
                 "processor_type": translate_constant_2(PROCESSOR_CHOICES),
-                'fault_source': [
-                    {'key': choices[0], 'pk_value': _(choices[1])}
+                "fault_source": [
+                    {"key": choices[0], "pk_value": _(choices[1])}
                     for choices in translate_constant_2(FAULT_SOURCE_CHOICES)
                 ],
             }
         )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def proceed(self, request, *args, **kwargs):
         """单据处理：节点间的处理
         处理路径操作分类介绍：
@@ -768,35 +850,47 @@ class TicketModelViewSet(ModelViewSet):
 
         ticket = self.get_object()
 
-        fields = request.data.get('fields')
-        state_id = str(request.data.get('state_id', ''))
+        fields = request.data.get("fields")
+        state_id = str(request.data.get("state_id", ""))
 
-        proceed_validate(request.user.username, ticket, copy.deepcopy(fields), state_id,
-                         request=request)
+        proceed_validate(
+            request.user.username,
+            ticket,
+            copy.deepcopy(fields),
+            state_id,
+            request=request,
+        )
         node_status = ticket.node_status.get(state_id=state_id)
         if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
             SignTask.objects.update_or_create(
-                status_id=node_status.id, processor=request.user.username,
-                defaults={"status": "RUNNING"}
+                status_id=node_status.id,
+                processor=request.user.username,
+                defaults={"status": "RUNNING"},
             )
         else:
             node_status.status = QUEUEING
             node_status.save()
 
-        res = ticket.activity_callback(state_id, request.user.username, fields, request.source)
+        res = ticket.activity_callback(
+            state_id, request.user.username, fields, request.source
+        )
         if not res.result:
             logger.warning(
-                "callback error， current state id %s, error message: %s" % (state_id, res.message))
+                "callback error， current state id %s, error message: %s"
+                % (state_id, res.message)
+            )
             ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
         return Response(
             {
-                'code': ResponseCodeStatus.OK if res.result else ResponseCodeStatus.FAILED,
-                'message': res.message,
-                'result': res.result,
+                "code": ResponseCodeStatus.OK
+                if res.result
+                else ResponseCodeStatus.FAILED,
+                "message": res.message,
+                "result": res.result,
             }
         )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def retry(self, request, *args, **kwargs):
         """
         失败的节点可以在此进行重试
@@ -804,8 +898,8 @@ class TicketModelViewSet(ModelViewSet):
 
         ticket = self.get_object()
 
-        inputs = request.data.get('inputs')
-        state_id = str(request.data.get('state_id', ''))
+        inputs = request.data.get("inputs")
+        state_id = str(request.data.get("state_id", ""))
 
         ticket_status_validate(ticket, state_id)
 
@@ -815,13 +909,15 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(
             {
-                'code': ResponseCodeStatus.OK if res.result else ResponseCodeStatus.FAILED,
-                'message': res.message,
-                'result': res.result,
+                "code": ResponseCodeStatus.OK
+                if res.result
+                else ResponseCodeStatus.FAILED,
+                "message": res.message,
+                "result": res.result,
             }
         )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def ignore(self, request, *args, **kwargs):
         """
         失败的节点可以在此进行重试
@@ -829,9 +925,9 @@ class TicketModelViewSet(ModelViewSet):
 
         ticket = self.get_object()
 
-        ignore_data = request.data.get('inputs')
-        state_id = str(request.data.get('state_id', ''))
-        is_direct = request.data.get('is_direct')
+        ignore_data = request.data.get("inputs")
+        state_id = str(request.data.get("state_id", ""))
+        is_direct = request.data.get("is_direct")
 
         ticket_status_validate(ticket, state_id)
         if is_direct:
@@ -839,69 +935,86 @@ class TicketModelViewSet(ModelViewSet):
             ticket.node_status.filter(state_id=state_id).update(status=FINISHED)
         else:
             ticket.node_status.filter(state_id=state_id).update(status=QUEUEING)
-            res = ticket.retry_node(state_id, ignore_data, action="MANUAL",
-                                    operator=request.user.username)
+            res = ticket.retry_node(
+                state_id, ignore_data, action="MANUAL", operator=request.user.username
+            )
         return Response(
             {
-                'code': ResponseCodeStatus.OK if res.result else ResponseCodeStatus.FAILED,
-                'message': res.message,
-                'result': res.result,
+                "code": ResponseCodeStatus.OK
+                if res.result
+                else ResponseCodeStatus.FAILED,
+                "message": res.message,
+                "result": res.result,
             }
         )
 
-    @action(detail=True, methods=['GET'], permission_classes=[SuperuserPermissionValidate])
+    @action(
+        detail=True, methods=["GET"], permission_classes=[SuperuserPermissionValidate]
+    )
     def skip_node(self, request, *args, **kwargs):
         instance = self.get_object()
         transition_id = request.query_params.get("transition_id")
         state_id = request.query_params.get("state_id")
         action_result = (
-            instance.skip_gateway_node(state_id,
-                                       transition_id) if transition_id else instance.skip_node(
-                state_id)
+            instance.skip_gateway_node(state_id, transition_id)
+            if transition_id
+            else instance.skip_node(state_id)
         )
-        return Response({"result": action_result.result, "message": action_result.message})
+        return Response(
+            {"result": action_result.result, "message": action_result.message}
+        )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def trigger_state_button(self, request, *args, **kwargs):
         """Trigger state custom button"""
         ticket = self.get_object()
-        serializer = TriggerStateButtonSerializer(data=request.data,
-                                                  context={'username': request.user.username})
+        serializer = TriggerStateButtonSerializer(
+            data=request.data, context={"username": request.user.username}
+        )
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        component_cls = ComponentLibrary.get_component_class('trigger',
-                                                             validated_data['component_key'])
+        component_cls = ComponentLibrary.get_component_class(
+            "trigger", validated_data["component_key"]
+        )
         component = component_cls(
-            context={'ticket_id': ticket.id, 'state_id': validated_data['state_id']})
+            context={"ticket_id": ticket.id, "state_id": validated_data["state_id"]}
+        )
 
         # Convert inputs to key/value dicts
         input_data = {}
-        inputs = validated_data.get('inputs', {})
+        inputs = validated_data.get("inputs", {})
         for key, item in inputs.items():
-            input_data.update(**{key: item.get('value')})
+            input_data.update(**{key: item.get("value")})
 
         result = component.invoke(input_data)
         if result:
             TicketEventLog.objects.create_trigger_action_log(
-                ticket, validated_data['status'], request.user.username, component_cls, input_data,
+                ticket,
+                validated_data["status"],
+                request.user.username,
+                component_cls,
+                input_data,
             )
             return Response()
         else:
-            raise ComponentInvokeError(component.data.get_one_of_outputs('message'))
+            raise ComponentInvokeError(component.data.get_one_of_outputs("message"))
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def trigger_actions(self, request, *args, **kwargs):
         """获取工单对应的触发器响应事件"""
         instance = self.get_object()
         operate_type = request.query_params.get("operate_type", "")
 
-        if operate_type != 'all':
+        if operate_type != "all":
             # 手动执行的，直接返回手动按钮
             return Response(
                 ActionSerializer(
-                    Action.objects.get_manual_trigger_actions(instance.id, SOURCE_TICKET),
-                    many=True).data
+                    Action.objects.get_manual_trigger_actions(
+                        instance.id, SOURCE_TICKET
+                    ),
+                    many=True,
+                ).data
             )
 
         # 所有的内容
@@ -913,24 +1026,26 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ActionSerializer(action_query_set, many=True).data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def terminate(self, request, *args, **kwargs):
         """单据终止"""
 
         ticket = self.get_object()
-        state_id = request.data.get('state_id')
-        terminate_message = request.data.get('terminate_message')
+        state_id = request.data.get("state_id")
+        terminate_message = request.data.get("terminate_message")
 
         terminate_validate(request.user.username, ticket, state_id, terminate_message)
 
         res = ticket.terminate(
-            state_id, terminate_message=terminate_message, operator=request.user.username,
-            source=request.source
+            state_id,
+            terminate_message=terminate_message,
+            operator=request.user.username,
+            source=request.source,
         )
 
         return Response(res)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def withdraw(self, request, *args, **kwargs):
         """撤单"""
 
@@ -941,7 +1056,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def supervise(self, request, *args, **kwargs):
         """督办"""
 
@@ -950,12 +1065,13 @@ class TicketModelViewSet(ModelViewSet):
         ticket = self.get_object()
         supervise_validate(ticket, username)
 
-        message = request.data.get('message') or Template(SUPERVISE_MESSAGE).render(
-            **{'title': ticket.title})
+        message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
+            **{"title": ticket.title}
+        )
         for step in ticket.current_steps:
             ticket.notify(
-                state_id=step['state_id'],
-                receivers=step['processors'],
+                state_id=step["state_id"],
+                receivers=step["processors"],
                 message=message,
                 action=SUPERVISE_OPERATE,
                 retry=False,
@@ -964,8 +1080,8 @@ class TicketModelViewSet(ModelViewSet):
             for _notify in ticket.flow.notify.all():
                 TicketSuperviseNotifyLog.objects.create(
                     ticket=ticket,
-                    supervised=step['processors'],
-                    state_id=step['state_id'],
+                    supervised=step["processors"],
+                    state_id=step["state_id"],
                     state_name=step["name"],
                     creator=username,
                     message=message,
@@ -974,7 +1090,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def operate(self, request, *args, **kwargs):
         """节点操作"""
 
@@ -986,14 +1102,14 @@ class TicketModelViewSet(ModelViewSet):
         operate_serializer.is_valid(raise_exception=True)
         data = operate_serializer.data
 
-        data['source'] = request.source
-        current_node = data['current_node']
-        data['ticket'] = ticket
+        data["source"] = request.source
+        current_node = data["current_node"]
+        data["ticket"] = ticket
         current_node.set_next_action(operator=request.user.username, **data)
 
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def suspend(self, request, *args, **kwargs):
         # 挂起操作
         ticket = self.get_object()
@@ -1004,7 +1120,7 @@ class TicketModelViewSet(ModelViewSet):
         ticket.suspend(suspend_message, operator=request.user.username)
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def unsuspend(self, request, *args, **kwargs):
         # 恢复操作
         ticket = self.get_object()
@@ -1014,7 +1130,7 @@ class TicketModelViewSet(ModelViewSet):
         ticket.unsuspend(operator=request.user.username)
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def close(self, request, *args, **kwargs):
         ticket = self.get_object()
         # TODO close校验
@@ -1022,17 +1138,20 @@ class TicketModelViewSet(ModelViewSet):
         if close_status not in ticket.status_instance.to_over_status_keys:
             raise ValidationError(_("设置的关闭状态不在正确状态范围之内"))
 
-        ticket.close(close_status=close_status, desc=request.data.get("desc"),
-                     operator=request.user.username)
+        ticket.close(
+            close_status=close_status,
+            desc=request.data.get("desc"),
+            operator=request.user.username,
+        )
         return Response()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def fields(self, request, *args, **kwargs):
         """
         根据ticket状态id获取fields信息
         """
 
-        state_id = self.request.query_params.get('state_id')
+        state_id = self.request.query_params.get("state_id")
 
         # 从TicketField中获取字段
         fields = self.get_object().fields.filter(state_id=state_id)
@@ -1041,7 +1160,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(fields)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def all_fields(self, request, *args, **kwargs):
         """获取ticket的所有fields信息"""
         # 从TicketField中获取字段
@@ -1051,7 +1170,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(fields)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def derive_tickets(self, request, *args, **kwargs):
         """
         获取ticket的所有新建关联单据
@@ -1083,7 +1202,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def master_or_slave(self, request, *args, **kwargs):
         """
         获取ticket的关联母单或者子单列表
@@ -1100,7 +1219,11 @@ class TicketModelViewSet(ModelViewSet):
 
         if master_slaves:
             # 判断当前单据是母单还是子单
-            related_type = "slave" if master_slaves.last().from_ticket_id == ticket.id else "master"
+            related_type = (
+                "slave"
+                if master_slaves.last().from_ticket_id == ticket.id
+                else "master"
+            )
             master_slave_dict = {}
             for master_slave in master_slaves:
                 if related_type == "slave":
@@ -1124,7 +1247,9 @@ class TicketModelViewSet(ModelViewSet):
 
             tickets = Ticket.objects.filter(id__in=master_slave_dict.keys())
             data_list = RelatedTicketSerializer(
-                instance=tickets, context={"username": request.user.username}, many=True,
+                instance=tickets,
+                context={"username": request.user.username},
+                many=True,
             ).data
 
             for data in data_list:
@@ -1137,14 +1262,14 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ret)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def bind_derive_tickets(self, request, *args, **kwargs):
         """绑定关联单"""
-        from_ticket_id = request.data.get('from_ticket')
-        to_ticket_ids = request.data.get('to_tickets')
+        from_ticket_id = request.data.get("from_ticket")
+        to_ticket_ids = request.data.get("to_tickets")
 
         if not Ticket.objects.get(pk=from_ticket_id).can_derive(request.user.username):
-            raise ValidationError(_('无操作权限'))
+            raise ValidationError(_("无操作权限"))
         ticket_to_tickets = []
 
         bind_derive_tickets_validate(from_ticket_id, to_ticket_ids)
@@ -1162,34 +1287,44 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def unbind_derive_ticket(self, request, *args, **kwargs):
         """解绑关联单"""
-        from_ticket = request.data.get('from_ticket')
-        to_ticket = request.data.get('to_ticket')
+        from_ticket = request.data.get("from_ticket")
+        to_ticket = request.data.get("to_ticket")
 
         if not Ticket.objects.get(pk=from_ticket).can_derive(request.user.username):
-            raise ValidationError(_('无操作权限'))
+            raise ValidationError(_("无操作权限"))
 
         ticket_to_ticket = TicketToTicket.objects.filter(
-            Q(Q(from_ticket_id=from_ticket) & Q(to_ticket_id=to_ticket) & Q(related_type=DERIVE))
-            | Q(Q(from_ticket_id=to_ticket) & Q(to_ticket_id=from_ticket) & Q(related_type=DERIVE))
+            Q(
+                Q(from_ticket_id=from_ticket)
+                & Q(to_ticket_id=to_ticket)
+                & Q(related_type=DERIVE)
+            )
+            | Q(
+                Q(from_ticket_id=to_ticket)
+                & Q(to_ticket_id=from_ticket)
+                & Q(related_type=DERIVE)
+            )
         ).all()
         if not ticket_to_ticket:
-            raise ValidationError(_('无效的关联关系'))
+            raise ValidationError(_("无效的关联关系"))
 
-        ticket_to_ticket.update(is_deleted=True, related_status="UNBIND_SUCCESS", end_at=now())
+        ticket_to_ticket.update(
+            is_deleted=True, related_status="UNBIND_SUCCESS", end_at=now()
+        )
 
         return Response()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def states(self, request, *args, **kwargs):
         """
         单据节点查询
         参数：state_id，可选，若为空则返回所有当前状态
         """
         ticket = self.get_object()
-        state_id = request.query_params.get('state_id')
+        state_id = request.query_params.get("state_id")
 
         if ticket.flow.engine_version == DEFAULT_ENGINE_VERSION:
             status = ticket.node_status
@@ -1198,18 +1333,18 @@ class TicketModelViewSet(ModelViewSet):
                 try:
                     status = status.get(state_id=state_id)
                 except Status.DoesNotExist:
-                    raise StateNotFoundError('state_id=%s' % state_id)
+                    raise StateNotFoundError("state_id=%s" % state_id)
 
             many = not state_id
-            show_all_fields = many or status.status != 'FINISHED'
+            show_all_fields = many or status.status != "FINISHED"
             ticket_status = StatusSerializer(
                 status,
                 many=many,
                 context={
-                    'username': request.user.username,
-                    'bk_biz_id': ticket.bk_biz_id,
-                    'show_all_fields': show_all_fields,
-                    'is_master_proxy': getattr(ticket, 'is_master_proxy', False),
+                    "username": request.user.username,
+                    "bk_biz_id": ticket.bk_biz_id,
+                    "show_all_fields": show_all_fields,
+                    "is_master_proxy": getattr(ticket, "is_master_proxy", False),
                 },
             )
             return Response(ticket_status.data)
@@ -1217,15 +1352,19 @@ class TicketModelViewSet(ModelViewSet):
         # old tickets
         if state_id:
             for state in list(ticket.flow.states.values()):
-                if str(state['id']) == state_id:
-                    return Response(OldTicketStateSerializer(state, many=False,
-                                                             context={'ticket': ticket}).data)
+                if str(state["id"]) == state_id:
+                    return Response(
+                        OldTicketStateSerializer(
+                            state, many=False, context={"ticket": ticket}
+                        ).data
+                    )
         return Response(
-            OldTicketStateSerializer(list(ticket.flow.states.values()), many=True,
-                                     context={'ticket': ticket}).data
+            OldTicketStateSerializer(
+                list(ticket.flow.states.values()), many=True, context={"ticket": ticket}
+            ).data
         )
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):
         """
         单据流转经过的连线列表查询
@@ -1236,27 +1375,30 @@ class TicketModelViewSet(ModelViewSet):
             return Response(ticket.active_transitions)
 
         # old tickets
-        t_ids = [int(id) for id, t in list(ticket.flow.transitions.items()) if
-                 t.get('direction') == 'FORWARD']
+        t_ids = [
+            int(id)
+            for id, t in list(ticket.flow.transitions.items())
+            if t.get("direction") == "FORWARD"
+        ]
         try:
             router_extras = [
-                json.loads(state.get('extras'))
+                json.loads(state.get("extras"))
                 for state in list(ticket.flow.states.values())
-                if state.get('type') == 'ROUTER'
+                if state.get("type") == "ROUTER"
             ]
         except Exception as e:
-            logger.error('get active_transitions error: %s' % str(e))
+            logger.error("get active_transitions error: %s" % str(e))
             router_extras = []
         unselected = []
         for extras in router_extras:
-            for transition in extras.get('transitions', []):
-                if transition.get('selected') is not True:
-                    unselected.append(transition.get('id'))
+            for transition in extras.get("transitions", []):
+                if transition.get("selected") is not True:
+                    unselected.append(transition.get("id"))
         return Response(list(set(t_ids).difference(unselected)))
 
     @action(
         detail=False,
-        methods=['get'],
+        methods=["get"],
         pagination_class=CustomPageNumberPagination,
         serializer_class=TicketLogSerializer,
         queryset=Ticket.objects.filter(is_draft=False),
@@ -1264,7 +1406,7 @@ class TicketModelViewSet(ModelViewSet):
     )
     def get_ticket_log(self, request, *args, **kwargs):
 
-        ticket_id = request.query_params.get('ticket_id')
+        ticket_id = request.query_params.get("ticket_id")
         if ticket_id:
             ticket = get_object_or_404(self.queryset, pk=ticket_id)
             ticket_serializer = self.serializer_class(ticket)
@@ -1272,27 +1414,29 @@ class TicketModelViewSet(ModelViewSet):
 
         queryset = self.queryset
 
-        if self.request.query_params.get('catalog_id'):
+        if self.request.query_params.get("catalog_id"):
             catalog_ids = ServiceCatalog.get_descendant_ids(
-                self.request.query_params.get('catalog_id'))
+                self.request.query_params.get("catalog_id")
+            )
             queryset = queryset.filter(catalog_id__in=catalog_ids)
 
-        start_time = self.request.query_params.get('create_at__gte')
+        start_time = self.request.query_params.get("create_at__gte")
         if start_time:
             queryset = queryset.filter(create_at__gte=start_time)
 
-        end_time = self.request.query_params.get('create_at__lte')
+        end_time = self.request.query_params.get("create_at__lte")
         if end_time:
             queryset = queryset.filter(create_at__lte=end_time)
 
-        field_key = self.request.query_params.get('field_key', '')
+        field_key = self.request.query_params.get("field_key", "")
         paginate_queryset = self.paginate_queryset(queryset=queryset)
-        serializer = self.serializer_class(paginate_queryset, many=True,
-                                           context={'field_key': field_key})
+        serializer = self.serializer_class(
+            paginate_queryset, many=True, context={"field_key": field_key}
+        )
 
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def merge_tickets(self, request, *args, **kwargs):
         """绑定母子单"""
 
@@ -1303,8 +1447,9 @@ class TicketModelViewSet(ModelViewSet):
 
         with transaction.atomic():
             # 若重复关联母子单，则先清空旧的母子单关联关系
-            TicketToTicket.objects.filter(from_ticket_id__in=from_ticket_ids,
-                                          related_type=MASTER_SLAVE).delete()
+            TicketToTicket.objects.filter(
+                from_ticket_id__in=from_ticket_ids, related_type=MASTER_SLAVE
+            ).delete()
 
             bulk_list = []
             for from_ticket_id in from_ticket_ids:
@@ -1320,7 +1465,7 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def unmerge_tickets(self, request, *args, **kwargs):
         """解绑母子单"""
         data = request.data
@@ -1334,13 +1479,14 @@ class TicketModelViewSet(ModelViewSet):
 
         for slave_ticket in slave_tickets:
             TicketToTicket.raw_objects.filter(
-                from_ticket_id=slave_ticket.id, to_ticket_id=validated_data["master_ticket_id"]
+                from_ticket_id=slave_ticket.id,
+                to_ticket_id=validated_data["master_ticket_id"],
             ).update(related_status="RUNNING")
             clone_pipeline.apply_async(args=(slave_ticket, master_ticket))
 
         return Response()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def unbind_history(self, request, *args, **kwargs):
         """解绑历史"""
         # 参数校验
@@ -1351,11 +1497,18 @@ class TicketModelViewSet(ModelViewSet):
         validated_data = serializer.validated_data
         unbind_histories = (
             TicketToTicket.raw_objects.filter(
-                related_type=validated_data["related_type"], related_status="UNBIND_SUCCESS"
+                related_type=validated_data["related_type"],
+                related_status="UNBIND_SUCCESS",
             )
-                .filter(Q(from_ticket_id=ticket.id) | Q(to_ticket_id=ticket.id))
-                .values("from_ticket_id", "to_ticket_id", "from_ticket__sn", "to_ticket__sn",
-                        "create_at", "end_at")
+            .filter(Q(from_ticket_id=ticket.id) | Q(to_ticket_id=ticket.id))
+            .values(
+                "from_ticket_id",
+                "to_ticket_id",
+                "from_ticket__sn",
+                "to_ticket__sn",
+                "create_at",
+                "end_at",
+            )
         )
 
         ret = []
@@ -1383,13 +1536,13 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response(ret)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def table_fields(self, request, *args, **kwargs):
         """获取公共字段"""
         ticket = self.get_object()
         return Response(FieldSerializer(ticket.table_fields(), many=True).data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def edit_field(self, request, *args, **kwargs):
         """单个修改字段值"""
 
@@ -1402,19 +1555,21 @@ class TicketModelViewSet(ModelViewSet):
             old_field_instance = copy.deepcopy(field_instance)
             old_field_instance._value = old
             old_data = copy.deepcopy(FieldSerializer(old_field_instance).data)
-            old_data.update({"value_status": 'before'})
-            new_data.update({"value_status": 'after'})
+            old_data.update({"value_status": "before"})
+            new_data.update({"value_status": "after"})
 
             form_data.extend([old_data, new_data])
 
-        field = request.data.get('field')
+        field = request.data.get("field")
         ticket = self.get_object()
-        validate_data, field_obj = edit_field_validate(field, service=ticket.service_type)
-        field_value = validate_data['value']
+        validate_data, field_obj = edit_field_validate(
+            field, service=ticket.service_type
+        )
+        field_value = validate_data["value"]
 
-        update_data = {'_value': field_value}
-        if validate_data.get('choice'):
-            update_data.update(choice=validate_data['choice'])
+        update_data = {"_value": field_value}
+        if validate_data.get("choice"):
+            update_data.update(choice=validate_data["choice"])
 
         old_value = field_obj.value
 
@@ -1436,7 +1591,9 @@ class TicketModelViewSet(ModelViewSet):
             priority_data = ticket.update_priority(urgency, impact)
             if priority_data:
                 # 存在优先级修改记录的时候才进行跟踪
-                edit_field_tracker(priority_data['instance'], priority_data['old_value'])
+                edit_field_tracker(
+                    priority_data["instance"], priority_data["old_value"]
+                )
 
             ticket.refresh_sla_task()
 
@@ -1444,8 +1601,11 @@ class TicketModelViewSet(ModelViewSet):
         if field_obj.key == FIELD_STATUS and ticket.current_status != field_value:
             if field_value in ticket.status_instance.to_over_status_keys:
                 # 如果是结束状态，直接结束
-                ticket.close(close_status=field_value, desc=request.data.get("desc"),
-                             operator=request.user.username)
+                ticket.close(
+                    close_status=field_value,
+                    desc=request.data.get("desc"),
+                    operator=request.user.username,
+                )
                 return Response()
             ticket.update_current_status(field_value)
 
@@ -1458,7 +1618,7 @@ class TicketModelViewSet(ModelViewSet):
             ticket,
             0,
             request.user.username,
-            'EDIT_FIELD',
+            "EDIT_FIELD",
             message="{operator} 修改字段【{detail_message}】.",
             detail_message=field_obj.name,
             fields=form_data,
@@ -1467,24 +1627,29 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def batch_approval(self, request, *args, **kwargs):
         """批量审批"""
-        result = request.data.get('result')
-        opinion = request.data.get('opinion')
-        approval_list = request.data.get('approval_list', [])
+        result = request.data.get("result")
+        opinion = request.data.get("opinion")
+        approval_list = request.data.get("approval_list", [])
         user = request.user.username
         for ticket_info in approval_list:
-            ticket = Ticket.objects.get(id=ticket_info['ticket_id'])
-            running_approval_status = ticket.node_status.filter(status=RUNNING, type=APPROVAL_STATE)
+            ticket = Ticket.objects.get(id=ticket_info["ticket_id"])
+            running_approval_status = ticket.node_status.filter(
+                status=RUNNING, type=APPROVAL_STATE
+            )
             for node_status in running_approval_status:
                 if user in node_status.get_processor_in_sign_state():
                     SignTask.objects.update_or_create(
-                        status_id=node_status.id, processor=user, defaults={"status": "RUNNING"}
+                        status_id=node_status.id,
+                        processor=user,
+                        defaults={"status": "RUNNING"},
                     )
                     cache.set(
-                        "approval_status_{}_{}_{}".format(user, ticket_info['ticket_id'],
-                                                          node_status.state_id),
+                        "approval_status_{}_{}_{}".format(
+                            user, ticket_info["ticket_id"], node_status.state_id
+                        ),
                         "RUNNING",
                         CACHE_10MIN,
                     )
@@ -1500,16 +1665,17 @@ class TicketModelViewSet(ModelViewSet):
                             % (node_status.state_id, res.message)
                         )
                         cache.delete(
-                            "approval_status_{}_{}_{}".format(user, ticket_info['ticket_id'],
-                                                              node_status.state_id)
+                            "approval_status_{}_{}_{}".format(
+                                user, ticket_info["ticket_id"], node_status.state_id
+                            )
                         )
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def add_follower(self, request, *args, **kwargs):
         """关注or取关"""
         ticket = self.get_object()
-        attention = request.data.get('attention')
+        attention = request.data.get("attention")
         if attention:
             ticket.add_follower(request.user.username)
         else:
@@ -1524,77 +1690,97 @@ class TicketModelViewSet(ModelViewSet):
         serializer = self.serializer_class(sla_tasks, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def reply(self, request, *args, **kwargs):
         ticket = self.get_object()
         state_id = request.data.get("state_id")
         ticket.reply(state_id)
         return Response()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def ticket_base_info(self, request, *args, **kwargs):
         """提单信息"""
         ticket = self.get_object()
         return Response(ticket.base_info())
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def recently_used_service(self, request, *args, **kwargs):
         filter_serializer = RecentlyTicketFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         filter_kwargs = filter_serializer.validated_data
-        tickets = self.queryset.filter(creator=self.request.user.username,
-                                       **filter_kwargs).values_list("service_id")
+        tickets = self.queryset.filter(
+            creator=self.request.user.username, **filter_kwargs
+        ).values_list("service_id")
         service_ids = set([ticket[0] for ticket in tickets])
         services = Service.objects.filter(
-            id__in=service_ids, display_type__in=[OPEN, GENERAL, ORGANIZATION], is_valid=True
+            id__in=service_ids,
+            display_type__in=[OPEN, GENERAL, ORGANIZATION],
+            is_valid=True,
         )
-        serializer = ServiceSerializer(services, many=True, context={"request": request})
+        serializer = ServiceSerializer(
+            services, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def my_approval_ticket(self, request, *args, **kwargs):
-        tickets = Ticket.objects.get_approval_tickets(self.queryset, request.user.username)
+        tickets = Ticket.objects.get_approval_tickets(
+            self.queryset, request.user.username
+        )
         context = self.get_serializer_context()
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(tickets, many=True, context=context)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def operate_check(self, request, *args, **kwargs):
         user = request.user.username
-        content = Cache().get(request.query_params.get('cache_key'))
-        processed_user = ''
+        content = Cache().get(request.query_params.get("cache_key"))
+        processed_user = ""
         if content:
             content = json.loads(content)
-            status = Status.objects.get(ticket_id=content["ticket_id"],
-                                        state_id=content["state_id"])
-            if user not in status.ticket.real_current_processors and user in status.get_processors():
+            status = Status.objects.get(
+                ticket_id=content["ticket_id"], state_id=content["state_id"]
+            )
+            if (
+                user not in status.ticket.real_current_processors
+                and user in status.get_processors()
+            ):
                 processed_user = status.processed_user
-                if user not in processed_user.split(','):
-                    return Response({'is_processed': True, 'processed_user': processed_user})
-        return Response({'is_processed': False, 'processed_user': processed_user})
+                if user not in processed_user.split(","):
+                    return Response(
+                        {"is_processed": True, "processed_user": processed_user}
+                    )
+        return Response({"is_processed": False, "processed_user": processed_user})
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def tickets_processors(self, request, *args, **kwargs):
-        ticket_ids = request.query_params.get('ids', "").split(",")
+        ticket_ids = request.query_params.get("ids", "").split(",")
         processors = Ticket.get_ticket_current_processors(ticket_ids)
         return Response(
-            {ticket_id: ",".join(processors.get(int(ticket_id), [])) for ticket_id in ticket_ids})
+            {
+                ticket_id: ",".join(processors.get(int(ticket_id), []))
+                for ticket_id in ticket_ids
+            }
+        )
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def tickets_creator(self, request, *args, **kwargs):
-        ticket_ids = request.query_params.get('ids', "").split(",")
+        ticket_ids = request.query_params.get("ids", "").split(",")
         ticket_list = self.queryset.filter(id__in=ticket_ids)
-        creator = get_bk_users(format='dict',
-                               users=list(set([ticket.creator for ticket in ticket_list])))
+        creator = get_bk_users(
+            format="dict", users=list(set([ticket.creator for ticket in ticket_list]))
+        )
         return Response(creator)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def tickets_can_operate(self, request, *args, **kwargs):
-        ticket_ids = request.query_params.get('ids', "").split(",")
+        ticket_ids = request.query_params.get("ids", "").split(",")
         ticket_list = self.queryset.filter(id__in=ticket_ids)
-        can_operate = {ticket.id: ticket.can_operate(request.user.username) for ticket in
-                       ticket_list}
+        can_operate = {
+            ticket.id: ticket.can_operate(request.user.username)
+            for ticket in ticket_list
+        }
         return Response(can_operate)
 
 
