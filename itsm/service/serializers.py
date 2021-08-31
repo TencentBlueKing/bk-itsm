@@ -413,7 +413,7 @@ class ServiceSerializer(AuthModelSerializer):
         sla_tasks = validated_data.pop("sla", [])
 
         instance = super(ServiceSerializer, self).create(validated_data)
-        instance.bind_catalog(catalog_id)
+        instance.bind_catalog(catalog_id, instance.project_key)
         instance.update_service_sla(sla_tasks)
 
         return instance
@@ -438,7 +438,6 @@ class ServiceSerializer(AuthModelSerializer):
 
     def update(self, instance, validated_data):
         """更新后重新绑定目录"""
-
         catalog_id = validated_data.pop("catalog_id", 0)
         sla_tasks = validated_data.pop("sla", [])
         with transaction.atomic():
@@ -447,7 +446,7 @@ class ServiceSerializer(AuthModelSerializer):
             instance.desc = validated_data["desc"]
             instance.updated_by = validated_data["updated_by"]
             instance.save()
-            instance.bind_catalog(catalog_id)
+            instance.bind_catalog(catalog_id, instance.project_key)
             instance.update_service_sla(sla_tasks)
 
         return instance

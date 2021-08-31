@@ -374,13 +374,13 @@ class Service(ObjectManagerMixin, Model):
 
     # ========================================== method ====================================================
 
-    def bind_catalog(self, catalog_id):
+    def bind_catalog(self, catalog_id, project_key=DEFAULT_PROJECT_PROJECT_KEY):
         """绑定服务到目录上"""
 
         if catalog_id is None or catalog_id == 0:
             return {"result": False, "message": "目录不能为空"}
 
-        return CatalogService.bind_service_to_catalog(self.id, catalog_id)
+        return CatalogService.bind_service_to_catalog(self.id, catalog_id, project_key)
 
     def bind_catalog_by_key(self, key):
         """绑定服务到目录上"""
@@ -862,18 +862,18 @@ class CatalogService(Model):
         ]
 
     @classmethod
-    def bind_service_to_catalog(cls, service_id, catalog_id):
+    def bind_service_to_catalog(
+        cls, service_id, catalog_id, project_key=DEFAULT_PROJECT_PROJECT_KEY
+    ):
         """绑定服务到目录上，目录已被占用，则返回False"""
-
         # 目录没有改变
         if cls.objects.filter(service_id=service_id, catalog_id=catalog_id).exists():
             return {"result": True, "message": "目录没有改变，无需重复绑定"}
 
         # 解除服务和其他目录的绑定
         cls.objects.filter(service_id=service_id).delete()
-
         obj, created = cls.objects.update_or_create(
-            service_id=service_id, catalog_id=catalog_id
+            service_id=service_id, catalog_id=catalog_id, project_key=project_key
         )
 
         return {"result": True, "created": created, "message": "目录绑定成功"}
