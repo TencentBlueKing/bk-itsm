@@ -178,7 +178,7 @@
         display: inline-block;
     }
     .bk-field-half {
-        width: 100%;
+        width: 50%;
         position: relative;
         padding-right: 10px;
         display: inline-block;

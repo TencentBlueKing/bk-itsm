@@ -96,7 +96,7 @@
             <span class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right"
                 :title="item.display_value">
-                {{item.display_value || item.value || '--'}}
+                <pre>{{item.display_value || item.value || '--'}}</pre>
             </span>
         </div>
         <!-- 链接 -->
