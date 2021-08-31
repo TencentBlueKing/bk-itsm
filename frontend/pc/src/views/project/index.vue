@@ -51,9 +51,21 @@
             }
         },
         created () {
+            if (this.$store.state.project.id !== this.$route.query.project_id && this.$route.query.project_id !== '') {
+                this.$store.commit('project/setProjectId', this.$route.query.project_id)
+            }
             this.getProjectList()
             if (this.$store.state.project.id) {
                 this.getProjectDetail()
+            } else {
+                const projectsWithViewPerm = this.$store.state.projectList.filter(item => item.auth_actions.includes('project_view'))
+                if (projectsWithViewPerm.length === 0) {
+                    this.$router.replace({ name: 'ProjectGuide' })
+                } else {
+                    this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key)
+                    this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key)
+                    this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
+                }
             }
         },
         methods: {
@@ -72,16 +84,6 @@
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectList')
                     this.$store.commit('project/setProjectList', res.data.items)
-                    if (!this.$store.state.project.id) {
-                        const projectsWithViewPerm = res.data.items.filter(item => item.auth_actions.includes('project_view'))
-                        if (projectsWithViewPerm.length === 0) {
-                            this.$router.replace({ name: 'ProjectGuide' })
-                        } else {
-                            this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key)
-                            this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key)
-                            this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
-                        }
-                    }
                 } catch (e) {
                     errorHandler(e, this)
                 } finally {

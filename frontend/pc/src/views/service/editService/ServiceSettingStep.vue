@@ -395,10 +395,13 @@
                     const { type, value } = this.$refs.supervisePerson.getValue()
                     workflow.supervise_type = type
                     workflow.supervisor = value
-                    if (type === 'STARTER') {
+                    if (type === 'STARTER' || value === undefined) {
                         workflow.supervise_type = 'EMPTY'
                         workflow.supervisor = ''
                     }
+                } else { // 默认值
+                    workflow.supervise_type = 'EMPTY'
+                    workflow.supervisor = ''
                 }
                 // 通知方式
                 workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
