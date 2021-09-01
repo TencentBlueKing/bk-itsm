@@ -272,7 +272,7 @@
             },
             // 跳转到新建服务模式
             handleCreate () {
-                const routeData = this.$router.resolve({ path: '/slaManager', query: { key: 'create' } })
+                const routeData = this.$router.resolve({ path: '/project/sla_manage', query: { project_id: this.$store.state.project.id, key: 'create' } })
                 window.open(routeData.href, '_blank')
             },
             // 校验

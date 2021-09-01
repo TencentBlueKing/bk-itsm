@@ -93,6 +93,7 @@
             </bk-table>
         </div>
         <edit-project-dialog
+            :list="list"
             :title="editDialogTitle"
             :is-show="isEditDialogShow"
             :project="projectForm"

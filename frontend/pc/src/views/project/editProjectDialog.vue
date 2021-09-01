@@ -85,7 +85,8 @@
                         color: ''
                     }
                 }
-            }
+            },
+            list: Array
         },
         data () {
             return {
@@ -101,6 +102,13 @@
                         {
                             max: 50,
                             message: '不能多于50个字符',
+                            trigger: 'blur'
+                        },
+                        {
+                            validator: this.validateName,
+                            message: function (val) {
+                                return `${val}-此项目名称已存在`
+                            },
                             trigger: 'blur'
                         }
                     ],
@@ -118,6 +126,13 @@
                         {
                             regex: /^[a-z][a-z0-9-_]+$/,
                             message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
+                            trigger: 'blur'
+                        },
+                        {
+                            validator: this.validateKey,
+                            message: function (val) {
+                                return `${val}-此项目代号已存在`
+                            },
                             trigger: 'blur'
                         }
                     ],
@@ -139,6 +154,14 @@
             }
         },
         methods: {
+            validateName (val) {
+                const projectNames = this.list.map(item => item.name)
+                return !projectNames.includes(val)
+            },
+            validateKey (val) {
+                const projectNames = this.list.map(item => item.key)
+                return !projectNames.includes(val)
+            },
             onEditProjectConfirm () {
                 this.$refs.projectForm.validate().then(async (result) => {
                     if (result) {
