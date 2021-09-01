@@ -96,7 +96,7 @@
             <span class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right"
                 :title="item.display_value">
-                <pre>{{item.display_value || item.value || '--'}}</pre>
+                <pre class="bk-pre">{{item.display_value || item.value || '--'}}</pre>
             </span>
         </div>
         <!-- 链接 -->
@@ -350,5 +350,8 @@
                 color: #63656E;
             }
         }
+    }
+    .bk-pre {
+        white-space: pre-wrap;
     }
 </style>
