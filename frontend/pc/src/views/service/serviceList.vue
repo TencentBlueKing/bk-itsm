@@ -329,7 +329,7 @@
         mounted () {
             this.getServiceTypes()
             this.getList()
-            this.getSlaList()
+            // this.getSlaList()
         },
         methods: {
             // 获取数据
@@ -380,7 +380,8 @@
             // 服务级别列表
             getSlaList () {
                 const params = {
-                    is_enabled: true
+                    is_enabled: true,
+                    project_key: this.$route.state.project.id
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
                     this.slaList = res.data

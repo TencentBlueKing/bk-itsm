@@ -123,10 +123,10 @@
                 data.forEach(item => {
                     const lastForm = list[list.length - 1]
                     if (item.layout === 'COL_6') {
-                        if (Array.isArray(lastForm) && lastForm[1] === undefined && item.layout_position === 'right') {
+                        if (Array.isArray(lastForm) && lastForm[1] === undefined && item.meta.layout_position === 'right') {
                             lastForm[1] = item
                         } else {
-                            const halfRowForm = item.layout_position === 'right' ? [undefined, item] : [item, undefined]
+                            const halfRowForm = item.meta.layout_position === 'right' ? [undefined, item] : [item, undefined]
                             list.push(halfRowForm)
                         }
                         return
@@ -167,7 +167,7 @@
                         }
                     }
                 }
-                field.layout_position = 'left'
+                field.meta.layout_position = 'left'
                 this.$emit('dragUpdateList', targetIndex, field)
             },
             // 半行表单拖拽到半行
@@ -180,10 +180,10 @@
                 const otherForm = rowForms.find(item => item)
                 const otherFormIndex = this.forms.findIndex(item => item.id === otherForm.id)
                 if (rowForms[0] === undefined) {
-                    field.layout_position = 'left'
+                    field.meta.layout_position = 'left'
                     targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
                 } else {
-                    field.layout_position = 'right'
+                    field.meta.layout_position = 'right'
                     targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
                 }
                 this.$emit('dragUpdateList', targetIndex, field)
