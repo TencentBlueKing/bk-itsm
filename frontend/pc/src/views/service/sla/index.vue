@@ -315,7 +315,8 @@
             getSlaList () {
                 this.slaListLoading = true
                 const params = {
-                    is_enabled: true
+                    is_enabled: true,
+                    project_key: this.$store.state.project.id
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
                     this.slaList = res.data
@@ -352,7 +353,10 @@
                 this.endNodeOption = afterNodes
             },
             getProtocolName (protocol) {
-                return protocol && this.slaList.find(sla => sla.id === protocol).name
+                const slaname = this.slaList.find(sla => sla.id === protocol)
+                if (slaname && slaname.name) {
+                    return protocol && slaname.name
+                }
             },
             handleSetAgreement () {
                 this.$refs.agreementForm.validate().then(validator => {
@@ -505,11 +509,11 @@
             },
             // 跳转到新建服务协议
             handleCreateAgreement () {
-                const routeData = this.$router.resolve({ path: '/agreement', query: { key: 'create' } })
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id } })
                 window.open(routeData.href, '_blank')
             },
             handleEditAgreement (option) {
-                const routeData = this.$router.resolve({ path: '/agreement', query: { key: 'create', item: JSON.stringify(option) } })
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id, item: JSON.stringify(option) } })
                 window.open(routeData.href, '_blank')
             },
             // 校验
