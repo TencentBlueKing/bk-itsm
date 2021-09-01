@@ -505,11 +505,11 @@
             },
             // 跳转到新建服务协议
             handleCreateAgreement () {
-                const routeData = this.$router.resolve({ path: '/agreement', query: { key: 'create' } })
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id } })
                 window.open(routeData.href, '_blank')
             },
             handleEditAgreement (option) {
-                const routeData = this.$router.resolve({ path: '/agreement', query: { key: 'create', item: JSON.stringify(option) } })
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id, item: JSON.stringify(option) } })
                 window.open(routeData.href, '_blank')
             },
             // 校验
