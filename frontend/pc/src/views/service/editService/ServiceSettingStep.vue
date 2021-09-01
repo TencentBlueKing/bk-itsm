@@ -290,7 +290,7 @@
                     is_supervise_needed: isSuperviseNeeded,
                     notify_rule: notifyRule,
                     notify_freq: notifyFreq,
-                    supervise_type: superviseType
+                    supervise_type
                 } = this.serviceInfo
                 try {
                     const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type)
@@ -317,7 +317,7 @@
                     this.formData.notify_freq = Number(notifyFreq) / 3600
                 }
                 this.supervisePerson = {
-                    type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
+                    type: supervise_type === 'EMPTY' ? 'STARTER' : supervise_type,
                     value: supervisor
                 }
             },
@@ -352,7 +352,10 @@
             },
             async validate () {
                 const params = {
-                    workflow_config: {}
+                    workflow_config: {
+                        supervise_type: 'EMPTY',
+                        supervisor: ''
+                    }
                 }
                 const workflow = params.workflow_config // 之前存在流程上的参数
                 // 可见范围
@@ -393,11 +396,9 @@
                 // 督办
                 if (this.$refs.supervisePerson && workflow.is_supervise_needed) {
                     const { type, value } = this.$refs.supervisePerson.getValue()
-                    workflow.supervise_type = type
-                    workflow.supervisor = value
-                    if (type === 'STARTER') {
-                        workflow.supervise_type = 'EMPTY'
-                        workflow.supervisor = ''
+                    if (type !== 'STARTER') {
+                        workflow.supervise_type = type
+                        workflow.supervisor = value
                     }
                 }
                 // 通知方式

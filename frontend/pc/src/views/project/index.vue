@@ -51,6 +51,9 @@
             }
         },
         created () {
+            if (this.$store.state.project.id !== this.$route.query.project_id && this.$route.query.project_id !== '') {
+                this.$store.commit('project/setProjectId', this.$route.query.project_id)
+            }
             this.getProjectList()
             if (this.$store.state.project.id) {
                 this.getProjectDetail()
