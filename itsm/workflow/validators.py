@@ -70,7 +70,15 @@ from itsm.component.utils.misc import find_sub_string
 from itsm.postman.models import RemoteApi
 from itsm.role.models import RoleType
 from itsm.workflow.backend import PipelineWrapper
-from itsm.workflow.models import Field, GlobalVariable, TemplateField, Transition, Workflow, TaskSchema, TaskConfig
+from itsm.workflow.models import (
+    Field,
+    GlobalVariable,
+    TemplateField,
+    Transition,
+    Workflow,
+    TaskSchema,
+    TaskConfig,
+)
 from itsm.trigger.models import Trigger
 from pipeline.exceptions import ConvergeMatchError, ParserException, StreamValidateError
 from pipeline.parser import PipelineParser
@@ -83,7 +91,11 @@ def person_validate(processors):
     processors = list_by_separator(processors)
     bk_users = get_bk_users(users=processors)
     if not set(processors).issubset(set(bk_users)):
-        raise ParamError(_("【{}】用户不存在").format(",".join(list(set(processors).difference(set(bk_users))))))
+        raise ParamError(
+            _("【{}】用户不存在").format(
+                ",".join(list(set(processors).difference(set(bk_users))))
+            )
+        )
 
 
 def person_and_type_validate(processors, processors_type, is_biz_needed):
@@ -139,10 +151,15 @@ def related_states_validate(field_key, workflow_states):
         if not task_api_instance:
             continue
 
-        if filter_key in task_api_instance.req_body or filter_key in task_api_instance.req_params:
+        if (
+            filter_key in task_api_instance.req_body
+            or filter_key in task_api_instance.req_params
+        ):
             raise ParamError(_("该字段正在被【{}】节点引用，请先取消引用").format(task_state.name))
 
-    sops_states = StateExtrasSerializer(workflow_states.filter(type=TASK_SOPS_STATE, is_draft=False), many=True).data
+    sops_states = StateExtrasSerializer(
+        workflow_states.filter(type=TASK_SOPS_STATE, is_draft=False), many=True
+    ).data
     for state in sops_states:
         keys = []
         if state["extras"]["sops_info"]["bk_biz_id"]["value_type"] == "variable":
@@ -187,9 +204,13 @@ def show_conditions_validate(field_key, workflow_fields):
     """
     from itsm.workflow.serializers import ConditionsFieldSerializer
 
-    show_conditions = ConditionsFieldSerializer(workflow_fields.filter(show_type=SHOW_BY_CONDITION), many=True).data
+    show_conditions = ConditionsFieldSerializer(
+        workflow_fields.filter(show_type=SHOW_BY_CONDITION), many=True
+    ).data
     for condition in show_conditions:
-        if field_key in [exp["key"] for exp in condition["show_conditions"]["expressions"]]:
+        if field_key in [
+            exp["key"] for exp in condition["show_conditions"]["expressions"]
+        ]:
             raise ParamError(_("该字段正作为【{}】字段的显示条件，请先取消引用").format(condition["name"]))
 
 
@@ -210,9 +231,13 @@ def template_fields_exists_validate(fields):
 
     if not fields:
         raise ParamError(_("请选择字段"))
-    template_fields = list(TemplateField.objects.filter(id__in=fields).values_list("id", flat=True))
+    template_fields = list(
+        TemplateField.objects.filter(id__in=fields).values_list("id", flat=True)
+    )
     if set(fields).difference(template_fields):
-        raise ParamError(_("{}公共字段不存在，请联系管理员").format(list(set(fields).difference(template_fields))))
+        raise ParamError(
+            _("{}公共字段不存在，请联系管理员").format(list(set(fields).difference(template_fields)))
+        )
 
 
 def table_remove_fiels_validate(fields, table):
@@ -222,21 +247,29 @@ def table_remove_fiels_validate(fields, table):
 
     table_fields = list(table.fields.values_list("id", flat=True))
     if not set(fields).issubset(table_fields):
-        raise ParamError(_("{}公共字段不存在，请联系管理员").format(list(set(table_fields).difference(fields))))
+        raise ParamError(
+            _("{}公共字段不存在，请联系管理员").format(list(set(table_fields).difference(fields)))
+        )
 
 
 def add_fields_from_table_validate(fields, state):
     """从基础模型添加字段校验"""
 
     custom_fields = (
-        Field.objects.filter(id__in=state.fields).exclude(source__in=[TABLE, BASE_MODEL]).values_list("key", flat=True)
+        Field.objects.filter(id__in=state.fields)
+        .exclude(source__in=[TABLE, BASE_MODEL])
+        .values_list("key", flat=True)
     )
     table_fields = [field["key"] for field in fields]
 
     if set(custom_fields).difference(table_fields) != set(custom_fields):
         raise ParamError(
             _("当前流程已存在唯一标识【{}】，请重新输入").format(
-                ",".join(list(set(custom_fields) - set(custom_fields).difference(table_fields)))
+                ",".join(
+                    list(
+                        set(custom_fields) - set(custom_fields).difference(table_fields)
+                    )
+                )
             )
         )
 
@@ -289,25 +322,31 @@ class WorkflowPipelineValidator(object):
 
     def task_validate(self):
         task_schema_ids = []
-        task_config = TaskConfig.objects.filter(workflow_id=self.instance.id, workflow_type=FLOW)
+        task_config = TaskConfig.objects.filter(
+            workflow_id=self.instance.id, workflow_type=FLOW
+        )
         for task_info in task_config:
             if task_info.task_schema_id not in task_schema_ids:
                 task_schema_ids.append(task_info.task_schema_id)
         if not task_schema_ids:
             return
 
-        draft_tasks = TaskSchema.objects.filter(id__in=task_schema_ids, is_draft=True).values_list("name", flat=True)
+        draft_tasks = TaskSchema.objects.filter(
+            id__in=task_schema_ids, is_draft=True
+        ).values_list("name", flat=True)
         if draft_tasks:
-            raise WorkFlowInvalidError([], _("流程内引用的任务模版【%s】为草稿状态，无法部署") % ",".join(draft_tasks))
+            raise WorkFlowInvalidError(
+                [], _("流程内引用的任务模版【%s】为草稿状态，无法部署") % ",".join(draft_tasks)
+            )
 
         for task in TaskSchema.objects.filter(id__in=task_schema_ids):
             self.trigger_validate(task, SOURCE_TASK)
 
     def state_validate(self):
         invalid_state_ids = list(
-            self.instance.states.filter(is_draft=True, is_deleted=False, type__in=NORMAL_STATES).values_list(
-                "id", flat=True
-            )
+            self.instance.states.filter(
+                is_draft=True, is_deleted=False, type__in=NORMAL_STATES
+            ).values_list("id", flat=True)
         )
 
         if invalid_state_ids:
@@ -318,15 +357,23 @@ class WorkflowPipelineValidator(object):
 
         error_messages = []
         all_field_keys = list(self.instance.fields.all().values_list("key", flat=True))
-        all_field_keys.extend([gv['key'] for gv in TICKET_GLOBAL_VARIABLES])
-        all_field_keys.extend(self.instance.table.fields.all().values_list("key", flat=True))
-        all_field_keys.extend(GlobalVariable.objects.filter(flow_id=self.instance.id).values_list("key", flat=True))
+        all_field_keys.extend([gv["key"] for gv in TICKET_GLOBAL_VARIABLES])
+        all_field_keys.extend(
+            self.instance.table.fields.all().values_list("key", flat=True)
+        )
+        all_field_keys.extend(
+            GlobalVariable.objects.filter(flow_id=self.instance.id).values_list(
+                "key", flat=True
+            )
+        )
 
         field_variables = self.get_condition_related_fields()
         for item in field_variables:
             item["diff"] = ",".join(set(item["fields"]).difference(set(all_field_keys)))
             if item["diff"]:
-                error_messages.append(_("{obj_type}【{name}】使用了未定义的字段【{diff}】").format(**item))
+                error_messages.append(
+                    _("{obj_type}【{name}】使用了未定义的字段【{diff}】").format(**item)
+                )
 
         if error_messages:
             raise WorkFlowInvalidError([], ", ".join(error_messages))
@@ -391,7 +438,9 @@ class WorkflowPipelineValidator(object):
         except WorkFlowInvalidError as error:
             raise error
         except ParserException as error:
-            invalid_state_ids = [int(self.states_map[k]) for arg in error.args for k, v in arg.items()]
+            invalid_state_ids = [
+                int(self.states_map[k]) for arg in error.args for k, v in arg.items()
+            ]
             raise WorkFlowInvalidError(invalid_state_ids, _("当前流程画布连线不合理，请重新确认. "))
         except ConvergeMatchError as error:
             invalid_state_ids = [int(self.states_map[error.gateway_id])]
@@ -431,17 +480,24 @@ class StateProcessorsValidator(object):
 
         is_biz_needed = value.get("workflow").is_biz_needed
 
-        if not RoleType.objects.filter(is_processor=True, type=processors_type).exists():
+        if not RoleType.objects.filter(
+            is_processor=True, type=processors_type
+        ).exists():
             raise ParamError(_("操作角色不存在"))
 
         # 支持提单人角色：STARTER
-        if processors_type not in [role.OPEN, role.STARTER, role.BY_ASSIGNOR, role.STARTER_LEADER] and processors == "":
+        if (
+            processors_type
+            not in [role.OPEN, role.STARTER, role.BY_ASSIGNOR, role.STARTER_LEADER]
+            and processors == ""
+        ):
             raise ParamError(_("操作角色不能为空"))
 
         if processors_type == role.OPEN:
             if not (
                 self.instance.is_first_state
-                or value["distribute_type"] in ["DISTRIBUTE_THEN_PROCESS", "DISTRIBUTE_THEN_CLAIM"]
+                or value["distribute_type"]
+                in ["DISTRIBUTE_THEN_PROCESS", "DISTRIBUTE_THEN_CLAIM"]
             ):
                 raise ParamError(_("该节点操作角色不能选择不限"))
 
@@ -491,8 +547,12 @@ class FieldValidator(object):
             raise ParamError(_("title 为内置唯一标识，请重新输入"))
 
         if (
-            Field.objects.filter(workflow_id=value.get("workflow"), key=value.get("key")).exists()
-            or GlobalVariable.objects.filter(flow_id=value.get("workflow").id, key=value.get("key")).exists()
+            Field.objects.filter(
+                workflow_id=value.get("workflow"), key=value.get("key")
+            ).exists()
+            or GlobalVariable.objects.filter(
+                flow_id=value.get("workflow").id, key=value.get("key")
+            ).exists()
         ):
             raise ParamError(_("当前流程已存在唯一标识【{}】，请重新输入").format(value.get("key")))
 
@@ -529,11 +589,16 @@ class FieldValidator(object):
             single_column_validate(column)
 
     def select_type_choice_validate(self, value):
-        if not (value.get("type") in list(SELECT_TYPE_CHOICES.keys()) and value.get("source_type") == "CUSTOM"):
+        if not (
+            value.get("type") in list(SELECT_TYPE_CHOICES.keys())
+            and value.get("source_type") == "CUSTOM"
+        ):
             return
         choice = value.get("choice", [])
         if not choice:
-            raise ParamError(_("【{0}】请输入自定义数据，换行分隔。").format(SELECT_TYPE_CHOICES[value.get("type")]))
+            raise ParamError(
+                _("【{0}】请输入自定义数据，换行分隔。").format(SELECT_TYPE_CHOICES[value.get("type")])
+            )
         for field in choice:
             name = field.get("name")
             key = field.get("key")
@@ -561,7 +626,9 @@ class FieldValidator(object):
         """
         self.field_common_validate(key)
         if not re.match("^[_a-zA-Z0-9]*$", key) or len(key) > LEN_MIDDLE:
-            raise ParamError(_("自定义数据key值【{}】仅支持【英文、数字和下划线】，长度小于128字符，请重新输入").format(key))
+            raise ParamError(
+                _("自定义数据key值【{}】仅支持【英文、数字和下划线】，长度小于128字符，请重新输入").format(key)
+            )
 
     @staticmethod
     def update_type_validate(instance, value):
@@ -573,7 +640,10 @@ class FieldValidator(object):
         if instance.type != value["type"]:
             related_validate(instance)
             return
-        if instance.type in list(SELECT_TYPE_CHOICES.keys()) and instance.source_type == "CUSTOM":
+        if (
+            instance.type in list(SELECT_TYPE_CHOICES.keys())
+            and instance.source_type == "CUSTOM"
+        ):
             if value.get("source_type") != "CUSTOM":
                 # source_type发生变化了，不需要以下校验
                 return
@@ -594,17 +664,26 @@ class TemplateFieldValidator(FieldValidator):
         self.tips_validate(value)
 
     def key_validate(self, value):
-        if not value.get("key"):
+
+        if not value.get("key") or not value.get("project_key"):
             return
         self.field_key_validate(value.get("key"))
         if not self.instance:
-            if TemplateField.objects.filter(Q(key=value.get("key")) & Q(is_deleted=False)).exists():
+            if TemplateField.objects.filter(
+                Q(key=value.get("key"))
+                & Q(project_key=value.get("project_key"))
+                & Q(is_deleted=False)
+            ).exists():
                 if value.get("key") in [FIELD_TITLE, FIELD_BIZ]:
                     raise ParamError(_("title, bk_biz_id 为内置唯一标识，请重新输入"))
-                raise ParamError(_("字段库已存在唯一标识【{}】，请重新输入").format(value.get("key")))
+                raise ParamError(_("当前项目字段库已存在唯一标识【{}】，请重新输入").format(value.get("key")))
 
     def name_validate(self, value):
-        fields = TemplateField.objects.filter(Q(name=value.get("name")) & Q(is_deleted=False))
+        fields = TemplateField.objects.filter(
+            Q(name=value.get("name"))
+            & Q(is_deleted=False)
+            & Q(project_key=value.get("project_key"))
+        )
         if self.instance:
             fields = fields.exclude(id=self.instance.id)
         if fields.exists():
@@ -644,7 +723,10 @@ class StatePollValidator(object):
             raise ParamError(_("轮询间隔必须为大于0的整数"))
         if not end_conditions.get("poll_time", ""):
             raise ParamError(_("轮询次数必须为大于0的整数"))
-        if not (str(end_conditions.get("poll_interval", "")) and str(end_conditions.get("poll_time", ""))):
+        if not (
+            str(end_conditions.get("poll_interval", ""))
+            and str(end_conditions.get("poll_time", ""))
+        ):
             raise ParamError(_("请添加完整结束条件"))
 
 
@@ -668,7 +750,9 @@ class StateGlobalVariablesValidator(object):
         """
         和其他相关联的model校验
         """
-        path_key_dict = {item["ref_path"]: item["key"] for item in self.instance.variables["outputs"]}
+        path_key_dict = {
+            item["ref_path"]: item["key"] for item in self.instance.variables["outputs"]
+        }
         refs = [output.get("ref_path") for output in outputs]
         deleted_variable = []
         for ref, key in six.iteritems(path_key_dict):
@@ -693,7 +777,9 @@ class TransitionValidator(object):
 
         self.from_state = value["from_state"]
         self.to_state = value["to_state"]
-        if Transition.objects.filter(from_state=self.from_state, to_state=self.to_state, is_deleted=False).exists():
+        if Transition.objects.filter(
+            from_state=self.from_state, to_state=self.to_state, is_deleted=False
+        ).exists():
             raise TransitionError(_("起始节点已经存在连接线."))
 
         # 节点连接校验
@@ -717,13 +803,15 @@ class TransitionValidator(object):
             if self.to_state.label == EMPTY and self.to_state.type != COVERAGE_STATE:
                 return
             if (
-                find_sub_string(self.to_state.label, NORMAL_STATE_LABEL_PREFIX) == self.from_state.label
+                find_sub_string(self.to_state.label, NORMAL_STATE_LABEL_PREFIX)
+                == self.from_state.label
                 and self.to_state.type in NORMAL_STATES
             ):
                 return
             if (
                 self.to_state.type == ROUTER_P_STATE
-                and find_sub_string(self.to_state.label, ROUTER_STATE_LABEL_PREFIX) == self.from_state.label
+                and find_sub_string(self.to_state.label, ROUTER_STATE_LABEL_PREFIX)
+                == self.from_state.label
             ):
                 return
             raise TransitionError(_("并行网关连线不规范"))
@@ -731,12 +819,16 @@ class TransitionValidator(object):
         if EMPTY in [self.from_state.label, self.to_state.label]:
             # 其中一个为空，也可以连接
             if self.from_state.type in NORMAL_STATES:
-                if self.to_state.type == COVERAGE_STATE and self.to_state.label == EMPTY:
+                if (
+                    self.to_state.type == COVERAGE_STATE
+                    and self.to_state.label == EMPTY
+                ):
                     if self.from_state.label.rfind(NORMAL_STATE_LABEL_PREFIX) == -1:
                         raise TransitionError(_("待连接的聚合网关与当前节点不在同一个工作区域内"))
             if (
                 self.from_state.type == COVERAGE_STATE == self.to_state.type
-                and find_sub_string(self.from_state.label, ROUTER_STATE_LABEL_PREFIX) == GLOBAL_LABEL
+                and find_sub_string(self.from_state.label, ROUTER_STATE_LABEL_PREFIX)
+                == GLOBAL_LABEL
             ):
                 raise TransitionError(_("待连接的聚合网关与当前节点不在同一个工作区域内"))
             return
@@ -749,9 +841,13 @@ class TransitionValidator(object):
             if self.from_state.type != COVERAGE_STATE:
                 return
 
-            from_state_pre_label = find_sub_string(self.from_state.label, ROUTER_STATE_LABEL_PREFIX)
+            from_state_pre_label = find_sub_string(
+                self.from_state.label, ROUTER_STATE_LABEL_PREFIX
+            )
             # 如果from 和 to 都是聚合，则from的比较值要继续往前推一个区域
-            from_state_pre_label = find_sub_string(from_state_pre_label, NORMAL_STATE_LABEL_PREFIX)
+            from_state_pre_label = find_sub_string(
+                from_state_pre_label, NORMAL_STATE_LABEL_PREFIX
+            )
             to_state_pre_label = find_sub_string(self.to_state.label, LABEL_PREFIX)
 
             if from_state_pre_label != to_state_pre_label:
@@ -761,14 +857,22 @@ class TransitionValidator(object):
         to_state_pre_label = find_sub_string(self.to_state.label, LABEL_PREFIX)
 
         if self.from_state.type == COVERAGE_STATE:
-            from_state_pre_label = find_sub_string(self.from_state.label, ROUTER_STATE_LABEL_PREFIX)
+            from_state_pre_label = find_sub_string(
+                self.from_state.label, ROUTER_STATE_LABEL_PREFIX
+            )
             if self.to_state.type == ROUTER_P_STATE:
-                to_state_pre_label = find_sub_string(self.to_state.label, ROUTER_STATE_LABEL_PREFIX)
+                to_state_pre_label = find_sub_string(
+                    self.to_state.label, ROUTER_STATE_LABEL_PREFIX
+                )
             else:
                 to_state_pre_label = self.to_state.label
         elif self.to_state.type == COVERAGE_STATE:
-            from_state_pre_label = find_sub_string(self.from_state.label, NORMAL_STATE_LABEL_PREFIX)
-            to_state_pre_label = find_sub_string(self.to_state.label, COVERAGE_STATE_LABEL_PREFIX)
+            from_state_pre_label = find_sub_string(
+                self.from_state.label, NORMAL_STATE_LABEL_PREFIX
+            )
+            to_state_pre_label = find_sub_string(
+                self.to_state.label, COVERAGE_STATE_LABEL_PREFIX
+            )
         else:
             from_state_pre_label = self.from_state.label
         if from_state_pre_label != to_state_pre_label:
@@ -779,7 +883,9 @@ def task_schema_delete_validate(instance):
     """
     当被引用的时候，不能删除任务模板
     """
-    is_exist = TaskConfig.objects.filter(workflow_type=FLOW, task_schema_id=instance.id).exists()
+    is_exist = TaskConfig.objects.filter(
+        workflow_type=FLOW, task_schema_id=instance.id
+    ).exists()
     if is_exist:
         raise ValidationError(_("当前任务模板已经被流程引用，无法删除！"))
 
