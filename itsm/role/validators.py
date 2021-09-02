@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
+from itsm.component.constants import DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.utils.basic import list_by_separator
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.role.models import RoleType, UserRole
@@ -41,13 +42,16 @@ class UserRoleValidator(object):
         role_key = value.get("role_key", "")
         name = value.get("name", "")
         access = value.get("access", "")
+        project_key = value.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
         members = list_by_separator(value.get("members", ""))
 
         if not RoleType.objects.filter(type=role_type).exists():
             raise serializers.ValidationError(_("{}角色类型不存在").format(role_type))
 
         if (
-            UserRole.objects.filter(name=name, role_type=role_type)
+            UserRole.objects.filter(
+                name=name, role_type=role_type, project_key=project_key
+            )
             .exclude(pk__in=[self.role.id] if self.role else [])
             .exists()
         ):
@@ -63,7 +67,9 @@ class UserRoleValidator(object):
         bk_users = get_bk_users(users=members)
         if not set(members).issubset(set(bk_users)):
             raise serializers.ValidationError(
-                _("【{}】用户不存在").format(",".join(list(set(members).difference(set(bk_users)))))
+                _("【{}】用户不存在").format(
+                    ",".join(list(set(members).difference(set(bk_users))))
+                )
             )
 
 
