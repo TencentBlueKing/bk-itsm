@@ -311,6 +311,7 @@
                                 pushData = {
                                     ...item,
                                     isCheck: true,
+                                    remindRuleValue: policie.condition.expressions[0].value,
                                     receivers: policie.actions[0].config.receivers,
                                     notify_type_list: policie.actions[0].config.notify.map(notifyObj => notifyObj.notify_type),
                                     email_notify: emailNotify && emailNotify.notify_template,
