@@ -329,7 +329,7 @@
         mounted () {
             this.getServiceTypes()
             this.getList()
-            this.getSlaList()
+            // this.getSlaList()
         },
         methods: {
             // 获取数据

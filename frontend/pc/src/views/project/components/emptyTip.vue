@@ -42,7 +42,7 @@
             <div class="link-area">
                 <div class="link-item" v-for="(item, index) in links" :key="index">
                     {{item.text}}
-                    <a :href="item.href" class="link-btn">
+                    <a :href="item.href" target="_blank" class="link-btn">
                         {{ item.btn }}
                         <i class="bk-itsm-icon icon-itsm-icon-three-seven"></i>
                     </a>

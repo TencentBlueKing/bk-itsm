@@ -22,6 +22,17 @@
 
 <template>
     <div class="bk-get-param">
+        <bk-table
+            v-if="isStatic"
+            :data="sopstableinfo"
+            :ext-cls="'bk-editor-table'">
+            <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
+            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+                <template slot-scope="props">
+                    <span>{{props.row.value || '--'}}</span>
+                </template>
+            </bk-table-column>
+        </bk-table>
         <!-- <bk-table :ext-cls="'bk-editor-table'"
             :data="paramTableShow"
             :size="'small'">
@@ -220,7 +231,8 @@
                     show: false,
                     width: 700
                 },
-                showTabData: {}
+                showTabData: {},
+                sopstableinfo: []
             }
         },
         computed: {},
@@ -266,6 +278,18 @@
             // },
             constants () {
                 this.renderKey = new Date().getTime()
+            }
+        },
+        mounted () {
+            if (this.isStatic === true) {
+                this.sopstableinfo = []
+                this.isStaticData.forEach((item) => {
+                    const ite = {
+                        name: item.name,
+                        value: item.value
+                    }
+                    this.sopstableinfo.push(ite)
+                })
             }
         },
         methods: {
