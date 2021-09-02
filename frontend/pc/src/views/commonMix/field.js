@@ -94,7 +94,7 @@ export default {
         // 关联数据展示的逻辑处理
         conditionField (item, list) {
             for (let i = 0; i < list.length; i++) {
-                if (list[i].show_type) {
+                if (list[i].show_type || list[i].show_result) {
                     list[i].showFeild = true
                     continue
                 }

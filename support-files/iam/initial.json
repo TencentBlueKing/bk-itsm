@@ -699,31 +699,6 @@
             }
         },
         {
-            "operation": "upsert_action",
-            "data": {
-                "id": "ticket_manage",
-                "name": "工单管理",
-                "name_en": "Manage Ticket",
-                "description": "管理某个服务资源下工单的权限",
-                "description_en": "",
-                "type": "manage",
-                "related_resource_types": [
-                    {
-                        "system_id": "bk_itsm",
-                        "id": "project",
-                        "related_instance_selections": [
-                            {
-                                "system_id": "bk_itsm",
-                                "id": "project_list",
-                                 "ignore_iam_path": true
-                            }
-                        ]
-                    }
-                ],
-                "version": 1
-            }
-        },
-        {
             "operation": "upsert_resource_type",
             "data": {
                 "id": "field",
