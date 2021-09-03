@@ -80,20 +80,26 @@
                             @click="onEditProject(props)">
                             {{ $t(`m['编辑']`) }}
                         </bk-button>
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
-                            text
-                            theme="primary"
-                            :class="{ 'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
-                            @click="onDeleteProject(props.row)">
-                            {{ $t(`m['删除']`) }}
-                        </bk-button>
+                        <div
+                            :style="{ display: 'inline-block' }"
+                            v-bk-tooltips.right="$t(`m['该项目不允许删除']`)">
+                            <!-- 删除按钮暂时禁用 -->
+                            <bk-button
+                                v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
+                                text
+                                theme="primary"
+                                :disabled="true"
+                                :class="{ 'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
+                                @click="onDeleteProject(props.row)">
+                                {{ $t(`m['删除']`) }}
+                            </bk-button>
+                        </div>
                     </template>
                 </bk-table-column>
             </bk-table>
         </div>
         <edit-project-dialog
-            :list="list"
+            :validate-list="valiateKeyNameObj"
             :title="editDialogTitle"
             :is-show="isEditDialogShow"
             :project="projectForm"
@@ -150,6 +156,10 @@
                     current: 1,
                     count: 0,
                     limit: 10
+                },
+                valiateKeyNameObj: {
+                    projectKeys: [],
+                    projectNames: []
                 }
             }
         },
@@ -207,6 +217,7 @@
                     return
                 }
                 this.isEditDialogShow = true
+                this.setValidateCondition()
                 this.projectForm = {
                     name: '',
                     key: '',
@@ -215,8 +226,20 @@
                 }
                 this.editingProject = null
             },
+            setValidateCondition (type, row) {
+                const projectKeys = this.list.map(item => item.key)
+                const projectNames = this.list.map(item => item.name)
+                this.valiateKeyNameObj = { projectKeys, projectNames }
+                if (type === 'edit') {
+                    this.valiateKeyNameObj = {
+                        projectKeys: projectKeys.filter(ite => ite !== row.key),
+                        projectNames: projectNames.filter(ite => ite !== row.name)
+                    }
+                }
+            },
             onEditProject (props) {
                 this.editingProject = props.row
+                this.setValidateCondition('edit', this.editingProject)
                 if (!this.hasPermission(['project_edit'], this.editingProject.auth_actions)) {
                     const resourceData = {
                         project: [{

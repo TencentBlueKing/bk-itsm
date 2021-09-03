@@ -86,7 +86,7 @@
                     }
                 }
             },
-            list: Array
+            validateList: Object
         },
         data () {
             return {
@@ -155,12 +155,10 @@
         },
         methods: {
             validateName (val) {
-                const projectNames = this.list.map(item => item.name)
-                return !projectNames.includes(val)
+                return !this.validateList.projectNames.includes(val)
             },
             validateKey (val) {
-                const projectNames = this.list.map(item => item.key)
-                return !projectNames.includes(val)
+                return !this.validateList.projectKeys.includes(val)
             },
             onEditProjectConfirm () {
                 this.$refs.projectForm.validate().then(async (result) => {
