@@ -99,7 +99,7 @@
             </bk-table>
         </div>
         <edit-project-dialog
-            :validate-list="validateKeyNameObj"
+            :validate-list="validateKeyName"
             :title="editDialogTitle"
             :is-show="isEditDialogShow"
             :project="projectForm"
@@ -157,10 +157,7 @@
                     count: 0,
                     limit: 10
                 },
-                validateKeyNameObj: {
-                    projectKeys: [],
-                    projectNames: []
-                }
+                validateKeyName: []
             }
         },
         computed: {
@@ -227,18 +224,12 @@
                 this.editingProject = null
             },
             setValidateCondition (type, row) {
-                const projectKeys = []
-                const projectNames = []
-                this.list.map(item => {
-                    projectKeys.push(item.key)
-                    projectNames.push(item.name)
+                const list = this.list.map(item => {
+                    return { key: item.key, name: item.name }
                 })
-                this.validateKeyNameObj = { projectKeys, projectNames }
+                this.validateKeyName = list
                 if (type === 'edit') {
-                    this.validateKeyNameObj = {
-                        projectKeys: projectKeys.filter(ite => ite !== row.key),
-                        projectNames: projectNames.filter(ite => ite !== row.name)
-                    }
+                    this.validateKeyName = list.filter(item => item.key !== row.key)
                 }
             },
             onEditProject (props) {
