@@ -36,15 +36,6 @@
         ]
     },
     {
-        "name": "单据查看",
-        "name_en": "ticket_view",
-        "actions": [
-            {
-                "id": "ticket_view"
-            }
-        ]
-    },
-    {
         "name": "统计信息查看",
         "name_en": "operational_data_view",
         "actions": [
