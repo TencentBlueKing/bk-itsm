@@ -31,7 +31,13 @@ from django.core.validators import RegexValidator
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from itsm.component.constants import PRIORITY, PX_URGENCY, PY_IMPACT, WEEKDAY_CHOICES
+from itsm.component.constants import (
+    PRIORITY,
+    PX_URGENCY,
+    PY_IMPACT,
+    WEEKDAY_CHOICES,
+    DEFAULT_PROJECT_PROJECT_KEY,
+)
 from itsm.component.drf.exception import ValidationError
 from itsm.component.exceptions import ParamError
 from itsm.service.models import DictData, ServiceSla, SysDict
@@ -62,7 +68,9 @@ def priority_value_validate(service_type, urgency_id, impact_id):
         return urgency, impact
 
 
-def priority_matrix_batch_update_validate(service_type, impact_data, urgency_data, priority_matrix):
+def priority_matrix_batch_update_validate(
+    service_type, impact_data, urgency_data, priority_matrix
+):
     """批量更新优先级矩阵参数校验"""
 
     for s in service_type:
@@ -82,53 +90,61 @@ def priority_matrix_batch_update_validate(service_type, impact_data, urgency_dat
 
 def matrix_data_validator(matrix_data, matrix_type):
     """影响范围和紧急程度数据校验"""
-    matrix_type_msg = ''
+    matrix_type_msg = ""
     if matrix_type == PX_URGENCY:
-        matrix_type_msg = '紧急程度'
+        matrix_type_msg = "紧急程度"
     if matrix_type == PY_IMPACT:
-        matrix_type_msg = '影响范围'
+        matrix_type_msg = "影响范围"
     for data in matrix_data:
-        if data.get('id') is None:
-            raise serializers.ValidationError(_('参数错误，%s数据缺少参数id') % matrix_type_msg)
-        if data.get('is_enabled') is None:
-            raise serializers.ValidationError(_('参数错误，%s数据缺少参数is_enabled') % matrix_type_msg)
-        if data.get('name') is None:
-            raise serializers.ValidationError(_('参数错误，%s数据缺少参数name') % matrix_type_msg)
-        if data.get('key') is None:
-            raise serializers.ValidationError(_('参数错误，%s数据缺少参数key') % matrix_type_msg)
+        if data.get("id") is None:
+            raise serializers.ValidationError(_("参数错误，%s数据缺少参数id") % matrix_type_msg)
+        if data.get("is_enabled") is None:
+            raise serializers.ValidationError(
+                _("参数错误，%s数据缺少参数is_enabled") % matrix_type_msg
+            )
+        if data.get("name") is None:
+            raise serializers.ValidationError(_("参数错误，%s数据缺少参数name") % matrix_type_msg)
+        if data.get("key") is None:
+            raise serializers.ValidationError(_("参数错误，%s数据缺少参数key") % matrix_type_msg)
 
 
 def priority_matrix_validator(priority_matrix):
     """优先级数据校验"""
     for priority in priority_matrix:
-        if priority.get('id') is None:
-            raise ParamError(_('参数错误，优先级数据缺少参数id'))
-        if priority.get('priority') is None:
-            raise ParamError(_('参数错误，优先级数据缺少参数priority'))
-        if not PriorityMatrix.objects.filter(id=priority.get('id')).exists():
-            raise ParamError(_('参数错误，不存在id为[%s]的优先级对象') % priority.get('id'))
+        if priority.get("id") is None:
+            raise ParamError(_("参数错误，优先级数据缺少参数id"))
+        if priority.get("priority") is None:
+            raise ParamError(_("参数错误，优先级数据缺少参数priority"))
+        if not PriorityMatrix.objects.filter(id=priority.get("id")).exists():
+            raise ParamError(_("参数错误，不存在id为[%s]的优先级对象") % priority.get("id"))
 
 
 def priority_validate(impact_data, urgency_data, priority_matrix):
     """校验影响范围和紧急程度交叉处的priority值是否填写了"""
 
     # {impact.key: impact.is_enabled, .....}
-    impact_dict = {impact.get('key'): impact.get('is_enabled') for impact in impact_data}
+    impact_dict = {
+        impact.get("key"): impact.get("is_enabled") for impact in impact_data
+    }
     # {urgency.key: urgency.is_enabled, .....}
-    urgency_dict = {urgency.get('key'): urgency.get('is_enabled') for urgency in urgency_data}
-    priority_set = SysDict.get_data_by_key(PRIORITY, 'sets')
+    urgency_dict = {
+        urgency.get("key"): urgency.get("is_enabled") for urgency in urgency_data
+    }
+    priority_set = SysDict.get_data_by_key(PRIORITY, "sets")
 
     for priority in priority_matrix:
-        impact_is_enabled = impact_dict.get(priority.get('impact'))
-        urgency_is_enabled = urgency_dict.get(priority.get('urgency'))
+        impact_is_enabled = impact_dict.get(priority.get("impact"))
+        urgency_is_enabled = urgency_dict.get(priority.get("urgency"))
 
         if impact_is_enabled and urgency_is_enabled:
-            if priority.get('priority') not in priority_set:
-                raise ParamError(_('参数错误，优先级选项不能为空且必须合法'))
+            if priority.get("priority") not in priority_set:
+                raise ParamError(_("参数错误，优先级选项不能为空且必须合法"))
 
 
 name_validator = RegexValidator(
-    re.compile('^[*a-zA-Z0-9_()（） \u4e00-\u9fa5]+$'), message=_('请输入合法名称：中英文、中英文括号、数字、下划线、空格及星号'), code='invalid',
+    re.compile("^[*a-zA-Z0-9_()（） \u4e00-\u9fa5]+$"),
+    message=_("请输入合法名称：中英文、中英文括号、数字、下划线、空格及星号"),
+    code="invalid",
 )
 
 
@@ -162,15 +178,17 @@ class ScheduleValidator(object):
     def name_validate(self, value):
         """服务名称校验"""
         schedule_obj = Schedule.objects
-
+        project_key = value.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
         if self.instance:
             # 如果是更新，内置的名称不能更新
-            if self.instance.is_builtin and value.get('name') != self.instance.name:
-                raise ParamError(_('内置服务模式：[%s] 的名称不能修改') % self.instance.name)
+            if self.instance.is_builtin and value.get("name") != self.instance.name:
+                raise ParamError(_("内置服务模式：[%s] 的名称不能修改") % self.instance.name)
 
             schedule_obj = schedule_obj.exclude(id=self.instance.id)
-        if schedule_obj.filter(name=value.get('name')).exists():
-            raise ParamError(_('服务模式名称：[%s] 已存在') % value.get('name'))
+        if schedule_obj.filter(
+            name=value.get("name"), project_key=project_key
+        ).exists():
+            raise ParamError(_("服务模式名称：[%s] 已存在") % value.get("name"))
 
     @staticmethod
     def holidays_workdays_validate(value):
@@ -182,30 +200,32 @@ class ScheduleValidator(object):
             for idx, day in enumerate(dates):
                 other_days = dates[:idx] + dates[idx + 1 :]
                 for other_day in other_days:
-                    if max(day.get('start_date'), other_day.get('start_date')) < min(
-                        day.get('end_date'), other_day.get('end_date')
+                    if max(day.get("start_date"), other_day.get("start_date")) < min(
+                        day.get("end_date"), other_day.get("end_date")
                     ):
-                        raise ParamError(_('{}时间段设置有冲突，请检查').format(day_type_msg))
+                        raise ParamError(_("{}时间段设置有冲突，请检查").format(day_type_msg))
 
-        holidays = value.get('holidays')
-        workdays = value.get('workdays')
+        holidays = value.get("holidays")
+        workdays = value.get("workdays")
         # 假期和假期之间，特定工作日之间不能有冲突
         if holidays:
-            date_compare(holidays, '节假日')
+            date_compare(holidays, "节假日")
         if workdays:
-            date_compare(holidays, '特殊工作日')
+            date_compare(holidays, "特殊工作日")
 
     @staticmethod
     def day_validate(value):
         """星期校验"""
-        days = value.get('days')
+        days = value.get("days")
         if days:
-            days_of_week = ",".join([day.get('day_of_week') for day in days]).split(",")
+            days_of_week = ",".join([day.get("day_of_week") for day in days]).split(",")
             # 星期唯一性校验
             counter_res = Counter(days_of_week)
             for k, v in list(counter_res.items()):
                 if v > 1:
-                    raise ParamError(_('请勿重复定义{}的工作时间').format(WEEKDAY_CHOICES[int(k)][1]))
+                    raise ParamError(
+                        _("请勿重复定义{}的工作时间").format(WEEKDAY_CHOICES[int(k)][1])
+                    )
 
 
 class DayValidator(object):
@@ -217,7 +237,7 @@ class DayValidator(object):
 
     def all_day_validate(self, value):
         """根据日期类型做不同的校验"""
-        type_of_day = value.get('type_of_day')
+        type_of_day = value.get("type_of_day")
         try:
             getattr(self, "{}_validate".format(type_of_day.lower()))(value)
         except AttributeError:
@@ -231,32 +251,32 @@ class DayValidator(object):
     @staticmethod
     def holiday_validate(holiday):
         """假期校验"""
-        if not holiday.get('name'):
-            raise serializers.ValidationError(_('请输入节假日名称'))
-        if holiday.get('start_date') > holiday.get('end_date'):
-            raise ParamError(_('节假日期：[%s]的时间范围设置错误') % holiday.get('name'))
+        if not holiday.get("name"):
+            raise serializers.ValidationError(_("请输入节假日名称"))
+        if holiday.get("start_date") > holiday.get("end_date"):
+            raise ParamError(_("节假日期：[%s]的时间范围设置错误") % holiday.get("name"))
 
     def workday_validate(self, workday):
         """特定工作日校验"""
-        if workday.get('start_date') > workday.get('end_date'):
-            raise ParamError(_('加班时间的范围设置错误，开始时间不能大于结束时间'))
+        if workday.get("start_date") > workday.get("end_date"):
+            raise ParamError(_("加班时间的范围设置错误，开始时间不能大于结束时间"))
         self.day_durations_validate(workday)
 
     @staticmethod
     def day_number_validate(day):
         """星期数字有效性校验"""
-        day_set = set(day.get('day_of_week').split(","))
+        day_set = set(day.get("day_of_week").split(","))
         if len(day_set & set(map(str, list(range(7))))) < len(day_set):
-            raise ParamError(_('请输入正确的星期数字(0-6)'))
+            raise ParamError(_("请输入正确的星期数字(0-6)"))
 
     def day_durations_validate(self, day):
         """工作时间段的名字校验"""
-        durations = day.get('duration', [])
+        durations = day.get("duration", [])
         if not durations:
-            raise ParamError(_('参数缺失：[duration]'))
-        name_list = [duration.get('name') for duration in durations]
+            raise ParamError(_("参数缺失：[duration]"))
+        name_list = [duration.get("name") for duration in durations]
         if len(set(name_list)) < len(name_list):
-            raise ParamError(_('工作时间段的命名不能重复，请检查'))
+            raise ParamError(_("工作时间段的命名不能重复，请检查"))
         self.durations_unique_validate(durations)
 
     @staticmethod
@@ -265,10 +285,10 @@ class DayValidator(object):
         for idx, duration in enumerate(durations):
             other_durations = durations[:idx] + durations[idx + 1 :]
             for other_duration in other_durations:
-                if max(duration.get('start_time'), other_duration.get('start_time')) < min(
-                    duration.get('end_time'), other_duration.get('end_time')
-                ):
-                    raise ParamError(_('工作日的工作时间段重合，请检查'))
+                if max(
+                    duration.get("start_time"), other_duration.get("start_time")
+                ) < min(duration.get("end_time"), other_duration.get("end_time")):
+                    raise ParamError(_("工作日的工作时间段重合，请检查"))
 
 
 class DurationValidator(object):
@@ -282,8 +302,8 @@ class DurationValidator(object):
 
     @staticmethod
     def duration_validate(value):
-        if value.get('start_time') >= value.get('end_time'):
-            raise ParamError(_('时间范围错误，开始时间不能大于或等于结束时间'))
+        if value.get("start_time") >= value.get("end_time"):
+            raise ParamError(_("时间范围错误，开始时间不能大于或等于结束时间"))
 
 
 class SlaValidator(object):
@@ -298,15 +318,15 @@ class SlaValidator(object):
     def name_validate(self, value):
         """SLA名称校验"""
         sla_obj = Sla.objects
-
+        project_key = value.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
         if self.instance:
             # 如果是更新，内置的名称不能更新
-            if self.instance.is_builtin and value.get('name') != self.instance.name:
-                raise ParamError(_('内置服务协议：[%s] 的名称不能修改' % self.instance.name))
+            if self.instance.is_builtin and value.get("name") != self.instance.name:
+                raise ParamError(_("内置服务协议：[%s] 的名称不能修改" % self.instance.name))
 
             sla_obj = sla_obj.exclude(id=self.instance.id)
-        if sla_obj.filter(name=value.get('name')).exists():
-            raise ParamError(_('服务协议名称：[%s] 已存在') % value.get('name'))
+        if sla_obj.filter(name=value.get("name"), project_key=project_key).exists():
+            raise ParamError(_("服务协议名称：[%s] 已存在") % value.get("name"))
 
 
 class SlaTimerRuleValidator(object):
@@ -322,15 +342,15 @@ class SlaTimerRuleValidator(object):
 
     @staticmethod
     def condition_validate(value):
-        condition = value.get('condition')
-        if condition.get('type') is None:
-            raise serializers.ValidationError(_('参数错误，计时规则条件表达式缺少type'))
-        expressions = condition.get('expressions', [])
+        condition = value.get("condition")
+        if condition.get("type") is None:
+            raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少type"))
+        expressions = condition.get("expressions", [])
         if expressions:
             for expression in expressions:
-                if expression.get('operator') is None:
-                    raise serializers.ValidationError(_('参数错误，计时规则条件表达式缺少operator'))
-                if expression.get('name') is None:
-                    raise serializers.ValidationError(_('参数错误，计时规则条件表达式缺少name'))
-                if expression.get('value') is None:
-                    raise serializers.ValidationError(_('参数错误，计时规则条件表达式缺少value'))
+                if expression.get("operator") is None:
+                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少operator"))
+                if expression.get("name") is None:
+                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少name"))
+                if expression.get("value") is None:
+                    raise serializers.ValidationError(_("参数错误，计时规则条件表达式缺少value"))
