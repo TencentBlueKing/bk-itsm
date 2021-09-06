@@ -198,4 +198,7 @@
         white-space: nowrap;
     }
 }
+.bk-search-tree-content {
+    height: 170px;
+}
 </style>
