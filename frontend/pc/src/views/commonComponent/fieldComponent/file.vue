@@ -151,16 +151,17 @@
             },
             // 修改 附件优化 1031
             downloadFile (file) {
+                console.log(this.item)
                 const tempKey = file.key
                 if (this.isBuild) {
                     window.open(window.SITE_URL
-                        + `api/ticket/fields/${this.item.workflow_id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`)
+                        + `api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`)
                 } else if (this.isCurrent) {
                     window.open(window.SITE_URL
-                        + `api/ticket/fields/${this.item.workflow_id}/download_file/?unique_key=${tempKey}&file_type=template`)
+                        + `api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
                 } else {
                     window.open(window.SITE_URL
-                        + `api/workflow/fields/${this.item.workflow_id}/download_file/?unique_key=${tempKey}&file_type=template`)
+                        + `api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
                 }
             },
             uploadErr (file, fileList) {
