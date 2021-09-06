@@ -151,7 +151,6 @@
             },
             // 修改 附件优化 1031
             downloadFile (file) {
-                console.log(this.item)
                 const tempKey = file.key
                 if (this.isBuild) {
                     window.open(window.SITE_URL
