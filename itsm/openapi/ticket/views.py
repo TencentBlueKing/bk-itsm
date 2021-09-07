@@ -70,7 +70,8 @@ from itsm.openapi.ticket.serializers import (
     TicketProceedSerializer,
     TicketRetrieveSerializer,
     TicketStatusSerializer,
-    TicketResultSerializer, TicketFilterSerializer,
+    TicketResultSerializer,
+    TicketFilterSerializer,
 )
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -95,41 +96,47 @@ def catch_ticket_operate_exception(view_func):
         except Ticket.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': TicketNotFoundError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': TicketNotFoundError.MESSAGE,
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
                 }
             )
         except ServerError as e:
             # 捕捉drf序列化检验的自定义错误
             return Response(
-                {'result': False, 'code': e.code_int, 'data': None, 'message': e.message})
+                {
+                    "result": False,
+                    "code": e.code_int,
+                    "data": None,
+                    "message": e.message,
+                }
+            )
         except ValidationError as e:
             # 捕捉drf序列化检验原始错误
             return Response(
                 {
-                    'result': False,
-                    'code': ParamError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': format_validation_message(e),
+                    "result": False,
+                    "code": ParamError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": format_validation_message(e),
                 }
             )
         except Exception as e:
             logger.error(traceback.format_exc())
             return Response(
                 {
-                    'result': False,
-                    'code': OperateTicketError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': _('接口异常，请检查请求参数: {}').format(e),
+                    "result": False,
+                    "code": OperateTicketError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": _("接口异常，请检查请求参数: {}").format(e),
                 }
             )
 
     return __wrapper
 
 
-@method_decorator(login_exempt, name='dispatch')
+@method_decorator(login_exempt, name="dispatch")
 class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     """
     工单视图
@@ -149,64 +156,64 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             queryset = Ticket.objects.get_tickets(username, queryset, **kwargs)
         return queryset
 
-    @action(detail=False, methods=['get'], serializer_class=TicketStatusSerializer)
+    @action(detail=False, methods=["get"], serializer_class=TicketStatusSerializer)
     def get_ticket_status(self, request):
         """
         单据状态，支持根据单据sn查询
         """
 
         try:
-            ticket = self.queryset.get(sn=request.query_params.get('sn'))
+            ticket = self.queryset.get(sn=request.query_params.get("sn"))
         except Ticket.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': TicketNotFoundError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': TicketNotFoundError.MESSAGE,
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
                 }
             )
 
         return Response(self.serializer_class(ticket).data)
 
-    @action(detail=False, methods=['post'], serializer_class=TicketResultSerializer)
+    @action(detail=False, methods=["post"], serializer_class=TicketResultSerializer)
     def ticket_approval_result(self, request):
         """
         单据状态，支持根据单据sn查询
         """
 
         try:
-            sn_list = request.data.get('sn')
+            sn_list = request.data.get("sn")
             tickets = self.queryset.filter(sn__in=sn_list)
             Cache().hdel("callback_error_ticket", *sn_list)
         except Ticket.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': TicketNotFoundError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': TicketNotFoundError.MESSAGE,
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
                 }
             )
 
         return Response(self.serializer_class(tickets, many=True).data)
 
-    @action(detail=False, methods=['post'], serializer_class=TicketListSerializer)
+    @action(detail=False, methods=["post"], serializer_class=TicketListSerializer)
     def get_tickets(self, request):
         """
         获取单据列表
         """
 
         queryset = self.queryset
-        sns = request.data.get('sns', [])
-        creator = request.data.get('creator', '')
-        create_at__lte = request.data.get('create_at__lte', '')
-        create_at__gte = request.data.get('create_at__gte', '')
-        end_at__lte = request.data.get('end_at__lte', '')
-        end_at__gte = request.data.get('end_at__gte', '')
-        username = request.data.get('username', '')
-        service_id__in = request.data.get('service_id__in', [])
-        bk_biz_id__in = request.data.get('bk_biz_id__in', [])
+        sns = request.data.get("sns", [])
+        creator = request.data.get("creator", "")
+        create_at__lte = request.data.get("create_at__lte", "")
+        create_at__gte = request.data.get("create_at__gte", "")
+        end_at__lte = request.data.get("end_at__lte", "")
+        end_at__gte = request.data.get("end_at__gte", "")
+        username = request.data.get("username", "")
+        service_id__in = request.data.get("service_id__in", [])
+        bk_biz_id__in = request.data.get("bk_biz_id__in", [])
 
         if sns:
             queryset = queryset.filter(sn__in=sns)
@@ -227,7 +234,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         if username:
             role_filter = Ticket.objects.build_todo_role_filter(username)
-            queryset = queryset.filter(current_status=PROCESS_RUNNING).filter(role_filter)
+            queryset = queryset.filter(current_status=PROCESS_RUNNING).filter(
+                role_filter
+            )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -236,47 +245,47 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], serializer_class=TicketRetrieveSerializer)
+    @action(detail=False, methods=["get"], serializer_class=TicketRetrieveSerializer)
     def get_ticket_info(self, request):
         """
         获取单据详情
         """
 
         try:
-            ticket = self.queryset.get(sn=request.query_params.get('sn'))
+            ticket = self.queryset.get(sn=request.query_params.get("sn"))
         except Ticket.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': TicketNotFoundError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': TicketNotFoundError.MESSAGE,
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
                 }
             )
 
         return Response(self.serializer_class(ticket).data)
 
-    @action(detail=False, methods=['get'], serializer_class=TicketLogsSerializer)
+    @action(detail=False, methods=["get"], serializer_class=TicketLogsSerializer)
     def get_ticket_logs(self, request):
         """
         获取单据日志
         """
 
         try:
-            ticket = self.queryset.get(sn=request.query_params.get('sn'))
+            ticket = self.queryset.get(sn=request.query_params.get("sn"))
         except Ticket.DoesNotExist:
             return Response(
                 {
-                    'result': False,
-                    'code': TicketNotFoundError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': TicketNotFoundError.MESSAGE,
+                    "result": False,
+                    "code": TicketNotFoundError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": TicketNotFoundError.MESSAGE,
                 }
             )
 
         return Response(self.serializer_class(ticket).data)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
     def create_ticket(self, request):
         """
@@ -288,26 +297,34 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         data = copy.deepcopy(request.data)
         fast_approval = data.pop("fast_approval", False)
         if fast_approval:
-            data["catalog_id"] = ServiceCatalog.objects.get(key="approve_service_catalog").id
-            data["service_id"] = Service.objects.get(name="内置审批服务", display_type=INVISIBLE).id
+            data["catalog_id"] = ServiceCatalog.objects.get(
+                key="approve_service_catalog"
+            ).id
+            data["service_id"] = Service.objects.get(
+                name="内置审批服务", display_type=INVISIBLE
+            ).id
             data["service_type"] = "request"
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        instance.do_after_create(data['fields'], request.data.get("from_ticket_id", None))
+        instance.do_after_create(
+            data["fields"], request.data.get("from_ticket_id", None)
+        )
         start_pipeline.apply_async([instance])
-        return Response({"sn": instance.sn, "id": instance.id})
+        return Response(
+            {"sn": instance.sn, "id": instance.id, "ticket_url": instance.pc_ticket_url}
+        )
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
     def operate_node(self, request):
         """
         处理单据节点（提交、认领、派单、转单、终止）
         """
-        sn = request.data.get('sn')
-        state_id = request.data.get('state_id')
-        action_type = request.data.get('action_type')
-        operator = request.data.get('operator')
+        sn = request.data.get("sn")
+        state_id = request.data.get("state_id")
+        action_type = request.data.get("action_type")
+        operator = request.data.get("operator")
 
         ticket = Ticket.objects.get(sn=sn)
         openapi_operate_validate(operator, ticket, state_id, action_type)
@@ -316,60 +333,73 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             # 重点参数校验：处理人/单据字段
             serializer = TicketProceedSerializer(
                 data=request.data,
-                context={'ticket': ticket, 'state_id': state_id, 'request': request}
+                context={"ticket": ticket, "state_id": state_id, "request": request},
             )
             serializer.is_valid(raise_exception=True)
             data = serializer.validated_data
 
             ticket.node_status.filter(state_id=state_id).update(status=QUEUEING)
-            res = ticket.activity_callback(state_id, data['operator'], data['fields'], API)
+            res = ticket.activity_callback(
+                state_id, data["operator"], data["fields"], API
+            )
             if not res.result:
                 logger.warning(
                     "callback error， current state id %s, error message: %s， field params %s"
-                    % (state_id, res.message, data['fields'])
+                    % (state_id, res.message, data["fields"])
                 )
                 ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
                 raise OperateTicketError(res.message)
 
         elif action_type == TERMINATE_OPERATE:
             # 重点参数校验：处理人/单据字段 --- 这一段看起来是无效的才对
-            action_message = request.data.get('action_message')
+            action_message = request.data.get("action_message")
             terminate_validate(operator, ticket, state_id, action_message)
 
-            ticket.terminate(state_id, terminate_message=action_message, operator=operator,
-                             source=API)
+            ticket.terminate(
+                state_id,
+                terminate_message=action_message,
+                operator=operator,
+                source=API,
+            )
         else:
             # 重点参数校验：action_type/processors_type/processors
-            serializer = TicketNodeOperateSerializer(request=request, ticket=ticket,
-                                                     operator=operator)
+            serializer = TicketNodeOperateSerializer(
+                request=request, ticket=ticket, operator=operator
+            )
             serializer.is_valid(raise_exception=True)
             data = serializer.validated_data
-            operator = data.pop('operator')
-            current_node = data.pop('current_node')
+            operator = data.pop("operator")
+            current_node = data.pop("current_node")
             current_node.set_next_action(operator, **data)
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
     def operate_ticket(self, request):
         """
         处理单据（挂起、恢复、撤销）
         """
-        sn = request.data.get('sn')
-        operator = request.data.get('operator')
-        action_type = request.data.get('action_type')
+        sn = request.data.get("sn")
+        operator = request.data.get("operator")
+        action_type = request.data.get("action_type")
         ticket = Ticket.objects.get(sn=sn)
 
-        if action_type not in [WITHDRAW_OPERATE, TERMINATE_OPERATE, SUSPEND_OPERATE,
-                               UNSUSPEND_OPERATE]:
+        if action_type not in [
+            WITHDRAW_OPERATE,
+            TERMINATE_OPERATE,
+            SUSPEND_OPERATE,
+            UNSUSPEND_OPERATE,
+        ]:
             # 非单据的操作类型，直接返回操作失败
             return Response(
                 {
-                    'result': False,
-                    'code': OperateTicketError.ERROR_CODE_INT,
-                    'data': None,
-                    'message': '{}，不支持的操作类型: {}'.format(OperateTicketError.MESSAGE, action_type),
+                    "result": False,
+                    "code": OperateTicketError.ERROR_CODE_INT,
+                    "data": None,
+                    "message": "{}，不支持的操作类型: {}".format(
+                        OperateTicketError.MESSAGE, action_type
+                    ),
                 }
             )
 
@@ -383,10 +413,12 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         elif action_type == UNSUSPEND_OPERATE:
             openapi_unsuspend_validate(ticket)
 
-        serializer = TicketOperateSerializer(data=request.data, context={'ticket': ticket})
+        serializer = TicketOperateSerializer(
+            data=request.data, context={"ticket": ticket}
+        )
         serializer.is_valid(raise_exception=True)
-        operator = serializer.validated_data['operator']
-        action_message = serializer.validated_data['action_message']
+        operator = serializer.validated_data["operator"]
+        action_message = serializer.validated_data["action_message"]
 
         # dispatch action
         if action_type == SUSPEND_OPERATE:
@@ -400,7 +432,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
     def proceed_approval(self, request):
         # 审批节点的处理
@@ -438,18 +470,25 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         logger.info("proceed_approval request fields is {}".format(fields))
         node_status = ticket.node_status.get(state_id=state_id)
         SignTask.objects.update_or_create(
-            status_id=node_status.id, processor=request.data.get("handler"),
-            defaults={"status": "RUNNING", }
+            status_id=node_status.id,
+            processor=request.data.get("handler"),
+            defaults={
+                "status": "RUNNING",
+            },
         )
-        res = ticket.activity_callback(state_id, request.data.get("handler"), fields, API)
+        res = ticket.activity_callback(
+            state_id, request.data.get("handler"), fields, API
+        )
         if not res.result:
             logger.warning(
-                "callback error， current state id %s, error message: %s" % (state_id, res.message))
+                "callback error， current state id %s, error message: %s"
+                % (state_id, res.message)
+            )
             ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
             raise OperateTicketError(res.message)
         return Response()
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     @catch_ticket_operate_exception
     def get_tickets_by_user(self, request):
         # 初始化serializer的上下文
@@ -470,15 +509,20 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         ).to_client_representation()
         return Response(data)
 
-    @action(detail=False, methods=['post'], url_path="token/verify")
+    @action(detail=False, methods=["post"], url_path="token/verify")
     @catch_ticket_operate_exception
     def verify(self, request):
-        token = request.data.get('token', "")
+        token = request.data.get("token", "")
         message = settings.APP_CODE + "_" + settings.SECRET_KEY
         return Response(
-            {"is_passed": AESVerification.verify(message, bytes(token, encoding='utf-8'))})
+            {
+                "is_passed": AESVerification.verify(
+                    message, bytes(token, encoding="utf-8")
+                )
+            }
+        )
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     @catch_ticket_operate_exception
     def callback_failed_ticket(self, request):
         return Response(Cache().hkeys("callback_error_ticket"))

@@ -135,6 +135,7 @@ from itsm.component.constants import (
     REVOKE_TYPE,
     ASSIGN_LEADER,
     TIME_DELTA,
+    LEN_XX_LONG,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -150,8 +151,11 @@ from itsm.component.constants.trigger import (
     SOURCE_TICKET,
 )
 from common.shortuuid import uuid as _uu
-from itsm.component.utils.client_backend_query import get_user_leader, get_user_departments, \
-    get_bk_users
+from itsm.component.utils.client_backend_query import (
+    get_user_leader,
+    get_user_departments,
+    get_bk_users,
+)
 from itsm.sla_engine.constants import (
     RUNNING as SLA_RUNNING,
     PAUSED as SLA_PAUSED,
@@ -169,7 +173,11 @@ from itsm.component.utils.conversion import (
 from itsm.component.utils.graph import dfs_paths
 from itsm.component.utils.misc import transform_single_username, transform_username
 from itsm.component.utils.dimensions import fill_time_dimension
-from itsm.iadmin.contants import TRANSITION_OPERATE, WAITING_FOR_OPERATE, WAITING_FOR_CONFIRM
+from itsm.iadmin.contants import (
+    TRANSITION_OPERATE,
+    WAITING_FOR_OPERATE,
+    WAITING_FOR_CONFIRM,
+)
 from itsm.postman.models import RemoteApiInstance
 from itsm.role.models import RoleType, UserRole
 from itsm.service.api import get_catalog_fullname, get_service_name
@@ -196,7 +204,10 @@ from itsm.workflow.models import TaskSchema, GlobalVariable, TaskConfig
 from pipeline.engine import api as pipeline_api
 from pipeline.service import task_service
 from pipeline.utils.boolrule import BoolRule
-from itsm.component.utils.client_backend_query import get_department_info, list_departments_info
+from itsm.component.utils.client_backend_query import (
+    get_department_info,
+    list_departments_info,
+)
 
 from .basic import Model
 
@@ -213,8 +224,9 @@ class SignTask(Model):
 
     status_id = models.IntegerField(_("状态ID"))
     order = models.IntegerField(_("顺序"), default=DEFAULT_ORDER)
-    status = models.CharField(_("任务状态"), max_length=LEN_SHORT, choices=TASK_STATUS_CHOICES,
-                              default="WAIT")
+    status = models.CharField(
+        _("任务状态"), max_length=LEN_SHORT, choices=TASK_STATUS_CHOICES, default="WAIT"
+    )
     processor = models.CharField(_("处理人"), max_length=LEN_LONG)
     is_passed = models.NullBooleanField(_("是否审批通过"), null=True)
 
@@ -247,40 +259,60 @@ class Status(Model):
     state_id = models.IntegerField(_("节点ID"))
     bk_biz_id = models.IntegerField(_("业务ID"), default=DEFAULT_BK_BIZ_ID)
     name = models.CharField(_("节点名"), max_length=LEN_NORMAL, default=EMPTY_STRING)
-    type = models.CharField(_("节点类型类型"), max_length=LEN_SHORT, choices=STATE_TYPE_CHOICES,
-                            default=NORMAL_STATE)
+    type = models.CharField(
+        _("节点类型类型"),
+        max_length=LEN_SHORT,
+        choices=STATE_TYPE_CHOICES,
+        default=NORMAL_STATE,
+    )
     is_sequential = models.BooleanField(_("是否是串行任务"), default=False)
-    status = models.CharField(_("节点状态"), max_length=LEN_SHORT, choices=STATUS_CHOICES,
-                              default="WAIT")
+    status = models.CharField(
+        _("节点状态"), max_length=LEN_SHORT, choices=STATUS_CHOICES, default="WAIT"
+    )
     tag = models.CharField(_("节点标签"), max_length=LEN_LONG, default=DEFAULT_STRING)
     action_type = models.CharField(
-        _("节点内部操作类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default=TRANSITION_OPERATE,
+        _("节点内部操作类型"),
+        max_length=LEN_SHORT,
+        choices=ACTION_CHOICES,
+        default=TRANSITION_OPERATE,
     )
     distribute_type = models.CharField(
-        _("分配方式"), max_length=LEN_SHORT, choices=DISTRIBUTE_TYPE_CHOICES, default="PROCESS",
+        _("分配方式"),
+        max_length=LEN_SHORT,
+        choices=DISTRIBUTE_TYPE_CHOICES,
+        default="PROCESS",
     )
     # 当前环节处理人
-    processors_type = models.CharField(_("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                       default="EMPTY")
-    processors = models.CharField(_("处理人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                  blank=True)
-
+    processors_type = models.CharField(
+        _("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    processors = models.CharField(
+        _("处理人列表"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
     # 被转单人
-    delivers_type = models.CharField(_("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                     default="EMPTY")
+    delivers_type = models.CharField(
+        _("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
     delivers = models.TextField(_("转单人列表"), default=EMPTY_STRING, null=True, blank=True)
     can_deliver = models.BooleanField(_("能否转单"), default=False)
 
     # 被分派人
     # TODO assignors_type/assignors是被分派人
-    assignors_type = models.CharField(_("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                      default="EMPTY")
-    assignors = models.TextField(_("派单人列表"), default=EMPTY_STRING, null=True, blank=True)
+    assignors_type = models.CharField(
+        _("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    assignors = models.TextField(
+        _("派单人列表"), default=EMPTY_STRING, null=True, blank=True
+    )
     can_terminate = models.BooleanField(_("能否强制终止"), default=False)
-    terminate_message = models.TextField(_("终止原因"), default=EMPTY_STRING, null=True, blank=True)
+    terminate_message = models.TextField(
+        _("终止原因"), default=EMPTY_STRING, null=True, blank=True
+    )
 
     fields = jsonfield.JSONField(_("字段列表"), default=EMPTY_LIST)
-    api_instance_id = models.IntegerField(_("api实例主键"), default=0, null=True, blank=True)
+    api_instance_id = models.IntegerField(
+        _("api实例主键"), default=0, null=True, blank=True
+    )
     error_message = models.TextField(_("失败信息"), blank=True, null=True)
 
     # contexts: 目前存储了标准运维节点的请求参数
@@ -310,11 +342,13 @@ class Status(Model):
         依次会签当前处理人: 去掉所有已处理人-> 按照依次会签顺序排序的首个待处理人
         随机会签当前处理人: 所有待处理人
         """
-        tasks = SignTask.objects.filter(status_id=self.id,
-                                        status__in=["RUNNING", "EXECUTED", "FINISHED"])
+        tasks = SignTask.objects.filter(
+            status_id=self.id, status__in=["RUNNING", "EXECUTED", "FINISHED"]
+        )
         processed_user_list = tasks.values_list("processor", flat=True)
-        user_list = UserRole.get_users_by_type(self.bk_biz_id, self.processors_type,
-                                               self.processors, self.ticket)
+        user_list = UserRole.get_users_by_type(
+            self.bk_biz_id, self.processors_type, self.processors, self.ticket
+        )
         # Filter unprocessed user
         processor_list = list(set(user_list).difference(processed_user_list))
         if self.is_sequential and processor_list:
@@ -335,8 +369,9 @@ class Status(Model):
         return processor
 
     def get_user_list(self):
-        user_list = UserRole.get_users_by_type(self.bk_biz_id, self.processors_type,
-                                               self.processors, self.ticket)
+        user_list = UserRole.get_users_by_type(
+            self.bk_biz_id, self.processors_type, self.processors, self.ticket
+        )
         return user_list
 
     def sign_is_finished(self, finish_condition, key_value):
@@ -348,7 +383,9 @@ class Status(Model):
         if conditions:
             key_value_copy = copy.deepcopy(key_value)
             rsp_conversion(key_value_copy)
-            b_result, b_conditions = build_conditions_by_mako_template(conditions, key_value_copy)
+            b_result, b_conditions = build_conditions_by_mako_template(
+                conditions, key_value_copy
+            )
             is_finished = BoolRule(b_conditions).test()
         else:
             is_finished = False
@@ -401,15 +438,22 @@ class Status(Model):
         action_type = kwargs["action_type"]
         ticket = kwargs.pop("ticket", None)
         real_processors = UserRole.get_users_by_type(
-            ticket.bk_biz_id, kwargs.get("processors_type", "PERSON"), kwargs.get("processors"),
+            ticket.bk_biz_id,
+            kwargs.get("processors_type", "PERSON"),
+            kwargs.get("processors"),
             ticket,
         )
 
         with transaction.atomic():
-            if action_type in [CLAIM_OPERATE, DISTRIBUTE_OPERATE, DELIVER_OPERATE,
-                               EXCEPTION_DISTRIBUTE_OPERATE]:
-                self.set_processors(kwargs.get("processors_type", "PERSON"),
-                                    kwargs.get("processors"))
+            if action_type in [
+                CLAIM_OPERATE,
+                DISTRIBUTE_OPERATE,
+                DELIVER_OPERATE,
+                EXCEPTION_DISTRIBUTE_OPERATE,
+            ]:
+                self.set_processors(
+                    kwargs.get("processors_type", "PERSON"), kwargs.get("processors")
+                )
 
             if action_type in [CLAIM_OPERATE, DISTRIBUTE_OPERATE]:
                 # 操作流状态机：派单->认领->处理
@@ -459,7 +503,10 @@ class Status(Model):
             return
 
         self.ticket.notify(
-            state_id=self.state_id, receivers=receivers, message=message, action=notify_action,
+            state_id=self.state_id,
+            receivers=receivers,
+            message=message,
+            action=notify_action,
             retry=retry,
         )
 
@@ -487,7 +534,11 @@ class Status(Model):
 
         if action_type in [DISTRIBUTE_OPERATE, EXCEPTION_DISTRIBUTE_OPERATE]:
             distribute_message = self.log_detail(processors_type, processors)
-            detail_message = distribute_message + " (%s)" % detail_message if detail_message else distribute_message
+            detail_message = (
+                distribute_message + " (%s)" % detail_message
+                if detail_message
+                else distribute_message
+            )
             log_message = "{operator} 分配【{name}】给：{detail_message}."
 
         elif detail_message:
@@ -507,13 +558,21 @@ class Status(Model):
         if processors_type == PERSON:
             detail_message = transform_username(processors)
         elif processors_type == ORGANIZATION:
-            organization = get_department_info(self.processors.strip(',')).get("name", "")
+            organization = get_department_info(self.processors.strip(",")).get(
+                "name", ""
+            )
             detail_message = "{} -> {}".format(_("组织架构"), organization)
         else:
             detail_message = "{} -> {}".format(
                 _(RoleType.objects.get(type=processors_type).name),
-                ",".join([_(role.name) for role in
-                          UserRole.objects.filter(id__in=processors.split(","))]),
+                ",".join(
+                    [
+                        _(role.name)
+                        for role in UserRole.objects.filter(
+                            id__in=processors.split(",")
+                        )
+                    ]
+                ),
             )
         return detail_message
 
@@ -541,8 +600,9 @@ class Status(Model):
         if self.processors_type == "OPEN":
             return True
 
-        return username in UserRole.get_users_by_type(bk_biz_id, self.processors_type,
-                                                      self.processors, self.ticket)
+        return username in UserRole.get_users_by_type(
+            bk_biz_id, self.processors_type, self.processors, self.ticket
+        )
 
     def can_sign_state_operate(self, username):
         """Sign state operate permission"""
@@ -600,8 +660,10 @@ class Status(Model):
         rules = [True] if is_system else [self.can_operate(username)]
         can_create = TaskConfig.objects.filter(
             Q(workflow_id=self.ticket.flow_id, workflow_type=VERSION)
-            & Q(Q(create_task_state=self.state_id) | Q(execute_task_state=self.state_id,
-                                                       execute_can_create=True))
+            & Q(
+                Q(create_task_state=self.state_id)
+                | Q(execute_task_state=self.state_id, execute_can_create=True)
+            )
         ).exists()
         rules.append(can_create)
 
@@ -613,7 +675,8 @@ class Status(Model):
 
         rules = []
         can_execute = TaskConfig.objects.filter(
-            workflow_id=self.ticket.flow_id, execute_task_state=self.state_id,
+            workflow_id=self.ticket.flow_id,
+            execute_task_state=self.state_id,
             workflow_type=VERSION,
         ).exists()
         rules.append(can_execute)
@@ -623,8 +686,10 @@ class Status(Model):
     @property
     def task_schemas(self):
         task_schema_ids = self.ticket.flow.task_schema_ids(self.state_id)
-        return [{"id": item.id, "name": item.name} for item in
-                TaskSchema.objects.filter(id__in=task_schema_ids)]
+        return [
+            {"id": item.id, "name": item.name}
+            for item in TaskSchema.objects.filter(id__in=task_schema_ids)
+        ]
 
     def update_execute_state_id(self):
         """
@@ -639,15 +704,19 @@ class Status(Model):
     def start_task(self, **kwargs):
         """启动单据下的任务"""
         from itsm.task.backend import TaskPipelineWrapper
+
         self.update_execute_state_id()
 
-        order_obj = Task.objects.filter(ticket_id=self.ticket_id,
-                                        execute_state_id=self.state_id).values_list("order")
+        order_obj = Task.objects.filter(
+            ticket_id=self.ticket_id, execute_state_id=self.state_id
+        ).values_list("order")
         if order_obj:
             sorted_id = sorted(set([obj[0] for obj in order_obj]))
 
             task_objs = Task.objects.filter(
-                ticket_id=self.ticket_id, execute_state_id=self.state_id, order=sorted_id[0]
+                ticket_id=self.ticket_id,
+                execute_state_id=self.state_id,
+                order=sorted_id[0],
             )
             for obj in task_objs:
                 task_pipeline_wrapper = TaskPipelineWrapper(self.ticket_id, obj.id)
@@ -663,7 +732,8 @@ class Status(Model):
         if self.processors_type in ["GENERAL", "CMDB"]:
             role_ids = list_by_separator(self.processors)
             role_name_list = list(
-                UserRole.objects.filter(id__in=role_ids).values_list("name", flat=True))
+                UserRole.objects.filter(id__in=role_ids).values_list("name", flat=True)
+            )
             display_name = ",".join(role_name_list)
 
         if self.processors_type == "PERSON":
@@ -674,12 +744,16 @@ class Status(Model):
                 user_list = [user for user in users.split(",") if user]
                 if operator in user_list:
                     operator_index = user_list.index(operator)
-                    user_list[0], user_list[operator_index] = user_list[operator_index], user_list[
-                        0]
+                    user_list[0], user_list[operator_index] = (
+                        user_list[operator_index],
+                        user_list[0],
+                    )
                 display_name = transform_username(user_list)
 
         if self.processors_type == "ORGANIZATION":
-            display_name = get_department_info(self.processors.strip(',')).get("name", "")
+            display_name = get_department_info(self.processors.strip(",")).get(
+                "name", ""
+            )
 
         return display_name
 
@@ -695,8 +769,9 @@ class Status(Model):
         """
         key_value = {}
         code_list = [PROCESS_COUNT, PASS_COUNT, REJECT_COUNT, PASS_RATE, REJECT_RATE]
-        user_list = UserRole.get_users_by_type(ticket.bk_biz_id, self.processors_type,
-                                               self.processors, ticket)
+        user_list = UserRole.get_users_by_type(
+            ticket.bk_biz_id, self.processors_type, self.processors, ticket
+        )
         context = {"total_count": len(user_list)}
 
         for code in code_list:
@@ -710,18 +785,21 @@ class Status(Model):
 
     def sign_process_count(self, **kwargs):
         """会签节点完成数"""
-        return SignTask.objects.filter(status_id=self.id,
-                                       status__in=["EXECUTED", "FINISHED"]).count()
+        return SignTask.objects.filter(
+            status_id=self.id, status__in=["EXECUTED", "FINISHED"]
+        ).count()
 
     def sign_pass_count(self, **kwargs):
         """会签节点通过数"""
-        return SignTask.objects.filter(status_id=self.id, status__in=["EXECUTED", "FINISHED"],
-                                       is_passed=True).count()
+        return SignTask.objects.filter(
+            status_id=self.id, status__in=["EXECUTED", "FINISHED"], is_passed=True
+        ).count()
 
     def sign_reject_count(self, **kwargs):
         """会签节点拒绝数"""
-        return SignTask.objects.filter(status_id=self.id, status__in=["EXECUTED", "FINISHED"],
-                                       is_passed=False).count()
+        return SignTask.objects.filter(
+            status_id=self.id, status__in=["EXECUTED", "FINISHED"], is_passed=False
+        ).count()
 
     def sign_pass_rate(self, total_count, **kwargs):
         """会签节点通过率"""
@@ -735,16 +813,19 @@ class Status(Model):
         if self.action_type == SYSTEM_OPERATE:
             return [_("系统自动处理")]
 
-        return UserRole.get_users_by_type(self.ticket.bk_biz_id, self.processors_type,
-                                          self.processors, self.ticket)
+        return UserRole.get_users_by_type(
+            self.ticket.bk_biz_id, self.processors_type, self.processors, self.ticket
+        )
 
     def get_delivers(self):
-        return UserRole.get_users_by_type(self.ticket.bk_biz_id, self.delivers_type, self.delivers,
-                                          self.ticket)
+        return UserRole.get_users_by_type(
+            self.ticket.bk_biz_id, self.delivers_type, self.delivers, self.ticket
+        )
 
     def get_assignors(self):
-        return UserRole.get_users_by_type(self.ticket.bk_biz_id, self.assignors_type,
-                                          self.assignors, self.ticket)
+        return UserRole.get_users_by_type(
+            self.ticket.bk_biz_id, self.assignors_type, self.assignors, self.ticket
+        )
 
     @property
     def is_schedule_ready(self):
@@ -755,12 +836,15 @@ class Status(Model):
             workflow_type=VERSION,
             execute_task_state=self.state_id,
             need_task_finished=True,
-        ).values_list('task_schema_id', flat=True)
+        ).values_list("task_schema_id", flat=True)
         is_exists = (
-            Task.objects.filter(ticket_id=self.ticket.pk, execute_state_id=self.state_id,
-                                task_schema_id__in=schema_ids)
-                .exclude(status__in=END_TASK_STATUS)
-                .exists()
+            Task.objects.filter(
+                ticket_id=self.ticket.pk,
+                execute_state_id=self.state_id,
+                task_schema_id__in=schema_ids,
+            )
+            .exclude(status__in=END_TASK_STATUS)
+            .exists()
         )
 
         return not is_exists
@@ -799,12 +883,19 @@ class Status(Model):
             for i in pop_attrs:
                 setting.pop(i, None)
 
-            from_ticket_status = TicketStatus.objects.get(service_type=service_type,
-                                                          key=self.ticket.current_status)
-            to_ticket_status = TicketStatus.objects.filter(service_type=service_type).filter(
-                **setting).first()
+            from_ticket_status = TicketStatus.objects.get(
+                service_type=service_type, key=self.ticket.current_status
+            )
+            to_ticket_status = (
+                TicketStatus.objects.filter(service_type=service_type)
+                .filter(**setting)
+                .first()
+            )
             # 是否满足单据状态流转设置
-            if to_ticket_status and to_ticket_status.id in from_ticket_status.to_status_id_set:
+            if (
+                to_ticket_status
+                and to_ticket_status.id in from_ticket_status.to_status_id_set
+            ):
                 return to_ticket_status
 
             to_ticket_status_name = to_ticket_status.name if to_ticket_status else None
@@ -883,16 +974,26 @@ class Status(Model):
         if not workflow_field_order:
             return self.ticket.fields.filter(state_id=self.state_id)
         clauses = " ".join(
-            ["WHEN workflow_field_id=%s THEN %s" % (pk, index) for index, pk in
-             enumerate(workflow_field_order)]
+            [
+                "WHEN workflow_field_id=%s THEN %s" % (pk, index)
+                for index, pk in enumerate(workflow_field_order)
+            ]
         )
         ordering = "CASE %s END" % clauses
 
         return (
             self.ticket.fields.filter(
-                Q(state_id=self.state_id) | Q(workflow_field_id__in=workflow_field_order))
-                .exclude(source=BASE_MODEL)
-                .extra(select={"ordering": ordering}, order_by=("ordering", "id",))
+                Q(state_id=self.state_id)
+                | Q(workflow_field_id__in=workflow_field_order)
+            )
+            .exclude(source=BASE_MODEL)
+            .extra(
+                select={"ordering": ordering},
+                order_by=(
+                    "ordering",
+                    "id",
+                ),
+            )
         )
 
     def approval_result(self, result, opinion):
@@ -940,13 +1041,18 @@ class Status(Model):
     @property
     def global_variables(self):
         """API实例产出的变量"""
-        return TicketGlobalVariable.objects.get_global_variables(self.ticket_id, self.state_id)
+        return TicketGlobalVariable.objects.get_global_variables(
+            self.ticket_id, self.state_id
+        )
 
     @property
     def processed_user(self):
-        processed = self.ticket.logs.filter(from_state_id=self.state_id).values_list("operator",
-                                                                                     flat=True)
-        return ','.join(set(self.processors.strip(',').split(',')) & set(list(processed)))
+        processed = self.ticket.logs.filter(from_state_id=self.state_id).values_list(
+            "operator", flat=True
+        )
+        return ",".join(
+            set(self.processors.strip(",").split(",")) & set(list(processed))
+        )
 
     # ======================================= SLA功能接口 =====================================
 
@@ -958,16 +1064,20 @@ class Status(Model):
         开始节点相同的SLA任务，若需要响
         """
         return SlaTask.objects.filter(
-            ticket_id=self.ticket_id, start_node_id=self.state_id, is_reply_need=True,
-            is_replied=False
+            ticket_id=self.ticket_id,
+            start_node_id=self.state_id,
+            is_reply_need=True,
+            is_replied=False,
         ).exists()
 
     @property
     def is_replied(self):
         """是否已响应"""
         return SlaTask.objects.filter(
-            ticket_id=self.ticket_id, start_node_id=self.state_id, is_reply_need=True,
-            is_replied=True
+            ticket_id=self.ticket_id,
+            start_node_id=self.state_id,
+            is_reply_need=True,
+            is_replied=True,
         ).exists()
 
     @property
@@ -977,7 +1087,8 @@ class Status(Model):
         tasks = SlaTask.objects.filter(ticket_id=self.ticket_id)
 
         service_sla_objs = ServiceSla.objects.filter(
-            service_id=self.ticket.service_id, sla_id__in=tasks.values_list("sla_id", flat=True)
+            service_id=self.ticket.service_id,
+            sla_id__in=tasks.values_list("sla_id", flat=True),
         ).values("sla_id", "states")
 
         sla_ids = []
@@ -999,16 +1110,25 @@ class Status(Model):
 
         sla_tasks = self.sla_tasks.filter(task_status=RUNNING)
         if not sla_tasks.exists():
-            return dict(sla_status=NORMAL, task_status=UNACTIVATED, deadline=None, end_at=None,
-                        sla_timeout=[0] * 6)
+            return dict(
+                sla_status=NORMAL,
+                task_status=UNACTIVATED,
+                deadline=None,
+                end_at=None,
+                sla_timeout=[0] * 6,
+            )
 
         task = sla_tasks.order_by("deadline").first()
 
         task_info = dict(
-            sla_status=task.sla_status, task_status=task.task_status, deadline=task.deadline,
-            end_at=task.end_at
+            sla_status=task.sla_status,
+            task_status=task.task_status,
+            deadline=task.deadline,
+            end_at=task.end_at,
         )
-        task_info.update(sla_timeout=self.sla_timeout(task_info["deadline"], task_info["end_at"]))
+        task_info.update(
+            sla_timeout=self.sla_timeout(task_info["deadline"], task_info["end_at"])
+        )
 
         return task_info
 
@@ -1022,8 +1142,10 @@ class Status(Model):
                 delta = relativedelta(deadline, datetime.now())
             else:
                 delta = relativedelta(deadline, stop_time)
-            return [int(getattr(delta, attr)) for attr in
-                    ["years", "months", "days", "hours", "minutes", "seconds"]]
+            return [
+                int(getattr(delta, attr))
+                for attr in ["years", "months", "days", "hours", "minutes", "seconds"]
+            ]
 
 
 class Ticket(Model):
@@ -1031,7 +1153,7 @@ class Ticket(Model):
 
     def __init__(self, *args, **kwargs):
         super(Ticket, self).__init__(*args, **kwargs)
-        self.notify_url = ''
+        self.notify_url = ""
 
     sn = models.CharField(_("单据号"), max_length=LEN_NORMAL, db_index=True)
     title = models.CharField(_("单据名称"), max_length=LEN_MIDDLE)
@@ -1042,13 +1164,18 @@ class Ticket(Model):
     # 服务项ID
     service_id = models.IntegerField(_("服务项ID"), default=EMPTY_INT)
     # 服务类型 change,event,request,question
-    service_type = models.CharField(_("服务编码"), default=DEFAULT_STRING, max_length=LEN_NORMAL,
-                                    db_index=True)
+    service_type = models.CharField(
+        _("服务编码"), default=DEFAULT_STRING, max_length=LEN_NORMAL, db_index=True
+    )
     # 流程版本ID
     flow_id = models.IntegerField(_("流程版本ID"), default=EMPTY_INT)
     # 蓝鲸业务ID，默认为-1，即不绑定业务
-    bk_biz_id = models.IntegerField(_("业务id"), default=DEFAULT_BK_BIZ_ID, blank=True, null=True)
-    priority_key = models.CharField(_("优先级编码"), max_length=LEN_LONG, blank=True, null=True)
+    bk_biz_id = models.IntegerField(
+        _("业务id"), default=DEFAULT_BK_BIZ_ID, blank=True, null=True
+    )
+    priority_key = models.CharField(
+        _("优先级编码"), max_length=LEN_LONG, blank=True, null=True
+    )
     # 单据对应的：pipeline_tree/states_map
     pipeline_data = jsonfield.JSONField(_("Pipeline流程树元数据"), default=EMPTY_DICT)
 
@@ -1057,24 +1184,34 @@ class Ticket(Model):
     # 单据当前状态
     current_status = models.CharField(_("单据状态"), max_length=LEN_SHORT)
     # 单据前一状态
-    pre_status = models.CharField(_("单据前一状态"), max_length=LEN_SHORT, default=EMPTY_STRING)
+    pre_status = models.CharField(
+        _("单据前一状态"), max_length=LEN_SHORT, default=EMPTY_STRING
+    )
 
     is_supervise_needed = models.BooleanField(_("是否需要督办"), default=False)
-    supervise_type = models.CharField(_("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                      default="EMPTY")
-    supervisor = models.CharField(_("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                  blank=True)
+    supervise_type = models.CharField(
+        _("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    supervisor = models.CharField(
+        _("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
 
-    current_task_processors = models.CharField(_("任务处理者列表"), max_length=LEN_LONG,
-                                               default=EMPTY_STRING)
-    history_task_processors = models.CharField(_("任务历史处理者列表"), max_length=LEN_LONG,
-                                               default=EMPTY_STRING)
+    current_task_processors = models.CharField(
+        _("任务处理者列表"), max_length=LEN_LONG, default=EMPTY_STRING
+    )
+    history_task_processors = models.CharField(
+        _("任务历史处理者列表"), max_length=LEN_LONG, default=EMPTY_STRING
+    )
 
     # Deprecated Fields
     # 针对节点的字段需要迁移到新的表中
     current_state_id = models.CharField(_("当前状态ID"), null=True, max_length=LEN_NORMAL)
-    current_assignor = models.CharField(_("分派人列表"), max_length=LEN_LONG, default=EMPTY_STRING)
-    current_processors = models.CharField(_("处理者列表"), max_length=LEN_LONG, default=EMPTY_STRING)
+    current_assignor = models.CharField(
+        _("分派人列表"), max_length=LEN_LONG, default=EMPTY_STRING
+    )
+    current_processors = models.CharField(
+        _("处理者列表"), max_length=LEN_LONG, default=EMPTY_STRING
+    )
     current_assignor_type = models.CharField(
         _("分派人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
     )
@@ -1100,7 +1237,9 @@ class Ticket(Model):
     """
     meta = jsonfield.JSONField(_("扩展描述信息"), default=EMPTY_DICT)
     # 单据对应的业务信息
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     objects = managers.TicketManager()
 
@@ -1126,8 +1265,10 @@ class Ticket(Model):
     def task_schemas(self):
         # todo 测试后删除
         task_schema_ids = [8]
-        return [{"id": item.id, "name": item.name} for item in
-                TaskSchema.objects.filter(id__in=task_schema_ids)]
+        return [
+            {"id": item.id, "name": item.name}
+            for item in TaskSchema.objects.filter(id__in=task_schema_ids)
+        ]
 
     @property
     def pipeline_message(self):
@@ -1150,15 +1291,19 @@ class Ticket(Model):
         for status in approval_status:
             if username in status.get_processor_in_sign_state():
                 is_running = cache.get(
-                    "approval_status_{}_{}_{}".format(username, status.ticket_id, status.state_id))
+                    "approval_status_{}_{}_{}".format(
+                        username, status.ticket_id, status.state_id
+                    )
+                )
                 if not is_running:
                     return True
         return False
 
     @classmethod
     def batch_waiting_approve(cls, ticket_ids, username):
-        all_status = Status.objects.filter(ticket_id__in=ticket_ids, status=RUNNING,
-                                           type=APPROVAL_STATE)
+        all_status = Status.objects.filter(
+            ticket_id__in=ticket_ids, status=RUNNING, type=APPROVAL_STATE
+        )
         ticket_status = {}
         for status in all_status:
             ticket_status.setdefault(status.ticket_id, []).append(status)
@@ -1167,8 +1312,9 @@ class Ticket(Model):
             for status in approval_status:
                 if username in status.get_processor_in_sign_state():
                     is_running = cache.get(
-                        "approval_status_{}_{}_{}".format(username, status.ticket_id,
-                                                          status.state_id)
+                        "approval_status_{}_{}_{}".format(
+                            username, status.ticket_id, status.state_id
+                        )
                     )
                     if not is_running:
                         waiting_approve[ticket_id] = True
@@ -1208,7 +1354,7 @@ class Ticket(Model):
     def ticket_url(self):
         if not self.notify_url:
             return "{site_url}/#/ticket/{ticket_id}/".format(
-                site_url=settings.TICKET_NOTIFY_HOST.rstrip('/'), ticket_id=self.id
+                site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"), ticket_id=self.id
             )
         return self.notify_url
 
@@ -1216,14 +1362,14 @@ class Ticket(Model):
     def iframe_ticket_url(self):
         """专门用来做iframe嵌入的url"""
         return "{site_url}/#/ticket/detail-iframe?id={ticket_id}".format(
-            site_url=settings.FRONTEND_URL.rstrip('/'), ticket_id=self.id
+            site_url=settings.FRONTEND_URL.rstrip("/"), ticket_id=self.id
         )
 
     @property
     def pc_ticket_url(self):
         """专门用来做iframe嵌入的url"""
         return "{site_url}/#/ticket/detail?id={ticket_id}".format(
-            site_url=settings.FRONTEND_URL.rstrip('/'), ticket_id=self.id
+            site_url=settings.FRONTEND_URL.rstrip("/"), ticket_id=self.id
         )
 
     def generate_ticket_url(self, state_id, receivers):
@@ -1231,16 +1377,16 @@ class Ticket(Model):
         ticket_token = TicketFollowerNotifyLog.get_unique_token()
         TicketFollowerNotifyLog.objects.create(
             **{
-                'ticket_token': ticket_token,
-                'ticket': self,
-                'followers': receivers,
-                'followers_type': PERSON,
-                'state_id': state_id,
+                "ticket_token": ticket_token,
+                "ticket": self,
+                "followers": receivers,
+                "followers_type": PERSON,
+                "state_id": state_id,
             }
         )
         client = Cache()
         self.notify_url = "{site_url}/#/ticket/{ticket_id}/?token={token}&cache_key={cache_key}".format(
-            site_url=settings.TICKET_NOTIFY_HOST.rstrip('/'),
+            site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"),
             ticket_id=self.id,
             token=ticket_token,
             cache_key=cache_key,
@@ -1304,8 +1450,9 @@ class Ticket(Model):
     @property
     def current_status_display(self):
         try:
-            return TicketStatus.objects.get(service_type=self.service_type,
-                                            key=self.current_status).name
+            return TicketStatus.objects.get(
+                service_type=self.service_type, key=self.current_status
+            ).name
         except TicketStatus.DoesNotExist:
             return "--"
 
@@ -1313,7 +1460,10 @@ class Ticket(Model):
     def pre_status_display(self):
         try:
             return _(
-                TicketStatus.objects.get(service_type=self.service_type, key=self.pre_status).name)
+                TicketStatus.objects.get(
+                    service_type=self.service_type, key=self.pre_status
+                ).name
+            )
         except TicketStatus.DoesNotExist:
             return "--"
 
@@ -1366,8 +1516,10 @@ class Ticket(Model):
         if self.is_over:
             return []
         return list(
-            self.node_status.filter(status__in=Status.CAN_OPERATE_STATUS).values_list("state_id",
-                                                                                      flat=True))
+            self.node_status.filter(status__in=Status.CAN_OPERATE_STATUS).values_list(
+                "state_id", flat=True
+            )
+        )
 
     @property
     def current_steps(self):
@@ -1386,16 +1538,19 @@ class Ticket(Model):
 
         return list(
             self.node_status.filter(
-                Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE)).values(
-                "id", "tag", "name"
-            )
+                Q(status__in=Status.CAN_OPERATE_STATUS)
+                | Q(status=FAILED, type=TASK_STATE)
+            ).values("id", "tag", "name")
         )
 
     @classmethod
     def ticket_current_steps(cls, ticket_ids):
         all_status = Status.objects.filter(
-            Q(ticket_id__in=ticket_ids) & (
-                Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE))
+            Q(ticket_id__in=ticket_ids)
+            & (
+                Q(status__in=Status.CAN_OPERATE_STATUS)
+                | Q(status=FAILED, type=TASK_STATE)
+            )
         ).values("ticket_id", "id", "tag", "name")
         ticket_status = {}
         for status in all_status:
@@ -1412,7 +1567,11 @@ class Ticket(Model):
                 for ns in self.node_status.filter(status__in=Status.CAN_OPERATE_STATUS)
             ]
         )
-        return running_status if running_status else TICKET_STATUS_DICT[self.current_status]
+        return (
+            running_status
+            if running_status
+            else TICKET_STATUS_DICT[self.current_status]
+        )
 
     @property
     def real_supervisors(self):
@@ -1422,8 +1581,9 @@ class Ticket(Model):
         if self.supervise_type == "EMPTY":
             return [self.creator]
 
-        supervisors = UserRole.get_users_by_type(self.bk_biz_id, self.supervise_type,
-                                                 self.supervisor, self)
+        supervisors = UserRole.get_users_by_type(
+            self.bk_biz_id, self.supervise_type, self.supervisor, self
+        )
 
         # 默认提单人可以督办
         supervisors.append(self.creator)
@@ -1436,7 +1596,9 @@ class Ticket(Model):
 
         assignors = set()
 
-        for p in chain(s.get_assignors() for s in Status.objects.get_running_status(self.id)):
+        for p in chain(
+            s.get_assignors() for s in Status.objects.get_running_status(self.id)
+        ):
             assignors.update(p)
 
         return assignors
@@ -1456,10 +1618,13 @@ class Ticket(Model):
             processors.update(p)
 
         for node_status in running_status:
-            tasks = Task.objects.filter(ticket_id=self.id, execute_state_id=node_status.state_id)
+            tasks = Task.objects.filter(
+                ticket_id=self.id, execute_state_id=node_status.state_id
+            )
             for task in tasks:
-                task_processor = UserRole.get_users_by_type(self.bk_biz_id, task.processors_type,
-                                                            task.processors)
+                task_processor = UserRole.get_users_by_type(
+                    self.bk_biz_id, task.processors_type, task.processors
+                )
                 processors.update(task_processor)
 
         return processors
@@ -1480,8 +1645,9 @@ class Ticket(Model):
         for node_status in running_status:
 
             is_execute = TaskConfig.objects.filter(
-                workflow_id=self.flow_id, workflow_type=VERSION,
-                execute_task_state=node_status.state_id
+                workflow_id=self.flow_id,
+                workflow_type=VERSION,
+                execute_task_state=node_status.state_id,
             ).exists()
 
             if is_execute:
@@ -1493,8 +1659,11 @@ class Ticket(Model):
     @classmethod
     def get_ticket_current_processors(cls, ticket_ids):
         running_status = Status.objects.filter(
-            Q(ticket_id__in=ticket_ids) & (
-                Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE))
+            Q(ticket_id__in=ticket_ids)
+            & (
+                Q(status__in=Status.CAN_OPERATE_STATUS)
+                | Q(status=FAILED, type=TASK_STATE)
+            )
         ).only("action_type", "processors_type", "processors", "ticket_id")
 
         tickets_processors = {}
@@ -1502,18 +1671,25 @@ class Ticket(Model):
             if status.action_type == SYSTEM_OPERATE:
                 continue
             tickets_processors.setdefault(status.processors_type, []).extend(
-                status.processors.strip(",").split(","))
+                status.processors.strip(",").split(",")
+            )
 
         instantiated_processors = {}
         for processors_type, processors in tickets_processors.items():
             if processors_type == ORGANIZATION:
                 departments = list_departments_info()
-                processors_info = {str(department["id"]): department["name"] for department in
-                                   departments}
+                processors_info = {
+                    str(department["id"]): department["name"]
+                    for department in departments
+                }
             elif processors_type in ["CMDB", "GENERAL"]:
-                processors_info = UserRole.get_role_name(processors_type, list(set(processors)))
+                processors_info = UserRole.get_role_name(
+                    processors_type, list(set(processors))
+                )
             else:
-                processors_info = get_bk_users(format='dict', users=list(set(processors)))
+                processors_info = get_bk_users(
+                    format="dict", users=list(set(processors))
+                )
             instantiated_processors[processors_type] = processors_info
 
         current_processors = {}
@@ -1521,22 +1697,29 @@ class Ticket(Model):
             if status.action_type == SYSTEM_OPERATE:
                 continue
             for processor in status.processors.strip(",").split(","):
-                real_processor = instantiated_processors[status.processors_type].get(processor,
-                                                                                     processor)
-                current_processors.setdefault(status.ticket_id, []).append(real_processor)
+                real_processor = instantiated_processors[status.processors_type].get(
+                    processor, processor
+                )
+                current_processors.setdefault(status.ticket_id, []).append(
+                    real_processor
+                )
         return current_processors
 
     def get_display_processors(self, status):
         if status.processors_type == ORGANIZATION:
-            return [get_department_info(status.processors.strip(',')).get("name", "")]
+            return [get_department_info(status.processors.strip(",")).get("name", "")]
         else:
-            return UserRole.get_users_by_type(self.bk_biz_id, status.processors_type,
-                                              status.processors, self)
+            return UserRole.get_users_by_type(
+                self.bk_biz_id, status.processors_type, status.processors, self
+            )
 
     @property
     def history_handlers(self):
         handlers = set(
-            TicketEventLog.objects.filter(ticket_id=self.id).values_list("operator", flat=True))
+            TicketEventLog.objects.filter(ticket_id=self.id).values_list(
+                "operator", flat=True
+            )
+        )
         return handlers
 
     @cached_property
@@ -1550,8 +1733,9 @@ class Ticket(Model):
         # 当前状态非结束和非挂起表示处于running状态
         return (
             self.current_status
-            in TicketStatus.objects.filter(service_type=self.service_type,
-                                           is_over=False).values_list("key", flat=True)
+            in TicketStatus.objects.filter(
+                service_type=self.service_type, is_over=False
+            ).values_list("key", flat=True)
             and self.current_status != SUSPEND
         )
 
@@ -1570,32 +1754,37 @@ class Ticket(Model):
     @property
     def is_slave(self):
         """是否子单"""
-        return TicketToTicket.objects.filter(related_type=MASTER_SLAVE,
-                                             from_ticket_id=self.id).exists()
+        return TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, from_ticket_id=self.id
+        ).exists()
 
     @property
     def is_master(self):
         """是否母单"""
-        return TicketToTicket.objects.filter(related_type=MASTER_SLAVE,
-                                             to_ticket_id=self.id).exists()
+        return TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, to_ticket_id=self.id
+        ).exists()
 
     def related_type(self):
         """关联类型"""
-        ticket_to_ticket = TicketToTicket.objects.filter(related_type=MASTER_SLAVE).filter(
-            Q(from_ticket_id=self.id) | Q(to_ticket_id=self.id)
-        )
+        ticket_to_ticket = TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE
+        ).filter(Q(from_ticket_id=self.id) | Q(to_ticket_id=self.id))
 
         if ticket_to_ticket:
-            related_type = "slave" if ticket_to_ticket.last().from_ticket_id == self.id else "master"
+            related_type = (
+                "slave"
+                if ticket_to_ticket.last().from_ticket_id == self.id
+                else "master"
+            )
             return related_type
 
     @property
     def slave_tickets(self):
         """所有子单"""
-        from_ticket_ids = TicketToTicket.objects.filter(related_type=MASTER_SLAVE,
-                                                        to_ticket_id=self.id).values_list(
-            "from_ticket_id", flat=True
-        )
+        from_ticket_ids = TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, to_ticket_id=self.id
+        ).values_list("from_ticket_id", flat=True)
         return Ticket.objects.filter(id__in=from_ticket_ids)
 
     @property
@@ -1611,7 +1800,8 @@ class Ticket(Model):
     def has_relationships(self):
         """是否有关联单"""
         if TicketToTicket.objects.filter(
-            Q(related_type=DERIVE) & (Q(from_ticket_id=self.id) | Q(to_ticket_id=self.id))
+            Q(related_type=DERIVE)
+            & (Q(from_ticket_id=self.id) | Q(to_ticket_id=self.id))
         ).exists():
             return True
         return False
@@ -1619,22 +1809,29 @@ class Ticket(Model):
     def get_master_ticket(self):
         """获取母单单据"""
         # 若存在, 获取单据的母单
-        slave_to_master = TicketToTicket.objects.filter(related_type=MASTER_SLAVE,
-                                                        from_ticket_id=self.id).last()
+        slave_to_master = TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, from_ticket_id=self.id
+        ).last()
         if slave_to_master:
             master_ticket = Ticket.objects.get(id=slave_to_master.to_ticket_id)
             return master_ticket
 
     @classmethod
     def get_batch_master_ticket(cls, ticket_ids):
-        slave_to_master = TicketToTicket.objects.filter(related_type=MASTER_SLAVE,
-                                                        from_ticket_id__in=ticket_ids)
-        ticket_map = {slave.from_ticket_id: slave.to_ticket_id for slave in slave_to_master}
+        slave_to_master = TicketToTicket.objects.filter(
+            related_type=MASTER_SLAVE, from_ticket_id__in=ticket_ids
+        )
+        ticket_map = {
+            slave.from_ticket_id: slave.to_ticket_id for slave in slave_to_master
+        }
         master_tickets = Ticket.objects.filter(id__in=ticket_map.values()).values(
             "id", "current_status", "meta", "service_type"
         )
         master_map = {ticket["id"]: ticket for ticket in master_tickets}
-        return {from_ticket: master_map[to_ticket] for from_ticket, to_ticket in ticket_map.items()}
+        return {
+            from_ticket: master_map[to_ticket]
+            for from_ticket, to_ticket in ticket_map.items()
+        }
 
     @property
     def ticket_fields(self):
@@ -1643,8 +1840,9 @@ class Ticket(Model):
         """
         from itsm.openapi.ticket.serializers import TicketFieldSerializer
 
-        return TicketFieldSerializer(self.fields.filter(is_deleted=False).order_by("id"),
-                                     many=True).data
+        return TicketFieldSerializer(
+            self.fields.filter(is_deleted=False).order_by("id"), many=True
+        ).data
 
     @property
     def ticket_logs(self):
@@ -1669,15 +1867,23 @@ class Ticket(Model):
     @classmethod
     def get_my_approval_ticket(cls, username):
         running_node = Status.objects.filter(type=APPROVAL_STATE, status=RUNNING)
-        closed_status = set(TicketStatus.objects.filter(is_over=True).values_list("key", flat=True))
+        closed_status = set(
+            TicketStatus.objects.filter(is_over=True).values_list("key", flat=True)
+        )
         my_approval_ticket = set(
-            [node.ticket_id for node in running_node if
-             username in node.get_processor_in_sign_state().split(",")]
+            [
+                node.ticket_id
+                for node in running_node
+                if username in node.get_processor_in_sign_state().split(",")
+            ]
         )
         return cls.objects.filter(id__in=my_approval_ticket).exclude(
-            current_status__in=closed_status)
+            current_status__in=closed_status
+        )
 
-    def get_output_fields(self, state_id=None, return_format='list', need_display=False):
+    def get_output_fields(
+        self, state_id=None, return_format="list", need_display=False
+    ):
         """
         对外输出变量字段列表
         """
@@ -1697,12 +1903,19 @@ class Ticket(Model):
                 continue
 
             value = format_exp_value(field.type, field.value)
-            output_fields.append({"key": field.key, "value": value, "source": field.source})
+            output_fields.append(
+                {"key": field.key, "value": value, "source": field.source}
+            )
             if need_display:
-                display_value = field.display_value if hasattr(field, "display_value") else value
+                display_value = (
+                    field.display_value if hasattr(field, "display_value") else value
+                )
                 output_fields.append(
-                    {"key": "{}__display".format(field.key), "value": display_value,
-                     "source": field.source}
+                    {
+                        "key": "{}__display".format(field.key),
+                        "value": display_value,
+                        "source": field.source,
+                    }
                 )
 
         output_fields.extend(TicketGlobalVariableSerializer(variables, many=True).data)
@@ -1710,13 +1923,15 @@ class Ticket(Model):
         global_context = self.get_global_context()
         output_fields.extend(global_context)
 
-        if return_format == 'dict':
-            return {item['key']: item['value'] for item in output_fields}
+        if return_format == "dict":
+            return {item["key"]: item["value"] for item in output_fields}
 
         return output_fields
 
     def get_ticket_global_output(self, display_type="dict"):
-        outputs = TicketGlobalVariable.get_ticket_output(self.id, display_type=display_type)
+        outputs = TicketGlobalVariable.get_ticket_output(
+            self.id, display_type=display_type
+        )
         fields = self.fields.filter(is_deleted=False)
         exist_keys = set()
         for field in fields:
@@ -1733,15 +1948,15 @@ class Ticket(Model):
         return outputs
 
     def get_ticket_result(self):
-        workflow_global_variable = GlobalVariable.objects.filter(flow_id=self.flow.workflow_id,
-                                                                 is_deleted=0).only(
-            'key', 'meta'
-        )
+        workflow_global_variable = GlobalVariable.objects.filter(
+            flow_id=self.flow.workflow_id, is_deleted=0
+        ).only("key", "meta")
         result_list = []
         for variable in workflow_global_variable:
             if variable.meta.get("code", "") == NODE_APPROVE_RESULT:
-                result = TicketGlobalVariable.objects.filter(key=variable.key,
-                                                             ticket_id=self.id).first()
+                result = TicketGlobalVariable.objects.filter(
+                    key=variable.key, ticket_id=self.id
+                ).first()
                 if result:
                     result_list.append(result.value == "true")
         return all(result_list) if self.current_status == PROCESS_FINISHED else False
@@ -1752,7 +1967,13 @@ class Ticket(Model):
         )
 
     def can_supervise(self, username):
-        return all([self.is_supervise_needed, not self.is_over, username in self.real_supervisors])
+        return all(
+            [
+                self.is_supervise_needed,
+                not self.is_over,
+                username in self.real_supervisors,
+            ]
+        )
 
     def can_operate(self, username):
         """
@@ -1761,7 +1982,9 @@ class Ticket(Model):
         if self.is_over or self.is_slave:
             return False
         processors = self.current_processors + self.current_task_processors
-        all_processors = set([processor for processor in processors.split(",") if processor])
+        all_processors = set(
+            [processor for processor in processors.split(",") if processor]
+        )
 
         if not all_processors:
             return False
@@ -1781,7 +2004,7 @@ class Ticket(Model):
                 # 对应的业务id和cmdb的角色存在列表中
                 return True
 
-        organization = set(map(lambda x: 'O_{}'.format(x), user_roles["organization"]))
+        organization = set(map(lambda x: "O_{}".format(x), user_roles["organization"]))
         if all_processors.intersection(organization):
             # 组织架构存在列表中
             return True
@@ -1791,15 +2014,21 @@ class Ticket(Model):
     def can_invite_followers(self, username):
         """能够邀请别人关注：提单人和处理人"""
 
-        return not self.is_over and (username == self.creator or self.has_perm(username))
+        return not self.is_over and (
+            username == self.creator or self.has_perm(username)
+        )
 
     def has_perm(self, username):
         """
         是否具有处理权限
         """
         return not self.is_slave and any(
-            [status.can_operate(username) for status in
-             self.node_status.filter(status__in=Status.CAN_OPERATE_STATUS)]
+            [
+                status.can_operate(username)
+                for status in self.node_status.filter(
+                    status__in=Status.CAN_OPERATE_STATUS
+                )
+            ]
         )
 
     def can_derive(self, username):
@@ -1813,7 +2042,9 @@ class Ticket(Model):
             dotted_name(username) in self.updated_by
             or username in self.task_operators
             or self.can_operate(username)
-            or AttentionUsers.objects.filter(ticket_id=self.id, follower=username).exists()
+            or AttentionUsers.objects.filter(
+                ticket_id=self.id, follower=username
+            ).exists()
         ):
             # 与单据操作相关的人，都是可以查看的
             return True
@@ -1823,7 +2054,8 @@ class Ticket(Model):
     def current_status_can_view(self, username):
         """当前运行环节能否查看"""
         status_list = Status.objects.filter(
-            Q(status__in=Status.CAN_OPERATE_STATUS) & Q(ticket_id=self.id)).all()
+            Q(status__in=Status.CAN_OPERATE_STATUS) & Q(ticket_id=self.id)
+        ).all()
         if not status_list:
             return False
         return any([status.can_view(username) for status in status_list])
@@ -1842,7 +2074,9 @@ class Ticket(Model):
 
             if self.node_status.filter(status__in=Status.STOPPED_STATUS).count() == 1:
                 # 自动执行节点
-                if self.node_status.filter(status=RUNNING, action_type=SYSTEM_OPERATE).exists():
+                if self.node_status.filter(
+                    status=RUNNING, action_type=SYSTEM_OPERATE
+                ).exists():
                     return False
 
                 return True
@@ -1853,7 +2087,9 @@ class Ticket(Model):
                 if first_status.status == RUNNING:
                     return True
             except Status.DoesNotExist:
-                logger.info("can_withdraw exception: %s not exist" % self.first_state_id)
+                logger.info(
+                    "can_withdraw exception: %s not exist" % self.first_state_id
+                )
                 return False
 
             return False
@@ -1870,9 +2106,10 @@ class Ticket(Model):
         if (
             self.is_over
             or not StatusTransit.objects.filter(
-            service_type=self.service_type, from_status__key=self.current_status,
-            to_status__is_over=True
-        ).exists()
+                service_type=self.service_type,
+                from_status__key=self.current_status,
+                to_status__is_over=True,
+            ).exists()
         ):
             # 当前状态无法到达关闭的时候，不可以进行关闭操作按钮
             return False
@@ -1894,9 +2131,13 @@ class Ticket(Model):
         self.save()
 
         # 公共字段区域, 单据状态的下拉框数据 需要随着单据状态更新而同步更新
-        ticket_status = TicketStatus.objects.get(key=status, service_type=self.service_type)
+        ticket_status = TicketStatus.objects.get(
+            key=status, service_type=self.service_type
+        )
         choice = TicketStatusOptionSerializer(ticket_status.to_status, many=True).data
-        self.fields.filter(key=FIELD_STATUS).update(_value=self.current_status, choice=choice)
+        self.fields.filter(key=FIELD_STATUS).update(
+            _value=self.current_status, choice=choice
+        )
 
     def update_priority(self, urgency=None, impact=None):
         """
@@ -1928,13 +2169,17 @@ class Ticket(Model):
             # 优先级的配置必须相关的两个字段都有值存在, 否则采用默认优先级
             if self.service_instance.sla and self.service_instance.sla.is_enabled:
                 default_priority = self.service_instance.sla.get_default_policy()
-                priorities = SysDict.list_data(PRIORITY, fields=["key", "name", "order"])
+                priorities = SysDict.list_data(
+                    PRIORITY, fields=["key", "name", "order"]
+                )
                 self.update_ticket_priority(priorities, default_priority)
 
             return None
 
         try:
-            new_priority = PriorityMatrix.objects.get_priority(self.service_type, urgency, impact)
+            new_priority = PriorityMatrix.objects.get_priority(
+                self.service_type, urgency, impact
+            )
         except PriorityMatrix.DoesNotExist as error:
             logger.warning("当前服务的优先级矩阵设置不正常，错误信息 {}".format(error))
             return
@@ -1945,7 +2190,9 @@ class Ticket(Model):
             # 首次更新优先级, 需初始化下拉框选项
             if old_priority is None:
                 choice = SysDict.list_data(PRIORITY, fields=["key", "name", "order"])
-                self.fields.filter(key=FIELD_PRIORITY).update(choice=choice, _value=new_priority)
+                self.fields.filter(key=FIELD_PRIORITY).update(
+                    choice=choice, _value=new_priority
+                )
             else:
                 self.fields.filter(key=FIELD_PRIORITY).update(_value=new_priority)
             priority_field.refresh_from_db()
@@ -2009,10 +2256,14 @@ class Ticket(Model):
 
     @property
     def status_instance(self):
-        return TicketStatus.objects.get(key=self.current_status, service_type=self.service_type)
+        return TicketStatus.objects.get(
+            key=self.current_status, service_type=self.service_type
+        )
 
     def is_current_step(self, state_id):
-        return self.node_status.filter(state_id=state_id, status__in=Status.RUNNING_STATUS).exists()
+        return self.node_status.filter(
+            state_id=state_id, status__in=Status.RUNNING_STATUS
+        ).exists()
 
     def state(self, state_id):
         """获取流程节点"""
@@ -2056,7 +2307,9 @@ class Ticket(Model):
     def is_token_accessible(self, username, token):
         """校验token有效性"""
 
-        return self.is_email_invite_token(username, token) or self.is_follow_token(username, token)
+        return self.is_email_invite_token(username, token) or self.is_follow_token(
+            username, token
+        )
 
     def is_email_invite_token(self, username, token):
         # 邮件邀请评价
@@ -2074,26 +2327,31 @@ class Ticket(Model):
         notify_log = self.follower_notify_logs.filter(ticket_token=token)
         if notify_log:
             followers = UserRole.get_users_by_type(
-                self.bk_biz_id, notify_log[0].followers_type, notify_log[0].followers, self,
+                self.bk_biz_id,
+                notify_log[0].followers_type,
+                notify_log[0].followers,
+                self,
             )
             return username in followers
         return False
 
-    def get_global_context(self, prefix='', return_format='list'):
+    def get_global_context(self, prefix="", return_format="list"):
         """全局单据属性
         attrs：属性key列表，用于过滤，默认返回所有属性
         params_ticket.sn -> ticket.sn
         """
-        start_from = len('ticket_')
+        start_from = len("ticket_")
 
-        if return_format == 'list':
+        if return_format == "list":
             cxt = [
-                {'key': var['key'], 'value': getattr(self, var['key'][start_from:], "")}
+                {"key": var["key"], "value": getattr(self, var["key"][start_from:], "")}
                 for var in TICKET_GLOBAL_VARIABLES
             ]
         else:
             cxt = {
-                '{0}{1}'.format(prefix, var['key']): getattr(self, var['key'][start_from:], "")
+                "{0}{1}".format(prefix, var["key"]): getattr(
+                    self, var["key"][start_from:], ""
+                )
                 for var in TICKET_GLOBAL_VARIABLES
             }
 
@@ -2105,7 +2363,9 @@ class Ticket(Model):
         标准运维任务总结信息
         """
         rel_part = []
-        for sops_task in Task.objects.filter(ticket_id=self.id, component_type=SOPS_TASK):
+        for sops_task in Task.objects.filter(
+            ticket_id=self.id, component_type=SOPS_TASK
+        ):
             task_info = {}
             for item in sops_task.all_fields.filter(key__in=REL_SUMMARY_FIELDS):
                 if item.key in TIME_DURATION_SUMMARY_FIELDS and item.value:
@@ -2138,8 +2398,9 @@ class Ticket(Model):
 
     @property
     def followers(self):
-        follower = AttentionUsers.objects.filter(ticket_id=self.id).values_list("follower",
-                                                                                flat=True)
+        follower = AttentionUsers.objects.filter(ticket_id=self.id).values_list(
+            "follower", flat=True
+        )
         return list(follower)
 
     @property
@@ -2149,7 +2410,9 @@ class Ticket(Model):
         return processors.strip(",")
 
     def add_follower(self, username):
-        exist = AttentionUsers.objects.filter(ticket_id=self.id, follower=username).exists()
+        exist = AttentionUsers.objects.filter(
+            ticket_id=self.id, follower=username
+        ).exists()
         if not exist:
             AttentionUsers.objects.create(ticket_id=self.id, follower=username)
 
@@ -2160,19 +2423,25 @@ class Ticket(Model):
         fields = []
         workflow_field = self.first_state["fields"]
         node_fields = self.fields.filter(
-            Q(state_id=self.first_state_id) | Q(workflow_field_id__in=workflow_field))
+            Q(state_id=self.first_state_id) | Q(workflow_field_id__in=workflow_field)
+        )
         for node_field in node_fields:
             fields.append(
-                {"type": node_field.type, "key": node_field.key, "value": node_field.value,
-                 "choice": node_field.choice}
+                {
+                    "type": node_field.type,
+                    "key": node_field.key,
+                    "value": node_field.value,
+                    "choice": node_field.choice,
+                }
             )
         data = {
             "catalog_id": self.catalog_id,
             "service_id": self.service_id,
             "service_type": self.service_type,
             "creator": self.creator,
-            "attention": AttentionUsers.objects.filter(ticket_id=self.id,
-                                                       follower=self.creator).exists(),
+            "attention": AttentionUsers.objects.filter(
+                ticket_id=self.id, follower=self.creator
+            ).exists(),
             "fields": fields,
         }
         return data
@@ -2194,7 +2463,8 @@ class Ticket(Model):
 
         # 特殊处理
         context.update(
-            creator=transform_single_username(self.creator), today_date=datetime.today(),
+            creator=transform_single_username(self.creator),
+            today_date=datetime.today(),
         )
 
         return context
@@ -2250,7 +2520,9 @@ class Ticket(Model):
             if target_id == start_state_id or target_id in further_nodes:
                 continue
 
-            target_distance = _min_path_length(dfs_paths(matrix, start_state_id, target_id))
+            target_distance = _min_path_length(
+                dfs_paths(matrix, start_state_id, target_id)
+            )
             # print '{}->{}: {}'.format(start_state_id, target_id, target_distance)
             if target_distance > state_distance:
                 further_nodes.add(target_id)
@@ -2277,21 +2549,41 @@ class Ticket(Model):
 
         return paths
 
-    def notify(self, state_id, receivers, message="", action=TRANSITION_OPERATE, retry=True,
-               **kwargs):
+    def notify(
+        self,
+        state_id,
+        receivers,
+        message="",
+        action=TRANSITION_OPERATE,
+        retry=True,
+        **kwargs
+    ):
         """发送单据和任务通知"""
         from itsm.ticket.tasks import notify_task, dispatch_retry_notify_event
-        logger.info("[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}"
-                    .format(state_id, receivers, message, action))
-        if state_id and self.node_status.get(state_id=state_id).action_type == SYSTEM_OPERATE:
+
+        logger.info(
+            "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
+                state_id, receivers, message, action
+            )
+        )
+        if (
+            state_id
+            and self.node_status.get(state_id=state_id).action_type == SYSTEM_OPERATE
+        ):
             return
 
-        if state_id and action in [TRANSITION_OPERATE, WAITING_FOR_OPERATE, WAITING_FOR_CONFIRM]:
+        if state_id and action in [
+            TRANSITION_OPERATE,
+            WAITING_FOR_OPERATE,
+            WAITING_FOR_CONFIRM,
+        ]:
             self.generate_ticket_url(state_id, receivers)
 
         try:
             # 本次通知
-            notify_task.apply_async(args=[self, receivers, message, action], kwargs=kwargs)
+            notify_task.apply_async(
+                args=[self, receivers, message, action], kwargs=kwargs
+            )
             self.notify_followers(action)
 
             # 重复通知
@@ -2308,12 +2600,19 @@ class Ticket(Model):
 
         try:
             receivers = list(
-                AttentionUsers.objects.filter(ticket_id=self.id).values_list("follower", flat=True))
-            notify_task.apply_async(args=[self, ",".join(receivers), '', NOTIFY_FOLLOWER_OPERATE])
+                AttentionUsers.objects.filter(ticket_id=self.id).values_list(
+                    "follower", flat=True
+                )
+            )
+            notify_task.apply_async(
+                args=[self, ",".join(receivers), "", NOTIFY_FOLLOWER_OPERATE]
+            )
         except Exception as err:
             logger.exception("notify followers exception: {}".format(err))
 
-    def set_finished(self, operator="", close_status=FINISHED, desc="", source=SYS, last_flow=None):
+    def set_finished(
+        self, operator="", close_status=FINISHED, desc="", source=SYS, last_flow=None
+    ):
         """
         设置结束状态
         """
@@ -2321,7 +2620,9 @@ class Ticket(Model):
         for ticket in self.master_slave_tickets:
             # TODO: 临时处理, 后面会放在母子单解绑逻辑中
             ticket.current_status = close_status
-            ticket.node_status.filter(status__in=Status.RUNNING_STATUS).update(status=FINISHED)
+            ticket.node_status.filter(status__in=Status.RUNNING_STATUS).update(
+                status=FINISHED
+            )
             ticket.current_task_processors = ""
             ticket.current_processors = ""
             ticket.current_processors_type = ""
@@ -2330,21 +2631,51 @@ class Ticket(Model):
             ticket.save()
 
             # 单据结束创建评价信息
-            TicketComment.objects.get_or_create(ticket_id=ticket.id, creator=ticket.creator)
+            TicketComment.objects.get_or_create(
+                ticket_id=ticket.id, creator=ticket.creator
+            )
 
             # 创建结束流转日志
             message = "流程结束."
             if source == WEB:
-                message = "{operator} 关闭了单据：{detail_message}." if desc else "{operator} 关闭了单据."
+                message = (
+                    "{operator} 关闭了单据：{detail_message}."
+                    if desc
+                    else "{operator} 关闭了单据."
+                )
 
-            TicketEventLog.objects.create_end_log(ticket, message, operator, detail_message=desc)
+            TicketEventLog.objects.create_end_log(
+                ticket, message, operator, detail_message=desc
+            )
 
         self.callback_request()
+
+    def get_last_approver(self):
+        """
+        获取最后一个审批节点的处理人
+        """
+        status = (
+            Status.objects.filter(
+                ticket_id=self.id, type__in=[APPROVAL_STATE, SIGN_STATE]
+            )
+            .order_by("-update_at")
+            .first()
+        )
+        if status is None:
+            return ""
+        sign_tasks = SignTask.objects.filter(status_id=status.id)
+
+        processors = []
+        for sign_task in sign_tasks:
+            processors.append(sign_task.processor)
+        return ",".join(processors)
 
     def callback_request(self):
         callback_url = self.meta.get("callback_url", "")
         if callback_url:
-            message = AESVerification.gen_signature(settings.APP_CODE + "_" + settings.SECRET_KEY)
+            message = AESVerification.gen_signature(
+                settings.APP_CODE + "_" + settings.SECRET_KEY
+            )
             request_data = {
                 "title": self.title,
                 "current_status": self.current_status,
@@ -2354,23 +2685,34 @@ class Ticket(Model):
                 "updated_by": self.updated_by,
                 "approve_result": self.get_ticket_result(),
                 "token": str(message, encoding="utf-8"),
+                "last_approver": self.get_last_approver(),
             }
             try:
-                logger.info("[TICKET] callback_request params is {}".format(request_data))
+                logger.info(
+                    "[TICKET] callback_request params is {}".format(request_data)
+                )
                 session = requests.session()
                 resp = session.post(url=callback_url, json=request_data, verify=False)
                 if resp.status_code not in {200, 201}:
                     raise Exception(
-                        "status_code is {}, msg is {}".format(resp.status_code, resp.content))
+                        "status_code is {}, msg is {}".format(
+                            resp.status_code, resp.content
+                        )
+                    )
                 result = resp.json()
                 if result.get("code") != 0:
                     raise Exception(
-                        "error is {}, msg is {}".format(result['code'], result["message"]))
+                        "error is {}, msg is {}".format(
+                            result["code"], result["message"]
+                        )
+                    )
             except Exception as err:
                 Cache().hset("callback_error_ticket", self.sn, int(time.time()))
                 logger.exception(
-                    "[TICKET] callback error, callback_url is {},message is {}".format(callback_url,
-                                                                                       err))
+                    "[TICKET] callback error, callback_url is {},message is {}".format(
+                        callback_url, err
+                    )
+                )
 
     def prepare_all_fields(self):
         """单据上下文准备：创建字段"""
@@ -2394,7 +2736,9 @@ class Ticket(Model):
             if ticket_field_key == FIELD_STATUS:
                 ticket_field.update(choice=status_choice)
 
-            ticket_field.update(workflow_field_id=ticket_field.pop("id", None), ticket=self)
+            ticket_field.update(
+                workflow_field_id=ticket_field.pop("id", None), ticket=self
+            )
             ticket_field.pop("api_info", None)
             ticket_field.pop("project_key", None)
             fields.append(TicketField(**ticket_field))
@@ -2421,18 +2765,18 @@ class Ticket(Model):
 
     # def fill_state_fields(self, fields):
     #     """更新单据字段"""
-    #     
+    #
     #     for field in fields:
     #         # 更新优先级由update_priority统一处理
     #         if field["key"] == FIELD_PRIORITY:
     #             continue
-    # 
+    #
     #         filter_fields = self.fields.filter(key=field["key"])
     #         # 多个单据字段：插入到节点的基础模型字段 + 唯一基础模型字段
     #         for ticket_field in filter_fields:
     #             ticket_field.value = field["value"]
     #             ticket_field.choice = field.get("choice", [])
-    #         
+    #
     #         bulk_update(filter_fields, update_fields=["_value", "choice"])
 
     def update_ticket_fields(self, fields):
@@ -2454,18 +2798,24 @@ class Ticket(Model):
         # 若自动设置单据状态, 单据状态的下拉框选项也随之更新
         if ticket_status:
             choice = TicketStatusOptionSerializer(
-                TicketStatus.objects.get(key=ticket_status.key,
-                                         service_type=self.service_type).to_status, many=True,
+                TicketStatus.objects.get(
+                    key=ticket_status.key, service_type=self.service_type
+                ).to_status,
+                many=True,
             ).data
 
             # 更新单据属性
             self.current_status = ticket_status.key
             # 更新单据公共字段
-            self.fields.filter(key=FIELD_STATUS).update(_value=ticket_status.key, choice=choice)
+            self.fields.filter(key=FIELD_STATUS).update(
+                _value=ticket_status.key, choice=choice
+            )
             # 如果是结束状态，直接结束
             if ticket_status.is_over:
                 self.close(
-                    close_status=ticket_status.key, desc=_("节点设置的默认单据状态为结束状态"), operator="system",
+                    close_status=ticket_status.key,
+                    desc=_("节点设置的默认单据状态为结束状态"),
+                    operator="system",
                 )
             self.save()
 
@@ -2487,7 +2837,7 @@ class Ticket(Model):
 
                     for user in f_value.split(","):
                         # 历史数据中多选人员选择字段存入了中文名: miya(miya)，暂时兼容
-                        username = user[0: user.find("(")] if "(" in user else user
+                        username = user[0 : user.find("(")] if "(" in user else user
                         var_pros = "{},{}".format(var_pros, username)
 
                     # 取到第一个处理人则停止解析
@@ -2522,8 +2872,12 @@ class Ticket(Model):
 
         # 被分派的人
         assignors_type, assignor_to = "", ""
-        f_assignors, f_assignors_type = _formatted(state.assignors_type, state.assignors, self)
-        f_processors, f_processors_type = _formatted(state.processors_type, state.processors, self)
+        f_assignors, f_assignors_type = _formatted(
+            state.assignors_type, state.assignors, self
+        )
+        f_processors, f_processors_type = _formatted(
+            state.processors_type, state.processors, self
+        )
 
         # 分派后处理/分派后认领
         if distribute_type in ["DISTRIBUTE_THEN_PROCESS", "DISTRIBUTE_THEN_CLAIM"]:
@@ -2535,8 +2889,9 @@ class Ticket(Model):
             action_type = DISTRIBUTE_OPERATE
         # 认领后处理
         elif distribute_type == "CLAIM_THEN_PROCESS":
-            real_processors = UserRole.get_users_by_type(self.bk_biz_id, f_processors_type,
-                                                         f_processors, self)
+            real_processors = UserRole.get_users_by_type(
+                self.bk_biz_id, f_processors_type, f_processors, self
+            )
             if len(real_processors) == 1:
                 processors = dotted_name(",".join(real_processors))
                 processors_type = PERSON
@@ -2557,8 +2912,11 @@ class Ticket(Model):
                 processors = f_processors
                 processors_type = f_processors_type
             status = RUNNING
-            action_type = SYSTEM_OPERATE if state.type in [TASK_STATE,
-                                                           TASK_SOPS_STATE] else TRANSITION_OPERATE
+            action_type = (
+                SYSTEM_OPERATE
+                if state.type in [TASK_STATE, TASK_SOPS_STATE]
+                else TRANSITION_OPERATE
+            )
 
         defaults = {
             "bk_biz_id": self.bk_biz_id,
@@ -2591,8 +2949,12 @@ class Ticket(Model):
         if Status.objects.filter(state_id=state_id, ticket_id=self.id).exists():
             # state_id, ticket_id对应唯一未删除的status，若存在多个，则存在BUG
             status = Status.objects.get(state_id=state_id, ticket_id=self.id)
-            last_operator = dotted_name(self.logs.filter(status=status.id).last().operator)
-            current_processors = f_processors if state.type == TASK_STATE else last_operator
+            last_operator = dotted_name(
+                self.logs.filter(status=status.id).last().operator
+            )
+            current_processors = (
+                f_processors if state.type == TASK_STATE else last_operator
+            )
             defaults.update(
                 processors_type=PERSON,
                 processors=current_processors,
@@ -2623,31 +2985,41 @@ class Ticket(Model):
 
         ticket_logs = (
             self.logs.filter(is_valid=True)
-                .exclude(from_state_id__in=[self.start_state["id"], self.end_state["id"]])
-                .order_by("operate_at")
+            .exclude(from_state_id__in=[self.start_state["id"], self.end_state["id"]])
+            .order_by("operate_at")
         )
 
         state_list = []
         for log in ticket_logs:
             status = Status._objects.filter(id=log.status).last()
-            ticket_status = StatusSerializer(status, context={"username": username,
-                                                              "show_all_fields": False, })
+            ticket_status = StatusSerializer(
+                status,
+                context={
+                    "username": username,
+                    "show_all_fields": False,
+                },
+            )
 
             state_info = ticket_status.data
             status_fields = {}
             if status is not None:
-                status_fields = dict([(str(field["id"]), field) for field in status.fields])
+                status_fields = dict(
+                    [(str(field["id"]), field) for field in status.fields]
+                )
 
             # 根据status存储的当时的fields的值更新
             if log.type == TRANSITION_OPERATE:
                 for field in state_info.get("fields", []):
                     field.update(
-                        value=status_fields.get(str(field["id"]), {}).get("value", field["value"]),
+                        value=status_fields.get(str(field["id"]), {}).get(
+                            "value", field["value"]
+                        ),
                         display_value=status_fields.get(str(field["id"]), {}).get(
                             "display_value", field["display_value"]
                         ),
-                        choice=status_fields.get(str(field["id"]), {}).get("choice",
-                                                                           field["choice"]),
+                        choice=status_fields.get(str(field["id"]), {}).get(
+                            "choice", field["choice"]
+                        ),
                     )
             else:
                 # 认领/分派/挂起/恢复挂起/转单等操作，字段置空
@@ -2655,8 +3027,9 @@ class Ticket(Model):
 
             message = _(log.message)
             if log.type == SYSTEM_OPERATE:
-                message = message.format(name=log.from_state_name,
-                                         detail_message=log.detail_message)
+                message = message.format(
+                    name=log.from_state_name, detail_message=log.detail_message
+                )
             else:
                 message = message.format(
                     operator=log.operator,
@@ -2677,12 +3050,20 @@ class Ticket(Model):
         # running state
         running_state = self.node_status.filter(status=RUNNING)
         running_status = StatusSerializer(
-            running_state, many=True, context={"username": username, "show_all_fields": False, },
+            running_state,
+            many=True,
+            context={
+                "username": username,
+                "show_all_fields": False,
+            },
         )
         state_info = running_status.data
         for state in state_info:
             state.update(
-                operator=state["processors"], operate_at="--", action="--", message="--",
+                operator=state["processors"],
+                operate_at="--",
+                action="--",
+                message="--",
                 status=RUNNING,
             )
         state_list += state_info
@@ -2690,7 +3071,9 @@ class Ticket(Model):
         # append end status
         if self.is_over:
             try:
-                end_log = self.logs.get(is_valid=True, from_state_id=self.end_state["id"])
+                end_log = self.logs.get(
+                    is_valid=True, from_state_id=self.end_state["id"]
+                )
                 state_list.append(
                     {
                         "name": _("结束"),
@@ -2726,8 +3109,11 @@ class Ticket(Model):
             status_serializer_data = StatusSerializer(
                 self.node_status,
                 many=True,
-                context={"username": username, "bk_biz_id": self.bk_biz_id,
-                         "show_all_fields": True, },
+                context={
+                    "username": username,
+                    "bk_biz_id": self.bk_biz_id,
+                    "show_all_fields": True,
+                },
             ).data
             for status in status_serializer_data:
                 log = self.logs.filter(status=status["id"]).last()
@@ -2738,7 +3124,9 @@ class Ticket(Model):
                         action=ACTION_DICT.get(log.type, ""),
                     )
                 else:
-                    status.update(operator=status["processors"], operate_at="--", action="--")
+                    status.update(
+                        operator=status["processors"], operate_at="--", action="--"
+                    )
                 for index, item in enumerate(status["operations"]):
                     if status["operations"][index]["key"] == TRANSITION_OPERATE:
                         status["operations"][index]["name"] = _("处理")
@@ -2757,7 +3145,11 @@ class Ticket(Model):
         old_ticket_states = OldTicketStateSerializer(
             list(self.flow.states.values()), many=True, context={"ticket": self}
         ).data
-        states = [state for state in old_ticket_states if state["type"] not in ["START", "END"]]
+        states = [
+            state
+            for state in old_ticket_states
+            if state["type"] not in ["START", "END"]
+        ]
         master_ids = [state["id"] for state in self.flow.master]
         states.sort(key=lambda x: master_ids.index(x["id"]), reverse=True)
         for state in states:
@@ -2792,7 +3184,9 @@ class Ticket(Model):
         # 创建并启动pipeline
         print("\n-------  ticket pipeline start  ----------\n")
         pipeline_wrapper = PipelineWrapper(kwargs.pop("flow", self.flow))
-        pipeline_data = pipeline_wrapper.create_pipeline(self.id, need_start=True, **kwargs)
+        pipeline_data = pipeline_wrapper.create_pipeline(
+            self.id, need_start=True, **kwargs
+        )
 
         self.pipeline_data = pipeline_data
         self.save(update_fields=("pipeline_data",))
@@ -2816,11 +3210,16 @@ class Ticket(Model):
 
         # 删除掉除了提单节点以外的内容
         self.logs.all().exclude(
-            from_state_id__in=[self.first_state_id, self.start_state["id"]]).delete()
+            from_state_id__in=[self.first_state_id, self.start_state["id"]]
+        ).delete()
 
         # 结束节点也要去掉 Todo: 但是子单的end时间还是跟母单不一样
         parent_logs = parent_ticket.logs.all().exclude(
-            from_state_id__in=[self.first_state_id, self.start_state["id"], self.end_state["id"]]
+            from_state_id__in=[
+                self.first_state_id,
+                self.start_state["id"],
+                self.end_state["id"],
+            ]
         )
         for log in parent_logs:
             log.id = None
@@ -2833,7 +3232,9 @@ class Ticket(Model):
 
         # 第二步，重新启动
         # 使用母单的flow初始化pipeline, 所有state_id来源母单
-        self.start(is_cloning=True, parent_ticket_id=parent_ticket.id, flow=parent_ticket.flow)
+        self.start(
+            is_cloning=True, parent_ticket_id=parent_ticket.id, flow=parent_ticket.flow
+        )
 
     def activity_callback(self, state_id, operator, fields=None, source=WEB):
         # 转换state_id为activity_id
@@ -2857,11 +3258,13 @@ class Ticket(Model):
             inputs = []
         try:
             if action == RETRY:
-                self.node_status.filter(state_id=state_id).update(query_params=inputs,
-                                                                  status=QUEUEING)
+                self.node_status.filter(state_id=state_id).update(
+                    query_params=inputs, status=QUEUEING
+                )
             else:
-                self.node_status.filter(state_id=state_id).update(ignore_params=inputs,
-                                                                  status=QUEUEING)
+                self.node_status.filter(state_id=state_id).update(
+                    ignore_params=inputs, status=QUEUEING
+                )
             cache.set(
                 "node_retry_{}_{}".format(self.id, state_id),
                 json.dumps({"action": action, "operator": operator}),
@@ -2870,8 +3273,10 @@ class Ticket(Model):
             node_id = self.pipeline_data["states_map"].get(str(state_id))
             res = pipeline_api.retry_node(node_id)
             if not res.result:
-                logger.warning("callback error， current state id %s, error message: %s" % (
-                    state_id, res.message))
+                logger.warning(
+                    "callback error， current state id %s, error message: %s"
+                    % (state_id, res.message)
+                )
                 self.node_status.filter(state_id=state_id).update(status=RUNNING)
             return res
         except Exception as e:
@@ -2910,7 +3315,9 @@ class Ticket(Model):
             self.start_sla(state_id)
 
         self.send_trigger_signal(
-            ENTER_STATE, sender=state_id, context={"dst_state": status.id, "operator": self.creator}
+            ENTER_STATE,
+            sender=state_id,
+            context={"dst_state": status.id, "operator": self.creator},
         )
 
         # 提单节点给提单人发送关注通知邮件, 非提单节点给处理人发送单据待办通知邮件
@@ -2924,7 +3331,13 @@ class Ticket(Model):
         else:
             receivers = ",".join(status.get_processors())
             action = TRANSITION_OPERATE
-        self.notify(state_id, receivers, action=action, retry=kwargs.get("retry", True), **context)
+        self.notify(
+            state_id,
+            receivers,
+            action=action,
+            retry=kwargs.get("retry", True),
+            **context
+        )
 
     def do_before_enter_sign_state(self, state_id, **kwargs):
         """Actions before enter sign state
@@ -2978,14 +3391,20 @@ class Ticket(Model):
             self.start_sla(state_id)
 
         # 发送进入节点的信号
-        self.send_trigger_signal(ENTER_STATE, sender=state_id,
-                                 context={"dst_state": node_status.id})
+        self.send_trigger_signal(
+            ENTER_STATE, sender=state_id, context={"dst_state": node_status.id}
+        )
 
         # Send notify
         processor = node_status.get_processor_in_sign_state()
 
         # TODO 发送通知可用触发器替代
-        self.notify(state_id, processor, action=TRANSITION_OPERATE, retry=kwargs.get("retry", True))
+        self.notify(
+            state_id,
+            processor,
+            action=TRANSITION_OPERATE,
+            retry=kwargs.get("retry", True),
+        )
 
         return variables, finish_condition, code_key
 
@@ -2998,7 +3417,7 @@ class Ticket(Model):
             pros = list_by_separator(processors)
 
             if processors_type == ORGANIZATION:
-                return map(lambda x: 'O_{}'.format(x), pros)
+                return map(lambda x: "O_{}".format(x), pros)
 
             return pros
 
@@ -3012,24 +3431,31 @@ class Ticket(Model):
                 processor = node_status.get_processor_in_sign_state()
                 processor_list = list_by_separator(processor)
             else:
-                processor_list = _formatted(node_status.processors_type, node_status.processors)
+                processor_list = _formatted(
+                    node_status.processors_type, node_status.processors
+                )
 
             node_processors.extend(
-                processor for processor in processor_list if
-                processor and processor not in node_processors
+                processor
+                for processor in processor_list
+                if processor and processor not in node_processors
             )
 
             tasks = Task.objects.filter(
-                ticket_id=self.id, execute_state_id=node_status.state_id,
-                status__in=[QUEUE, WAITING_FOR_OPERATE]
+                ticket_id=self.id,
+                execute_state_id=node_status.state_id,
+                status__in=[QUEUE, WAITING_FOR_OPERATE],
             )
             for task in tasks:
-                task_processors.extend(_formatted(task.processors_type, task.processors))
+                task_processors.extend(
+                    _formatted(task.processors_type, task.processors)
+                )
 
         current_processors = node_processors[:]
         current_processors.extend(
-            processor for processor in task_processors if
-            processor and processor not in current_processors
+            processor
+            for processor in task_processors
+            if processor and processor not in current_processors
         )
 
         self.current_processors = dotted_name(",".join(current_processors))
@@ -3079,7 +3505,9 @@ class Ticket(Model):
             f["_value"] = f.pop("value", "")
             field_map[f["key"]] = f
 
-        node_fields = TicketField.objects.filter(state_id=node_status.state_id, ticket_id=self.id)
+        node_fields = TicketField.objects.filter(
+            state_id=node_status.state_id, ticket_id=self.id
+        )
         exclude_fields = list(TicketField.FIELDS) + ["id", "ticket"]
         for node_field in node_fields:
             node_field_dict = node_field.tag_data(exclude=exclude_fields)
@@ -3091,13 +3519,15 @@ class Ticket(Model):
 
             # Table field need sync to BASE-MODEL field
             if node_field_dict["source"] == TABLE:
-                TicketField.objects.filter(ticket_id=self.id, key=node_field_dict["key"]).update(
-                    _value=node_field_dict["_value"]
-                )
+                TicketField.objects.filter(
+                    ticket_id=self.id, key=node_field_dict["key"]
+                ).update(_value=node_field_dict["_value"])
 
             # Get sign task approve result
-            if node_field.meta.get("code") == APPROVE_RESULT and node_field_dict[
-                "_value"] == "true":
+            if (
+                node_field.meta.get("code") == APPROVE_RESULT
+                and node_field_dict["_value"] == "true"
+            ):
                 is_passed = True
 
         task_fields = TaskField.objects.bulk_create(task_field_objs)
@@ -3122,10 +3552,12 @@ class Ticket(Model):
         # Event log form data
         task_fields_list = TaskFieldSerializer(task_fields, many=True).data
         # Create log
-        TicketEventLog.objects.create_sign_state_log(self, node_status, operator, source,
-                                                     task_fields_list)
+        TicketEventLog.objects.create_sign_state_log(
+            self, node_status, operator, source, task_fields_list
+        )
         SignTask.objects.filter(status_id=node_status.id, processor=operator).update(
-            status="EXECUTED")
+            status="EXECUTED"
+        )
 
     def do_before_exit_sign_state(self, state_id):
         status = self.status(state_id)
@@ -3164,111 +3596,127 @@ class Ticket(Model):
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
         self.create_ticket_relation(from_ticket_id)
-        print('----- create ticket create_ticket_relation end')
+        print("----- create ticket create_ticket_relation end")
 
         # 启动SLA任务
-        print('----- create ticket create_sla_task end')
+        print("----- create ticket create_sla_task end")
 
         # 单据上下文准备：创建字段
         self.prepare_all_fields()
-        print('----- create ticket prepare_all_fields end')
+        print("----- create ticket prepare_all_fields end")
         # 创建开始流转日志
         TicketEventLog.objects.create_start_log(self)
-        print('----- create ticket create_start_log end')
+        print("----- create ticket create_start_log end")
 
         # 为sla提前初始化优先级
         self.fill_state_fields(fields)
         self.update_priority()
 
         self.do_before_enter_state(self.first_state_id)
-        print('----- create ticket do_before_enter_state end')
+        print("----- create ticket do_before_enter_state end")
         self.do_in_state(self.first_state_id, fields, self.creator, source)
-        print('----- create ticket do_in_state end')
+        print("----- create ticket do_in_state end")
 
         # 更新公共字段
         self.fields.filter(key=FIELD_STATUS).update(_value=self.current_status)
 
         self.do_before_exit_state(self.first_state_id)
-        print('----- create ticket do_before_exit_state end')
+        print("----- create ticket do_before_exit_state end")
 
         # 发送创建成功的信号
         self.send_trigger_signal(CREATE_TICKET)
 
     def create_moa_ticket(self, state_id):
-        if settings.RUN_VER == 'ieod':
+        if settings.RUN_VER == "ieod":
             try:
                 from blueking.component.ieod.shortcuts import get_client_by_user
 
                 status = self.node_status.get(state_id=state_id)
-                state_fields = self.get_state_fields(self.first_state_id, need_serialize=False)
+                state_fields = self.get_state_fields(
+                    self.first_state_id, need_serialize=False
+                )
                 data = {
-                    'operator': self.creator,
-                    'work_items': [
+                    "operator": self.creator,
+                    "work_items": [
                         {
                             "category": "99511B1EDD8E4EB9B70E7AC1184EEBC2",
-                            'process_name': self.sn,
+                            "process_name": self.sn,
                             "title": self.title,
-                            'form_url': "{}#/ticket/{}/?activeNname=all&router=globalview".format(
+                            "form_url": "{}#/ticket/{}/?activeNname=all&router=globalview".format(
                                 settings.TICKET_NOTIFY_HOST, self.id
                             ),
-                            'callback_url': "{}openapi/ticket/proceed_approval/".format(
-                                settings.MY_OA_CALLBACK_URL),
+                            "callback_url": "{}openapi/ticket/proceed_approval/".format(
+                                settings.MY_OA_CALLBACK_URL
+                            ),
                             "activity": state_id,
-                            'enable_quick_approval': True,
-                            'enable_batch_approval': False,
-                            'handler': status.get_processor_in_sign_state(),
+                            "enable_quick_approval": True,
+                            "enable_batch_approval": False,
+                            "handler": status.get_processor_in_sign_state(),
                             "process_inst_id": self.sn,
                             "actions": [
                                 {"display_name": "通过", "value": "true"},
                                 {"display_name": "拒绝", "value": "false"},
                             ],
-                            'approval_history': [
+                            "approval_history": [
                                 {
-                                    'approver': log.operator,
-                                    'action': log.action.lower(),
-                                    'step': '',
-                                    'opinion': log.message.format(
+                                    "approver": log.operator,
+                                    "action": log.action.lower(),
+                                    "step": "",
+                                    "opinion": log.message.format(
                                         operator=log.operator,
                                         name=log.from_state_name,
                                         detail_message=log.detail_message,
                                         action=log.action.lower(),
                                     ),
-                                    'approval_time': log.operate_at.strftime('%Y-%m-%dT%H:%M:%S'),
-                                    'remark': '',
+                                    "approval_time": log.operate_at.strftime(
+                                        "%Y-%m-%dT%H:%M:%S"
+                                    ),
+                                    "remark": "",
                                 }
                                 for log in self.logs.all()[1:]
                             ],
-                            'list_view': [
-                                {'key': '单号', 'value': self.sn},
-                                {'key': '服务目录', 'value': self.catalog_fullname},
-                                {'key': '提单人', 'value': self.creator},
-                                {'key': '提单时间',
-                                 'value': self.create_at.strftime('%Y-%m-%d %H:%M:%S')},
+                            "list_view": [
+                                {"key": "单号", "value": self.sn},
+                                {"key": "服务目录", "value": self.catalog_fullname},
+                                {"key": "提单人", "value": self.creator},
+                                {
+                                    "key": "提单时间",
+                                    "value": self.create_at.strftime(
+                                        "%Y-%m-%d %H:%M:%S"
+                                    ),
+                                },
                             ],
-                            'detail_view': [{'key': '单号', 'value': self.sn},
-                                            {'key': '标题', 'value': self.title}]
-                                           + [
-                                               {'key': f.name, 'value': self.display_content(f.type,
-                                                                                             f.display_value)}
-                                               for f in state_fields.exclude(
-                                    type__in=['TABLE', 'CUSTOMTABLE', 'FILE'])
-                                           ],
+                            "detail_view": [
+                                {"key": "单号", "value": self.sn},
+                                {"key": "标题", "value": self.title},
+                            ]
+                            + [
+                                {
+                                    "key": f.name,
+                                    "value": self.display_content(
+                                        f.type, f.display_value
+                                    ),
+                                }
+                                for f in state_fields.exclude(
+                                    type__in=["TABLE", "CUSTOMTABLE", "FILE"]
+                                )
+                            ],
                         }
                     ],
                 }
-                logger.info('create_moa_ticket request data is {}'.format(data))
+                logger.info("create_moa_ticket request data is {}".format(data))
                 client = get_client_by_user(self.creator)
                 # client.set_use_test_env(False)
                 # moa_client = client.myoa.workitem_create
 
                 # result = moa_client(data)
                 result = client.myoa.workitem_create(data)
-                logger.info('create_moa_ticket result data is {}'.format(result))
+                logger.info("create_moa_ticket result data is {}".format(result))
             except Exception as err:
-                logger.info('create_moa_ticket err is {}'.format(err))
+                logger.info("create_moa_ticket err is {}".format(err))
 
     def close_moa_ticket(self, state_id, operator):
-        if settings.RUN_VER == 'ieod':
+        if settings.RUN_VER == "ieod":
             try:
                 from blueking.component.ieod.shortcuts import get_client_by_user
 
@@ -3278,20 +3726,20 @@ class Ticket(Model):
                     "title": "ITSM:{}".format(self.title),
                     "process_inst_id": self.sn,
                     "activity": state_id,
-                    'process_name': self.sn,
+                    "process_name": self.sn,
                 }
-                logger.info('close_moa_ticket request data is {}'.format(data))
+                logger.info("close_moa_ticket request data is {}".format(data))
                 client = get_client_by_user(self.creator)
                 # client.set_use_test_env(False)
                 # result = moa_client(data)
                 result = client.myoa.workitem_close(data)
-                logger.info('close_moa_ticket result is {}'.format(result))
+                logger.info("close_moa_ticket result is {}".format(result))
             except Exception as err:
-                logger.info('close_moa_ticket err is {}'.format(err))
+                logger.info("close_moa_ticket err is {}".format(err))
 
     @staticmethod
     def display_content(field_type, content):
-        if field_type != 'CUSTOM-FORM':
+        if field_type != "CUSTOM-FORM":
             return content
         try:
             schemes_map = {}
@@ -3299,7 +3747,9 @@ class Ticket(Model):
             for scheme_name in schemes:
                 schemes_map[scheme_name] = {
                     column["key"]: column["name"]
-                    for column in content["schemes"][scheme_name]["attrs"].get("column", [])
+                    for column in content["schemes"][scheme_name]["attrs"].get(
+                        "column", []
+                    )
                 }
 
             text_content = []
@@ -3316,18 +3766,26 @@ class Ticket(Model):
                     for attr_name, attr_value in attr.items():
                         try:
                             if isinstance(attr_value["value"], str):
-                                single.append("{}:{}".format(schemes_map[scheme][attr_name],
-                                                             attr_value["value"]))
+                                single.append(
+                                    "{}:{}".format(
+                                        schemes_map[scheme][attr_name],
+                                        attr_value["value"],
+                                    )
+                                )
                         except Exception as err:
                             logger.error(
-                                "parser moa content error, form data is {}, err is {}".format(data,
-                                                                                              err))
-                    detail.append(','.join(single))
+                                "parser moa content error, form data is {}, err is {}".format(
+                                    data, err
+                                )
+                            )
+                    detail.append(",".join(single))
                 if label:
-                    text_content.append("{}:\n{}\n".format(label, '\n'.join(detail)))
-            return '\n'.join(text_content)
+                    text_content.append("{}:\n{}\n".format(label, "\n".join(detail)))
+            return "\n".join(text_content)
         except Exception as err:
-            logger.exception('create_moa_ticket parser CUSTOM-FORM error, msg is {}'.format(err))
+            logger.exception(
+                "create_moa_ticket parser CUSTOM-FORM error, msg is {}".format(err)
+            )
             return ""
 
     def send_trigger_signal(self, signal, sender=None, context=None):
@@ -3341,7 +3799,11 @@ class Ticket(Model):
             context = {}
 
         context.update(
-            {item['key']: item['value'] for item in self.get_output_fields(need_display=True)})
+            {
+                item["key"]: item["value"]
+                for item in self.get_output_fields(need_display=True)
+            }
+        )
         context.update({"dst_ticket": self.id})
 
         try:
@@ -3355,7 +3817,9 @@ class Ticket(Model):
                 rule_source_type=SOURCE_TICKET,
             )
         except BaseException:
-            logger.exception(_("触发器事件发送失败, ticket_sn {} signal ：{}").format(self.sn, signal))
+            logger.exception(
+                _("触发器事件发送失败, ticket_sn {} signal ：{}").format(self.sn, signal)
+            )
 
     def create_ticket_relation(self, from_ticket_id):
         # 创建单据关联关系
@@ -3363,7 +3827,9 @@ class Ticket(Model):
             return
 
         TicketToTicket.objects.create(
-            from_ticket_id=from_ticket_id, to_ticket_id=self.id, related_type=DERIVE,
+            from_ticket_id=from_ticket_id,
+            to_ticket_id=self.id,
+            related_type=DERIVE,
             creator=self.creator,
         )
         # 创建关联单的信号发出
@@ -3371,14 +3837,19 @@ class Ticket(Model):
 
     def can_schedule(self, state_id):
         schema_ids = TaskConfig.objects.filter(
-            workflow_id=self.flow_id, workflow_type=VERSION, execute_task_state=state_id,
-            need_task_finished=True
-        ).values_list('task_schema_id')
+            workflow_id=self.flow_id,
+            workflow_type=VERSION,
+            execute_task_state=state_id,
+            need_task_finished=True,
+        ).values_list("task_schema_id")
         is_exist = (
-            Task.objects.filter(ticket_id=self.pk, execute_state_id=state_id,
-                                task_schema_id__in=schema_ids)
-                .exclude(status__in=['FINISHED', 'SKIPPED'])
-                .exists()
+            Task.objects.filter(
+                ticket_id=self.pk,
+                execute_state_id=state_id,
+                task_schema_id__in=schema_ids,
+            )
+            .exclude(status__in=["FINISHED", "SKIPPED"])
+            .exists()
         )
         return not is_exist
 
@@ -3388,15 +3859,20 @@ class Ticket(Model):
 
         for state_id in self.current_state_ids:
             schema_ids = TaskConfig.objects.filter(
-                workflow_id=self.flow_id, workflow_type=VERSION, execute_task_state=state_id,
-                need_task_finished=True
-            ).values_list('task_schema_id')
+                workflow_id=self.flow_id,
+                workflow_type=VERSION,
+                execute_task_state=state_id,
+                need_task_finished=True,
+            ).values_list("task_schema_id")
             if schema_ids:
                 is_exist = (
-                    Task.objects.filter(ticket_id=self.pk, execute_state_id=state_id,
-                                        task_schema_id__in=schema_ids)
-                        .exclude(status='FINISHED')
-                        .exists()
+                    Task.objects.filter(
+                        ticket_id=self.pk,
+                        execute_state_id=state_id,
+                        task_schema_id__in=schema_ids,
+                    )
+                    .exclude(status="FINISHED")
+                    .exists()
                 )
                 if is_exist:
                     return False
@@ -3415,25 +3891,25 @@ class Ticket(Model):
             return
 
         # 更新任务状态
-        Task.objects.filter(ticket_id=self.pk, status='NEW').update(status='QUEUE')
+        Task.objects.filter(ticket_id=self.pk, status="NEW").update(status="QUEUE")
 
         # 更新单据中的任务处理人
         operators = []
-        for task in Task.objects.filter(ticket_id=self.pk, status='QUEUE'):
+        for task in Task.objects.filter(ticket_id=self.pk, status="QUEUE"):
             # 支持通用角色
             if task.processors_type == PERSON:
                 operators.extend(task.processor_user_list)
             elif task.processors_type == GENERAL:
                 operators.extend(list_by_separator(task.processors))
 
-        self.current_task_processors = dotted_name(','.join(list(set(operators))))
+        self.current_task_processors = dotted_name(",".join(list(set(operators))))
         self.save()
 
     def add_history_task_processors(self, username):
         """追加历史任务处理人"""
         history_task_processors = list_by_separator(self.history_task_processors)
         history_task_processors.append(username)
-        self.history_task_processors = dotted_name(','.join(history_task_processors))
+        self.history_task_processors = dotted_name(",".join(history_task_processors))
         self.save()
 
     def close(self, close_status, desc="", operator=""):
@@ -3445,15 +3921,24 @@ class Ticket(Model):
         self.stop_all_sla()
         return
 
-    def do_before_end_pipeline(self, operator="", close_status=FINISHED, desc="", source=SYS,
-                               by_flow=None):
-        self.set_finished(operator=operator, close_status=close_status, desc=desc, source=source,
-                          last_flow=by_flow)
+    def do_before_end_pipeline(
+        self, operator="", close_status=FINISHED, desc="", source=SYS, by_flow=None
+    ):
+        self.set_finished(
+            operator=operator,
+            close_status=close_status,
+            desc=desc,
+            source=source,
+            last_flow=by_flow,
+        )
 
         self.send_trigger_signal(CLOSE_TICKET)
 
         self.notify(
-            state_id="", receivers=self.creator, message=_("您的单据已经完成！"), action=FINISHED,
+            state_id="",
+            receivers=self.creator,
+            message=_("您的单据已经完成！"),
+            action=FINISHED,
             retry=False,
         )
         return
@@ -3509,9 +3994,12 @@ class Ticket(Model):
         return action_result
 
     def skip_gateway_node(self, state_id, transition_id):
-        node_id = self.pipeline_data["exclusive_gateway_source_state"].get(str(state_id))
-        flow_id = {value: key for key, value in self.pipeline_data["transitions_map"].items()}.get(
-            str(transition_id))
+        node_id = self.pipeline_data["exclusive_gateway_source_state"].get(
+            str(state_id)
+        )
+        flow_id = {
+            value: key for key, value in self.pipeline_data["transitions_map"].items()
+        }.get(str(transition_id))
         return pipeline_api.skip_exclusive_gateway(node_id, flow_id)
 
     def update_ticket_status(self, fields, operator):
@@ -3533,8 +4021,9 @@ class Ticket(Model):
 
         status = self.status(state_id)
         status.status = FINISHED
-        all_fields = FieldSerializer(status.ticket_fields, many=True,
-                                     context={"show_all_fields": False}).data
+        all_fields = FieldSerializer(
+            status.ticket_fields, many=True, context={"show_all_fields": False}
+        ).data
         status.fields = [field for field in all_fields]
         status.save()
 
@@ -3551,7 +4040,9 @@ class Ticket(Model):
                 raise RevokePipelineError(res.message)
 
             # 更新节点状态及终止原因
-            node_status.set_status(TERMINATED, operator, terminate_message=terminate_message)
+            node_status.set_status(
+                TERMINATED, operator, terminate_message=terminate_message
+            )
 
             for ticket in self.master_slave_tickets:
                 TicketEventLog.objects.create_log(
@@ -3577,13 +4068,19 @@ class Ticket(Model):
             self.send_trigger_signal(TERMINATE_TICKET)
 
             # 向提单人发送通知
-            message = message.format(operator=operator, name=node_status.name,
-                                     detail_message=terminate_message)
+            message = message.format(
+                operator=operator,
+                name=node_status.name,
+                detail_message=terminate_message,
+            )
             self.close_moa_ticket(state_id, operator)
             self.callback_request()
             self.notify(
-                state_id=state_id, receivers=self.creator, message=message,
-                action=TERMINATE_OPERATE, retry=False,
+                state_id=state_id,
+                receivers=self.creator,
+                message=message,
+                action=TERMINATE_OPERATE,
+                retry=False,
             )
 
         self.stop_all_sla()
@@ -3605,12 +4102,17 @@ class Ticket(Model):
             to_state_id=0,
         )
 
-        self.send_trigger_signal(SUSPEND_TICKET, context={"suspend_message": suspend_message})
+        self.send_trigger_signal(
+            SUSPEND_TICKET, context={"suspend_message": suspend_message}
+        )
 
         # 向提单人发送通知
         self.notify(
-            state_id="", receivers=self.creator, message=tlog.translated_message,
-            action=SUSPEND_OPERATE, retry=False,
+            state_id="",
+            receivers=self.creator,
+            message=tlog.translated_message,
+            action=SUSPEND_OPERATE,
+            retry=False,
         )
 
         # 暂停SLA计时
@@ -3626,14 +4128,18 @@ class Ticket(Model):
             status = "RUNNING" if not self.pre_status else self.pre_status
             self.update_current_status(status)
 
-        tlog = TicketEventLog.objects.create_log(self, 0, operator, UNSUSPEND_OPERATE,
-                                                 message=message, to_state_id=0)
+        tlog = TicketEventLog.objects.create_log(
+            self, 0, operator, UNSUSPEND_OPERATE, message=message, to_state_id=0
+        )
         # 向提单人发送通知
         self.send_trigger_signal(RECOVERY_TICKET)
 
         self.notify(
-            state_id="", receivers=self.creator, message=tlog.translated_message,
-            action=UNSUSPEND_OPERATE, retry=False,
+            state_id="",
+            receivers=self.creator,
+            message=tlog.translated_message,
+            action=UNSUSPEND_OPERATE,
+            retry=False,
         )
 
         # 恢复SLA计时
@@ -3642,7 +4148,9 @@ class Ticket(Model):
     def withdraw(self, operator, source):
         """撤销单据"""
         running_status = Status.objects.get_running_status(self.id)
-        state_id = running_status.first().state_id if running_status else self.first_state_id
+        state_id = (
+            running_status.first().state_id if running_status else self.first_state_id
+        )
 
         node_status = self.status(state_id)
 
@@ -3698,7 +4206,10 @@ class Ticket(Model):
 
         try:
             role = UserRole.objects.get(id=self.current_processors)
-            return "%s-> %s" % ("通用角色" if role.role_type == "GENERAL" else "CMDB角色", role.name,)
+            return "%s-> %s" % (
+                "通用角色" if role.role_type == "GENERAL" else "CMDB角色",
+                role.name,
+            )
         except UserRole.DoesNotExist:
             return ""
 
@@ -3706,16 +4217,20 @@ class Ticket(Model):
         """获取当前处理人列表"""
 
         users = UserRole.get_users_by_type(
-            bk_biz_id if bk_biz_id else self.bk_biz_id, self.current_processors_type,
-            self.current_processors, self,
+            bk_biz_id if bk_biz_id else self.bk_biz_id,
+            self.current_processors_type,
+            self.current_processors,
+            self,
         )
 
         return users
 
     def get_from_transition(self, pipeline_flow_id):
-        if 'transitions_map' not in self.pipeline_data:
+        if "transitions_map" not in self.pipeline_data:
             return []
-        transition_id = self.pipeline_data.get('transitions_map', {}).get(pipeline_flow_id)
+        transition_id = self.pipeline_data.get("transitions_map", {}).get(
+            pipeline_flow_id
+        )
         # if transition_id:
         #     return self.flow.transitions[transition_id]
         if transition_id:
@@ -3741,10 +4256,14 @@ class Ticket(Model):
             for department in departments:
                 family = list(reversed(department["family"]))
                 second_level_id, second_level_name = (
-                    (int(family[0]["id"]), family[0]["name"]) if len(family) > 0 else (-1, _("其他"))
+                    (int(family[0]["id"]), family[0]["name"])
+                    if len(family) > 0
+                    else (-1, _("其他"))
                 )
                 third_level_id, third_level_name = (
-                    (int(family[1]["id"]), family[1]["name"]) if len(family) > 1 else (-1, _("其他"))
+                    (int(family[1]["id"]), family[1]["name"])
+                    if len(family) > 1
+                    else (-1, _("其他"))
                 )
                 TicketOrganization.objects.create(
                     username=self.creator,
@@ -3768,15 +4287,20 @@ class Ticket(Model):
         organization_info = []
         for ticket in tickets:
             if ticket["creator"] not in user_departments:
-                user_departments[ticket["creator"]] = get_user_departments(ticket["creator"],
-                                                                           id_only=False)
+                user_departments[ticket["creator"]] = get_user_departments(
+                    ticket["creator"], id_only=False
+                )
             for department in user_departments[ticket["creator"]]:
                 family = list(reversed(department["family"]))
                 second_level_id, second_level_name = (
-                    (int(family[0]["id"]), family[0]["name"]) if len(family) > 0 else (-1, _("其他"))
+                    (int(family[0]["id"]), family[0]["name"])
+                    if len(family) > 0
+                    else (-1, _("其他"))
                 )
                 third_level_id, third_level_name = (
-                    (int(family[1]["id"]), family[1]["name"]) if len(family) > 1 else (-1, _("其他"))
+                    (int(family[1]["id"]), family[1]["name"])
+                    if len(family) > 1
+                    else (-1, _("其他"))
                 )
                 organization_info.append(
                     TicketOrganization(
@@ -3817,7 +4341,8 @@ class Ticket(Model):
     def get_ticket_user_count(cls, service_id, scope=None):
         tickets = cls.objects.filter(service_id=service_id)
         event_log = TicketEventLog.objects.filter(
-            ticket__id__in=set(tickets.values_list("id", flat=True)))
+            ticket__id__in=set(tickets.values_list("id", flat=True))
+        )
         if scope:
             print("scope is {}".format(scope))
             event_log = event_log.filter(operate_at__range=scope)
@@ -3830,13 +4355,14 @@ class Ticket(Model):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(**time_range)
-                .extra(select={"date_str": data_str})
-                .values("date_str")
-                .annotate(count=Count("creator", distinct=True))
-                .order_by("date_str")
+            .extra(select={"date_str": data_str})
+            .values("date_str")
+            .annotate(count=Count("creator", distinct=True))
+            .order_by("date_str")
         )
-        dates_range = fill_time_dimension(time_range["create_at__gte"],
-                                          time_range["create_at__lte"], info, time_delta)
+        dates_range = fill_time_dimension(
+            time_range["create_at__gte"], time_range["create_at__lte"], info, time_delta
+        )
         return dates_range
 
     @classmethod
@@ -3844,13 +4370,14 @@ class Ticket(Model):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(**data)
-                .extra(select={"date_str": data_str})
-                .values("date_str")
-                .annotate(count=Count("id"))
-                .order_by("date_str")
+            .extra(select={"date_str": data_str})
+            .values("date_str")
+            .annotate(count=Count("id"))
+            .order_by("date_str")
         )
-        dates_range = fill_time_dimension(data["create_at__gte"], data["create_at__lte"], info,
-                                          time_delta)
+        dates_range = fill_time_dimension(
+            data["create_at__gte"], data["create_at__lte"], info, time_delta
+        )
         return dates_range
 
     @classmethod
@@ -3858,14 +4385,15 @@ class Ticket(Model):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(**data)
-                .filter(bk_biz_id__gt=-1)
-                .extra(select={"date_str": data_str})
-                .values("date_str")
-                .annotate(count=Count("bk_biz_id", distinct=True))
-                .order_by("date_str")
+            .filter(bk_biz_id__gt=-1)
+            .extra(select={"date_str": data_str})
+            .values("date_str")
+            .annotate(count=Count("bk_biz_id", distinct=True))
+            .order_by("date_str")
         )
-        dates_range = fill_time_dimension(data["create_at__gte"], data["create_at__lte"], info,
-                                          time_delta)
+        dates_range = fill_time_dimension(
+            data["create_at__gte"], data["create_at__lte"], info, time_delta
+        )
         return dates_range
 
     # ======================================= SLA功能接口 =====================================
@@ -3895,7 +4423,7 @@ class Ticket(Model):
         """单据高亮颜色"""
 
         if not self._sla_tasks.exists():
-            return ''
+            return ""
 
         color = SlaTicketHighlight.objects.all().first()
         if self.is_sla_inner_state(self.current_state_ids):
@@ -3904,7 +4432,7 @@ class Ticket(Model):
             if self._sla_tasks.filter(sla_status=REPLY_TIMEOUT).exists():
                 return color.reply_timeout_color
 
-        return ''
+        return ""
 
     def create_sla_task(self, state_id=None):
         """
@@ -3921,9 +4449,8 @@ class Ticket(Model):
 
         # 任务是否需要响应
         sla_objs = Sla.objects.filter(
-            id__in=service_sla_objs.values_list("sla_id", flat=True)).values(
-            "id", "is_reply_need"
-        )
+            id__in=service_sla_objs.values_list("sla_id", flat=True)
+        ).values("id", "is_reply_need")
         reply_hash = {obj["id"]: obj["is_reply_need"] for obj in sla_objs}
         # 创建工单SLA任务
         sla_tasks = [
@@ -3941,18 +4468,23 @@ class Ticket(Model):
         SlaTask.objects.bulk_create(sla_tasks)
 
     def is_sla_start_state(self, state_id):
-        return ServiceSla.objects.filter(service_id=self.service_id,
-                                         start_node_id=state_id).exists()
+        return ServiceSla.objects.filter(
+            service_id=self.service_id, start_node_id=state_id
+        ).exists()
 
     def is_sla_end_state(self, state_id):
-        return ServiceSla.objects.filter(service_id=self.service_id, end_node_id=state_id).exists()
+        return ServiceSla.objects.filter(
+            service_id=self.service_id, end_node_id=state_id
+        ).exists()
 
     def is_sla_inner_state(self, state_ids):
         """判断当前节点是否在sla内"""
 
         inner_ids = set()
         # TODO ServiceSla缺少版本
-        for states in ServiceSla.objects.filter(service_id=self.service_id).values_list("states"):
+        for states in ServiceSla.objects.filter(service_id=self.service_id).values_list(
+            "states"
+        ):
             inner_ids.update(states[0])
 
         return bool(set(state_ids) & inner_ids)
@@ -3961,14 +4493,16 @@ class Ticket(Model):
 
         begin_at = datetime.now()
         for sla_task in self._sla_tasks.filter(start_node_id=state_id).exclude(
-            task_status=SLA_STOPPED):
+            task_status=SLA_STOPPED
+        ):
             sla_task.start(begin_at)
 
     def stop_sla(self, state_id):
 
         end_at = datetime.now()
         for sla_task in self._sla_tasks.filter(end_node_id=state_id).exclude(
-            task_status=SLA_STOPPED):
+            task_status=SLA_STOPPED
+        ):
             sla_task.stop(end_at)
 
     def stop_all_sla(self):
@@ -4001,11 +4535,17 @@ class Ticket(Model):
 class TicketOrganization(Model):
     username = models.CharField(_("用户名"), max_length=LEN_LONG)
     first_level_id = models.IntegerField(_("一级组织id"), default=-1)
-    first_level_name = models.CharField(_("一级组织名称"), max_length=LEN_LONG, default=_("其他"))
+    first_level_name = models.CharField(
+        _("一级组织名称"), max_length=LEN_LONG, default=_("其他")
+    )
     second_level_id = models.IntegerField(_("二级组织id"), default=-1)
-    second_level_name = models.CharField(_("二级组织名称"), max_length=LEN_LONG, default=_("其他"))
+    second_level_name = models.CharField(
+        _("二级组织名称"), max_length=LEN_LONG, default=_("其他")
+    )
     third_level_id = models.IntegerField(_("三级组织id"), default=-1)
-    third_level_name = models.CharField(_("三级组织名称"), max_length=LEN_LONG, default=_("其他"))
+    third_level_name = models.CharField(
+        _("三级组织名称"), max_length=LEN_LONG, default=_("其他")
+    )
     family = jsonfield.JSONField(_("组织树"), default=EMPTY_DICT)
     create_at = models.DateTimeField(_("创建时间"))
 
@@ -4030,14 +4570,28 @@ class TicketToTicket(Model):
         ("UNBIND_FAILED", _("解绑失败")),
     ]
 
-    from_ticket = models.ForeignKey(Ticket, help_text=_("源单据"), related_name="from_tickettotickets",
-                                    null=True, on_delete=models.CASCADE)
-    to_ticket = models.ForeignKey(Ticket, help_text=_("目标单据"), related_name="to_tickettotickets",
-                                  null=True, on_delete=models.CASCADE)
-    related_type = models.CharField(_("单据关联类型"), max_length=LEN_SHORT, choices=RELATE_CHOICES,
-                                    default=DERIVE)
+    from_ticket = models.ForeignKey(
+        Ticket,
+        help_text=_("源单据"),
+        related_name="from_tickettotickets",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    to_ticket = models.ForeignKey(
+        Ticket,
+        help_text=_("目标单据"),
+        related_name="to_tickettotickets",
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    related_type = models.CharField(
+        _("单据关联类型"), max_length=LEN_SHORT, choices=RELATE_CHOICES, default=DERIVE
+    )
     related_status = models.CharField(
-        _("关联状态"), max_length=LEN_SHORT, choices=RELATED_STATUS_CHOICES, default="BIND_SUCCESS",
+        _("关联状态"),
+        max_length=LEN_SHORT,
+        choices=RELATED_STATUS_CHOICES,
+        default="BIND_SUCCESS",
     )
 
     objects = managers.Manager()
@@ -4055,8 +4609,12 @@ class TicketToTicket(Model):
 class StatusTransitLog(models.Model):
     """单据状态流转日志"""
 
-    ticket = models.ForeignKey(Ticket, help_text=_("关联的单据"), related_name="transit_log",
-                               on_delete=models.CASCADE)
+    ticket = models.ForeignKey(
+        Ticket,
+        help_text=_("关联的单据"),
+        related_name="transit_log",
+        on_delete=models.CASCADE,
+    )
     from_status = models.CharField(_("流转前的单据状态"), max_length=LEN_LONG)
     to_status = models.CharField(_("流转后的单据状态"), max_length=LEN_LONG)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)

@@ -80,3 +80,6 @@ xlrd==1.2.0
 typing_extensions==3.6.5
 
 anyjson==0.3.3
+
+#bkouth
+PyJWT==2.1.0 
