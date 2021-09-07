@@ -26,23 +26,30 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 当前提供给前端获取用户权限链接使用
 
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.constants.iam import ACTIONS
 from itsm.auth_iam.utils import IamRequest
-from itsm.component.exceptions import ProjectSettingsNotFound
+from itsm.component.exceptions import ProjectSettingsNotFound, DeleteError
 from itsm.project.handler.migration_handler import MigrationHandlerDispatcher
 from itsm.project.models import Project, ProjectSettings, UserProjectAccessRecord
-from itsm.project.serializers import ProjectSerializer, ProjectSettingSerializer, \
-    ProjectMigrateSerializer
+from itsm.project.serializers import (
+    ProjectSerializer,
+    ProjectSettingSerializer,
+    ProjectMigrateSerializer,
+)
 
 
 class ProjectViewSet(component_viewsets.AuthModelViewSet):
     serializer_class = ProjectSerializer
-    queryset = Project.objects.filter(~Q(key='public'), is_deleted=False)
+    queryset = Project.objects.filter(~Q(key="public"), is_deleted=False)
 
-    @action(detail=True, methods=['get'])
+    def destroy(self, request, *args, **kwargs):
+        raise DeleteError(_("删除失败，项目目前不允许删除！"))
+
+    @action(detail=True, methods=["get"])
     def info(self, request, *args, **kwargs):
         """查询用户依赖当前项目的权限"""
         iam_client = IamRequest(request)
@@ -58,25 +65,28 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
             "resource_type_name": "项目",
         }
         for action_info in ACTIONS:
-            if "project" in action_info['relate_resources']:
-                apply_actions.append(action_info['id'])
+            if "project" in action_info["relate_resources"]:
+                apply_actions.append(action_info["id"])
 
-        auth_actions = iam_client.batch_resource_multi_actions_allowed(apply_actions,
-                                                                       [project_info]).get("0", {})
+        auth_actions = iam_client.batch_resource_multi_actions_allowed(
+            apply_actions, [project_info]
+        ).get("0", {})
 
-        auth_actions = [action_id for action_id, result in auth_actions.items() if result]
+        auth_actions = [
+            action_id for action_id, result in auth_actions.items() if result
+        ]
 
-        project_info['auth_actions'] = auth_actions
+        project_info["auth_actions"] = auth_actions
         return Response(project_info)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def project_settings(self, request, *args, **kwargs):
         instance = self.get_object()
         settings = ProjectSettings.objects.filter(project=instance)
         project_serializer = ProjectSettingSerializer(instance=settings, many=True)
         return Response(project_serializer.data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def update_settings(self, request, *args, **kwargs):
         ser = ProjectSettingSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -87,12 +97,13 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
         project_settings.save()
         return Response()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def update_project_record(self, request, *args, **kwargs):
         instance = self.get_object()
         username = request.user.username
-        user_project_record = UserProjectAccessRecord.objects \
-            .filter(username=username).first()
+        user_project_record = UserProjectAccessRecord.objects.filter(
+            username=username
+        ).first()
         if user_project_record is None:
             UserProjectAccessRecord.create_record(username, instance.key)
         else:
@@ -100,7 +111,7 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
 
         return Response()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def migration_project(self, request, *args, **kwargs):
         """
         request: data
@@ -109,16 +120,17 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
             "resource_id":2,
             "old_project_key":0,
             "new_project_key":"test_project"
-        
+
         }
         """
         ser = ProjectMigrateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
-        MigrationHandlerDispatcher(resource_type=data["resource_type"])\
-            .migrate(data["resource_id"],
-                     data["old_project_key"],
-                     data["new_project_key"],
-                     request)
+        MigrationHandlerDispatcher(resource_type=data["resource_type"]).migrate(
+            data["resource_id"],
+            data["old_project_key"],
+            data["new_project_key"],
+            request,
+        )
 
         return Response()

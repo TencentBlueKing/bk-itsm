@@ -146,19 +146,26 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         服务目录
         """
 
-        project_key = request.query_params.get(
-            "project_key", DEFAULT_PROJECT_PROJECT_KEY
-        )
-
         service_id = request.query_params.get("service_id")
         ticket_creator = request.query_params.get("ticket_creator")
-        states = self.queryset.get(
-            id=service_id, project_key=project_key
-        ).workflow.states
+        try:
+            show_first_state = bool(int(request.query_params.get("all", 0)))
+        except Exception:
+            show_first_state = False
+
+        workflow = self.queryset.get(id=service_id).workflow
+        # 获取第一个提单节点的id
+        first_state = workflow.first_state
+        # 根据提单节点 通过路径 乡下搜索，获得正确的state顺序
+        states = workflow.post_states(first_state["id"])
+
+        # 全量数据下，将提单节点插入第一个
+        if show_first_state:
+            states.insert(0, first_state)
 
         states_roles = []
-        for state in states.values():
-            if state["processors_type"] == role.OPEN:
+        for state in states:
+            if state["type"] in ["START", "END"]:
                 continue
 
             use_creator = state["processors_type"] in [
@@ -182,7 +189,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
                 }
             )
 
-        return Response(sorted(states_roles, key=lambda x: x["id"]))
+        return Response(states_roles)
 
     @action(detail=False, methods=["post"])
     def insert_service(self, requests):
