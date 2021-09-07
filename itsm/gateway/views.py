@@ -409,10 +409,11 @@ def get_sops_template_schemes(request):
 
 def get_sops_preview_task_tree(request):
     try:
-        bk_biz_id = request.POST.get("bk_biz_id")
+        data = json.loads(request.body)
+        bk_biz_id = data.get("bk_biz_id")
         data = {
-            "template_id": request.POST.get("template_id"),
-            "exclude_task_nodes_id": request.POST.get("exclude_task_nodes_id", []),
+            "template_id": data.get("template_id"),
+            "exclude_task_nodes_id": data.get("exclude_task_nodes_id", []),
         }
         if bk_biz_id:
             data["bk_biz_id"] = bk_biz_id
@@ -424,10 +425,11 @@ def get_sops_preview_task_tree(request):
 
 def get_sops_preview_common_task_tree(request):
     try:
-        bk_biz_id = request.POST.get("bk_biz_id")
+        data = json.loads(request.body)
+        bk_biz_id = data.get("bk_biz_id")
         data = {
-            "template_id": request.POST.get("template_id"),
-            "exclude_task_nodes_id": request.POST.get("exclude_task_nodes_id", []),
+            "template_id": data.get("template_id"),
+            "exclude_task_nodes_id": data.get("exclude_task_nodes_id", []),
         }
         if bk_biz_id:
             data["bk_biz_id"] = bk_biz_id
