@@ -104,24 +104,57 @@ class TicketOpenTest(TestCase):
                                        role_key="rating_manager", access="")
 
         states = {
-            "92580": {"id": 92580, "processors_type": "GENERAL", "processors": "8,7", "name": "节点1",
-                      "is_multi": True},
+            "92580": {
+                "id": 92580,
+                "processors_type": "GENERAL",
+                "processors": "8,7",
+                "name": "节点1",
+                "type": "START",
+                "is_multi": True
+            },
             "92581": {
                 "id": 92581,
                 "processors_type": "IAM",
                 "processors": str(role.id),
                 "name": "节点2",
+                "type": "NORMAL",
                 "is_multi": False,
             },
             "92582": {
                 "id": 92582,
                 "processors_type": "PERSON",
-                "processors": "hoganren1",
+                "processors": "admin",
                 "name": "节点3",
+                "type": "NORMAL",
+                "is_multi": False,
+            },
+            "92583": {
+                "id": 92583,
+                "processors_type": "PERSON",
+                "processors": "admin",
+                "name": "节点4",
+                "type": "END",
                 "is_multi": False,
             },
         }
-        workflow = WorkflowVersion.objects.create(name="test_flow", workflow_id=1, states=states)
+        transitions = {
+            "92584": {
+                "id": 92583,
+                "from_state": 92580,
+                "to_state": 92581,
+            },
+            "92585": {
+                "id": 92584,
+                "from_state": 92581,
+                "to_state": 92582,
+            },
+            "92586": {
+                "id": 92585,
+                "from_state": 92582,
+                "to_state": 92583,
+            }
+        }
+        workflow = WorkflowVersion.objects.create(name="test_flow", workflow_id=1, states=states, transitions=transitions)
         service = Service.objects.create(key="123", name="test", workflow=workflow)
         url = "/openapi/service/get_service_roles/?service_id={}".format(service.id)
         rsp = self.client.get(path=url)
@@ -129,18 +162,14 @@ class TicketOpenTest(TestCase):
         self.assertEqual(
             roles,
             [
-                {"id": 92580, "name": "节点1", "processors_type": "GENERAL", "processors": "admin",
-                 "sign_type": "and"},
                 {
-                    "id": 92581,
-                    "name": "节点2",
-                    "processors_type": "IAM",
-                    "processors": "rating_manager",
-                    "sign_type": "or",
-                },
-                {"id": 92582, "name": "节点3", "processors_type": "PERSON", "processors": "hoganren1",
-                 "sign_type": "or"},
-            ],
+                    "id": 92582, 
+                    "name": "节点3", 
+                    "processors_type": "PERSON", 
+                    "processors": "admin",
+                    "sign_type": "or"
+                }
+            ]
         )
 
     @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
@@ -199,25 +228,24 @@ class TicketOpenTest(TestCase):
     @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
     def test_get_ticket_logs(self):
         sn = self.create_ticket()
-        
+
         url = "/openapi/ticket/get_ticket_logs/"
 
         resp = self.client.get(url, {
             "sn": sn
         })
-        
+
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], 0)
         self.assertEqual(resp.data["data"]["sn"], sn)
         self.assertEqual(resp.data["message"], "success")
-        
+
     @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
     def test_operate_ticket(self):
-    
         sn = self.create_ticket()
 
         url = "/openapi/ticket/operate_ticket/"
-        
+
         resp = self.client.post(url, json.dumps({
             "sn": sn,
             "operator": "admin",
@@ -229,7 +257,7 @@ class TicketOpenTest(TestCase):
         self.assertEqual(resp.data["code"], 0)
 
         url = "/openapi/ticket/get_ticket_status/"
-        
+
         resp = self.client.get(
             url, {
                 "sn": sn
@@ -239,14 +267,3 @@ class TicketOpenTest(TestCase):
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], 0)
         self.assertEqual(resp.data["data"]["current_status"], "REVOKED")
-
-        
-        
-        
-        
-
-        
-        
-        
-        
-        
