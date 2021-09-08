@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import hashlib
 import json
+from math import ceil
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -209,6 +210,60 @@ def get_bk_business(bk_biz_id, role_type):
     return ",".join(bk_business)
 
 
+def get_list_department_profiles(params, page_size=2000):
+    """
+    分页查询部门的用户信息
+
+    @params params: dict 参数信息
+    @params page_size: int 每页拉取的数量
+    @return result list
+    """
+
+    params["page_size"] = page_size
+    res = client_backend.usermanage.list_department_profiles(params)
+    count = res.get("count")
+
+    # 获取第一页的结果
+    result = res.get("results", [])
+    # 算出来总页数
+    page_number = ceil(count / page_size)
+
+    # 从第二页开始拉取
+    for page in range(2, page_number + 1):
+        params["page"] = page
+        res = client_backend.usermanage.list_department_profiles(params)
+        result.extend(res.get("results", []))
+
+    return result
+
+
+def get_list_departments(params, page_size=2000):
+    """
+    分页拉取部门信息
+
+    @params params: dict 参数信息
+    @params page_size: int 每页拉取的数量
+    @return result list
+    """
+
+    params["page_size"] = page_size
+    res = client_backend.usermanage.list_departments(params)
+    count = res.get("count")
+
+    # 获取第一页的结果
+    result = res.get("results", [])
+    # 算出来总页数
+    page_number = ceil(count / page_size)
+
+    # 从第二页开始拉取
+    for page in range(2, page_number + 1):
+        params["page"] = page
+        res = client_backend.usermanage.list_departments(params)
+        result.extend(res.get("results", []))
+
+    return result
+
+
 def get_department_users(department_id, recursive=False, detail=False):
     """获取部门用户列表，支持递归查询"""
     cache_key = "{}department|{}users|{}".format(PREFIX_KEY, department_id, recursive)
@@ -216,13 +271,12 @@ def get_department_users(department_id, recursive=False, detail=False):
 
     if users is None:
         try:
-            res = client_backend.usermanage.list_department_profiles(
+            res = get_list_department_profiles(
                 {
                     "id": department_id,
                     "recursive": recursive,
                     # 默认只返回id/username，detail为True则返回所有字段
                     "detail": detail,
-                    "no_page": True,
                 }
             )
             users = [item["username"] for item in res]
@@ -245,7 +299,7 @@ def get_department_info(department_id):
 
 def list_departments_info():
     try:
-        res = client_backend.usermanage.list_departments({"fields": "name,id", "no_page": True})
+        res = get_list_departments({"fields": "name,id"})
     except ComponentCallError as e:
         logger.error("获取组织架构失败：error=%s".format(str(e)))
         return []

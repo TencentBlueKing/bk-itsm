@@ -41,7 +41,7 @@ from itsm.component.exceptions import (
 from itsm.component.constants import ResponseCodeStatus
 from itsm.component.constants.iam import HTTP_499_IAM_FORBIDDEN
 from itsm.component.utils.basic import build_tree
-from itsm.component.utils.client_backend_query import get_biz_choices
+from itsm.component.utils.client_backend_query import get_biz_choices, get_list_departments, get_list_department_profiles
 from itsm.component.utils.response import Fail, Success
 from itsm.component.apigw import client as apigw_client
 
@@ -186,10 +186,9 @@ def get_departments(request):
     """
     try:
         # 获取所有部门的扁平化列表信息
-        res = client_backend.usermanage.list_departments(
+        res = get_list_departments(
             {
-                "fields": "id,name,parent,level,order",
-                "no_page": True,
+                "fields": "id,name,parent,level,order"
             }
         )
 
@@ -208,12 +207,11 @@ def get_department_users(request):
         department_id = request.GET.get("id")
         recursive = request.GET.get("recursive") == "true"
 
-        res = client_backend.usermanage.list_department_profiles(
+        res = get_list_department_profiles(
             {
                 "id": department_id,
                 "recursive": recursive,
-                "detail": True,
-                "no_page": True,
+                "detail": True
             }
         )
 
