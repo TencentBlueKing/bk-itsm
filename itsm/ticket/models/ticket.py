@@ -161,7 +161,7 @@ from itsm.sla_engine.constants import (
     PAUSED as SLA_PAUSED,
     STOPPED as SLA_STOPPED,
 )
-from itsm.component.exceptions import CallPipelineError, RevokePipelineError
+from itsm.component.exceptions import CallPipelineError, RevokePipelineError, ObjectNotExist
 from itsm.component.utils.basic import dotted_name, list_by_separator
 from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.conversion import (
@@ -558,9 +558,7 @@ class Status(Model):
         if processors_type == PERSON:
             detail_message = transform_username(processors)
         elif processors_type == ORGANIZATION:
-            organization = get_department_info(self.processors.strip(",")).get(
-                "name", ""
-            )
+            organization = get_department_info(processors).get("name", "")
             detail_message = "{} -> {}".format(_("组织架构"), organization)
         else:
             detail_message = "{} -> {}".format(
@@ -1374,13 +1372,19 @@ class Ticket(Model):
 
     def generate_ticket_url(self, state_id, receivers):
         cache_key = _uu()
+        status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
+        if not status:
+            logger.info(
+                "get status object does not exist, param: ticket_id={}, state_id={}".format(self.id,
+                                                                                            state_id))
+            raise ObjectNotExist(_("没有获取到当前节点处理状态"))
         ticket_token = TicketFollowerNotifyLog.get_unique_token()
         TicketFollowerNotifyLog.objects.create(
             **{
                 "ticket_token": ticket_token,
                 "ticket": self,
-                "followers": receivers,
-                "followers_type": PERSON,
+                "followers": status.processors,
+                "followers_type": status.processors_type,
                 "state_id": state_id,
             }
         )
@@ -2213,7 +2217,7 @@ class Ticket(Model):
 
         # 更新单据的优先级属性
         self.priority_key = priority_info.get("key")
-        if self.meta is EMPTY_DICT:
+        if not self.meta:
             self.meta = dict(priority=priority_info)
         self.save()
 
