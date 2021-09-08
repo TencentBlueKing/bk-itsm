@@ -156,6 +156,8 @@ class TicketOpenTest(TestCase):
         }
         workflow = WorkflowVersion.objects.create(name="test_flow", workflow_id=1, states=states, transitions=transitions)
         service = Service.objects.create(key="123", name="test", workflow=workflow)
+        
+        # test1: 测试url参数只有service.id时的执行情况
         url = "/openapi/service/get_service_roles/?service_id={}".format(service.id)
         rsp = self.client.get(path=url)
         roles = rsp.data["data"]
@@ -166,6 +168,30 @@ class TicketOpenTest(TestCase):
                     "id": 92582, 
                     "name": "节点3", 
                     "processors_type": "PERSON", 
+                    "processors": "admin",
+                    "sign_type": "or"
+                }
+            ]
+        )
+        
+        # test2: 测试url参数为service.id和all，且all=1(逻辑真)时的执行情况
+        url_with_all = "/openapi/service/get_service_roles/?service_id={}&all={}".format(service.id, 1)
+        rsp_with_all = self.client.get(path=url_with_all)
+        roles_with_all = rsp_with_all.data['data']
+        self.assertEqual(
+            roles_with_all,
+            [
+                {
+                    'id': 92581,
+                    'name': '节点2',
+                    'processors': 'rating_manager',
+                    'processors_type': 'IAM',
+                    'sign_type': 'or'
+                },
+                {
+                    "id": 92582,
+                    "name": "节点3",
+                    "processors_type": "PERSON",
                     "processors": "admin",
                     "sign_type": "or"
                 }
