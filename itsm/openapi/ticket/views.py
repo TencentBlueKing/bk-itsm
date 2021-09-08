@@ -492,9 +492,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @catch_ticket_operate_exception
     def get_tickets_by_user(self, request):
         # 初始化serializer的上下文
-        username = request.query_params.get("username", None)
+        username = request.query_params.get("user", None)
         if username is None:
-            raise ParamError("username 为必填项")
+            raise ParamError("user 为必填项")
         queryset = self.custom_filter_queryset(request, username)
         page = self.paginate_queryset(queryset)
         if page is not None:
