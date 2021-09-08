@@ -10,7 +10,7 @@ COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*"
 # 删除coverage历史归档文件
 coverage erase
 
-TEST_LOGS=$(coverage run --include "$COVERAGE_INCLUDE_PATH" --omit "$COVERAGE_OMIT_PATH" ./manage.py test apps.node_man apps.backend 2>&1)
+TEST_LOGS=$(coverage run --include "$COVERAGE_INCLUDE_PATH" --omit "$COVERAGE_OMIT_PATH" ./manage.py test itsm.tests  2>&1)
 echo "${TEST_LOGS}"
 TEST_RESULT=$(echo "${TEST_LOGS}" | grep -Ev "'errors'" | grep -E "Ran|OK|failures|errors")
 TEST_TIME=''
