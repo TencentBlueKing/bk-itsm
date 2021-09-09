@@ -115,7 +115,6 @@
                 this.formList = this.transFieldsToDraggable(val)
             }
         },
-        mounted () {},
         methods: {
             // 将字段列表转换为拖拽组件所需格式
             transFieldsToDraggable (data) {

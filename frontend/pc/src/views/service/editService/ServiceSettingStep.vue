@@ -230,7 +230,7 @@
                     value: ''
                 },
                 revokeWayList: [
-                    { name: '不支持撤回', id: 'not_support' },
+                    { name: '不支持撤回', id: 'not_support', key: 0 },
                     { name: this.$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`), id: 'before_flow', key: 2 },
                     { name: this.$t(`m.treeinfo['任何节点，提单人都可撤回单据']`), id: 'all_node', key: 1 },
                     { name: this.$t(`m.treeinfo['指定节点前可以撤回']`), id: 'specify_node', key: 3 }
@@ -294,7 +294,7 @@
                 } = this.serviceInfo
                 try {
                     const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type)
-                    this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'before_flow'
+                    this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'not_support'
                     this.formData.revokeState = revokeConfig.state
                 } catch (error) {
                     console.log(error)
@@ -354,7 +354,11 @@
                 const params = {
                     workflow_config: {
                         supervise_type: 'EMPTY',
-                        supervisor: ''
+                        supervisor: '',
+                        revoke_config: {
+                            type: 0, // 默认值
+                            state: 0
+                        }
                     }
                 }
                 const workflow = params.workflow_config // 之前存在流程上的参数
@@ -382,6 +386,7 @@
                 } = this.formData
                 if (revokeWay === 'not_support') {
                     workflow.is_revocable = false
+                    // 这是字段
                 } else {
                     workflow.is_revocable = true
                     const type = this.revokeWayList.find(item => item.id === revokeWay).key
