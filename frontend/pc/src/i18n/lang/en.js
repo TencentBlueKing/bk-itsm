@@ -314,7 +314,7 @@ export const m = {
         '流程名称不能为空且最长不超过120个字': 'Name is required and its length cannot exceed 120 chars. ',
         '名称不能为空且不能重复': 'The name cannot be null and cannot be repeated',
         '名称不能为空且最长不超过64个字': 'Name is required and its length cannot exceed 64 chars. ',
-        '编码格式为英文数字及下划线且不能重复': 'The encoding format is English number and underline and cannot be repeated',
+        '名称ID为英文数字及下划线且不能重复': 'The name of the ID is English number and underline and cannot be repeated',
         '流程类型': 'Type of the workflow ',
         '流程类型不能为空': 'Type is required ',
         '基础模型不能为空': 'The model cannot be blank ',
