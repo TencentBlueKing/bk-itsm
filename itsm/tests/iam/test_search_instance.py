@@ -70,7 +70,7 @@ class IamSearchInstanceTest(unittest.TestCase):
         s_provider = ServiceResourceProvider()
         service_instances = s_provider.search_instance(filter_obj, page_obj)
 
-        self.assertEqual(service_instances.count, 100)
+        self.assertEqual(service_instances.count, 34)
 
         v_provider = WorkflowVersionResourceProvider()
         version_instances = v_provider.search_instance(filter_obj, page_obj)

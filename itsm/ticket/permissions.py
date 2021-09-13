@@ -67,26 +67,27 @@ class TicketPermissionValidate(permissions.BasePermission):
         # 函数内实现的，超级管理员的放最前面
         # 单据正常处理/撤销/通知关注人的权限在函数体内实现, 超级管理员直接返回，不需要鉴权
         if view.action in [
-            'proceed',
-            'withdraw',
-            'notify',
-            'send_sms',
-            'send_email',
-            'master_or_slave',
-            'add_follower',
+            "proceed",
+            "withdraw",
+            "notify",
+            "send_sms",
+            "send_email",
+            "master_or_slave",
+            "add_follower",
         ]:
             return True
 
         if request.method not in permissions.SAFE_METHODS and (
-            obj.is_slave or obj.status_instance.is_over):
+            obj.is_slave or obj.status_instance.is_over
+        ):
             # 单据无法操作的情况暂时放在这里
             raise ValidationError(_("抱歉，当前单据无法操作"))
 
         # 权限校验 与 业务逻辑校验混在了一起
-        if view.action == 'close' and obj.can_close(username):
+        if view.action == "close" and obj.can_close(username):
             return True
 
-        if view.action == 'operate':
+        if view.action == "operate":
             try:
                 node = obj.node_status.get(state_id=request.data.get("state_id"))
             except Exception:
@@ -102,7 +103,7 @@ class TicketPermissionValidate(permissions.BasePermission):
                 return True
 
             # 单据带token请求，则判断
-            token = request.query_params.get('token')
+            token = request.query_params.get("token")
             if token and obj.is_token_accessible(username, token):
                 return True
 
@@ -111,8 +112,13 @@ class TicketPermissionValidate(permissions.BasePermission):
         # 处理权限校验
         self.message = _("抱歉，您无权操作该单据")
 
+        if view.action == "supervise":
+            return obj.can_supervise(username)
+
         # 修改公共字段权限
-        if view.action == 'edit_field' and Service.is_service_owner(obj.service_id, username):
+        if view.action == "edit_field" and Service.is_service_owner(
+            obj.service_id, username
+        ):
             return True
 
         return obj.can_operate(username)
@@ -125,9 +131,10 @@ class TicketPermissionValidate(permissions.BasePermission):
             "resource_type": "service",
         }
 
-        apply_actions = ['ticket_view']
-        auth_actions = iam_client.resource_multi_actions_allowed(apply_actions, [resource_info],
-                                                                 project_key=obj.project_key)
+        apply_actions = ["ticket_view"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=obj.project_key
+        )
         if auth_actions.get("ticket_view"):
             return True
 
@@ -135,20 +142,23 @@ class TicketPermissionValidate(permissions.BasePermission):
         resources = [
             Resource(
                 settings.BK_IAM_SYSTEM_ID,
-                resource_info['resource_type'],
-                str(resource_info['resource_id']),
+                resource_info["resource_type"],
+                str(resource_info["resource_id"]),
                 {
                     "iam_resource_owner": resource_info.get("creator", ""),
-                    "_bk_iam_path_": bk_iam_path if resource_info[
-                                                        'resource_type'] != "project" else "",
-                    "name": resource_info.get('resource_name', ""),
+                    "_bk_iam_path_": bk_iam_path
+                    if resource_info["resource_type"] != "project"
+                    else "",
+                    "name": resource_info.get("resource_name", ""),
                 },
             )
         ]
 
         raise AuthFailedException(
-            settings.BK_IAM_SYSTEM_ID, Subject("user", request.user.username),
-            Action(apply_actions[0]), resources
+            settings.BK_IAM_SYSTEM_ID,
+            Subject("user", request.user.username),
+            Action(apply_actions[0]),
+            resources,
         )
 
 
@@ -157,7 +167,10 @@ class StatePermissionValidate(permissions.BasePermission):
         self.message = _("抱歉，您无权操作当前单据任务")
 
     def has_object_permission(self, request, obj):
-        if request.data.get("action_type") == "EXCEPTION_DISTRIBUTE" and request.user.is_superuser:
+        if (
+            request.data.get("action_type") == "EXCEPTION_DISTRIBUTE"
+            and request.user.is_superuser
+        ):
             return True
         return obj.can_operate(request.user.username)
 
@@ -171,7 +184,7 @@ class EventLogPermissionValidate(permissions.BasePermission):
         if UserRole.is_itsm_superuser(request.user.username):
             return True
 
-        if view.action in ['get_index_ticket_event_log', 'get_my_deal_time']:
+        if view.action in ["get_index_ticket_event_log", "get_my_deal_time"]:
             return True
 
         ticket_id = request.query_params.get("ticket")
@@ -190,19 +203,19 @@ class TicketFieldPermissionValidate(permissions.BasePermission):
     """
 
     def __init__(self):
-        self.message = _('抱歉，您无权限查看此信息')
+        self.message = _("抱歉，您无权限查看此信息")
 
     def has_permission(self, request, view):
         if UserRole.is_itsm_superuser(request.user.username):
             return True
-        if view.action in ['api_field_choices', "download_file"]:
+        if view.action in ["api_field_choices", "download_file"]:
             return True
         return False
 
     def has_object_permission(self, request, view, obj):
         if UserRole.is_itsm_superuser(request.user.username):
             return True
-        if view.action in ['api_field_choices', "download_file"]:
+        if view.action in ["api_field_choices", "download_file"]:
             return True
         return False
 
@@ -212,7 +225,7 @@ class FollowersNotifyLogPermissionValidate(permissions.BasePermission):
         self.message = _("抱歉，您无权查看该单据的日志信息")
 
     def has_permission(self, request, view):
-        params = request.query_params if request.method == 'GET' else request.data
+        params = request.query_params if request.method == "GET" else request.data
 
         ticket_id = params.get("ticket_id")
         try:
@@ -236,7 +249,7 @@ class CommentPermissionValidate(permissions.BasePermission):
             return True
 
         if request.method in permissions.SAFE_METHODS:
-            token = request.query_params.get('token')
+            token = request.query_params.get("token")
             # 提单人或邀请评价能查看
             if obj.ticket.creator == username:
                 return True
@@ -244,8 +257,8 @@ class CommentPermissionValidate(permissions.BasePermission):
                 return True
 
         # 提单人或邀请评价才能从web评价
-        if view.action == 'update':
-            token = request.data.get('token')
+        if view.action == "update":
+            token = request.data.get("token")
             self.message = _("抱歉，您不是该单据的提单人，无法评价")
             if obj.ticket.creator == username:
                 return True
@@ -263,6 +276,8 @@ class OperationalDataPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         username = request.user.username
-        if UserRole.is_itsm_superuser(username) or UserRole.is_statics_manager(username):
+        if UserRole.is_itsm_superuser(username) or UserRole.is_statics_manager(
+            username
+        ):
             return True
         return False

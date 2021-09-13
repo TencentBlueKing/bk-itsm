@@ -87,8 +87,17 @@
             handleCreateProject () {
                 bus.$emit('openCreateProjectDialog')
             },
-            handleApplyProject () {
+            async handleApplyProject () {
                 // @todo: 待确定申请项目权限逻辑
+                const params = {
+                    'action': [],
+                    'system_id': 'itsm',
+                    'system_name': '流程服务'
+                }
+                const res = await this.$store.dispatch('common/getIamUrl', params)
+                if (res.data) {
+                    window.open(res.data.url, '__blank')
+                }
             }
         }
     }

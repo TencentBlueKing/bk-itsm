@@ -26,9 +26,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.constants import ADMIN_CHOICES
+from itsm.component.constants import ADMIN_CHOICES, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.drf.mixins import DynamicListModelMixin
-from itsm.component.drf.viewsets import GenericViewSet, ReadOnlyModelViewSet, AuthModelViewSet
+from itsm.component.drf.viewsets import (
+    GenericViewSet,
+    ReadOnlyModelViewSet,
+    AuthModelViewSet,
+)
 from itsm.iadmin.contants import ORGANIZATION_KEY, SWITCH_OFF
 from itsm.iadmin.models import SystemSettings
 from itsm.role.models import RoleType, UserRole
@@ -81,9 +85,27 @@ class UserRoleModelViewSet(DynamicListModelMixin, AuthModelViewSet):
     def get_queryset(self):
         if not self.request.query_params.get("page_size"):
             self.pagination_class = None
-        project_key = self.request.query_params.get("project_key", 0)
-        query_set = super(UserRoleModelViewSet, self).get_queryset().filter(project_key=project_key)
+        query_set = super(UserRoleModelViewSet, self).get_queryset().filter()
         return query_set
+
+    def list(self, request, *args, **kwargs):
+        """
+        获取用户组列表
+        """
+        project_key = request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            project_key=project_key
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         """BEP: 根据字段名生成字段role_key，并补充到field
@@ -123,4 +145,8 @@ class UserRoleExtraViewSet(GenericViewSet):
     def get_global_choices(self, request):
         """查询全局选项列表信息"""
 
-        return Response({"admin_choices": translate_constant_2(ADMIN_CHOICES), })
+        return Response(
+            {
+                "admin_choices": translate_constant_2(ADMIN_CHOICES),
+            }
+        )

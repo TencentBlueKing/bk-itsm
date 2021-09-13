@@ -458,8 +458,8 @@
                     this.currCreateFormWay = way
                 } else {
                     this.updateServiceSource('custom')
-                    this.showFieldOption = true
                 }
+                this.showFieldOption = true
             },
             createServicePopoverShow () {
                 this.isDropdownShow = true
@@ -598,7 +598,7 @@
                         message: '请选择服务提单信息创建方式',
                         theme: 'error'
                     })
-                    return false
+                    return { data: { result: false } }
                 }
                 if (!this.formLoading && !this.detailLoading && this.$refs.serviceForm) {
                     // 用全量节点详情字段，传到后台接口，会抛出节点 desc 字段不能为空校验失败信息
