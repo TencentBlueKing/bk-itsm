@@ -32,7 +32,7 @@
         <div class="mask"></div>
         <div class="opt-btns">
             <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four" @click="$emit('onFormEditClick', form)"></i>
-            <i class="btn-item bk-itsm-icon icon-itsm-icon-copy" @click="$emit('onFormCloneClick', form)"></i>
+            <i class="btn-item bk-itsm-icon icon-itsm-icon-copy" v-if="form.source === 'CUSTOM' " @click="$emit('onFormCloneClick', form)"></i>
             <i class="btn-item bk-icon icon-delete" :class="deleteDisabled ? 'disabled' : ''" @click="onDeleteClick(form)"></i>
         </div>
     </div>

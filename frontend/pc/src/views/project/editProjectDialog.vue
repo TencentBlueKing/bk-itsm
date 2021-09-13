@@ -66,6 +66,7 @@
 <script>
     import { deepClone } from '@/utils/util'
     import { errorHandler } from '@/utils/errorHandler.js'
+    import i18n from '@/i18n/index.js'
 
     export default {
         name: 'EditProjectDialog',
@@ -85,8 +86,7 @@
                         color: ''
                     }
                 }
-            },
-            validateList: Array
+            }
         },
         data () {
             return {
@@ -154,11 +154,25 @@
             }
         },
         methods: {
-            validateName (val) {
-                return !this.validateList.map(item => item.name).includes(val)
+            projectValidateList (list, type) {
+                const projectList = []
+                projectList.push(list)
+                if (this.title === i18n.t('m["编辑项目"]')) {
+                    projectList.length = 0
+                    const result = list.filter(item => item[type] !== this.project[type])
+                    projectList.push(result)
+                }
+                return projectList[0]
             },
-            validateKey (val) {
-                return !this.validateList.map(item => item.key).includes(val)
+            async validateName (val) {
+                const res = await this.$store.dispatch('project/getProjectList')
+                const projectList = this.projectValidateList(res.data.items, 'name')
+                return !projectList.map(item => item.name).includes(val)
+            },
+            async validateKey (val) {
+                const res = await this.$store.dispatch('project/getProjectList')
+                const projectList = this.projectValidateList(res.data.items, 'key')
+                return !projectList.map(item => item.key).includes(val)
             },
             onEditProjectConfirm () {
                 this.$refs.projectForm.validate().then(async (result) => {

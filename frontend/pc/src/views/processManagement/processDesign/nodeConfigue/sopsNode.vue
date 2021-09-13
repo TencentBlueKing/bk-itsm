@@ -300,13 +300,6 @@
                     }
                     await this.getTemplateDetail(this.configur.extras.sops_info.template_id)
                     this.basicsFormData.templateId = this.configur.extras.sops_info.template_id
-                    this.constants.forEach(item => {
-                        this.configur.extras.sops_info.constants.filter(ite => {
-                            if (item.key === ite.key) {
-                                item.value = ite.value
-                            }
-                        })
-                    })
                 }
                 this.isLoading = false
             },
@@ -434,6 +427,13 @@
                             constants.push(res.data.pipeline_tree.constants[key])
                         }
                     }
+                    constants.forEach(item => {
+                        this.configur.extras.sops_info.constants.filter(ite => {
+                            if (item.key === ite.key) {
+                                item.value = ite.value
+                            }
+                        })
+                    })
                     constants.sort((a, b) => a.index - b.index)
                     this.constants = constants
                 } catch (e) {
