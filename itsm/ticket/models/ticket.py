@@ -161,7 +161,11 @@ from itsm.sla_engine.constants import (
     PAUSED as SLA_PAUSED,
     STOPPED as SLA_STOPPED,
 )
-from itsm.component.exceptions import CallPipelineError, RevokePipelineError, ObjectNotExist
+from itsm.component.exceptions import (
+    CallPipelineError,
+    RevokePipelineError,
+    ObjectNotExist,
+)
 from itsm.component.utils.basic import dotted_name, list_by_separator
 from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.conversion import (
@@ -210,6 +214,7 @@ from itsm.component.utils.client_backend_query import (
 )
 
 from .basic import Model
+from ..base import BaseTicket
 
 
 class SignTask(Model):
@@ -1146,7 +1151,7 @@ class Status(Model):
             ]
 
 
-class Ticket(Model):
+class Ticket(Model, BaseTicket):
     """工单表"""
 
     def __init__(self, *args, **kwargs):
@@ -1375,8 +1380,10 @@ class Ticket(Model):
         status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
         if not status:
             logger.info(
-                "get status object does not exist, param: ticket_id={}, state_id={}".format(self.id,
-                                                                                            state_id))
+                "get status object does not exist, param: ticket_id={}, state_id={}".format(
+                    self.id, state_id
+                )
+            )
             raise ObjectNotExist(_("没有获取到当前节点处理状态"))
         ticket_token = TicketFollowerNotifyLog.get_unique_token()
         TicketFollowerNotifyLog.objects.create(
@@ -3629,117 +3636,6 @@ class Ticket(Model):
 
         # 发送创建成功的信号
         self.send_trigger_signal(CREATE_TICKET)
-
-    def create_moa_ticket(self, state_id):
-        if settings.RUN_VER == "ieod":
-            try:
-                from blueking.component.ieod.shortcuts import get_client_by_user
-
-                status = self.node_status.get(state_id=state_id)
-                state_fields = self.get_state_fields(
-                    self.first_state_id, need_serialize=False
-                )
-                data = {
-                    "operator": self.creator,
-                    "work_items": [
-                        {
-                            "category": "99511B1EDD8E4EB9B70E7AC1184EEBC2",
-                            "process_name": self.sn,
-                            "title": self.title,
-                            "form_url": "{}#/ticket/{}/?activeNname=all&router=globalview".format(
-                                settings.TICKET_NOTIFY_HOST, self.id
-                            ),
-                            "callback_url": "{}openapi/ticket/proceed_approval/".format(
-                                settings.MY_OA_CALLBACK_URL
-                            ),
-                            "activity": state_id,
-                            "enable_quick_approval": True,
-                            "enable_batch_approval": False,
-                            "handler": status.get_processor_in_sign_state(),
-                            "process_inst_id": self.sn,
-                            "actions": [
-                                {"display_name": "通过", "value": "true"},
-                                {"display_name": "拒绝", "value": "false"},
-                            ],
-                            "approval_history": [
-                                {
-                                    "approver": log.operator,
-                                    "action": log.action.lower(),
-                                    "step": "",
-                                    "opinion": log.message.format(
-                                        operator=log.operator,
-                                        name=log.from_state_name,
-                                        detail_message=log.detail_message,
-                                        action=log.action.lower(),
-                                    ),
-                                    "approval_time": log.operate_at.strftime(
-                                        "%Y-%m-%dT%H:%M:%S"
-                                    ),
-                                    "remark": "",
-                                }
-                                for log in self.logs.all()[1:]
-                            ],
-                            "list_view": [
-                                {"key": "单号", "value": self.sn},
-                                {"key": "服务目录", "value": self.catalog_fullname},
-                                {"key": "提单人", "value": self.creator},
-                                {
-                                    "key": "提单时间",
-                                    "value": self.create_at.strftime(
-                                        "%Y-%m-%d %H:%M:%S"
-                                    ),
-                                },
-                            ],
-                            "detail_view": [
-                                {"key": "单号", "value": self.sn},
-                                {"key": "标题", "value": self.title},
-                            ]
-                            + [
-                                {
-                                    "key": f.name,
-                                    "value": self.display_content(
-                                        f.type, f.display_value
-                                    ),
-                                }
-                                for f in state_fields.exclude(
-                                    type__in=["TABLE", "CUSTOMTABLE", "FILE"]
-                                )
-                            ],
-                        }
-                    ],
-                }
-                logger.info("create_moa_ticket request data is {}".format(data))
-                client = get_client_by_user(self.creator)
-                # client.set_use_test_env(False)
-                # moa_client = client.myoa.workitem_create
-
-                # result = moa_client(data)
-                result = client.myoa.workitem_create(data)
-                logger.info("create_moa_ticket result data is {}".format(result))
-            except Exception as err:
-                logger.info("create_moa_ticket err is {}".format(err))
-
-    def close_moa_ticket(self, state_id, operator):
-        if settings.RUN_VER == "ieod":
-            try:
-                from blueking.component.ieod.shortcuts import get_client_by_user
-
-                data = {
-                    "operator": operator,
-                    "category": "99511B1EDD8E4EB9B70E7AC1184EEBC2",
-                    "title": "ITSM:{}".format(self.title),
-                    "process_inst_id": self.sn,
-                    "activity": state_id,
-                    "process_name": self.sn,
-                }
-                logger.info("close_moa_ticket request data is {}".format(data))
-                client = get_client_by_user(self.creator)
-                # client.set_use_test_env(False)
-                # result = moa_client(data)
-                result = client.myoa.workitem_close(data)
-                logger.info("close_moa_ticket result is {}".format(result))
-            except Exception as err:
-                logger.info("close_moa_ticket err is {}".format(err))
 
     @staticmethod
     def display_content(field_type, content):

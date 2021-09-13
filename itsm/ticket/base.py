@@ -23,40 +23,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-# 内部版配置
 
-import os
+class BaseTicket:
+    def create_moa_ticket(self, state_id):
+        pass
 
-from adapter.utils.storage import CephStorage
-from . import api as ADAPTER_API  # noqa
-
-ESB_SDK_NAME = 'blueking.component.ieod'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('GCS_MYSQL_NAME'),
-        'USER': os.environ.get('GCS_MYSQL_USER'),
-        'PASSWORD': os.environ.get('GCS_MYSQL_PASSWORD'),
-        'HOST': os.environ.get('GCS_MYSQL_HOST'),
-        'PORT': os.environ.get('GCS_MYSQL_PORT'),
-    },
-}
-
-# RGW 相关配置，请修改为蓝鲸为你分配的相关信息
-RGW_ACCESS_KEY_ID = os.environ.get('CEPH_AWS_ACCESS_KEY_ID', '')
-RGW_SECRET_ACCESS_KEY = os.environ.get('CEPH_AWS_SECRET_ACCESS_KEY', '')
-RGW_STORAGE_BUCKET_NAME = os.environ.get('CEPH_BUCKET', '')
-RGW_ENDPOINT_URL = os.environ.get('CEPH_RGW_URL', '')
-
-# TODO: 暂时开放文件读写控制，后期改为私有存储+临时访问链接的方式
-RGW_OBJECT_PARAMETERS = {'ACL': 'public-read'}
-DEFAULT_FILE_STORAGE = 'bkstorages.backends.rgw.RGWBoto3Storage'
-
-# STATICFILES_STORAGE = 'bkstorages.backends.rgw.StaticRGWBoto3Storage'
-
-
-STORE = CephStorage()
-
-# 企业微信发送
-QY_WEIXIN = 'rtx'
+    def close_moa_ticket(self, state_id, operator):
+        pass
