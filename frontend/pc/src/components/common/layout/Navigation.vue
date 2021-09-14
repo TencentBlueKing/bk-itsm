@@ -456,6 +456,7 @@
                 this.isEditDialogShow = false
                 this.onSelectProject(key)
                 this.getProjectList()
+                this.$router.replace({ name: 'projectTicket', query: { project_id: key } })
             },
             onProjectDialogCancel () {
                 this.isEditDialogShow = false
