@@ -271,7 +271,7 @@
                 }
                 const params = {
                     role_type: type,
-                    project_key: this.$store.state.project.id || this.$route.query.project.id
+                    project_key: this.$store.state.project.id || this.$store.state.project.id
                 }
                 // 非后台管理页面需要加 shortcut 参数
                 if (this.shortcut) {
@@ -302,7 +302,7 @@
                         }
                     })
                     // 显示指定选项
-                    if (this.targetSpecifyIdList.length) {
+                    if (this.targetSpecifyIdList.length && type !== 'GENERAL') {
                         userList = userList.filter(m => {
                             return this.targetSpecifyIdList.some(id => String(id) === m.id)
                         })

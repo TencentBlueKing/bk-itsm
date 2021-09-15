@@ -273,6 +273,11 @@
                 if (val) {
                     this.selectedProject = val
                 }
+            },
+            projectList (val) {
+                if (!val) {
+                    this.getProjectList()
+                }
             }
         },
         created () {
@@ -456,7 +461,6 @@
                 this.isEditDialogShow = false
                 this.onSelectProject(key)
                 this.getProjectList()
-                this.$router.replace({ name: 'projectTicket', query: { project_id: key } })
             },
             onProjectDialogCancel () {
                 this.isEditDialogShow = false
