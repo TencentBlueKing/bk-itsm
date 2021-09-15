@@ -114,6 +114,8 @@
                     :fields="fieldList"
                     :context="context"
                     :constants="constants"
+                    :constant-default-value="constantDefaultValue"
+                    :quote-vars="quoteVars"
                     :flow-info="flowInfo">
                 </sops-get-param>
                 <no-data v-else></no-data>
@@ -147,6 +149,7 @@
     import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
     import BasicCard from '@/components/common/layout/BasicCard.vue'
     import { errorHandler } from '../../../../utils/errorHandler'
+    import { deepClone } from '@/utils/util.js'
 
     export default {
         name: 'sopsNode',
@@ -180,6 +183,8 @@
         },
         data () {
             return {
+                quoteVars: [],
+                constantDefaultValue: {},
                 basicsFormData: {
                     name: '',
                     templateId: '',
@@ -280,6 +285,7 @@
         },
         mounted () {
             this.initData()
+            this.getTicketOutput()
         },
         methods: {
             async initData () {
@@ -289,9 +295,11 @@
                 if (userProjectList) this.projectList = userProjectList.data
                 if (Object.keys(this.configur.extras).length !== 0) {
                     this.basicsFormData.name = this.configur.name
-                    this.constants = this.configur.extras.sops_info.constants
+                    // 流程类型
                     this.basicsFormData.processType = this.configur.extras.sops_info.template_source
+                    // 跳过执行任务ID
                     this.excludeTaskNodesId = this.configur.extras.sops_info.exclude_task_nodes_id || []
+                    // 项目ID
                     this.basicsFormData.projectId = this.configur.extras.sops_info.bk_biz_id.value
                     if (this.basicsFormData.processType === 'common') {
                         await this.getTemplateList(this.basicsFormData.processType)
@@ -314,6 +322,7 @@
                 this.planDisable = !isCommonProcess
                 if (isCommonProcess) {
                     this.processesLoading = true
+                    // 获取流程模板
                     await this.$store.dispatch('getTemplateList', params).then((res) => {
                         this.templateList = res.data
                     }).catch(res => {
@@ -378,11 +387,15 @@
                     if (this.excludeTaskNodesId.length !== 0) {
                         res.data.forEach(item => {
                             if (item.data) {
-                                this.excludeTaskNodesId.filter(ite => {
-                                    if (!JSON.parse(item.data).includes(ite)) {
-                                        this.basicsFormData.planId.push(item.id)
-                                    }
+                                const ids = this.optionalNodeIdList.filter(nodeId => {
+                                    return !JSON.parse(item.data).includes(nodeId)
                                 })
+                                const result = ids.filter(ite => {
+                                    return !this.excludeTaskNodesId.includes(ite)
+                                })
+                                if (result.length === 0 && this.excludeTaskNodesId.length === ids.length) {
+                                    this.basicsFormData.planId.push(item.id)
+                                }
                             }
                         })
                     }
@@ -432,6 +445,7 @@
                             if (item.key === ite.key) {
                                 item.value = ite.value
                             }
+                            this.constantDefaultValue[item.key] = deepClone(item.value)
                         })
                     })
                     constants.sort((a, b) => a.index - b.index)
@@ -454,6 +468,17 @@
                     errorHandler(res, this)
                 }).finally(() => {
                 })
+            },
+            async getTicketOutput () {
+                try {
+                    this.quoteVarsLoading = true
+                    const res = await this.$store.dispatch('ticket/getTicketOutput', this.$route.query.serviceId)
+                    this.quoteVars = res.data
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    this.quoteVarsLoading = false
+                }
             },
             onClearProcess () {
                 if (this.basicsFormData.processType !== 'common') {
