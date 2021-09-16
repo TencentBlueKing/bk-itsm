@@ -513,7 +513,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "flow_version_list
+                                "id": "flow_version_list"
                             }
                         ]
                     }
@@ -1688,9 +1688,9 @@
             "operation": "upsert_action",
             "data": {
                 "id": "sla_agreement_create",
-                "name": "SLA 服务模式创建",
+                "name": "SLA 服务协议创建",
                 "name_en": "Create SLA agreement",
-                "description": "Sla 服务模式创建",
+                "description": "Sla 服务协议创建",
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [
