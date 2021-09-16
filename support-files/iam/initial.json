@@ -393,8 +393,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "service_list",
-                                "ignore_iam_path": true
+                                "id": "service_list"
                             }
                         ]
                     }
@@ -466,8 +465,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "workflow_list",
-                                "ignore_iam_path": true
+                                "id": "workflow_list"
                             }
                         ]
                     }
@@ -491,8 +489,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "workflow_list",
-                                "ignore_iam_path": true
+                                "id": "workflow_list"
                             }
                         ]
                     }
@@ -516,8 +513,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "flow_version_list",
-                                "ignore_iam_path": true
+                                "id": "flow_version_list"
                             }
                         ]
                     }
@@ -541,8 +537,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "flow_version_list",
-                                "ignore_iam_path": true
+                                "id": "flow_version_list"
                             }
                         ]
                     }
@@ -638,8 +633,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "role_list",
-                                "ignore_iam_path": true
+                                "id": "role_list"
                             }
                         ]
                     }
@@ -663,8 +657,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "service_list",
-                                "ignore_iam_path": true
+                                "id": "service_list"
                             }
                         ]
                     }
@@ -734,8 +727,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "project_list",
-                                 "ignore_iam_path": true
+                                "id": "project_list"
                             }
                         ]
                     }
@@ -801,8 +793,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -826,8 +817,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -851,8 +841,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -938,8 +927,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "trigger_list",
-                                "ignore_iam_path": true
+                                "id": "trigger_list"
                             }
                         ]
                     }
@@ -963,8 +951,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "bk_itsm",
-                                "id": "trigger_list",
-                                "ignore_iam_path": true
+                                "id": "trigger_list"
                             }
                         ]
                     }
