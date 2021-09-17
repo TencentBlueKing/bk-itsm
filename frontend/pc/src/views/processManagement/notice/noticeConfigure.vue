@@ -46,14 +46,17 @@
                 <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
                     <template slot-scope="props">
-                        <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
+                        <template v-if="hasPermission(['global_settings_manage'])">
+                            <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
+                        </template>
+                        <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['global_settings_manage']) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
                     <template slot-scope="props">
-                        <bk-button theme="primary" text @click="editorInfo(props.row)">
+                        <bk-button theme="primary" v-cursor="{ active: !hasPermission(['global_settings_manage']) }" :disabled="!hasPermission(['global_settings_manage'])" text @click="editorInfo(props.row)">
                             {{ $t('m.deployPage["编辑"]') }}
                         </bk-button>
                     </template>
@@ -81,12 +84,14 @@
 <script>
     import { errorHandler } from '../../../utils/errorHandler'
     import editorNotice from './editorNotice.vue'
+    import permission from '@/mixins/permission.js'
 
     export default {
         name: 'noticeConfigure',
         components: {
             editorNotice
         },
+        mixins: [permission],
         data () {
             return {
                 isDataLoading: true,
@@ -133,6 +138,10 @@
                 this.getNoticeList()
             },
             editorInfo (item) {
+                if (!this.hasPermission(['global_settings_manage'])) {
+                    this.applyForPermission(['global_settings_manage'], [], {})
+                    return
+                }
                 this.noticeInfo.formInfo = item
                 this.noticeInfo.show = true
             },
@@ -171,7 +180,10 @@
             color: #3A84FF;
         }
     }
-
+    .bk-table-permission {
+        color: #dcdee5;
+        cursor: pointer;
+    }
     .bk-notice-table {
         margin-top: 10px;
         min-height: 200px;

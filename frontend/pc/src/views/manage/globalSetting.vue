@@ -325,7 +325,7 @@
                         id: '',
                         title: this.$t('m.home["知识库功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: false
                     },
                     task: {
                         id: '',

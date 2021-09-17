@@ -380,13 +380,18 @@
             deleteUser (item) {
                 // 删除权限校验
                 if (!this.hasPermission(['user_group_delete'], item.auth_actions)) {
+                    const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
+                        project: [{
+                            id: projectInfo.key,
+                            name: projectInfo.name
+                        }],
                         user_group: [{
                             id: item.id,
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['role_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['user_group_delete'], item.auth_actions, resourceData)
                     return false
                 }
                 this.$bkInfo({
