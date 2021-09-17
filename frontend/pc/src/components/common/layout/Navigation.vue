@@ -273,11 +273,6 @@
                 if (val) {
                     this.selectedProject = val
                 }
-            },
-            projectList (val) {
-                if (!val) {
-                    this.getProjectList()
-                }
             }
         },
         created () {
@@ -286,6 +281,7 @@
             bus.$on('openCreateTicketDialog', () => {
                 this.isCreateTicketDialogShow = true
             })
+            this.getProjectList()
             bus.$on('openCreateProjectDialog', () => {
                 this.handleCreateProject()
             })
@@ -294,7 +290,7 @@
             async getProjectList () {
                 try {
                     this.$store.commit('project/setProjectListLoading', true)
-                    const res = await this.$store.dispatch('project/getProjectList')
+                    const res = await this.$store.dispatch('project/getProjectAllList')
                     this.$store.commit('project/setProjectList', res.data.items)
                 } catch (e) {
                     errorHandler(e, this)

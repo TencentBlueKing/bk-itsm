@@ -271,7 +271,7 @@
                 }
                 const params = {
                     role_type: type,
-                    project_key: this.$store.state.project.id || this.$store.state.project.id
+                    project_key: this.$store.state.project.id || this.$route.query.project.id
                 }
                 // 非后台管理页面需要加 shortcut 参数
                 if (this.shortcut) {

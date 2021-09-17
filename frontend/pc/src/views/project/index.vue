@@ -73,7 +73,7 @@
             async getProjectList () {
                 try {
                     this.$store.commit('project/setProjectListLoading', true)
-                    const res = await this.$store.dispatch('project/getProjectList')
+                    const res = await this.$store.dispatch('project/getProjectAllList')
                     this.$store.commit('project/setProjectList', res.data.items)
                     if (!this.$store.state.project.id) {
                         const projectsWithViewPerm = res.data.items.filter(item => item.auth_actions.includes('project_view'))
