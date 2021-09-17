@@ -49,6 +49,16 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
     def destroy(self, request, *args, **kwargs):
         raise DeleteError(_("删除失败，项目目前不允许删除！"))
 
+    @action(detail=False, methods=["get"])
+    def all(self, request, *args, **kwargs):
+        """
+        查询当前用户所有项目依赖的权限
+        @return: 所有项目的信息以及对应项目下当前用户依赖的权限
+        """    
+        project_serializer = ProjectSerializer(self.queryset, many=True)
+        project_serializer.context["request"] = request
+        return Response(project_serializer.data)
+
     @action(detail=True, methods=["get"])
     def info(self, request, *args, **kwargs):
         """查询用户依赖当前项目的权限"""

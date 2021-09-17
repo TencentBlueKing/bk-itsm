@@ -78,7 +78,7 @@ ACTIONS = [
     },
     {
         "id": "service_view",
-        "name": "服务管理",
+        "name": "服务查看",
         "relate_resources": ["service"],
         "relate_actions": ["project_view"],
         "resource_topo": ["project", "service"],
@@ -309,7 +309,7 @@ ACTIONS = [
     },
     {
         "id": "sla_calendar_create",
-        "name": "SLA 服务模式创建",
+        "name": "SLA 服务模式新建",
         "relate_resources": ["project"],
         "relate_actions": ["project_view"],
         "resource_topo": ["project", "sla_calendar"],

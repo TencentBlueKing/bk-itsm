@@ -94,7 +94,35 @@
                 :constants="constants"
                 :context="context"
                 :key="renderKey"
-                v-model="formData">
+                v-model="formData"
+                :hooked="hookedVarList"
+                @configLoadingChange="configLoading = $event">
+                <template slot="tagHook" slot-scope="{ scheme }">
+                    <div class="hook-area">
+                        <bk-checkbox
+                            :disabled="disabled || disabledRenderForm"
+                            :value="!!hookedVarList[scheme.tag_code]"
+                            @change="onHookChange($event, scheme)">
+                            {{ $t(`m.tickets["引用变量"]`) }}
+                        </bk-checkbox>
+                        <!-- <div v-if="hookedVarList[scheme.tag_code]" class="var-select"> -->
+                        <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
+                            <bk-select
+                                :disabled="disabled || disabledRenderForm"
+                                :clearable="false"
+                                :value="formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
+                                @selected="onSelectVar($event, scheme)">
+                                <bk-option
+                                    v-for="varItem in quoteVars"
+                                    :key="varItem.key"
+                                    :id="varItem.key"
+                                    :name="varItem.name">
+                                    {{ varItem.name }}
+                                </bk-option>
+                            </bk-select>
+                        </div>
+                    </div>
+                </template>
             </render-form>
         </div>
         <div class="bk-add-slider" v-if="sliderInfo.show && isStatic === false">
@@ -119,6 +147,7 @@
 
 <script>
     import addField from '../addField/index.vue'
+    import { deepClone } from '@/utils/util.js'
 
     export default {
         name: 'sopsGetParam',
@@ -126,6 +155,8 @@
             addField
         },
         props: {
+            quoteVars: Array,
+            constantDefaultValue: Object,
             context: {
                 type: Object,
                 default () {
@@ -173,14 +204,21 @@
         },
         data () {
             return {
+                disabled: false,
+                disabledRenderForm: false,
+                hookedVarList: {}, // 被勾选为引用的变量
+                // quoteVarsLoading: false,
+                configLoading: false,
+                quoteErrors: [], // 变量引用校验不同通过列表
                 renderKey: '',
                 formData: {},
                 formOptions: {
                     showRequired: true,
                     showGroup: true,
                     showLabel: true,
-                    showHook: false,
-                    showDesc: true
+                    showHook: true,
+                    showDesc: true,
+                    formEdit: !this.disabled && !this.disabledRenderForm
                 },
                 fieldList: [],
                 checkInfo: {
@@ -237,45 +275,6 @@
         },
         computed: {},
         watch: {
-            // paramTableData: {
-            //     handler (newValue) {
-            //         this.paramTableShow = []
-            //         this.paramTableShow = this.paramTableShow.concat(this.biz, newValue)
-            //         this.paramTableShow.forEach(item => {
-            //             item.value = ''
-            //             if (item.source_type === 'component_outputs') {
-            //                 item.source_type = 'component_inputs'
-            //             }
-            //         })
-            //         if (this.configur.extras
-            //             && this.configur.extras.sops_info
-            //             && this.configur.extras.sops_info.template_id) {
-            //             this.paramTableShow.forEach(
-            //                 (item, index) => {
-            //                     if (!index && this.configur.extras.sops_info.bk_biz_id) {
-            //                         item.source_type = this.configur.extras.sops_info.bk_biz_id['value_type']
-
-            //                         item.value = this.configur.extras.sops_info.bk_biz_id['value']
-            //                     } else {
-            //                         const current = this.configur.extras.sops_info.constants.filter(
-            //                             ite => {
-            //                                 return ite.key === item.key
-            //                             }
-            //                         )[0]
-            //                         if (current) {
-            //                             item.source_type = current['value_type']
-            //                             item.value = current['value']
-            //                         }
-            //                     }
-            //                     if (item.source_type === 'variable') {
-            //                         item.source_type = 'component_inputs'
-            //                     }
-            //                 }
-            //             )
-            //         }
-            //     },
-            //     deep: false
-            // },
             constants () {
                 this.renderKey = new Date().getTime()
             }
@@ -293,6 +292,23 @@
             }
         },
         methods: {
+            onHookChange (val, scheme) {
+                this.$set(this.hookedVarList, scheme.tag_code, val)
+                const constantItem = this.constants.filter(item => item.key === scheme.tag_code)
+                constantItem[0].is_quoted = val
+                if (val) {
+                    this.formData[scheme.tag_code] = ''
+                } else {
+                    this.formData[scheme.tag_code] = constantItem ? deepClone(this.constantDefaultValue[scheme.tag_code]) : ''
+                    const index = this.quoteErrors.findIndex(item => item === scheme.tag_code)
+                    if (index > -1) {
+                        this.quoteErrors.splice(index, 1)
+                    }
+                }
+            },
+            onSelectVar (val, scheme) {
+                this.formData[scheme.tag_code] = `\${${val}}`
+            },
             getRenderFormValidate () {
                 return this.$refs.renderForm.validate()
             },
@@ -319,5 +335,41 @@
 </script>
 
 <style lang="scss" scoped>
-
+.hook-area {
+    display: flex;
+    height: 32px;
+    flex-wrap: nowrap;
+    align-items: center;
+    .var-select {
+        position: relative;
+        margin-left: 14px;
+        width: 200px;
+        .quote-error {
+            border-color: #ff5757;
+        }
+    }
+    .quote-error-text {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        color: #ff5757;
+    }
+    .update-tips {
+        position: absolute;
+        right: -20px;
+        top: 10px;
+        font-size: 14px;
+        color: #ff9c01;
+        cursor: pointer;
+    }
+}
+/deep/ .el-input__inner {
+    width: 60%;
+}
+/deep/ .rf-tag-hook {
+    top: 40px;
+}
+/deep/ .rf-tag-form {
+    width: 76%;
+}
 </style>

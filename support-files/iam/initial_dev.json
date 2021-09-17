@@ -465,8 +465,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "workflow_list",
-                                "ignore_iam_path": true
+                                "id": "workflow_list"
                             }
                         ]
                     }
@@ -490,8 +489,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "workflow_list",
-                                "ignore_iam_path": true
+                                "id": "workflow_list"
                             }
                         ]
                     }
@@ -515,8 +513,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "flow_version_list",
-                                "ignore_iam_path": true
+                                "id": "flow_version_list"
                             }
                         ]
                     }
@@ -540,8 +537,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "flow_version_list",
-                                "ignore_iam_path": true
+                                "id": "flow_version_list"
                             }
                         ]
                     }
@@ -637,8 +633,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "role_list",
-                                "ignore_iam_path": true
+                                "id": "role_list"
                             }
                         ]
                     }
@@ -662,8 +657,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "service_list",
-                                "ignore_iam_path": true
+                                "id": "service_list"
                             }
                         ]
                     }
@@ -687,8 +681,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "project_list",
-                                "ignore_iam_path": true
+                                "id": "project_list,"
                             }
                         ]
                     }
@@ -1031,8 +1024,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -1056,8 +1048,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -1081,8 +1072,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "field_list",
-                                "ignore_iam_path": true
+                                "id": "field_list"
                             }
                         ]
                     }
@@ -1168,8 +1158,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "trigger_list",
-                                "ignore_iam_path": true
+                                "id": "trigger_list"
                             }
                         ]
                     }
@@ -1193,8 +1182,7 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "trigger_list",
-                                "ignore_iam_path": true
+                                "id": "trigger_list"
                             }
                         ]
                     }
@@ -1700,9 +1688,9 @@
             "operation": "upsert_action",
             "data": {
                 "id": "sla_agreement_create",
-                "name": "SLA 服务模式创建",
+                "name": "SLA 服务协议创建",
                 "name_en": "Create SLA agreement",
-                "description": "Sla 服务模式创建",
+                "description": "Sla 服务协议创建",
                 "description_en": "",
                 "type": "create",
                 "related_resource_types": [
