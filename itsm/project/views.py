@@ -71,7 +71,7 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
 
             auth_actions = iam_client.batch_resource_multi_actions_allowed(
                 apply_actions, [project_info]
-            ).get("0", {})
+            ).get(project_instance.key, {})
 
             auth_actions = [
                 action_id for action_id, result in auth_actions.items() if result
