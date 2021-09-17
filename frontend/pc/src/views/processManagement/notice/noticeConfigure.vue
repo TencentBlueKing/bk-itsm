@@ -44,7 +44,7 @@
                 :data="noticeList"
                 :size="'small'">
                 <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['通知类型']`)" :disabled="true">
+                <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
                     <template slot-scope="props">
                         <template v-if="hasPermission(['global_settings_manage'])">
                             <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>

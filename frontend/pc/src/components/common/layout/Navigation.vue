@@ -281,7 +281,6 @@
             bus.$on('openCreateTicketDialog', () => {
                 this.isCreateTicketDialogShow = true
             })
-            this.getProjectList()
             bus.$on('openCreateProjectDialog', () => {
                 this.handleCreateProject()
             })
