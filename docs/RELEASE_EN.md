@@ -7,6 +7,13 @@
  [Optimization]Front-end UI design optimization  
  [Optimization] Permission model update  
  [repaired] Assignment of orders to organizational structure exceptions
+ [repaired] When creating a service, the service bill of lading information is not selected  
+ [Optimization] Add fields, custom data duplication data correction still prompts duplication  
+ [Optimization] Hide content related to the knowledge base  
+ [Optimization] The newly created user is transferred to the general role, the user group cannot be pulled, and there is no prompt to apply for permission  
+ [Optimization] Notification configuration permission settings, those without permission should be grayed out + locked  
+ [Optimization] No prompt for user group delete permission  
+ [Optimization] Edit the existing fields of the service bill of lading information, which cannot be saved  
 
 ## [Version: 2.5.9]-2021-05-07
  [repaired] Failed to download file in attachment upload field  
