@@ -51,36 +51,13 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all(self, request, *args, **kwargs):
-        """查询用户依赖所有项目的权限"""
-        iam_client = IamRequest(request)
-        apply_actions = []
-
-        for action_info in ACTIONS:
-            if "project" in action_info["relate_resources"]:
-                apply_actions.append(action_info["id"])
-
-        project_info_list = []
-        for project_instance in Project.objects.exclude(key="public"):
-            # 默认项目信息
-            project_info = {
-                "resource_id": project_instance.key,
-                "resource_name": project_instance.name,
-                "resource_type": "project",
-                "resource_type_name": "项目",
-            }
-
-            auth_actions = iam_client.batch_resource_multi_actions_allowed(
-                apply_actions, [project_info]
-            ).get(project_instance.key, {})
-
-            auth_actions = [
-                action_id for action_id, result in auth_actions.items() if result
-            ]
-
-            project_info["auth_actions"] = auth_actions
-            project_info_list.append(project_info)
-
-        return Response(project_info_list)
+        """
+        查询当前用户所有项目依赖的权限
+        @return: 所有项目的信息以及对应项目下当前用户依赖的权限
+        """    
+        project_serializer = ProjectSerializer(self.queryset, many=True)
+        project_serializer.context["request"] = request
+        return Response(project_serializer.data)
 
     @action(detail=True, methods=["get"])
     def info(self, request, *args, **kwargs):
