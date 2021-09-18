@@ -281,6 +281,8 @@
             bus.$on('openCreateTicketDialog', () => {
                 this.isCreateTicketDialogShow = true
             })
+            // 待修复
+            this.getProjectList()
             bus.$on('openCreateProjectDialog', () => {
                 this.handleCreateProject()
             })
@@ -290,7 +292,7 @@
                 try {
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectAllList')
-                    this.$store.commit('project/setProjectList', res.data.items)
+                    this.$store.commit('project/setProjectList', res.data)
                 } catch (e) {
                     errorHandler(e, this)
                 } finally {
