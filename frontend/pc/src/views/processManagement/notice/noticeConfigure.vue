@@ -46,17 +46,17 @@
                 <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
                     <template slot-scope="props">
-                        <template v-if="hasPermission(['notification_view'])">
+                        <template v-if="hasPermission(['notification_manage'])">
                             <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
                         </template>
-                        <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['notification_view']) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
+                        <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['notification_manage']) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
                 <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
                     <template slot-scope="props">
-                        <bk-button theme="primary" v-cursor="{ active: !hasPermission(['notification_view']) }" :disabled="!hasPermission(['notification_view'])" text @click="editorInfo(props.row)">
+                        <bk-button theme="primary" v-cursor="{ active: !hasPermission(['notification_manage']) }" :disabled="!hasPermission(['notification_manage'])" text @click="editorInfo(props.row)">
                             {{ $t('m.deployPage["编辑"]') }}
                         </bk-button>
                     </template>
@@ -138,8 +138,8 @@
                 this.getNoticeList()
             },
             editorInfo (item) {
-                if (!this.hasPermission(['notification_view'])) {
-                    this.applyForPermission(['notification_view'], [], {})
+                if (!this.hasPermission(['notification_manage'])) {
+                    this.applyForPermission(['notification_manage'], [], {})
                     return
                 }
                 this.noticeInfo.formInfo = item
