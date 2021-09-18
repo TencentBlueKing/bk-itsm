@@ -70,6 +70,10 @@ export default {
         getProjectList ({ commit }, params) {
             return ajax.get('/project/projects/', { params }).then(response => response.data)
         },
+        // 获取项目所以列表
+        getProjectAllList ({ commit }, params) {
+            return ajax.get('/project/projects/all/', { params }).then(response => response.data)
+        },
         // 创建项目
         createProject ({ commit }, data) {
             return ajax.post('/project/projects/', data).then(response => response.data)
