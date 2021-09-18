@@ -428,14 +428,14 @@ ACTIONS = [
     },
     {
         "id": "notification_view",
-        "name": "全局通知查看",
+        "name": "通知配置查看",
         "relate_resources": [],
         "relate_actions": [],
         "resource_topo": [],
     },
     {
         "id": "notification_manage",
-        "name": "全局通知管理",
+        "name": "通知配置管理",
         "relate_resources": [],
         "relate_actions": [],
         "resource_topo": [],
@@ -475,7 +475,6 @@ ACTIONS = [
         "relate_actions": [],
         "resource_topo": [],
     },
-    
 ]
 
 RESOURCES = [
@@ -533,12 +532,24 @@ PROJECT_INFO = {
     "resource_type_name": "项目",
 }
 
-PLATFORM_PERMISSION = ['project_create', 'notification_view', "notification_manage",
-                       'global_settings_view', 'global_settings_manage',
-                       'knowledge_manage', 'operational_data_view',
-                       'settings_view', 'settings_manage', "task_template_create",
-                       "public_api_create", "public_field_create", "sla_priority_view",
-                       "sla_priority_manage", "ticket_state_view", "ticket_state_manage",
-                       "platform_manage_access"]
+PLATFORM_PERMISSION = [
+    "project_create",
+    "notification_view",
+    "notification_manage",
+    "global_settings_view",
+    "global_settings_manage",
+    "knowledge_manage",
+    "operational_data_view",
+    "settings_view",
+    "settings_manage",
+    "task_template_create",
+    "public_api_create",
+    "public_field_create",
+    "sla_priority_view",
+    "sla_priority_manage",
+    "ticket_state_view",
+    "ticket_state_manage",
+    "platform_manage_access",
+]
 
 IAM_SEARCH_INSTANCE_CACHE_TIME = 10 * 60  # 缓存5分钟
