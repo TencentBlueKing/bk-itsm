@@ -40,13 +40,14 @@
                 <bk-form-item property="name" :label="$t(`m['项目名称']`)" :required="true">
                     <bk-input
                         v-model="projectForm.name"
+                        :disabled="editDialogFormDisable"
                         :placeholder="$t(`m['请输入50个字符以内的项目名称']`)">
                     </bk-input>
                 </bk-form-item>
                 <bk-form-item property="key" :label="$t(`m['项目代号']`)" :required="true">
                     <bk-input
                         v-model="projectForm.key"
-                        :disabled="!!project.key"
+                        :disabled="!!project.key || editDialogFormDisable"
                         :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
                     </bk-input>
                 </bk-form-item>
@@ -86,7 +87,8 @@
                         color: ''
                     }
                 }
-            }
+            },
+            editDialogFormDisable: Boolean
         },
         data () {
             return {
@@ -165,13 +167,11 @@
                 return projectList[0]
             },
             async validateName (val) {
-                const res = await this.$store.dispatch('project/getProjectAllList')
-                const projectList = this.projectValidateList(res.data.items, 'name')
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name')
                 return !projectList.map(item => item.name).includes(val)
             },
             async validateKey (val) {
-                const res = await this.$store.dispatch('project/getProjectAllList')
-                const projectList = this.projectValidateList(res.data.items, 'key')
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key')
                 return !projectList.map(item => item.key).includes(val)
             },
             onEditProjectConfirm () {

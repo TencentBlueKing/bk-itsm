@@ -53,6 +53,7 @@
                 :ext-cls="'bk-halfline-item bk-halfline-margin'">
                 <bk-input maxlength="120"
                     v-model="formInfo.name"
+                    @change="fieldNameChange"
                     :disabled="changeInfo.source === 'TABLE' && formInfo.key !== 'bk_biz_id'"
                     :placeholder="$t(`m.treeinfo['请输入字段显示名']`)"
                     @input="putKey">
@@ -615,6 +616,13 @@
             }
         },
         methods: {
+            fieldNameChange () {
+                const keyElement = this.$refs.fieldForm.$data.formItems.find(item => item.property === 'key')
+                if (keyElement.fieldValue) {
+                    keyElement.validator.content = ''
+                    keyElement.validator.state = ''
+                }
+            },
             // 初始化赋值数据
             async initData () {
                 // 去掉时间间隔的选项
