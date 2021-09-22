@@ -210,7 +210,7 @@
                 sideRouters: [],
                 activeNav: '',
                 activeSideRouter: '',
-                selectedProject: this.$store.state.project.id || this.$route.query.project_id,
+                selectedProject: this.$store.state.project.id,
                 isEditDialogShow: false,
                 isVersionLogShow: false,
                 isCreateTicketDialogShow: false,
