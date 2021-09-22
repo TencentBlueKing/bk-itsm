@@ -209,7 +209,7 @@
                 sideRouters: [],
                 activeNav: '',
                 activeSideRouter: '',
-                selectedProject: this.$store.state.project.id,
+                selectedProject: this.$store.state.project.id || this.$route.query.project_id,
                 isEditDialogShow: false,
                 isVersionLogShow: false,
                 isCreateTicketDialogShow: false,
@@ -281,8 +281,6 @@
             bus.$on('openCreateTicketDialog', () => {
                 this.isCreateTicketDialogShow = true
             })
-            // 待修复
-            this.getProjectList()
             bus.$on('openCreateProjectDialog', () => {
                 this.handleCreateProject()
             })

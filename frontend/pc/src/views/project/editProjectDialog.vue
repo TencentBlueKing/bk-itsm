@@ -165,13 +165,11 @@
                 return projectList[0]
             },
             async validateName (val) {
-                const res = await this.$store.dispatch('project/getProjectAllList')
-                const projectList = this.projectValidateList(res.data, 'name')
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name')
                 return !projectList.map(item => item.name).includes(val)
             },
             async validateKey (val) {
-                const res = await this.$store.dispatch('project/getProjectAllList')
-                const projectList = this.projectValidateList(res.data, 'key')
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key')
                 return !projectList.map(item => item.key).includes(val)
             },
             onEditProjectConfirm () {

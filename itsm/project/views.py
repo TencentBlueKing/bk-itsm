@@ -55,9 +55,9 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
         查询当前用户所有项目依赖的权限
         @return: 所有项目的信息以及对应项目下当前用户依赖的权限
         """    
-        project_serializer = ProjectSerializer(self.queryset, many=True)
-        project_serializer.context["request"] = request
-        return Response(project_serializer.data)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        serializer.context["request"] = request
+        return Response(serializer.data)
 
     @action(detail=True, methods=["get"])
     def info(self, request, *args, **kwargs):
