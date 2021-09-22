@@ -40,13 +40,14 @@
                 <bk-form-item property="name" :label="$t(`m['项目名称']`)" :required="true">
                     <bk-input
                         v-model="projectForm.name"
+                        :disabled="editDialogFormDisable"
                         :placeholder="$t(`m['请输入50个字符以内的项目名称']`)">
                     </bk-input>
                 </bk-form-item>
                 <bk-form-item property="key" :label="$t(`m['项目代号']`)" :required="true">
                     <bk-input
                         v-model="projectForm.key"
-                        :disabled="!!project.key"
+                        :disabled="!!project.key || editDialogFormDisable"
                         :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
                     </bk-input>
                 </bk-form-item>
@@ -86,7 +87,8 @@
                         color: ''
                     }
                 }
-            }
+            },
+            editDialogFormDisable: Boolean
         },
         data () {
             return {

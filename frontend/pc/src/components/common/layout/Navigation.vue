@@ -174,6 +174,7 @@
                 :title="$t(`m['新建项目']`)"
                 :is-show="isEditDialogShow"
                 :project="projectForm"
+                :edit-dialog-form-disable="editDialogFormDisable"
                 @confirm="onProjectDialogConfirm"
                 @cancel="onProjectDialogCancel">
             </edit-project-dialog>
@@ -218,7 +219,8 @@
                     key: '',
                     desc: '',
                     color: ''
-                }
+                },
+                editDialogFormDisable: false
             }
         },
         computed: {
@@ -273,6 +275,11 @@
                 if (val) {
                     this.selectedProject = val
                 }
+            },
+            isEditDialogShow (val) {
+                if (val) {
+                    this.getProjectList()
+                }
             }
         },
         created () {
@@ -288,12 +295,14 @@
         methods: {
             async getProjectList () {
                 try {
+                    this.editDialogFormDisable = true
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectAllList')
                     this.$store.commit('project/setProjectList', res.data)
                 } catch (e) {
                     errorHandler(e, this)
                 } finally {
+                    this.editDialogFormDisable = false
                     this.$store.commit('project/setProjectListLoading', false)
                 }
             },
@@ -454,8 +463,8 @@
             },
             onProjectDialogConfirm (key) {
                 this.isEditDialogShow = false
-                this.onSelectProject(key)
                 this.getProjectList()
+                this.onSelectProject(key)
             },
             onProjectDialogCancel () {
                 this.isEditDialogShow = false
