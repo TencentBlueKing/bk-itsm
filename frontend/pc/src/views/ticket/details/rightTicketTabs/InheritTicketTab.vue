@@ -24,12 +24,14 @@
     <div class="bk-flowlog-inherit">
         <div class="mb20">
             <bk-button :theme="'default'" class="mr10"
+                data-test-id="ticket_button_createInheritTicket"
                 :title="(ticketInfo.is_over || !ticketInfo.can_operate) ? $t(`m.newCommon['暂无权限或单据已结束']`) : $t(`m.newCommon['新建']`)"
                 :disabled="ticketInfo.is_over || !ticketInfo.can_operate"
                 @click="openAddInheritSlider">
                 {{ $t('m.newCommon["新建"]') }}
             </bk-button>
             <bk-button :theme="'default'" class="icon-cus"
+                data-test-id="ticket_button_InheritTicketBindingHistory"
                 :title="historyList.length ? $t(`m.newCommon['绑定历史']`) : $t(`m.newCommon['暂无关联历史']`)"
                 icon=" bk-itsm-icon icon-history"
                 :disabled="!historyList.length"
@@ -103,6 +105,7 @@
         </div>
         <div class="inherit-bottom-button">
             <bk-button
+                data-test-id="ticket_button_batchUnbind"
                 theme="default"
                 :title="$t(`m.newCommon['批量解绑']`)"
                 :disabled="!checkList.length"

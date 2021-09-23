@@ -27,12 +27,12 @@
             <span class="bk-head-icon" v-if="false"></span>
             <!-- <i class="bk-icon icon-order-progress"></i> -->
             <span v-if="false">{{ $t('m.newCommon["工单进度预览"]') }}</span>
-            <span class="bk-font-icon" @click="openFull" title="全屏">
+            <span data-test-id="ticket_button_progressFullscreen" class="bk-font-icon" @click="openFull" title="全屏">
                 <i class="bk-itsm-icon icon-order-open cus-order-open"></i>
             </span>
         </div>
         <!-- 流程预览图 -->
-        <div class="bk-order-flow" v-bkloading="{ isLoading: isDataLoading }">
+        <div class="bk-order-flow" v-bkloading="{ isLoading: `isDataLoading` }">
             <template v-if="!isDataLoading && !fullStatus">
                 <preview
                     ref="preview"
