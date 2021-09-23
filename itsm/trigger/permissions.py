@@ -76,7 +76,7 @@ class WorkflowTriggerPermit(IamAuthPermit):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        if view.action == "create_or_update_rules":
+        if view.action in ["create_or_update_rules", "update", "destroy"]:
             return True
 
         apply_actions = ["triggers_manage"]
