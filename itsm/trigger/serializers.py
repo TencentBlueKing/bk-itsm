@@ -23,6 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from django.db.models import Model
 from rest_framework import serializers
 
 from itsm.component.constants import (
@@ -78,6 +79,19 @@ class TriggerSerializer(AuthModelSerializer):
     def run_validators(self, value):
         self.validators.extend([TriggerValidator(self.instance)])
         return super(TriggerSerializer, self).run_validators(value)
+    
+    def update_auth_actions(self, instance, data):
+        """
+        更新权限信息
+        """
+        if instance is not None:
+            if instance.source_type != "basic":
+                data.update(auth_actions=["triggers_view", "triggers_manage"])
+            else:
+                resource_id = str(instance.id if isinstance(instance, Model) else instance['id'])
+                instance_permissions = self.resource_permissions.get(resource_id, {})
+                data.update(auth_actions=[action for action, result in instance_permissions.items() if result])
+        return data
 
 
 class TriggerRuleSerializer(AuthModelSerializer):
@@ -94,6 +108,20 @@ class TriggerRuleSerializer(AuthModelSerializer):
         model = TriggerRule
         fields = model.FIELDS + model.DISPLAY_FIELDS
         read_only_fields = model.DISPLAY_FIELDS
+        
+    def update_auth_actions(self, instance, data):
+        """
+        更新权限信息
+        """
+        if instance is not None:
+            trigger = Trigger.objects.get(id=instance.trigger_id)
+            if trigger.source_type != "basic":
+                data.update(auth_actions=["triggers_view", "triggers_manage"])
+            else:
+                resource_id = str(instance.id if isinstance(instance, Model) else instance['id'])
+                instance_permissions = self.resource_permissions.get(resource_id, {})
+                data.update(auth_actions=[action for action, result in instance_permissions.items() if result])
+        return data
 
 
 class ActionSchemaSerializer(AuthModelSerializer):
