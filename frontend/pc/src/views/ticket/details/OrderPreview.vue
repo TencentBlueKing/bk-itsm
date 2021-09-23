@@ -32,7 +32,7 @@
             </span>
         </div>
         <!-- 流程预览图 -->
-        <div class="bk-order-flow" v-bkloading="{ isLoading: `isDataLoading` }">
+        <div class="bk-order-flow" v-bkloading="{ isLoading: isDataLoading }">
             <template v-if="!isDataLoading && !fullStatus">
                 <preview
                     ref="preview"
