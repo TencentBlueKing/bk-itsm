@@ -28,6 +28,7 @@
             </div>
             <div class="bk-form-content" v-if="treeInfo.node.level">
                 <bk-button :theme="'primary'"
+                    data-test-id="serviceCatalogue_button_create"
                     :title="$t(`m.managePage['新增']`)"
                     icon="plus"
                     class="mr10 plus-cus"
@@ -35,6 +36,7 @@
                     {{$t(`m.managePage['新增']`)}}
                 </bk-button>
                 <bk-button :theme="'default'"
+                    data-test-id="serviceCatalogue_button_batchDelete"
                     :title="$t(`m.serviceConfig['批量移除']`)"
                     class="mr10"
                     :disabled="!checkList.length"
@@ -43,6 +45,7 @@
                 </bk-button>
                 <div class="bk-search-input">
                     <bk-input
+                        data-test-id="serviceCatalogue_input_searchKey"
                         :placeholder="$t(`m.serviceConfig['请输入关键字']`)"
                         :clearable="true"
                         :right-icon="'bk-icon icon-search'"
@@ -56,7 +59,7 @@
         <!-- 表格拖拽 -->
         <!-- <draggable tag="tbody" v-model="listInfo" @end="updateInfo" handle=".move-handler-content"></draggable> -->
         <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isTableLoading }">
-            <table class="bk-draggable-table">
+            <table data-test-id="serviceCatalogue_table_drag" class="bk-draggable-table">
                 <thead>
                     <tr>
                         <th v-if="listInfo.length">
@@ -82,6 +85,7 @@
                             <td>
                                 <!-- <i class="bk-icon icon-move-new move-handler" v-if="!searchInfo.key"></i> -->
                                 <bk-checkbox
+                                    data-test-id="service_checkbox_check"
                                     :true-value="trueStatus"
                                     :false-value="falseStatus"
                                     v-model="item.checkValue"
@@ -113,7 +117,7 @@
                                 </div>
                             </td>
                             <td style="min-width: 100px;">
-                                <bk-button theme="primary" text @click="deleteOne(item)">
+                                <bk-button data-test-id="serviceCatalogue_button_deleteService" theme="primary" text @click="deleteOne(item)">
                                     {{ $t('m.serviceConfig["移除"]') }}
                                 </bk-button>
                             </td>
@@ -201,6 +205,7 @@
                 </bk-table>
                 <div class="mt20">
                     <bk-button
+                        data-test-id="serviceCatalogue_button_serviceCreate"
                         theme="primary"
                         :title="$t(`m.serviceConfig['新增']`)"
                         v-if="!entryInfo.listInfo.length"
@@ -208,6 +213,7 @@
                         {{ $t('m.serviceConfig["新增"]') }}
                     </bk-button>
                     <bk-button
+                        data-test-id="serviceCatalogue_button_serviceConfirm"
                         theme="primary"
                         :title="$t(`m.serviceConfig['确认']`)"
                         :disabled="!entryInfo.checkList.length"
@@ -217,6 +223,7 @@
                         {{ $t('m.serviceConfig["确认"]') }}
                     </bk-button>
                     <bk-button
+                        data-test-id="serviceCatalogue_button_serviceCancel"
                         theme="default"
                         :title="$t(`m.serviceConfig['取消']`)"
                         :loading="secondClick"

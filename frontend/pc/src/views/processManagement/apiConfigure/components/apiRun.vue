@@ -88,6 +88,7 @@
         <div class="bk-basic-btn" v-if="!apiDetailInfoCommon.is_builtin">
             <bk-button :disabled="isSuccess"
                 @click="updateApi"
+                data-test-id="apiDetail_button_runUpdateApi"
                 :theme="'primary'"
                 :title="$t(`m.systemConfig['保存参数']`)">
                 {{$t(`m.systemConfig['保存参数']`)}}

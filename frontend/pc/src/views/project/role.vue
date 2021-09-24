@@ -36,6 +36,7 @@
                 :links="emptyTip.links">
                 <template slot="btns">
                     <bk-button theme="primary"
+                        data-test-id="userGroup_button_create_permission"
                         v-cursor="{ active: !hasPermission(['user_group_create']) }"
                         :class="{
                             'btn-permission-disable': !hasPermission(['user_group_create'])
@@ -52,6 +53,7 @@
             <template v-else>
                 <div class="bk-only-btn">
                     <bk-button theme="primary"
+                        data-test-id="userGroup_button_create"
                         v-cursor="{ active: !hasPermission(['user_group_create']) }"
                         icon="plus"
                         :title="$t(`m.deployPage['新增']`)"
@@ -67,6 +69,7 @@
                     </bk-button>
                     <div class="bk-only-search">
                         <bk-input
+                            data-test-id="userGroup_input_search"
                             :placeholder="$t(`m.systemConfig['请输入角色名称']`)"
                             :clearable="true"
                             :right-icon="'bk-icon icon-search'"
@@ -110,6 +113,7 @@
                     <bk-table-column :label="$t(`m.user['操作']`)" width="150">
                         <template slot-scope="props">
                             <bk-button
+                                data-test-id="userGroup_button_edit"
                                 v-cursor="{ active: !hasPermission(['user_group_edit'], props.row.auth_actions) }"
                                 theme="primary"
                                 text
@@ -121,6 +125,7 @@
                             </bk-button>
                             <bk-button
                                 v-if="!props.row.is_builtin"
+                                data-test-id="userGroup_button_delete"
                                 v-cursor="{ active: !hasPermission(['user_group_delete'], props.row.auth_actions) }"
                                 theme="primary"
                                 text
@@ -137,6 +142,7 @@
         </div>
         <!-- 编辑列表 -->
         <bk-dialog
+            data-test-id="userGroup_dialog_editAndCreate"
             v-model="openDialog.isShow"
             :render-directive="'if'"
             :width="openDialog.width"

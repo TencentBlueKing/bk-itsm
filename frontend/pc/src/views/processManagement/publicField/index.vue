@@ -36,6 +36,7 @@
                 :links="emptyTip.links">
                 <template slot="btns">
                     <bk-button :theme="'primary'"
+                        data-test-id="field_button_createField"
                         v-cursor="{ active: !hasPermission(createFieldPerm) }"
                         :class="{
                             'btn-permission-disable': !hasPermission(createFieldPerm)
@@ -49,6 +50,7 @@
                 <div class="bk-only-btn">
                     <div class="bk-more-search">
                         <bk-button :theme="'primary'"
+                            data-test-id="field_button_addField"
                             v-cursor="{ active: !hasPermission(createFieldPerm) }"
                             :title="$t(`m.deployPage['新增']`)"
                             icon="plus"
@@ -61,6 +63,7 @@
                         <div class="bk-search-name">
                             <div class="bk-search-content">
                                 <bk-input
+                                    data-test-id="field_input_searchField"
                                     :clearable="true"
                                     :right-icon="'bk-icon icon-search'"
                                     :placeholder="moreSearch[0].placeholder"
@@ -93,6 +96,7 @@
                         <template slot-scope="props">
                             <bk-button
                                 v-if="!hasPermission(editFieldPerm, props.row.auth_actions)"
+                                data-test-id="field_button_viewfield"
                                 v-cursor
                                 text
                                 theme="primary"
@@ -146,18 +150,20 @@
                             <bk-button
                                 v-if="!hasPermission(editFieldPerm, props.row.auth_actions)"
                                 v-cursor
+                                data-test-id="field_button_editfield_permission"
                                 text
                                 theme="primary"
                                 class="btn-permission-disable"
                                 @click="openField(props.row, editFieldPerm)">
                                 {{ $t('m.deployPage["编辑"]') }}
                             </bk-button>
-                            <bk-button v-else theme="primary" text @click="openField(props.row)">
+                            <bk-button data-test-id="field_button_editfield" v-else theme="primary" text @click="openField(props.row)">
                                 {{ $t('m.deployPage["编辑"]') }}
                             </bk-button>
                             <!-- 删除 -->
                             <bk-button
                                 v-if="!hasPermission(deleteFieldPerm, props.row.auth_actions)"
+                                data-test-id="field_button_deletefield_permission"
                                 v-cursor
                                 text
                                 theme="primary"
@@ -166,6 +172,7 @@
                                 {{ $t('m.deployPage["删除"]') }}
                             </bk-button>
                             <bk-button
+                                data-test-id="field_button_deletefield"
                                 v-else
                                 theme="primary"
                                 text

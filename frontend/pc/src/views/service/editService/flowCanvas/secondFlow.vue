@@ -23,6 +23,7 @@
 <template>
     <div class="bk-second-flow">
         <js-flow
+            data-test-id="service_jsflow_serviceProcess"
             ref="jsFlow"
             v-model="canvasData"
             selector="entry-item"

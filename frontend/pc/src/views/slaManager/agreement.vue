@@ -37,6 +37,7 @@
                     :links="emptyTip.links">
                     <template slot="btns">
                         <bk-button
+                            data-test-id="sla_button_createAgreement_permission"
                             v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
                             theme="primary"
                             :class="{
@@ -57,6 +58,7 @@
                     <div class="bk-only-btn">
                         <div class="bk-more-search">
                             <bk-button
+                                data-test-id="sla_button_createAgreement"
                                 v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
                                 :theme="'primary'"
                                 :title="$t(`m.managePage['新增']`)"
@@ -70,6 +72,7 @@
                             <div class="bk-search-name">
                                 <div class="bk-search-content">
                                     <bk-input
+                                        data-test-id="sla_button_searchAgreement"
                                         :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
                                         :clearable="true"
                                         :right-icon="'bk-icon icon-search'"
@@ -100,6 +103,7 @@
                         <bk-table-column :label="$t(`m.slaContent['协议名称']`)">
                             <template slot-scope="props">
                                 <bk-button
+                                    data-test-id="sla_button_agreementEditFromName"
                                     v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
                                     v-cursor
                                     text
@@ -110,6 +114,7 @@
                                 </bk-button>
                                 <span
                                     v-else
+                                    data-test-id="sla_span_agreementEditFromName"
                                     class="bk-lable-primary"
                                     @click="addAgreement(props.row, 'sla_agreement_edit')"
                                     :title="props.row.name">
@@ -151,6 +156,7 @@
                             <template slot-scope="props">
                                 <!-- 编辑 -->
                                 <bk-button
+                                    data-test-id="sla_button_agreementEditFromOperate"
                                     v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
                                     v-cursor
                                     text
@@ -160,6 +166,7 @@
                                     {{ $t('m.deployPage["编辑"]')}}
                                 </bk-button>
                                 <bk-button
+                                    data-test-id="sla_button_agreementEditFromOperate"
                                     v-else
                                     theme="primary"
                                     text
@@ -168,6 +175,7 @@
                                 </bk-button>
                                 <!-- 删除 -->
                                 <bk-button
+                                    data-test-id="sla_button_agreementDeleteFromOperate1"
                                     v-if="!hasPermission(['sla_agreement_delete'], props.row.auth_actions)"
                                     v-cursor
                                     text
@@ -177,6 +185,7 @@
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>
                                 <bk-button theme="primary"
+                                    data-test-id="sla_button_agreementDeleteFromOperate2"
                                     text
                                     v-else-if="props.row.service_count > 0 || props.row.is_builtin"
                                     :disabled="props.row.service_count > 0 || props.row.is_builtin"
@@ -184,6 +193,7 @@
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>
                                 <bk-button theme="primary" text v-else
+                                    data-test-id="sla_button_agreementDeleteFromOperate3"
                                     @click="deleteAgreement(props.row)">
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>

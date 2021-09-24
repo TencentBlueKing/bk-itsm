@@ -91,8 +91,8 @@
                         </bk-checkbox-group>
                     </div>
                     <div class="row-operating">
-                        <span @click="onAddCondition">+</span>
-                        <span @click="onDelCondition(index)">-</span>
+                        <span data-test-id="trigger_span_add" @click="onAddCondition">+</span>
+                        <span data-test-id="trigger_span_delete" @click="onDelCondition(index)">-</span>
                     </div>
                 </div>
             </bk-form>

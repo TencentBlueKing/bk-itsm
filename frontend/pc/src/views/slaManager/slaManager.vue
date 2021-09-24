@@ -38,6 +38,7 @@
                     :links="emptyTip.links">
                     <template slot="btns">
                         <bk-button
+                            data-test-id="slaPattern_button_createPermission"
                             v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
                             theme="primary"
                             :class="{
@@ -58,6 +59,7 @@
                     <!-- 新增 -->
                     <div class="bk-sla-add">
                         <bk-button
+                            data-test-id="slaPattern_button_create"
                             v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
                             theme="primary"
                             :title="$t(`m.eventdeploy['新增']`)"
