@@ -437,7 +437,7 @@
                 window.DEFAULT_PROJECT = val
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
-                this.$router.push({ name: this.$route.name, query: { project_id: val } })
+                this.$router.push({ name: 'projectTicket', query: { project_id: val } })
             },
             applyForProjectViewPerm (project, perm) {
                 if (!this.hasPermission([perm], project.auth_actions)) {

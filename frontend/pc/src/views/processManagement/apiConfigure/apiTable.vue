@@ -289,13 +289,13 @@
                             }]
                         }
                         this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
+                        return
                     }
-                    return
+                    this.$parent.displayInfo['level_1'] = await item
+                    await this.$parent.displayInfo['level_1']
+                    // 展示 单个api
+                    await this.$parent.getRemoteApiDetail(item.id)
                 }
-                this.$parent.displayInfo['level_1'] = await item
-                await this.$parent.displayInfo['level_1']
-                // 展示 单个api
-                await this.$parent.getRemoteApiDetail(item.id)
             },
             getRemoteSystemData () {
                 this.$parent.getRemoteSystemData()

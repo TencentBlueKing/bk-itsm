@@ -32,7 +32,7 @@
                             class="display-range"
                             form-type="inline-auto-width"
                             ref="displayRange"
-                            :value="visibleRange"
+                            :value="formData.visibleRange"
                             :show-role-type-list="displayRangeTypes">
                         </deal-person>
                     </bk-form-item>
@@ -225,10 +225,6 @@
             return {
                 frequencyList,
                 showMoreConfig: false,
-                visibleRange: {
-                    type: 'OPEN',
-                    value: ''
-                },
                 revokeWayList: [
                     { name: '不支持撤回', id: 'not_support', key: 0 },
                     { name: this.$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`), id: 'before_flow', key: 2 },
@@ -244,6 +240,10 @@
                 nodeListLoading: false,
                 nodeList: [],
                 formData: {
+                    visibleRange: {
+                        type: 'OPEN',
+                        value: ''
+                    },
                     revokeWay: 'before_flow',
                     revokeState: 0,
                     otherSettings: [],
