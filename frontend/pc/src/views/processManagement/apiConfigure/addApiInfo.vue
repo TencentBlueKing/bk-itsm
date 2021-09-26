@@ -23,6 +23,7 @@
 <template>
     <div class="bk-add-api">
         <bk-form
+            data-test-id="api_form_ApiInfo"
             :label-width="200"
             form-type="vertical"
             :model="directory.formInfo"
@@ -131,6 +132,7 @@
         </p>
         <div class="mb20">
             <bk-button theme="primary"
+                data-test-id="api_button_AccessApi_createApi"
                 :title="$t(`m.systemConfig['确认']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -138,6 +140,7 @@
                 {{ $t('m.systemConfig["确认"]') }}
             </bk-button>
             <bk-button theme="default"
+                data-test-id="api_button_closeSideslider"
                 :title="$t(`m.systemConfig['取消']`)"
                 :disabled="secondClick"
                 @click="closeAdd">

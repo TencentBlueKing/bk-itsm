@@ -28,6 +28,7 @@
             <div class="bk-only-btn">
                 <div class="bk-more-search">
                     <bk-button
+                        data-test-id="service_button_createService"
                         v-cursor="{ active: !hasPermission(['service_create']) }"
                         :theme="'primary'"
                         icon="plus"
@@ -39,6 +40,7 @@
                         {{$t(`m.serviceConfig['新增']`)}}
                     </bk-button>
                     <bk-button :theme="'default'"
+                        data-test-id="service_button_batchDeleteService"
                         :title="$t(`m.serviceConfig['批量删除']`)"
                         :disabled="!checkList.length"
                         @click="deleteCheck">
@@ -94,6 +96,7 @@
                         </template>
                         <template v-else>
                             <bk-checkbox
+                                data-test-id="service_checkbox_checkService"
                                 v-bk-tooltips.right="{
                                     content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
                                     disabled: !props.row.bounded_catalogs[0],
@@ -202,7 +205,7 @@
                             @click="onServicePermissonCheck(['service_manage'], props.row)">
                             SLA
                         </bk-button>
-                        <router-link v-else class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
+                        <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
                         <!-- 编辑 -->
                         <bk-button
                             v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
@@ -215,6 +218,7 @@
                         </bk-button>
                         <bk-button
                             v-else
+                            data-test-id="service_button_editService"
                             theme="primary"
                             text
                             @click="changeEntry(props.row, 'edit')">
@@ -246,6 +250,7 @@
                         </template>
                         <template v-else>
                             <bk-button
+                                data-test-id="service_button_deleteService"
                                 theme="primary"
                                 text
                                 @click="deleteOne(props.row)">

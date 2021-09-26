@@ -147,10 +147,12 @@
                                     v-if="item.parentInfo.type === 'object' || item.type === 'object'">
                                     <ul>
                                         <li v-if="item.parentInfo && item.parentInfo.type === 'object'"
+                                            data-test-id="apiDetail_li_addBortherNode"
                                             :title="$t(`m.systemConfig['兄弟节点']`)" @click.stop="addBrotherLine(item)">
                                             <span>{{ $t('m.systemConfig["兄弟节点"]') }}</span>
                                         </li>
                                         <li v-if="item.type === 'object' || (item.type === 'array' && (!item.children || !item.children.length))"
+                                            data-test-id="apiDetail_li_deleteBortherNode"
                                             :title="$t(`m.systemConfig['子节点']`)" @click.stop="addChildLine(item)">
                                             <span>{{ $t('m.systemConfig["子节点"]') }}</span>
                                         </li>

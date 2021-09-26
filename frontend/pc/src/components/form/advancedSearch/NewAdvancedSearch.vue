@@ -28,6 +28,7 @@
                     <slot></slot>
                 </div>
                 <bk-input
+                    data-test-id="search_input_enter"
                     :clearable="true"
                     :right-icon="'bk-icon icon-search'"
                     :placeholder="searchForms[0].desc"
@@ -36,12 +37,13 @@
                     @clear="onClearClick">
                 </bk-input>
                 <bk-button
+                    data-test-id="search_button_conditions"
                     :title="$t(`m.deployPage['更多筛选条件']`)"
                     icon=" bk-itsm-icon icon-search-more"
                     class="ml10 filter-btn"
                     @click="onShowSearchMore">
                 </bk-button>
-                <i style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
+                <i data-test-id="ticket_button_highlightSetting" style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
             </div>
         </div>
         <!-- 高级搜索 -->
@@ -112,11 +114,13 @@
                 <!-- 查询清空 -->
                 <div class="bk-filter-btn">
                     <bk-button theme="primary"
+                        data-test-id="highlight_button_search"
                         :title="$t(`m.deployPage['查询']`)"
                         @click="onSearchClick">
                         {{ $t('m.deployPage["查询"]') }}
                     </bk-button>
                     <bk-button theme="default"
+                        data-test-id="highlight_button_clear"
                         :title="$t(`m.deployPage['清空']`)"
                         @click="onClearClick">
                         {{ $t('m.deployPage["清空"]') }}

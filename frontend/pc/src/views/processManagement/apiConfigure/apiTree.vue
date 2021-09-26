@@ -41,6 +41,7 @@
                             <ul class="bk-dropdown-list" slot="dropdown-content">
                                 <li>
                                     <a href="javascript:;"
+                                        data-test-id="api_a_accessApi"
                                         v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                                         :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                                         :title="$t(`m.systemConfig['接入']`)"
@@ -50,6 +51,7 @@
                                 </li>
                                 <li>
                                     <a href="javascript:;"
+                                        data-test-id="api_a_createApi"
                                         v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                                         :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                                         :title="$t(`m.systemConfig['新增']`)"
@@ -66,6 +68,7 @@
                 <ul class="bk-tree-group" @scroll="scrollEvent">
                     <li v-for="(item, index) in treeList"
                         :key="index"
+                        data-test-id="api_li_viewApiTable"
                         @click="showBackground(item, index, 0)">
                         <template v-if="!item.id">
                             <div class="bk-group-parent bk-p18"
@@ -85,12 +88,14 @@
                                     <ul class="bk-more" :style="styletranslateY">
                                         <li
                                             v-if="!item.is_builtin"
+                                            data-test-id="api_li_deleteApiDirectory"
                                             v-cursor="{ active: !projectId && !hasPermission(['public_api_manage']) }"
                                             :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage']) }"
                                             @click.stop="openDelete(item)">
                                             <span>{{ $t('m.systemConfig["删除"]') }}</span>
                                         </li>
                                         <li
+                                            data-test-id="api_li_editApiDirectory"
                                             v-cursor="{ active: !projectId && !hasPermission(['public_api_manage']) }"
                                             :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage']) }"
                                             @click.stop="openDictionary('CHANGE' ,item)">
@@ -119,6 +124,7 @@
         </div>
         <!-- 接入系统 -->
         <bk-dialog
+            data-test-id="api_dialog_accessApi"
             v-model="dictDataTable.showDialog"
             :render-directive="'if'"
             :width="dictDataTable.width"

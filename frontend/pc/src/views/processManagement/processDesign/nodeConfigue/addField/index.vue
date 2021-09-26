@@ -205,6 +205,7 @@
             </template>
             <template v-if="formInfo.type === 'CUSTOMTABLE'">
                 <bk-form-item
+                    data-test-id="field_form_custom"
                     :label="$t(`m.treeinfo['自定义数据']`)"
                     :required="true"
                     :ext-cls="'bk-mt20-item'">
@@ -348,6 +349,7 @@
         </bk-form>
         <div class="operate-btns mt20">
             <bk-button :theme="'primary'"
+                data-test-id="field_button_submit"
                 :title="$t(`m.treeinfo['提交']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -355,6 +357,7 @@
                 {{$t(`m.treeinfo['提交']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="field_button_cancel"
                 :title="$t(`m.treeinfo['取消']`)"
                 :disabled="secondClick"
                 class="mr10"

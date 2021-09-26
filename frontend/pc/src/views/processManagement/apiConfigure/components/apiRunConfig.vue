@@ -37,6 +37,7 @@
             </template>
             <template slot="append">
                 <bk-button style="border: none; height: 30px; border-radius: 0;"
+                    data-test-id="apiDetail_button_sendRequset"
                     :theme="'primary'"
                     :title="$t(`m.systemConfig['发送']`)"
                     @click="testUrl">

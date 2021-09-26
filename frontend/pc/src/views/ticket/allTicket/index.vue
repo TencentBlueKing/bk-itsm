@@ -48,6 +48,7 @@
                                         @clear="handleClearSearch">
                                         <div class="slot-content">
                                             <bk-button
+                                                data-test-id="ticket_button_export"
                                                 class="export"
                                                 :title="$t(`m.tickets['导出']`)"
                                                 @click="openExportList">

@@ -23,6 +23,7 @@
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
         <bk-timeline
+            data-test-id="ticket_timeline_viewLog"
             ext-cls="log-time-line"
             :list="list"
             @select="handleSelect"></bk-timeline>

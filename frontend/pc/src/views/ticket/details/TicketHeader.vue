@@ -56,6 +56,7 @@
         <div class="operation-group">
             <!-- 刷新 -->
             <bk-button
+                data-test-id="ticket_button_refreshTicketDetail"
                 size="small"
                 class="mr10 operation-refresh"
                 :class="{ 'rotate': rotate, 'not-rotate': !rotate }"
@@ -66,6 +67,7 @@
             </bk-button>
             <bk-popover :content="$t(`m.tickets['单据当前不能被撤回']`)" :disabled="ticketInfo.can_withdraw">
                 <bk-button
+                    data-test-id="ticket_button_removeTicket"
                     size="small"
                     class="mr10"
                     theme="default"
@@ -76,6 +78,7 @@
             </bk-popover>
             <bk-popover :content="disabledText" :disabled="ticketInfo.can_supervise">
                 <bk-button
+                    data-test-id="ticket_button_superviseTicket"
                     size="small"
                     class="mr10"
                     theme="default"
@@ -86,6 +89,7 @@
             </bk-popover>
             <bk-popover :content="getDisabledContentText(ticketInfo.is_commented)" :disabled="!(ticketInfo.is_commented || !ticketInfo.can_comment)">
                 <bk-button
+                    data-test-id="ticket_button_appraiseTicket"
                     v-if="Number(ticketInfo.comment_id) !== -1"
                     size="small"
                     class="mr10"
@@ -109,6 +113,7 @@
                 <ul class="bk-dropdown-list-cus" slot="dropdown-content">
                     <li>
                         <bk-button
+                            data-test-id="ticket_button_ticketPrint"
                             class="bk-dropdown-list-btn"
                             theme="default"
                             :text="true"
@@ -121,6 +126,7 @@
                             :disabled="ticketInfo.can_operate && ticketInfo.current_status !== 'SUSPENDED'"
                             placement="left-end">
                             <bk-button
+                                data-test-id="ticket_button_ticketPending"
                                 class="bk-dropdown-list-btn"
                                 theme="default"
                                 :text="true"
@@ -135,6 +141,7 @@
                             :disabled="ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED'"
                             placement="left-end">
                             <bk-button
+                                data-test-id="ticket_button_ticketRecover"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
                                 :disabled="!(ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED')"
@@ -148,6 +155,7 @@
                             :disabled="ticketInfo.can_close"
                             placement="left-end">
                             <bk-button
+                                data-test-id="ticket_button_ticketClose"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
                                 :disabled="!ticketInfo.can_close"
@@ -163,6 +171,7 @@
                             :disabled="ticketInfo.can_operate"
                             placement="left-end">
                             <bk-button
+                                data-test-id="ticket_button_trigger"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
                                 :disabled="!ticketInfo.can_operate"

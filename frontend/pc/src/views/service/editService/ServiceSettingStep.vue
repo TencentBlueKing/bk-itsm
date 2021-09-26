@@ -25,7 +25,7 @@
         <section class="settion-card">
             <h2 class="card-title">{{ $t(`m.tickets['服务设置']`) }}</h2>
             <div class="card-content">
-                <bk-form ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
+                <bk-form data-test-id="service_form_serviceSetting" ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
                     <bk-form-item :label="$t(`m.serviceConfig['可见范围']`)">
                         <deal-person
                             style="width: 600px;"
@@ -81,7 +81,7 @@
         <section class="settion-card notic-card">
             <h2 class="card-title">{{ $t(`m.tickets['通知设置']`) }}</h2>
             <div class="card-content">
-                <bk-form form-type="vertical" :model="formData" class="service-setting-form">
+                <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
                     <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
                         <bk-checkbox-group v-model="formData.notify">
                             <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">

@@ -36,6 +36,7 @@
                 :links="emptyTip.links">
                 <template slot="btns">
                     <bk-button
+                        data-test-id="triggers_button_create_permission"
                         :theme="'primary'"
                         v-cursor="{ active: !hasPermission(['triggers_create']) }"
                         :class="{
@@ -60,6 +61,7 @@
                 </div>
                 <div class="bk-normal-search">
                     <bk-button :theme="'primary'"
+                        data-test-id="triggers_button_create"
                         v-cursor="{ active: !hasPermission(['triggers_create']) }"
                         :title="$t(`m.managePage['新增']`)"
                         icon="plus"
@@ -71,6 +73,7 @@
                     </bk-button>
                     <div class="bk-search-key">
                         <bk-input
+                            data-test-id="triggers_button_search"
                             :clearable="true"
                             :right-icon="'bk-icon icon-search'"
                             v-model="searchKey"

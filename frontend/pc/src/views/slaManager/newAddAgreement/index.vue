@@ -87,13 +87,14 @@
             </div>
             <div>
                 <p class="bk-group-title">
-                    <span style="margin-right: 15px;">{{ $t('m.slaContent["是否启用该协议"]') }}</span>
+                    <span data-test-id="sla_span_isUseAgreement" style="margin-right: 15px;">{{ $t('m.slaContent["是否启用该协议"]') }}</span>
                     <bk-switcher v-model="formInfo.agreementStatus" size="small" theme="primary"></bk-switcher>
                 </p>
             </div>
         </div>
         <div class="bk-priority-btn">
             <bk-button
+                data-test-id="sla_button_submitAgreement"
                 theme="primary"
                 :title="$t(`m.slaContent['提交']`)"
                 class="mr10"
@@ -101,6 +102,7 @@
                 @click="submitInfo">{{ $t(`m.slaContent['提交']`) }}
             </bk-button>
             <bk-button
+                data-test-id="sla_button_closeAgreement"
                 theme="default"
                 :title="$t(`m.eventdeploy['取消']`)"
                 class="mr10"
