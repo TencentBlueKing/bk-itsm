@@ -437,7 +437,8 @@
                 window.DEFAULT_PROJECT = val
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
-                this.$router.push({ name: this.$route.name, query: { project_id: val } })
+                // 申请权限页面新建项目跳到项目单据下
+                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : this.$route.name, query: { project_id: val } })
             },
             applyForProjectViewPerm (project, perm) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
