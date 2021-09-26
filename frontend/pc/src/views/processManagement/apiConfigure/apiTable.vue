@@ -280,22 +280,20 @@
         },
         methods: {
             async entryOne (item) {
-                if (!this.projectId) {
-                    if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
-                        const resourceData = {
-                            public_api: [{
-                                id: item.id,
-                                name: item.name
-                            }]
-                        }
-                        this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
-                        return
+                // 公共api
+                if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
+                    const resourceData = {
+                        public_api: [{
+                            id: item.id,
+                            name: item.name
+                        }]
                     }
-                    this.$parent.displayInfo['level_1'] = await item
-                    await this.$parent.displayInfo['level_1']
-                    // 展示 单个api
-                    await this.$parent.getRemoteApiDetail(item.id)
+                    this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
+                    return
                 }
+                this.$parent.displayInfo['level_1'] = item
+                // 展示 单个api
+                await this.$parent.getRemoteApiDetail(item.id)
             },
             getRemoteSystemData () {
                 this.$parent.getRemoteSystemData()
