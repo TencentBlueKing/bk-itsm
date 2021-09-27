@@ -103,11 +103,10 @@
                     v-for="item in projectList"
                     :key="item.key"
                     :id="item.key"
-                    :disabled="!hasPermission(['project_view'], item.auth_actions)"
                     :name="item.name">
                     <div
-                        v-cursor="{ active: !hasPermission(['project_view'], item.auth_actions) }"
-                        :class="['project-item', { 'text-permission-disable': !hasPermission(['project_view'], item.auth_actions) }]"
+                        v-cursor="{ active: !item.auth_actions.includes('project_view') }"
+                        :class="['project-item', { 'text-permission-disable': !item.auth_actions.includes('project_view') }]"
                         @click="applyForProjectViewPerm(item, 'project_view')">
                         {{ item.name }}
                     </div>
