@@ -205,7 +205,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_create'], [], resourceData)
+                    this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
                     this.isEdit = false
                     this.changeInfo.isShow = true

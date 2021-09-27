@@ -114,8 +114,8 @@
                 </bk-option>
                 <div slot="extension" class="project-select-extension">
                     <div
-                        v-cursor="{ active: !hasPermission(['project_create']) }"
-                        :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create']) }]"
+                        v-cursor="{ active: !hasPermission(['project_create'], $store.state.project.projectAuthActions) }"
+                        :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create'], $store.state.project.projectAuthActions) }]"
                         @click="handleCreateProject">
                         <i class="bk-icon icon-plus-circle"></i>
                         {{ $t(`m['新建项目']`) }}
@@ -297,8 +297,8 @@
                 try {
                     this.editDialogFormDisable = true
                     this.$store.commit('project/setProjectListLoading', true)
-                    const res = await this.$store.dispatch('project/getProjectAllList')
-                    this.$store.commit('project/setProjectList', res.data)
+                    const res = await this.$store.dispatch('project/getProjectList')
+                    this.$store.commit('project/setProjectList', res.data.items)
                 } catch (e) {
                     errorHandler(e, this)
                 } finally {
@@ -448,6 +448,7 @@
                             name: project.name
                         }]
                     }
+                    debugger
                     this.applyForPermission([perm], project.auth_actions, resourceData)
                 }
             },

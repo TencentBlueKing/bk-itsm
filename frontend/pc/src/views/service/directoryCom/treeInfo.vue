@@ -312,7 +312,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['catalog_create'], [], resourceData)
+                    this.applyForPermission(['catalog_create'], this.$store.state.project.projectAuthActions, resourceData)
                     return
                 }
                 if (String(this.treeInfo.node.level) === '3') {
@@ -400,7 +400,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['catalog_edit'], [], resourceData)
+                    this.applyForPermission(['catalog_edit'], this.$store.state.project.projectAuthActions, resourceData)
                     return
                 }
                 if (!this.treeInfo.node.id) {
@@ -431,7 +431,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['catalog_delete'], [], resourceData)
+                    this.applyForPermission(['catalog_delete'], this.$store.state.project.projectAuthActions, resourceData)
                     return
                 }
                 if (!this.treeInfo.node.id) {

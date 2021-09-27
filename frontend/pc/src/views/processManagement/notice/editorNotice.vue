@@ -252,7 +252,7 @@
             // 保存
             submitNotice () {
                 if (!this.hasPermission(['ticket_state_manage'])) {
-                    this.applyForPermission(['ticket_state_manage'], [], {})
+                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthAction, {})
                     return
                 }
                 this.$refs.wechatForm.validate().then(validator => {}, validator => {})
