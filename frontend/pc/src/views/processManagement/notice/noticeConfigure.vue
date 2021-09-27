@@ -138,7 +138,7 @@
                 this.getNoticeList()
             },
             editorInfo (item) {
-                if (!this.hasPermission(['notification_manage'])) {
+                if (!this.hasPermission(['notification_manage'], this.$store.state.project.projectAuthActions)) {
                     this.applyForPermission(['notification_manage'], this.$store.state.project.projectAuthActions, {})
                     return
                 }
