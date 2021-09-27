@@ -46,7 +46,6 @@ export default {
             state.id = value
         },
         setProjectInfo (state, value) {
-            console.log('这执行了')
             state.projectInfo = value
             state.projectAuthActions = value.auth_actions
         },
