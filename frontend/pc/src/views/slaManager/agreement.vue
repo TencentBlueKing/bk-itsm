@@ -38,10 +38,10 @@
                     <template slot="btns">
                         <bk-button
                             data-test-id="sla_button_createAgreement_permission"
-                            v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
+                            v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :class="{
-                                'btn-permission-disable': !hasPermission(['sla_agreement_create'])
+                                'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
                             }"
                             @click="addAgreement({}, 'sla_agreement_create')">
                             {{ $t('m["立即创建"]') }}
@@ -59,12 +59,12 @@
                         <div class="bk-more-search">
                             <bk-button
                                 data-test-id="sla_button_createAgreement"
-                                v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
+                                v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
                                 :theme="'primary'"
                                 :title="$t(`m.managePage['新增']`)"
                                 icon="plus"
                                 :class="['mr10', 'plus-cus', {
-                                    'btn-permission-disable': !hasPermission(['sla_agreement_create'])
+                                    'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
                                 }]"
                                 @click="addAgreement({}, 'sla_agreement_create')">
                                 {{ $t('m.managePage["新增"]') }}

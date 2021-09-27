@@ -37,9 +37,9 @@
                 <template slot="btns">
                     <bk-button theme="primary"
                         data-test-id="userGroup_button_create_permission"
-                        v-cursor="{ active: !hasPermission(['user_group_create']) }"
+                        v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
                         :class="{
-                            'btn-permission-disable': !hasPermission(['user_group_create'])
+                            'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
                         }"
                         @click="showEditor({
                             name: '',
@@ -54,11 +54,11 @@
                 <div class="bk-only-btn">
                     <bk-button theme="primary"
                         data-test-id="userGroup_button_create"
-                        v-cursor="{ active: !hasPermission(['user_group_create']) }"
+                        v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
                         icon="plus"
                         :title="$t(`m.deployPage['新增']`)"
                         :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['user_group_create'])
+                            'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
                         }]"
                         @click="showEditor({
                             name: '',

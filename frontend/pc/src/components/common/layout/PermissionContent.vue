@@ -87,7 +87,7 @@
                     if (resource.instances.length > 0) {
                         resource.instances.forEach(instanceItem => {
                             instanceItem.forEach(item => {
-                                data.push(`${item.type_name}：${item.name}`)
+                                data.push(`${item.type_name === null ? item.type : item.type_name}：${item.name}`)
                             })
                         })
                     }

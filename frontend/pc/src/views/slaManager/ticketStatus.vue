@@ -205,8 +205,8 @@
             },
             // 编辑工单状态
             editStatus (item) {
-                if (!this.hasPermission(['ticket_state_manage'])) {
-                    this.applyForPermission(['ticket_state_manage'], [], {})
+                if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
+                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {})
                     return
                 }
                 this.tagName = item.service_type_name
@@ -218,8 +218,8 @@
             },
             // 配置工单状态
             configStatus (item) {
-                if (!this.hasPermission(['ticket_state_manage'])) {
-                    this.applyForPermission(['ticket_state_manage'], [], {})
+                if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
+                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {})
                     return
                 }
                 this.tagName = item.service_type_name

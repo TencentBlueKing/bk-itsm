@@ -29,11 +29,11 @@
                 <div class="bk-more-search">
                     <bk-button
                         data-test-id="service_button_createService"
-                        v-cursor="{ active: !hasPermission(['service_create']) }"
+                        v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
                         :theme="'primary'"
                         icon="plus"
                         :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['service_create'])
+                            'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
                         }]"
                         :title="$t(`m.serviceConfig['新增']`)"
                         @click="onServiceCreatePermissonCheck">
@@ -411,7 +411,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['service_create'], [], resourceData)
+                    this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
                     this.$router.push({
                         name: 'projectServiceEdit',
