@@ -448,7 +448,6 @@
                             name: project.name
                         }]
                     }
-                    debugger
                     this.applyForPermission([perm], project.auth_actions, resourceData)
                 }
             },
