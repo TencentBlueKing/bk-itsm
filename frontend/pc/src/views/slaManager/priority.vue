@@ -71,11 +71,11 @@
             <div class="bk-priority-btn" :class="{ 'bk-margin-btn': priorityConten.editorStatus }">
                 <template v-if="!priorityConten.editorStatus">
                     <bk-button
-                        v-cursor="{ active: !hasPermission(['sla_priority_manage']) }"
+                        v-cursor="{ active: !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions) }"
                         :theme="'primary'"
                         :title="$t(`m.eventdeploy['编辑']`)"
                         :class="['mr10', {
-                            'btn-permission-disable': !hasPermission(['sla_priority_manage'])
+                            'btn-permission-disable': !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions)
                         }]"
                         :loading="secondClick"
                         @click="editorPriority">
@@ -184,7 +184,7 @@
             // 编辑
             editorPriority () {
                 if (!this.hasPermission(['sla_priority_manage'])) {
-                    this.applyForPermission(['sla_priority_manage'], [], {})
+                    this.applyForPermission(['sla_priority_manage'], this.$store.state.project.projectAuthActions, {})
                     return
                 }
                 this.priorityConten.editorStatus = true

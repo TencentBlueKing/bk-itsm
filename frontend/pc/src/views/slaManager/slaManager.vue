@@ -39,10 +39,10 @@
                     <template slot="btns">
                         <bk-button
                             data-test-id="slaPattern_button_createPermission"
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
+                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :class="{
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'])
+                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
                             }"
                             @click="addModelInfo">
                             {{ $t('m["立即创建"]') }}
@@ -197,7 +197,7 @@
             },
             // 新增
             addModelInfo () {
-                if (!this.hasPermission(['sla_calendar_create'])) {
+                if (!this.hasPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{

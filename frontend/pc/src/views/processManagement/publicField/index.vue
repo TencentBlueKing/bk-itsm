@@ -502,7 +502,7 @@
                             }]
                         }
                     }
-                    this.applyForPermission(this.createFieldPerm, [], resourceData)
+                    this.applyForPermission(this.createFieldPerm, this.$store.state.project.projectAuthActions, resourceData)
                     return
                 }
                 this.changeInfo = {

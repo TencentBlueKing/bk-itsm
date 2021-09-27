@@ -29,7 +29,7 @@
                 <div class="bk-more-search">
                     <bk-button
                         data-test-id="service_button_createService"
-                        v-cursor="{ active: !hasPermission(['service_create']) }"
+                        v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
                         :theme="'primary'"
                         icon="plus"
                         :class="['mr10', 'plus-cus', {

@@ -50,29 +50,29 @@
                 <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
                     <ul>
                         <li
-                            v-cursor="{ active: !hasPermission(['catalog_create']), zIndex: 3001 }"
+                            v-cursor="{ active: !hasPermission(['catalog_create'], $store.state.project.projectAuthActions), zIndex: 3001 }"
                             :title="$t(`m.serviceConfig['新增']`)"
                             :class="{
                                 'bk-disabled-add': String(treeInfo.node.level) === '3',
-                                'text-permission-disable': !hasPermission(['catalog_create'])
+                                'text-permission-disable': !hasPermission(['catalog_create'], $store.state.project.projectAuthActions)
                             }"
                             @click="openAdd">
                             <span>{{ $t('m.serviceConfig["新增"]') }}</span>
                         </li>
                         <li
-                            v-cursor="{ active: !hasPermission(['catalog_edit']) }"
+                            v-cursor="{ active: !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['编辑']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_edit'])
+                                'text-permission-disable': !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions)
                             }"
                             @click="openUpdate">
                             <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
                         </li>
                         <li
-                            v-cursor="{ active: !hasPermission(['catalog_delete']) }"
+                            v-cursor="{ active: !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['删除']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_delete'])
+                                'text-permission-disable': !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions)
                             }"
                             @click="openDelete">
                             <span>{{ $t('m.serviceConfig["删除"]') }}</span>
@@ -304,7 +304,7 @@
             },
             // 新增目录
             openAdd () {
-                if (!this.hasPermission(['catalog_create'])) {
+                if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -392,7 +392,7 @@
             },
             // 编辑目录
             openUpdate () {
-                if (!this.hasPermission(['catalog_edit'])) {
+                if (!this.hasPermission(['catalog_edit'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -423,7 +423,7 @@
             },
             // 删除
             openDelete () {
-                if (!this.hasPermission(['catalog_delete'])) {
+                if (!this.hasPermission(['catalog_delete'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
