@@ -104,7 +104,7 @@
                             <template slot-scope="props">
                                 <bk-button
                                     data-test-id="sla_button_agreementEditFromName"
-                                    v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
+                                    v-if="!hasPermission(['sla_agreement_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -157,7 +157,7 @@
                                 <!-- 编辑 -->
                                 <bk-button
                                     data-test-id="sla_button_agreementEditFromOperate"
-                                    v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
+                                    v-if="!hasPermission(['sla_agreement_edit'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -176,7 +176,7 @@
                                 <!-- 删除 -->
                                 <bk-button
                                     data-test-id="sla_button_agreementDeleteFromOperate1"
-                                    v-if="!hasPermission(['sla_agreement_delete'], props.row.auth_actions)"
+                                    v-if="!hasPermission(['sla_agreement_delete'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -437,7 +437,8 @@
             },
             // 新增
             addAgreement (item, reqPerm) {
-                if (!this.hasPermission([reqPerm], item.auth_actions)) {
+                const authResources = reqPerm === 'sla_agreement_create' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+                if (!this.hasPermission([reqPerm], authResources)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -451,7 +452,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : item.auth_actions, resourceData)
+                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.changeInfo.is_reply_need = item.is_reply_need
                     this.changeInfo.info = item
@@ -471,7 +472,7 @@
             },
             // 删除
             deleteAgreement (item) {
-                if (!this.hasPermission(['sla_agreement_delete'])) {
+                if (!this.hasPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -483,7 +484,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_agreement_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.$bkInfo({
                         type: 'warning',
