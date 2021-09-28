@@ -60,12 +60,12 @@
                     <div class="bk-sla-add">
                         <bk-button
                             data-test-id="slaPattern_button_create"
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
+                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :title="$t(`m.eventdeploy['新增']`)"
                             icon="plus"
                             :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'])
+                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
                             }]"
                             @click="addModelInfo">
                             {{ $t('m.eventdeploy["新增"]') }}
@@ -214,7 +214,7 @@
             },
             // 修改信息/查看详情
             changeLineInfo (item, index) {
-                if (!this.hasPermission(['sla_calendar_edit'], item.auth_actions)) {
+                if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -226,7 +226,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_edit'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return false
                 }
                 this.changeInfo.info = item

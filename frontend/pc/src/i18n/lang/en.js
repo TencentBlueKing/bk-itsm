@@ -129,6 +129,7 @@ export const m = {
         '配置有更新': 'form value changed'
     },
     'common': {
+        '任务模板': 'task_template',
         '大于': 'more than',
         '不大于': 'no more than',
         '小于': 'less than',

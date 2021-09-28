@@ -120,7 +120,7 @@
                 <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150">
                     <template slot-scope="props">
                         <span
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                             v-cursor
                             class="bk-lable-primary text-permission-disable"
                             ::title="props.row.name"
@@ -403,7 +403,7 @@
             },
             // 创建服务权限点击时校验
             onServiceCreatePermissonCheck () {
-                if (!this.hasPermission(['service_create'])) {
+                if (!this.hasPermission(['service_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -456,7 +456,7 @@
                         name: projectInfo.name
                     }]
                 }
-                this.applyForPermission(required, row.auth_actions, resourceData)
+                this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData)
             },
             deleteCheck () {
                 this.$bkInfo({

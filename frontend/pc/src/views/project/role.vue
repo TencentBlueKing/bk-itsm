@@ -114,11 +114,11 @@
                         <template slot-scope="props">
                             <bk-button
                                 data-test-id="userGroup_button_edit"
-                                v-cursor="{ active: !hasPermission(['user_group_edit'], props.row.auth_actions) }"
+                                v-cursor="{ active: !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
                                 theme="primary"
                                 text
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['user_group_edit'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
                                 }]"
                                 @click="showEditor(props.row, 'edit')">
                                 {{ $t('m.user["编辑"]') }}
@@ -126,11 +126,11 @@
                             <bk-button
                                 v-if="!props.row.is_builtin"
                                 data-test-id="userGroup_button_delete"
-                                v-cursor="{ active: !hasPermission(['user_group_delete'], props.row.auth_actions) }"
+                                v-cursor="{ active: !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
                                 theme="primary"
                                 text
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['user_group_delete'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
                                 }]"
                                 @click="deleteUser(props.row)">
                                 {{ $t('m.user["删除"]') }}
@@ -351,7 +351,8 @@
             showEditor (item, type) {
                 // 编辑权限校验
                 const authAction = type === 'new' ? 'user_group_create' : 'user_group_edit'
-                if (!this.hasPermission([authAction], item.auth_actions || [])) {
+                const authResources = type === 'new' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+                if (!this.hasPermission([authAction], authResources || [])) {
                     let resourceData = {}
                     const projectInfo = this.$store.state.project.projectInfo
                     if (authAction === 'user_group_create') {
@@ -373,7 +374,7 @@
                             }]
                         }
                     }
-                    this.applyForPermission([authAction], item.auth_actions || [], resourceData)
+                    this.applyForPermission([authAction], authResources, resourceData)
                     return false
                 }
                 this.openDialog.isShow = true
@@ -385,7 +386,7 @@
             // 删除
             deleteUser (item) {
                 // 删除权限校验
-                if (!this.hasPermission(['user_group_delete'], item.auth_actions)) {
+                if (!this.hasPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -397,7 +398,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['user_group_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return false
                 }
                 this.$bkInfo({

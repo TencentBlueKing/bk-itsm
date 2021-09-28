@@ -73,7 +73,11 @@
         },
         data () {
             return {
-                lock: require('../../../images/lock-radius.svg')
+                lock: require('../../../images/lock-radius.svg'),
+                // 返回499code 关联的实例对象取type
+                template: {
+                    'task_template': this.$t(`m.common['任务模板']`)
+                }
             }
         },
         methods: {
@@ -87,7 +91,7 @@
                     if (resource.instances.length > 0) {
                         resource.instances.forEach(instanceItem => {
                             instanceItem.forEach(item => {
-                                data.push(`${item.type_name === null ? item.type : item.type_name}：${item.name}`)
+                                data.push(`${item.type_name === null ? this.template[item.type] : item.type_name}：${item.name}`)
                             })
                         })
                     }
