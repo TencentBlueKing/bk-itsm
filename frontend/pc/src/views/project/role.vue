@@ -351,8 +351,8 @@
             showEditor (item, type) {
                 // 编辑权限校验
                 const authAction = type === 'new' ? 'user_group_create' : 'user_group_edit'
-                const authResources = type === 'new' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
-                if (!this.hasPermission([authAction], authResources || [])) {
+                const curPermissions = type === 'new' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+                if (!this.hasPermission([authAction], curPermissions || [])) {
                     let resourceData = {}
                     const projectInfo = this.$store.state.project.projectInfo
                     if (authAction === 'user_group_create') {
@@ -374,7 +374,7 @@
                             }]
                         }
                     }
-                    this.applyForPermission([authAction], authResources, resourceData)
+                    this.applyForPermission([authAction], curPermissions, resourceData)
                     return false
                 }
                 this.openDialog.isShow = true

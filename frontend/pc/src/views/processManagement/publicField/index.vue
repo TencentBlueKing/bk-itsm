@@ -51,11 +51,11 @@
                     <div class="bk-more-search">
                         <bk-button :theme="'primary'"
                             data-test-id="field_button_addField"
-                            v-cursor="{ active: !hasPermission(createFieldPerm) }"
+                            v-cursor="{ active: !hasPermission(createFieldPerm, $store.state.project.projectAuthActions) }"
                             :title="$t(`m.deployPage['新增']`)"
                             icon="plus"
                             :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(createFieldPerm)
+                                'btn-permission-disable': !hasPermission(createFieldPerm, $store.state.project.projectAuthActions)
                             }]"
                             @click="addField">
                             {{ $t('m.deployPage["新增"]') }}
@@ -95,7 +95,7 @@
                     <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
                         <template slot-scope="props">
                             <bk-button
-                                v-if="!hasPermission(editFieldPerm, $store.state.project.projectAuthActions)"
+                                v-if="!hasPermission(editFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                 data-test-id="field_button_viewfield"
                                 v-cursor
                                 text
@@ -148,7 +148,7 @@
                         <template slot-scope="props">
                             <!-- 编辑 -->
                             <bk-button
-                                v-if="!hasPermission(editFieldPerm, props.row.auth_actions)"
+                                v-if="!hasPermission(editFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                 v-cursor
                                 data-test-id="field_button_editfield_permission"
                                 text
@@ -162,7 +162,7 @@
                             </bk-button>
                             <!-- 删除 -->
                             <bk-button
-                                v-if="!hasPermission(deleteFieldPerm, props.row.auth_actions)"
+                                v-if="!hasPermission(deleteFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                 data-test-id="field_button_deletefield_permission"
                                 v-cursor
                                 text
@@ -491,7 +491,7 @@
             },
             // 新增字段
             addField () {
-                if (!this.hasPermission(this.createFieldPerm)) {
+                if (!this.hasPermission(this.createFieldPerm, this.$store.state.project.projectAuthActions)) {
                     let resourceData = {}
                     if (this.projectId) {
                         const projectInfo = this.$store.state.project.projectInfo
