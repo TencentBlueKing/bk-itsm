@@ -421,8 +421,8 @@
                         if (!this.hasPermission([router.view_prem], this.$store.state.project.projectAuthActions)) {
                             const projectResource = {}
                             const { actions } = this.$store.state.common.permissionMeta
-                            const pre = actions.find(item => item.id === router.view_prem)
-                            projectResource[pre.relate_resources[0]] = [{
+                            const curPermissionData = actions.find(item => item.id === router.view_prem)
+                            projectResource[curPermissionData.relate_resources[0]] = [{
                                 id: router.id,
                                 name: router.name
                             }]
