@@ -76,7 +76,8 @@
                 lock: require('../../../images/lock-radius.svg'),
                 // 返回499code 关联的实例对象取type
                 template: {
-                    'task_template': this.$t(`m.common['任务模板']`)
+                    'task_template': this.$t(`m.common['任务模板']`),
+                    'public_api': this.$t(`m.common['公共API']`)
                 }
             }
         },

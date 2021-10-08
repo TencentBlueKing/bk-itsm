@@ -417,6 +417,30 @@
                     if (this.$store.state.project.id) {
                         query.project_id = this.$store.state.project.id
                     }
+                    if (router.viewField) {
+                        if (!this.hasPermission([router.viewField], this.$store.state.project.projectAuthActions)) {
+                            const projectInfo = this.$store.state.project.projectInfo
+                            const info = [{
+                                id: router.id,
+                                name: router.name
+                            }]
+                            const resourceData = {
+                                project: [{
+                                    id: projectInfo.key,
+                                    name: projectInfo.name
+                                }],
+                                field: info,
+                                service: info,
+                                sla_agreement: info,
+                                sla_calendar: info,
+                                user_group: info,
+                                trigger: info,
+                                ticket: info
+                            }
+                            this.applyForPermission([router.viewField], this.$store.state.project.projectAuthActions, resourceData)
+                            return
+                        }
+                    }
                     this.$router.push({ name: router.id, query })
                 } else {
                     this.$router.push(router.path)

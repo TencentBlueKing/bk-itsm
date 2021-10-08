@@ -130,6 +130,7 @@ export const m = {
     },
     'common': {
         '任务模板': 'task_template',
+        '公共API': 'public_api',
         '大于': 'more than',
         '不大于': 'no more than',
         '小于': 'less than',
