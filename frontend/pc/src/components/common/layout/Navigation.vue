@@ -417,27 +417,24 @@
                     if (this.$store.state.project.id) {
                         query.project_id = this.$store.state.project.id
                     }
-                    if (router.viewField) {
-                        if (!this.hasPermission([router.viewField], this.$store.state.project.projectAuthActions)) {
-                            const projectInfo = this.$store.state.project.projectInfo
-                            const info = [{
+                    if (router.view_prem) {
+                        if (!this.hasPermission([router.view_prem], this.$store.state.project.projectAuthActions)) {
+                            const projectResource = {}
+                            const { actions } = this.$store.state.common.permissionMeta
+                            const pre = actions.find(item => item.id === router.view_prem)
+                            projectResource[pre.relate_resources[0]] = [{
                                 id: router.id,
                                 name: router.name
                             }]
+                            const projectInfo = this.$store.state.project.projectInfo
                             const resourceData = {
                                 project: [{
                                     id: projectInfo.key,
                                     name: projectInfo.name
                                 }],
-                                field: info,
-                                service: info,
-                                sla_agreement: info,
-                                sla_calendar: info,
-                                user_group: info,
-                                trigger: info,
-                                ticket: info
+                                ...projectResource
                             }
-                            this.applyForPermission([router.viewField], this.$store.state.project.projectAuthActions, resourceData)
+                            this.applyForPermission([router.view_prem], this.$store.state.project.projectAuthActions, resourceData)
                             return
                         }
                     }

@@ -89,7 +89,7 @@ const ROUTE_LIST = [
                         icon: 'bk-itsm-icon icon-ticket_4',
                         path: '/project/ticket',
                         prefix: ['/ticket/detail', '/ticket/create'],
-                        viewField: 'ticket_view'
+                        view_prem: 'ticket_view'
                     },
                     {
                         name: i18n.t(`m["服务"]`),
@@ -97,7 +97,7 @@ const ROUTE_LIST = [
                         icon: 'bk-itsm-icon icon-it-new-sevice',
                         path: '/project/service/list',
                         prefix: ['/project/service/'],
-                        viewField: 'service_view'
+                        view_prem: 'service_view'
                     },
                     {
                         name: i18n.t(`m["服务目录"]`),
@@ -123,7 +123,7 @@ const ROUTE_LIST = [
                         id: 'projectFields',
                         icon: 'bk-itsm-icon icon-aphabet_t',
                         path: '/project/fields',
-                        viewField: 'field_view'
+                        view_prem: 'field_view'
                     }
                 ]
             },
@@ -137,14 +137,14 @@ const ROUTE_LIST = [
                         id: 'slaAgreement',
                         icon: 'bk-itsm-icon icon-sla',
                         path: '/project/sla_agreement',
-                        viewField: 'sla_agreement_view'
+                        view_prem: 'sla_agreement_view'
                     },
                     {
                         name: i18n.t(`m["模式"]`),
                         id: 'slaManage',
                         icon: 'bk-itsm-icon icon-sla',
                         path: '/project/sla_manage',
-                        viewField: 'sla_calendar_view'
+                        view_prem: 'sla_calendar_view'
                     }
                     // {
                     //     name: i18n.t(`m["单据状态管理"]`),
@@ -163,14 +163,14 @@ const ROUTE_LIST = [
                         id: 'projectRoles',
                         icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
                         path: '/project/roles',
-                        viewField: 'user_group_view'
+                        view_prem: 'user_group_view'
                     },
                     {
                         name: i18n.t(`m["触发器"]`),
                         id: 'projectTrigger',
                         icon: 'bk-itsm-icon icon-slide',
                         path: '/project/trigger',
-                        viewField: 'triggers_view'
+                        view_prem: 'triggers_view'
                     }
                 ]
             }
