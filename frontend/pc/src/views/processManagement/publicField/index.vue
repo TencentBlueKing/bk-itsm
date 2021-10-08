@@ -51,11 +51,11 @@
                     <div class="bk-more-search">
                         <bk-button :theme="'primary'"
                             data-test-id="field_button_addField"
-                            v-cursor="{ active: !hasPermission(createFieldPerm, $store.state.project.projectAuthActions) }"
+                            v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
                             :title="$t(`m.deployPage['新增']`)"
                             icon="plus"
                             :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(createFieldPerm, $store.state.project.projectAuthActions)
+                                'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
                             }]"
                             @click="addField">
                             {{ $t('m.deployPage["新增"]') }}
@@ -348,6 +348,9 @@
             },
             globalChoise () {
                 return this.$store.state.common.configurInfo
+            },
+            curPermission () {
+                return this.projectId ? this.$store.state.project.projectAuthActions : []
             }
         },
         mounted () {
@@ -491,7 +494,7 @@
             },
             // 新增字段
             addField () {
-                if (!this.hasPermission(this.createFieldPerm, this.$store.state.project.projectAuthActions)) {
+                if (!this.hasPermission(this.createFieldPerm, this.curPermission)) {
                     let resourceData = {}
                     if (this.projectId) {
                         const projectInfo = this.$store.state.project.projectInfo
@@ -502,7 +505,7 @@
                             }]
                         }
                     }
-                    this.applyForPermission(this.createFieldPerm, this.$store.state.project.projectAuthActions, resourceData)
+                    this.applyForPermission(this.createFieldPerm, this.curPermission, resourceData)
                     return
                 }
                 this.changeInfo = {
