@@ -402,9 +402,7 @@
                         params.name = this.dictDataTable.formInfo.addName
                         params.code = this.dictDataTable.formInfo.addCode
                     }
-                    if (this.projectId) {
-                        params.project_key = this.projectId
-                    }
+                    params.project_key = !this.projectId ? 'public' : this.projectId
                     if (this.dictDataTable.title === this.$t(`m.systemConfig["修改系统"]`)) {
                         params['id'] = this.dictDataTable.formInfo.id
                         this.secondClick = true

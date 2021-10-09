@@ -398,8 +398,8 @@
                             }]
                         }
                         this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
+                        return
                     }
-                    return
                 }
                 this.$bkInfo({
                     type: 'warning',
