@@ -323,7 +323,7 @@ ACTIONS = [
     },
     {
         "id": "sla_agreement_create",
-        "name": "SLA 服务协议新建",
+        "name": "SLA 服务协议创建",
         "relate_resources": ["project"],
         "relate_actions": ["project_view"],
         "resource_topo": ["project", "sla_agreement"],
