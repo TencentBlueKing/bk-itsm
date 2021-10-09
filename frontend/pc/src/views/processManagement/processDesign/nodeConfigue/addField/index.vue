@@ -446,7 +446,8 @@
             autoSelectedType: {
                 type: Boolean,
                 default: true
-            }
+            },
+            nodesList: Array
         },
         data () {
             return {
@@ -647,7 +648,7 @@
                     const descInfo = item.typeName === 'CUSTOM' ? this.$t(`m.treeinfo['自定义数据每行的name和key都不能相同。']`) : this.$t(`m.treeinfo['接口中的数据详情']`)
                     this.$set(item, 'desc', descInfo)
                 })
-                await this.getFrontNodesList()
+                this.frontNodesList = this.nodesList
                 this.assignmentData()
                 this.changeRegex('ASSOCIATED_FIELD_VALIDATION')
                 // 获取字段校验方式
@@ -735,28 +736,28 @@
                 this.assignValue = JSON.parse(JSON.stringify(assignValue))
             },
             // 获取前置节点的字段信息
-            async getFrontNodesList () {
-                if (!this.state && !this.templateInfo.id) {
-                    return
-                }
-                let url = ''
-                const params = {}
-                if (this.state) {
-                    url = 'apiRemote/get_related_fields'
-                    params.workflow = this.workflow
-                    params.state = this.state
-                }
-                if (this.templateInfo.id) {
-                    url = 'taskTemplate/getFrontFieldsList'
-                    params.id = this.templateInfo.id
-                    params.stage = this.templateStage
-                }
-                await this.$store.dispatch(url, params).then(res => {
-                    this.frontNodesList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                })
-            },
+            // async getFrontNodesList () {
+            //     if (!this.state && !this.templateInfo.id) {
+            //         return
+            //     }
+            //     let url = ''
+            //     const params = {}
+            //     if (this.state) {
+            //         url = 'apiRemote/get_related_fields'
+            //         params.workflow = this.workflow
+            //         params.state = this.state
+            //     }
+            //     if (this.templateInfo.id) {
+            //         url = 'taskTemplate/getFrontFieldsList'
+            //         params.id = this.templateInfo.id
+            //         params.stage = this.templateStage
+            //     }
+            //     await this.$store.dispatch(url, params).then(res => {
+            //         this.frontNodesList = res.data
+            //     }).catch(res => {
+            //         errorHandler(res, this)
+            //     })
+            // },
             // 操作字段关联条件
             addExpression () {
                 this.formInfo.regex_config.rule.expressions.push({

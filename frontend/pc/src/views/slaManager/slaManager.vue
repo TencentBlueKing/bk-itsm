@@ -235,7 +235,7 @@
             },
             // 删除
             deleteModel (item, index) {
-                if (!this.hasPermission(['sla_calendar_delete'], item.auth_actions)) {
+                if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -247,7 +247,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return false
                 }
                 if (item.is_builtin) {
