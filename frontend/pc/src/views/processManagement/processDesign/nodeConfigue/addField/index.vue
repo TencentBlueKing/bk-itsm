@@ -628,7 +628,7 @@
                 }
             },
             // 初始化赋值数据
-            async initData () {
+            initData () {
                 // 去掉时间间隔的选项
                 this.fieldTypeList = this.globalChoise.field_type.filter(item => item.typeName !== 'DATETIMERANGE')
                 if ((this.changeInfo.type === 'COMPLEX-MEMBERS' || this.changeInfo.type === 'SOPS_TEMPLATE') && this.addOrigin.addOriginInfo.type === 'templateField') {
