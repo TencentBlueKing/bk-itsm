@@ -88,16 +88,14 @@ const ROUTE_LIST = [
                         id: 'projectTicket',
                         icon: 'bk-itsm-icon icon-ticket_4',
                         path: '/project/ticket',
-                        prefix: ['/ticket/detail', '/ticket/create'],
-                        view_prem: 'ticket_view'
+                        prefix: ['/ticket/detail', '/ticket/create']
                     },
                     {
                         name: i18n.t(`m["服务"]`),
                         id: 'projectServiceList',
                         icon: 'bk-itsm-icon icon-it-new-sevice',
                         path: '/project/service/list',
-                        prefix: ['/project/service/'],
-                        view_prem: 'service_view'
+                        prefix: ['/project/service/']
                     },
                     {
                         name: i18n.t(`m["服务目录"]`),
@@ -122,8 +120,7 @@ const ROUTE_LIST = [
                         name: i18n.t(`m["字段"]`),
                         id: 'projectFields',
                         icon: 'bk-itsm-icon icon-aphabet_t',
-                        path: '/project/fields',
-                        view_prem: 'field_view'
+                        path: '/project/fields'
                     }
                 ]
             },
@@ -136,15 +133,13 @@ const ROUTE_LIST = [
                         name: i18n.t(`m["协议"]`),
                         id: 'slaAgreement',
                         icon: 'bk-itsm-icon icon-sla',
-                        path: '/project/sla_agreement',
-                        view_prem: 'sla_agreement_view'
+                        path: '/project/sla_agreement'
                     },
                     {
                         name: i18n.t(`m["模式"]`),
                         id: 'slaManage',
                         icon: 'bk-itsm-icon icon-sla',
-                        path: '/project/sla_manage',
-                        view_prem: 'sla_calendar_view'
+                        path: '/project/sla_manage'
                     }
                     // {
                     //     name: i18n.t(`m["单据状态管理"]`),
@@ -162,15 +157,13 @@ const ROUTE_LIST = [
                         name: i18n.t(`m["用户组"]`),
                         id: 'projectRoles',
                         icon: 'bk-itsm-icon icon-itsm-icon-two-zero',
-                        path: '/project/roles',
-                        view_prem: 'user_group_view'
+                        path: '/project/roles'
                     },
                     {
                         name: i18n.t(`m["触发器"]`),
                         id: 'projectTrigger',
                         icon: 'bk-itsm-icon icon-slide',
-                        path: '/project/trigger',
-                        view_prem: 'triggers_view'
+                        path: '/project/trigger'
                     }
                 ]
             }

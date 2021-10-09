@@ -417,27 +417,6 @@
                     if (this.$store.state.project.id) {
                         query.project_id = this.$store.state.project.id
                     }
-                    if (router.view_prem) {
-                        if (!this.hasPermission([router.view_prem], this.$store.state.project.projectAuthActions)) {
-                            const projectResource = {}
-                            const { actions } = this.$store.state.common.permissionMeta
-                            const curPermissionData = actions.find(item => item.id === router.view_prem)
-                            projectResource[curPermissionData.relate_resources[0]] = [{
-                                id: router.id,
-                                name: router.name
-                            }]
-                            const projectInfo = this.$store.state.project.projectInfo
-                            const resourceData = {
-                                project: [{
-                                    id: projectInfo.key,
-                                    name: projectInfo.name
-                                }],
-                                ...projectResource
-                            }
-                            this.applyForPermission([router.view_prem], this.$store.state.project.projectAuthActions, resourceData)
-                            return
-                        }
-                    }
                     this.$router.push({ name: router.id, query })
                 } else {
                     this.$router.push(router.path)
