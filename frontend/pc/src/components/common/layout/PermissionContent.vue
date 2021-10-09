@@ -77,7 +77,8 @@
                 // 返回499code 关联的实例对象取type
                 resource_label: {
                     'task_template': this.$t(`m.common['任务模板']`),
-                    'public_api': this.$t(`m.common['公共API']`)
+                    'public_api': this.$t(`m.common['公共API']`),
+                    'service': this.$t(`m.common['服务']`)
                 }
             }
         },
