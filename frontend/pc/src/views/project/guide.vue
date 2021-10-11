@@ -29,9 +29,9 @@
             :links="emptyTip.links">
             <template slot="btns">
                 <bk-button theme="primary"
-                    v-cursor="{ active: !hasPermission(['project_create']) }"
+                    v-cursor="{ active: !hasPermission(['project_create'], $store.state.project.projectAuthActions) }"
                     :class="{
-                        'btn-permission-disable': !hasPermission(['project_create'])
+                        'btn-permission-disable': !hasPermission(['project_create'], $store.state.project.projectAuthActions)
                     }"
                     @click="handleCreateProject">
                     {{ $t(`m['立即创建']`) }}
@@ -81,6 +81,14 @@
                         }
                     ]
                 }
+            }
+        },
+        async created () {
+            const res = await this.$store.dispatch('project/getProjectAllList')
+            this.$store.commit('project/setProjectList', res.data)
+            const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'))
+            if (projectsWithViewPerm.length !== 0) {
+                this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
             }
         },
         methods: {
