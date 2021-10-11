@@ -197,7 +197,7 @@
                     <template slot-scope="props">
                         <!-- sla -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
@@ -208,7 +208,7 @@
                         <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
                         <!-- 编辑 -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
@@ -226,7 +226,7 @@
                         </bk-button>
                         <!-- 删除 -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
