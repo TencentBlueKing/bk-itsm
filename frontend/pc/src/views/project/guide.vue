@@ -29,9 +29,9 @@
             :links="emptyTip.links">
             <template slot="btns">
                 <bk-button theme="primary"
-                    v-cursor="{ active: !hasPermission(['project_create'], $store.state.project.projectAuthActions) }"
+                    v-cursor="{ active: !hasPermission(['project_create']) }"
                     :class="{
-                        'btn-permission-disable': !hasPermission(['project_create'], $store.state.project.projectAuthActions)
+                        'btn-permission-disable': !hasPermission(['project_create'])
                     }"
                     @click="handleCreateProject">
                     {{ $t(`m['立即创建']`) }}
