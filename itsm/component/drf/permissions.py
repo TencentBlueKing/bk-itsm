@@ -192,7 +192,7 @@ class IamAuthPermit(permissions.BasePermission):
         resources.append(
             {
                 "resource_id": project_key,
-                "resource_name": self.get_project(project_key=project_key),
+                "resource_name": self.get_project(project_key=project_key).name,
                 "resource_type": "project",
                 "creator": project.creator,
             }

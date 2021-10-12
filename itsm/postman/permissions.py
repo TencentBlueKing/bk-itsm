@@ -37,7 +37,6 @@ class IsObjManager(perm.IsManager):
 
 
 class RemoteApiPermit(perm.IamAuthProjectViewPermit):
-    
     def has_permission(self, request, view):
         if view.action == "create":
             if "remote_system" in request.data:
@@ -47,13 +46,13 @@ class RemoteApiPermit(perm.IamAuthProjectViewPermit):
                     apply_actions = ["public_api_view"]
                     return self.iam_auth(request, apply_actions)
         return True
-    
+
     def has_object_permission(self, request, view, obj):
         if obj is not None:
             # 如果是公共api需要单独鉴权
             if obj.remote_system.project_key == PUBLIC_PROJECT_PROJECT_KEY:
                 if view.action == "retrieve":
-                    apply_actions = ["public_api_view"]
+                    apply_actions = []
                 else:
                     apply_actions = ["public_api_manage"]
                 return self.iam_auth(request, apply_actions, obj)
@@ -61,5 +60,7 @@ class RemoteApiPermit(perm.IamAuthProjectViewPermit):
                 # 项目
                 project_key = obj.remote_system.project_key
                 apply_actions = ["project_view"]
-                return self.has_project_view_permission(request, project_key, apply_actions)
+                return self.has_project_view_permission(
+                    request, project_key, apply_actions
+                )
         return True
