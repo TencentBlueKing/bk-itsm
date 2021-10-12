@@ -238,6 +238,7 @@ class TemplateFieldPermissionValidate(IamAuthPermit):
 class TaskSchemaPermit(IamAuthPermit):
     def has_permission(self, request, view):
 
+        apply_actions = []
         if view.action == "create":
             apply_actions = ["task_template_create"]
 
