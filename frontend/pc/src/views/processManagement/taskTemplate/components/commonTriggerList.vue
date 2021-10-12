@@ -373,6 +373,7 @@
             },
             citeTrigger () {
                 const params = {
+                    project_key: this.$store.state.project.id,
                     src_trigger_ids: this.citeList.map(item => item.id),
                     dst_source_id: this.sourceId,
                     dst_source_type: this.sourceType,
