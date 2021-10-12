@@ -151,6 +151,7 @@
                     :change-info="changeInfo"
                     :template-info="templateInfo"
                     :template-stage="templateStage"
+                    :nodes-list="nodesList"
                     :add-origin="addOrigin"
                     :table-list="showTabList"
                     :is-edit-public="isEditPublic"
@@ -228,6 +229,7 @@
         },
         data () {
             return {
+                nodesList: [],
                 isDataLoading: false,
                 secondClick: false,
                 showTabList: [],
@@ -407,6 +409,30 @@
             clearFieldsIndexInfo () {
                 sessionStorage.removeItem('fieldsIndexMap')
             },
+            // 获取前置节点的字段信息
+            getFrontNodesList () {
+                if (!this.configur.id && !this.templateInfo.id) {
+                    return
+                }
+                let url = ''
+                const params = {}
+                if (this.configur.id) {
+                    url = 'apiRemote/get_related_fields'
+                    params.workflow = this.workflow
+                    params.state = this.configur.id
+                }
+                if (this.templateInfo.id) {
+                    url = 'taskTemplate/getFrontFieldsList'
+                    params.id = this.templateInfo.id
+                    params.stage = this.templateStage
+                }
+                this.$store.dispatch(url, params).then(res => {
+                    this.nodesList = res.data
+                    this.sliderInfo.show = true
+                }).catch(res => {
+                    errorHandler(res, this)
+                })
+            },
             // 新增字段
             addField () {
                 this.changeInfo = {
@@ -429,14 +455,13 @@
                     meta: {}
                 }
                 this.sliderInfo.title = this.$t(`m.treeinfo["新增字段"]`)
-                this.sliderInfo.show = true
+                this.getFrontNodesList()
             },
-            // 编辑字段
             openField (item) {
                 this.changeInfo = item
                 this.changeInfo.is_tips = item.is_tips || false
                 this.sliderInfo.title = this.$t(`m.treeinfo["编辑字段"]`)
-                this.sliderInfo.show = true
+                this.getFrontNodesList()
             },
             // 字段预览
             previewField () {

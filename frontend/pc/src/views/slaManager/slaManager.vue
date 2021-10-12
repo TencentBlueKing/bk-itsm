@@ -38,10 +38,11 @@
                     :links="emptyTip.links">
                     <template slot="btns">
                         <bk-button
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
+                            data-test-id="slaPattern_button_createPermission"
+                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :class="{
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'])
+                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
                             }"
                             @click="addModelInfo">
                             {{ $t('m["立即创建"]') }}
@@ -58,12 +59,13 @@
                     <!-- 新增 -->
                     <div class="bk-sla-add">
                         <bk-button
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create']) }"
+                            data-test-id="slaPattern_button_create"
+                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :title="$t(`m.eventdeploy['新增']`)"
                             icon="plus"
                             :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'])
+                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
                             }]"
                             @click="addModelInfo">
                             {{ $t('m.eventdeploy["新增"]') }}
@@ -195,7 +197,7 @@
             },
             // 新增
             addModelInfo () {
-                if (!this.hasPermission(['sla_calendar_create'])) {
+                if (!this.hasPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -203,7 +205,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_create'], [], resourceData)
+                    this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
                     this.isEdit = false
                     this.changeInfo.isShow = true
@@ -212,7 +214,7 @@
             },
             // 修改信息/查看详情
             changeLineInfo (item, index) {
-                if (!this.hasPermission(['sla_calendar_edit'], item.auth_actions)) {
+                if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -224,7 +226,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_edit'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return false
                 }
                 this.changeInfo.info = item
@@ -233,7 +235,7 @@
             },
             // 删除
             deleteModel (item, index) {
-                if (!this.hasPermission(['sla_calendar_delete'], item.auth_actions)) {
+                if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -245,7 +247,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_calendar_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return false
                 }
                 if (item.is_builtin) {

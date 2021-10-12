@@ -22,6 +22,7 @@
 
 <template>
     <bk-dialog
+        data-test-id="service_dialog_serviceChoiceDialog"
         render-directive="if"
         ext-cls="choose-service-template-dialog"
         :width="980"

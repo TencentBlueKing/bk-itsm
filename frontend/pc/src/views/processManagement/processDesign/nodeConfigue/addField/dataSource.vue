@@ -174,9 +174,11 @@
             },
             // 获取Api系统列表
             getApiSystemList () {
-                const params = {}
+                const params = {
+                    project_key: this.$store.state.project.id || 'public'
+                }
                 this.isSystemLoading = true
-                this.$store.dispatch('apiRemote/get_remote_system', params).then(res => {
+                this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
                     this.apiSysList = res.data.filter(item => item.is_activated)
                 }).catch(res => {
                     errorHandler(res, this)

@@ -75,15 +75,14 @@
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectAllList')
                     this.$store.commit('project/setProjectList', res.data)
-                    if (!this.$store.state.project.id) {
-                        const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'))
-                        if (projectsWithViewPerm.length === 0) {
-                            this.$router.replace({ name: 'ProjectGuide', query: { project_id: this.$route.query.project_id || '' } })
-                        } else {
-                            this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key)
-                            this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key)
-                            this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
-                        }
+                    const projectsWithViewPerm = this.$store.state.project.projectList.filter(item => item.auth_actions.includes('project_view'))
+                    if (projectsWithViewPerm.length === 0) {
+                        this.$router.replace({ name: 'ProjectGuide' })
+                    }
+                    if (!this.$store.state.project.id && projectsWithViewPerm.length !== 0) {
+                        this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key)
+                        this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key)
+                        this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
                     }
                 } catch (e) {
                     errorHandler(e, this)

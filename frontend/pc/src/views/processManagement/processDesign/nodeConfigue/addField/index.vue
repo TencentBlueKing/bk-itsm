@@ -205,6 +205,7 @@
             </template>
             <template v-if="formInfo.type === 'CUSTOMTABLE'">
                 <bk-form-item
+                    data-test-id="field_form_custom"
                     :label="$t(`m.treeinfo['自定义数据']`)"
                     :required="true"
                     :ext-cls="'bk-mt20-item'">
@@ -348,6 +349,7 @@
         </bk-form>
         <div class="operate-btns mt20">
             <bk-button :theme="'primary'"
+                data-test-id="field_button_submit"
                 :title="$t(`m.treeinfo['提交']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -355,6 +357,7 @@
                 {{$t(`m.treeinfo['提交']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="field_button_cancel"
                 :title="$t(`m.treeinfo['取消']`)"
                 :disabled="secondClick"
                 class="mr10"
@@ -443,7 +446,8 @@
             autoSelectedType: {
                 type: Boolean,
                 default: true
-            }
+            },
+            nodesList: Array
         },
         data () {
             return {
@@ -624,7 +628,7 @@
                 }
             },
             // 初始化赋值数据
-            async initData () {
+            initData () {
                 // 去掉时间间隔的选项
                 this.fieldTypeList = this.globalChoise.field_type.filter(item => item.typeName !== 'DATETIMERANGE')
                 if ((this.changeInfo.type === 'COMPLEX-MEMBERS' || this.changeInfo.type === 'SOPS_TEMPLATE') && this.addOrigin.addOriginInfo.type === 'templateField') {
@@ -644,7 +648,11 @@
                     const descInfo = item.typeName === 'CUSTOM' ? this.$t(`m.treeinfo['自定义数据每行的name和key都不能相同。']`) : this.$t(`m.treeinfo['接口中的数据详情']`)
                     this.$set(item, 'desc', descInfo)
                 })
-                await this.getFrontNodesList()
+                if (!this.nodesList) {
+                    this.getFrontNodesList()
+                } else {
+                    this.frontNodesList = this.nodesList
+                }
                 this.assignmentData()
                 this.changeRegex('ASSOCIATED_FIELD_VALIDATION')
                 // 获取字段校验方式

@@ -25,6 +25,7 @@
         <div v-if="formList.length" class="form-list">
             <bk-form form-type="vertical">
                 <draggable
+                    data-test-id="service_draggable_serviceFormDrag"
                     handle=".form-view-item"
                     :value="formList"
                     :group="{

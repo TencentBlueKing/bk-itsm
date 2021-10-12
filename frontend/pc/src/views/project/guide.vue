@@ -83,6 +83,14 @@
                 }
             }
         },
+        async created () {
+            const res = await this.$store.dispatch('project/getProjectAllList')
+            this.$store.commit('project/setProjectList', res.data)
+            const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'))
+            if (projectsWithViewPerm.length !== 0) {
+                this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
+            }
+        },
         methods: {
             handleCreateProject () {
                 bus.$emit('openCreateProjectDialog')

@@ -25,14 +25,14 @@
         <section class="settion-card">
             <h2 class="card-title">{{ $t(`m.tickets['服务设置']`) }}</h2>
             <div class="card-content">
-                <bk-form ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
+                <bk-form data-test-id="service_form_serviceSetting" ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
                     <bk-form-item :label="$t(`m.serviceConfig['可见范围']`)">
                         <deal-person
                             style="width: 600px;"
                             class="display-range"
                             form-type="inline-auto-width"
                             ref="displayRange"
-                            :value="visibleRange"
+                            :value="formData.visibleRange"
                             :show-role-type-list="displayRangeTypes">
                         </deal-person>
                     </bk-form-item>
@@ -81,7 +81,7 @@
         <section class="settion-card notic-card">
             <h2 class="card-title">{{ $t(`m.tickets['通知设置']`) }}</h2>
             <div class="card-content">
-                <bk-form form-type="vertical" :model="formData" class="service-setting-form">
+                <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
                     <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
                         <bk-checkbox-group v-model="formData.notify">
                             <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
@@ -225,10 +225,6 @@
             return {
                 frequencyList,
                 showMoreConfig: false,
-                visibleRange: {
-                    type: 'OPEN',
-                    value: ''
-                },
                 revokeWayList: [
                     { name: '不支持撤回', id: 'not_support', key: 0 },
                     { name: this.$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`), id: 'before_flow', key: 2 },
@@ -244,6 +240,10 @@
                 nodeListLoading: false,
                 nodeList: [],
                 formData: {
+                    visibleRange: {
+                        type: 'OPEN',
+                        value: ''
+                    },
                     revokeWay: 'before_flow',
                     revokeState: 0,
                     otherSettings: [],

@@ -28,6 +28,7 @@
         </nav-title>
         <div class="steps-container">
             <bk-steps ext-cls="steps-icon"
+                data-test-id="service_steps_serviceEditStep"
                 :controllable="true"
                 line-type="solid"
                 :cur-step="currStep"
@@ -61,6 +62,7 @@
         </div>
         <div v-show="!isShowNodeConfig" class="submit-footer-bar">
             <bk-button
+                data-test-id="service_button_prevStep"
                 ext-cls="button-item"
                 theme="default"
                 :disabled="isSubmitting"
@@ -68,6 +70,7 @@
                 {{ prevStepBtnName }}
             </bk-button>
             <bk-button
+                data-test-id="service_button_nextStep"
                 ext-cls="button-item"
                 theme="primary"
                 :disabled="!serviceId && serviceId !== 0"

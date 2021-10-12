@@ -209,7 +209,7 @@
                         </div>
                     </div>
                     <div class="add-and-reduce-box" v-if="formInfo.workdays.length === 0">
-                        <div class="bk-add-group" @click="addLine('workdays')">
+                        <div class="bk-add-group" data-test-id="slaPattern_div_addGroup" @click="addLine('workdays')">
                             <i class="bk-itsm-icon icon-flow-add"></i>
                         </div>
                     </div>

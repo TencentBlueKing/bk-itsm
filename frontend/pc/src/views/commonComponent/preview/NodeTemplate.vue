@@ -22,6 +22,7 @@
 
 <template>
     <div
+        data-test-id="node_template_view"
         class="bk-flow-location"
         @mousedown="movdeDoneFn"
         @mousemove="moveFn"

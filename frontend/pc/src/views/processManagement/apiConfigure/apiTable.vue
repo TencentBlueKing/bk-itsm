@@ -36,12 +36,14 @@
                                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                                 :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                                 :title="$t(`m.systemConfig['接入']`)"
+                                data-test-id="api_a_apiTableAccessApi"
                                 @click="openShade('JOIN')">
                                 {{ $t(`m.systemConfig['接入']`) }}
                             </a>
                         </li>
                         <li>
                             <a href="javascript:;"
+                                data-test-id="api_a_apiTableCreateApi"
                                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                                 :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                                 :title="$t(`m.systemConfig['新增']`)"
@@ -52,6 +54,7 @@
                     </ul>
                 </bk-dropdown-menu>
                 <bk-button :theme="'default'"
+                    data-test-id="api_button_apiTableuploadApi"
                     v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
                     :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                     :title="$t(`m.systemConfig['点击上传']`)"
@@ -60,6 +63,7 @@
                     {{$t(`m.systemConfig['导入']`)}}
                 </bk-button>
                 <bk-button :theme="'default'"
+                    data-test-id="api_button_apiTableBatchDeleteApi"
                     class="mr10 batch-remove-btn"
                     :title="$t(`m.systemConfig['批量移除']`)"
                     :disabled="!checkList.length"
@@ -67,6 +71,7 @@
                     {{$t(`m.systemConfig['批量移除']`)}}
                 </bk-button>
                 <bk-input class="bk-api-input"
+                    data-test-id="api_input_apiTableKeyword"
                     v-model="searchInfo.key"
                     :placeholder="$t(`m.systemConfig['请输入关键字']`)"
                     :right-icon="'bk-icon icon-search'"
@@ -100,6 +105,7 @@
                 <template slot-scope="props">
                     <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
                     <span class="bk-lable-primary"
+                        data-test-id="api_span_apiTableViewDetail"
                         v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="props.row.name"
@@ -144,12 +150,14 @@
             <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
                 <template slot-scope="props">
                     <bk-button theme="primary" text
+                        data-test-id="api_button_apiTableExportApi"
                         :title="$t(`m.systemConfig['导出']`)"
                         :disabled="props.row.is_builtin"
                         @click="exportFlow(props.row)">
                         {{ $t('m.systemConfig["导出"]') }}
                     </bk-button>
                     <bk-button theme="primary" text
+                        data-test-id="api_button_apiTableEditApi"
                         v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="$t(`m.systemConfig['编辑']`)"
@@ -158,6 +166,7 @@
                         {{ $t('m.systemConfig["编辑"]') }}
                     </bk-button>
                     <bk-button theme="primary" text
+                        data-test-id="api_button_apiTableDeleteApi"
                         v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="$t(`m.systemConfig['移除']`)"
@@ -280,20 +289,18 @@
         },
         methods: {
             async entryOne (item) {
-                if (!this.projectId) {
-                    if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
-                        const resourceData = {
-                            public_api: [{
-                                id: item.id,
-                                name: item.name
-                            }]
-                        }
-                        this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
+                // 公共api
+                if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
+                    const resourceData = {
+                        public_api: [{
+                            id: item.id,
+                            name: item.name
+                        }]
                     }
+                    this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
                     return
                 }
-                this.$parent.displayInfo['level_1'] = await item
-                await this.$parent.displayInfo['level_1']
+                this.$parent.displayInfo['level_1'] = item
                 // 展示 单个api
                 await this.$parent.getRemoteApiDetail(item.id)
             },
@@ -391,8 +398,8 @@
                             }]
                         }
                         this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
+                        return
                     }
-                    return
                 }
                 this.$bkInfo({
                     type: 'warning',

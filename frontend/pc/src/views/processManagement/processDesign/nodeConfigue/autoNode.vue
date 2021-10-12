@@ -449,8 +449,10 @@
             },
             // 获取Api系统列表
             async getRemoteSystemData () {
-                const params = {}
-                await this.$store.dispatch('apiRemote/get_remote_system', params).then(res => {
+                const params = {
+                    project_key: this.$store.state.project.id
+                }
+                await this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
                     this.apiSysList = res.data.filter(
                         item => {
                             return item.is_activated

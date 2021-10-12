@@ -101,6 +101,7 @@
         <div class="bk-basic-btn" v-if="!DetailInfo.is_builtin">
             <bk-button
                 :theme="'primary'"
+                data-test-id="apiDetail_button_editUpdateApi"
                 :title="$t(`m.systemConfig['保存']`)"
                 @click="updateApi">
                 {{$t(`m.systemConfig['保存']`)}}
