@@ -411,15 +411,15 @@
             },
             // 获取前置节点的字段信息
             getFrontNodesList () {
-                if (!this.state && !this.templateInfo.id) {
+                if (!this.configur.id && !this.templateInfo.id) {
                     return
                 }
                 let url = ''
                 const params = {}
-                if (this.state) {
+                if (this.configur.id) {
                     url = 'apiRemote/get_related_fields'
                     params.workflow = this.workflow
-                    params.state = this.state
+                    params.state = this.configur.id
                 }
                 if (this.templateInfo.id) {
                     url = 'taskTemplate/getFrontFieldsList'

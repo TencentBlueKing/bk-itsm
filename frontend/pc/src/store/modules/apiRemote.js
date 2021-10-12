@@ -61,6 +61,13 @@ export default {
                 return res
             })
         },
+        // 获取当前项目、系统api分类
+        get_all_remote_system ({ commit, state, dispatch }, params) {
+            return ajax.get('postman/remote_system/all/', { params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
         // 获取系统分类列表
         get_remote_system ({ commit, state, dispatch }, params) {
             return ajax.get(`postman/remote_system/`, { params }).then(response => {
