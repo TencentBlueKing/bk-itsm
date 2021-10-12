@@ -35,7 +35,8 @@ from itsm.component.constants import (
     ACTION_STATUS_FAILED,
     EMPTY_STRING,
     EMPTY_INT,
-    ResponseCodeStatus, DEFAULT_PROJECT_PROJECT_KEY,
+    ResponseCodeStatus,
+    DEFAULT_PROJECT_PROJECT_KEY,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.drf import viewsets as component_viewsets
@@ -55,15 +56,21 @@ from .permissions import WorkflowTriggerPermit
 class ComponentApiViewSet(component_viewsets.APIView):
     def get(self, request, *args, **kwargs):
         """Get registered trigger components"""
-        query_codes = [code for code in request.query_params.get("code__in", "").split(",") if code]
+        query_codes = [
+            code for code in request.query_params.get("code__in", "").split(",") if code
+        ]
         ret = []
-        for code, component_cls in ComponentLibrary.components.get('trigger', {}).items():
-            if getattr(component_cls, 'is_sub_class', False) or (code not in query_codes and query_codes):
+        for code, component_cls in ComponentLibrary.components.get(
+            "trigger", {}
+        ).items():
+            if getattr(component_cls, "is_sub_class", False) or (
+                code not in query_codes and query_codes
+            ):
                 continue
             component_item = {
-                'name': _(component_cls.name),
-                'key': code,
-                'field_schema': component_cls.get_inputs(),
+                "name": _(component_cls.name),
+                "key": code,
+                "field_schema": component_cls.get_inputs(),
                 "exclude_signal_type": component_cls.exclude_signal_type,
             }
             ret.append(component_item)
@@ -79,27 +86,34 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
         "source_id": ["exact", "in"],
         "source_type": ["exact", "in"],
         "signal": ["exact", "in"],
-        "sender": ['exact', 'in'],
+        "sender": ["exact", "in"],
     }
 
     permission_classes = (WorkflowTriggerPermit,)
     permission_free_actions = ["list"]
+
     def get_queryset(self):
-                
+
         if not self.request.query_params.get("page_size"):
             self.pagination_class = None
 
         query_set = super(TriggerViewSet, self).get_queryset()
         source_table_id = self.request.query_params.get("source_table_id")
         if source_table_id and source_table_id.isdigit():
-            query_set = query_set.filter(source_table_id__in=[EMPTY_INT, int(source_table_id)])
+            query_set = query_set.filter(
+                source_table_id__in=[EMPTY_INT, int(source_table_id)]
+            )
         return query_set.filter()
-    
-    def list(self, request, *args, **kwargs):
-        
-        project_key = self.request.query_params.get("project_key", DEFAULT_PROJECT_PROJECT_KEY)
 
-        queryset = self.filter_queryset(self.get_queryset().filter(project_key=project_key))
+    def list(self, request, *args, **kwargs):
+
+        project_key = self.request.query_params.get(
+            "project_key", DEFAULT_PROJECT_PROJECT_KEY
+        )
+
+        queryset = self.filter_queryset(
+            self.get_queryset().filter(project_key=project_key)
+        )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -108,7 +122,7 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=['GET'], detail=False, url_path="signals")
+    @action(methods=["GET"], detail=False, url_path="signals")
     def trigger_signals(self, request, *args, **kwargs):
         signal_types = request.query_params.get("signal_type", "").split(",")
         signals = [
@@ -121,23 +135,31 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def clone(self, request, *args, **kwargs):
         # 除了id, source_id, source_type, 可覆盖引用触发器的属性列表
-        can_update_attrs = ["signal"]
-        can_update_info = dict([(attr, request.data[attr]) for attr in can_update_attrs if attr in request.data])
+        can_update_attrs = ["signal", "project_key"]
+        can_update_info = dict(
+            [
+                (attr, request.data[attr])
+                for attr in can_update_attrs
+                if attr in request.data
+            ]
+        )
 
         return Response(
             import_trigger(
-                request.data['src_trigger_ids'],
-                dst_source_id=request.data['dst_source_id'],
-                dst_source_type=request.data['dst_source_type'],
-                dst_sender=request.data['dst_sender'],
+                request.data["src_trigger_ids"],
+                dst_source_id=request.data["dst_source_id"],
+                dst_source_type=request.data["dst_source_type"],
+                dst_sender=request.data["dst_sender"],
                 **can_update_info
             )
         )
 
-    @action(methods=['POST'], detail=True)
+    @action(methods=["POST"], detail=True)
     def create_or_update_rules(self, request, *args, **kwargs):
         def _single_create(action_data):
-            serializer = TriggerRuleSerializer(data=action_data, context=self.get_serializer_context())
+            serializer = TriggerRuleSerializer(
+                data=action_data, context=self.get_serializer_context()
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return serializer.data
@@ -145,12 +167,15 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
         def _single_update(action_data, instance):
 
             serializer = TriggerRuleSerializer(
-                instance, data=action_data, partial=False, context=self.get_serializer_context()
+                instance,
+                data=action_data,
+                partial=False,
+                context=self.get_serializer_context(),
             )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
-            if getattr(instance, '_prefetched_objects_cache', None):
+            if getattr(instance, "_prefetched_objects_cache", None):
                 # copy from drf
                 # If 'prefetch_related' has been applied to a queryset, we need to
                 # forcibly invalidate the prefetch cache on the instance.
@@ -165,18 +190,22 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
             for _data in request.data:
                 _data.update({"trigger_id": instance.id})
                 try:
-                    rule_instance = TriggerRule.objects.get(id=_data.get('id', 0))
+                    rule_instance = TriggerRule.objects.get(id=_data.get("id", 0))
                     rule = _single_update(_data, rule_instance)
                 except TriggerRule.DoesNotExist:
                     rule = _single_create(_data)
-                rules.append(rule['id'])
-        TriggerRule.objects.filter(trigger_id=instance.id).exclude(id__in=rules).delete()
+                rules.append(rule["id"])
+        TriggerRule.objects.filter(trigger_id=instance.id).exclude(
+            id__in=rules
+        ).delete()
         return Response(rules)
 
-    @action(methods=['POST'], detail=True)
+    @action(methods=["POST"], detail=True)
     def create_or_update_action_schemas(self, request, *args, **kwargs):
         def _single_create(action_data):
-            serializer = ActionSchemaSerializer(data=action_data, context=self.get_serializer_context())
+            serializer = ActionSchemaSerializer(
+                data=action_data, context=self.get_serializer_context()
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return serializer.data
@@ -184,12 +213,15 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
         def _single_update(action_data, instance):
 
             serializer = ActionSchemaSerializer(
-                instance, data=action_data, partial=False, context=self.get_serializer_context()
+                instance,
+                data=action_data,
+                partial=False,
+                context=self.get_serializer_context(),
             )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
-            if getattr(instance, '_prefetched_objects_cache', None):
+            if getattr(instance, "_prefetched_objects_cache", None):
                 # copy from drf
                 # If 'prefetch_related' has been applied to a queryset, we need to
                 # forcibly invalidate the prefetch cache on the instance.
@@ -201,11 +233,11 @@ class TriggerViewSet(component_viewsets.ModelViewSet):
         with transaction.atomic():
             for _data in request.data:
                 try:
-                    instance = ActionSchema.objects.get(id=_data.get('id', 0))
+                    instance = ActionSchema.objects.get(id=_data.get("id", 0))
                     schema = _single_update(_data, instance)
                 except ActionSchema.DoesNotExist:
                     schema = _single_create(_data)
-                schemas.append(schema['id'])
+                schemas.append(schema["id"])
         return Response(schemas)
 
 
@@ -240,7 +272,7 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
         query_set = super(ActionSchemaViewSet, self).get_queryset()
         return query_set
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=["POST"], detail=False)
     def batch_create(self, request, *args, **kwargs):
         """
         批量创建响应事件
@@ -254,10 +286,10 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
 
         schemas = []
         for _data in request.data:
-            schemas.append(_single_create(_data)['id'])
+            schemas.append(_single_create(_data)["id"])
         return Response(schemas, status=status.HTTP_201_CREATED)
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=["POST"], detail=False)
     def batch_create_or_update(self, request, *args, **kwargs):
         def _single_create(action_data):
             serializer = self.get_serializer(data=action_data)
@@ -271,7 +303,7 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
-            if getattr(instance, '_prefetched_objects_cache', None):
+            if getattr(instance, "_prefetched_objects_cache", None):
                 # copy from drf
                 # If 'prefetch_related' has been applied to a queryset, we need to
                 # forcibly invalidate the prefetch cache on the instance.
@@ -283,11 +315,11 @@ class ActionSchemaViewSet(component_viewsets.AuthWithoutResourceModelViewSet):
         with transaction.atomic():
             for _data in request.data:
                 try:
-                    instance = self.queryset.get(id=_data.get('id', 0))
+                    instance = self.queryset.get(id=_data.get("id", 0))
                     schema = _single_update(_data, instance)
                 except ActionSchema.DoesNotExist:
                     schema = _single_create(_data)
-                schemas.append(schema['id'])
+                schemas.append(schema["id"])
         return Response(schemas)
 
 
@@ -298,7 +330,12 @@ class ActionViewSet(component_viewsets.ModelViewSet):
 
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-    filter_fields = {"id": ["exact", "in"], "sender": ["exact", "in"], "source_type": ['exact'], "source_id": ["exact"]}
+    filter_fields = {
+        "id": ["exact", "in"],
+        "sender": ["exact", "in"],
+        "source_type": ["exact"],
+        "source_id": ["exact"],
+    }
 
     def get_queryset(self):
         if not self.request.query_params.get("page_size"):
@@ -314,7 +351,8 @@ class ActionViewSet(component_viewsets.ModelViewSet):
             return queryset
 
         schema_id__in = ActionSchema.objects.filter(
-            id__in=queryset.values_list("schema_id", flat=True), operate_type=operate_type
+            id__in=queryset.values_list("schema_id", flat=True),
+            operate_type=operate_type,
         ).values_list("id", flat=True)
         return queryset.filter(schema_id__in=schema_id__in)
 
@@ -322,16 +360,25 @@ class ActionViewSet(component_viewsets.ModelViewSet):
         """
         获取详情的时候采用详情序列化参数
         """
-        if self.action == 'retrieve':
+        if self.action == "retrieve":
             return ActionDetailSerializer
         return super(ActionViewSet, self).get_serializer_class()
 
-    @action(methods=['POST'], detail=True)
+    @action(methods=["POST"], detail=True)
     def run(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(status=ACTION_STATUS_CREATED)
         instance = self.get_object()
         instance.execute(operator=request.user.username, need_update_context=True)
         result = False if instance.status == ACTION_STATUS_FAILED else True
         instance.refresh_from_db()
-        message = instance.ex_data[0].get("message") if instance.ex_data else EMPTY_STRING
-        return Response({"result": result, "message": message, "data": None, "code": ResponseCodeStatus.OK})
+        message = (
+            instance.ex_data[0].get("message") if instance.ex_data else EMPTY_STRING
+        )
+        return Response(
+            {
+                "result": result,
+                "message": message,
+                "data": None,
+                "code": ResponseCodeStatus.OK,
+            }
+        )
