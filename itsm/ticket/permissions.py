@@ -96,6 +96,9 @@ class TicketPermissionValidate(permissions.BasePermission):
 
             return StatePermissionValidate().has_object_permission(request, node)
 
+        if view.action == "get_ticket_output":
+            return True
+
         # 查看权限校验
         if request.method in permissions.SAFE_METHODS:
 
