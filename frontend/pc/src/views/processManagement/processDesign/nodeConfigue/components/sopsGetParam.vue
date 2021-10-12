@@ -105,7 +105,6 @@
                             @change="onHookChange($event, scheme)">
                             {{ $t(`m.tickets["引用变量"]`) }}
                         </bk-checkbox>
-                        <!-- <div v-if="hookedVarList[scheme.tag_code]" class="var-select"> -->
                         <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
                             <bk-select
                                 :disabled="disabled || disabledRenderForm"
@@ -113,7 +112,7 @@
                                 :value="formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
                                 @selected="onSelectVar($event, scheme)">
                                 <bk-option
-                                    v-for="varItem in quoteVars"
+                                    v-for="varItem in stateList"
                                     :key="varItem.key"
                                     :id="varItem.key"
                                     :name="varItem.name">

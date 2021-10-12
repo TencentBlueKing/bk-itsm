@@ -285,7 +285,6 @@
         },
         mounted () {
             this.initData()
-            this.getTicketOutput()
         },
         methods: {
             async initData () {
@@ -468,17 +467,6 @@
                     errorHandler(res, this)
                 }).finally(() => {
                 })
-            },
-            async getTicketOutput () {
-                try {
-                    this.quoteVarsLoading = true
-                    const res = await this.$store.dispatch('ticket/getTicketOutput', this.$route.query.serviceId)
-                    this.quoteVars = res.data
-                } catch (e) {
-                    console.error(e)
-                } finally {
-                    this.quoteVarsLoading = false
-                }
             },
             onClearProcess () {
                 if (this.basicsFormData.processType !== 'common') {
