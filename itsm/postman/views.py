@@ -103,6 +103,7 @@ class RemoteSystemViewSet(ModelViewSet):
         project_key = request.query_params.get(
             "project_key", PUBLIC_PROJECT_PROJECT_KEY
         )
+
         queryset = self.filter_queryset(self.get_queryset()).filter(
             project_key=project_key
         )
@@ -111,6 +112,19 @@ class RemoteSystemViewSet(ModelViewSet):
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def all(self, request, *args, **kwargs):
+        project_key = request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            Q(project_key=project_key) | Q(project_key=PUBLIC_PROJECT_PROJECT_KEY)
+        )
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
