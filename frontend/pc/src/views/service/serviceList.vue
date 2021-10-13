@@ -85,7 +85,7 @@
                     align="center"
                     :selectable="disabledFn">
                     <template slot-scope="props">
-                        <template v-if="!hasPermission(['service_manage'], props.row.auth_actions)">
+                        <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
                             <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
                                 <span
                                     v-cursor

@@ -376,7 +376,7 @@
                     value = value.join(',')
                 }
                 return {
-                    value: value || undefined,
+                    value: value || '',
                     type: this.formData.levelOne
                 }
             }
