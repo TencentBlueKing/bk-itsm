@@ -342,6 +342,7 @@
                 }
                 if (!this.flowInfo.is_biz_needed) {
                     excludeProcessor.push('CMDB')
+                    this.deliversExclude.push('CMDB')
                 }
                 this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor]
             },
