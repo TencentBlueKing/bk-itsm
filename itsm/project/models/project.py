@@ -25,8 +25,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.db import models, transaction
 
-from itsm.component.constants import LEN_MIDDLE, LEN_LONG, EMPTY_STRING, LEN_NORMAL, LEN_SHORT, \
-    PUBLIC_PROJECT_PROJECT_KEY
+from itsm.component.constants import (
+    LEN_MIDDLE,
+    LEN_LONG,
+    EMPTY_STRING,
+    LEN_NORMAL,
+    LEN_SHORT,
+    PUBLIC_PROJECT_PROJECT_KEY,
+)
 from itsm.iadmin.contants import PROJECT_SETTING
 from itsm.project.models.base import Model
 from django.utils.translation import ugettext as _
@@ -38,20 +44,33 @@ from itsm.sla.models import Sla, Schedule
 class Project(Model):
     key = models.CharField(_("项目唯一标识"), max_length=LEN_SHORT, primary_key=True)
     name = models.CharField(_("项目名"), max_length=LEN_MIDDLE)
-    desc = models.CharField(_("项目描述"), max_length=LEN_LONG, null=True, blank=True,
-                            default=EMPTY_STRING)
+    desc = models.CharField(
+        _("项目描述"), max_length=LEN_LONG, null=True, blank=True, default=EMPTY_STRING
+    )
     logo = models.TextField(_("logo base64 内容"), default="", blank=True)
     color = models.CharField(_("项目颜色"), null=True, default="", max_length=LEN_SHORT)
     is_enabled = models.BooleanField(_("是否启用"), default=True, db_index=True)
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
-    resource_operations = ["project_view", "project_edit", "service_create",
-                           "field_create", "user_group_create", "triggers_create",
-                           "sla_calendar_create", "sla_agreement_create",
-                           "settings_view", "settings_manage",
-                           "catalog_create", "catalog_edit", "catalog_delete"]
+    resource_operations = [
+        "project_view",
+        "project_edit",
+        "service_create",
+        "field_create",
+        "user_group_create",
+        "triggers_create",
+        "sla_calendar_create",
+        "sla_agreement_create",
+        "settings_view",
+        "settings_manage",
+        "catalog_create",
+        "catalog_edit",
+        "catalog_delete",
+    ]
 
     auth_resource = {"resource_type": "project", "resource_type_name": "项目"}
+
+    need_auth_grant = True
 
     def init_service_catalogs(self, catalog):
         level_1 = [item for item in catalog if item["level"] == 1]
@@ -59,19 +78,32 @@ class Project(Model):
         # 预留支持3级
         level_3 = [item for item in catalog if item["level"] == 3]
         root_key = "{}_{}".format(self.key, "root")
-        root = ServiceCatalog.create_root(key=root_key, name=_("根目录"), is_deleted=False,
-                                          project_key=self.key)
+        root = ServiceCatalog.create_root(
+            key=root_key, name=_("根目录"), is_deleted=False, project_key=self.key
+        )
         for level1 in level_1:
-            l_1 = ServiceCatalog.create_catalog(key=level1["key"], name=level1["name"], parent=root,
-                                                project_key=self.key)
+            l_1 = ServiceCatalog.create_catalog(
+                key=level1["key"],
+                name=level1["name"],
+                parent=root,
+                project_key=self.key,
+            )
             for level2 in level_2:
                 if l_1.key == level2["parent_key"]:
-                    l_2 = ServiceCatalog.create_catalog(key=level2["key"], name=level2["name"],
-                                                        parent=l_1, project_key=self.key)
+                    l_2 = ServiceCatalog.create_catalog(
+                        key=level2["key"],
+                        name=level2["name"],
+                        parent=l_1,
+                        project_key=self.key,
+                    )
                     for level3 in level_3:
                         if l_2.key == level3["parent_key"]:
-                            ServiceCatalog.create_catalog(key=level3["key"], name=level3["name"],
-                                                          parent=l_2, project_key=self.key)
+                            ServiceCatalog.create_catalog(
+                                key=level3["key"],
+                                name=level3["name"],
+                                parent=l_2,
+                                project_key=self.key,
+                            )
 
     def init_project_settings(self):
         for project_setting in PROJECT_SETTING:
@@ -79,7 +111,7 @@ class Project(Model):
                 type=project_setting[1],
                 key=project_setting[0],
                 value=project_setting[2],
-                project=self
+                project=self,
             )
 
     def init_project_sla(self):
@@ -93,16 +125,13 @@ class Project(Model):
     def init_default_project(cls):
         try:
             Project.objects.get_or_create(
-                key=0,
-                name="默认项目",
-                desc="全局默认项目",
-                creator="admin"
+                key=0, name="默认项目", desc="全局默认项目", creator="admin"
             )
             Project.objects.get_or_create(
                 key=PUBLIC_PROJECT_PROJECT_KEY,
                 name="公共项目",
                 desc="全局公共项目，用于存放公共字段",
-                creator="admin"
+                creator="admin",
             )
         except BaseException as error:
             print("init_default_project error， error is {}".format(error))
@@ -117,15 +146,15 @@ class ProjectSettings(Model):
 
 class UserProjectAccessRecord(Model):
     username = models.CharField(_("用户名"), max_length=LEN_SHORT, primary_key=True)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     @classmethod
     def create_record(cls, username, project_key):
         with transaction.atomic():
             cls.objects.create(
-                creator=username,
-                username=username,
-                project_key=project_key
+                creator=username, username=username, project_key=project_key
             )
 
     def update_record(self, project_key):
