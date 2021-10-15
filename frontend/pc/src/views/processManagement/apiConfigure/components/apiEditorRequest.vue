@@ -82,6 +82,7 @@
         <template v-if="basicInfo.method === 'POST'">
             <div class="mb10">
                 <bk-button :theme="'primary'"
+                    data-test-id="apiDetail_button_importRequsetJSON"
                     :title="$t(`m.systemConfig['导入JSON']`)"
                     :disabled="basicInfo.is_builtin"
                     @click="closeDictionary">

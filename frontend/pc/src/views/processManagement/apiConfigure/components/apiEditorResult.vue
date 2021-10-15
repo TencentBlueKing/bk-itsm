@@ -33,6 +33,7 @@
         <template v-if="!jsonCheckIndex">
             <div class="mb10">
                 <bk-button :theme="'primary'"
+                    data-test-id="apiDetail_button_importResultJSON"
                     :title="$t(`m.systemConfig['导入JSON']`)"
                     :disabled="basicInfo.is_builtin"
                     @click="closeDictionary">

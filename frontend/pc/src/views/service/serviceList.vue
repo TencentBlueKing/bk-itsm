@@ -28,17 +28,19 @@
             <div class="bk-only-btn">
                 <div class="bk-more-search">
                     <bk-button
-                        v-cursor="{ active: !hasPermission(['service_create']) }"
+                        data-test-id="service_button_createService"
+                        v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
                         :theme="'primary'"
                         icon="plus"
                         :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['service_create'])
+                            'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
                         }]"
                         :title="$t(`m.serviceConfig['新增']`)"
                         @click="onServiceCreatePermissonCheck">
                         {{$t(`m.serviceConfig['新增']`)}}
                     </bk-button>
                     <bk-button :theme="'default'"
+                        data-test-id="service_button_batchDeleteService"
                         :title="$t(`m.serviceConfig['批量删除']`)"
                         :disabled="!checkList.length"
                         @click="deleteCheck">
@@ -83,7 +85,7 @@
                     align="center"
                     :selectable="disabledFn">
                     <template slot-scope="props">
-                        <template v-if="!hasPermission(['service_manage'], props.row.auth_actions)">
+                        <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
                             <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
                                 <span
                                     v-cursor
@@ -94,6 +96,7 @@
                         </template>
                         <template v-else>
                             <bk-checkbox
+                                data-test-id="service_checkbox_checkService"
                                 v-bk-tooltips.right="{
                                     content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
                                     disabled: !props.row.bounded_catalogs[0],
@@ -117,7 +120,7 @@
                 <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150">
                     <template slot-scope="props">
                         <span
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                             v-cursor
                             class="bk-lable-primary text-permission-disable"
                             ::title="props.row.name"
@@ -194,7 +197,7 @@
                     <template slot-scope="props">
                         <!-- sla -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
@@ -202,10 +205,10 @@
                             @click="onServicePermissonCheck(['service_manage'], props.row)">
                             SLA
                         </bk-button>
-                        <router-link v-else class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
+                        <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
                         <!-- 编辑 -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
@@ -215,6 +218,7 @@
                         </bk-button>
                         <bk-button
                             v-else
+                            data-test-id="service_button_editService"
                             theme="primary"
                             text
                             @click="changeEntry(props.row, 'edit')">
@@ -222,7 +226,7 @@
                         </bk-button>
                         <!-- 删除 -->
                         <bk-button
-                            v-if="!hasPermission(['service_manage'], props.row.auth_actions)"
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
@@ -246,6 +250,7 @@
                         </template>
                         <template v-else>
                             <bk-button
+                                data-test-id="service_button_deleteService"
                                 theme="primary"
                                 text
                                 @click="deleteOne(props.row)">
@@ -398,7 +403,7 @@
             },
             // 创建服务权限点击时校验
             onServiceCreatePermissonCheck () {
-                if (!this.hasPermission(['service_create'])) {
+                if (!this.hasPermission(['service_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -406,7 +411,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['service_create'], [], resourceData)
+                    this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
                     this.$router.push({
                         name: 'projectServiceEdit',
@@ -451,7 +456,7 @@
                         name: projectInfo.name
                     }]
                 }
-                this.applyForPermission(required, row.auth_actions, resourceData)
+                this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData)
             },
             deleteCheck () {
                 this.$bkInfo({

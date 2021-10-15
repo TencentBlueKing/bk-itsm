@@ -36,10 +36,11 @@
                 :links="emptyTip.links">
                 <template slot="btns">
                     <bk-button
+                        data-test-id="triggers_button_create_permission"
                         :theme="'primary'"
-                        v-cursor="{ active: !hasPermission(['triggers_create']) }"
+                        v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
                         :class="{
-                            'btn-permission-disable': !hasPermission(['triggers_create'])
+                            'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
                         }"
                         @click="addTrigger">
                         {{ $t('m["立即创建"]') }}
@@ -60,17 +61,19 @@
                 </div>
                 <div class="bk-normal-search">
                     <bk-button :theme="'primary'"
-                        v-cursor="{ active: !hasPermission(['triggers_create']) }"
+                        data-test-id="triggers_button_create"
+                        v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
                         :title="$t(`m.managePage['新增']`)"
                         icon="plus"
                         :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['triggers_create'])
+                            'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
                         }]"
                         @click="addTrigger">
                         {{ $t('m.managePage["新增"]') }}
                     </bk-button>
                     <div class="bk-search-key">
                         <bk-input
+                            data-test-id="triggers_button_search"
                             :clearable="true"
                             :right-icon="'bk-icon icon-search'"
                             v-model="searchKey"
@@ -196,7 +199,7 @@
             },
             // 新增触发器
             addTrigger () {
-                if (!this.hasPermission(['triggers_create'])) {
+                if (!this.hasPermission(['triggers_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -204,7 +207,7 @@
                             name: projectInfo.name
                         }]
                     }
-                    this.applyForPermission(['triggers_create'], [], resourceData)
+                    this.applyForPermission(['triggers_create'], this.$store.state.project.projectAuthActions, resourceData)
                     return
                 }
                 this.triggerInfo = {}
@@ -245,7 +248,7 @@
             },
             // 修改触发器
             changeTrigger (item, index) {
-                if (!this.hasPermission(['triggers_manage'], item.auth_actions)) {
+                if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -257,7 +260,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['triggers_manage'], item.auth_actions, resourceData)
+                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return
                 }
                 this.triggerInfo = item

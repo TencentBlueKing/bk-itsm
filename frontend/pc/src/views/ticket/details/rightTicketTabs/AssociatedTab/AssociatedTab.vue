@@ -26,12 +26,14 @@
         v-bkloading="{ isLoading: loading }">
         <div class="mb20">
             <bk-button class="mr10"
+                data-test-id="ticket_button_createAssociateTicket"
                 theme="default"
                 :title="$t(`m.newCommon['新建']`)"
                 @click="openAddAssociation">
                 {{ $t('m.newCommon["新建"]') }}
             </bk-button>
             <bk-button
+                data-test-id="ticket_button_associateTicketHistory"
                 class="icon-cus"
                 theme="default"
                 icon=" bk-itsm-icon icon-history"

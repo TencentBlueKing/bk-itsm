@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <bk-tab :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
+    <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
         <bk-tab-panel
             name="log"
             :label="$t(`m.newCommon['流转日志']`)">

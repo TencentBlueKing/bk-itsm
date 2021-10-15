@@ -38,7 +38,7 @@
                     <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m.trigger['是否启用']`)">
-                    <bk-switcher v-model="formData.is_enabled" size="small"></bk-switcher>
+                    <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small"></bk-switcher>
                 </bk-form-item>
                 <template v-if="!originInfoToTrigger.id">
                     <bk-form-item :label="$t(`m.trigger['基础模型']`)">
@@ -71,6 +71,7 @@
                 <p class="bk-type-name">{{iconInfo.name}}</p>
                 <div class="bk-type-change"
                     :class="{ 'bk-show': iconInfo.status }"
+                    data-test-id="trigger_div_changeType"
                     @click="handleClick">
                     <span>{{$t(`m.trigger['点击更换']`)}}</span>
                 </div>
@@ -97,7 +98,7 @@
                     :required="true"
                     :property="'signal'"
                     style="width: 300px;">
-                    <bk-select v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)">
+                    <bk-select data-test-id="triggers_select_choiceEvent" v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)">
                         <bk-option-group
                             v-for="(group, index) in triggerEventList"
                             :name="group.name"
@@ -141,12 +142,13 @@
                                 </template>
                                 <template v-else>
                                     <i class="bk-icon icon-close icon-nodelete"
+                                        data-test-id="trigger_i_closeTriggerRule"
                                         v-bk-tooltips.top-start="$t(`m.trigger['规则不能为空']`)"></i>
                                 </template>
                                 <!-- 条件触发开关 -->
                                 <div class="bk-condition-switch">
                                     <span class="mr5">{{$t(`m.trigger['条件触发']`)}}</span>
-                                    <bk-switcher v-model="item.triggerStatus" size="small"></bk-switcher>
+                                    <bk-switcher data-test-id="triggers_switcher_conditionTriggered" v-model="item.triggerStatus" size="small"></bk-switcher>
                                 </div>
                             </div>
                             <div v-show="item.showContent">
@@ -163,7 +165,7 @@
                             </div>
                         </div>
                         <p class="bk-add-rules" @click="addRule">
-                            <i class="bk-icon icon-plus-circle"></i><span>{{$t(`m.trigger['添加规则']`)}}</span>
+                            <i class="bk-icon icon-plus-circle"></i><span data-test-id="trigger_span_addTriggerRules">{{$t(`m.trigger['添加规则']`)}}</span>
                         </p>
                     </div>
                 </bk-form-item>
@@ -171,6 +173,7 @@
         </div>
         <div class="bk-submit-trigger">
             <bk-button :theme="'primary'"
+                data-test-id="trigger_button_submitTrigger"
                 :title="$t(`m.trigger['确认']`)"
                 :disabled="btnLoading"
                 class="mr10"
@@ -178,6 +181,7 @@
                 {{$t(`m.trigger['确认']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="trigger_button_submitTrigger"
                 :title="$t(`m.trigger['保持草稿']`)"
                 :disabled="btnLoading"
                 class="mr10"
@@ -185,6 +189,7 @@
                 {{$t(`m.trigger['保持草稿']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="trigger_button_KeepDraft"
                 :disabled="btnLoading"
                 :title="$t(`m.trigger['取消']`)"
                 @click="closeTrigger">

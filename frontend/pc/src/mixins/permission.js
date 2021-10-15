@@ -29,9 +29,8 @@ const permission = {
          * @param { Array } curPermission 当前拥有的权限（针对单个实例）
          */
         getAllAppPermission (curPermission) {
-            const projectAuthActions = this.$store.state.project.projectAuthActions
             const systemPermission = this.$store.state.common.systemPermission
-            return [...projectAuthActions, ...systemPermission, ...curPermission]
+            return [...systemPermission, ...curPermission]
         },
         /**
          * 判断当前权限是否满足需要的权限
@@ -153,7 +152,7 @@ const permission = {
                 data.push({
                     type: resourceMap.id,
                     type_name: resourceMap.name,
-                    id: Number(item.id),
+                    id: item.id,
                     name: item.name
                 })
             })

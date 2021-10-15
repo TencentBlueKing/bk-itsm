@@ -296,7 +296,7 @@
                         }
                         person = this.$refs.personSelect.getValue()
                     }
-                    
+
                     this.$emit('submitFormAjax', Object.assign(this.formData, { person }))
                 }, validator => {
                     console.warn(validator)

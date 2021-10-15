@@ -174,6 +174,7 @@
                 :title="$t(`m['新建项目']`)"
                 :is-show="isEditDialogShow"
                 :project="projectForm"
+                :edit-dialog-form-disable="editDialogFormDisable"
                 @confirm="onProjectDialogConfirm"
                 @cancel="onProjectDialogCancel">
             </edit-project-dialog>
@@ -218,7 +219,8 @@
                     key: '',
                     desc: '',
                     color: ''
-                }
+                },
+                editDialogFormDisable: false
             }
         },
         computed: {
@@ -273,6 +275,11 @@
                 if (val) {
                     this.selectedProject = val
                 }
+            },
+            isEditDialogShow (val) {
+                if (val) {
+                    this.getProjectList()
+                }
             }
         },
         created () {
@@ -281,8 +288,6 @@
             bus.$on('openCreateTicketDialog', () => {
                 this.isCreateTicketDialogShow = true
             })
-            // 待修复
-            this.getProjectList()
             bus.$on('openCreateProjectDialog', () => {
                 this.handleCreateProject()
             })
@@ -290,12 +295,14 @@
         methods: {
             async getProjectList () {
                 try {
+                    this.editDialogFormDisable = true
                     this.$store.commit('project/setProjectListLoading', true)
                     const res = await this.$store.dispatch('project/getProjectAllList')
                     this.$store.commit('project/setProjectList', res.data)
                 } catch (e) {
                     errorHandler(e, this)
                 } finally {
+                    this.editDialogFormDisable = false
                     this.$store.commit('project/setProjectListLoading', false)
                 }
             },
@@ -430,7 +437,8 @@
                 window.DEFAULT_PROJECT = val
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
-                this.$router.push({ name: this.$route.name, query: { project_id: val } })
+                // 申请权限页面新建项目跳到项目单据下
+                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : this.$route.name, query: { project_id: val } })
             },
             applyForProjectViewPerm (project, perm) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
@@ -456,8 +464,8 @@
             },
             onProjectDialogConfirm (key) {
                 this.isEditDialogShow = false
-                this.onSelectProject(key)
                 this.getProjectList()
+                this.onSelectProject(key)
             },
             onProjectDialogCancel () {
                 this.isEditDialogShow = false

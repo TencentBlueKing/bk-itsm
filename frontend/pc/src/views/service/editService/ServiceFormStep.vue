@@ -24,7 +24,7 @@
     <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
         <!-- 字段选择 -->
         <div class="field-option" v-show="showFieldOption">
-            <bk-tab :active.sync="active" type="unborder-card" ext-cls="field-tab">
+            <bk-tab data-test-id="service_tab_servcieField" :active.sync="active" type="unborder-card" ext-cls="field-tab">
                 <bk-tab-panel name="library-fields">
                     <template slot="label">
                         <i class="panel-icon bk-icon icon-apps"></i>
@@ -51,7 +51,7 @@
         </div>
         <!-- 基础信息 -->
         <div class="basic-body">
-            <section class="settion-card basic-info-card">
+            <section data-test-id="servie_section_serviceBasicInformation" class="settion-card basic-info-card">
                 <h2 class="card-title">{{ $t(`m.tickets['服务基础信息']`) }}</h2>
                 <div class="card-content">
                     <!-- 编辑状态 -->
@@ -112,7 +112,7 @@
                     </div>
                 </div>
             </section>
-            <section class="settion-card create-info-card">
+            <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
                 <h2 class="card-title">
                     <span>{{ $t(`m.tickets['服务提单信息']`) }}</span>
                     <bk-popover
@@ -134,6 +134,7 @@
                         <ul class="bk-dropdown-list" slot="content">
                             <li v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
                                 :key="index"
+                                data-test-id="servie_section_QuicklyCreateForm"
                                 @click="onCreateFormWayCLick(way)">
                                 {{ way.name }}
                             </li>
@@ -152,6 +153,7 @@
                                 always: true
                             }">
                             <bk-button
+                                data-test-id="service_button_selectServiceForm"
                                 :disabled="!serviceTemplateDisable"
                                 ext-cls="button-item"
                                 theme="default"

@@ -39,25 +39,24 @@ class WorkflowTriggerPermit(IamAuthPermit):
 
     @staticmethod
     def create_trigger_from_workflow(request, view):
-        return view.action == 'create' and request.data.get("source_type") == SOURCE_WORKFLOW
+        return (
+            view.action == "create"
+            and request.data.get("source_type") == SOURCE_WORKFLOW
+        )
 
     @staticmethod
     def clone_trigger_to_workflow(request, view):
-        return view.action == 'clone' and request.data.get("dst_source_type") == SOURCE_WORKFLOW
+        return (
+            view.action == "clone"
+            and request.data.get("dst_source_type") == SOURCE_WORKFLOW
+        )
 
     def has_permission(self, request, view):
         if self.is_safe_method(request, view) and view.detail is False:
             # 非详情内容，可以直接通过
             return True
-        
-        if self.create_trigger_from_workflow(request, view) or self.clone_trigger_to_workflow(request, view):
-            # 如果是流程的操作，需要对流程资源进行鉴权
-            apply_action = ["workflow_manage"]
-            source_id = request.data.get("source_id") or request.data.get("dst_source_id")
 
-            return self.iam_auth(request, apply_action, self.get_flow_or_raise_error(source_id))
-
-        if view.action in ['clone', 'create']:
+        if view.action in ["clone", "create"]:
             # 其他的引用和创建，都需要尽心给流程元素的鉴权:
             return self.iam_create_auth(request, apply_actions=["triggers_create"])
 
@@ -67,7 +66,7 @@ class WorkflowTriggerPermit(IamAuthPermit):
     #     if not obj.source_type == SOURCE_WORKFLOW:
     #         # 非流程来源的，更新做流程元素管理的权限
     #         return self.iam_auth(request, apply_actions=[], obj=obj)
-    # 
+    #
     #     # 与流程相关的，走流程的权限
     #     apply_action = ["workflow_manage"]
     #     return self.iam_auth(request, apply_action, self.get_flow_or_raise_error(obj.source_id))
@@ -75,6 +74,8 @@ class WorkflowTriggerPermit(IamAuthPermit):
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
+            return True
+        if view.action in ["create_or_update_rules", "update", "destroy"]:
             return True
 
         apply_actions = ["triggers_manage"]

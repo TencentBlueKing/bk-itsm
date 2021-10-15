@@ -58,17 +58,15 @@ class ModelViewSet(component_viewsets.ModelViewSet):
     """按需改造DRF默认的ModelViewSet类"""
 
     def perform_create(self, serializer):
-        """创建时补充基础Model中的字段
-        """
-        user = serializer.context.get('request').user
-        username = getattr(user, 'username', 'guest')
+        """创建时补充基础Model中的字段"""
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
         serializer.save(creator=username, updated_by=username)
 
     def perform_update(self, serializer):
-        """更新时补充基础Model中的字段
-        """
-        user = serializer.context.get('request').user
-        username = getattr(user, 'username', 'guest')
+        """更新时补充基础Model中的字段"""
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
         serializer.save(updated_by=username)
 
 
@@ -77,10 +75,10 @@ class ApiInstanceViewsSet(ModelViewSet):
     queryset = RemoteApiInstance._objects.all()
     permission_classes = ()
 
-    @action(detail=True, methods=['post', 'get'])
+    @action(detail=True, methods=["post", "get"])
     def field_choices(self, request, *args, **kwargs):
         kv_relation = request.data.pop("kv_relation", {})
-        params = {'params_%s' % key: value for key, value in list(request.data.items())}
+        params = {"params_%s" % key: value for key, value in list(request.data.items())}
 
         instance = self.get_object()
         choices = instance.get_api_choice(kv_relation, params)
@@ -97,13 +95,18 @@ class RemoteSystemViewSet(ModelViewSet):
     pagination_class = None
 
     filter_fields = {
-        'is_activated': ['exact'],
+        "is_activated": ["exact"],
     }
-    
+
     def list(self, request, *args, **kwargs):
-        
-        project_key = request.query_params.get("project_key", PUBLIC_PROJECT_PROJECT_KEY)
-        queryset = self.filter_queryset(self.get_queryset()).filter(project_key=project_key)
+
+        project_key = request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            project_key=project_key
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -113,13 +116,25 @@ class RemoteSystemViewSet(ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"])
+    def all(self, request, *args, **kwargs):
+        project_key = request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
 
-    @action(detail=False, methods=['get'])
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            Q(project_key=project_key) | Q(project_key=PUBLIC_PROJECT_PROJECT_KEY)
+        )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"])
     def get_systems(self, request):
         """接入系统列表"""
 
         systems = get_systems()
-        
+
         project_key = request.query_params.get("project_key", 0)
 
         data = []
@@ -129,32 +144,32 @@ class RemoteSystemViewSet(ModelViewSet):
         for sys in systems:
             data.append(
                 {
-                    'name': sys.get('label') or sys.get('name', ''),
-                    'code': sys.get('name', ''),
-                    'domain': sys.get('domain', ''),
-                    'desc': sys.get('remark', ''),
-                    'system_id': sys.get('id', 0),
+                    "name": sys.get("label") or sys.get("name", ""),
+                    "code": sys.get("name", ""),
+                    "domain": sys.get("domain", ""),
+                    "desc": sys.get("remark", ""),
+                    "system_id": sys.get("id", 0),
                 }
             )
-            codes.add(sys.get('name'))
+            codes.add(sys.get("name"))
 
         # 自定义添加的系统
         for sys in self.queryset.exclude(code__in=codes, project_key=project_key):
             data.append(
                 {
-                    'name': sys.name,
-                    'code': sys.code,
-                    'domain': sys.domain,
-                    'desc': sys.desc,
-                    'system_id': sys.system_id,
+                    "name": sys.name,
+                    "code": sys.code,
+                    "domain": sys.domain,
+                    "desc": sys.desc,
+                    "system_id": sys.system_id,
                 }
             )
 
         return Response(data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_components(self, request):
-        system_code = request.GET.get('system_code')
+        system_code = request.GET.get("system_code")
         components = get_components([system_code])
         return Response(components)
 
@@ -167,57 +182,72 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
     permission_classes = (RemoteApiPermit,)
 
     filter_fields = {
-        'is_activated': ['exact'],
+        "is_activated": ["exact"],
     }
 
     def get_queryset(self):
         queryset = super(RemoteApiViewSet, self).get_queryset()
 
-        key = self.request.query_params.get('key')
+        key = self.request.query_params.get("key")
         if key:
             queryset = queryset.filter(Q(name__icontains=key) | Q(path__icontains=key))
 
-        remote_system = self.request.query_params.get('remote_system')
+        remote_system = self.request.query_params.get("remote_system")
         if remote_system:
             return queryset.filter(remote_system__id=remote_system)
 
+        project_key = self.request.query_params.get("project_key")
+
+        if project_key:
+            public_remote_system_ids = RemoteSystem.objects.filter(
+                project_key=project_key
+            ).values_list("id", flat=True)
+            return queryset.filter(remote_system__id__in=public_remote_system_ids)
+
         return queryset
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def run_api(self, request, *args, **kwargs):
         api = self.get_object()
-        if api.method == 'POST':
-            query_params = request.data.get('req_body', {})
+        if api.method == "POST":
+            query_params = request.data.get("req_body", {})
         else:
-            query_params = request.data.get('req_params', {})
+            query_params = request.data.get("req_params", {})
 
         api_config = api.get_api_config(query_params)
 
         # overwrite map_code
-        map_code = request.data.get('map_code', '')
-        before_req = request.data.get('before_req', '')
+        map_code = request.data.get("map_code", "")
+        before_req = request.data.get("before_req", "")
         api_config.update(map_code=map_code, before_req=before_req)
 
         rsp = bk.http(config=api_config)
 
         # 多加一层是因为前端对返回的message有一个统一添加msg的逻辑（为了屏蔽返回差异），所以此处加一层包裹，前端取data里面的值
-        return Response({'result': True, 'message': 'success', 'code': ResponseCodeStatus.OK, 'data': rsp})
+        return Response(
+            {
+                "result": True,
+                "message": "success",
+                "code": ResponseCodeStatus.OK,
+                "data": rsp,
+            }
+        )
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def batch_delete(self, request, *args, **kwargs):
         """批量删除操作
-            TODO: 缺少负责人鉴权
+        TODO: 缺少负责人鉴权
         """
 
-        id_list = [i for i in request.data.get('id').split(',') if i.isdigit()]
+        id_list = [i for i in request.data.get("id").split(",") if i.isdigit()]
 
         will_deleted = self.queryset.filter(id__in=id_list)
-        real_deleted = list(will_deleted.values_list('id', flat=True))
+        real_deleted = list(will_deleted.values_list("id", flat=True))
         will_deleted.delete()
 
         return Response(real_deleted)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def exports(self, request, pk=None):
         """
         导出Api接口
@@ -226,9 +256,11 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
         api = self.get_object()
         data = api.tag_data()
 
-        response = HttpResponse(content_type='application/octet-stream; charset=utf-8')
-        response['Content-Disposition'] = "attachment; filename=bk_itsm_api_{}_{}.json".format(
-            api.func_name, datetime.datetime.now().strftime('%Y%m%d%H%M')
+        response = HttpResponse(content_type="application/octet-stream; charset=utf-8")
+        response[
+            "Content-Disposition"
+        ] = "attachment; filename=bk_itsm_api_{}_{}.json".format(
+            api.func_name, datetime.datetime.now().strftime("%Y%m%d%H%M")
         )
 
         # 统一导入导出格式为列表数据
@@ -236,36 +268,36 @@ class RemoteApiViewSet(DynamicListModelMixin, ModelViewSet):
 
         return response
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def imports(self, request, pk=None):
         """
         导入Api接口
         """
 
-        if pk == '0':
+        if pk == "0":
             apis = []
             try:
-                data = json.loads(request.FILES.get('file').read())
+                data = json.loads(request.FILES.get("file").read())
             except ValueError:
-                raise ParamError(_('文件格式有误，请提供从本系统导出的json文件'))
+                raise ParamError(_("文件格式有误，请提供从本系统导出的json文件"))
 
             for item in data:
                 try:
                     api = RemoteApi.restore_api(item, request.user.username)
                     apis.append(api)
                 except Exception as e:
-                    logger.error('import workflow exception: %s' % e)
+                    logger.error("import workflow exception: %s" % e)
 
-            return Response({'success': len(apis), 'failed': len(data) - len(apis)})
+            return Response({"success": len(apis), "failed": len(data) - len(apis)})
 
-        raise NotAllowedError(_('暂不支持当前操作'))
+        raise NotAllowedError(_("暂不支持当前操作"))
 
 
 class RpcApiViewSet(component_viewsets.APIView):
     def get(self, request, *args, **kwargs):
         """获取rpc的API列表"""
         ret = []
-        for code, component_cls in ComponentLibrary.components.get('rpc', {}).items():
+        for code, component_cls in ComponentLibrary.components.get("rpc", {}).items():
             rpc_api = {"name": component_cls.name, "key": code, "req_params": []}
             # API传入参数
             if isinstance(component_cls.Form, DeclarativeFieldsMetaclass):
@@ -292,14 +324,16 @@ class RpcApiViewSet(component_viewsets.APIView):
         if not result:
             return Response(
                 {
-                    'result': False,
-                    'code': ResponseCodeStatus.OK,
-                    'message': "Render context error, see the log for details",
-                    'data': [],
+                    "result": False,
+                    "code": ResponseCodeStatus.OK,
+                    "message": "Render context error, see the log for details",
+                    "data": [],
                 }
             )
 
         request.data.update(**request_params)
-        component_cls = ComponentLibrary.get_component_class('rpc', request.data[RPC_CODE])
+        component_cls = ComponentLibrary.get_component_class(
+            "rpc", request.data[RPC_CODE]
+        )
         component_obj = component_cls(request)
         return Response(component_obj.invoke())

@@ -47,7 +47,7 @@ class TriggerResourceProvider(ItsmResourceProvider):
             parent_id = filter.parent["id"]
             if parent_id:
                 # todo: add project
-                queryset = Trigger.objects.filter(project_key=parent_id)
+                queryset = Trigger.objects.filter(project_key=parent_id, source_type="basic")
         elif filter.search and filter.resource_type_chain:
             # 返回结果需要带上资源拓扑路径信息
             with_path = True
@@ -67,8 +67,7 @@ class TriggerResourceProvider(ItsmResourceProvider):
             # queryset = queryset
             # todo: add project
             project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = Trigger.objects.filter(project_key__in=list(project_ids)).filter(
-                field_filter)
+            queryset = Trigger.objects.filter(project_key__in=list(project_ids), source_type="basic").filter(field_filter)
 
         count = queryset.count()
 

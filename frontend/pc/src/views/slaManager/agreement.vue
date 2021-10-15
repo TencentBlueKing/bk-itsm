@@ -37,10 +37,11 @@
                     :links="emptyTip.links">
                     <template slot="btns">
                         <bk-button
-                            v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
+                            data-test-id="sla_button_createAgreement_permission"
+                            v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
                             theme="primary"
                             :class="{
-                                'btn-permission-disable': !hasPermission(['sla_agreement_create'])
+                                'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
                             }"
                             @click="addAgreement({}, 'sla_agreement_create')">
                             {{ $t('m["立即创建"]') }}
@@ -57,12 +58,13 @@
                     <div class="bk-only-btn">
                         <div class="bk-more-search">
                             <bk-button
-                                v-cursor="{ active: !hasPermission(['sla_agreement_create']) }"
+                                data-test-id="sla_button_createAgreement"
+                                v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
                                 :theme="'primary'"
                                 :title="$t(`m.managePage['新增']`)"
                                 icon="plus"
                                 :class="['mr10', 'plus-cus', {
-                                    'btn-permission-disable': !hasPermission(['sla_agreement_create'])
+                                    'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
                                 }]"
                                 @click="addAgreement({}, 'sla_agreement_create')">
                                 {{ $t('m.managePage["新增"]') }}
@@ -70,6 +72,7 @@
                             <div class="bk-search-name">
                                 <div class="bk-search-content">
                                     <bk-input
+                                        data-test-id="sla_button_searchAgreement"
                                         :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
                                         :clearable="true"
                                         :right-icon="'bk-icon icon-search'"
@@ -100,7 +103,8 @@
                         <bk-table-column :label="$t(`m.slaContent['协议名称']`)">
                             <template slot-scope="props">
                                 <bk-button
-                                    v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
+                                    data-test-id="sla_button_agreementEditFromName"
+                                    v-if="!hasPermission(['sla_agreement_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -110,6 +114,7 @@
                                 </bk-button>
                                 <span
                                     v-else
+                                    data-test-id="sla_span_agreementEditFromName"
                                     class="bk-lable-primary"
                                     @click="addAgreement(props.row, 'sla_agreement_edit')"
                                     :title="props.row.name">
@@ -151,7 +156,8 @@
                             <template slot-scope="props">
                                 <!-- 编辑 -->
                                 <bk-button
-                                    v-if="!hasPermission(['sla_agreement_edit'], props.row.auth_actions)"
+                                    data-test-id="sla_button_agreementEditFromOperate"
+                                    v-if="!hasPermission(['sla_agreement_edit'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -160,6 +166,7 @@
                                     {{ $t('m.deployPage["编辑"]')}}
                                 </bk-button>
                                 <bk-button
+                                    data-test-id="sla_button_agreementEditFromOperate"
                                     v-else
                                     theme="primary"
                                     text
@@ -168,7 +175,8 @@
                                 </bk-button>
                                 <!-- 删除 -->
                                 <bk-button
-                                    v-if="!hasPermission(['sla_agreement_delete'], props.row.auth_actions)"
+                                    data-test-id="sla_button_agreementDeleteFromOperate1"
+                                    v-if="!hasPermission(['sla_agreement_delete'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -177,6 +185,7 @@
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>
                                 <bk-button theme="primary"
+                                    data-test-id="sla_button_agreementDeleteFromOperate2"
                                     text
                                     v-else-if="props.row.service_count > 0 || props.row.is_builtin"
                                     :disabled="props.row.service_count > 0 || props.row.is_builtin"
@@ -184,6 +193,7 @@
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>
                                 <bk-button theme="primary" text v-else
+                                    data-test-id="sla_button_agreementDeleteFromOperate3"
                                     @click="deleteAgreement(props.row)">
                                     {{ $t('m.deployPage["删除"]') }}
                                 </bk-button>
@@ -427,7 +437,8 @@
             },
             // 新增
             addAgreement (item, reqPerm) {
-                if (!this.hasPermission([reqPerm], item.auth_actions)) {
+                const authResources = reqPerm === 'sla_agreement_create' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+                if (!this.hasPermission([reqPerm], authResources)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -441,7 +452,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : item.auth_actions, resourceData)
+                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.changeInfo.is_reply_need = item.is_reply_need
                     this.changeInfo.info = item
@@ -461,7 +472,7 @@
             },
             // 删除
             deleteAgreement (item) {
-                if (!this.hasPermission(['sla_agreement_delete'])) {
+                if (!this.hasPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -473,7 +484,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['sla_agreement_delete'], item.auth_actions, resourceData)
+                    this.applyForPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.$bkInfo({
                         type: 'warning',

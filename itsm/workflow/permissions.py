@@ -88,12 +88,12 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
 
     def has_permission(self, request, view):
         # apply_actions = ["service_manage", "service_view"]
-        # 
+        #
         # # 节点和字段的查看，首先必须有当前流程的管理权限
         # if not view.action == 'list':
         #     # 非列表请求，通过object鉴权
         #     return True
-        # 
+        #
         # workflow_id = request.query_params.get("workflow")
         # if workflow_id is None:
         #     return False
@@ -102,7 +102,7 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
         # except Workflow.DoesNotExist:
         #     return False
         # service_obj = flow.service
-        # 
+        #
         # return self.iam_auth(request, apply_actions, service_obj)
         return True
 
@@ -121,16 +121,15 @@ class BaseWorkflowElementIamAuth(IamAuthPermit):
 
 
 class ServiceViewPermit(IamAuthPermit):
-    
     def has_permission(self, request, view):
         return True
-    
+
     def has_object_permission(self, request, view, obj, **kwargs):
         # if view.action in ["deploy", "update"]:
         #     apply_actions = ["service_manage", "service_view"]
         #     service_obj = obj.service
         #     return self.iam_auth(request, apply_actions, service_obj)
-        
+
         return True
 
 
@@ -151,12 +150,14 @@ class VersionDeletePermit(permissions.BasePermission):
 
         # 以下逻辑是属于校验的内容，但是居然写到了权限里边[捂脸]
 
-        if view.action == 'batch_delete':
-            id_list = [i for i in request.data.get('id').split(',') if i.isdigit()]
+        if view.action == "batch_delete":
+            id_list = [i for i in request.data.get("id").split(",") if i.isdigit()]
             return not Service.objects.filter(workflow__in=id_list).exists()
 
-        if view.action == 'destroy':
-            return not Service.objects.filter(workflow=request.parser_context['kwargs'].get('pk')).exists()
+        if view.action == "destroy":
+            return not Service.objects.filter(
+                workflow=request.parser_context["kwargs"].get("pk")
+            ).exists()
 
         return True
 
@@ -165,16 +166,15 @@ class VersionDeletePermit(permissions.BasePermission):
 
 
 class FlowVersionIamAuth(ServiceViewPermit):
-
     def has_object_permission(self, request, view, obj):
         # if request.method in permissions.SAFE_METHODS:
         #     return True
-        # 
+        #
         # apply_actions = ["service_manage", "service_view"]
         # service_obj = Workflow.objects.get(obj.workflow_id).service
         # return self.iam_auth(request, apply_actions, service_obj)
         return True
-    
+
 
 class IsSuperuser(permissions.BasePermission):
     """
@@ -188,7 +188,6 @@ class IsSuperuser(permissions.BasePermission):
 
 
 class TemplateFieldPermissionValidate(IamAuthPermit):
-
     def has_permission(self, request, view):
         # 不关联实例的资源，任何请求都要提前鉴权
         # 当前系统内，如果没有project_view的权限，无法进入系统
@@ -196,9 +195,11 @@ class TemplateFieldPermissionValidate(IamAuthPermit):
             return True
 
         apply_actions = []
-        resource_type = getattr(view.queryset.model, "auth_resource", {}).get("resource_type")
- 
-        if view.action == 'create':
+        resource_type = getattr(view.queryset.model, "auth_resource", {}).get(
+            "resource_type"
+        )
+
+        if view.action == "create":
             if request.data.get("project_key", None) == PUBLIC_PROJECT_PROJECT_KEY:
                 apply_actions.append("public_field_create")
                 return self.iam_auth(request, apply_actions)
@@ -206,24 +207,24 @@ class TemplateFieldPermissionValidate(IamAuthPermit):
                 apply_actions.append("{}_create".format(resource_type))
             if "project_key" in request.data:
                 return self.iam_create_auth(request, apply_actions)
-        
+
         return True
-    
+
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
             return True
-        
+
         fields_action_map = {
             "retrieve": ["field_view"],
             "destroy": ["field_delete"],
-            "update": ["field_edit"]
+            "update": ["field_edit"],
         }
-        
+
         public_fields_action_map = {
             "retrieve": ["public_field_view"],
             "destroy": ["public_field_delete"],
-            "update": ["public_field_edit"]
+            "update": ["public_field_edit"],
         }
         apply_actions = []
         if view.action in ["retrieve", "destroy", "update"]:
@@ -235,14 +236,12 @@ class TemplateFieldPermissionValidate(IamAuthPermit):
 
 
 class TaskSchemaPermit(IamAuthPermit):
-    
     def has_permission(self, request, view):
 
-        apply_actions = ["platform_manage_access"]
-        
+        apply_actions = []
         if view.action == "create":
             apply_actions = ["task_template_create"]
-       
+
         return self.iam_auth(request, apply_actions)
 
     def has_object_permission(self, request, view, obj, **kwargs):

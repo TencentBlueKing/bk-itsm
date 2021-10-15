@@ -83,20 +83,38 @@
                 }
             }
         },
+        async created () {
+            const res = await this.$store.dispatch('project/getProjectAllList')
+            this.$store.commit('project/setProjectList', res.data)
+            const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'))
+            if (projectsWithViewPerm.length !== 0) {
+                this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
+            }
+        },
         methods: {
             handleCreateProject () {
                 bus.$emit('openCreateProjectDialog')
             },
             async handleApplyProject () {
-                // @todo: 待确定申请项目权限逻辑
-                const params = {
-                    'action': [],
-                    'system_id': 'itsm',
-                    'system_name': '流程服务'
-                }
-                const res = await this.$store.dispatch('common/getIamUrl', params)
-                if (res.data) {
-                    window.open(res.data.url, '__blank')
+                const projectInfo = this.$store.state.project.projectInfo
+                if (this.$route.query.project_id) {
+                    const resourceData = {
+                        project: [{
+                            id: projectInfo.key || '--',
+                            name: projectInfo.name || '--'
+                        }]
+                    }
+                    this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData)
+                } else {
+                    const params = {
+                        'action': [],
+                        'system_id': 'itsm',
+                        'system_name': '流程服务'
+                    }
+                    const res = await this.$store.dispatch('common/getIamUrl', params)
+                    if (res.data) {
+                        window.open(res.data.url, '__blank')
+                    }
                 }
             }
         }

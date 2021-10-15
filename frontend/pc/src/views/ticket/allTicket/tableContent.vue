@@ -40,9 +40,11 @@
                         placement="top">
                         <div class="attention-icon">
                             <i
+                                data-test-id="ticket_popover_unfollow"
                                 class="bk-itsm-icon icon-rate"
                                 @click="onChangeAttention(row)"></i>
                             <i
+                                data-test-id="ticket_popover_follow"
                                 class="bk-itsm-icon icon-favorite"
                                 :class="{ 'is-attention': row.hasAttention }"
                                 @click="onChangeAttention(row)"></i>
@@ -51,6 +53,7 @@
                 </template>
             </bk-table-column>
             <bk-table-column
+                data-test-id="ticket_table_render"
                 v-for="field in setting.selectedFields"
                 :key="field.id"
                 :label="field.label"
@@ -91,12 +94,14 @@
                     <template v-else-if="field.id === 'operate'">
                         <template v-if="row.can_comment || row.can_operate">
                             <bk-button v-if="row.can_comment"
+                                data-test-id="ticket_button_appraise"
                                 theme="primary"
                                 text
                                 @click="checkOne(row)">
                                 {{ $t('m.tickets["满意度评价"]') }}
                             </bk-button>
                             <router-link
+                                data-test-id="ticket_link_detail"
                                 v-if="row.can_operate"
                                 target="_blank"
                                 class="table-link"
@@ -106,6 +111,7 @@
                         </template>
                         <template v-else>
                             <router-link
+                                data-test-id="ticket_link_view_details "
                                 class="table-link"
                                 target="_blank"
                                 :to="{ name: 'TicketDetail', query: { id: row.id, project_id: row.project_key, from } }">
@@ -121,6 +127,7 @@
             
             <bk-table-column type="setting">
                 <bk-table-setting-content
+                    data-test-id="ticket_table_setting"
                     :fields="setting.fields"
                     :selected="setting.selectedFields"
                     :size="setting.size"
