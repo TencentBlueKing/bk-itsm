@@ -63,11 +63,11 @@
                         </bk-radio>
                         <bk-radio :value="'sequential'" :ext-cls="'mr20'">{{$t(`m.treeinfo['顺序会签']`)}}
                             <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['所有处理人均要进行审批。']`)"></i>
+                                v-bk-tooltips="$t(`m.treeinfo['所有处理人按顺序进行审批。']`)"></i>
                         </bk-radio>
                         <bk-radio :value="'random'">{{$t(`m.treeinfo['随机会签']`)}}
                             <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['所有处理人均要进行审批。']`)"></i>
+                                v-bk-tooltips="$t(`m.treeinfo['所有处理人随机进行审批。']`)"></i>
                         </bk-radio>
                     </bk-radio-group>
                     <template v-if="isShowSignSwitch">
@@ -432,6 +432,9 @@
                 this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep'
                 this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : ''
                 if (this.configur.finish_condition && this.configur.finish_condition.expressions) {
+                    if (this.configur.finish_condition.expressions.length) {
+                        this.isShowSignOptions = true
+                    }
                     this.finishCondition = JSON.parse(JSON.stringify(this.configur.finish_condition))
                     this.finishCondition.expressions.forEach(group => {
                         group.expressions = group.expressions.map(expression => {
