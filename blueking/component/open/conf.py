@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # """Django project settings
 # """
 
+import os
 
 try:
     from django.conf import settings
@@ -34,15 +35,17 @@ try:
     SECRET_KEY = settings.APP_TOKEN
     # COMPONENT_SYSTEM_HOST = settings.BK_PAAS_HOST
     # HTTPS-SUPPORT
-    COMPONENT_SYSTEM_HOST = getattr(
-        settings,
-        'BK_PAAS_INNER_HOST',
-        settings.BK_PAAS_HOST)
-    DEFAULT_BK_API_VER = getattr(settings, 'DEFAULT_BK_API_VER', 'v2')
+    # COMPONENT_SYSTEM_HOST = getattr(
+    #     settings,
+    #     'BK_PAAS_INNER_HOST',
+    #     settings.BK_PAAS_HOST)
+    HOST = getattr(settings, "BK_PAAS_INNER_HOST", settings.BK_PAAS_HOST)
+    COMPONENT_SYSTEM_HOST = os.environ.get("BK_COMPONENT_API_URL", HOST)
+    DEFAULT_BK_API_VER = getattr(settings, "DEFAULT_BK_API_VER", "v2")
 except BaseException:
-    APP_CODE = ''
-    SECRET_KEY = ''
-    COMPONENT_SYSTEM_HOST = ''
-    DEFAULT_BK_API_VER = 'v2'
+    APP_CODE = ""
+    SECRET_KEY = ""
+    COMPONENT_SYSTEM_HOST = ""
+    DEFAULT_BK_API_VER = "v2"
 
 CLIENT_ENABLE_SIGNATURE = False
