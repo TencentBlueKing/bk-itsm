@@ -1103,7 +1103,7 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         """
         src_instance = self.get_object()
         # 通过前端接口复制的任务模板，直接置为草稿，需要重新保存处理
-        new_ids, _ = TaskSchema.objects.clone([src_instance.id], is_draft=True)
+        new_ids = TaskSchema.objects.clone([src_instance.id], is_draft=True)
         return Response(new_ids)
 
     def perform_destroy(self, instance):

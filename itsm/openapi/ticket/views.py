@@ -307,10 +307,16 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        instance.do_after_create(
-            data["fields"], request.data.get("from_ticket_id", None)
-        )
-        start_pipeline.apply_async([instance])
+
+        try:
+            instance.do_after_create(
+                request.data["fields"], request.data.get("from_ticket_id", None)
+            )
+            start_pipeline.apply_async([instance])
+        except BaseException as error:
+            Ticket.objects.filter(id=instance.id).delete()
+            logger.exception("failed create ticket: {%s}", data)
+            raise ValidationError(_("创建单据失败，报错信息：{}".format(str(error))))
         return Response(
             {"sn": instance.sn, "id": instance.id, "ticket_url": instance.pc_ticket_url}
         )

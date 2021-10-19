@@ -16,8 +16,16 @@ specific language governing permissions and limitations under the License.
 # """
 
 
-class BlueSettings(object):
+def get_settings_from_module(module, is_upper=True):
+    setting_items = {}
+    for _setting in dir(module):
+        if is_upper and not _setting.isupper():
+            continue
+        setting_items[_setting] = getattr(module, _setting)
+    return setting_items
 
+
+class BlueSettings(object):
     def __init__(self):
         from django.conf import settings as django_settings
         from blueapps.conf import default_settings
@@ -32,8 +40,9 @@ class BlueSettings(object):
             elif hasattr(self._default_settings, key):
                 return getattr(self._default_settings, key)
 
-        raise AttributeError("%r object has no attribute %r"
-                             % (self.__class__.__name__, key))
+        raise AttributeError(
+            "%r object has no attribute %r" % (self.__class__.__name__, key)
+        )
 
 
 settings = BlueSettings()

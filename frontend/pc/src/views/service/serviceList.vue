@@ -554,12 +554,12 @@
             // 全选 半选
             handleSelectAll (selection) {
                 this.dataList.forEach(item => {
-                    if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], item.auth_actions)) {
+                    if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                         item.checkStatus = !!selection.length
                     }
                 })
                 // 选中有权限数据
-                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], item.auth_actions))
+                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions]))
             },
             handleSelect (selection, row) {
                 this.checkList = selection
