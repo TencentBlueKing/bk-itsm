@@ -411,6 +411,7 @@
     .bk-add-content {
         .bk-content-group {
             width: 100% !important;
+            background: white;
             margin-bottom: 18px;
             box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
             border-radius: 2px;
@@ -469,6 +470,7 @@
         }
         .bk-priority-configur {
             display: inline-block;
+            box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
             width: 84%;
         }
     }
