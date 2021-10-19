@@ -56,16 +56,98 @@
                     :label="$t(`m.treeinfo['审批方式：']`)"
                     :required="true"
                     :property="'nodeType'">
-                    <bk-radio-group v-model="formInfo.is_multi">
-                        <bk-radio :value="false" :ext-cls="'mr40 pr40'">{{$t(`m.treeinfo['或签']`)}}
+                    <bk-radio-group v-model="processType" @change="handleChangeDispose">
+                        <bk-radio :value="'multi'" :ext-cls="'mr20'">{{$t(`m.treeinfo['或签']`)}}
                             <i class="bk-itsm-icon icon-icon-info tooltip-icon"
                                 v-bk-tooltips="$t(`m.treeinfo['任一处理人完成审批即可。']`)"></i>
                         </bk-radio>
-                        <bk-radio :value="true">{{$t(`m.treeinfo['多签']`)}}
+                        <bk-radio :value="'sequential'" :ext-cls="'mr20'">{{$t(`m.treeinfo['顺序会签']`)}}
                             <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['所有处理人均要进行审批。']`)"></i>
+                                v-bk-tooltips="$t(`m.treeinfo['所有处理人按顺序进行审批。']`)"></i>
+                        </bk-radio>
+                        <bk-radio :value="'random'">{{$t(`m.treeinfo['随机会签']`)}}
+                            <i class="bk-itsm-icon icon-icon-info tooltip-icon"
+                                v-bk-tooltips="$t(`m.treeinfo['所有处理人随机进行审批。']`)"></i>
                         </bk-radio>
                     </bk-radio-group>
+                    <template v-if="isShowSignSwitch">
+                        <span class="bk-condtion-switch">{{ $t(`m.treeinfo['提前结束条件']`) }}</span>
+                        <bk-switcher v-model="isShowSignOptions" theme="primary"></bk-switcher>
+                        <i class="bk-itsm-icon icon-icon-info tooltip-icon" v-bk-tooltips="$t(`m.treeinfo['若配置了会签提前结束条件，满足条件，将提前结束']`)"></i>
+                        <div class="bk-condition-content" v-if="isShowSignOptions">
+                            <div class="bk-condition-group" v-for="(group, gIndex) in finishCondition.expressions" :key="gIndex">
+                                <p class="bk-group-title">{{$t(`m.treeinfo['或-条件组']`)}}{{gIndex + 1}}</p>
+                                <div :class="{ 'bk-group-content': true, 'bk-group-contents': group.expressions.length > 1 }">
+                                    <bk-form :label-width="0"
+                                        :rules="finishConditionRule"
+                                        ref="finishConditionForms"
+                                        v-for="(expression, eIndex) in group.expressions" :key="eIndex"
+                                        :model="expression"
+                                        form-type="inline"
+                                        :ext-cls="'bk-condition'">
+                                        <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'key'">
+                                            <div class="bk-left-block" v-if="group.expressions.length > 1">
+                                                <span :class="{ 'left-top-default': true, 'no-left-border': eIndex === 0 }"></span>
+                                                <span :class="{ 'left-bottom-default': true, 'no-left-border': eIndex === group.expressions.length - 1 }"></span>
+                                                <span class="bk-left-letter" v-if="eIndex !== group.expressions.length - 1">{{$t(`m.common['且']`)}}</span>
+                                            </div>
+                                            <bk-select
+                                                v-model="expression.key"
+                                                :font-size="'medium'"
+                                                :clearable="false"
+                                                :ext-cls="'bk-form-width-long'"
+                                                @selected="selectCondition($event, expression, eIndex, gIndex)">
+                                                <bk-option v-for="option in allCondition"
+                                                    :key="option.id"
+                                                    :id="option.key"
+                                                    :name="option.name">
+                                                </bk-option>
+                                            </bk-select>
+                                        </bk-form-item>
+                                        <bk-form-item :ext-cls="'bk-form-item-cus'">
+                                            <bk-select v-model="expression.condition"
+                                                :font-size="'medium'"
+                                                :clearable="false"
+                                                :ext-cls="'bk-form-width-short'">
+                                                <bk-option v-for="option in betweenList"
+                                                    :key="option.key"
+                                                    :id="option.key"
+                                                    :name="option.name">
+                                                </bk-option>
+                                            </bk-select>
+                                        </bk-form-item>
+                                        <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'value'">
+                                            <bk-input v-model="expression.value"
+                                                :ext-cls="'bk-form-width-long'"
+                                                v-bk-tooltips="expression.tooltipInfo"
+                                                :disabled="(!formInfo.processors.length && expression.meta.unit === 'INT') ||
+                                                    !expression.key"
+                                                :clearable="false"
+                                                type="number"
+                                                :max="expression.meta.unit === 'INT' ? formInfo.processors.length : 100"
+                                                :min="0"
+                                                :precision="0"
+                                                @change="giveTooltip(expression)"></bk-input>
+                                            <span v-if="expression.meta.unit === 'PERCENT'"
+                                                class="buttonIcon">%</span>
+                                        </bk-form-item>
+                                        <bk-form-item :ext-cls="'bk-form-item-cus'">
+                                            <div class="bk-operate-expression">
+                                                <i class="bk-itsm-icon icon-flow-add mr10" @click="operateExpression(group)"></i>
+                                                <i class="bk-itsm-icon icon-flow-reduce mr10" :class="{ 'bk-itsm-icon-disable':
+                                                    group.expressions.length === 1 }"
+                                                    @click="operateExpression(group, 'del', eIndex, gIndex, expression)"></i>
+                                            </div>
+                                        </bk-form-item>
+                                        <i class="bk-icon icon-close bk-delete-group"
+                                            @click="operateGroup('del', gIndex)"></i>
+                                    </bk-form>
+                                </div>
+                            </div>
+                            <p class="bk-add-group" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
+                                {{$t(`m.treeinfo['添加“或”条件组']`)}}</p>
+                        </div>
+                    </template>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
                     <div @click="checkStatus.processors = false">
@@ -163,7 +245,6 @@
     import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
     import BasicCard from '@/components/common/layout/BasicCard.vue'
     import { errorHandler } from '../../../../utils/errorHandler'
-    
     export default {
         name: 'ApprovalNode',
         components: {
@@ -190,6 +271,77 @@
         },
         data () {
             return {
+                betweenList: [
+                    {
+                        id: 1,
+                        name: '>=',
+                        key: '>='
+                    },
+                    {
+                        id: 2,
+                        name: '>',
+                        key: '>'
+                    },
+                    {
+                        id: 3,
+                        name: '=',
+                        key: '=='
+                    },
+                    {
+                        id: 4,
+                        name: '<=',
+                        key: '<='
+                    },
+                    {
+                        id: 5,
+                        name: '<',
+                        key: '<'
+                    }
+                ],
+                finishCondition: {
+                    expressions: [
+                        {
+                            expressions: [],
+                            type: 'and'
+                        }
+                    ],
+                    type: 'or'
+                },
+                finishConditionRule: {
+                    key: [
+                        {
+                            required: true,
+                            message: this.$t(`m.systemConfig['请输入']`),
+                            trigger: 'blur'
+                        }
+                    ],
+                    value: [
+                        {
+                            required: true,
+                            message: this.$t(`m.systemConfig['请输入']`),
+                            trigger: 'blur'
+                        }
+                    ]
+                },
+                emptyExpression: {
+                    key: '',
+                    condition: '>=',
+                    value: '',
+                    source: 'global',
+                    type: 'INT',
+                    meta: {
+                        code: '',
+                        unit: 'INT'
+                    },
+                    tooltipInfo: {
+                        disabled: false,
+                        content: this.$t(`m.treeinfo['请先选择条件']`),
+                        placements: ['top']
+                    }
+                },
+                isShowSignSwitch: false,
+                isShowSignOptions: false,
+                processType: '',
                 isLoading: false,
                 secondClick: false,
                 getConditionFlag: false,
@@ -245,23 +397,60 @@
                 }
             }
         },
+        watch: {
+            'formInfo.processors': function () {
+                this.setAllTooltip()
+            }
+        },
         mounted () {
             this.initData()
         },
         methods: {
             initData () {
+                this.getAllConditions()
                 this.isLoading = true
                 let getSecondLevelList
+                this.processType = 'multi'
                 // name
                 this.formInfo.name = this.configur.name
                 // 节点标签
                 this.formInfo.tag = this.configur.tag || ''
                 this.formInfo.is_multi = this.configur.is_multi === true
                 // this.formInfo.can_deliver = this.configur.can_deliver === true
+                if (this.configur.is_multi) {
+                    this.isShowSignSwitch = true
+                    if (this.configur.is_sequential) {
+                        this.processType = 'sequential'
+                    } else {
+                        this.processType = 'random'
+                    }
+                } else {
+                    this.processType = 'multi'
+                }
                 this.formInfo.is_sequential = this.configur.is_sequential
                 this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : []
                 this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep'
                 this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : ''
+                if (this.configur.finish_condition && this.configur.finish_condition.expressions) {
+                    if (this.configur.finish_condition.expressions.length) {
+                        this.isShowSignOptions = true
+                    }
+                    this.finishCondition = JSON.parse(JSON.stringify(this.configur.finish_condition))
+                    this.finishCondition.expressions.forEach(group => {
+                        group.expressions = group.expressions.map(expression => {
+                            const tooltipInfo = {
+                                disabled: true,
+                                content: '',
+                                placements: ['top']
+                            }
+                            return { ...expression, tooltipInfo }
+                        })
+                    })
+                } else {
+                    this.passRateExpression.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
+                    this.finishCondition.expressions[0].expressions.push(JSON.parse(JSON.stringify(this.passRateExpression)))
+                    this.giveTooltip(this.passRateExpression)
+                }
                 this.$set(this.formInfo, 'can_deliver', this.configur.can_deliver === true)
                 if (this.formInfo.ticket_type === 'custom') {
                     getSecondLevelList = this.getSecondLevelList()
@@ -341,13 +530,22 @@
                         workflow: this.flowInfo.id,
                         type: this.configur.type,
                         is_terminable: false,
-                        processors_type: 'PERSON'
+                        processors_type: 'PERSON',
+                        finish_condition: this.finishCondition,
+                        is_multi: false
                     }
                     // 基本信息
                     params.name = this.formInfo.name
                     params.is_sequential = this.formInfo.is_sequential
                     params.processors_type = ''
                     params.processors = ''
+                    // 提前条件结束为false
+                    if (!this.isShowSignOptions) {
+                        params.finish_condition = {
+                            expressions: [],
+                            type: 'or'
+                        }
+                    }
                     // 处理人为空校验
                     if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
                         this.checkStatus.processors = true
@@ -368,7 +566,9 @@
                         params.delivers_type = data.type
                         params.delivers = data.value
                     }
-                    params.is_multi = this.formInfo.is_multi
+                    if (this.processType !== 'multi') {
+                        params.is_multi = true
+                    }
                     params.tag = this.formInfo.tag
                     params.can_deliver = this.formInfo.can_deliver
                     params.ticket_type = this.formInfo.ticket_type
@@ -408,6 +608,16 @@
             closeNode () {
                 this.$emit('closeConfigur', false)
             },
+            handleChangeDispose (val) {
+                this.isShowSignSwitch = false
+                this.formInfo.is_sequential = false
+                if (val !== 'multi') {
+                    this.isShowSignSwitch = true
+                }
+                if (val === 'sequential') {
+                    this.formInfo.is_sequential = true
+                }
+            },
             // 获取二级状态数据
             handleTicket (value) {
                 this.formInfo.ticket_key = ''
@@ -416,6 +626,107 @@
                         this.getSecondLevelList()
                     }
                 }
+            },
+            operateGroup (type = 'add', index) {
+                if (type === 'del') {
+                    if (this.finishCondition.expressions.length === 1) {
+                        this.$bkInfo({
+                            type: 'warning',
+                            title: this.$t(`m.treeinfo['确定删除唯一的条件组？']`),
+                            subTitle: this.$t(`m.treeinfo['若删除，则必须所有人处理完成才结束']`),
+                            confirmFn: () => {
+                                this.finishCondition.expressions.splice(index, 1)
+                            }
+                        })
+                    } else {
+                        this.finishCondition.expressions.splice(index, 1)
+                    }
+                } else {
+                    this.finishCondition.expressions.push({
+                        expressions: [JSON.parse(JSON.stringify(this.emptyExpression))],
+                        type: 'and'
+                    })
+                }
+            },
+            // 添加删除条件
+            operateExpression (expressionGroup, type = 'add', eIndex, gIndex, expression) {
+                if (type === 'del') {
+                    if (expressionGroup.expressions.length === 1) {
+                        return
+                    }
+                    if (gIndex === 0 && eIndex === 0 && expression.meta.code === 'PROCESS_COUNT') {
+                        this.$bkInfo({
+                            type: 'warning',
+                            title: this.$t(`m.treeinfo['确定删除“处理人数”？']`),
+                            subTitle: this.$t(`m.treeinfo['若删除该条件，则忽略处理人数，条件满足即结束']`),
+                            confirmFn: () => {
+                                expressionGroup.expressions.splice(eIndex, 1)
+                            }
+                        })
+                    } else {
+                        expressionGroup.expressions.splice(eIndex, 1)
+                    }
+                } else {
+                    expressionGroup.expressions.push(JSON.parse(JSON.stringify(this.emptyExpression)))
+                }
+            },
+            // 获取提前结束可选条件
+            async getAllConditions () {
+                const id = this.configur.id
+                this.getConditionFlag = true
+                await this.$store.dispatch('apiRemote/get_sign_conditions', id).then(res => {
+                    this.allCondition = res.data
+                }).catch(res => {
+                    errorHandler(res, this)
+                }).finally(() => {
+                    this.getConditionFlag = false
+                })
+            },
+            // 设置条件tooltip
+            giveTooltip (expression) {
+                if (!expression.key) {
+                    expression.tooltipInfo.disabled = false
+                    expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择条件']`)
+                    return
+                }
+                if (!(expression.meta.code === 'PASS_RATE' || expression.meta.code === 'REJECT_RATE') && !this.formInfo.processors.length) {
+                    expression.tooltipInfo.disabled = false
+                    expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择处理人']`)
+                    return
+                }
+                expression.tooltipInfo.disabled = true
+                expression.tooltipInfo.content = ''
+            },
+            // 所有条件添加tootip
+            setAllTooltip () {
+                this.finishCondition.expressions.forEach(group => {
+                    group.expressions.forEach(expression => {
+                        this.giveTooltip(expression)
+                    })
+                })
+            },
+            // 条件选择回调
+            selectCondition (val, condition, eIndex, gIndex) {
+                if (gIndex === 0 && eIndex === 0 && condition.meta.code === 'PROCESS_COUNT') {
+                    this.$bkInfo({
+                        type: 'warning',
+                        title: this.$t(`m.treeinfo['确定更改“处理人数”？']`),
+                        subTitle: this.$t(`m.treeinfo['若更改该条件，则忽略处理人数，条件满足即结束']`),
+                        cancelFn: () => {
+                            condition.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
+                        },
+                        confirmFn: () => {
+                            this.changeCondition(condition)
+                        }
+                    })
+                } else {
+                    this.changeCondition(condition)
+                }
+            },
+            changeCondition (condition) {
+                condition.meta.code = this.allCondition.find(one => one.key === condition.key).meta.code
+                condition.meta.unit = this.allCondition.find(one => one.key === condition.key).meta.unit || 'INT'
+                this.giveTooltip(condition)
             }
         }
     }
@@ -478,8 +789,12 @@
                 align-items: center;
                 margin-top: 40px;
             }
-
-            .bk-condition-content{
+        }
+        .bk-condtion-switch {
+            font-size: 14px;
+            color: #979BA5;
+        }
+        .bk-condition-content{
                 height: auto;
                 max-width: 750px;
 
@@ -491,7 +806,7 @@
                         font-weight: bold;
                         font-size: 14px;
                         margin-bottom: 6px;
-                        margin-top: 30px;
+                        // margin-top: 30px;
                     }
 
                     .bk-group-content{
@@ -642,6 +957,5 @@
                     }
                 }
             }
-        }
     }
 </style>

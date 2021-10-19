@@ -1346,6 +1346,10 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '提前结束条件': 'Early termination condition',
+        '顺序会签': 'Sequential sign',
+        '随机会签': 'Random sign',
+        '若配置了会签提前结束条件，满足条件，将提前结束': 'If the conditions for ending the countersignature early are met, the countersignature is terminated in advance',
         '请输入选项ID': 'Please enter the option ID',
         '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
@@ -1373,6 +1377,8 @@ export const m = {
         '多签': 'Multi-sign',
         '任一处理人完成审批即可。': 'Any processor can complete the approval.',
         '所有处理人均要进行审批。': 'All processors are subject to approval.',
+        '所有处理人随机进行审批。': 'All processors will be randomly approved.',
+        '所有处理人按顺序进行审批。': 'All processors approve in order.',
         '对应单据状态：': 'Ticket Status:',
         '审批方式：': 'Approval way: ',
         '共': 'Total ',
