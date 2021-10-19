@@ -85,8 +85,8 @@ class IadminConfig(AppConfig):
                 "host": os.getenv("BKAPP_REDIS_HOST"),
                 "port": os.getenv("BKAPP_REDIS_PORT"),
                 "password": os.getenv("BKAPP_REDIS_PASSWORD"),
-                "service_name": os.getenv("BKAPP_REDIS_SERVICE_NAME"),
-                "mode": os.getenv("BKAPP_REDIS_MODE"),
-                "db": os.getenv("BKAPP_REDIS_DB"),
+                "service_name": os.getenv("BKAPP_REDIS_SERVICE_NAME", "mymaster"),
+                "mode": os.getenv("BKAPP_REDIS_MODE", "single"),
+                "db": os.getenv("BKAPP_REDIS_DB", 0),
             }
         post_migrate.connect(app_ready_handler, sender=self)

@@ -23,6 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import importlib
+from urllib.parse import urljoin
+
 from config import RUN_VER, BK_PAAS_HOST, OPEN_VER  # noqa
 
 if RUN_VER == "open":
@@ -68,17 +71,24 @@ if ALLOW_CSRF:
     MIDDLEWARE = ("common.middlewares.DisableCSRFCheck",) + MIDDLEWARE
 
 MEDIA_URL = "%smedia/" % SITE_URL
-BK_STATIC_URL = '/static'
+BK_STATIC_URL = "/static"
 
 # REMOTE_STATIC_URL = "http://127.0.0.1:8000/static/"
 # STATIC_URL = "http://127.0.0.1:8000/static/"
 # ==============================================================================
 # 加载环境差异化配置
 # ==============================================================================
-ver_settings = importlib.import_module('adapter.config.sites.%s.ver_settings' % RUN_VER)
+ver_settings = importlib.import_module("adapter.config.sites.%s.ver_settings" % RUN_VER)
 for _setting in dir(ver_settings):
     if _setting.upper() == _setting:
         locals()[_setting] = getattr(ver_settings, _setting)
+
+ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
+if ENGINE_REGION == "default":
+    default_settings = importlib.import_module('adapter.config.sites.%s.ver_settings' % "v3")
+    for _setting in dir(default_settings):
+        if _setting.upper() == _setting:
+            locals()[_setting] = getattr(default_settings, _setting)
 
 BK_IAM_RESOURCE_API_HOST = os.getenv(
     "BKAPP_IAM_RESOURCE_API_HOST", urljoin(BK_PAAS_INNER_HOST, "/t/{}".format(APP_CODE))
