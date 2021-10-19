@@ -507,13 +507,13 @@
         color: #63656e;
         .task-title {
             position: relative;
-            &::after {
-                position: absolute;
-                right: -15px;
-                top: 3px;
-                content: '*';
-                color: #ea3636;
-            }
+            // &::after {
+            //     position: absolute;
+            //     right: -15px;
+            //     top: 3px;
+            //     content: '*';
+            //     color: #ea3636;
+            // }
         }
         .header-right-content {
             float: right;
