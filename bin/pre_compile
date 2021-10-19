@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$RUN_VER" == "open" ]
+then
+  exit 0
+fi
+
 echo "clean other version's files"
 rm -rf blueapps
 rm -rf blueking

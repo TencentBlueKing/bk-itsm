@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import importlib
 from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
@@ -36,7 +36,21 @@ from config import (
     BK_PAAS_INNER_HOST,
 )
 
+# 标准运维页面服务地址
+SITE_URL_SOPS = "/o/bk_sops/"
+
+# 针对 paas_v3 容器化差异化配置
+ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
+if ENGINE_REGION == "default":
+    env_settings = importlib.import_module("adapter.config.sites.%s.env" % "v3")
+    for _setting in dir(env_settings):
+        if _setting.upper() == _setting:
+            locals()[_setting] = getattr(env_settings, _setting)
+    SITE_URL_SOPS = "/bk--sops/"
+
 # 请在这里加入你的自定义 APP
+from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
+
 INSTALLED_APPS += (
     # 配置项
     "itsm.iadmin",
@@ -64,6 +78,7 @@ INSTALLED_APPS += (
     "itsm.misc",
     "itsm.trigger",
     "itsm.task",
+    "itsm.openapi",
     "data_migration",
     # 'silk',
     "mptt",
@@ -84,6 +99,7 @@ INSTALLED_APPS += (
     "weixin",
     # 'flower',
     # 'monitors',
+    "itsm.monitor",
 )
 
 # IAM 开启开关
@@ -135,6 +151,8 @@ MIDDLEWARE = (
     # 'pyinstrument.middleware.ProfilerMiddleware',
 )
 
+MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
+
 # 所有环境的日志级别可以在这里配置
 # LOG_LEVEL = 'DEBUG'
 
@@ -177,6 +195,16 @@ CELERY_IMPORTS = (
 
 # load logging settings
 LOGGING = get_logging_config_dict(locals())
+
+# 需要添加的 trace 相关信息格式
+inject_formatters = ("verbose",)
+# 注入到日志配置，会直接在对应 formatter 格式之后添加 trace_format
+# 日志中添加trace_id
+ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
+if ENABLE_OTEL_TRACE:
+    INSTALLED_APPS += ("itsm.monitor.opentelemetry.instrument_app",)
+    trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
+    inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
 
 # 初始化管理员列表，列表中的人员将拥有预发布环境和正式环境的管理员权限
 # 注意：请在首次提测和上线前修改，之后的修改将不会生效
@@ -356,19 +384,19 @@ else:
 
 CACHES.update(
     {
-        'db': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'django_cache',
+        "db": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "django_cache",
         },
-        'login_db': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'account_cache',
+        "login_db": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "account_cache",
         },
-        'dummy': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        "dummy": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         },
-        'locmem': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "locmem": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         },
     }
 )
@@ -626,7 +654,10 @@ CLOSE_NOTIFY = os.environ.get("BKAPP_CLOSE_NOTIFY", None)
 BK_CC_HOST = os.environ.get("BK_CC_HOST", "#")
 BK_JOB_HOST = os.environ.get("BK_JOB_HOST", "#")
 
-BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", BK_PAAS_HOST)
+# 适配容器化
+USER_MANGE_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_HOST)
+
+BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", USER_MANGE_HOST)
 
 BK_USER_MANAGE_WEIXIN_HOST = os.environ.get("BK_USER_MANAGE_WEIXIN_HOST", BK_PAAS_HOST)
 
@@ -684,22 +715,19 @@ PROFILER = {
 # The name of the class to use to run the test suite
 TEST_RUNNER = "itsm.tests.runner.ItsmTestRunner"
 
-# 标准运维页面服务地址
-SITE_URL_SOPS = "/o/bk_sops/"
-
 # 统一转发前缀
 PREFIX_SOPS = ""
 
 # 设置被代理的标准运维插件AJAX请求地址，比如API网关的接口
 # 'https://paasee-dev.XX.com/t/bk_sops/apigw/dispatch_plugin_query/'
 SOPS_PROXY_URL = os.environ.get(
-    "BKAPP_SOPS_PROXY_URL", "{}/o/bk_sops/".format(BK_PAAS_INNER_HOST)
+    "BKAPP_SOPS_PROXY_URL", "{}{}".format(BK_PAAS_INNER_HOST, SITE_URL_SOPS)
 )
 
 # 设置被代理的标准运维插件静态资源地址，比如标准运维的site_url或API网关接口
 # 'https://paasee-dev.XX.com/t/bk_sops'
 SOPS_SITE_URL = os.environ.get(
-    "BKAPP_SOPS_SITE_URL", "{}/o/bk_sops/".format(BK_PAAS_HOST)
+    "BKAPP_SOPS_SITE_URL", "{}{}".format(BK_PAAS_HOST, SITE_URL_SOPS)
 )
 
 # 允许转发的非静态内容路径
@@ -748,7 +776,11 @@ BK_DESKTOP_URL = os.environ.get("BK_DESKTOP_URL") or BK_PAAS_HOST
 
 BK_IAM_API_PREFIX = SITE_URL + "openapi"
 BK_API_USE_TEST_ENV = True if os.environ.get("BK_API_USE_TEST_ENV") == "True" else False
-BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", BK_PAAS_INNER_HOST)
+
+# iam适配容器化
+IAM_ESB_PAAS_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_INNER_HOST)
+BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", IAM_ESB_PAAS_HOST)
+
 IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
 CALLBACK_AES_KEY = "APPROVAL_RESULT"
@@ -784,10 +816,23 @@ USE_TZ = False
 DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
 DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 
+# bkchat快速审批
+USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
+if USE_BKCHAT:
+    BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
+    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
+    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # 通知消息模版
-CONTENT_CREATOR_WITH_TRANSLATION = True if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION",
-                                                     "true").lower() == "true" else False
+CONTENT_CREATOR_WITH_TRANSLATION = (
+    True
+    if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION", "true").lower() == "true"
+    else False
+)
+
+# 系统api调用账户
+SYSTEM_USE_API_ACCOUNT = "admin"
