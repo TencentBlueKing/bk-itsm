@@ -716,20 +716,24 @@
                 this.formInfo.show_conditions = assignValue.show_conditions || {}
                 if (this.formInfo.type === 'CUSTOMTABLE') {
                     this.customTableInfo.list = []
-                    assignValue.meta.columns.forEach(node => {
-                        const valChoice = []
-                        node.choice.forEach(vaule => {
-                            valChoice.push(vaule.name)
+                    if (assignValue.meta.hasOwnProperty('columns')) {
+                        assignValue.meta.columns.forEach(node => {
+                            const valChoice = []
+                            node.choice.forEach(vaule => {
+                                valChoice.push(vaule.name)
+                            })
+                            this.customTableInfo.list.push({
+                                name: node.name,
+                                display: node.display,
+                                choice: valChoice.join('\n'),
+                                required: node.required,
+                                nameCheck: false,
+                                check: false
+                            })
                         })
-                        this.customTableInfo.list.push({
-                            name: node.name,
-                            display: node.display,
-                            choice: valChoice.join('\n'),
-                            required: node.required,
-                            nameCheck: false,
-                            check: false
-                        })
-                    })
+                    } else {
+                        this.customTableInfo.list.push({ name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false })
+                    }
                 }
                 // 标准运维变量
                 if (Object.keys(this.sospInfo).length) {
@@ -1241,6 +1245,7 @@
                     this.checkStatus.customStatus = this.fieldInfo.list.some(item => (item.nameCheck || item.keyCheck))
                 }
                 if (this.formInfo.type === 'CUSTOMTABLE') {
+                    const repeatName = []
                     this.customTableInfo.list.forEach(item => {
                         let choiceList = []
                         if (item.choice && (item.display === 'select' || item.display === 'multiselect')) {
@@ -1250,6 +1255,11 @@
                         }
                         item.nameCheck = item.name.length === 0 || item.name.length > 120
                         item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'))
+                        if (!repeatName.includes(item.name)) {
+                            repeatName.push(item.name)
+                        } else {
+                            item.nameCheck = true
+                        }
                     })
                     this.checkStatus.customTableStatus = this.customTableInfo.list.some(item => (item.nameCheck || item.check))
                 }
