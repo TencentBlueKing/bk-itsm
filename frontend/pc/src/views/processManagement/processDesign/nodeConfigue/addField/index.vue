@@ -1244,6 +1244,7 @@
                     })
                     this.checkStatus.customStatus = this.fieldInfo.list.some(item => (item.nameCheck || item.keyCheck))
                 }
+
                 if (this.formInfo.type === 'CUSTOMTABLE') {
                     const repeatName = []
                     this.customTableInfo.list.forEach(item => {
