@@ -323,6 +323,22 @@
                         }
                     ]
                 },
+                passRateExpression: {
+                    key: '',
+                    condition: '>=',
+                    value: '',
+                    source: 'global',
+                    type: 'INT',
+                    meta: {
+                        code: 'PROCESS_COUNT',
+                        unit: 'INT'
+                    },
+                    tooltipInfo: {
+                        disabled: true,
+                        content: '',
+                        placements: ['top']
+                    }
+                },
                 emptyExpression: {
                     key: '',
                     condition: '>=',
@@ -447,7 +463,10 @@
                         })
                     })
                 } else {
-                    this.passRateExpression.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
+                    const passRateExpressionKey = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT')
+                    if (passRateExpressionKey) {
+                        this.passRateExpression.key = passRateExpressionKey.key
+                    }
                     this.finishCondition.expressions[0].expressions.push(JSON.parse(JSON.stringify(this.passRateExpression)))
                     this.giveTooltip(this.passRateExpression)
                 }

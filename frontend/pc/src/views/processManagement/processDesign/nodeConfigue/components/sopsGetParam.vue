@@ -199,14 +199,14 @@
                 default () {
                     return false
                 }
-            }
+            },
+            // 被勾选为引用的变量
+            hookedVarList: Object
         },
         data () {
             return {
                 disabled: false,
                 disabledRenderForm: false,
-                hookedVarList: {}, // 被勾选为引用的变量
-                // quoteVarsLoading: false,
                 configLoading: false,
                 quoteErrors: [], // 变量引用校验不同通过列表
                 renderKey: '',

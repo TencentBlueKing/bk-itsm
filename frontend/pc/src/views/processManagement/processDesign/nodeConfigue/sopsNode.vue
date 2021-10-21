@@ -114,6 +114,7 @@
                     :fields="fieldList"
                     :context="context"
                     :constants="constants"
+                    :hooked-var-list="hookedVarList"
                     :constant-default-value="constantDefaultValue"
                     :quote-vars="quoteVars"
                     :flow-info="flowInfo">
@@ -184,6 +185,7 @@
         data () {
             return {
                 quoteVars: [],
+                hookedVarList: {},
                 constantDefaultValue: {},
                 basicsFormData: {
                     name: '',
@@ -307,6 +309,16 @@
                     }
                     await this.getTemplateDetail(this.configur.extras.sops_info.template_id)
                     this.basicsFormData.templateId = this.configur.extras.sops_info.template_id
+                    this.constants.forEach(item => {
+                        this.configur.extras.sops_info.constants.filter(ite => {
+                            if (item.key === ite.key) {
+                                item.value = ite.value
+                            }
+                            if (ite.is_quoted) {
+                                this.hookedVarList[item.key] = true
+                            }
+                        })
+                    })
                 }
                 this.isLoading = false
             },
@@ -519,7 +531,8 @@
                                     name,
                                     key: key || 1,
                                     value_type: vt,
-                                    type: item.custom_type
+                                    type: item.custom_type,
+                                    is_quoted: this.hookedVarList[formKey]
                                 }
                                 formData.push(formTeamlate)
                             }
