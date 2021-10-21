@@ -124,6 +124,9 @@ class State(Model):
     is_terminable = models.BooleanField(_("是否可以终止"), default=False)
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
 
+    # 是否允许在单据处理人为空时跳过
+    is_allow_skip = models.BooleanField(_("是否允许在单据处理人为空时跳过"), default=False)
+
     # 会签及任务控制
     is_sequential = models.BooleanField(_("是否是串行任务"), default=False)
     finish_condition = jsonfield.JSONField(_("可向下调度的条件"), default=EMPTY_DICT)

@@ -25,11 +25,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 from django.core.cache import cache
-from itsm.component.constants import NODE_APPROVE_RESULT, PROCESS_COUNT
-from itsm.ticket.models import Ticket, Status
+from itsm.component.constants import NODE_APPROVE_RESULT, PROCESS_COUNT, APPROVE_RESULT
+from itsm.ticket.models import Ticket, Status, TicketField
 from pipeline.component_framework.component import Component
 
 from .itsm_sign import ItsmSignService
+from .tasks import auto_approve
 
 logger = logging.getLogger("celery")
 
@@ -59,8 +60,88 @@ class ItsmApprovalService(ItsmSignService):
         data.set_outputs("variables", variables)
         data.set_outputs("finish_condition", finish_condition)
         data.set_outputs("code_key", code_key)
+        node_status = Status.objects.get(ticket_id=ticket.id, state_id=state_id)
+        
+        if self.is_skip_approve(ticket, state_id, node_status):
+            node_status.processors_type = "PERSON"
+            node_status.processors = "system"
+            node_status.save()
+            msg = "检测到当前处理人为空，系统自动过单"
+            callback_data = {
+                "fields": self.get_approve_fields(ticket_id, state_id, msg),
+                "ticket_id": ticket_id,
+                'source': 'SYS',
+                'operator': "system",
+                "state_id": state_id
+            }
+            logger.info(
+                "检测到当前单据处理人为空，系统即将准备自动过单, ticket_id={}, state_id={}, callback_data={}".format(
+                    ticket.id, state_id, callback_data))
+            activity_id = ticket.activity_for_state(state_id)
+            auto_approve.apply_async((node_status.id, "system", activity_id, callback_data),
+                                     countdown=20)  # 20秒之后自动回调
+            return True
+
+        if self.is_auto_approve(ticket, node_status):
+            msg = "检测到当前处理人包含提单人，系统自动过单"
+            callback_data = {
+                "fields": self.get_approve_fields(ticket_id, state_id, msg),
+                "ticket_id": ticket_id,
+                'source': 'SYS',
+                'operator': ticket.creator,
+                "state_id": state_id
+            }
+            logger.info(
+                "检测到当前单据开启了自动过单，即将准备自动过单, ticket_id={}, state_id={}, callback_data={}".format(
+                    ticket.id, state_id, callback_data))
+            activity_id = ticket.activity_for_state(state_id)
+            auto_approve.apply_async((node_status.id, ticket.creator, activity_id, callback_data),
+                                     countdown=20)  # 20秒之后自动回调
 
         return True
+
+    def is_skip_approve(self, ticket, state_id, node_status):
+        processors = node_status.get_processors()
+        state = ticket.state(state_id)
+        if state.get("is_allow_skip", False) and len(processors) == 0:
+            return True
+        return False
+
+    def is_auto_approve(self, ticket, node_status):
+        processors = node_status.get_processors()
+        if ticket.flow.is_auto_approve and ticket.creator in processors:
+            return True
+        return False
+
+    def get_approve_fields(self, ticket_id, state_id, msg):
+        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket_id)
+        fields = []
+        remarked = False
+        for field in node_fields:
+            if field.meta.get("code") == APPROVE_RESULT:
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": 'true',
+                    }
+                )
+            else:
+                if not remarked:
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": msg,
+                        }
+                    )
+                    remarked = True
+
+        return fields
 
     @staticmethod
     def get_finish_condition(user_count):
