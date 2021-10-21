@@ -309,7 +309,7 @@
 }
 .steps-content {
     height: calc(100vh - 225px);
-    overflow: auto;
+    // overflow: auto;
     @include scroller;
 }
 .submit-footer-bar {
