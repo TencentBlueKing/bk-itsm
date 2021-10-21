@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #3a84ff;
+  color: #3a84ff !important; //高级配置统一蓝色
   cursor: pointer;
   .bk-icon {
       padding: 0 5px;
