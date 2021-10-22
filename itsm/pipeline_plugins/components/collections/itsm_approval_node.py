@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 from django.core.cache import cache
-from itsm.component.constants import NODE_APPROVE_RESULT, PROCESS_COUNT
+from itsm.component.constants import PROCESS_COUNT
 from itsm.ticket.models import Ticket, Status
 from pipeline.component_framework.component import Component
 
@@ -85,24 +85,6 @@ class ItsmApprovalService(ItsmSignService):
         node_status = Status.objects.get(ticket_id=ticket_id, state_id=state_id)
         user_list = node_status.get_user_list()
         return len(user_list)
-
-    @staticmethod
-    def get_key_value(node_status, ticket, code_key):
-        key_value = {}
-        reject_count = node_status.sign_reject_count()
-        if reject_count > 0:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "false"
-        return key_value
-
-    @staticmethod
-    def task_is_finished(node_status, finish_condition, key_value, code_key):
-        if key_value.get(code_key[NODE_APPROVE_RESULT]) == "false":
-            return True
-        process_count = node_status.sign_process_count()
-        is_finished = True if process_count >= int(finish_condition["value"]) else False
-        if is_finished:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "true"
-        return is_finished
 
     @staticmethod
     def do_before_exit(ticket, state_id, operator):
