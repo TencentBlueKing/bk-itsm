@@ -74,14 +74,22 @@ def sign_update(state_id, flow_id):
         variable["key"] = get_random_key(variable["name"])
         global_variables.append(GlobalVariable(**variable))
         state.add_variables(
-            variable["key"], variable["type"], name=variable["name"], source="global", meta=variable["meta"]
+            variable["key"],
+            variable["type"],
+            name=variable["name"],
+            source="global",
+            meta=variable["meta"],
         )
     GlobalVariable.objects.bulk_create(global_variables)
 
     # Create sign state built-in fields
     field_ids = []
     for sign_field in SIGN_FIELDS:
-        sign_field.update(key=get_random_key(sign_field["name"]), state_id=state_id, workflow_id=flow_id)
+        sign_field.update(
+            key=get_random_key(sign_field["name"]),
+            state_id=state_id,
+            workflow_id=flow_id,
+        )
         # Bulk create cannot get PK
         field = Field.objects.create(**sign_field)
         field_ids.append(field.id)
@@ -92,13 +100,17 @@ def sign_update(state_id, flow_id):
 def approval_update(state_id, flow_id):
     global_variables = []
     state = State.objects.get(id=state_id)
-    for variable in APPROVAL_VARIABLES:
+    for variable in APPROVAL_VARIABLES + SIGN_VARIABLES:
         variable["flow_id"] = flow_id
         variable["state_id"] = state_id
         variable["key"] = get_random_key(variable["name"])
         global_variables.append(GlobalVariable(**variable))
         state.add_variables(
-            variable["key"], variable["type"], name=variable["name"], source="global", meta=variable["meta"]
+            variable["key"],
+            variable["type"],
+            name=variable["name"],
+            source="global",
+            meta=variable["meta"],
         )
     GlobalVariable.objects.bulk_create(global_variables)
     field_ids = []
@@ -118,7 +130,9 @@ def approval_update(state_id, flow_id):
 
 
 def state_deleted_handler(sender, flow_id, state_id, **kwargs):
-    Transition.objects.filter(Q(from_state_id=state_id) | Q(to_state_id=state_id)).delete()
+    Transition.objects.filter(
+        Q(from_state_id=state_id) | Q(to_state_id=state_id)
+    ).delete()
     GlobalVariable.objects.filter(flow_id=flow_id, state_id=state_id).delete()
 
 
@@ -128,15 +142,18 @@ def task_schema_created_handler(sender, instance, created, *args, **kwargs):
         return
     if instance.component_type == SOPS_TASK:
         task_field_schema_objs = [
-            TaskFieldSchema(task_schema_id=instance.id, **task_field) for task_field in SOPS_TASK_FIELDS_SCHEMA
+            TaskFieldSchema(task_schema_id=instance.id, **task_field)
+            for task_field in SOPS_TASK_FIELDS_SCHEMA
         ]
     elif instance.component_type == DEVOPS_TASK:
         task_field_schema_objs = [
-            TaskFieldSchema(task_schema_id=instance.id, **task_field) for task_field in DEVOPS_TASK_FIELDS_SCHEMA
+            TaskFieldSchema(task_schema_id=instance.id, **task_field)
+            for task_field in DEVOPS_TASK_FIELDS_SCHEMA
         ]
     else:
         task_field_schema_objs = [
-            TaskFieldSchema(task_schema_id=instance.id, **task_field) for task_field in TASK_FIELDS_SCHEMA
+            TaskFieldSchema(task_schema_id=instance.id, **task_field)
+            for task_field in TASK_FIELDS_SCHEMA
         ]
     TaskFieldSchema.objects.bulk_create(task_field_schema_objs)
 
@@ -151,13 +168,17 @@ def init_after_workflow_created(sender, instance, created, *args, **kwargs):
         return
 
     if instance.table:
-        ordering = 'FIELD(`id`, %s)' % ','.join([str(field_id) for field_id in instance.table.fields_order])
-        fields = TemplateField.objects.filter(id__in=instance.table.fields_order, is_builtin=True)
+        ordering = "FIELD(`id`, %s)" % ",".join(
+            [str(field_id) for field_id in instance.table.fields_order]
+        )
+        fields = TemplateField.objects.filter(
+            id__in=instance.table.fields_order, is_builtin=True
+        )
 
         if not instance.is_biz_needed:
             fields.exclude(key=FIELD_BIZ)
 
-        fields = fields.extra(select={'ordering': ordering}, order_by=('ordering',))
+        fields = fields.extra(select={"ordering": ordering}, order_by=("ordering",))
 
         try:
             Field.objects.create_table_fields(instance, fields)
@@ -186,8 +207,12 @@ def init_after_workflow_created(sender, instance, created, *args, **kwargs):
 
     # 默认串行连线：start->first->end
     try:
-        Transition.objects.create_forward_transition(instance.pk, start_state.pk, first_state.pk, True, "")
-        Transition.objects.create_forward_transition(instance.pk, first_state.pk, end_state.pk, True, "默认")
+        Transition.objects.create_forward_transition(
+            instance.pk, start_state.pk, first_state.pk, True, ""
+        )
+        Transition.objects.create_forward_transition(
+            instance.pk, first_state.pk, end_state.pk, True, "默认"
+        )
     except BaseException as error:
         instance.delete()
         raise WorkFlowError("create transition error:%s" % str(error))
@@ -202,9 +227,9 @@ def after_basic_model_saved(sender, instance, created, *args, **kwargs):
     """
     if created:
         return
-    Field.objects.filter(workflow__in=instance.used_workflow.all(), source='TABLE').exclude(
-        key__in=instance.fields.values_list("key", flat=True)
-    ).delete()
+    Field.objects.filter(
+        workflow__in=instance.used_workflow.all(), source="TABLE"
+    ).exclude(key__in=instance.fields.values_list("key", flat=True)).delete()
 
 
 def after_base_field_saved(sender, instance, created, *args, **kwargs):
@@ -223,7 +248,9 @@ def after_base_field_saved(sender, instance, created, *args, **kwargs):
 
     base_models = instance.tables.all()
 
-    Field.objects.filter(workflow__table__in=base_models, key=instance.key).update(**field)
+    Field.objects.filter(workflow__table__in=base_models, key=instance.key).update(
+        **field
+    )
 
 
 def builtin_approval_workflow_create():
@@ -257,10 +284,19 @@ def builtin_approval_workflow_create():
         start_state = State.objects.create_start_state(instance.pk)
         first_state = State.objects.create_first_state(instance, name="提单")
         approver_field = Field.objects.create(
-            workflow=instance, name="审批人", key="APPROVER", type="MEMBERS", state=first_state, layout="COL_12"
+            workflow=instance,
+            name="审批人",
+            key="APPROVER",
+            type="MEMBERS",
+            state=first_state,
+            layout="COL_12",
         )
         approve_content_field = Field.objects.create(
-            workflow=instance, name="审批内容", key="APPROVAL_CONTENT", type="TEXT", state=first_state
+            workflow=instance,
+            name="审批内容",
+            key="APPROVAL_CONTENT",
+            type="TEXT",
+            state=first_state,
         )
 
         first_state.fields.append(approver_field.pk)
@@ -270,12 +306,20 @@ def builtin_approval_workflow_create():
         approval_state = State.objects.create_approval_state(instance, name="内置审批节点")
         approval_update(approval_state.id, approval_state.workflow_id)
 
-        end_state = State.objects.create_end_state(instance.pk, axis={"x": 890, "y": 150})
+        end_state = State.objects.create_end_state(
+            instance.pk, axis={"x": 890, "y": 150}
+        )
 
         # 默认串行连线：start->first->approval->end
-        Transition.objects.create_forward_transition(instance.pk, start_state.pk, first_state.pk, True, "")
-        Transition.objects.create_forward_transition(instance.pk, first_state.pk, approval_state.pk, True, "默认")
-        Transition.objects.create_forward_transition(instance.pk, approval_state.pk, end_state.pk, True, "默认")
+        Transition.objects.create_forward_transition(
+            instance.pk, start_state.pk, first_state.pk, True, ""
+        )
+        Transition.objects.create_forward_transition(
+            instance.pk, first_state.pk, approval_state.pk, True, "默认"
+        )
+        Transition.objects.create_forward_transition(
+            instance.pk, approval_state.pk, end_state.pk, True, "默认"
+        )
         instance.save()
         version = instance.create_version(name=instance.name, operator="")
         return version
