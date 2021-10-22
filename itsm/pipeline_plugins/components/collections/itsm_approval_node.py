@@ -44,17 +44,26 @@ class ItsmApprovalService(ItsmSignService):
         if super(ItsmSignService, self).execute(data, parent_data):
             return True
 
-        logger.info("itsm_sign execute: data={}, parent_data={}".format(data.inputs, parent_data.inputs))
+        logger.info(
+            "itsm_sign execute: data={}, parent_data={}".format(
+                data.inputs, parent_data.inputs
+            )
+        )
         ticket_id = parent_data.inputs.ticket_id
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
 
-        variables, _, code_key = ticket.do_before_enter_sign_state(state_id, by_flow=self.by_flow)
+        variables, finish_condition, code_key = ticket.do_before_enter_sign_state(
+            state_id, by_flow=self.by_flow
+        )
         is_multi = ticket.flow.get_state(state_id)["is_multi"]
         user_count = str(self.get_user_count(ticket_id, state_id)) if is_multi else "1"
         ticket.create_moa_ticket(state_id)
 
-        finish_condition = self.get_finish_condition(user_count)
+        # 如果是普通的审批节点，则自动生成条件
+        if not is_multi:
+            finish_condition = self.get_finish_condition(user_count)
+
         # Set outputs to data
         data.set_outputs("variables", variables)
         data.set_outputs("finish_condition", finish_condition)
@@ -102,7 +111,11 @@ class ItsmApprovalService(ItsmSignService):
 
     def final_execute(self, node_status, operator):
         super(ItsmApprovalService, self).final_execute(node_status, operator)
-        cache.delete("approval_status_{}_{}_{}".format(operator, node_status.ticket_id, node_status.state_id))
+        cache.delete(
+            "approval_status_{}_{}_{}".format(
+                operator, node_status.ticket_id, node_status.state_id
+            )
+        )
 
     def outputs_format(self):
         return []
