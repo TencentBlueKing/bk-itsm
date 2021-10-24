@@ -38,12 +38,14 @@ from .views import (
     TicketStatusModelViewSet,
     TicketTestModelViewSet,
 )
+from .views.ticket_remark import TicketRemarkModelViewSet
 from .views_test import TestViewSet
 
 
 routers = DefaultRouter(trailing_slash=True)
 
 routers.register(r"receipts", TicketModelViewSet, basename="receipts")
+routers.register(r"remark", TicketRemarkModelViewSet, basename="remark")
 routers.register(r"current_steps", TicketStatusModelViewSet, basename="current_steps")
 routers.register(r"fields", FieldViewSet, basename="fields")
 routers.register(r"logs", EventLogViewSet, basename="event_logs")
@@ -51,7 +53,9 @@ routers.register(r"templates", TemplateViewSet, basename="templates")
 routers.register(r"comments", CommentViewSet, basename="comments")
 routers.register(r"invite", CommentInviteViewSet, basename="invite")
 routers.register(r"draft", StateDraftViewSet, basename="draft")
-routers.register(r"followers_logs", FollowersNotifyLogViewSet, basename="followers_logs")
+routers.register(
+    r"followers_logs", FollowersNotifyLogViewSet, basename="followers_logs"
+)
 routers.register(r"operational", OperationalDataViewSet, basename="operational")
 routers.register(r"test", TestViewSet, basename="test")
 routers.register(r"ticket_tests", TicketTestModelViewSet, basename="ticket_test")
