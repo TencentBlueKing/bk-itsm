@@ -51,17 +51,16 @@
                 <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
             </div>
         </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
+        <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
             </div>
-        </li>
-        <!-- 暂时隐藏 审批节点-->
-        <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
+        </li> -->
+        <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
             <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
             </div>
-        </li> -->
+        </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['并行网关']`)">
             <div class="entry-item entry-gateway" data-type="ROUTER-P">
                 <i class="bk-itsm-icon icon-flow-convergence"></i>
