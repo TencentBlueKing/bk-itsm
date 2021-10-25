@@ -120,7 +120,7 @@
                                             <bk-input v-model="expression.value"
                                                 :ext-cls="'bk-form-width-long'"
                                                 v-bk-tooltips="expression.tooltipInfo"
-                                                :disabled="(!formInfo.processors.length && expression.meta.unit === 'INT') ||
+                                                :disabled="(!$refs.processors.getValue().value && expression.meta.unit === 'INT') ||
                                                     !expression.key"
                                                 :clearable="false"
                                                 type="number"
@@ -422,8 +422,8 @@
             this.initData()
         },
         methods: {
-            initData () {
-                this.getAllConditions()
+            async initData () {
+                await this.getAllConditions()
                 this.isLoading = true
                 let getSecondLevelList
                 this.processType = 'multi'
@@ -694,7 +694,9 @@
                 const id = this.configur.id
                 this.getConditionFlag = true
                 await this.$store.dispatch('apiRemote/get_sign_conditions', id).then(res => {
-                    this.allCondition = res.data
+                    // 会签不需要审批结果
+                    const result = res.data.filter(item => item.meta.code !== 'NODE_APPROVE_RESULT')
+                    this.allCondition = result
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -708,7 +710,7 @@
                     expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择条件']`)
                     return
                 }
-                if (!(expression.meta.code === 'PASS_RATE' || expression.meta.code === 'REJECT_RATE') && !this.formInfo.processors.length) {
+                if (!(expression.meta.code === 'PASS_RATE' || expression.meta.code === 'REJECT_RATE') && !this.$refs.processors.getValue().value) {
                     expression.tooltipInfo.disabled = false
                     expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择处理人']`)
                     return
@@ -726,21 +728,23 @@
             },
             // 条件选择回调
             selectCondition (val, condition, eIndex, gIndex) {
-                if (gIndex === 0 && eIndex === 0 && condition.meta.code === 'PROCESS_COUNT') {
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: this.$t(`m.treeinfo['确定更改“处理人数”？']`),
-                        subTitle: this.$t(`m.treeinfo['若更改该条件，则忽略处理人数，条件满足即结束']`),
-                        cancelFn: () => {
-                            condition.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
-                        },
-                        confirmFn: () => {
-                            this.changeCondition(condition)
-                        }
-                    })
-                } else {
-                    this.changeCondition(condition)
-                }
+                this.changeCondition(condition)
+                // 不需要二次确认
+                // if (gIndex === 0 && eIndex === 0 && condition.meta.code === 'PROCESS_COUNT') {
+                //     this.$bkInfo({
+                //         type: 'warning',
+                //         title: this.$t(`m.treeinfo['确定更改“处理人数”？']`),
+                //         subTitle: this.$t(`m.treeinfo['若更改该条件，则忽略处理人数，条件满足即结束']`),
+                //         cancelFn: () => {
+                //             condition.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
+                //         },
+                //         confirmFn: () => {
+                //             this.changeCondition(condition)
+                //         }
+                //     })
+                // } else {
+                //     this.changeCondition(condition)
+                // }
             },
             changeCondition (condition) {
                 condition.meta.code = this.allCondition.find(one => one.key === condition.key).meta.code

@@ -36,7 +36,7 @@
                 @step-changed="onStepChange">
             </bk-steps>
         </div>
-        <div class="steps-content" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
+        <div :class="['steps-content', { 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
             <template v-if="!serviceLoading && !flowInfoLoading">
                 <service-form-step v-if="currStep === 1"
                     ref="serviceFormStep"
@@ -309,8 +309,11 @@
 }
 .steps-content {
     height: calc(100vh - 225px);
-    // overflow: auto;
+    overflow: auto;
     @include scroller;
+}
+.steps-content-height {
+    height: calc(100vh - 165px);
 }
 .submit-footer-bar {
     position: relative;
