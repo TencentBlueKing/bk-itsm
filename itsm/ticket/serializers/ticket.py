@@ -1350,6 +1350,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         else:
             validated_data["remark_type"] = parent_node.remark_type
         validated_data["parent_id"] = parent_id
+        validated_data["ticket_id"] = parent_node.ticket_id
         validated_data.pop("parent")
         return super(TicketRemarkSerializer, self).create(validated_data)
 

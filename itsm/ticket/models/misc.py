@@ -409,7 +409,7 @@ class TicketRemark(BaseMpttModel):
     @classmethod
     def create_root(cls, ticket_id, **kwargs):
         return cls.create_node(
-            content="", ticket_id=ticket_id, remark_type="ROOT", key="root", **kwargs
+            content="", ticket_id=ticket_id, remark_type="ROOT", key=None, **kwargs
         )
 
     @classmethod
@@ -451,7 +451,10 @@ class TicketRemark(BaseMpttModel):
     @classmethod
     def root_subtree(cls, ticket_id):
         # 获取当前节点的根节点
-        root_node = cls._objects.get(ticket_id=ticket_id, key="root")
+        try:
+            root_node = cls._objects.get(ticket_id=ticket_id, remark_type="ROOT")
+        except cls.DoesNotExist:
+            root_node = TicketRemark.create_root(ticket_id=ticket_id)
         return cls.subtree(root_node)
 
     @classmethod
