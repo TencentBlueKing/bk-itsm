@@ -1373,7 +1373,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("被引用的评论不允许被再次回复")
 
         if parent_node.remark_type == "ROOT":
-            validated_data["remark_type"] = self.get_remark_type()
+            validated_data["remark_type"] = self.get_remark_type(parent_node.ticket_id)
         else:
             validated_data["remark_type"] = parent_node.remark_type
         validated_data["parent_id"] = parent_id
