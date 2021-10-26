@@ -29,14 +29,31 @@ from django.db.models import Count
 
 from itsm.component.constants import TIME_DELTA
 from itsm.component.utils.dimensions import fill_time_dimension
+from itsm.ticket.models import Ticket, TicketEventLog
 
 
-def user_count(last_week=None, this_week=None):
+def user_count(last_week=None, this_week=None, project_key=None):
+    if project_key:
+        tickets = Ticket.objects.filter(project_key=project_key)
+        event_log = TicketEventLog.objects.filter(
+            ticket__id__in=set(tickets.values_list("id", flat=True))
+        )
+        if last_week:
+            event_log = event_log.filter(operate_at__range=last_week)
+    
+        if this_week:
+            event_log = event_log.filter(operate_at__range=this_week)
+    
+        users_count = len(set(event_log.values_list("operator", flat=True)))
+        return users_count
+
     if not (last_week or this_week):
         return User.objects.count()
     if last_week:
-        return cache.get("last_week_user_count") or User.objects.filter(last_login__range=last_week).count()
-    
+        return (
+            cache.get("last_week_user_count")
+            or User.objects.filter(last_login__range=last_week).count()
+        )
     return User.objects.filter(last_login__range=this_week).count()
 
 

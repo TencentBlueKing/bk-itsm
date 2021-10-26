@@ -400,17 +400,17 @@ class Service(ObjectManagerMixin, Model):
         FavoriteService.objects.filter(service_id=self.id, user=username).delete()
 
     @classmethod
-    def get_count(cls, scope=None, project_key=DEFAULT_PROJECT_PROJECT_KEY):
-        services = Service.objects.filter(project_key=project_key)
+    def get_count(cls, scope=None, project_queryset=Q()):
+        services = Service.objects.filter(project_queryset)
         if scope:
-            services = services.filter(create_at__range=scope, project_key=project_key)
+            services = services.filter(create_at__range=scope)
         return services.count()
 
     @classmethod
-    def get_service_statistics(cls, time_delta, data):
+    def get_service_statistics(cls, time_delta, data, project_query=Q()):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(**data)
+            cls.objects.filter(project_query).filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
