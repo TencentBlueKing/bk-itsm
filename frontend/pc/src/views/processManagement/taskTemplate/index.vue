@@ -46,6 +46,7 @@
                     </div>
                     <div class="bk-normal-search">
                         <bk-button
+                            data-test-id="taskTemplate-button-create"
                             v-cursor="{ active: !hasPermission(['task_template_create']) }"
                             :theme="'primary'"
                             :title="$t(`m.systemConfig['新增']`)"
@@ -58,6 +59,7 @@
                         </bk-button>
                         <div class="bk-search-key">
                             <bk-input
+                                data-test-id="taskTemplate-input-search"
                                 :clearable="true"
                                 :right-icon="'bk-icon icon-search'"
                                 v-model="searchKey"
@@ -91,10 +93,12 @@
                                 </span>
                                 <span class="bk-task-operate">
                                     <i class="bk-itsm-icon icon-itsm-icon-copy"
+                                        :data-test-id="`taskTemplate-i-cloneTemplate${index}`"
                                         :class="{ 'icon-disable': item.component_type === 'SOPS' }"
                                         v-bk-tooltips="item.component_type === 'SOPS' ? $t(`m.taskTemplate['标准运维模板不可克隆']`) : $t(`m.taskTemplate['克隆模板']`)"
                                         @click.stop="cloneTemplate(item)"></i>
                                     <i class="bk-icon icon-delete"
+                                        :data-test-id="`taskTemplate-i-deleteTemplate${index}`"
                                         :class="{ 'icon-disable': item.is_builtin }"
                                         v-bk-tooltips="item.is_builtin ? $t(`m.taskTemplate['内置模板不可删除']`) : $t(`m.taskTemplate['删除模板']`)"
                                         @click.stop="deleteTemplate(item)"></i>
@@ -134,6 +138,7 @@
         </div>
         <!-- 新增弹窗 -->
         <bk-dialog v-model="addDialogInfo.isShow"
+            data-test-id="taskTemplate-dialog-taskCreate"
             :title="addDialogInfo.title"
             :auto-close="false"
             :mask-close="false"
@@ -143,7 +148,12 @@
             :ok-text="$t(`m.taskTemplate['进入配置']`)"
             @confirm="saveTemplate">
             <bk-form :label-width="150" :model="firstStepInfo" :rules="formRule" ref="taskInfoForm" :form-type="'vertical'">
-                <bk-form-item :label="$t(`m.taskTemplate['任务模板名称']`)" :required="true" :property="'name'" :ext-cls="'bk-form-width'">
+                <bk-form-item
+                    data-test-id="taskTemplate-dialog-taskTemplateName"
+                    :label="$t(`m.taskTemplate['任务模板名称']`)"
+                    :required="true"
+                    :property="'name'"
+                    :ext-cls="'bk-form-width'">
                     <bk-input v-model="firstStepInfo.name"
                         maxlength="120">
                     </bk-input>
@@ -151,7 +161,9 @@
                 <bk-form-item :label="$t(`m.user['负责人：']`)">
                     <member-select v-model="firstStepInfo.ownersInputValue"></member-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.taskTemplate['任务描述']`)" :ext-cls="'bk-form-width'">
+                <bk-form-item
+                    :label="$t(`m.taskTemplate['任务描述']`)"
+                    :ext-cls="'bk-form-width'">
                     <bk-input
                         :placeholder="$t(`m.taskTemplate['请输入任务描述']`)"
                         :type="'textarea'"

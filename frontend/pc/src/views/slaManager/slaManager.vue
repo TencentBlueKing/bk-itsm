@@ -92,9 +92,9 @@
                                     </p>
                                 </div>
                                 <div class="bk-sla-operat">
-                                    <i class="bk-icon icon-delete" v-if="!item.is_builtin"
+                                    <i class="bk-icon icon-delete" data-test-id="slaPattern-i-deleteModel1" v-if="!item.is_builtin"
                                         @click.stop="deleteModel(item, index)"></i>
-                                    <i class="bk-icon icon-delete bk-icon-disabled builtin" v-else
+                                    <i class="bk-icon icon-delete bk-icon-disabled builtin" data-test-id="slaPattern-i-deleteModel2" v-else
                                         @click.stop="deleteModel(item, index)"
                                         v-bk-tooltips="bktooltipsInfo"></i>
                                 </div>

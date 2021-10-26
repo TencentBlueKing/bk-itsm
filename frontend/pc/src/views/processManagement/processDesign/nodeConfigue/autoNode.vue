@@ -23,14 +23,14 @@
 <template>
     <div class="bk-basic-node">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form :label-width="150" :model="formInfo">
-                <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
+            <bk-form data-test-id="service-form-autoNode" :label-width="150" :model="formInfo">
+                <bk-form-item data-test-id="autoNode-input-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
                     <bk-input :ext-cls="'bk-form-width'"
                         v-model="formInfo.name"
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['API接口']`)" :required="true">
+                <bk-form-item data-test-id="autoNode-select-apiInterface" :label="$t(`m.treeinfo['API接口']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         v-model="formInfo.api_info.remote_system_id"
                         :clearable="false"
@@ -58,7 +58,7 @@
                         </bk-select>
                     </template>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+                <bk-form-item data-test-id="autoNode-select-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
                     <div @click="checkStatus.processors = false">
                         <deal-person
                             ref="processors"
@@ -153,6 +153,7 @@
         </common-trigger-list>
         <div class="mt20" style="font-size: 0">
             <bk-button :theme="'primary'"
+                data-test-id="autoNode-button-submit"
                 :title="$t(`m.treeinfo['确定']`)"
                 :disabled="!formInfo.api_info.remote_api_id"
                 class="mr10"
@@ -160,6 +161,7 @@
                 {{$t(`m.treeinfo['确定']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="autoNode-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
                 class="mr10"
                 @click="closeNode">

@@ -24,6 +24,7 @@
     <div class="bk-field-info mb20">
         <div class="bk-node-btn">
             <bk-button
+                data-test-id="fieldConfig-button-addField"
                 v-if="configur.type !== 'APPROVAL'"
                 :theme="'default'"
                 :title="$t(`m.treeinfo['新增字段']`)"
@@ -32,6 +33,7 @@
                 {{$t(`m.treeinfo['新增字段']`)}}
             </bk-button>
             <bk-button
+                data-test-id="fieldConfig-button-addModelField"
                 v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
                 :theme="'default'"
                 :title="$t(`m.treeinfo['选择模型字段']`)"
@@ -40,6 +42,7 @@
                 {{$t(`m.treeinfo['选择模型字段']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="fieldConfig-button-previewField"
                 :title="$t(`m.treeinfo['字段预览']`)"
                 class="mr10"
                 :disabled="!showTabList.length"

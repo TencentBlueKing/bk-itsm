@@ -112,6 +112,7 @@
         <!-- 步骤操作按钮 -->
         <div class="bk-common-step">
             <bk-button theme="default"
+                data-test-id="taskTemplate-button-commonStep-nextStep"
                 v-if="step"
                 class="mr10"
                 :loading="buttonLoading"
@@ -120,6 +121,7 @@
                 {{$t(`m.taskTemplate['上一步']`)}}
             </bk-button>
             <bk-button theme="primary"
+                :data-test-id="step === 2 ? 'taskTemplate-button-commonStep-saveStep' : 'taskTemplate-button-commonStep-pervStep'"
                 class="mr10"
                 :loading="buttonLoading"
                 :title="step === 2 ? $t(`m.taskTemplate['完成']`) : $t(`m.deployPage['下一步']`)"
@@ -127,6 +129,7 @@
                 {{ step === 2 ? $t(`m.taskTemplate['完成']`) : $t(`m.deployPage['下一步']`) }}
             </bk-button>
             <bk-button theme="default"
+                data-test-id="taskTemplate-button-commonStep-saveDrafts"
                 class="mr10"
                 :loading="buttonLoading"
                 :title="$t(`m.trigger['保持草稿']`)"
@@ -134,6 +137,7 @@
                 {{$t(`m.trigger['保持草稿']`)}}
             </bk-button>
             <bk-button theme="default"
+                data-test-id="taskTemplate-button-commonStep-closeTask"
                 class="mr10"
                 :loading="buttonLoading"
                 :title="$t(`m.taskTemplate['取消']`)"

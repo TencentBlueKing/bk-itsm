@@ -23,15 +23,15 @@
 <template>
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'">
-                <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
+            <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'">
+                <bk-form-item data-test-id="sopsNode-select-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
                     <bk-input
                         :ext-cls="'bk-form-width'"
                         v-model="basicsFormData.name"
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m['流程类型：']`)" :required="true" :property="'processType'">
+                <bk-form-item data-test-id="sopsNode-select-processType" :label="$t(`m['流程类型：']`)" :required="true" :property="'processType'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.processType"
@@ -46,7 +46,7 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
+                <bk-form-item data-test-id="sopsNode-select-business" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.projectId"
@@ -63,7 +63,7 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m['流程模板：']`)" :required="true" :property="'templateId'">
+                <bk-form-item data-test-id="sopsNode-select-processTemplate" :label="$t(`m['流程模板：']`)" :required="true" :property="'templateId'">
                     <bk-select
                         :ext-cls="'bk-form-width bk-form-display'"
                         v-model="basicsFormData.templateId"
@@ -130,12 +130,14 @@
         </common-trigger-list>
         <div class="mt20" style="font-size: 0">
             <bk-button :theme="'primary'"
+                data-test-id="sopsNode-button-submit"
                 :title="$t(`m.treeinfo['确定']`)"
                 class="mr10"
                 @click="submit">
                 {{$t(`m.treeinfo['确定']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="sopsNode-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
                 class="mr10"
                 @click="closeNode">

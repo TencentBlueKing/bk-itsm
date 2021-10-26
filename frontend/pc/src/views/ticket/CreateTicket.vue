@@ -101,6 +101,7 @@
             <!-- 按钮组 -->
             <div class="bottom-group mt20">
                 <bk-button :theme="'primary'"
+                    data-test-id="createTicket-button-submit"
                     :title="$t(`m.common['提交']`)"
                     :loading="submitting"
                     class="mr10"

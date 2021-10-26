@@ -40,6 +40,7 @@
                     :rules="nameRules"
                     ref="dynamicForm">
                     <bk-form-item
+                        data-test-id="slaModel-input-modelName"
                         :label="$t(`m.slaContent['服务模式名称']`)"
                         :required="true"
                         :property="'name'">
@@ -309,6 +310,7 @@
             </div>
             <div class="bk-model-btn">
                 <bk-button
+                    data-test-id="slaModel-button-modelSave"
                     v-if="isEdit"
                     theme="primary"
                     :title="$t(`m.deployPage['保存']`)"
@@ -317,6 +319,7 @@
                     :disabled="clickSecond">{{ $t(`m.deployPage['保存']`) }}
                 </bk-button>
                 <bk-button
+                    data-test-id="slaModel-button-modelSubmit"
                     v-else
                     theme="primary"
                     :title="$t(`m.slaContent['提交']`)"
@@ -325,6 +328,7 @@
                     :disabled="clickSecond">{{$t(`m.slaContent['提交']`)}}
                 </bk-button>
                 <bk-button
+                    data-test-id="slaModel-button-modelClose"
                     theme="default"
                     :title="$t(`m.wiki['取消']`)"
                     class="mr10"
