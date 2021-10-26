@@ -160,12 +160,14 @@
                     :model="formData"
                     ref="dynamicForm">
                     <bk-form-item
+                        data-test-id="role-input-roleName"
                         :label="$t(`m.user['角色名称：']`)"
                         :required="true"
                         :property="'name'">
                         <bk-input v-model.trim="formData.name" maxlength="120"></bk-input>
                     </bk-form-item>
                     <bk-form-item
+                        data-test-id="role-input-staffList"
                         :label="$t(`m.user['人员名单：']`)"
                         :required="true">
                         <member-select v-model="formData.staffInputValue"></member-select>

@@ -29,6 +29,7 @@
         <div class="first-level">
             <!-- 一级处理人 -->
             <bk-select :ext-cls="'bk-form-width mr10'"
+                data-test-id="dealPerson-select-firstHandler"
                 v-model="formData.levelOne"
                 :loading="initLoaing"
                 :clearable="false"
@@ -53,6 +54,7 @@
             <!-- 通用角色表|CMDB|权限中心|第三方系统|指定节点处理人上级|引用变量 -->
             <template v-else-if="['GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE'].includes(formData.levelOne)">
                 <bk-select :ext-cls="'bk-form-width'"
+                    data-test-id="dealPerson-select-secondHandler"
                     v-model="formData.levelSecond"
                     :loading="isLoading"
                     show-select-all

@@ -77,6 +77,7 @@
             <div class="bk-engine-node">
                 <ul>
                     <li v-for="(item, index) in clickList"
+                        :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }`"
                         class="tool"
                         :key="index"
                         @click.stop="addNormal(node, item)" :title="item.name">

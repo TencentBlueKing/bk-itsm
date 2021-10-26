@@ -25,6 +25,7 @@
         <div class="bk-tree-content" v-bkloading="{ isLoading: isTreeLoading }">
             <div class="bk-tree-search">
                 <bk-input
+                    data-test-id="directory-input-search"
                     :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
                     :clearable="true"
                     :right-icon="'bk-icon icon-search'"
@@ -50,6 +51,7 @@
                 <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
                     <ul>
                         <li
+                            data-test-id="directoty-li-addCatalogue"
                             v-cursor="{ active: !hasPermission(['catalog_create'], $store.state.project.projectAuthActions), zIndex: 3001 }"
                             :title="$t(`m.serviceConfig['新增']`)"
                             :class="{
@@ -60,6 +62,7 @@
                             <span>{{ $t('m.serviceConfig["新增"]') }}</span>
                         </li>
                         <li
+                            data-test-id="directoty-li-editCatalogue"
                             v-cursor="{ active: !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['编辑']`)"
                             :class="{
@@ -69,6 +72,7 @@
                             <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
                         </li>
                         <li
+                            data-test-id="directoty-li-delCatalogue"
                             v-cursor="{ active: !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['删除']`)"
                             :class="{

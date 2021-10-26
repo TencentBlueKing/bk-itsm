@@ -58,8 +58,8 @@
                                             <i class="bk-icon icon-plus"></i>
                                         </div>
                                         <ul class="bk-dropdown-list" slot="dropdown-content">
-                                            <li><a href="javascript:;" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
-                                            <li><a href="javascript:;" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
+                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-addTrigger" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
+                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-quoteCommonTrigger" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
                                         </ul>
                                     </bk-dropdown-menu>
                                 </ul>

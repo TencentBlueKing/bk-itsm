@@ -46,6 +46,7 @@
                 </bk-form-item>
             </template>
             <bk-form-item
+                data-test-id="field-input-fieldName"
                 :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
                 :label="$t(`m.treeinfo['字段名']`)"
                 :required="true"
@@ -72,6 +73,7 @@
                 </bk-input>
             </bk-form-item>
             <bk-form-item
+                data-test-id="field-select-fieldType"
                 :label="$t(`m.treeinfo['字段类型']`)"
                 :required="true"
                 :property="'type'"
