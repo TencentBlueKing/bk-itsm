@@ -57,20 +57,20 @@
                     <!-- 编辑状态 -->
                     <div v-if="isBasicFormEditting" class="service-basic-form">
                         <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
-                            <bk-form-item :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
+                            <bk-form-item data-test-id="service-input-serviceName" :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
                                 <bk-input v-model="formData.name"></bk-input>
                             </bk-form-item>
                             <bk-form-item :label="$t(`m.serviceConfig['服务描述']`)" property="desc">
                                 <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
                             </bk-form-item>
-                            <bk-form-item :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
+                            <bk-form-item data-test-id="service-select-serviceDirectory" :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
                                 <select-tree
                                     v-model="formData.catalog_id"
                                     :list="dirList"
                                     ext-cls="bk-form-width">
                                 </select-tree>
                             </bk-form-item>
-                            <bk-form-item :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
+                            <bk-form-item data-test-id="service-select-serviceType" :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
                                 <bk-select v-model="formData.key"
                                     :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
                                     :clearable="false"
@@ -93,6 +93,7 @@
                                 {{ $t(`m.treeinfo['取消']`) }}
                             </bk-button>
                             <bk-button ext-cls="button-item"
+                                data-test-id="service-button-submit"
                                 theme="primary"
                                 :loading="isSubmitting"
                                 :title="$t(`m.eventdeploy['确认']`)"
@@ -153,7 +154,7 @@
                                 always: true
                             }">
                             <bk-button
-                                data-test-id="service_button_selectServiceForm"
+                                :data-test-id="`service-button-selectServiceForm-${way.key}`"
                                 :disabled="!serviceTemplateDisable"
                                 ext-cls="button-item"
                                 theme="default"

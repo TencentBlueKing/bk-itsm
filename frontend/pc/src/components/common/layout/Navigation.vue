@@ -46,7 +46,7 @@
                         v-for="router in topNav"
                         :key="router.id"
                         :class="['nav-item', { active: router.id === activeNav }]">
-                        <router-link :to="router.path" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
+                        <router-link :to="router.path" :data-test-id="`navigation-router-navRouter-${router.id}`" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
                     </li>
                 </ul>
             </div>
@@ -71,7 +71,7 @@
                         </ul>
                     </template>
                 </bk-popover>
-                <bk-popover theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
+                <bk-popover data-test-id="navigation-popover-user" theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
                     <div class="user-name">
                         <span>{{ userName }}</span>
                         <i class="bk-icon icon-down-shape"></i>
@@ -82,7 +82,7 @@
                                 <span @click="onGoToProjectList">{{ $t(`m["项目管理"]`) }}</span>
                             </li>
                             <li class="operate-item">
-                                <span @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
+                                <span data-test-id="navigation-span-logout" @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
                             </li>
                         </ul>
                     </template>
@@ -91,6 +91,7 @@
         </template>
         <template slot="menu">
             <bk-select
+                data-test-id="navigation-select-projectList"
                 v-if="activeNav === 'project'"
                 :value="selectedProject"
                 class="project-select"
@@ -114,6 +115,7 @@
                 </bk-option>
                 <div slot="extension" class="project-select-extension">
                     <div
+                        data-test-id="navigation-div-createProject"
                         v-cursor="{ active: !hasPermission(['project_create']) }"
                         :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create']) }]"
                         @click="handleCreateProject">
@@ -121,6 +123,7 @@
                         {{ $t(`m['新建项目']`) }}
                     </div>
                     <div
+                        data-test-id="navigation-div-manageProject"
                         class="action-item"
                         @click="goToProjectManage">
                         <i class="bk-icon icon-apps"></i>
@@ -143,6 +146,7 @@
                         :key="router.id">
                         <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
                         <bk-navigation-menu-item
+                            data-test-id="navigation-menu-projectSubRouter"
                             v-for="item in router.subRouters"
                             :key="item.id"
                             :id="item.id"
@@ -153,6 +157,7 @@
                         </bk-navigation-menu-item>
                     </div>
                     <bk-navigation-menu-item
+                        data-test-id="navigation-menu-platformRouter"
                         v-else
                         :key="router.id"
                         :id="router.id"

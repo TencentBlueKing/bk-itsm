@@ -24,12 +24,19 @@
     <div class="bk-basic-node">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
             <bk-form :label-width="150" :model="formInfo" :rules="nodeInfoRule" ref="nodeInfoForm">
-                <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'" :ext-cls="'bk-form-width'">
+                <bk-form-item
+                    data-test-id="signNode-input-name"
+                    :label="$t(`m.treeinfo['节点名称：']`)"
+                    :required="true"
+                    :property="'name'"
+                    :ext-cls="'bk-form-width'">
                     <bk-input v-model="formInfo.name"
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['处理方式：']`)" :required="true" :property="'nodeType'">
+                <bk-form-item
+                    :label="$t(`m.treeinfo['处理方式：']`)"
+                    :required="true" :property="'nodeType'">
                     <bk-radio-group v-model="formInfo.is_sequential">
                         <bk-radio :value="false" :ext-cls="'mr50 pr40'">{{$t(`m.treeinfo['多人随机会签']`)}}
                             <i class="bk-itsm-icon icon-icon-info tooltip-icon"
@@ -40,7 +47,11 @@
                     </bk-radio-group>
                 </bk-form-item>
                 <bk-form-item
-                    :label="$t(`m.treeinfo['处理人：']`)" :required="true" :property="'processors'" :ext-cls="'bk-processor-width form-cus-height'">
+                    data-test-id="signNode-radio-processors "
+                    :label="$t(`m.treeinfo['处理人：']`)"
+                    :required="true"
+                    :property="'processors'"
+                    :ext-cls="'bk-processor-width form-cus-height'">
                     <member-select v-model="formInfo.processors">
                     </member-select>
                     <p v-if="formInfo.processors.length" class="bk-processor-length">{{$t(`m.treeinfo['共']`)}}<span>{{formInfo.processors.length}}</span>{{formInfo.is_sequential ? $t(`m.treeinfo['人']`) + $t(`m.treeinfo['，名单顺序将会影响会签顺序']`) : $t(`m.treeinfo['人']`)}}</p>
@@ -103,7 +114,7 @@
                                     </bk-option>
                                 </bk-select>
                             </bk-form-item>
-                            <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'value'">
+                            <bk-form-item data-test-id="signNode-input-conditionValue" :ext-cls="'bk-form-item-cus'" :property="'value'">
                                 <bk-input v-model="expression.value"
                                     :ext-cls="'bk-form-width-long'"
                                     v-bk-tooltips="expression.tooltipInfo"
@@ -144,6 +155,7 @@
         </common-trigger-list>
         <div class="bk-node-btn">
             <bk-button :theme="'primary'"
+                data-test-id="signNode-button-submit"
                 :title="$t(`m.treeinfo['确定']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -151,6 +163,7 @@
                 {{$t(`m.treeinfo['确定']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="signNode-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
                 :loading="secondClick"
                 class="mr10"

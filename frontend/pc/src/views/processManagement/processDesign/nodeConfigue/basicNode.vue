@@ -51,6 +51,7 @@
         </common-trigger-list>
         <div class="bk-node-btn mt20">
             <bk-button :theme="'primary'"
+                data-test-id="basicNode-button-submit"
                 :title="$t(`m.treeinfo['确定']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -58,6 +59,7 @@
                 {{$t(`m.treeinfo['确定']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="basicNode-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
                 :loading="secondClick"
                 class="mr10"
