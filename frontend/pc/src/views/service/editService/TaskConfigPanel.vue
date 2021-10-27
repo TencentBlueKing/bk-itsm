@@ -184,32 +184,28 @@
         methods: {
             initTaskCondition () {
                 if (this.serviceInfo.extras && this.serviceInfo.extras.task_settings) {
-                    const taskSettings = this.serviceInfo.extras.task_settings
-                    if (Array.isArray(taskSettings)) {
-                        this.taskConditionList = taskSettings.map(setting => {
-                            const con = {
-                                taskId: setting.task_schema_id,
-                                createNodeId: setting.create_task_state,
-                                dealNodeId: setting.execute_task_state,
-                                others: [],
-                                dealLoading: false,
-                                dealList: []
-                            }
-                            if (setting.execute_can_create) {
-                                con.others.push(1)
-                            }
-                            if (setting.need_task_finished) {
-                                con.others.push(2)
-                            }
-                            return con
-                        })
-                        this.taskConditionList.forEach(condition => {
-                            this.getCanDealNodeList(condition.createNodeId, condition)
-                        })
-                        this.useTask = !!taskSettings.length
-                    } else {
-                        errorHandler('taskSettings not Array', this)
-                    }
+                    const taskSettings = !Array.isArray(this.workflowInfo.extras.task_settings) ? [this.workflowInfo.extras.task_settings] : this.workflowInfo.extras.task_settings
+                    this.taskConditionList = taskSettings.map(setting => {
+                        const con = {
+                            taskId: setting.task_schema_id,
+                            createNodeId: setting.create_task_state,
+                            dealNodeId: setting.execute_task_state,
+                            others: [],
+                            dealLoading: false,
+                            dealList: []
+                        }
+                        if (setting.execute_can_create) {
+                            con.others.push(1)
+                        }
+                        if (setting.need_task_finished) {
+                            con.others.push(2)
+                        }
+                        return con
+                    })
+                    this.taskConditionList.forEach(condition => {
+                        this.getCanDealNodeList(condition.createNodeId, condition)
+                    })
+                    this.useTask = !!taskSettings.length
                 }
             },
             getTaskTemplateList () {
