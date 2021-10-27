@@ -62,6 +62,7 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item
+                    data-test-id="lineConfig-select-condition"
                     :label="$t(`m.treeinfo['流转条件']`)"
                     :required="true">
                     <bk-select v-model="lineInfo.condition_type"
@@ -78,6 +79,7 @@
                 </bk-form-item>
             </template>
             <bk-form-item
+                data-test-id="lineConfig-select-relation"
                 :label="$t(`m.treeinfo['关系名称']`)"
                 :property="'name'"
                 :required="true">
@@ -122,6 +124,7 @@
                                 v-for="(node, nodeIndex) in item.expressions"
                                 :key="nodeIndex" @click="item.checkInfo = false">
                                 <bk-form-item
+                                    data-test-id="lineConfig-select-fieldList"
                                     :ext-cls="'bk-width210 no-label'">
                                     <bk-select
                                         v-model="node.key"
@@ -138,6 +141,7 @@
                                 </bk-form-item>
                                 <template v-if="node.betweenList">
                                     <bk-form-item
+                                        data-test-id="lineConfig-select-betweenList"
                                         :ext-cls="'bk-width100 no-label'">
                                         <bk-select
                                             v-model="node.condition"
@@ -153,6 +157,7 @@
                                     </bk-form-item>
                                 </template>
                                 <bk-form-item
+                                    data-test-id="lineConfig-select-choiceList"
                                     :label="''"
                                     :ext-cls="'bk-width195 no-label'">
                                     <template v-if="node.source !== 'global'">
@@ -218,8 +223,9 @@
                                     </template>
                                 </bk-form-item>
                                 <div class="bk-between-operat">
-                                    <span class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
+                                    <span data-test-id="lineConfig-span-addNode" class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
                                     <i class="bk-itsm-icon icon-flow-reduce"
+                                        data-test-id="lineConfig-i-deleteNode"
                                         :class="{ 'bk-no-delete': item.expressions.length === 1 }"
                                         @click="deleteNode(item, nodeIndex)"></i>
                                 </div>
@@ -233,7 +239,7 @@
                 </bk-form>
             </div>
             <p class="bk-add-between">
-                <span @click="addCondition">
+                <span data-test-id="lineConfig-span-addCondition" @click="addCondition">
                     <i class="bk-icon icon-plus-circle"></i>{{ $t('m.treeinfo["添加条件组"]') }}
                 </span>
             </p>
@@ -247,6 +253,7 @@
         </div>
         <div class="mt20" :class="{ 'bk-line-btn': scrollTopStatus }">
             <bk-button theme="primary"
+                data-test-id="lineConfig-button-submit"
                 class="mr10"
                 :title="$t(`m.treeinfo['确认']`)"
                 :loading="secondClick"

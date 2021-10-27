@@ -143,12 +143,14 @@
                     ref="dictDataForm">
                     <template v-if="dictDataTable.type === 'ADD'">
                         <bk-form-item
+                            data-test-id="api-input-systemName"
                             :label="$t(`m.systemConfig['系统名称：']`)"
                             :required="true"
                             :property="'addName'">
                             <bk-input :clearable="true" v-model="dictDataTable.formInfo.addName"></bk-input>
                         </bk-form-item>
                         <bk-form-item
+                            data-test-id="api-input-systemCode"
                             :label="$t(`m.systemConfig['系统编码：']`)"
                             :required="true"
                             :property="'addCode'">

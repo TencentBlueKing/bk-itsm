@@ -27,6 +27,7 @@
             :rules="rules"
             ref="basicForm">
             <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)"
+                data-test-id="basicInfo-input-nodeName"
                 :ext-cls="'bk-item-width'"
                 :required="true"
                 :property="'name'">
@@ -48,7 +49,7 @@
                     </bk-option>
                 </bk-select>
             </bk-form-item>
-            <bk-form-item :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
+            <bk-form-item data-test-id="basicInfo-select-ProcessingScenarios" :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
                 <bk-select :ext-cls="'bk-form-width'"
                     v-model="formInfo.distribute_type"
                     :clearable="false"
@@ -82,7 +83,7 @@
                 </bk-form-item>
             </template>
             <template v-if="processorsInfo.type">
-                <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-component-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
                     <div @click="checkStatus.processors = false">
                         <deal-person
                             ref="processors"
@@ -122,7 +123,7 @@
                 </template>
             </bk-form-item>
             <template v-if="!nodeInfo.is_builtin">
-                <bk-form-item :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-radio-canDeliver" :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
                     <bk-radio-group v-model="formInfo.can_deliver">
                         <bk-radio :value="trueStatus" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
                         <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
@@ -130,7 +131,7 @@
                 </bk-form-item>
             </template>
             <template v-if="formInfo.can_deliver">
-                <bk-form-item :label="$t(`m.treeinfo['转单人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-radio-delivers" :label="$t(`m.treeinfo['转单人：']`)" :required="true">
                     <div @click="checkStatus.delivers = false">
                         <deal-person
                             ref="delivers"

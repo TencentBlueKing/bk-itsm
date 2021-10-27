@@ -28,6 +28,7 @@
                 :model="formInfo"
                 :rules="nodeInfoRule" ref="nodeInfoForm">
                 <bk-form-item
+                    data-test-id="approveNode-input-nodeName"
                     :label="$t(`m.treeinfo['节点名称：']`)"
                     :required="true"
                     :property="'name'"
@@ -37,6 +38,7 @@
                     </bk-input>
                 </bk-form-item>
                 <bk-form-item
+                    data-test-id="approveNode-input-nodeLabel"
                     :label="$t(`m.treeinfo['节点标签：']`)"
                     :required="true"
                     :ext-cls="'bk-form-width'">
@@ -53,6 +55,7 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item
+                    data-test-id="approveNode-radio-approveMode"
                     :label="$t(`m.treeinfo['审批方式：']`)"
                     :required="true"
                     :property="'nodeType'">
@@ -67,7 +70,10 @@
                         </bk-radio>
                     </bk-radio-group>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+                <bk-form-item
+                    data-test-id="approveNode-component-processor"
+                    :label="$t(`m.treeinfo['处理人：']`)"
+                    :required="true">
                     <div @click="checkStatus.processors = false">
                         <deal-person
                             ref="processors"
@@ -77,7 +83,11 @@
                         </deal-person>
                     </div>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['设置单据状态：']`)" :required="true" :ext-cls="'bk-form-width'">
+                <bk-form-item
+                    data-test-id="approveNode-input-ticketStatus"
+                    :label="$t(`m.treeinfo['设置单据状态：']`)"
+                    :required="true"
+                    :ext-cls="'bk-form-width'">
                     <bk-select :ext-cls="'inline-form-width'"
                         v-model="formInfo.ticket_type"
                         :clearable="false"
@@ -106,7 +116,10 @@
                     </template>
                 </bk-form-item>
                 <template v-if="!configur.is_builtin">
-                    <bk-form-item :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
+                    <bk-form-item
+                        data-test-id="approveNode-radio-canDeliver"
+                        :label="$t(`m.treeinfo['是否可转单：']`)"
+                        :required="true">
                         <bk-radio-group v-model="formInfo.can_deliver">
                             <bk-radio :value="true" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
                             <bk-radio :value="false">{{ $t('m.treeinfo["否"]') }}</bk-radio>
@@ -114,7 +127,10 @@
                     </bk-form-item>
                 </template>
                 <template v-if="formInfo.can_deliver">
-                    <bk-form-item :label="$t(`m.treeinfo['转单人：']`)" :required="true">
+                    <bk-form-item
+                        data-test-id="approveNode-component-deliver"
+                        :label="$t(`m.treeinfo['转单人：']`)"
+                        :required="true">
                         <div @click="checkStatus.delivers = false">
                             <deal-person
                                 ref="delivers"
@@ -141,6 +157,7 @@
         </common-trigger-list>
         <div class="bk-node-btn">
             <bk-button :theme="'primary'"
+                data-test-id="approve-button-submit"
                 :title="$t(`m.treeinfo['确定']`)"
                 :loading="secondClick"
                 class="mr10"
@@ -148,6 +165,7 @@
                 {{$t(`m.treeinfo['确定']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="approve-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
                 :loading="secondClick"
                 class="mr10"

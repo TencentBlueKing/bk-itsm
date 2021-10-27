@@ -226,6 +226,7 @@
                         </bk-button>
                         <!-- 删除 -->
                         <bk-button
+                            data-test-id="service_button_deleteService1"
                             v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
@@ -237,6 +238,7 @@
                         <template v-else-if="!!props.row.bounded_catalogs[0]">
                             <bk-popover placement="top">
                                 <bk-button
+                                    data-test-id="service_button_deleteService2"
                                     theme="primary"
                                     text
                                     :disabled="!!props.row.bounded_catalogs[0]"
@@ -250,7 +252,7 @@
                         </template>
                         <template v-else>
                             <bk-button
-                                data-test-id="service_button_deleteService"
+                                data-test-id="service_button_deleteService3"
                                 theme="primary"
                                 text
                                 @click="deleteOne(props.row)">

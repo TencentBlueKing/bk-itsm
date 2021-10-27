@@ -70,7 +70,7 @@
                 {{ prevStepBtnName }}
             </bk-button>
             <bk-button
-                data-test-id="service_button_nextStep"
+                data-test-id="service_button_nextStepAndSave"
                 ext-cls="button-item"
                 theme="primary"
                 :disabled="!serviceId && serviceId !== 0"

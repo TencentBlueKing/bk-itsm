@@ -22,6 +22,7 @@
 
 <template>
     <bk-dialog
+        data-test-id="createTicket-dialog-ontext"
         render-directive="if"
         ext-cls="create-ticket-dialog"
         :width="980"
@@ -40,6 +41,7 @@
             </div>
             <div class="search-input-wrapper">
                 <bk-input
+                    data-test-id="createTicket-input-search"
                     class="search-input"
                     right-icon="bk-icon icon-search"
                     :placeholder="$t(`m.common['请输入服务名称']`)"
@@ -77,6 +79,7 @@
                                         <i class="bk-itsm-icon icon-itsm-icon-fill-fit"></i>
                                     </div>
                                     <i
+                                        data-test-id="createTicket-i-favorite"
                                         :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
                                         v-bk-tooltips="{
                                             placement: 'top',

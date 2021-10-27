@@ -64,6 +64,7 @@
                     <tr>
                         <th v-if="listInfo.length">
                             <bk-checkbox
+                                data-test-id="directiory-checkbox-check"
                                 :true-value="trueStatus"
                                 :false-value="falseStatus"
                                 v-model="allCheck"

@@ -156,7 +156,7 @@
                             <template slot-scope="props">
                                 <!-- 编辑 -->
                                 <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate"
+                                    data-test-id="sla_button_agreementEditFromOperate1"
                                     v-if="!hasPermission(['sla_agreement_edit'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
@@ -166,7 +166,7 @@
                                     {{ $t('m.deployPage["编辑"]')}}
                                 </bk-button>
                                 <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate"
+                                    data-test-id="sla_button_agreementEditFromOperate2"
                                     v-else
                                     theme="primary"
                                     text
