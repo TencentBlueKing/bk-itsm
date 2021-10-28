@@ -4220,8 +4220,8 @@ class Ticket(Model, BaseTicket):
         TicketOrganization.objects.bulk_create(organization_info)
 
     @classmethod
-    def get_count(cls, service_id=None, scope=None):
-        tickets = cls.objects.filter()
+    def get_count(cls, service_id=None, scope=None, project_query=Q()):
+        tickets = cls.objects.filter(project_query)
         if service_id:
             tickets = tickets.filter(service_id=service_id)
         if scope:
@@ -4229,8 +4229,8 @@ class Ticket(Model, BaseTicket):
         return tickets.count()
 
     @classmethod
-    def get_biz_count(cls, service_id=None, scope=None):
-        tickets = Ticket.objects.filter(bk_biz_id__gt=-1)
+    def get_biz_count(cls, service_id=None, scope=None, project_query=Q()):
+        tickets = Ticket.objects.filter(project_query).filter(bk_biz_id__gt=-1)
         if service_id:
             tickets = tickets.filter(service_id=service_id)
         if scope:
@@ -4238,8 +4238,8 @@ class Ticket(Model, BaseTicket):
         return len(set(tickets.values_list("bk_biz_id", flat=True)))
 
     @classmethod
-    def get_ticket_user_count(cls, service_id, scope=None):
-        tickets = cls.objects.filter(service_id=service_id)
+    def get_ticket_user_count(cls, service_id, scope=None, project_query=Q()):
+        tickets = cls.objects.filter(project_query).filter(service_id=service_id)
         event_log = TicketEventLog.objects.filter(
             ticket__id__in=set(tickets.values_list("id", flat=True))
         )
@@ -4251,10 +4251,10 @@ class Ticket(Model, BaseTicket):
         return users_count
 
     @classmethod
-    def get_creator_statistics(cls, time_delta, time_range):
+    def get_creator_statistics(cls, time_delta, time_range, project_query=Q()):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(**time_range)
+            cls.objects.filter(project_query).filter(**time_range)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("creator", distinct=True))
@@ -4266,10 +4266,10 @@ class Ticket(Model, BaseTicket):
         return dates_range
 
     @classmethod
-    def get_ticket_statistics(cls, time_delta, data):
+    def get_ticket_statistics(cls, time_delta, data, project_query=Q()):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(**data)
+            cls.objects.filter(project_query).filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -4281,10 +4281,10 @@ class Ticket(Model, BaseTicket):
         return dates_range
 
     @classmethod
-    def get_biz_statistics(cls, time_delta, data):
+    def get_biz_statistics(cls, time_delta, data, project_queryset=Q()):
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(**data)
+            cls.objects.filter(project_queryset).filter(**data)
             .filter(bk_biz_id__gt=-1)
             .extra(select={"date_str": data_str})
             .values("date_str")

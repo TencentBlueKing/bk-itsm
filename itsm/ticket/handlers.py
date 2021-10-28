@@ -22,10 +22,11 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from itsm.component.constants import TASK_PI_PREFIX, SOURCE_TICKET, MANUAL
 from itsm.ticket_status.models import TicketStatus
+from itsm.service.models import Service
 from .models import StatusTransitLog, Ticket, TicketEventLog
 
 
@@ -89,3 +90,37 @@ def create_trigger_action_log(sender, instance, **kwargs):
         fields=instance.get_fields(flat=True),
         detail_message=instance.ex_data[0].get('message') or "",
     )
+
+
+class ProjectOperationalData:
+    """项目级别的运营数据"""
+
+    def __init__(self, service_id=None, scope=None, project_key=None):
+        """
+        当project_key为None时，本类的方法返回值均为全局级别的运营数据
+        当project_key为指定值时，本类的方法返回值为指定项目下的运营数据
+        @param service_id: 服务id
+        @param scope: 时间范围
+        @param project_key: 项目唯一标示
+        """
+        self.project_queryset = Q()
+        self.service_id = service_id
+        self.scope = scope
+        if project_key:
+            self.project_queryset = Q(project_key=project_key)
+
+    def get_ticket_count(self):
+        """获取单据总数"""
+        return Ticket.get_count(self.service_id, self.scope, self.project_queryset)
+
+    def get_service_count(self):
+        """"获取服务总数"""
+        return Service.get_count(self.scope, self.project_queryset)
+
+    def get_biz_count(self):
+        """获取业务总数"""
+        return Ticket.get_biz_count(self.service_id, self.scope, self.project_queryset)
+
+    def get_ticket_user_count(self):
+        """获取用户总数"""
+        return Ticket.get_ticket_user_count(self.service_id, self.scope, self.project_queryset)
