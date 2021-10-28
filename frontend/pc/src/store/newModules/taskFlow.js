@@ -94,6 +94,9 @@ export default {
         getSopsPreview ({ commit }, params) {
             return ajax.post(`/gateway/sops/get_sops_preview_task_tree/`, params).then(response => response.data)
         },
+        getSopsCommonPreview ({ commit }, params) {
+            return ajax.post(`/gateway/sops/get_sops_preview_common_task_tree/`, params).then(response => response.data)
+        },
         // 同步标准运维任务状态
         syncSopsTaskStatus ({ commit, state, dispatch }, params) {
             return ajax.get(`/task/tasks/sync_task_status/`, { params: params }).then(response => {
