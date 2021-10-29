@@ -36,6 +36,10 @@ const API = () => import('../../views/project/api.vue')
 const SlaManage = () => import('../../views/slaManager/slaManager.vue')
 const SlaAgreement = () => import('../../views/slaManager/agreement.vue')
 
+const ProjectOperationData = () => import('../../views/operation/index.vue')
+const ProjectOperationHome = () => import('../../views/operation/home.vue')
+const ProjectOperationService = () => import('../../views/operation/service.vue')
+
 export default [
     {
         path: '/project_list',
@@ -129,6 +133,23 @@ export default [
                 path: 'sla_agreement',
                 name: 'slaAgreement',
                 component: SlaAgreement
+            },
+            {
+                path: 'projectOperation',
+                name: 'projectAnalysisData',
+                component: ProjectOperationData,
+                children: [
+                    {
+                        path: 'home',
+                        name: 'projectOperationHome',
+                        component: ProjectOperationHome
+                    },
+                    {
+                        path: 'service',
+                        name: 'projectOperationService',
+                        component: ProjectOperationService
+                    }
+                ]
             }
         ]
     }
