@@ -407,7 +407,8 @@ class Service(ObjectManagerMixin, Model):
         return services.count()
 
     @classmethod
-    def get_service_statistics(cls, time_delta, data, project_query=Q()):
+    def get_service_statistics(cls, time_delta, data, project_key=None):
+        project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(project_query).filter(**data)
