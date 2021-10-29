@@ -4251,7 +4251,8 @@ class Ticket(Model, BaseTicket):
         return users_count
 
     @classmethod
-    def get_creator_statistics(cls, time_delta, time_range, project_query=Q()):
+    def get_creator_statistics(cls, time_delta, time_range, project_key=None):
+        project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(project_query).filter(**time_range)
@@ -4266,7 +4267,8 @@ class Ticket(Model, BaseTicket):
         return dates_range
 
     @classmethod
-    def get_ticket_statistics(cls, time_delta, data, project_query=Q()):
+    def get_ticket_statistics(cls, time_delta, data, project_key=None):
+        project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
             cls.objects.filter(project_query).filter(**data)
@@ -4281,10 +4283,11 @@ class Ticket(Model, BaseTicket):
         return dates_range
 
     @classmethod
-    def get_biz_statistics(cls, time_delta, data, project_queryset=Q()):
+    def get_biz_statistics(cls, time_delta, data, project_key=None):
+        project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_queryset).filter(**data)
+            cls.objects.filter(project_query).filter(**data)
             .filter(bk_biz_id__gt=-1)
             .extra(select={"date_str": data_str})
             .values("date_str")

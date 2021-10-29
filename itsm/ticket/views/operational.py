@@ -325,7 +325,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         time_delta = kwargs.pop("timedelta")
         resource_type = kwargs.pop("resource_type")
         if project_key:
-            kwargs.update({"project_query": Q(project_key=project_key)})
+            kwargs.update({"project_key": project_key})
         statistics = {
             "creator": Ticket.get_creator_statistics,
             "ticket": Ticket.get_ticket_statistics,
@@ -345,7 +345,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         time_delta = kwargs.pop("timedelta")
         resource_type = kwargs.pop("resource_type")
         if project_key:
-            kwargs.update({"project_query": Q(project_key=project_key)})
+            kwargs.update({"project_query": project_key})
 
         statistics = {
             "ticket": Ticket.get_ticket_statistics,
@@ -382,13 +382,13 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             else:
                 user_info[user.username].append(
                     {"name": user.first_level_name, "family": user.family})
+                
+        project_query = Q(project_key=project_key) if project_key else Q()
 
         ticket_info = (
-            self.queryset.filter(**kwargs).values("creator").annotate(count=Count("id")).order_by(
+            self.queryset.filter(project_query).filter(**kwargs).values("creator").annotate(count=Count("id")).order_by(
                 "-count")[:10]
         )
-        if project_key:
-            ticket_info = ticket_info.filter(project_key=project_key)
         top_creator = [
             {
                 "organization": user_info.get(ticket["creator"], []),
