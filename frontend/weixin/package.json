@@ -47,7 +47,7 @@
     "postcss-loader": "^3.0.0",
     "postcss-mixins": "^6.2.3",
     "postcss-nested": "^4.2.1",
-    "postcss-normalize": "^9.0.0",
+    "postcss-normalize": "^8.0.1",
     "postcss-preset-env": "^6.7.0",
     "postcss-px-to-viewport": "^1.1.1",
     "postcss-px2rem": "^0.3.0",
