@@ -442,26 +442,33 @@
                 const template = this.templateList.find(item => item.id === this.basicsFormData.templateId)
                 try {
                     this.sopsFormLoading = true
-                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
+                    const isCommon = this.basicsFormData.processType === 'common'
+                    const res = !isCommon ? await this.$store.dispatch('taskFlow/getSopsPreview', {
                         bk_biz_id: template.bk_biz_id,
                         template_id: template.id,
                         exclude_task_nodes_id: this.excludeTaskNodesId
-                    })
+                    }) : deepClone(this.constants)
                     const constants = []
-                    for (const key in res.data.pipeline_tree.constants) {
-                        if (res.data.pipeline_tree.constants[key].show_type === 'show') {
-                            constants.push(res.data.pipeline_tree.constants[key])
-                        }
-                    }
-                    constants.forEach(item => {
-                        this.configur.extras.sops_info.constants.filter(ite => {
-                            if (item.key === ite.key) {
-                                item.value = ite.value
+                    if (!isCommon) {
+                        for (const key in res.data.pipeline_tree.constants) {
+                            if (res.data.pipeline_tree.constants[key].show_type === 'show') {
+                                constants.push(res.data.pipeline_tree.constants[key])
                             }
-                            this.constantDefaultValue[item.key] = deepClone(item.value)
-                        })
-                    })
+                        }
+                    } else {
+                        constants.push(...res)
+                    }
                     constants.sort((a, b) => a.index - b.index)
+                    constants.forEach(item => {
+                        const list = this.configur.extras.sops_info.constants.filter(ite => ite.key === item.key)[0]
+                        if (list.is_quoted) {
+                            this.hookedVarList[item.key] = true
+                            item.value = '${' + list.value + '}'
+                        } else {
+                            item.value = list.value
+                        }
+                        this.constantDefaultValue[item.key] = deepClone(item.value)
+                    })
                     this.constants = constants
                 } catch (e) {
                     console.error(e)
@@ -529,7 +536,7 @@
                             const { name, key } = item
                             if (item.show_type === 'show') {
                                 const formTeamlate = {
-                                    value: this.$refs.getParam.formData[formKey],
+                                    value: this.hookedVarList[formKey] ? this.$refs.getParam.formData[formKey].slice(2, this.$refs.getParam.formData[formKey].length - 1) : this.$refs.getParam.formData[formKey],
                                     name,
                                     key: key || 1,
                                     value_type: vt,
