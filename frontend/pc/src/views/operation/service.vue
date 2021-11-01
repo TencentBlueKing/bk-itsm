@@ -502,7 +502,7 @@
         position: absolute;
         top: 168px;
         right: 20px;
-        z-index: 1002;
+        z-index: 100;
         .bk-date-picker {
             width: 360px;
             background: #ffffff;

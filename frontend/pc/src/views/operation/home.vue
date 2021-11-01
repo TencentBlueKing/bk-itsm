@@ -864,7 +864,7 @@
         top: 158px;
         right: 0;
         padding: 10px 20px 10px;
-        z-index: 1003;
+        z-index: 100;
         .bk-date-picker {
             float: right;
             width: 360px;
