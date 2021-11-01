@@ -24,7 +24,7 @@
     <div class="operation-service">
         <div class="section-nav">
             <div class="service-wrap">
-                <i class="bk-icon icon-arrows-left back-icon" @click="$router.push({ name: 'OperationHome' })"></i>
+                <i class="bk-icon icon-arrows-left back-icon" @click="$router.push({ name: $route.query.project_id ? 'projectOperationHome' : 'OperationHome', query: $route.query.project_id ? { project_id: $route.query.project_id } : '' })"></i>
                 <bk-select
                     class="service-selector"
                     :value="serviceId"
