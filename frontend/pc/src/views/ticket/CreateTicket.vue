@@ -26,7 +26,7 @@
             :title-name="$t(`m.navigation['提单']`)"
             @goBack="onBackIconClick">
         </nav-title>
-        <div class="create-ticket-body" v-bkloading="{ isLoading: serviceLoading }">
+        <div class="create-ticket-body" v-if="!isRemindPageShow" v-bkloading="{ isLoading: serviceLoading }">
             <!-- 服务信息 -->
             <section class="service-info">
                 <div class="service-icon-wrap">
@@ -166,6 +166,12 @@
             </div>
         </div>
         <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
+        <create-ticker-succer
+            :router-info="routerInfo"
+            :times="times"
+            v-if="isRemindPageShow"
+            @onBackIconClick="onBackIconClick">
+        </create-ticker-succer>
     </div>
 </template>
 <script>
@@ -177,6 +183,7 @@
     import { errorHandler } from '@/utils/errorHandler'
     import { deepClone } from '../../utils/util'
     import memberSelect from '@/views/commonComponent/memberSelect'
+    import CreateTickerSuccer from './details/components/createTickerSuccer.vue'
 
     export default {
         name: 'CreateTicket',
@@ -184,7 +191,8 @@
             NavTitle,
             FieldInfo,
             memberSelect,
-            CreateTicketDialog
+            CreateTicketDialog,
+            CreateTickerSuccer
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
@@ -208,7 +216,11 @@
                 fieldList: [],
                 reCreateFieldList: [],
                 remindCheck: false,
-                isCreateTicketDialogShow: false
+                isCreateTicketDialogShow: false,
+                // 落地页
+                isRemindPageShow: false,
+                times: 25,
+                routerInfo: {}
             }
         },
         watch: {
@@ -352,13 +364,13 @@
                         message: this.$t('m.common["提交成功！"]'),
                         theme: 'success'
                     })
-                    // 跳到单据详情页
-                    this.$router.push({
+                    this.isRemindPageShow = true
+                    this.routerInfo = {
                         name: 'TicketDetail',
                         query: {
                             id: res.data.id, from: 'created'
                         }
-                    })
+                    }
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -654,5 +666,11 @@
         color: #666;
         font-size: 14px;
     }
+}
+.remind-page {
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    border: 1px solid red;
 }
 </style>

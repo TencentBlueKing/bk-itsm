@@ -27,11 +27,10 @@
         ext-cls="create-ticket-dialog"
         :width="980"
         :value="isShow"
+        :show-footer="false"
         :mask-close="false"
         :auto-close="false"
-        :close-icon="false"
-        :ok-text="$t(`m.common['下一步']`)"
-        @confirm="onConfirm"
+        :close-icon="true"
         @cancel="onCloseDialog">
         <div class="select-service">
             <div class="tab-wrapper">
@@ -227,29 +226,15 @@
             },
             // 点击服务
             onSelectService (service) {
-                if (this.selectedService && this.selectedService.id === service.id) {
-                    this.selectedService = null
-                } else {
-                    this.selectedService = service
-                }
-            },
-            onConfirm () {
-                if (!this.selectedService) {
-                    this.$bkMessage({
-                        message: '请选择服务',
-                        theme: 'error'
-                    })
-                } else {
-                    const { id, project_key } = this.selectedService
-                    this.onCloseDialog()
-                    this.$router.push({
-                        name: 'CreateTicket',
-                        query: {
-                            service_id: id,
-                            project_id: project_key
-                        }
-                    })
-                }
+                const { id, project_key } = service
+                this.onCloseDialog()
+                this.$router.push({
+                    name: 'CreateTicket',
+                    query: {
+                        service_id: id,
+                        project_id: project_key
+                    }
+                })
             },
             onCloseDialog () {
                 this.$emit('update:isShow', false)
