@@ -372,14 +372,14 @@
             // 计算子元素
             countSon (itemChildren) {
                 const item = this.bodyTableData.filter(ite => {
-                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString())
+                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey)
                 })[0]
                 return item.children.length === 1
             },
             // 添加 array 列表元素
             async addChildren (itemChildren) {
                 const item = this.bodyTableData.filter(ite => {
-                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString())
+                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey)
                 })[0]
 
                 const index = this.bodyTableData.indexOf(item) + 1
@@ -408,7 +408,7 @@
                     return
                 }
                 const currentObj = this.bodyTableData.filter(ite => {
-                    return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
+                    return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey)
                 })[0].children
                 if (currentObj.length <= 1) {
                     return
