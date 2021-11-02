@@ -32,7 +32,7 @@ else:
 
 # 预发布环境
 RUN_MODE = "STAGING"
-RIO_TOKEN = "de78a415e065444c8be829cb7eedb316"
+RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
 
 # 正式环境的日志级别可以在这里配置
 # V2
@@ -68,14 +68,14 @@ if ALLOW_CSRF:
     MIDDLEWARE = ("common.middlewares.DisableCSRFCheck",) + MIDDLEWARE
 
 MEDIA_URL = "%smedia/" % SITE_URL
-BK_STATIC_URL = '/static'
+BK_STATIC_URL = "/static"
 
 # REMOTE_STATIC_URL = "http://127.0.0.1:8000/static/"
 # STATIC_URL = "http://127.0.0.1:8000/static/"
 # ==============================================================================
 # 加载环境差异化配置
 # ==============================================================================
-ver_settings = importlib.import_module('adapter.config.sites.%s.ver_settings' % RUN_VER)
+ver_settings = importlib.import_module("adapter.config.sites.%s.ver_settings" % RUN_VER)
 for _setting in dir(ver_settings):
     if _setting.upper() == _setting:
         locals()[_setting] = getattr(ver_settings, _setting)
