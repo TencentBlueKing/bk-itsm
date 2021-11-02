@@ -97,6 +97,8 @@ class WorkflowBase(ObjectManagerMixin, Model):
 
     # 业务逻辑字段
     is_biz_needed = models.BooleanField(_("是否绑定业务"), default=False)
+    # 是否自动过单
+    is_auto_approve = models.BooleanField(_("是否自动过单"), default=False)
     is_iam_used = models.BooleanField(_("是否使用IAM角色"), default=False)
     is_supervise_needed = models.BooleanField(_("是否需要督办"), default=False)
     supervise_type = models.CharField(_("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
@@ -234,6 +236,7 @@ class Workflow(WorkflowBase):
             notify=list(self.notify.values_list("id", flat=True)),
             engine_version=DEFAULT_ENGINE_VERSION,
             revoke_config=self.revoke_config,
+            is_auto_approve=self.is_auto_approve
         )
         return data
 
