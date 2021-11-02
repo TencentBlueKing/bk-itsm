@@ -414,8 +414,7 @@
         },
         methods: {
             initData () {
-                // this.unfold = this.hasNodeOptAuth
-                this.unfold = this.hasNodeOptAuth
+                this.unfold = this.hasNodeOptAuth && !this.nodeAutoPass()
                 const item = this.nodeInfo
                 if (item.sla_task_status === 2) {
                     if (item.sla_status === 2) {

@@ -308,7 +308,7 @@
                 } catch (error) {
                     console.log(error)
                 }
-                this.formData.is_auto_approve = this.serviceInfo.is_auto_approve || false
+                this.formData.is_auto_approve = this.flowInfo.is_auto_approve
                 this.formData.visibleRange = {
                     type: display_type,
                     value: display_role
@@ -384,7 +384,7 @@
                     params.display_type = data.type
                     params.display_role = data.value || undefined
                 }
-                params.is_auto_approve = this.formData.is_auto_approve
+                workflow.is_auto_approve = this.formData.is_auto_approve
                 // 撤单方式
                 const {
                     revokeWay,

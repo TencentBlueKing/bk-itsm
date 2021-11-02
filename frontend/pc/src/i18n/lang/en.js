@@ -2361,5 +2361,6 @@ export const m = {
     '请输入表单参数': 'Please enter form parameters',
     '请先创建服务后再进行操作': 'Create the service before performing the operation',
     '该项目不允许删除': 'This project is not allowed to be deleted',
-    '分析': 'Analysis'
+    '分析': 'Analysis',
+    '审批节点已自动处理': 'The approval node is automatically processed'
 }
