@@ -66,6 +66,8 @@ class WorkflowSerializer(DynamicFieldsModelSerializer):
     table = serializers.PrimaryKeyRelatedField(required=True, queryset=Table.objects.all())
     # 业务属性字段
     is_biz_needed = serializers.BooleanField(required=False)
+    # 是否自动过单
+    is_auto_approve = serializers.BooleanField(required=False)
     is_iam_used = serializers.BooleanField(required=False)
     is_supervise_needed = serializers.BooleanField(required=False)
     supervise_type = serializers.ChoiceField(required=False, choices=PROCESSOR_CHOICES)
@@ -106,6 +108,7 @@ class WorkflowSerializer(DynamicFieldsModelSerializer):
                      'owners',
                      'extras',
                      'revoke_config',
+                     'is_auto_approve',
                  ) + model.FIELDS
 
         # 只读字段在创建和更新时均被忽略

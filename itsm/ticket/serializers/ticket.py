@@ -716,6 +716,9 @@ class TicketSerializer(AuthModelSerializer):
         # 关注人
         data.update(followers=self.ticket_followers.get(inst.id, []))
 
+        # 自动过单相关的配置
+        data.update(is_auto_approve=inst.flow.is_auto_approve)
+
         # SLA
         data.update(sla=list(inst.slas.values_list("name", flat=True)), sla_color=inst.sla_color)
 
