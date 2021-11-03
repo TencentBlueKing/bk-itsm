@@ -3602,7 +3602,14 @@ class Ticket(Model, BaseTicket):
         if self.is_sla_end_state(state_id):
             self.stop_sla(state_id)
 
-        self.send_trigger_signal(LEAVE_STATE, state_id, context={"operator": operator})
+        current_status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
+        if current_status is None:
+            logger.info(
+                "get status object does not exist, param: ticket_id={}, state_id={}".format(self.id,
+                                                                                            state_id))
+            raise ObjectNotExist(_("没有获取到当前节点处理状态"))
+        if current_status.status == FINISHED:
+            self.send_trigger_signal(LEAVE_STATE, state_id, context={"operator": operator})
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
