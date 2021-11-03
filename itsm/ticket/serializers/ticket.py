@@ -55,6 +55,7 @@ from itsm.component.constants import (
     STATUS_CHOICES,
     TABLE,
     TASK_SOPS_STATE,
+    TASK_DEVOPS_STATE,
     TASK_STATE,
     TASK_STATUS_DICT,
     SIGN_STATE,
@@ -228,6 +229,16 @@ class StatusSerializer(serializers.ModelSerializer):
                 "error_message": inst.error_message,
             }
             data["api_info"] = remote_info
+        elif inst.state["type"] == TASK_DEVOPS_STATE:
+            remote_info = {
+                "devops_info": self.build_devops_info(
+                    inst.state["extras"]["devops_info"], data["contexts"].get("build_params", {})
+                ),
+                "devops_result": TASK_STATUS_DICT.get(data["status"], _("执行中")),
+                "devops_build_url": data["contexts"].get("build_url", ""),
+                "error_message": inst.error_message,
+            }
+            data["api_info"] = remote_info
         elif inst.state["type"] in [SIGN_STATE, APPROVAL_STATE]:
             # Get sign task progress
             sign_tasks = SignTask.objects.filter(status_id=inst.id)
@@ -342,6 +353,37 @@ class StatusSerializer(serializers.ModelSerializer):
             ]
         )
 
+        return info
+
+    @staticmethod
+    def build_devops_info(devops_info, task_params):
+        if not task_params:
+            return []
+        info = [
+            {
+                "key": "project_id",
+                "name": devops_info["project_id"]["name"],
+                "value": devops_info["project_id"]["value"],
+                "params_value": task_params["project_id"],
+            },
+            {
+                "key": "pipeline_id",
+                "name": devops_info["pipeline_id"]["name"],
+                "value": devops_info["pipeline_id"]["value"],
+                "params_value": task_params["pipeline_id"],
+            }]
+        if devops_info["constants"]:
+            info.extend(
+                [
+                    {
+                        "key": constant["key"],
+                        "name": constant["name"],
+                        "value": constant["value"],
+                        "params_value": constant["value"],
+                    }
+                    for constant in devops_info["constants"]
+                ]
+            )
         return info
 
     @staticmethod
