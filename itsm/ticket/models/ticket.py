@@ -1341,7 +1341,7 @@ class Ticket(Model, BaseTicket):
         """
         # 优先级必定有值，否则数据错误
         priority_field = self.fields.filter(key=FIELD_PRIORITY).first()
-        return priority_field.value
+        return priority_field.ticket.priority_key
 
     @property
     def priority_name(self):
@@ -2159,7 +2159,7 @@ class Ticket(Model, BaseTicket):
             priority_field = self.fields.get(key=FIELD_PRIORITY, source=BASE_MODEL)
         except TicketField.DoesNotExist as error:
             logger.warning("当前单据不包含优先级的字段， error is {}".format(error))
-            return None
+            return {}
 
         if not impact:
             try:
@@ -2167,25 +2167,39 @@ class Ticket(Model, BaseTicket):
 
             except TicketField.DoesNotExist as error:
                 logger.warning("当前单据不包含影响范围的字段， error is {}".format(error))
-                return None
+                return {}
 
         if not urgency:
             try:
                 urgency = self.fields.get(key=FIELD_PX_URGENCY, source=BASE_MODEL).value
             except TicketField.DoesNotExist as error:
                 logger.warning("当前单据不包含紧急度的字段， error is {}".format(error))
-                return
+                return {}
 
         if not (urgency and impact):
             # 优先级的配置必须相关的两个字段都有值存在, 否则采用默认优先级
-            if self.service_instance.sla and self.service_instance.sla.is_enabled:
-                default_priority = self.service_instance.sla.get_default_policy()
+            if self.service_instance:
+                # 1.在关联表中拿到sla_id
+                try:
+                    sla_id = ServiceSla.objects.get(service_id=self.service_instance.id).sla_id
+                except ServiceSla.DoesNotExist as error:
+                    logger.warning(
+                        "Failed to get sla_id from ServiceSla， error is {}".format(error))
+                    return {}
+                    # 2.拿到sla实例
+                try:
+                    sla_instance = Sla.objects.get(id=sla_id)
+                except Sla.DoesNotExist as error:
+                    logger.warning(
+                        "Failed to get sla_instance from Sla， error is {}".format(error))
+                    return {}
+                default_priority = sla_instance.get_default_policy()
                 priorities = SysDict.list_data(
                     PRIORITY, fields=["key", "name", "order"]
                 )
                 self.update_ticket_priority(priorities, default_priority)
 
-            return None
+            return {}
 
         try:
             new_priority = PriorityMatrix.objects.get_priority(
@@ -2193,7 +2207,7 @@ class Ticket(Model, BaseTicket):
             )
         except PriorityMatrix.DoesNotExist as error:
             logger.warning("当前服务的优先级矩阵设置不正常，错误信息 {}".format(error))
-            return
+            return {}
 
         old_priority = priority_field.value
 
