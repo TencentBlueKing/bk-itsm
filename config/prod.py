@@ -30,6 +30,11 @@ if RUN_VER == "open":
 else:
     from blueapps.patch.settings_paas_services import *  # noqa
 
+    # 正式环境 static_url 设置为 https
+    STATIC_FRONTEND_URL = os.environ.get("BKAPP_FRONTEND_URL", None)
+    if STATIC_FRONTEND_URL is not None:
+        STATIC_URL = "%sstatic/" % STATIC_FRONTEND_URL
+
 # 正式环境
 RUN_MODE = "PRODUCT"
 
