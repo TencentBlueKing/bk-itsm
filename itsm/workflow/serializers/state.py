@@ -38,6 +38,7 @@ from itsm.component.constants import (
     TASK_SOPS_STATE,
     TASK_STATE,
     LEN_LONG,
+    TASK_DEVOPS_STATE,
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import dotted_name, dotted_property
@@ -49,6 +50,7 @@ from itsm.workflow.validators import (
     StateGlobalVariablesValidator,
     StatePollValidator,
     StateProcessorsValidator,
+    DevSopsStateValidator,
 )
 
 
@@ -56,12 +58,20 @@ class StateSerializer(serializers.ModelSerializer):
     """状态序列化"""
 
     name = serializers.CharField(
-        required=False, initial=EMPTY_STRING, max_length=LEN_NORMAL, allow_blank=True, allow_null=True
+        required=False,
+        initial=EMPTY_STRING,
+        max_length=LEN_NORMAL,
+        allow_blank=True,
+        allow_null=True,
     )
-    desc = serializers.CharField(required=False, initial=EMPTY_STRING, max_length=LEN_NORMAL)
+    desc = serializers.CharField(
+        required=False, initial=EMPTY_STRING, max_length=LEN_NORMAL
+    )
     type = serializers.ChoiceField(choices=STATE_TYPE_CHOICES, required=False)
     tag = serializers.CharField(required=False, max_length=LEN_LONG)
-    processors = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    processors = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     processors_type = serializers.ChoiceField(choices=PROCESSOR_CHOICES, required=False)
     assignors = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     assignors_type = serializers.ChoiceField(choices=PROCESSOR_CHOICES, required=False)
@@ -73,7 +83,9 @@ class StateSerializer(serializers.ModelSerializer):
     is_terminable = serializers.BooleanField(required=False)
     axis = JSONField(required=False, initial={})
     variables = JSONField(required=False, initial={})
-    distribute_type = serializers.ChoiceField(choices=DISTRIBUTE_TYPE_CHOICES, required=False)
+    distribute_type = serializers.ChoiceField(
+        choices=DISTRIBUTE_TYPE_CHOICES, required=False
+    )
     api_info = JSONField(required=False, initial={})
     finish_condition = JSONField(required=False, initial={})
     extras = JSONField(required=False, initial={})
@@ -82,79 +94,80 @@ class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
         fields = (
-            'workflow',
-            'id',
-            'key',
-            'name',
-            'desc',
-            'distribute_type',
-            'axis',
-            'is_builtin',
-            'variables',
-            'tag',
-            'processors_type',
-            'processors',
-            'assignors',
-            'assignors_type',
-            'delivers',
-            'delivers_type',
-            'can_deliver',
-            'extras',
-            'is_draft',
-            'is_terminable',
-            'fields',
-            'type',
-            'api_info',
-            'api_instance_id',
-            'is_sequential',
-            'finish_condition',
-            'is_multi',
-            'is_allow_skip'
+            "workflow",
+            "id",
+            "key",
+            "name",
+            "desc",
+            "distribute_type",
+            "axis",
+            "is_builtin",
+            "variables",
+            "tag",
+            "processors_type",
+            "processors",
+            "assignors",
+            "assignors_type",
+            "delivers",
+            "delivers_type",
+            "can_deliver",
+            "extras",
+            "is_draft",
+            "is_terminable",
+            "fields",
+            "type",
+            "api_info",
+            "api_instance_id",
+            "is_sequential",
+            "finish_condition",
+            "is_multi",
+            "is_allow_skip",
         ) + model.FIELDS
 
         read_only_fields = model.FIELDS
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            if validated_data.get('type', '') == 'TASK':
-                api_info = validated_data.pop('api_info', {})
-                api_info.pop('remote_system_id', '')
-                api_info.pop('id', '')
+            if validated_data.get("type", "") == "TASK":
+                api_info = validated_data.pop("api_info", {})
+                api_info.pop("remote_system_id", "")
+                api_info.pop("id", "")
 
-                remote_api = RemoteApi.objects.get(id=api_info['remote_api_id'])
-                api_info['remote_api_info'] = RemoteApiSerializer(remote_api).data
+                remote_api = RemoteApi.objects.get(id=api_info["remote_api_id"])
+                api_info["remote_api_info"] = RemoteApiSerializer(remote_api).data
                 api_info.update(
-                    map_code=remote_api.map_code, before_req=remote_api.before_req,
+                    map_code=remote_api.map_code,
+                    before_req=remote_api.before_req,
                 )
 
                 api_instance = RemoteApiInstance.objects.create(**api_info)
-                validated_data['api_instance_id'] = api_instance.id
+                validated_data["api_instance_id"] = api_instance.id
 
                 outputs = GlobalVariable.objects.create_global_variable(
                     instance.id,
                     instance.workflow_id,
-                    instance.variables['outputs'],
-                    validated_data['variables']['outputs'],
+                    instance.variables["outputs"],
+                    validated_data["variables"]["outputs"],
                 )
-                validated_data['variables'].update(outputs=outputs)
-            if validated_data.get('type', '') == 'TASK-SOPS':
+                validated_data["variables"].update(outputs=outputs)
+            if validated_data.get("type", "") == "TASK-SOPS":
                 GlobalVariable.objects.get_or_create(
-                    key='sops_result_%s' % instance.id,
+                    key="sops_result_%s" % instance.id,
                     name="任务执行结果",
                     type="BOOLEAN",
                     is_valid=True,
                     state_id=instance.id,
                     flow_id=instance.workflow_id,
                 )
-                validated_data['variables'] = {
-                    'inputs': [],
-                    'outputs': [
+                validated_data["variables"] = {
+                    "inputs": [],
+                    "outputs": [
                         {
-                            'source': 'global',
-                            'name': '任务执行结果',
-                            'key': 'sops_result_%s' % instance.id,
-                            'ref_path': '',
-                            'type': 'BOOLEAN',
+                            "source": "global",
+                            "name": "任务执行结果",
+                            "key": "sops_result_%s" % instance.id,
+                            "ref_path": "",
+                            "type": "BOOLEAN",
                         }
                     ],
                 }
@@ -166,56 +179,68 @@ class StateSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         validated_data = super(StateSerializer, self).to_internal_value(data)
 
-        if validated_data.get('processors_type') == PERSON:
-            validated_data['processors'] = dotted_name(validated_data.get('processors', ''))
+        if validated_data.get("processors_type") == PERSON:
+            validated_data["processors"] = dotted_name(
+                validated_data.get("processors", "")
+            )
 
-        if validated_data.get('assignors_type') == PERSON:
-            validated_data['assignors'] = dotted_name(validated_data.get('assignors', ''))
+        if validated_data.get("assignors_type") == PERSON:
+            validated_data["assignors"] = dotted_name(
+                validated_data.get("assignors", "")
+            )
 
         # 网关节点无需额外配置，直接为非草稿状态
-        if validated_data.get('type') in ['ROUTER-P', 'COVERAGE']:
+        if validated_data.get("type") in ["ROUTER-P", "COVERAGE"]:
             validated_data.update(is_draft=False)
 
         return validated_data
 
     def to_representation(self, instance):
         data = super(StateSerializer, self).to_representation(instance)
-        if data['processors_type'] == PERSON:
-            data['processors'] = dotted_property(instance, 'processors')
-        if data['assignors_type'] == PERSON:
-            data['assignors'] = dotted_property(instance, 'assignors')
-        if data['type'] == 'TASK' and instance.api_instance:
-            data['api_info'] = ApiInstanceSerializer(instance.api_instance).data
-        if data['type'] == 'NORMAL' and data['is_builtin'] is True:
-            data['is_first_state'] = True
+        if data["processors_type"] == PERSON:
+            data["processors"] = dotted_property(instance, "processors")
+        if data["assignors_type"] == PERSON:
+            data["assignors"] = dotted_property(instance, "assignors")
+        if data["type"] == "TASK" and instance.api_instance:
+            data["api_info"] = ApiInstanceSerializer(instance.api_instance).data
+        if data["type"] == "NORMAL" and data["is_builtin"] is True:
+            data["is_first_state"] = True
         else:
-            data['is_first_state'] = False
+            data["is_first_state"] = False
 
         return data
 
     def get_variables(self, data):
         if self.instance is None:
-            return {'inputs': [], 'outputs': []}
+            return {"inputs": [], "outputs": []}
         return data
 
     # =============================================== validate ===============
 
     def validate_name(self, value):
-        if self.context['view'].action == 'update':
+        if self.context["view"].action == "update":
             if not value:
-                raise ParamError(_('节点名称不能为空'))
+                raise ParamError(_("节点名称不能为空"))
         return value
 
     def run_validation(self, data=empty):
 
-        if self.context['view'].action != 'update':
+        if self.context["view"].action != "update":
             return super(StateSerializer, self).run_validation(data)
         if self.instance.type == TASK_STATE:
-            self.validators = [StatePollValidator(), StateGlobalVariablesValidator(self.instance)]
+            self.validators = [
+                StatePollValidator(),
+                StateGlobalVariablesValidator(self.instance),
+            ]
             return super(StateSerializer, self).run_validation(data)
         elif self.instance.type == TASK_SOPS_STATE:
             self.validators = [
                 SopsStateValidator(self.instance),
+            ]
+            return super(StateSerializer, self).run_validation(data)
+        elif self.instance.type == TASK_DEVOPS_STATE:
+            self.validators = [
+                DevSopsStateValidator(self.instance),
             ]
             return super(StateSerializer, self).run_validation(data)
         else:
