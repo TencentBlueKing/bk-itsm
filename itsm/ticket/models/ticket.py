@@ -889,11 +889,9 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = (
-                TicketStatus.objects.filter(service_type=service_type)
-                .filter(**setting)
-                .first()
-            )
+            to_ticket_status = TicketStatus.objects.filter(
+                service_type=service_type
+            ).filter(key=setting.get("name")).first()
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
