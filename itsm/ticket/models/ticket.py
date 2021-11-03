@@ -136,6 +136,7 @@ from itsm.component.constants import (
     ASSIGN_LEADER,
     TIME_DELTA,
     LEN_XX_LONG,
+    TASK_DEVOPS_STATE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -2925,7 +2926,7 @@ class Ticket(Model, BaseTicket):
             status = RUNNING
             action_type = (
                 SYSTEM_OPERATE
-                if state.type in [TASK_STATE, TASK_SOPS_STATE]
+                if state.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE]
                 else TRANSITION_OPERATE
             )
 
