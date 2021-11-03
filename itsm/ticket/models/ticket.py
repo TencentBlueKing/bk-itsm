@@ -2473,11 +2473,11 @@ class Ticket(Model, BaseTicket):
             attr_value = _(plain_value) if isinstance(plain_value, str) else plain_value
             context.update(**{attr["key"]: attr_value})
 
-        # 特殊处理
-        context.update(
-            creator=transform_single_username(self.creator),
-            today_date=datetime.today(),
-        )
+        # 添加时间
+        context.update(today_date=datetime.today())
+        # creator用户名翻译成中英文格式
+        if settings.CONTENT_CREATOR_WITH_TRANSLATION:
+            context.update(creator=transform_single_username(self.creator))
 
         return context
 
