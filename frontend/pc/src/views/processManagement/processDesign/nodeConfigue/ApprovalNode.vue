@@ -222,6 +222,14 @@
                         </div>
                     </bk-form-item>
                 </template>
+                <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true">
+                    <bk-checkbox
+                        :true-value="true"
+                        :false-value="false"
+                        v-model="formInfo.is_allow_skip">
+                        节点处理人为空时，直接跳过且不视为异常
+                    </bk-checkbox>
+                </bk-form-item>
             </bk-form>
         </basic-card>
         <basic-card :card-label="$t(`m.treeinfo['字段配置']`)" class="mt20">
@@ -387,7 +395,8 @@
                     ticket_key: '',
                     is_sequential: false,
                     is_multi: true,
-                    processors: []
+                    processors: [],
+                    is_allow_skip: false
                 },
                 nodeTagList: [],
                 allCondition: [],
@@ -462,6 +471,7 @@
                     this.processType = 'multi'
                 }
                 this.formInfo.is_sequential = this.configur.is_sequential
+                this.formInfo.is_allow_skip = this.configur.is_allow_skip
                 this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : []
                 this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep'
                 this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : ''
@@ -569,7 +579,8 @@
                         is_terminable: false,
                         processors_type: 'PERSON',
                         finish_condition: this.finishCondition,
-                        is_multi: false
+                        is_multi: false,
+                        is_allow_skip: false
                     }
                     // 基本信息
                     params.name = this.formInfo.name
@@ -598,6 +609,8 @@
                         this.checkStatus.delivers = true
                         return
                     }
+                    // 处理人异常时
+                    params.is_allow_skip = this.formInfo.is_allow_skip
                     if (this.$refs.delivers) {
                         const data = this.$refs.delivers.getValue()
                         params.delivers_type = data.type
