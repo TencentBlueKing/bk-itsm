@@ -44,7 +44,8 @@
                         style="margin-left: 5px;"
                         v-bk-tooltips.top="$t(`m.newCommon['您暂无权限处理']`)">
                     </i>
-                    <span class="node-name">{{ nodeInfo.name }}</span>
+                    <!-- <span class="node-name">{{ nodeInfo.name }}</span> -->
+                    <span class="node-name">{{ nodeAutoPass() ? `(${ nodeInfo.name })` + $t(`m['审批节点已自动处理']`) : nodeInfo.name }}</span>
                     <!-- 当前节点处理人 -->
                     <span
                         :ref="'processorsSpan' + index"
@@ -413,8 +414,7 @@
         },
         methods: {
             initData () {
-                this.unfold = this.hasNodeOptAuth
-
+                this.unfold = this.hasNodeOptAuth && !this.nodeAutoPass()
                 const item = this.nodeInfo
                 if (item.sla_task_status === 2) {
                     if (item.sla_status === 2) {
@@ -427,7 +427,13 @@
                     this.runTime()
                 }
             },
-            
+            // 自动通过
+            nodeAutoPass () {
+                if (this.ticketInfo.hasOwnProperty('is_auto_approve') && this.nodeInfo.type === 'APPROVAL') {
+                    return this.ticketInfo.is_auto_approve && window.username === this.ticketInfo.creator.split('(')[0] && this.nodeInfo.tasks.some(item => item.processor === this.ticketInfo.creator)
+                }
+                return false
+            },
             // 按钮操作
             clickBtn (btn) {
                 // 字段校验
@@ -584,6 +590,7 @@
             // 展开收起
             closeUnflod (e) {
                 // 禁止冒泡
+                if (this.nodeAutoPass()) return
                 if (e.target.className.indexOf('bk-processor-check') === -1) {
                     if (!this.nodeInfo.can_operate && !this.currSignProcessorInfo) {
                         return

@@ -1346,6 +1346,7 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '自动处理': 'Auto-processing',
         '提前结束条件': 'Early termination condition',
         '顺序会签': 'Sequential sign',
         '随机会签': 'Random sign',
@@ -2359,5 +2360,7 @@ export const m = {
     '选择执行方案，默认选择全部任务节点': 'Select the execution scheme. By default, all task nodes are selected',
     '请输入表单参数': 'Please enter form parameters',
     '请先创建服务后再进行操作': 'Create the service before performing the operation',
-    '该项目不允许删除': 'This project is not allowed to be deleted'
+    '该项目不允许删除': 'This project is not allowed to be deleted',
+    '分析': 'Analysis',
+    '审批节点已自动处理': 'The approval node is automatically processed'
 }

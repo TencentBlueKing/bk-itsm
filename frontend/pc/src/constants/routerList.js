@@ -150,7 +150,7 @@ const ROUTE_LIST = [
             },
             {
                 name: i18n.t(`m["管理"]`),
-                abbrName: 'Man.',
+                abbrName: 'Man',
                 id: 'projectManage',
                 subRouters: [
                     {
@@ -164,6 +164,20 @@ const ROUTE_LIST = [
                         id: 'projectTrigger',
                         icon: 'bk-itsm-icon icon-slide',
                         path: '/project/trigger'
+                    }
+                ]
+            },
+            {
+                name: i18n.t(`m["分析"]`),
+                abbrName: 'Ana',
+                id: 'analysis',
+                subRouters: [
+                    {
+                        name: i18n.t(`m["运营分析"]`),
+                        id: 'projectOperationHome',
+                        icon: 'bk-itsm-icon icon-operational-data',
+                        path: '/project/projectOperation/home',
+                        prefix: ['/project/projectOperation/service']
                     }
                 ]
             }
