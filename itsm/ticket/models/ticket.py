@@ -3637,6 +3637,22 @@ class Ticket(Model, BaseTicket):
         # 发送创建成功的信号
         self.send_trigger_signal(CREATE_TICKET)
 
+    def get_list_view(self):
+        list_view = [
+            {"key": "单号", "value": self.sn},
+            {"key": "服务目录", "value": self.catalog_fullname},
+            {"key": "提单人", "value": self.creator},
+        ]
+        reason = self.get_field_value("reason", None)
+        if reason is None:
+            list_view.append(
+                {"key": "提单时间", "value": self.create_at.strftime("%Y-%m-%d %H:%M:%S")}
+            )
+        else:
+            list_view.append({"key": "申请理由", "value": reason})
+
+        return list_view
+
     @staticmethod
     def display_content(field_type, content):
         if field_type != "CUSTOM-FORM":
@@ -4255,7 +4271,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**time_range)
+            cls.objects.filter(project_query)
+            .filter(**time_range)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("creator", distinct=True))
@@ -4271,7 +4288,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -4287,7 +4305,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .filter(bk_biz_id__gt=-1)
             .extra(select={"date_str": data_str})
             .values("date_str")
