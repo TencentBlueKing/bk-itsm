@@ -600,6 +600,7 @@ class PipelineWrapper(object):
                     SIGN_STATE,
                     VIRTUAL_STATE,
                     APPROVAL_STATE,
+                    TASK_DEVOPS_STATE,
                 ]:
                     # NORMAL（普通节点和分支网关节点）
                     outgoings = state["outgoing"]
