@@ -392,6 +392,8 @@ class TicketRemark(BaseMpttModel):
     ticket_id = models.IntegerField(
         _("单据id"), max_length=LEN_SHORT, null=False, default=0
     )
+    users = models.JSONField(_("用户@的用户列表"), default=[])
+    update_log = models.JSONField(_("用户评论的更新记录"), default=[])
 
     class Meta:
         app_label = "ticket"

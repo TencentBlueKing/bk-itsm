@@ -27,6 +27,7 @@ import copy
 import json
 
 from collections import OrderedDict
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
@@ -99,6 +100,8 @@ from itsm.ticket.models import (
     SlaTicketHighlight,
     TicketRemark,
 )
+from itsm.ticket.tasks import remark_notify
+from itsm.ticket.utils import compute_list_difference
 from itsm.workflow.models import WorkflowVersion
 from itsm.ticket.serializers.field import (
     FieldSerializer,
@@ -1336,6 +1339,8 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
     )
     parent__id = serializers.IntegerField(required=False, source="parent.id")
     parent_key = serializers.CharField(required=False, allow_blank=True)
+    update_log = serializers.JSONField(required=False)
+    users = serializers.ListField(required=True, initial=[])
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
@@ -1366,6 +1371,27 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
 
         return "PUBLIC"
 
+    def update(self, instance, validated_data):
+        update_by = validated_data["updated_by"]
+        receivers = ",".join(
+            compute_list_difference(instance.users, validated_data["users"])
+        )
+        instance.update_log.append(
+            "{}于{}更新了该评论".format(
+                update_by, datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            )
+        )
+        instance = super(TicketRemarkSerializer, self).update(instance, validated_data)
+        remark_notify.apply_async(
+            args=[
+                instance.ticket_id,
+                instance.creator,
+                validated_data["content"],
+                receivers,
+            ]
+        )
+        return instance
+
     def create(self, validated_data):
         parent_id = validated_data["parent"]["id"]
         parent_node = TicketRemark.objects.get(id=parent_id)
@@ -1379,7 +1405,17 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
         validated_data.pop("parent")
-        return super(TicketRemarkSerializer, self).create(validated_data)
+        instance = super(TicketRemarkSerializer, self).create(validated_data)
+
+        remark_notify.apply_async(
+            args=[
+                instance.ticket_id,
+                instance.creator,
+                instance.content,
+                ",".join(instance.users),
+            ]
+        )
+        return instance
 
     class Meta:
         model = TicketRemark
@@ -1391,6 +1427,8 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             "parent_key",
             "parent__id",
             "content",
+            "update_log",
+            "users",
         )
         # 只读字段在创建和更新时均被忽略
         read_only_fields = (
@@ -1401,4 +1439,5 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             "parent__id",
             "parent__name",
             "ticket_id",
+            "update_log",
         )
