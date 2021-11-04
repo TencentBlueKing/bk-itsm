@@ -34,7 +34,6 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
-from itsm.auth_iam.utils import IamRequest
 from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -1341,35 +1340,9 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
     parent_key = serializers.CharField(required=False, allow_blank=True)
     update_log = serializers.JSONField(required=False)
     users = serializers.ListField(required=True, initial=[])
-
-    def iam_ticket_view_auth(self, request, obj):
-        iam_client = IamRequest(request)
-        resource_info = {
-            "resource_id": str(obj.service_id),
-            "resource_name": obj.service_name,
-            "resource_type": "service",
-        }
-
-        apply_actions = ["ticket_view"]
-        auth_actions = iam_client.resource_multi_actions_allowed(
-            apply_actions, [resource_info], project_key=obj.project_key
-        )
-        if auth_actions.get("ticket_view"):
-            return True
-
-        return False
-
-    def get_remark_type(self, ticket_id):
-        request = self.context["request"]
-        ticket = Ticket.objects.get(id=ticket_id)
-
-        view_permit = ticket.can_view(request.user.username)
-        iam_permit = self.iam_ticket_view_auth(request, ticket)
-
-        if view_permit or iam_permit:
-            return "INSIDE"
-
-        return "PUBLIC"
+    remark_type = serializers.ChoiceField(
+        required=True, choices=TicketRemark.REMARK_TYPE
+    )
 
     def update(self, instance, validated_data):
         update_by = validated_data["updated_by"]
@@ -1398,10 +1371,6 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
         if parent_node.level > 1:
             raise serializers.ValidationError("被引用的评论不允许被再次回复")
 
-        if parent_node.remark_type == "ROOT":
-            validated_data["remark_type"] = self.get_remark_type(parent_node.ticket_id)
-        else:
-            validated_data["remark_type"] = parent_node.remark_type
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
         validated_data.pop("parent")
@@ -1429,6 +1398,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             "content",
             "update_log",
             "users",
+            "remark_type",
         )
         # 只读字段在创建和更新时均被忽略
         read_only_fields = (

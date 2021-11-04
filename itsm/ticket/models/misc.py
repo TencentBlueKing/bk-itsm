@@ -479,6 +479,8 @@ class TicketRemark(BaseMpttModel):
             "ticket_id": node.ticket_id,
             "level": node.level,
             "children": children,
+            "update_log": node.update_log,
+            "users": node.users,
         }
 
         return data
