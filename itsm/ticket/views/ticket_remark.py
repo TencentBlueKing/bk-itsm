@@ -36,5 +36,6 @@ class TicketRemarkModelViewSet(ModelViewSet):
     def tree_view(self, request):
         """评论视图"""
         ticket_id = request.query_params.get("ticket_id", "")
-        tree_data = TicketRemark.root_subtree(ticket_id=ticket_id)
+        show_type = request.query_params.get("show_type", "PUBLIC")
+        tree_data = TicketRemark.root_subtree(ticket_id=ticket_id, show_type=show_type)
         return Response(tree_data)

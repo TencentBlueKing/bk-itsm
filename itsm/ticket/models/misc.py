@@ -451,23 +451,25 @@ class TicketRemark(BaseMpttModel):
         return comment
 
     @classmethod
-    def root_subtree(cls, ticket_id):
+    def root_subtree(cls, ticket_id, show_type):
         # 获取当前节点的根节点
         try:
             root_node = cls._objects.get(ticket_id=ticket_id, remark_type="ROOT")
         except cls.DoesNotExist:
             root_node = TicketRemark.create_root(ticket_id=ticket_id)
-        return cls.subtree(root_node)
+        return cls.subtree(root_node, show_type)
 
     @classmethod
-    def subtree(cls, node):
+    def subtree(cls, node, show_type):
         """获取以node为根的子树"""
 
         node_children = (
-            node.get_children().filter(is_deleted=False).order_by("-create_at")
+            node.get_children()
+            .filter(is_deleted=False, remark_type=show_type)
+            .order_by("-create_at")
         )
 
-        children = [node.subtree(child) for child in node_children]
+        children = [node.subtree(child, show_type) for child in node_children]
 
         data = {
             "id": node.id,
