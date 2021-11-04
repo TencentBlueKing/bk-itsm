@@ -54,6 +54,7 @@ urlpatterns = [
     url(r'^db_fix_for_service_catalog/$', views.db_fix_for_service_catalog),
     url(r'^weekly_statical/$', views.weekly_statical),
     url(r'^db_fix_for_workflow_after_2_5_9/$', views.db_fix_for_workflow_after_2_5_9),
+    url(r'^db_fix_for_blueapps_after_2_6_0/$', views.db_fix_for_blueapps_after_2_6_0),
     # 获取settings内容
 ]
 
