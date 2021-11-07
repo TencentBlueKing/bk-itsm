@@ -78,6 +78,7 @@ from itsm.service.serializers import (
     DictKeySerializer,
     ServiceConfigSerializer,
     ServiceListSerializer,
+    ServiceImportSerializer,
 )
 from itsm.sla.models import PriorityMatrix
 from mptt.exceptions import InvalidMove
@@ -630,6 +631,29 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         state_id = service.workflow.first_state["id"]
         state = State.objects.get(id=state_id)
         return state
+
+    @action(detail=True, methods=["get"], permission_classes=())
+    def export(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response(instance.tag_data())
+
+    @action(detail=False, methods=["post"])
+    def import_service(self, request, *args, **kwargs):
+        data = request.data
+        ServiceImportSerializer(data=data).is_valid(raise_exception=True)
+        with transaction.atomic():
+            workflow_tag_data = data.pop("workflow")
+            workflow = Workflow.objects.restore(
+                workflow_tag_data, request.user.username
+            )[0]
+            version = workflow.create_version()
+            data["workflow_id"] = version.id
+            if Service.validate_service_name(data["name"]):
+                raise ParamError(_("导入失败，服务名称已经存在"))
+            service = Service.objects.create(**data)
+        return Response(
+            self.serializer_class(service, context=self.get_serializer_context()).data
+        )
 
 
 class SysDictViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):

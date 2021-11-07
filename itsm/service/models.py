@@ -411,7 +411,8 @@ class Service(ObjectManagerMixin, Model):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -455,6 +456,28 @@ class Service(ObjectManagerMixin, Model):
             except Exception as e:
                 sla.delete()
                 raise e
+
+    @classmethod
+    def validate_service_name(cls, service_name):
+        return cls.objects.filter(name=service_name).exists()
+
+    def tag_data(self):
+        from itsm.workflow.models import Workflow
+
+        workflow = Workflow.objects.get(id=self.workflow.workflow_id)
+        return {
+            "key": self.key,
+            "name": self.name,
+            "desc": self.desc,
+            "workflow": workflow.tag_data(),
+            "owners": self.owners,
+            "can_ticket_agency": self.can_ticket_agency,
+            "is_valid": self.is_valid,
+            "display_type": self.display_type,
+            "display_role": self.display_role,
+            "source": self.source,
+            "project_key": self.project_key,
+        }
 
 
 class ServiceSla(models.Model):
