@@ -100,6 +100,11 @@
                         :api-info="item.api_info"
                         :node-info="item">
                     </approvalNodeInfo>
+                    <devopsNodeInfo
+                        v-else-if="item.type === 'TASK-DEVOPS'"
+                        :api-info="item.api_info"
+                        :node-info="item">
+                    </devopsNodeInfo>
                     <sopsNodeInfo
                         v-else
                         :api-info="item.api_info"
@@ -128,6 +133,7 @@
     import fieldPreview from '@/views/commonComponent/fieldPreview'
     import autoNodeInfo from './autoNodeInfo.vue'
     import sopsNodeInfo from './sopsNodeInfo.vue'
+    import devopsNodeInfo from './devopsNodeInfo.vue'
     import signNodeInfo from './signNodeInfo'
     import approvalNodeInfo from './approvalNodeInfo'
     import { errorHandler } from '@/utils/errorHandler'
@@ -140,7 +146,8 @@
             autoNodeInfo,
             sopsNodeInfo,
             signNodeInfo,
-            approvalNodeInfo
+            approvalNodeInfo,
+            devopsNodeInfo
         },
         props: {
             // 单据信息

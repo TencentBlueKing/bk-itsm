@@ -90,7 +90,8 @@
                                     'icon-task-icon',
                                     'con-copy-new',
                                     'icon-sign-node',
-                                    'icon-approval-node'
+                                    'icon-approval-node',
+                                    'icon-devops-task-icon'
                                 ].includes(item.iconStyle) }
                             ]">
                         </i>
@@ -141,6 +142,7 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+                    { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
                 ],
@@ -148,6 +150,7 @@
                     { type: 'NORMAL', name: this.$t(`m.treeinfo["手动节点"]`), iconStyle: 'icon-icon-artificial' },
                     { type: 'TASK', name: this.$t(`m.treeinfo["API节点"]`), iconStyle: 'icon-api-node' },
                     { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
+                    { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },

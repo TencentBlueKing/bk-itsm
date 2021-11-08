@@ -1,12 +1,13 @@
 @font-face {
 	font-family: "commonicon";
-	src: url("scss/icon/fonts/commonicon.svg#commonicon") format("svg"),
-    url("scss/icon/fonts/commonicon.ttf") format("truetype"),
-    url("scss/icon/fonts/commonicon.woff") format("woff"),
-    url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
+	src: url("scss/icon/fonts/commonicon.svg#iconcool") format("svg"),
+url("scss/icon/fonts/commonicon.ttf") format("truetype"),
+url("scss/icon/fonts/commonicon.woff") format("woff"),
+url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
     font-weight: normal;
     font-style: normal;
 }
+
 .bk-itsm-icon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'commonicon' !important;
@@ -21,6 +22,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 .icon-qw:before {
 	content: "\e1fd";
 }
@@ -785,4 +787,13 @@
 }
 .icon-ticket_2:before {
 	content: "\e20a";
+}
+.icon-devops-icon:before {
+	content: "\e20c";
+}
+.icon-devops-task-icon:before {
+	content: "\e20e";
+}
+.icon-sops-task-icon:before {
+	content: "\e20d";
 }

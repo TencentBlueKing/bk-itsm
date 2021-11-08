@@ -2362,5 +2362,10 @@ export const m = {
     '请先创建服务后再进行操作': 'Create the service before performing the operation',
     '该项目不允许删除': 'This project is not allowed to be deleted',
     '分析': 'Analysis',
-    '审批节点已自动处理': 'The approval node is automatically processed'
+    '审批节点已自动处理': 'The approval node is automatically processed',
+    '流水线': 'Pipeline',
+    '蓝盾节点': 'Devops Node',
+    '流水线参数': 'Pipeline params',
+    '必填项': 'required fields',
+    '跳转蓝盾查看': 'Link to Devops'
 }
