@@ -24,12 +24,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import time
+import uuid
 
 import jsonfield
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext as _
+from mptt.fields import TreeForeignKey
 
 from itsm.component.constants import (
     EMPTY_DICT,
@@ -41,7 +43,9 @@ from itsm.component.constants import (
     LEN_SHORT,
     NOTIFY_TYPE_CHOICES,
     PROCESSOR_CHOICES,
+    FIRST_ORDER,
 )
+from itsm.component.db.models import BaseMpttModel
 from itsm.ticket import managers
 
 
@@ -51,7 +55,9 @@ class TicketTemplate(models.Model):
     name = models.CharField(_("模板名称"), max_length=LEN_NORMAL)
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL)
     service = models.CharField(_("对应服务主键"), default=EMPTY_STRING, max_length=LEN_NORMAL)
-    template = jsonfield.JSONField(_("单据模板字段"), default=EMPTY_LIST, null=True, blank=True)
+    template = jsonfield.JSONField(
+        _("单据模板字段"), default=EMPTY_LIST, null=True, blank=True
+    )
 
     class Meta:
         app_label = "ticket"
@@ -68,7 +74,9 @@ class TicketStateDraft(models.Model):
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL)
     ticket_id = models.IntegerField(_("单据id"))
     state_id = models.IntegerField(_("节点id"))
-    draft = jsonfield.JSONField(_("单据节点草稿字段"), default=EMPTY_LIST, null=True, blank=True)
+    draft = jsonfield.JSONField(
+        _("单据节点草稿字段"), default=EMPTY_LIST, null=True, blank=True
+    )
 
     class Meta:
         app_label = "ticket"
@@ -84,12 +92,17 @@ class TicketComment(models.Model):
 
     SOURCE_CHOICE = [("WEB", "蓝鲸平台"), ("SMS", "短信邀请"), ("SYS", "系统自评")]
 
-    ticket = models.OneToOneField('ticket.Ticket', help_text=_("关联工单"), related_name="comments",
-                                  on_delete=models.CASCADE)
+    ticket = models.OneToOneField(
+        "ticket.Ticket",
+        help_text=_("关联工单"),
+        related_name="comments",
+        on_delete=models.CASCADE,
+    )
     stars = models.IntegerField("评价等级1~5，5星为最好", default=0)
     comments = models.CharField(_("评价信息"), max_length=LEN_LONG, null=True, blank=True)
-    source = models.CharField(_("评价来源"), choices=SOURCE_CHOICE, default="SYS",
-                              max_length=LEN_NORMAL)
+    source = models.CharField(
+        _("评价来源"), choices=SOURCE_CHOICE, default="SYS", max_length=LEN_NORMAL
+    )
     creator = models.CharField(_("创建人"), max_length=LEN_NORMAL, null=True, blank=True)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
@@ -112,34 +125,52 @@ class TicketComment(models.Model):
         start = time.time()
         try:
             uncommented_finished = (
-                Ticket.objects.filter(is_deleted=False, is_draft=False, current_status="FINISHED")
-                    .exclude(id__in=TicketComment.objects.values_list('ticket_id', flat=True))
-                    .values_list('id', flat=True)
+                Ticket.objects.filter(
+                    is_deleted=False, is_draft=False, current_status="FINISHED"
+                )
+                .exclude(
+                    id__in=TicketComment.objects.values_list("ticket_id", flat=True)
+                )
+                .values_list("id", flat=True)
             )
 
             TicketComment.objects.bulk_create(
-                [TicketComment(ticket_id=ticket_id) for ticket_id in uncommented_finished]
+                [
+                    TicketComment(ticket_id=ticket_id)
+                    for ticket_id in uncommented_finished
+                ]
             )
-            print('fix history ticket comments: %s, elapsed: %ss' % (
-            len(uncommented_finished), time.time() - start))
+            print(
+                "fix history ticket comments: %s, elapsed: %ss"
+                % (len(uncommented_finished), time.time() - start)
+            )
         except Exception as e:
-            print('fix history ticket comments exception: %s' % e)
+            print("fix history ticket comments exception: %s" % e)
 
     @classmethod
     def ticket_comments(cls, ticket_ids):
-        comments = cls.objects.filter(ticket_id__in=ticket_ids).values("ticket_id", "id", "stars")
-        info = {comment["ticket_id"]: {"id": comment["id"], "stars": comment["stars"]} for comment
-                in comments}
+        comments = cls.objects.filter(ticket_id__in=ticket_ids).values(
+            "ticket_id", "id", "stars"
+        )
+        info = {
+            comment["ticket_id"]: {"id": comment["id"], "stars": comment["stars"]}
+            for comment in comments
+        }
         return info
 
 
 class TicketCommentInvite(models.Model):
     """邀请途径记录表"""
 
-    comment = models.ForeignKey(TicketComment, help_text=_("关联评论"), related_name="invite",
-                                on_delete=models.CASCADE)
-    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="SMS",
-                                   choices=NOTIFY_TYPE_CHOICES)
+    comment = models.ForeignKey(
+        TicketComment,
+        help_text=_("关联评论"),
+        related_name="invite",
+        on_delete=models.CASCADE,
+    )
+    notify_type = models.CharField(
+        _("通知方式"), max_length=LEN_SHORT, default="SMS", choices=NOTIFY_TYPE_CHOICES
+    )
     receiver = models.CharField(_("联系人/联系方式"), max_length=LEN_NORMAL, default="")
     code = models.CharField(_("短码"), max_length=10, default="", unique=True)
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
@@ -168,15 +199,17 @@ class TicketCommentInvite(models.Model):
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成code
-            return '##Err##'
+            return "##Err##"
 
         # [T|P|D][6c] = 7c
-        return '{}{}'.format(settings.RUN_MODE[0], code)
+        return "{}{}".format(settings.RUN_MODE[0], code)
 
     @classmethod
     def get_user_comments_invites(cls, user):
         comments_invites = {}
-        invites = TicketCommentInvite.objects.filter(receiver=user).values("comment_id", "code")
+        invites = TicketCommentInvite.objects.filter(receiver=user).values(
+            "comment_id", "code"
+        )
         for invite in invites:
             comments_invites.setdefault(invite["comment_id"], []).append(invite["code"])
         return comments_invites
@@ -186,14 +219,17 @@ class NotifyLogModel(models.Model):
     """通知日志公共字段"""
 
     state_id = models.IntegerField(_("发送节点ID"), default=EMPTY_INT)
-    state_name = models.CharField(_("节点名称"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True,
-                                  blank=True)
-    creator = models.CharField(_("创建人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True,
-                               blank=True)
+    state_name = models.CharField(
+        _("节点名称"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+    )
+    creator = models.CharField(
+        _("创建人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+    )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     message = models.TextField(_("通知信息"), default=EMPTY_STRING, null=True, blank=True)
-    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL",
-                                   choices=NOTIFY_TYPE_CHOICES)
+    notify_type = models.CharField(
+        _("通知方式"), max_length=LEN_SHORT, default="EMAIL", choices=NOTIFY_TYPE_CHOICES
+    )
     is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
 
     objects = managers.Manager()
@@ -213,14 +249,28 @@ class NotifyLogModel(models.Model):
 class TicketFollowerNotifyLog(NotifyLogModel):
     """工单关注人通知日志"""
 
-    ticket = models.ForeignKey('ticket.Ticket', help_text=_("关联工单"),
-                               related_name="follower_notify_logs", on_delete=models.CASCADE)
-    followers = models.CharField(_("关注人"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                 blank=True)
-    followers_type = models.CharField(_("处理者类型/角色类型"), max_length=LEN_SHORT,
-                                      choices=PROCESSOR_CHOICES, default="EMPTY")
+    ticket = models.ForeignKey(
+        "ticket.Ticket",
+        help_text=_("关联工单"),
+        related_name="follower_notify_logs",
+        on_delete=models.CASCADE,
+    )
+    followers = models.CharField(
+        _("关注人"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
+    followers_type = models.CharField(
+        _("处理者类型/角色类型"),
+        max_length=LEN_SHORT,
+        choices=PROCESSOR_CHOICES,
+        default="EMPTY",
+    )
     ticket_token = models.CharField(
-        _("关注链接只读标识"), max_length=10, default=EMPTY_STRING, unique=True, null=True, blank=True
+        _("关注链接只读标识"),
+        max_length=10,
+        default=EMPTY_STRING,
+        unique=True,
+        null=True,
+        blank=True,
     )
     is_sys_sended = models.BooleanField(_("是否系统流程发送"), default=False)
 
@@ -248,19 +298,24 @@ class TicketFollowerNotifyLog(NotifyLogModel):
             retry += 1
         else:
             # 尝试60次一直重复，则放弃生成code
-            return '##Err##'
+            return "##Err##"
 
         # [T|P|D][6c] = 7c
-        return '{}{}'.format(settings.RUN_MODE[0], ticket_token)
+        return "{}{}".format(settings.RUN_MODE[0], ticket_token)
 
 
 class TicketSuperviseNotifyLog(NotifyLogModel):
     """工单督办日志"""
 
-    ticket = models.ForeignKey('ticket.Ticket', help_text=_("关联工单"),
-                               related_name="supervise_notify_logs", on_delete=models.CASCADE)
-    supervised = models.CharField(_("被督办的人"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                  blank=True)
+    ticket = models.ForeignKey(
+        "ticket.Ticket",
+        help_text=_("关联工单"),
+        related_name="supervise_notify_logs",
+        on_delete=models.CASCADE,
+    )
+    supervised = models.CharField(
+        _("被督办的人"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
 
     class Meta:
         app_label = "ticket"
@@ -274,22 +329,22 @@ class TicketSuperviseNotifyLog(NotifyLogModel):
 class TicketGlobalVariable(models.Model):
     """自动节点全局变量"""
 
-    key = models.CharField(_('变量关键字'), max_length=LEN_LONG)
-    name = models.CharField(_('变量名'), max_length=LEN_NORMAL, default=EMPTY_STRING)
-    value = jsonfield.JSONField(_('变量值'), default=EMPTY_DICT)
+    key = models.CharField(_("变量关键字"), max_length=LEN_LONG)
+    name = models.CharField(_("变量名"), max_length=LEN_NORMAL, default=EMPTY_STRING)
+    value = jsonfield.JSONField(_("变量值"), default=EMPTY_DICT)
 
-    state_id = models.IntegerField(_('关联节点'), null=True, blank=True)
-    ticket_id = models.IntegerField(_('关联单据'), null=True, blank=True)
+    state_id = models.IntegerField(_("关联节点"), null=True, blank=True)
+    ticket_id = models.IntegerField(_("关联单据"), null=True, blank=True)
 
-    create_at = models.DateTimeField(_('创建时间'), auto_now_add=True)
-    update_at = models.DateTimeField(_('更新时间'), auto_now=True)
+    create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
+    update_at = models.DateTimeField(_("更新时间"), auto_now=True)
 
     objects = managers.TicketGlobalVariableManager()
 
     class Meta:
-        app_label = 'ticket'
-        verbose_name = _('单据全局变量')
-        verbose_name_plural = _('单据全局变量')
+        app_label = "ticket"
+        verbose_name = _("单据全局变量")
+        verbose_name_plural = _("单据全局变量")
 
     @classmethod
     def get_ticket_output(cls, ticket_id, display_type="dict"):
@@ -302,5 +357,130 @@ class TicketGlobalVariable(models.Model):
             outputs = []
             for variable in variables:
                 outputs.append(
-                    {"key": variable.key, "name": variable.name, "value": variable.value})
+                    {
+                        "key": variable.key,
+                        "name": variable.name,
+                        "value": variable.value,
+                    }
+                )
         return outputs
+
+
+def uniqid():
+    return uuid.uuid3(uuid.uuid1(), uuid.uuid4().hex).hex
+
+
+class TicketRemark(BaseMpttModel):
+    REMARK_TYPE = [
+        ("PUBLIC", "公开评论"),
+        ("INSIDE", "内部评论"),
+        ("ROOT", "根评论"),
+    ]
+
+    key = models.CharField(_("目录关键字"), max_length=LEN_LONG, unique=True)
+    content = models.TextField(_("评论内容"), max_length=LEN_LONG, null=True, blank=True)
+    order = models.IntegerField(_("节点顺序"), default=FIRST_ORDER)
+    remark_type = models.CharField(_("评论类型"), max_length=LEN_SHORT, choices=REMARK_TYPE)
+    parent = TreeForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        verbose_name=_("上级目录"),
+        null=True,
+        blank=True,
+        related_name="children",
+    )
+    ticket_id = models.IntegerField(
+        _("单据id"), max_length=LEN_SHORT, null=False, default=0
+    )
+    users = models.JSONField(_("用户@的用户列表"), default=[])
+    update_log = models.JSONField(_("用户评论的更新记录"), default=[])
+
+    class Meta:
+        app_label = "ticket"
+        ordering = ("order",)
+
+    def save(self, *args, **kwargs):
+        """自动填充key"""
+
+        # 创建目录时若key为空则自动生成key
+        if self.pk is None and not self.key:
+            self.key = uniqid()
+
+        return super(TicketRemark, self).save(*args, **kwargs)
+
+    @classmethod
+    def create_root(cls, ticket_id, **kwargs):
+        return cls.create_node(
+            content="", ticket_id=ticket_id, remark_type="ROOT", key=None, **kwargs
+        )
+
+    @classmethod
+    @transaction.atomic
+    def create_node(
+        cls,
+        ticket_id,
+        content,
+        remark_type,
+        key=None,
+        parent=None,
+        is_deleted=False,
+        **kwargs
+    ):
+        """
+        Creates a new catalog
+        """
+
+        # 通过其他手段获取parent
+        if parent is None and kwargs.get("parent_key"):
+            parent = cls.objects.get(key=kwargs.get("parent_key"))
+
+        # 自动生成key
+        if key is None:
+            key = uniqid()
+
+        comment, _ = cls._objects.get_or_create(
+            defaults={
+                "content": content,
+                "parent": parent,
+                "ticket_id": ticket_id,
+                "remark_type": remark_type,
+            },
+            **{"key": key, "is_deleted": is_deleted}
+        )
+
+        return comment
+
+    @classmethod
+    def root_subtree(cls, ticket_id, show_type):
+        # 获取当前节点的根节点
+        try:
+            root_node = cls._objects.get(ticket_id=ticket_id, remark_type="ROOT")
+        except cls.DoesNotExist:
+            root_node = TicketRemark.create_root(ticket_id=ticket_id)
+        return cls.subtree(root_node, show_type)
+
+    @classmethod
+    def subtree(cls, node, show_type):
+        """获取以node为根的子树"""
+
+        node_children = (
+            node.get_children()
+            .filter(is_deleted=False, remark_type=show_type)
+            .order_by("-create_at")
+        )
+
+        children = [node.subtree(child, show_type) for child in node_children]
+
+        data = {
+            "id": node.id,
+            "key": node.key,
+            "content": node.content,
+            "remark": node.remark_type,
+            "ticket_id": node.ticket_id,
+            "level": node.level,
+            "children": children,
+            "update_log": node.update_log,
+            "users": node.users,
+        }
+
+        return data

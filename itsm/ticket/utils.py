@@ -55,3 +55,10 @@ def translate_constant_export_fields_dict(value):
     for index, item in enumerate(value):
         value[index]["name"] = _(item["name"])
     return value
+
+
+def compute_list_difference(current, new):
+    """
+    计算A列表相较于B列表多出来的部分
+    """
+    return list(set(new).difference(set(current)))
