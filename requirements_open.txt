@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+# itsm开源版所需要的python包
+# 请确保指定的包和版本号，通过pip安装
+
+#blueapps
+blueapps-open==4.0.2rc0
