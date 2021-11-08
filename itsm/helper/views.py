@@ -55,8 +55,19 @@ from itsm.helper.tasks import (
     _update_logs_type,
     _db_fix_for_service_catalog,
     _db_fix_for_workflow_to_2_5_9,
+    _db_fix_for_blueapps_after_2_6_0,
 )
 from itsm.ticket.models import Ticket, TicketEventLog
+
+
+@permission_required('is_superuser')
+def db_fix_for_blueapps_after_2_6_0(request):
+    """服务目录添加前置路径"""
+    try:
+        _db_fix_for_blueapps_after_2_6_0.delay()
+        return HttpResponse("_db_fix_for_blueapps_after_2_6_0: 任务下发到后台，请耐心等待，具体结果，请查看celery日志。")
+    except Exception as e:
+        return HttpResponse('任务下发异常:%s' % e)
 
 
 @permission_required('is_superuser')

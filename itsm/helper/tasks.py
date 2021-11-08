@@ -34,6 +34,8 @@ import json
 import os
 
 from celery import task
+from django.conf import settings
+from django.db import connection
 from django.db.models import F
 from django_bulk_update.helper import bulk_update
 
@@ -67,6 +69,34 @@ from itsm.role.models import UserRole
 from itsm.service.models import OldSla, Service, ServiceCatalog
 from itsm.ticket.models import Ticket, TicketEventLog, TicketField
 from itsm.workflow.models import DefaultField, Field, State, Workflow, WorkflowVersion
+
+
+@task
+def _db_fix_for_blueapps_after_2_6_0():
+    """
+    blueapps的数据升级
+    """
+    migrations = (
+        ('account', '0002_init_superuser'),
+        ('account', '0003_verifyinfo')
+    )
+    if settings.RUN_VER != "open":
+        logger.Exception("当前运行环境为:{}，不支持db_fix_for_blueapps_after_2_6_0方法".format(
+            settings.RUN_VER))
+        return
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT `app`, `name` FROM django_migrations;')
+            rows = cursor.fetchall()
+            for migration in migrations:
+                if migration in rows:
+                    continue
+                dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                cursor.execute(
+                    "INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES (\"{}\", \"{}\", \"{}\");".format(
+                        migration[0], migration[1], dt))
+    except BaseException as err:
+        logger.Exception(str(err))
 
 
 @task
