@@ -272,7 +272,7 @@
             },
             // 删除触发器
             deleteTrigger (item, index) {
-                if (!this.hasPermission(['triggers_manage'], item.auth_actions)) {
+                if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -284,7 +284,7 @@
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['triggers_manage'], item.auth_actions, resourceData)
+                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return
                 }
                 this.$bkInfo({
