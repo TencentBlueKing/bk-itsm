@@ -292,9 +292,9 @@
         },
         methods: {
             onHookChange (val, scheme) {
-                this.$set(this.hookedVarList, scheme.tag_code, val)
-                const constantItem = this.constants.filter(item => item.key === scheme.tag_code)
-                constantItem[0].is_quoted = val
+                this.$emit('onChangeHook', scheme.tag_code, val)
+                const constantItem = this.constants.find(item => item.key === scheme.tag_code)
+                constantItem.is_quoted = val
                 if (val) {
                     this.formData[scheme.tag_code] = ''
                 } else {
