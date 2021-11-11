@@ -24,7 +24,7 @@
     <div class="task-form">
         <div class="use-task-config">
             <span class="mr5">{{ $t(`m.trigger['是否启用']`) }}</span>
-            <bk-switcher v-model="useTask" @change="handleUseTaskChange"></bk-switcher>
+            <bk-switcher v-model="useTask" data-test-id="taskConfig-switcher-isUse" @change="handleUseTaskChange"></bk-switcher>
         </div>
         <template v-if="useTask">
             <bk-form v-for="(oneCondition, index) in taskConditionList"

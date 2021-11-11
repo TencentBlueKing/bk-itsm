@@ -125,7 +125,7 @@
         </section>
         <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
             <div
-                class="card-title more-configuration mt20" @click="showMoreConfig = !showMoreConfig">
+                class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
                 <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
                 <i v-else class="bk-icon icon-up-shape"></i>
                 <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
