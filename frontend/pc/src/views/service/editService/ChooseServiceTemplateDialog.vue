@@ -46,6 +46,7 @@
                 <ul class="template-list" v-if="templateList.length">
                     <li class="template-item" v-for="(template, index) in templateList"
                         :key="index"
+                        :data-test-id="`serviceTemplateList-li-${template.id}`"
                         @click="onTemplateClick(template)">
                         <p class="template-name" v-html="template.name"></p>
                         <p class="template-time" v-if="createWay === 'recom'">{{ template.time }}</p>
