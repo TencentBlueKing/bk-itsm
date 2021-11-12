@@ -72,6 +72,11 @@ def index(request):
     ):
         BK_USER_MANAGE_HOST = FRONTEND_URL
 
+    # 非ieod环境不开启自动跳转
+    if settings.RUN_VER == "ieod":
+        if not request.is_secure():
+            return HttpResponseIndexRedirect(request.path)
+
     logger.info("HTTP_REFERER={}".format(request.META.get("HTTP_REFERER", "")))
     # 更新cmdb通用角色
     UserRole.update_cmdb_common_roles()
