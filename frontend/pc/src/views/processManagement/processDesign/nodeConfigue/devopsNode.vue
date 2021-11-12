@@ -47,6 +47,19 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
+                <bk-form-item
+                    data-test-id="devops-component-processor"
+                    :label="$t(`m.treeinfo['处理人：']`)"
+                    :required="true">
+                    <div @click="checkStatus.processors = false">
+                        <deal-person
+                            ref="processors"
+                            :value="processorsInfo"
+                            :node-info="configur"
+                            :exclude-role-type-list="excludeProcessor">
+                        </deal-person>
+                    </div>
+                </bk-form-item>
             </bk-form>
         </basic-card>
 
@@ -112,6 +125,7 @@
     </div>
 </template>
 <script>
+    import dealPerson from './components/dealPerson.vue'
     import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
     import BasicCard from '@/components/common/layout/BasicCard.vue'
     import DevopsPreview from '@/components/task/DevopsPreview.vue'
@@ -131,7 +145,8 @@
             BasicCard,
             commonTriggerList,
             DevopsPreview,
-            NoData
+            NoData,
+            dealPerson
         },
         props: {
             // 流程信息
@@ -161,7 +176,8 @@
                 basicInfo: {
                     nodeName: '',
                     businessId: '',
-                    pipelineId: ''
+                    pipelineId: '',
+                    processors: []
                 },
                 businessList: [],
                 pipelineList: [],
@@ -179,7 +195,16 @@
                     pipelineId: [newRequiredRule()]
                    
                 },
-                pipelineRules: {}
+                pipelineRules: {},
+                checkStatus: {
+                    delivers: false,
+                    processors: false
+                },
+                excludeProcessor: [],
+                processorsInfo: {
+                    type: '',
+                    value: ''
+                }
             }
         },
         watch: {
@@ -210,8 +235,36 @@
                         this.onSelectBusiness()
                         this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value
                         this.getPipelineInfo(1)
+                        this.processorsInfo = {
+                            type: this.configur.processors_type,
+                            value: this.configur.processors
+                        }
+                        this.getExcludeRoleTypeList()
                     }
                 })
+            },
+            // 计算处理人类型需要排除的类型
+            getExcludeRoleTypeList () {
+                // 不显示的人员类型
+                let excludeProcessor = []
+                // 内置节点
+                if (this.configur.is_builtin) {
+                    excludeProcessor = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE']
+                } else {
+                    excludeProcessor = ['OPEN']
+                }
+                // 是否使用权限中心角色
+                if (!this.flowInfo.is_iam_used) {
+                    excludeProcessor.push('IAM')
+                }
+                // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
+                if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
+                    excludeProcessor.push('BY_ASSIGNOR')
+                }
+                if (!this.flowInfo.is_biz_needed) {
+                    excludeProcessor.push('CMDB')
+                }
+                this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor]
             },
             // 选择项目获取流水线
             onSelectBusiness () {
@@ -256,6 +309,10 @@
                 this.$parent.closeConfigur()
             },
             submit () {
+                if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
+                    this.checkStatus.processors = true
+                    return
+                }
                 Promise.all([
                     this.$refs.basicInfo.validate(),
                     this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null
@@ -269,6 +326,7 @@
                             'key': item
                         }
                     })
+                    const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                     const params = {
                         'extras': {
                             'devops_info': {
@@ -286,6 +344,8 @@
                                 'constants': constants
                             }
                         },
+                        'processors': processors || '',
+                        'processors_type': processors_type,
                         'is_draft': false,
                         'is_terminable': false,
                         'name': this.basicInfo.nodeName,
