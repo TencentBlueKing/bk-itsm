@@ -86,8 +86,12 @@ from itsm.service.models import ServiceCatalog, Service
 from itsm.ticket.models import Ticket, TicketField, SignTask, TicketEventLog
 from itsm.ticket.serializers import TicketList, TicketSerializer
 from itsm.ticket.tasks import start_pipeline
-from itsm.ticket.validators import terminate_validate, withdraw_validate, FieldSerializer, \
-    edit_field_validate
+from itsm.ticket.validators import (
+    terminate_validate,
+    withdraw_validate,
+    FieldSerializer,
+    edit_field_validate,
+)
 
 
 def catch_ticket_operate_exception(view_func):
@@ -250,7 +254,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def edit_field(self, request, *args, **kwargs):
         """
         单个修改字段值
@@ -264,12 +268,12 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             old_field_instance = copy.deepcopy(field_instance)
             old_field_instance._value = old
             old_data = copy.deepcopy(FieldSerializer(old_field_instance).data)
-            old_data.update({"value_status": 'before'})
-            new_data.update({"value_status": 'after'})
+            old_data.update({"value_status": "before"})
+            new_data.update({"value_status": "after"})
             form_data.extend([old_data, new_data])
 
-        field = request.data.get('field')
-        ticket_id = request.data.get('ticket_id')
+        field = request.data.get("field")
+        ticket_id = request.data.get("ticket_id")
 
         try:
             ticket = Ticket.objects.get(id=ticket_id)
@@ -277,15 +281,19 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             raise ValidationError("ticket_id = {} 对应的单据不存在！".format(ticket_id))
 
         # 如果ticket当前状态为：已完成/已终止/已撤销，则无法修改字段
-        if ticket.current_status in ['FINISHED', 'TERMINATED', 'REVOKED']:
-            raise ValidationError("current_status = {} 当前状态不可修改字段！".format(ticket.current_status))
+        if ticket.current_status in ["FINISHED", "TERMINATED", "REVOKED"]:
+            raise ValidationError(
+                "current_status = {} 当前状态不可修改字段！".format(ticket.current_status)
+            )
 
-        validate_data, field_obj = edit_field_validate(field, service=ticket.service_type)
-        field_value = validate_data['value']
+        validate_data, field_obj = edit_field_validate(
+            field, service=ticket.service_type
+        )
+        field_value = validate_data["value"]
 
-        update_data = {'_value': field_value}
-        if validate_data.get('choice'):
-            update_data.update(choice=validate_data['choice'])
+        update_data = {"_value": field_value}
+        if validate_data.get("choice"):
+            update_data.update(choice=validate_data["choice"])
 
         old_value = field_obj.value
 
@@ -307,7 +315,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             priority_data = ticket.update_priority(urgency, impact)
             if priority_data:
                 # 存在优先级修改记录的时候才进行跟踪
-                edit_field_tracker(priority_data['instance'], priority_data['old_value'])
+                edit_field_tracker(
+                    priority_data["instance"], priority_data["old_value"]
+                )
 
             ticket.refresh_sla_task()
 
@@ -315,8 +325,11 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         if field_obj.key == FIELD_STATUS and ticket.current_status != field_value:
             if field_value in ticket.status_instance.to_over_status_keys:
                 # 如果是结束状态，直接结束
-                ticket.close(close_status=field_value, desc=request.data.get("desc"),
-                             operator=request.user.username)
+                ticket.close(
+                    close_status=field_value,
+                    desc=request.data.get("desc"),
+                    operator=request.user.username,
+                )
                 return Response()
             ticket.update_current_status(field_value)
 
@@ -329,7 +342,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             ticket,
             0,
             request.user.username,
-            'EDIT_FIELD',
+            "EDIT_FIELD",
             message="{operator} 修改字段【{detail_message}】.",
             detail_message=field_obj.name,
             fields=form_data,
@@ -581,13 +594,27 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             raise OperateTicketError(res.message)
         return Response()
 
+    @action(detail=False, methods=["post"])
+    @catch_ticket_operate_exception
+    def proceed_fast_approval(self, request):
+        """
+        处理快速审批请求
+        """
+        if settings.RUN_VER == "ieod":
+            from platform_config.ieod.bkchat.utils import proceed_fast_approval
+        else:
+            from platform_config.open.bkchat.utils import proceed_fast_approval
+        return proceed_fast_approval(request)
+
     @action(detail=False, methods=["get"])
     @catch_ticket_operate_exception
     def get_tickets_by_user(self, request):
         # 初始化serializer的上下文
-        username = request.query_params.get("username") if request.query_params.get(
-            "username", None) else request.query_params.get(
-            "user", None)
+        username = (
+            request.query_params.get("username")
+            if request.query_params.get("username", None)
+            else request.query_params.get("user", None)
+        )
         if username is None:
             raise ParamError("user 为必填项")
         queryset = self.custom_filter_queryset(request, username)
