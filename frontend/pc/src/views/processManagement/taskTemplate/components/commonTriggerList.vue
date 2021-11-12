@@ -24,7 +24,7 @@
     <div class="mt20 mb20">
         <div
             v-if="openFunction.TRIGGER_SWITCH && origin !== 'workflow' && origin !== 'transition'"
-            class="more-configuration" @click="showMoreConfig = !showMoreConfig">
+            class="more-configuration" data-test-id="trigger-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
             <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
             <i v-else class="bk-icon icon-up-shape"></i>
             <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>

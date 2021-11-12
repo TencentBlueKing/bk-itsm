@@ -31,7 +31,7 @@
         @click="clickNode(node, $event)"
         @mouseout="hoverNode(node)"
         v-bk-clickoutside="closeNode">
-        <div v-if="node.type === 'START'" class="startpoint">
+        <div v-if="node.type === 'START'" class="startpoint" data-test-id="start">
             {{ $t(`m.treeinfo['开始']`) }}
         </div>
         <div v-if="node.type === 'END'" class="endpoint">
