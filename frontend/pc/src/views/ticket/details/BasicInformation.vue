@@ -23,13 +23,29 @@
 <template>
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
-            <div class="bk-basic-form">
+            <!-- <div class="bk-basic-form">
                 <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
-            </div>
+            </div> -->
             <div class="bk-basic-form">
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li>
+                        <span class="bk-info-title">{{ $t('m.newCommon["标题："]') }}</span>
+                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                    </li>
+                    <li>
+                        <span class="bk-info-title">{{ $t('m.newCommon["影响范围："]') }}</span>
+                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                    </li>
+                    <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
+                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                    </li>
+                    <li>
+                        <span class="bk-info-title">{{ $t('m.newCommon["单号："]') }}</span>
+                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                    </li>
+                    <li>
+                        <span class="bk-info-title">{{ $t('m.newCommon["紧急程度："]') }}</span>
                         <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
                     </li>
                     <li>
@@ -38,12 +54,12 @@
                             :title="basicInfomation.catalog_fullname + '>' + basicInfomation.service_name">{{basicInfomation.catalog_fullname}}>{{basicInfomation.service_name}}</span>
                     </li>
                     <li>
-                        <business-card :basic-infomation="basicInfomation"></business-card>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单人："]') }}</span>
+                        <!-- <business-card :basic-infomation="basicInfomation"></business-card> -->
+                        <span class="bk-info-title">{{ $t('m.newCommon["关联业务："]') }}</span>
                         <span class="bk-info-content pl5">{{basicInfomation.creator || '--'}}</span>
                     </li>
                     <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单时间："]') }}</span>
+                        <span class="bk-info-title">{{ $t('m.newCommon["优先级："]') }}</span>
                         <span class="bk-info-content">{{basicInfomation.create_at || '--'}}</span>
                     </li>
                 </ul>
@@ -59,14 +75,14 @@
 </template>
 
 <script>
-    import tableFields from './components/tableFields.vue'
-    import businessCard from '@/components/common/BusinessCard.vue'
+    // import tableFields from './components/tableFields.vue'
+    // import businessCard from '@/components/common/BusinessCard.vue'
 
     export default {
         name: 'BasicInformation',
         components: {
-            tableFields,
-            businessCard
+            // tableFields,
+            // businessCard
         },
         props: {
             basicInfomation: {
@@ -134,6 +150,7 @@
 <style scoped lang='scss'>
     @import '../../../scss/mixins/clearfix.scss';
     .basic-info-wrap {
+        height: 138px;
         position: relative;
         padding-bottom: 14px;
         &.fold {
@@ -159,7 +176,7 @@
         }
 
         li {
-            width: 50%;
+            width: 33.33%;
             float: left;
             font-size: 12px;
             color: #63656E;
@@ -176,13 +193,17 @@
         }
 
         .bk-info-title {
+            width: 70px;
+            text-align: right;
             float: left;
-            font-weight: bold;
+            color: #979BA5;
         }
 
         .bk-info-content {
+            font-weight: 400;
             word-wrap: break-word;
             padding-left: 5px;
+            color: #313238;
         }
 
         .bk-basic-li {

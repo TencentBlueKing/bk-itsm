@@ -328,7 +328,9 @@
                 document.addEventListener('mousemove', this.handleLineMouseMove, false)
 
                 const minTabWidth = document.querySelector('.ticket-container-right .bk-tab-header .bk-tab-label-wrapper .bk-tab-label-list').clientWidth
+                console.log(minTabWidth)
                 const currTabWidth = document.querySelector('.ticket-container-right .bk-tab-header').clientWidth
+                console.log(currTabWidth)
                 if (!this.dragLine.maxLength) {
                     // 误差
                     const offset = 4
@@ -453,10 +455,10 @@
     }
     .ticket-container-right {
         margin-left: 4px;
-        width: 32%;
+        // width: 320px;
         height: 100%;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        background: #ffffff;
+        // box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        // background: #ffffff;
     }
 }
 </style>

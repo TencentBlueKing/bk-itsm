@@ -48,13 +48,18 @@
                     @change="searchHandler">
                 </bk-input>
             </div>
-            <div style="height: 100%;" v-bkloading="{ isLoading: loading }">
+            <div style="height: calc(100% - 40px);" v-bkloading="{ isLoading: loading }">
                 <template v-if="!loading">
                     <bk-tab :active="activeClassify" type="unborder-card">
                         <bk-tab-panel
                             v-for="group in serviceList"
                             :key="group.name"
                             v-bind="group">
+                            <template v-slot:label>
+                                <i class="panel-icon bk-icon icon-cog-shape"></i>
+                                <span class="panel-name">{{ group.label }}</span>
+                                <i class="panel-count" v-if="group.data.length > 0">{{ group.data.length }}</i>
+                            </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
                                     :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
@@ -147,7 +152,7 @@
                     const group = list.find(item => item.name === service.key)
                     group.data.push(service)
                 })
-
+                console.log(list)
                 return list
             }
         },
@@ -413,7 +418,11 @@
     }
     .create-ticket-dialog {
         &.bk-dialog-wrapper .bk-dialog-tool {
-            min-height: 14px;
+            min-height: 16px;
+            height: calc(100% - 40px);
+            .bk-dialog-close {
+                top: 20px;
+            }
         }
     }
     .service-title-desc-tooltip {

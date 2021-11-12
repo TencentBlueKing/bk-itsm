@@ -2,11 +2,27 @@
     <div>
         <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
-                <bk-tab :active.sync="baseActiveTab" type="unborder-card">
+                <bk-collapse v-model="activeName">
+                    <bk-collapse-item name="ticket">
+                        <span class="ticket-title">提单信息</span>
+                        <div class="ticket-creator">
+                            <span>提单人: {{ ticketInfo.creator}}</span><span>提单时间: {{ ticketInfo.create_at}}</span>
+                        </div>
+                        <div slot="content" class="f13">
+                            <basic-information
+                                ref="basicInfo"
+                                v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
+                                :basic-infomation="ticketInfo"
+                                :first-state-fields="firstStateFields">
+                            </basic-information>
+                        </div>
+                    </bk-collapse-item>
+                </bk-collapse>
+                <!-- <bk-tab :active.sync="baseActiveTab" type="unborder-card">
                     <bk-tab-panel
                         name="base"
                         :label="$t(`m.slaContent['基本信息']`)">
-                        <!-- 基础信息 -->
+                        基础信息
                         <basic-information
                             ref="basicInfo"
                             v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
@@ -17,7 +33,7 @@
                     <bk-tab-panel
                         name="preview"
                         :label="$t(`m.newCommon['工单进度预览']`)">
-                        <!-- 工单预览 -->
+                        工单预览
                         <order-preview
                             v-if="baseActiveTab === 'preview' && !loading.ticketLoading && !loading.nodeInfoLoading"
                             :basic-infomation="ticketInfo"
@@ -26,7 +42,7 @@
                             @reloadTicket="reloadTicket">
                         </order-preview>
                     </bk-tab-panel>
-                </bk-tab>
+                </bk-tab> -->
             </div>
         </div>
         <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
@@ -34,10 +50,10 @@
                 <!-- 当前步骤 -->
                 <bk-tab-panel
                     name="currentStep"
-                    :label="$t(`m.newCommon['当前步骤']`)">
+                    :label="$t(`m.newCommon['单据处理']`)">
                     <!-- 当前节点 -->
                     <template slot="label">
-                        <span class="panel-name">{{ $t(`m.newCommon['当前步骤']`) }}</span>
+                        <span class="panel-name">{{ $t(`m.newCommon['单据处理']`) }}</span>
                         <i class="panel-count">{{ currStepNodeNum }}</i>
                     </template>
                     <current-steps
@@ -52,11 +68,11 @@
                     </current-steps>
                 </bk-tab-panel>
                 <!-- 全部评论 TODO -->
-                <!-- <bk-tab-panel
+                <bk-tab-panel
                     name="allComments"
                     :label="$t(`m.newCommon['所有评论']`)">
                     111
-                </bk-tab-panel> -->
+                </bk-tab-panel>
             </bk-tab>
         </div>
     </div>
@@ -64,7 +80,7 @@
 
 <script>
     import BasicInformation from './BasicInformation.vue'
-    import OrderPreview from './OrderPreview.vue'
+    // import OrderPreview from './OrderPreview.vue'
     import CurrentSteps from './currentSteps/index.vue'
     import { deepClone } from '@/utils/util'
     import commonMix from '@/views/commonMix/common.js'
@@ -75,7 +91,7 @@
         name: 'LeftTicketContent',
         components: {
             BasicInformation,
-            OrderPreview,
+            // OrderPreview,
             CurrentSteps
         },
         mixins: [commonMix, fieldMix, apiFieldsWatch],
@@ -95,7 +111,8 @@
                 // 当前步骤
                 currentStepList: [],
                 allFieldList: [],
-                currentStepLoading: false
+                currentStepLoading: false,
+                activeName: ['ticket']
             }
         },
         computed: {
@@ -167,11 +184,23 @@
 <style lang='scss' scoped>
 .base-info-content {
     padding: 0 10px;
-    min-height: 145px;
+    min-height: 46px;
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;
     /deep/ .bk-tab-section {
         padding: 0;
+    }
+    .ticket-title {
+        font-weight: 700;
+        font-size: 14px;
+    }
+    .ticket-creator {
+        display: inline-block;
+        color: #979BA5;
+        font-size: 12px;
+        span{
+            margin-left: 30px;
+        }
     }
 }
 .current-step-content {
