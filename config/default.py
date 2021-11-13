@@ -354,6 +354,25 @@ else:
         }
     }
 
+CACHES.update(
+    {
+        'db': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache',
+        },
+        'login_db': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'account_cache',
+        },
+        'dummy': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        },
+        'locmem': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        },
+    }
+)
+
 # ==============================================================================
 # Django 项目配置 - 其他
 # ==============================================================================
