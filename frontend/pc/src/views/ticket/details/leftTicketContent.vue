@@ -71,7 +71,14 @@
                 <bk-tab-panel
                     name="allComments"
                     :label="$t(`m.newCommon['所有评论']`)">
-                    111
+                    <template slot="label">
+                        <span class="panel-name">{{ $t(`m.newCommon['所有评论']`) }}</span>
+                        <i class="panel-count">{{ currStepNodeNum }}</i>
+                    </template>
+                    <wang-editor
+                        :ticket-info="ticketInfo"
+                        :ticket-id="ticketId"
+                    ></wang-editor>
                 </bk-tab-panel>
             </bk-tab>
         </div>
@@ -86,13 +93,15 @@
     import commonMix from '@/views/commonMix/common.js'
     import fieldMix from '@/views/commonMix/field.js'
     import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js'
+    import WangEditor from './comment/index.vue'
 
     export default {
         name: 'LeftTicketContent',
         components: {
             BasicInformation,
-            // OrderPreview,
-            CurrentSteps
+            OrderPreview,
+            CurrentSteps,
+            WangEditor
         },
         mixins: [commonMix, fieldMix, apiFieldsWatch],
         props: {

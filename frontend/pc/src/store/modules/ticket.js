@@ -117,6 +117,36 @@ export default {
         // 获取可引用变量
         getTicketOutput({ commit }, id) {
             return ajax.get(`ticket/receipts/${id}/get_ticket_output/`).then(response => response.data)
-        }
+        },
+        // 获取单据下的所有评论
+        getTicketAllComments ({ commit, state, dispatch }, params) {
+            return ajax.get('ticket/remark/tree_view/', { params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据新增评论
+        addTicketComment ({ commit, state, dispatch }, params) {
+            return ajax.post('ticket/remark/', params).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据修改评论
+        updateTicketComment ({ commit, state, dispatch }, params) {
+            const { id } = params
+            return ajax.put(`ticket/remark/${id}/`, params).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据删除评论
+        deleteTicketComment ({ commit, state, dispatch }, params) {
+            const id = params
+            return ajax.delete(`ticket/remark/${id}/`).then(response => {
+                let res = response.data
+                return res
+            })
+        },
     }
 }
