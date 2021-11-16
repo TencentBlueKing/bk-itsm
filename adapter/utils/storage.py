@@ -44,7 +44,35 @@ class CephStorage(Storage):
         """保存文件"""
         return self.storage.save(name, content, max_length)
 
-    def open(self, name, mode='rb'):
+    def open(self, name, mode="rb"):
+        """打开文件"""
+        return self.storage.open(name)
+
+    def exists(self, name):
+        """是否存在"""
+        return self.storage.exists(name)
+
+    def mkdir(self, name):
+        """占位"""
+        pass
+
+
+class RepoStorage(Storage):
+    _storage = None
+
+    @property
+    def storage(self):
+        from bkstorages.backends.bkrepo import BKRepoStorage
+
+        if self._storage is None:
+            self._storage = BKRepoStorage()
+        return self._storage
+
+    def save(self, name, content, max_length=None):
+        """保存文件"""
+        return self.storage.save(name, content, max_length)
+
+    def open(self, name, mode="rb"):
         """打开文件"""
         return self.storage.open(name)
 

@@ -30,7 +30,6 @@ import sys
 # Django starts so that shared_task will use this app.
 from blueapps.core.celery import celery_app
 
-
 __all__ = [
     "celery_app",
     "RUN_VER",
@@ -51,10 +50,11 @@ __all__ = [
 # SaaS运行版本，如非必要请勿修改
 RUN_VER = "open"
 # SaaS应用ID
-APP_ID = ""
+APP_ID = os.environ.get("BKPAAS_APP_ID", "")
 # SaaS安全密钥，注意请勿泄露该密钥
-APP_TOKEN = ""
+APP_TOKEN = os.environ.get("BKPAAS_APP_SECRET", "")
 # 蓝鲸SaaS平台URL，例如 http://paas.bking.com
+BK_PAAS_HOST = os.environ.get("BKAPP_PAAS_HOST", "")
 
 RUN_VER = os.environ.get("RUN_VER", RUN_VER)
 OPEN_VER = "enterprise"
@@ -72,3 +72,16 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT, PROJECT_MODULE_NAME = os.path.split(PROJECT_PATH)
 BASE_DIR = PROJECT_ROOT
 PYTHON_BIN = os.path.dirname(sys.executable)
+
+
+def get_env_or_raise(key):
+    """Get an environment variable, if it does not exist, raise an exception"""
+    value = os.environ.get(key)
+    if not value:
+        raise RuntimeError(
+            (
+                'Environment variable "{}" not found, you must set this variable to run this application.'
+                " See http://docs.open.oa.com/topics/faq_for_developing#36-本地开发时报错-environment-variable-x-not-found-怎么办"
+            ).format(key)
+        )
+    return value

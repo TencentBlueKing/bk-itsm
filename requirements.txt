@@ -6,7 +6,6 @@
 # blueapps requirement
 Django==3.2.4
 PyMySQL==0.6.7
-mysqlclient==2.0.3
 MarkupSafe==1.0
 Mako==1.0.6
 requests==2.23.0
@@ -15,7 +14,7 @@ django-celery-beat==2.0.0
 django-celery-results==2.0.0
 # pi==3.3.1
 python-json-logger==0.1.7
-whitenoise==3.3.0
+whitenoise==5.3.0
 six==1.16.0
 httplib2==0.9.1
 djangorestframework==3.12.4
@@ -74,6 +73,16 @@ curlify==2.2.1
 idna==2.9
 urllib3==1.25.9
 pycrypto==2.6.1
+
+#others
+raven==6.1.0
+ddtrace==0.14.1
+gunicorn==19.6.0
+bkstorages==1.0.1
+pytz==2019.3
+suds-jurko==0.6
+mysqlclient==1.4.4
+mock==2.0.0
 
 # excel
 xlrd==1.2.0
