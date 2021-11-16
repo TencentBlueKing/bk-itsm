@@ -22,7 +22,23 @@
 
 <template>
     <div class="bk-correlationsla-info" v-bkloading="{ isLoading: loading }">
-        <div class="bk-correlationsla-li" v-for="(sla, index) in slaList" :key="index">
+        <div>
+            <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+            <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">响应倒计时</u>
+            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
+            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
+            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
+            <i :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+        </div>
+        <div>
+            <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+            <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">处理倒计时</u>
+            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
+            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
+            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
+            <i v-if="false" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+        </div>
+        <!-- <div class="bk-correlationsla-li" v-for="(sla, index) in slaList" :key="index">
             <div class="bk-corr-sla-name">
                 <span
                     v-if="sla.task_status === 2 && sla.sla_status === 4"
@@ -79,12 +95,11 @@
             <div class="bk-time-box">
                 {{ $t('m.newCommon["实际处理时长"]') }} :
                 <span v-if="sla.task_status === 1" style="color: #3A84FF">{{$t('m.newCommon["未开启"]')}}</span>
-                <!-- 计时中-->
                 <span v-else-if="sla.task_status === 2" :style="{ 'color': (sla.sla_status === 4 ? '#EA3536' : '#3A84FF') }">{{convertTimeArrToString(sla.sla_timecost)}}</span>
                 <span v-else-if="sla.task_status === 3" :style="{ 'color': (sla.sla_status === 4 ? '#EA3536' : '#FE9C00') }">{{convertTimeArrToString(sla.resovle_cost) || $t('m.newCommon["已暂停"]')}}</span>
                 <span v-else :style="{ 'color': (sla.sla_status === 4 ? '#EA3536' : '#63656E') }">{{convertTimeArrToString(sla.resovle_cost)}}</span>
             </div>
-        </div>
+        </div> -->
         <div class="bk-no-content" v-if="!slaList.length">
             <img src="@/images/box.png">
             <p>{{ $t('m.newCommon["未绑定SLA协议"]') }}</p>
@@ -110,10 +125,14 @@
         },
         data () {
             return {
+                isResponseTimeout: true,
+                isProcessTimeout: true,
+                isNormal: false,
                 convertTimeArrToString,
                 loading: false,
                 slaList: [],
                 runningTime: [],
+                curTime: new Date(),
                 taskStatusColor: [
                     {},
                     {
@@ -137,6 +156,8 @@
                         backgroundColor: '#FEDDDC'
                     }
                 ],
+                responseTime: [0, 0, 0, 0, 0, 0], // 响应倒计时
+                processingTime: [0, 0, 0, 0, 0, 0], // 处理倒计时
                 taskStatusList: ['', this.$t('m.newCommon["未开启"]'), this.$t('m.newCommon["计时中"]'), this.$t('m.newCommon["暂停中"]'), this.$t('m.newCommon["已结束"]'), this.$t('m.newCommon["已超时"]')]
             }
         },
@@ -153,6 +174,7 @@
                 }
                 this.$store.dispatch('change/getReceiptsSlaTask', params).then(res => {
                     this.slaList = res.data
+                    console.log(res.data)
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -163,24 +185,35 @@
             changeTimeoutStatus () {
                 this.slaList.forEach((item, index) => {
                     if (item.task_status === 2) {
-                        const currentCost = convertTimeArrToMS(item.resovle_cost)
-                        this.runTime(currentCost, index)
+                        const responseCost = convertTimeArrToMS(item.resovle_cost)
+                        const processCost = convertTimeArrToMS(['0', '0', '0', '1', '0', '0'])
+                        this.runTime(responseCost, processCost, index)
                     }
                     item.reply_cost = convertTimeArrToString(item.reply_cost)
                 })
             },
-            runTime (currentSec, index) {
+            changeTime (currentSec) {
+                const absCurrentSec = Math.abs(currentSec)
+                const day = absCurrentSec / (24 * 60 * 60)
+                const hour = (absCurrentSec % (24 * 60 * 60)) / (60 * 60)
+                const minute = absCurrentSec % (24 * 60 * 60) % (60 * 60) / 60
+                const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60
+                return { day, hour, minute, sec }
+            },
+            runTime (currentSec, processCost, index) {
                 // 启动计时器
                 this.myInterval(() => {
-                    currentSec++
-                    const slaTimecost = [0, 0]
-                    const absCurrentSec = Math.abs(currentSec)
-                    const day = absCurrentSec / (24 * 60 * 60)
-                    const hour = (absCurrentSec % (24 * 60 * 60)) / (60 * 60)
-                    const minute = absCurrentSec % (24 * 60 * 60) % (60 * 60) / 60
-                    const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60
-                    slaTimecost.push(parseInt(day), parseInt(hour), parseInt(minute), sec)
-                    this.slaList[index].sla_timecost = slaTimecost
+                    currentSec--
+                    processCost--
+                    const responseTime = [0, 0] // 响应时间
+                    const processTime = [0, 0] // 处理时间
+                    const rTime = this.changeTime(currentSec)
+                    const pTime = this.changeTime(processCost)
+                    responseTime.push(parseInt(rTime.day), parseInt(rTime.hour), parseInt(rTime.minute), rTime.sec)
+                    processTime.push(parseInt(pTime.day), parseInt(pTime.hour), parseInt(pTime.minute), pTime.sec)
+                    this.slaList[index].sla_timecost = responseTime
+                    this.responseTime = responseTime
+                    this.processingTime = processTime
                     this.$set(this.slaList, index, this.slaList[index])
                 }, 1000)
             },
@@ -203,54 +236,38 @@
 
 <style scoped lang='scss'>
     .bk-correlationsla-info {
-        // padding: 18px 12px;
-        color: #63656E;
-        .bk-correlationsla-li {
-            width: 100%;
-            padding: 12px 20px;
-            border-radius: 2px;
-            border: 1px solid #DCDEE5;
-            font-size: 12px;
-            margin-bottom: 12px;
-            .bk-corr-sla-name {
-                font-size: 14px;
-                font-weight: 700;
-                margin-bottom: 12px;
-                .bk-corr-sla-status {
-                    display: inline-block;
-                    width: 44px;
-                    height: 18px;
-                    line-height: 18px;
-                    font-size: 12px;
-                    font-weight: normal;
-                    border-radius: 2px;
-                    text-align: center;
-                }
-            }
-            .bk-argeement-norm {
-                margin-bottom: 12px;
-            }
-            .bk-startend-state {
-                margin-bottom: 12px;
-                span {
-                    font-weight: 700;
-                }
-            }
-            .bk-time-box {
-                display: inline-block;
-                width: 250px;
-                margin-bottom: 12px;
-            }
+        height: 134px;
+        display: flex;
+        flex-direction: column;
+        padding: 26px 28px;
+        justify-content: space-between;
+        .time {
+            text-align: center;
+            display: inline-block;
+            background-color: #f0f1f5;
+            color: #63656E;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 28px;
+            width: 28px;
+            height: 30px;
+        }
+        .warn {
+            background-color: #fff1db;
+        }
+        .timeout {
+            background-color: #ffebeb;
+        }
+        .time-type {
+            font-size: 14px;
+            color: #767880;
+            margin-right: 20px;
         }
     }
-    .bk-no-content {
-        text-align: center;
-        padding: 80px 0;
-
-        p {
-            font-size: 16px;
-            color: #63656E;
-            margin-top: 10px;
-        }
+    .icon-itsm-icon-mark-eight {
+        color: red;
+    }
+    .icon-itsm-icon-three-eight {
+        color: #ff9c01;
     }
 </style>

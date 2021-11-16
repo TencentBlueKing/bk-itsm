@@ -30,7 +30,7 @@
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["标题："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                        <span class="bk-info-content">{{basicInfomation.title || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["影响范围："]') }}</span>
@@ -42,7 +42,7 @@
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["单号："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                        <span class="bk-info-content">{{basicInfomation.sn || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["紧急程度："]') }}</span>
@@ -60,7 +60,7 @@
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["优先级："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.create_at || '--'}}</span>
+                        <span class="bk-info-content">{{basicInfomation.priority_name || '--'}}</span>
                     </li>
                 </ul>
             </div>
@@ -178,9 +178,10 @@
         li {
             width: 33.33%;
             float: left;
-            font-size: 12px;
+            margin: 8px 0;
+            font-size: 14px;
             color: #63656E;
-            line-height: 26px;
+            line-height: 22px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;

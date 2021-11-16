@@ -45,7 +45,7 @@
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
-                <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div>
+                <!-- <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div> -->
                 <div class="show-right-icon" @click="onShowRightContent" v-show="!showRightTabs">
                     <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
                 </div>

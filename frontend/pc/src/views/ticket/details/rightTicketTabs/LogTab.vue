@@ -22,6 +22,7 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
+        <div v-if="true" class="ticket-process"><i class="bk-itsm-icon icon-basic-info">  查看完整流程</i></div>
         <bk-timeline
             data-test-id="ticket_timeline_viewLog"
             ext-cls="log-time-line"
@@ -110,6 +111,12 @@
 </script>
 
 <style lang='scss' scoped>
+.ticket-process {
+    padding: 0px 0px 10px;
+    font-size: 12px;
+    color: #3A84FF;
+
+}
 .log-list {
     width: 100%;
     height: 100%;

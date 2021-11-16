@@ -27,31 +27,10 @@
                 <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>SLA信息</span>
                 <span class="view-sla-rule" @click="viewSlaRule">规则查看</span>
             </div>
-            <div v-if="isShowSla">
-                <div v-if="isUseSla" class="count-down ">
-                    <div>
-                        <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                        <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">响应倒计时</u>
-                        <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">27</span>&nbsp;:&nbsp;
-                        <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">27</span>&nbsp;:&nbsp;
-                        <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">27</span>
-                        <!-- #ffebeb 警告 -->
-                        <!-- #fff1db 预警 -->
-                        <!-- commonicon-icon icon-itsm-icon-three-eight -->
-                        <i :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
-                    </div>
-                    <div>
-                        <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                        <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">处理倒计时</u>
-                        <span class="time">27</span>&nbsp;:&nbsp;
-                        <span class="time">27</span>&nbsp;:&nbsp;
-                        <span class="time">27</span>
-                        <i v-if="false" :class="['bk-itsm-icon', isDisposeTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
-                    </div>
-                </div>
-                <div v-else>
-                    暂无
-                </div>
+            <div v-show="isShowSla">
+                <sla-record-tab :basic-infomation="ticketInfo"
+                    :node-list="nodeList">
+                </sla-record-tab>
             </div>
         </div>
         <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
@@ -61,7 +40,7 @@
                 <log-tab v-if="activeTab === 'log'">
                 </log-tab>
             </bk-tab-panel>
-            <bk-tab-panel
+            <!-- <bk-tab-panel
                 name="slaLog"
                 :label="$t(`m.task['SLA记录']`)">
                 <sla-record-tab :basic-infomation="ticketInfo"
@@ -106,7 +85,7 @@
                 <div class="bk-log-flow" v-if="activeTab === 'mother-child'">
                     <inherit-ticket :ticket-info="ticketInfo"></inherit-ticket>
                 </div>
-            </bk-tab-panel>
+            </bk-tab-panel> -->
             <bk-tab-panel
                 name="related-ticket"
                 :label="$t(`m.newCommon['关联单']`)">
@@ -123,24 +102,19 @@
     import { mapState } from 'vuex'
     import LogTab from './LogTab.vue'
     import AssociatedTab from './AssociatedTab/AssociatedTab.vue'
-    import InheritTicket from './InheritTicketTab.vue'
-    import EmailNoticeTab from './EmailNoticeTab.vue'
-    import CommentTab from './CommentTab.vue'
-    import AllTaskTab from './AllTaskTab.vue'
+    // import InheritTicket from './InheritTicketTab.vue'
+    // import EmailNoticeTab from './EmailNoticeTab.vue'
+    // import CommentTab from './CommentTab.vue'
+    // import AllTaskTab from './AllTaskTab.vue'
     import SlaRecordTab from './SlaRecordTab.vue'
-    import taskHistory from '../taskInfo/taskHistory.vue'
+    // import taskHistory from '../taskInfo/taskHistory.vue'
 
     export default {
         name: 'RightTiketTabs',
         components: {
             LogTab,
             AssociatedTab,
-            InheritTicket,
-            EmailNoticeTab,
-            CommentTab,
-            AllTaskTab,
-            SlaRecordTab,
-            taskHistory
+            SlaRecordTab
         },
         props: {
             ticketInfo: {
@@ -208,35 +182,6 @@
             float: right;
             color: #3A84FF;
             font-size: 12px;
-        }
-    }
-    .count-down {
-        height: 134px;
-        display: flex;
-        flex-direction: column;
-        padding: 26px 28px;
-        justify-content: space-between;
-        .time {
-            text-align: center;
-            display: inline-block;
-            background-color: #f0f1f5;
-            color: #63656E;
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 28px;
-            width: 28px;
-            height: 30px;
-        }
-        .warn {
-            background-color: #fff1db;
-        }
-        .timeout {
-            background-color: #ffebeb;
-        }
-        .time-type {
-            font-size: 14px;
-            color: #767880;
-            margin-right: 20px;
         }
     }
 }
