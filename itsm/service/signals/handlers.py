@@ -64,6 +64,18 @@ def register_builtin_iam_service(sender, **kwargs):
     except Exception as err:
         print(traceback.format_exc())
         print('register builtin iam exception, msg is {} '.format(err))
+    
+       
+def register_builtin_bkbase_service(sender, **kwargs):
+    from itsm.workflow.models import Workflow
+    from itsm.service.models import Service
+
+    try:
+        Workflow.objects.init_bkbase_workflow()
+        Service.objects.init_bkbase_services()
+    except Exception as err:
+        print(traceback.format_exc())
+        print('register builtin bkbase exception, msg is {} '.format(err))
 
 
 def register_builtin_service(sender, **kwargs):
