@@ -101,6 +101,29 @@ class ServiceManager(managers.Manager):
                 obj.bind_catalog_by_key(builtin_service['bind'])
                 obj.save()
 
+    def init_bkbase_services(self):
+        from itsm.workflow.models import Workflow
+        from itsm.component.constants import BUILTIN_BKBASE_SERVICES
+
+        for builtin_service in BUILTIN_BKBASE_SERVICES:
+            original_workflow = Workflow.objects.get(name=builtin_service['flow_name'])
+            obj = self.filter(workflow__workflow_id=original_workflow.id,
+                              name=builtin_service['name']).first()
+            if not obj:
+                obj = self.create(
+                    name=builtin_service['name'],
+                    display_type=builtin_service['display_type'],
+                    display_role=dotted_name(builtin_service.get('display_role', '')),
+                    key="request",
+                    desc=builtin_service.get('desc', "内置服务"),
+                    workflow=original_workflow.create_version(),
+                )
+
+            if builtin_service.get("bind"):
+                obj.display_role = dotted_name(builtin_service.get('display_role', ''))
+                obj.bind_catalog_by_key(builtin_service['bind'])
+                obj.save()
+
     def insert_services(self, services, catalog=None):
         from itsm.workflow.models import Workflow
 

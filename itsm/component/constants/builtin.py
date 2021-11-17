@@ -259,5 +259,80 @@ BUILTIN_IAM_SERVICES = [
     },
 ]
 
+BUILTIN_BKBASE_SERVICES = [
+    {
+        "name": "创建资源组",
+        "flow_name": "创建资源组",
+        "desc": "创建资源组",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "资源组扩容",
+        "flow_name": "资源组扩容",
+        "desc": "资源组扩容",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "项目申请资源组",
+        "flow_name": "项目申请资源组",
+        "desc": "项目申请资源组",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "项目申请业务数据",
+        "flow_name": "项目申请业务数据",
+        "desc": "项目申请业务数据",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "申请角色权限",
+        "flow_name": "申请角色权限",
+        "desc": "申请角色权限",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "离线计算补算",
+        "flow_name": "离线计算补算",
+        "desc": "离线计算补算",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "第三方应用授权申请",
+        "flow_name": "第三方应用授权申请",
+        "desc": "第三方应用授权申请",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+    {
+        "name": "TDM数据源接入",
+        "flow_name": "TDM数据源接入",
+        "desc": "TDM数据源接入",
+        "type": "BKBASE",
+        "display_type": API,
+        "display_role": "BK_BASE",
+        "bind": "approve_service_catalog",
+    },
+]
+
 DEFAULT_PROJECT_PROJECT_KEY = "0"
 PUBLIC_PROJECT_PROJECT_KEY = "public"

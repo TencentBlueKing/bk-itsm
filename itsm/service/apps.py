@@ -37,6 +37,7 @@ from itsm.service.signals.handlers import (
     register_builtin_approve_service,
     register_builtin_iam_service,
     register_builtin_service,
+    register_builtin_bkbase_service,
 )
 
 
@@ -74,3 +75,4 @@ class ServiceConfig(AppConfig):
         post_migrate.connect(register_builtin_approve_service, sender=self)
         post_migrate.connect(register_builtin_iam_service, sender=self)
         post_migrate.connect(register_builtin_service, sender=self)
+        post_migrate.connect(register_builtin_bkbase_service, sender=self)
