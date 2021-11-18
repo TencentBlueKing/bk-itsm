@@ -267,7 +267,7 @@ class Workflow(WorkflowBase):
             notify=list(self.notify.values_list("id", flat=True)),
             engine_version=DEFAULT_ENGINE_VERSION,
             revoke_config=self.revoke_config,
-            is_auto_approve=self.is_auto_approve
+            is_auto_approve=self.is_auto_approve,
         )
         return data
 
@@ -508,7 +508,7 @@ class Workflow(WorkflowBase):
     def update_workflow_configs(self, workflow_config):
         self.is_revocable = workflow_config["is_revocable"]
         self.revoke_config = workflow_config["revoke_config"]
-        self.notify.add(*self.get_notifiy_objs(workflow_config["notify"]))
+        self.notify.set(self.get_notifiy_objs(workflow_config["notify"]))
         self.notify_freq = workflow_config.get("notify_freq", EMPTY_INT)
         self.notify_rule = workflow_config.get("notify_rule", "NONE")
         self.is_supervise_needed = workflow_config["is_supervise_needed"]
