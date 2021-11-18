@@ -25,19 +25,19 @@
         <template v-if="slaList.length">
             <div>
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">响应倒计时</u>
-                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
-                <i :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+                <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">{{ $t('m["响应"]') }}{{ isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</u>
+                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
+                <i v-if="!isResponseNormal" :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
             </div>
             <div>
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">处理倒计时</u>
-                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
-                <i v-if="false" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+                <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</u>
+                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
+                <i v-if="!isProcessNormal" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
             </div>
         </template>
         <!-- <div class="bk-correlationsla-li" v-for="(sla, index) in slaList" :key="index">
@@ -104,7 +104,7 @@
         </div> -->
         <div class="bk-no-content" v-else>
             <img src="@/images/box.png">
-            <p>{{ $t('m.newCommon["暂时没有甚至SLA"]') }}<span>去设置</span></p>
+            <p>{{ $t('m["暂时没有设置SLA"]') }}<span @click="goToSla">{{ $t('m["去设置"]') }}</span></p>
         </div>
     </div>
 </template>
@@ -127,9 +127,14 @@
         },
         data () {
             return {
-                isResponseTimeout: true,
-                isProcessTimeout: true,
-                isNormal: false,
+                isResponseTimeout: false,
+                isProcessTimeout: false,
+                isResponseNormal: true,
+                isProcessNormal: true,
+                rWarningThreshold: '', // 响应预警阈值
+                rTimeOutThreshold: '', // 响应超时阈值
+                pWarningThreshold: '', // 处理预警阈值
+                pTimeOutThreshold: '', // 处理超时阈值
                 convertTimeArrToString,
                 loading: false,
                 slaList: [],
@@ -160,7 +165,9 @@
                 ],
                 responseTime: [0, 0, 0, 0, 0, 0], // 响应倒计时
                 processingTime: [0, 0, 0, 0, 0, 0], // 处理倒计时
-                taskStatusList: ['', this.$t('m.newCommon["未开启"]'), this.$t('m.newCommon["计时中"]'), this.$t('m.newCommon["暂停中"]'), this.$t('m.newCommon["已结束"]'), this.$t('m.newCommon["已超时"]')]
+                taskStatusList: ['', this.$t('m.newCommon["未开启"]'), this.$t('m.newCommon["计时中"]'), this.$t('m.newCommon["暂停中"]'), this.$t('m.newCommon["已结束"]'), this.$t('m.newCommon["已超时"]')],
+                responseCost: '',
+                processCost: ''
             }
         },
         watch: {
@@ -169,13 +176,28 @@
             this.getReceiptsSlaTask()
         },
         methods: {
+            getProtocolsList () {
+                const params = {
+                    project_id: this.basicInfomation.project_key
+                }
+                this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
+                    const curSla = res.data.find(item => item.name === this.basicInfomation.sla[0])
+                    const condition = curSla.action_policies.map(item => {
+                        return item.condition.expressions[0].value
+                    })
+                    this.rWarningThreshold = condition[0] / 100
+                    this.rTimeOutThreshold = condition[1] / 100
+                    this.pWarningThreshold = condition[2] / 100
+                    this.pTimeOutThreshold = condition[3] / 100
+                })
+            },
             getReceiptsSlaTask () {
+                this.getProtocolsList()
                 this.loading = true
                 const params = {
                     id: this.basicInfomation.id
                 }
                 this.$store.dispatch('change/getReceiptsSlaTask', params).then(res => {
-                    console.log(res.data)
                     this.slaList = res.data
                 }).catch(res => {
                     errorHandler(res, this)
@@ -185,12 +207,16 @@
                 })
             },
             changeTimeoutStatus () {
-                const a = this.changeTime(new Date().getTime())
-                console.log(a)
                 this.slaList.forEach((item, index) => {
                     if (item.task_status === 2) {
-                        const responseCost = convertTimeArrToMS(item.resovle_cost)
-                        const processCost = convertTimeArrToMS(['0', '0', '0', '1', '0', '0'])
+                        // 当前时间
+                        const curTime = convertTimeArrToMS(new Date().toLocaleDateString().split('/').concat(new Date().toTimeString().split(' ')[0].split(':')))
+                        // 响应倒计时
+                        const Rtime = convertTimeArrToMS(item.reply_deadline.split(' ')[0].split('-').concat(item.reply_deadline.split(' ')[1].split(':')))
+                        // 处理倒计时
+                        const Ptime = convertTimeArrToMS(item.deadline.split(' ')[0].split('-').concat(item.deadline.split(' ')[1].split(':')))
+                        const responseCost = Rtime - curTime
+                        const processCost = Ptime - curTime
                         this.runTime(responseCost, processCost, index)
                     }
                     item.reply_cost = convertTimeArrToString(item.reply_cost)
@@ -204,17 +230,40 @@
                 const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60
                 return { day, hour, minute, sec }
             },
+            goToSla () {
+                this.$router.push({
+                    name: 'projectServiceSla',
+                    params: {
+                        id: this.basicInfomation.service_id
+                    },
+                    query: {
+                        project_id: this.$route.query.project_id
+                    }
+                })
+            },
             // changeTimeFormat () {
 
             // },
-            runTime (currentSec, processCost, index) {
+            runTime (responseCost, processCost, index) {
                 // 启动计时器
                 this.myInterval(() => {
-                    currentSec--
+                    responseCost--
                     processCost--
+                    if (responseCost < this.responseCost - (this.rTimeOutThreshold * this.responseCost)) {
+                        this.isResponseTimeout = true
+                        this.isResponseNormal = false
+                    } else if (responseCost < this.rWarningThreshold * this.responseCost) {
+                        this.isResponseNormal = false
+                    }
+                    if (processCost < this.processCost - (this.pTimeOutThreshold * this.processCost)) {
+                        this.isProcessTimeout = true
+                        this.isProcessNormal = false
+                    } else if (processCost < this.pWarningThreshold * this.processCost) { // 预警time
+                        this.isProcessNormal = false
+                    }
                     const responseTime = [0, 0] // 响应时间
                     const processTime = [0, 0] // 处理时间
-                    const rTime = this.changeTime(currentSec)
+                    const rTime = this.changeTime(responseCost)
                     const pTime = this.changeTime(processCost)
                     responseTime.push(parseInt(rTime.day), parseInt(rTime.hour), parseInt(rTime.minute), rTime.sec)
                     processTime.push(parseInt(pTime.day), parseInt(pTime.hour), parseInt(pTime.minute), pTime.sec)
@@ -269,6 +318,19 @@
             font-size: 14px;
             color: #767880;
             margin-right: 20px;
+        }
+        .bk-no-content {
+            margin: 0 auto;
+            text-align: center;
+            p {
+                font-size: 12px;
+                line-height: 20px;
+                color: #63656E;
+                span {
+                    cursor: pointer;
+                    color: #3A84FF;
+                }
+            }
         }
     }
     .icon-itsm-icon-mark-eight {

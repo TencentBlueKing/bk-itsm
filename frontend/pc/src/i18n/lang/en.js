@@ -2372,5 +2372,18 @@ export const m = {
     '蓝盾节点': 'Devops Node',
     '流水线参数': 'Pipeline params',
     '必填项': 'required fields',
-    '跳转蓝盾查看': 'Link to Devops'
+    '跳转蓝盾查看': 'Link to Devops',
+    '暂时没有设置SLA': 'SLA is not set for now',
+    '去设置': 'To set',
+    '响应': 'response',
+    '已超时': 'timedout',
+    '倒计时': 'countdown',
+    '处理': 'process',
+    '发布': 'publish',
+    'SLA信息': 'SLA information',
+    '规则查看': 'Rule View',
+    '全部评论': 'All comments',
+    '仅内部可见': 'internally visible only',
+    '确认删除该条评论？': 'Are you sure to delete this comment?',
+    '已被编辑': 'edited'
 }

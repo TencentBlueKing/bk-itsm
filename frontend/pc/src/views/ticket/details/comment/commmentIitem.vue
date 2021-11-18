@@ -2,27 +2,27 @@
     <div class="comment">
         <div class="comment-info">
             <!-- <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar> -->
-            <img class="user-img" src="" alt="">
-            <p><span class="user-name">windyhasda  </span><span class="issue-time">发布于 2020-05-15</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> 仅内部可见</i></p>
+            <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div>
+            <p><span class="user-name">{{ curComment.creator}}  </span><span class="issue-time">发布于 {{ curComment.create_at }}</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
             <div
                 v-if="curComment.update_log.length"
                 v-bk-tooltips.top-start="{
                     placement: 'top-start',
-                    content: '鼠标移入显示移出消失，浮层不承载复杂文本和操作。'
+                    content: curComment.update_log
                 }"
                 class="edited">
-                <span>已被编辑</span>
+                <span>{{ $t('m["已被编辑"]') }}</span>
             </div>
             <div class="reply-praise">
-                <i class="bk-itsm-icon icon-itsm-icon-speak" @click="$emit('editComment', curComment , 'add')"></i>
-                <i class="bk-itsm-icon icon-itsm-icon-smeil" @click="endorse"></i>
-                <ul class="expression">
+                <i class="bk-itsm-icon icon-itsm-icon-speak" title="回复" @click="$emit('editComment', curComment , 'add')"></i>
+                <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i>
+                <!-- <ul v-if="isAgree" class="expression">
                     <li>😘</li>
                     <li>😭</li>
                     <li>😊</li>
                     <li>😁</li>
                     <li>👍</li>
-                </ul>
+                </ul> -->
             </div>
         </div>
         <div class="comment-content">
@@ -30,13 +30,13 @@
         </div>
         <div class="comment-reply">
             <div class="comment-message" v-for="(item, index) in curComment.children" :key="index">
-                <span>“ 回复 miffyyang 的评论：</span>
+                <span>“ 回复 miffyyang 的评论：{{ $t('m["规则查看"]') }}</span>
                 <p>{{ item.content }}</p>
             </div>
         </div>
         <div class="operation">
-            <span @click="$emit('editComment', curComment, 'edit')">编辑</span>|
-            <span @click="isShowDeleteDialog(1)">删除</span>
+            <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>|
+            <span @click="isShowDeleteDialog(1)">{{ $t('m["删除"]') }}</span>
         </div>
         <bk-dialog
             ext-cls="delete-dialog"
@@ -44,10 +44,10 @@
             :show-footer="false"
             v-model="deleteCommentDialog">
             <i class="bk-itsm-icon icon-info-fail"></i>
-            <div class="delete-tip">确认删除该条评论？</div>
+            <div class="delete-tip">{{ $t('m["确认删除该条评论？"]') }}</div>
             <div class="delete-option">
-                <bk-button :theme="'primary'" @click="deleteComment(curComment.id)">确定</bk-button>
-                <bk-button @click="isShowDeleteDialog(0)">取消</bk-button>
+                <bk-button :theme="'primary'" @click="deleteComment(curComment.id)">{{ $t('m["确定"]') }}</bk-button>
+                <bk-button @click="isShowDeleteDialog(0)">{{ $t('m["取消"]') }}</bk-button>
             </div>
         </bk-dialog>
     </div>
@@ -62,12 +62,17 @@
         data () {
             return {
                 isEditComment: false,
-                deleteCommentDialog: false
+                deleteCommentDialog: false,
+                isAgree: false
             }
         },
-        mounted () {
-        },
         methods: {
+            randomHex () {
+                return `#${Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')}`
+            },
+            avatar (str) {
+                return str.substr(0, 1).toLocaleUpperCase()
+            },
             deleteComment (id) {
                 this.$store.dispatch('ticket/deleteTicketComment', id).then(res => {
                     this.$emit('refreshComment')
@@ -75,7 +80,8 @@
                 })
             },
             endorse () {
-                console.log('agree')
+                this.isAgree = !this.isAgree
+                console.log('agree', '暂不支持')
             },
             isShowDeleteDialog (val) {
                 this.deleteCommentDialog = !!val
@@ -93,11 +99,16 @@
     .comment-info {
         display: flex;
         line-height: 22px;
-        .user-img {
+        .author {
             width: 30px;
             height: 30px;
+            border: 1px solid #dcdee5;
             border-radius: 50%;
             margin-right: 10px;
+            line-height: 28px;
+            font-size: 20px;
+            text-align: center;
+            opacity: 0.8;
         }
         .user-name {
             color: #3a3b41;

@@ -23,18 +23,18 @@
 <template>
     <div class="wang-editor-template">
         <ul v-show="isShowSelect" class="select-pattern">
-            <li v-for="(item, index) in selectPatternList" :key="index">
+            <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
                 <i :class="item.icon"></i>
-                <span @click="postComment(item.type)">{{ item.name}}</span>
+                <span>{{ item.name}}</span>
                 <p>{{ item.docs }}</p>
             </li>
         </ul>
         <editor v-if="isShowEditor" ref="editorAdd" :editor-id="'editor1'" @changebuttonStatus="changebuttonStatus"></editor>
-        <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? '发布' : '返回' }}</bk-button>
+        <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
         <!-- <bk-button title="loading" icon="loading" :disabled="true" class="mr10">loading</bk-button> -->
         <bk-divider></bk-divider>
-        <div>全部评论</div>
-        <ul>
+        <div>{{ $t('m["全部评论"]') }}</div>
+        <ul v-bkloading="{ isLoading: commentLoading }">
             <li v-for="(item, index) in commentList" :key="index">
                 <commment-item
                     :cur-comment="item"
@@ -67,7 +67,8 @@
             commentId: [Number, String],
             commentList: Array,
             ticketInfo: Object,
-            ticketId: [Number, String]
+            ticketId: [Number, String],
+            commentLoading: Boolean
         },
         data () {
             return {
@@ -97,26 +98,10 @@
             }
         },
         methods: {
-            async init () {
-                if (this.ticketId) {
-                    // 有项目id时加载内部评论
-                    const commentList = []
-                    const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
-                    if (this.$route.query.project_id) {
-                        const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
-                        commentList.push(...res.data.children)
-                    }
-                    commentList.push(...res.data.children)
-                    this.$emit('getCommentCount', commentList.length)
-                    this.commentList = commentList
-                    this.commentId = res.data.id
-                }
-            },
             editComment (curComment, type) {
                 const _this = this.$refs.editorEdit.editor
                 _this.txt.clear()
                 this.editType = type
-                console.log(curComment, type)
                 this.curCommentId = curComment.id
                 if (type === 'edit') _this.txt.html(curComment.content)
                 // 新增回复评论的类型取决于父级类型
@@ -170,14 +155,14 @@
                         ticket_id: this.ticketId,
                         parent__id: this.commentId,
                         remark_type: this.commentType,
-                        users: ['admin']
+                        users: ['v_zyxazhang']
                     }
                     if (text) {
                         this.$store.dispatch('ticket/addTicketComment', params).then(res => {
                             this.refreshComment()
-                            this.isShowEditor = false
                         })
                     }
+                    this.isShowEditor = false
                 }
             }
         }
@@ -199,6 +184,9 @@
                 flex: 1;
                 padding: 40px;
                 flex-direction: column;
+                &:hover {
+                    background-color: #F0F1F5;
+                }
                 i{
                     font-size: 30px;
                 }

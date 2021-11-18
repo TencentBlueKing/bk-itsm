@@ -44,6 +44,7 @@
                         :first-state-fields="firstStateFields"
                         :node-trigger-list="nodeTriggerList"
                         :ticket-id="ticketId"
+                        :comment-loading="commentLoading"
                         @refreshComment="refreshComment">
                     </left-ticket-content>
                 </div>
@@ -107,6 +108,7 @@
         data () {
             return {
                 showRightTabs: true,
+                commentLoading: false,
                 ticketTimer: null, // 单据详情轮询器
                 containerLeftWidth: 0,
                 ticketId: '',
@@ -185,6 +187,7 @@
             async getComments () {
                 if (this.ticketId) {
                     // 有项目id时加载内部评论
+                    this.commentLoading = true
                     const commentList = []
                     const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
                     if (this.$route.query.project_id) {
@@ -195,6 +198,7 @@
                     commentList.sort((a, b) => b.id - a.id)
                     this.commentList = commentList
                     this.commentId = res.data.id
+                    this.commentLoading = false
                 }
             },
             refreshComment () {
@@ -357,9 +361,7 @@
                 document.addEventListener('mousemove', this.handleLineMouseMove, false)
 
                 const minTabWidth = document.querySelector('.ticket-container-right .bk-tab-header .bk-tab-label-wrapper .bk-tab-label-list').clientWidth
-                console.log(minTabWidth)
                 const currTabWidth = document.querySelector('.ticket-container-right .bk-tab-header').clientWidth
-                console.log(currTabWidth)
                 if (!this.dragLine.maxLength) {
                     // 误差
                     const offset = 4

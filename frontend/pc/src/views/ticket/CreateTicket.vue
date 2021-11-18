@@ -368,7 +368,7 @@
                     this.routerInfo = {
                         name: 'TicketDetail',
                         query: {
-                            id: res.data.id, from: 'created'
+                            id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined
                         }
                     }
                 }).catch((res) => {

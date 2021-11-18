@@ -316,6 +316,7 @@
             setActive () {
                 const hasMatched = this.routerList.some(nav => {
                     const navId = nav.id
+                    this.getProjectList()
                     if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
                         const matched = this.traverseSubRouter(nav.subRouters, navId)
                         if (matched.navId) {

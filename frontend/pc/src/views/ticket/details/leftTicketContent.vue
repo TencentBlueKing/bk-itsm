@@ -80,6 +80,7 @@
                         :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
+                        :comment-loading="commentLoading"
                         @refreshComment="refreshComment"
                     ></wang-editor>
                 </bk-tab-panel>
@@ -131,7 +132,8 @@
             nodeList: Array,
             firstStateFields: Array,
             nodeTriggerList: Array,
-            ticketId: [Number, String]
+            ticketId: [Number, String],
+            commentLoading: Boolean
         },
         inject: ['reloadTicket'],
         data () {

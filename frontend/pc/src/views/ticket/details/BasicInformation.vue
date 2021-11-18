@@ -34,7 +34,7 @@
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["影响范围："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                        <span class="bk-info-content">{{basicInfomation.table_fields.find(item => item.key === 'impact').display_value || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
@@ -46,7 +46,7 @@
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["紧急程度："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                        <span class="bk-info-content">{{basicInfomation.table_fields.find(item => item.key === 'urgency').display_value || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["服务目录："]') }}</span>
@@ -56,7 +56,7 @@
                     <li>
                         <!-- <business-card :basic-infomation="basicInfomation"></business-card> -->
                         <span class="bk-info-title">{{ $t('m.newCommon["关联业务："]') }}</span>
-                        <span class="bk-info-content pl5">{{basicInfomation.creator || '--'}}</span>
+                        <span class="bk-info-content pl5">{{basicInfomation.service_name || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["优先级："]') }}</span>

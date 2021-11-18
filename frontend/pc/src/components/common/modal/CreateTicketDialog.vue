@@ -152,7 +152,6 @@
                     const group = list.find(item => item.name === service.key)
                     group.data.push(service)
                 })
-                console.log(list)
                 return list
             }
         },
@@ -231,13 +230,14 @@
             },
             // 点击服务
             onSelectService (service) {
-                const { id, project_key } = service
+                const { id, key } = service
                 this.onCloseDialog()
                 this.$router.push({
                     name: 'CreateTicket',
                     query: {
                         service_id: id,
-                        project_id: project_key
+                        key: key,
+                        project_id: this.$route.query.project_id
                     }
                 })
             },

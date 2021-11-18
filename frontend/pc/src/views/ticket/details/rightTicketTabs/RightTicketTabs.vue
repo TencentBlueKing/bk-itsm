@@ -24,10 +24,10 @@
     <div class="right-content">
         <div class="sla-information">
             <div class="sla-view">
-                <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>SLA信息</span>
-                <span class="view-sla-rule" @click="viewSlaRule">规则查看</span>
+                <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', !isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>{{ $t('m["SLA信息"]') }}</span>
+                <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
             </div>
-            <div v-show="isShowSla">
+            <div :class="['ishowSlaRecord', isShowSla ? 'hide' : '']">
                 <sla-record-tab :basic-infomation="ticketInfo"
                     :node-list="nodeList">
                 </sla-record-tab>
@@ -193,6 +193,14 @@
             color: #3A84FF;
             font-size: 12px;
         }
+    }
+    .ishowSlaRecord {
+        transition: all 0.5s;
+        height: 134px;
+        overflow: hidden;
+    }
+    .hide {
+        height: 0;
     }
 }
 .right-tiket-tabs {
