@@ -119,7 +119,7 @@
                 let url = ''
                 const params = {
                     content: text,
-                    users: ['admin'],
+                    users: [],
                     remark_type: this.$route.query.project_id ? 'INSIDE' : 'PUBLIC'
                 }
                 if (this.editType === 'edit') {
@@ -155,7 +155,7 @@
                         ticket_id: this.ticketId,
                         parent__id: this.commentId,
                         remark_type: this.commentType,
-                        users: ['v_zyxazhang']
+                        users: []
                     }
                     if (text) {
                         this.$store.dispatch('ticket/addTicketComment', params).then(res => {
