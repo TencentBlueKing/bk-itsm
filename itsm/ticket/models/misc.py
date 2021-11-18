@@ -481,6 +481,10 @@ class TicketRemark(BaseMpttModel):
             "children": children,
             "update_log": node.update_log,
             "users": node.users,
+            "creator": node.creator,
+            "create_at": node.create_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "update_at": node.update_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_by": node.updated_by,
         }
 
         return data
