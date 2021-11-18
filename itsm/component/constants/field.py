@@ -35,6 +35,25 @@ REJECT_RATE = "REJECT_RATE"  # 拒绝率
 APPROVE_RESULT = "APPROVE_RESULT"  # 审批结果
 NODE_APPROVE_RESULT = "NODE_APPROVE_RESULT"  # 审批结果
 
+TASK_EXECUTE_RESULT = "TASK_EXECUTE_RESULT"  # 任务执行结果
+
+
+TASK_VARIABLES = [
+    {
+        "name": _("执行结果"),
+        "type": "STRING",
+        "meta": {
+            "code": TASK_EXECUTE_RESULT,
+            "type": "SELECT",
+            "choice": [
+                {"key": "false", "name": _("失败")},
+                {"key": "true", "name": _("成功")},
+            ],
+        },
+    },
+]
+
+
 # Value unit
 PERCENT = "PERCENT"
 
@@ -58,7 +77,14 @@ SIGN_FIELDS = [
         "choice": [{"key": "true", "name": _("通过")}, {"key": "false", "name": _("拒绝")}],
         "meta": {"code": APPROVE_RESULT},
     },
-    {"name": _("备注"), "is_builtin": False, "display": True, "type": "TEXT", "regex": "EMPTY", "layout": "COL_12"},
+    {
+        "name": _("备注"),
+        "is_builtin": False,
+        "display": True,
+        "type": "TEXT",
+        "regex": "EMPTY",
+        "layout": "COL_12",
+    },
 ]
 
 APPROVAL_VARIABLES = [
@@ -68,7 +94,10 @@ APPROVAL_VARIABLES = [
         "meta": {
             "code": NODE_APPROVE_RESULT,
             "type": "SELECT",
-            "choice": [{"key": "false", "name": _("拒绝")}, {"key": "true", "name": _("通过")}],
+            "choice": [
+                {"key": "false", "name": _("拒绝")},
+                {"key": "true", "name": _("通过")},
+            ],
         },
     },
 ]
@@ -92,7 +121,9 @@ APPROVAL_FIELDS = [
         "layout": "COL_12",
         "validate_type": "OPTION",
         "show_conditions": {
-            "expressions": [{"value": "false", "type": "RADIO", "condition": "==", "key": ""}],
+            "expressions": [
+                {"value": "false", "type": "RADIO", "condition": "==", "key": ""}
+            ],
             "type": "and",
         },
         "show_type": SHOW_BY_CONDITION,
@@ -104,7 +135,9 @@ APPROVAL_FIELDS = [
         "regex": "EMPTY",
         "layout": "COL_12",
         "show_conditions": {
-            "expressions": [{"value": "true", "type": "RADIO", "condition": "==", "key": ""}],
+            "expressions": [
+                {"value": "true", "type": "RADIO", "condition": "==", "key": ""}
+            ],
             "type": "and",
         },
         "show_type": SHOW_BY_CONDITION,
