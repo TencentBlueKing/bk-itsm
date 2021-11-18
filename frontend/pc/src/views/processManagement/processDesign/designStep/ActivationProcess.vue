@@ -78,6 +78,14 @@
                         </bk-form-item>
                     </p>
                 </bk-form-item>
+                <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
+                    <bk-checkbox
+                        :true-value="true"
+                        :false-value="false"
+                        v-model="formData.is_auto_approve">
+                        当审批节点的审批人为申请人时，自动通过
+                    </bk-checkbox>
+                </bk-form-item>
             </bk-form>
         </basic-card>
 
@@ -178,7 +186,7 @@
         <!-- 展开高级配置 -->
         <div
             v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH"
-            class="more-configuration mt20" @click="showMoreConfig = !showMoreConfig">
+            class="more-configuration mt20" data-test-id="activationProcess-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
             <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
             <i v-else class="bk-icon icon-up-shape"></i>
             <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
@@ -272,7 +280,8 @@
                     revoke_config: {
                         type: 2,
                         state: ''
-                    }
+                    },
+                    is_auto_approve: false
                 },
                 revokeStateError: false,
                 nodeListLoading: false,
@@ -372,6 +381,8 @@
                 this.getThirdInfo()
                 // 部署流程
                 this.formData.deploy_name = this.flowInfo.name
+                // 审批节点：审批人为申请人
+                this.formData.is_auto_approve = this.flowInfo.is_auto_approve || false
                 // 校验
                 this.rules.deploy_name = this.checkCommonRules('name').name
             },
@@ -514,7 +525,8 @@
                     is_enabled: true,
                     is_draft: false,
                     deploy: this.formData.can_deploy,
-                    deploy_name: this.formData.can_deploy ? this.formData.deploy_name : ''
+                    deploy_name: this.formData.can_deploy ? this.formData.deploy_name : '',
+                    is_auto_approve: this.formData.is_auto_approve
                 }
                 if (this.formData.can_withdraw) {
                     const revokeType = this.formData.revoke_config.type

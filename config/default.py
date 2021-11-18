@@ -354,6 +354,25 @@ else:
         }
     }
 
+CACHES.update(
+    {
+        'db': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache',
+        },
+        'login_db': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'account_cache',
+        },
+        'dummy': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        },
+        'locmem': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        },
+    }
+)
+
 # ==============================================================================
 # Django 项目配置 - 其他
 # ==============================================================================
@@ -768,3 +787,7 @@ DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
+
+# 通知消息模版
+CONTENT_CREATOR_WITH_TRANSLATION = True if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION",
+                                                     "true").lower() == "true" else False

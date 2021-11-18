@@ -75,6 +75,14 @@
                             :show-role-type-list="superviseTypes">
                         </deal-person>
                     </bk-form-item>
+                    <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
+                        <bk-checkbox
+                            :true-value="true"
+                            :false-value="false"
+                            v-model="formData.is_auto_approve">
+                            当审批节点的审批人为申请人时，自动通过
+                        </bk-checkbox>
+                    </bk-form-item>
                 </bk-form>
             </div>
         </section>
@@ -125,7 +133,7 @@
         </section>
         <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
             <div
-                class="card-title more-configuration mt20" @click="showMoreConfig = !showMoreConfig">
+                class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
                 <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
                 <i v-else class="bk-icon icon-up-shape"></i>
                 <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
@@ -249,7 +257,8 @@
                     otherSettings: [],
                     notify_rule: 'ONCE',
                     notify_freq: '',
-                    notify: ['WEIXIN', 'EMAIL']
+                    notify: ['WEIXIN', 'EMAIL'],
+                    is_auto_approve: false
                 },
                 superviseTypes: ['PERSON', 'GENERAL', 'STARTER'],
                 supervisePerson: {
@@ -299,7 +308,7 @@
                 } catch (error) {
                     console.log(error)
                 }
-                
+                this.formData.is_auto_approve = this.flowInfo.is_auto_approve
                 this.formData.visibleRange = {
                     type: display_type,
                     value: display_role
@@ -358,7 +367,8 @@
                         revoke_config: {
                             type: 0, // 默认值
                             state: 0
-                        }
+                        },
+                        is_auto_approve: this.formData.is_auto_approve
                     }
                 }
                 const workflow = params.workflow_config // 之前存在流程上的参数
@@ -374,7 +384,7 @@
                     params.display_type = data.type
                     params.display_role = data.value || undefined
                 }
-
+                workflow.is_auto_approve = this.formData.is_auto_approve
                 // 撤单方式
                 const {
                     revokeWay,

@@ -431,3 +431,14 @@ def build_auto_transit_rules(ticket, auto_transits):
         }
     ]
     return rules
+
+
+@task
+def remark_notify(ticket_id, creator, message, receivers):
+    ticket = Ticket.objects.get(id=ticket_id)
+    title = "{0}在单据{1}({2})下评论@了您".format(creator, ticket.title, ticket.sn)
+    # 单据评论通知规则跟随单据配置
+    for _notify in ticket.flow.notify.all():
+        _notify.send_message(
+            title=title, message=message, receivers=receivers, ticket_id=ticket_id
+        )

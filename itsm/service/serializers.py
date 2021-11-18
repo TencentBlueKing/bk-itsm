@@ -46,6 +46,7 @@ from itsm.component.constants import (
     PROCESSOR_CHOICES,
     OPEN,
     SERVICE_SOURCE_CHOICES,
+    EMPTY_INT,
 )
 from itsm.component.drf.serializers import (
     DynamicFieldsModelSerializer,
@@ -731,6 +732,7 @@ class WorkFlowConfigSerializer(serializers.Serializer):
     supervisor = serializers.CharField(
         required=True, max_length=LEN_LONG, allow_blank=True
     )
+    is_auto_approve = serializers.BooleanField(required=True)
 
 
 class ServiceConfigSerializer(serializers.Serializer):
@@ -746,3 +748,77 @@ class ServiceConfigSerializer(serializers.Serializer):
             if "display_role" not in attrs:
                 raise ValidationError(_("display_role 为必填项"))
         return attrs
+
+
+class WorkflowImportSerializer(serializers.Serializer):
+    # 基础字段
+    name = serializers.CharField(
+        required=True,
+        max_length=LEN_MIDDLE,
+        error_messages={"blank": _("请输入流程名称!"), "max_length": _("流程名称长度不能大于120个字符")},
+    )
+    flow_type = serializers.CharField(required=True, max_length=LEN_NORMAL)
+    desc = serializers.CharField(
+        required=True, max_length=LEN_LONG, min_length=1, allow_blank=True
+    )
+    owners = serializers.CharField(
+        required=True, max_length=LEN_XX_LONG, allow_blank=True
+    )
+    # 基础模型
+    table = serializers.DictField(required=True)
+    version_number = serializers.CharField(required=True)
+    version_message = serializers.CharField(required=True, allow_blank=True)
+    states = serializers.DictField(required=True)
+    transitions = serializers.DictField(required=True)
+    triggers = serializers.ListField(required=True)
+    fields = serializers.DictField(required=True)
+
+    # 业务属性字段
+    is_biz_needed = serializers.BooleanField(required=True)
+    is_iam_used = serializers.BooleanField(required=True)
+    is_task_needed = serializers.BooleanField(required=True)
+    is_supervise_needed = serializers.BooleanField(required=True)
+    supervise_type = serializers.ChoiceField(required=True, choices=PROCESSOR_CHOICES)
+    engine_version = serializers.CharField(required=True)
+    supervisor = serializers.CharField(
+        required=True, max_length=LEN_LONG, allow_blank=True
+    )
+    is_enabled = serializers.BooleanField(required=True)
+    is_draft = serializers.BooleanField(required=True)
+    is_revocable = serializers.BooleanField(required=True)
+    revoke_config = serializers.JSONField(required=True)
+    notify = serializers.ListField(required=True)
+    notify_rule = serializers.ChoiceField(
+        required=True, allow_blank=True, choices=NOTIFY_RULE_CHOICES
+    )
+    notify_freq = serializers.IntegerField(default=EMPTY_INT)
+
+
+class ServiceImportSerializer(serializers.Serializer):
+    name = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+        max_length=LEN_MIDDLE,
+        validators=[
+            UniqueValidator(queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")),
+            # name_validator
+        ],
+    )
+    key = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_LONG,
+        validators=[key_validator],
+    )
+    desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
+    is_valid = serializers.BooleanField(required=True)
+    display_type = serializers.ChoiceField(required=True, choices=DISPLAY_CHOICES)
+    display_role = serializers.CharField(
+        required=True, max_length=LEN_LONG, allow_blank=True
+    )
+    project_key = serializers.CharField(required=True, max_length=LEN_SHORT)
+    source = serializers.ChoiceField(required=True, choices=SERVICE_SOURCE_CHOICES)
+    owners = serializers.CharField(
+        required=False, error_messages={"blank": _("服务负责人不能为空")}
+    )
+    workflow = WorkflowImportSerializer(required=True)

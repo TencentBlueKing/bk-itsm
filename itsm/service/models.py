@@ -33,8 +33,7 @@ from django.db import models, transaction
 from django.db.models import Q, Count
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
-from mptt.managers import TreeManager
-from mptt.models import MPTTModel, TreeForeignKey
+from mptt.models import TreeForeignKey
 from multiselectfield import MultiSelectField
 
 from itsm.component.constants import (
@@ -54,6 +53,7 @@ from itsm.component.constants import (
     SERVICE_SOURCE_CHOICES,
     DEFAULT_PROJECT_PROJECT_KEY,
 )
+from itsm.component.db.models import BaseMpttModel
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.exceptions import DeleteError, ParamError, SlaParamError
 from itsm.component.utils.basic import dotted_name, fill_tree_route, get_random_key
@@ -411,7 +411,8 @@ class Service(ObjectManagerMixin, Model):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -456,6 +457,28 @@ class Service(ObjectManagerMixin, Model):
                 sla.delete()
                 raise e
 
+    @classmethod
+    def validate_service_name(cls, service_name):
+        return cls.objects.filter(name=service_name).exists()
+
+    def tag_data(self):
+        from itsm.workflow.models import Workflow
+
+        workflow = Workflow.objects.get(id=self.workflow.workflow_id)
+        return {
+            "key": self.key,
+            "name": self.name,
+            "desc": self.desc,
+            "workflow": workflow.tag_data(),
+            "owners": self.owners,
+            "can_ticket_agency": self.can_ticket_agency,
+            "is_valid": self.is_valid,
+            "display_type": self.display_type,
+            "display_role": self.display_role,
+            "source": self.source,
+            "project_key": self.project_key,
+        }
+
 
 class ServiceSla(models.Model):
     """服务与SLA关联表"""
@@ -473,37 +496,6 @@ class ServiceSla(models.Model):
         app_label = "service"
         verbose_name = _("服务与SLA关联表")
         verbose_name_plural = _("服务与SLA关联表")
-
-
-class BaseMpttModel(MPTTModel):
-    """基础字段"""
-
-    FIELDS = ("creator", "create_at", "updated_by", "update_at", "end_at")
-
-    creator = models.CharField(
-        _("创建人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
-    )
-    create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
-    update_at = models.DateTimeField(_("更新时间"), auto_now=True)
-    updated_by = models.CharField(
-        _("修改人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
-    )
-    end_at = models.DateTimeField(_("结束时间"), null=True, blank=True)
-    is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
-
-    _objects = TreeManager()
-    objects = managers.DictDataManager()
-
-    class Meta:
-        app_label = "service"
-        abstract = True
-
-    def delete(self, using=None):
-        self.is_deleted = True
-        self.save()
-
-    def hard_delete(self, using=None):
-        super(BaseMpttModel, self).delete()
 
 
 class ServiceCatalog(BaseMpttModel):

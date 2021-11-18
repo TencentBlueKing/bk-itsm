@@ -31,6 +31,16 @@ import sys
 from blueapps.core.celery import celery_app
 
 
+def get_env_or_raise(key):
+    """Get an environment variable, if it does not exist, raise an exception"""
+    value = os.environ.get(key)
+    if not value:
+        raise RuntimeError(
+            ('Environment variable "{}" not found, you must set this variable to run this application.').format(key)
+        )
+    return value
+
+
 __all__ = [
     "celery_app",
     "RUN_VER",

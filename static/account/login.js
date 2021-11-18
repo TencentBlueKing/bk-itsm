@@ -17,7 +17,8 @@ $.ajaxSetup({
             }
 
             try{
-                window.top.BLUEKING.corefunc.open_login_dialog(response['login_url']);
+                var login_url = response['login_url'].replace('http', 'https')
+                window.top.BLUEKING.corefunc.open_login_dialog(login_url);
             }catch(err){
                 open_login_dialog(
                     response['login_url'], response['width'], response['height']);
@@ -30,17 +31,20 @@ $.ajaxSetup({
  * 打开登录窗口
  */
 function open_login_dialog(src, width, height){
-    var login_html = '<div class="mod_login" id="loginbox" style="padding: 0px 0px; visibility: visible;" align="center">' +
-                        '<iframe name="login_frame" id="login_frame"  width="100%" height="100%" frameborder="0" allowtransparency="yes"  src="'+src+
-                        '" style="width:'+width+'px;height:'+height+'px;"></iframe>' +
-                     '</div>';
-    art.dialog({
-        id:"401_dialog",
-        fixed: true,
-        lock: true,
-        padding: "0px 0px",
-        content: login_html
-    });
+    src = src.replace("plain/?size=big", "").replace("&", "?").replace("account/login_success/", "");
+    window.location.href = src;
+    // src = src.replace('http', 'https');
+    // var login_html = '<div class="mod_login" id="loginbox" style="padding: 0px 0px; visibility: visible;" align="center">' +
+    //                     '<iframe name="login_frame" id="login_frame"  width="100%" height="100%" frameborder="0" allowtransparency="yes"  src="'+src+
+    //                     '" style="width:'+width+'px;height:'+height+'px;"></iframe>' +
+    //                  '</div>';
+    // art.dialog({
+    //     id:"401_dialog",
+    //     fixed: true,
+    //     lock: true,
+    //     padding: "0px 0px",
+    //     content: login_html
+    // });
 }
 
 /**

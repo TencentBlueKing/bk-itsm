@@ -22,8 +22,10 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+from django.db import transaction
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -31,13 +33,14 @@ from blueapps.account.decorators import login_exempt
 from itsm.component.utils.basic import dotted_name
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
-from itsm.component.exceptions import ServicePartialError
+from itsm.component.exceptions import ServicePartialError, ServiceInsertError
 from itsm.component.exceptions import ObjectNotExist
 from itsm.openapi.service.serializers import (
     ServiceRetrieveSerializer,
     ServiceSerializer,
 )
 from itsm.service.models import CatalogService, Service, ServiceCatalog
+from itsm.service.serializers import ServiceImportSerializer
 from itsm.workflow.models import Workflow
 from itsm.component.constants import role, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.role.models import UserRole
@@ -207,3 +210,21 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
             if not insert_result.get("result"):
                 raise ServicePartialError(insert_result.get("message"))
         return Response()
+
+    @action(detail=False, methods=["post"])
+    def import_service(self, request):
+        data = request.data
+        ServiceImportSerializer(data=data).is_valid(raise_exception=True)
+        with transaction.atomic():
+            workflow_tag_data = data.pop("workflow")
+            workflow = Workflow.objects.restore(
+                workflow_tag_data, request.user.username
+            )[0]
+            version = workflow.create_version()
+            data["workflow_id"] = version.id
+            if Service.validate_service_name(data["name"]):
+                raise ServiceInsertError(_("导入失败，服务名称已经存在"))
+            service = Service.objects.create(**data)
+        return Response(
+            self.serializer_class(service, context=self.get_serializer_context()).data
+        )

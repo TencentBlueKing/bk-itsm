@@ -1346,6 +1346,7 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '自动处理': 'Auto-processing',
         '提前结束条件': 'Early termination condition',
         '顺序会签': 'Sequential sign',
         '随机会签': 'Random sign',
@@ -2365,5 +2366,11 @@ export const m = {
     '当前流程已跳转至下一流程节点': 'The current process has moved to the next process node',
     '后将自动跳转至流程详情查看': 'automatically jump to flow details',
     '返回列表': 'Return list',
-    '查看流程详情': 'Viewing Process Details'
+    '查看流程详情': 'Viewing Process Details',
+    '审批节点已自动处理': 'The approval node is automatically processed',
+    '流水线': 'Pipeline',
+    '蓝盾节点': 'Devops Node',
+    '流水线参数': 'Pipeline params',
+    '必填项': 'required fields',
+    '跳转蓝盾查看': 'Link to Devops'
 }

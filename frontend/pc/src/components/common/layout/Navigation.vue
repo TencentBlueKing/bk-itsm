@@ -34,6 +34,7 @@
         <template slot="header">
             <div class="nav-header">
                 <bk-button
+                    data-test-id="navigation-button-createTicket"
                     theme="primary"
                     icon="plus"
                     size="small"
@@ -146,8 +147,8 @@
                         :key="router.id">
                         <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
                         <bk-navigation-menu-item
-                            data-test-id="navigation-menu-projectSubRouter"
                             v-for="item in router.subRouters"
+                            :data-test-id="`navigation-menu-${item.id}`"
                             :key="item.id"
                             :id="item.id"
                             :disabled="item.disabled"
@@ -157,7 +158,7 @@
                         </bk-navigation-menu-item>
                     </div>
                     <bk-navigation-menu-item
-                        data-test-id="navigation-menu-platformRouter"
+                        :data-test-id="`navigation-menu-platformRouter-${router.id}`"
                         v-else
                         :key="router.id"
                         :id="router.id"

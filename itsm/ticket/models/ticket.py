@@ -136,6 +136,7 @@ from itsm.component.constants import (
     ASSIGN_LEADER,
     TIME_DELTA,
     LEN_XX_LONG,
+    TASK_DEVOPS_STATE,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -889,11 +890,9 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = (
-                TicketStatus.objects.filter(service_type=service_type)
-                .filter(**setting)
-                .first()
-            )
+            to_ticket_status = TicketStatus.objects.filter(
+                service_type=service_type
+            ).filter(key=setting.get("name")).first()
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
@@ -1341,7 +1340,7 @@ class Ticket(Model, BaseTicket):
         """
         # 优先级必定有值，否则数据错误
         priority_field = self.fields.filter(key=FIELD_PRIORITY).first()
-        return priority_field.value
+        return priority_field.ticket.priority_key
 
     @property
     def priority_name(self):
@@ -2159,7 +2158,7 @@ class Ticket(Model, BaseTicket):
             priority_field = self.fields.get(key=FIELD_PRIORITY, source=BASE_MODEL)
         except TicketField.DoesNotExist as error:
             logger.warning("当前单据不包含优先级的字段， error is {}".format(error))
-            return None
+            return {}
 
         if not impact:
             try:
@@ -2167,25 +2166,39 @@ class Ticket(Model, BaseTicket):
 
             except TicketField.DoesNotExist as error:
                 logger.warning("当前单据不包含影响范围的字段， error is {}".format(error))
-                return None
+                return {}
 
         if not urgency:
             try:
                 urgency = self.fields.get(key=FIELD_PX_URGENCY, source=BASE_MODEL).value
             except TicketField.DoesNotExist as error:
                 logger.warning("当前单据不包含紧急度的字段， error is {}".format(error))
-                return
+                return {}
 
         if not (urgency and impact):
             # 优先级的配置必须相关的两个字段都有值存在, 否则采用默认优先级
-            if self.service_instance.sla and self.service_instance.sla.is_enabled:
-                default_priority = self.service_instance.sla.get_default_policy()
+            if self.service_instance:
+                # 1.在关联表中拿到sla_id
+                try:
+                    sla_id = ServiceSla.objects.get(service_id=self.service_instance.id).sla_id
+                except ServiceSla.DoesNotExist as error:
+                    logger.warning(
+                        "Failed to get sla_id from ServiceSla， error is {}".format(error))
+                    return {}
+                    # 2.拿到sla实例
+                try:
+                    sla_instance = Sla.objects.get(id=sla_id)
+                except Sla.DoesNotExist as error:
+                    logger.warning(
+                        "Failed to get sla_instance from Sla， error is {}".format(error))
+                    return {}
+                default_priority = sla_instance.get_default_policy()
                 priorities = SysDict.list_data(
                     PRIORITY, fields=["key", "name", "order"]
                 )
                 self.update_ticket_priority(priorities, default_priority)
 
-            return None
+            return {}
 
         try:
             new_priority = PriorityMatrix.objects.get_priority(
@@ -2193,7 +2206,7 @@ class Ticket(Model, BaseTicket):
             )
         except PriorityMatrix.DoesNotExist as error:
             logger.warning("当前服务的优先级矩阵设置不正常，错误信息 {}".format(error))
-            return
+            return {}
 
         old_priority = priority_field.value
 
@@ -2472,11 +2485,11 @@ class Ticket(Model, BaseTicket):
             attr_value = _(plain_value) if isinstance(plain_value, str) else plain_value
             context.update(**{attr["key"]: attr_value})
 
-        # 特殊处理
-        context.update(
-            creator=transform_single_username(self.creator),
-            today_date=datetime.today(),
-        )
+        # 添加时间
+        context.update(today_date=datetime.today())
+        # creator用户名翻译成中英文格式
+        if settings.CONTENT_CREATOR_WITH_TRANSLATION:
+            context.update(creator=transform_single_username(self.creator))
 
         return context
 
@@ -2925,7 +2938,7 @@ class Ticket(Model, BaseTicket):
             status = RUNNING
             action_type = (
                 SYSTEM_OPERATE
-                if state.type in [TASK_STATE, TASK_SOPS_STATE]
+                if state.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE]
                 else TRANSITION_OPERATE
             )
 
@@ -3602,7 +3615,14 @@ class Ticket(Model, BaseTicket):
         if self.is_sla_end_state(state_id):
             self.stop_sla(state_id)
 
-        self.send_trigger_signal(LEAVE_STATE, state_id, context={"operator": operator})
+        current_status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
+        if current_status is None:
+            logger.info(
+                "get status object does not exist, param: ticket_id={}, state_id={}".format(self.id,
+                                                                                            state_id))
+            raise ObjectNotExist(_("没有获取到当前节点处理状态"))
+        if current_status.status == FINISHED:
+            self.send_trigger_signal(LEAVE_STATE, state_id, context={"operator": operator})
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
@@ -3636,6 +3656,22 @@ class Ticket(Model, BaseTicket):
 
         # 发送创建成功的信号
         self.send_trigger_signal(CREATE_TICKET)
+
+    def get_list_view(self):
+        list_view = [
+            {"key": "单号", "value": self.sn},
+            {"key": "服务目录", "value": self.catalog_fullname},
+            {"key": "提单人", "value": self.creator},
+        ]
+        reason = self.get_field_value("reason", None)
+        if reason is None:
+            list_view.append(
+                {"key": "提单时间", "value": self.create_at.strftime("%Y-%m-%d %H:%M:%S")}
+            )
+        else:
+            list_view.append({"key": "申请理由", "value": reason})
+
+        return list_view
 
     @staticmethod
     def display_content(field_type, content):
@@ -4255,7 +4291,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**time_range)
+            cls.objects.filter(project_query)
+            .filter(**time_range)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("creator", distinct=True))
@@ -4271,7 +4308,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -4287,7 +4325,8 @@ class Ticket(Model, BaseTicket):
         project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(project_query).filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .filter(bk_biz_id__gt=-1)
             .extra(select={"date_str": data_str})
             .values("date_str")

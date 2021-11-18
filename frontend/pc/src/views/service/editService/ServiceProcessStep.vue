@@ -50,6 +50,12 @@
                     :configur="configur"
                     @closeConfigur="closeConfigur">
                 </sopsNode>
+                <devopsNode
+                    v-if="configur.type === 'TASK-DEVOPS'"
+                    :flow-info="flowInfo"
+                    :configur="configur"
+                    @closeConfigur="closeConfigur">
+                </devopsNode>
                 <signNode
                     v-if="configur.type === 'SIGN'"
                     :flow-info="flowInfo"
@@ -75,6 +81,7 @@
     import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue'
     import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue'
     import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue'
+    import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
     import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
 
     export default {
@@ -85,7 +92,8 @@
             autoNode,
             sopsNode,
             signNode,
-            ApprovalNode
+            ApprovalNode,
+            devopsNode
         },
         props: {
             serviceInfo: {

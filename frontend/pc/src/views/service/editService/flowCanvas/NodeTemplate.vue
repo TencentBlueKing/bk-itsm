@@ -31,16 +31,16 @@
         @click="clickNode(node, $event)"
         @mouseout="hoverNode(node)"
         v-bk-clickoutside="closeNode">
-        <div v-if="node.type === 'START'" class="startpoint">
+        <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
             {{ $t(`m.treeinfo['开始']`) }}
         </div>
-        <div v-if="node.type === 'END'" class="endpoint">
+        <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode">
             {{ $t('m.treeinfo["结束"]') }}
         </div>
         <!-- 手动节点 -->
         <template v-for="(item, index) in typeList">
             <template v-if="node.type === item.type">
-                <div class="common-node" :key="index">
+                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`">
                     <span class="common-auto-icon"
                         :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
                         @click.stop="openconfigu">
@@ -77,7 +77,7 @@
             <div class="bk-engine-node">
                 <ul>
                     <li v-for="(item, index) in clickList"
-                        :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }`"
+                        :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }-${node.id}`"
                         class="tool"
                         :key="index"
                         @click.stop="addNormal(node, item)" :title="item.name">
@@ -90,7 +90,8 @@
                                     'icon-task-icon',
                                     'con-copy-new',
                                     'icon-sign-node',
-                                    'icon-approval-node'
+                                    'icon-approval-node',
+                                    'icon-devops-task-icon'
                                 ].includes(item.iconStyle) }
                             ]">
                         </i>
@@ -141,6 +142,7 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+                    { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
                 ],
@@ -148,6 +150,7 @@
                     { type: 'NORMAL', name: this.$t(`m.treeinfo["手动节点"]`), iconStyle: 'icon-icon-artificial' },
                     { type: 'TASK', name: this.$t(`m.treeinfo["API节点"]`), iconStyle: 'icon-api-node' },
                     { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
+                    { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },

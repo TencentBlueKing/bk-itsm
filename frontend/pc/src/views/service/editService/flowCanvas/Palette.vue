@@ -51,6 +51,11 @@
                 <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
             </div>
         </li>
+        <li v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
+            <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
+            </div>
+        </li>
         <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
