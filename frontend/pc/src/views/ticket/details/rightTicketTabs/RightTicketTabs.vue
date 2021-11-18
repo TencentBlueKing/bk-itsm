@@ -37,7 +37,7 @@
             <bk-tab-panel
                 name="log"
                 :label="$t(`m.newCommon['流转进程']`)">
-                <log-tab v-if="activeTab === 'log'">
+                <log-tab v-if="activeTab === 'log'" @viewProcess="viewProcess">
                 </log-tab>
             </bk-tab-panel>
             <!-- <bk-tab-panel
@@ -145,8 +145,17 @@
             handleClickShowSla () {
                 this.isShowSla = !this.isShowSla
             },
+            // 跳转对应项目下sla
             viewSlaRule () {
-                console.log('跳转sla协议')
+                this.$router.push({
+                    name: 'slaAgreement',
+                    query: {
+                        project_id: this.$route.query.project_id || 0
+                    }
+                })
+            },
+            viewProcess (val) {
+                this.$emit('viewProcess', val)
             }
         }
     }
@@ -179,6 +188,7 @@
             color: #63656E;
         }
         .view-sla-rule {
+            cursor: pointer;
             float: right;
             color: #3A84FF;
             font-size: 12px;

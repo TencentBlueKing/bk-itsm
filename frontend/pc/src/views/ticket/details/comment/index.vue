@@ -29,8 +29,9 @@
                 <p>{{ item.docs }}</p>
             </li>
         </ul>
-        <editor v-if="isShowEditor" ref="editorAdd" :editor-id="'editor1'"></editor>
-        <bk-button class="submit" :theme="'primary'" @click="submit">发布</bk-button>
+        <editor v-if="isShowEditor" ref="editorAdd" :editor-id="'editor1'" @changebuttonStatus="changebuttonStatus"></editor>
+        <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? '发布' : '返回' }}</bk-button>
+        <!-- <bk-button title="loading" icon="loading" :disabled="true" class="mr10">loading</bk-button> -->
         <bk-divider></bk-divider>
         <div>全部评论</div>
         <ul>
@@ -63,16 +64,19 @@
             editor
         },
         props: {
+            commentId: [Number, String],
+            commentList: Array,
             ticketInfo: Object,
             ticketId: [Number, String]
         },
         data () {
             return {
-                commentId: '',
+                // commentId: '',
                 curCommentId: '',
                 commentType: '', // 评论类型
                 isShowSelect: true,
                 isShowEditor: false, // 打开富文本
+                isEditEditor: false, // 是否编辑文本
                 selectPatternList: [
                     {
                         type: 'INSIDE',
@@ -87,20 +91,24 @@
                         docs: '发布的评论所有人可见'
                     }
                 ],
-                commentList: [],
+                // commentList: [],
                 editType: '',
                 isEdit: false
             }
-        },
-        mounted () {
-            this.init()
         },
         methods: {
             async init () {
                 if (this.ticketId) {
                     // 有项目id时加载内部评论
-                    const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': this.$route.query.project_id ? 'INSIDE' : 'PUBLIC' })
-                    this.commentList = res.data.children
+                    const commentList = []
+                    const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
+                    if (this.$route.query.project_id) {
+                        const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
+                        commentList.push(...res.data.children)
+                    }
+                    commentList.push(...res.data.children)
+                    this.$emit('getCommentCount', commentList.length)
+                    this.commentList = commentList
                     this.commentId = res.data.id
                 }
             },
@@ -115,6 +123,9 @@
                 this.commentType = curComment.remark
                 this.isEdit = true
             },
+            changebuttonStatus (val) {
+                this.isEditEditor = val
+            },
             submitEdit () {
                 const _this = this.$refs.editorEdit.editor
                 const text = _this.txt.text()
@@ -124,7 +135,7 @@
                 const params = {
                     content: text,
                     users: ['admin'],
-                    remark_type: 'INSIDE'
+                    remark_type: this.$route.query.project_id ? 'INSIDE' : 'PUBLIC'
                 }
                 if (this.editType === 'edit') {
                     params.id = this.curCommentId
@@ -139,7 +150,7 @@
                 })
             },
             refreshComment () {
-                this.init()
+                this.$emit('refreshComment')
             },
             postComment (type) {
                 this.commentType = type
@@ -148,24 +159,25 @@
             },
             submit () {
                 // 评论内容
-                const _this = this.$refs.editorAdd.editor
-                const text = _this.txt.text()
-                this.editorData = ''
-                this.isShowSelect = true
-                this.isShowEditor = false
-                _this.txt.clear()
-                const params = {
-                    content: text,
-                    ticket_id: this.ticketId,
-                    parent__id: this.commentId,
-                    remark_type: this.commentType,
-                    users: ['admin']
-                }
-                if (text) {
-                    this.$store.dispatch('ticket/addTicketComment', params).then(res => {
-                        console.log(res)
-                        this.refreshComment()
-                    })
+                if (this.$refs.editorAdd) {
+                    const _this = this.$refs.editorAdd.editor
+                    const text = _this.txt.text()
+                    this.editorData = ''
+                    this.isShowSelect = true
+                    _this.txt.clear()
+                    const params = {
+                        content: text,
+                        ticket_id: this.ticketId,
+                        parent__id: this.commentId,
+                        remark_type: this.commentType,
+                        users: ['admin']
+                    }
+                    if (text) {
+                        this.$store.dispatch('ticket/addTicketComment', params).then(res => {
+                            this.refreshComment()
+                            this.isShowEditor = false
+                        })
+                    }
                 }
             }
         }

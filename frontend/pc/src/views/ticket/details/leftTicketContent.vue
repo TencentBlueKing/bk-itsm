@@ -71,23 +71,42 @@
                 <bk-tab-panel
                     name="allComments"
                     :label="$t(`m.newCommon['所有评论']`)">
-                    <template slot="label">
+                    <template v-slot:label>
                         <span class="panel-name">{{ $t(`m.newCommon['所有评论']`) }}</span>
-                        <i class="panel-count">{{ currStepNodeNum }}</i>
+                        <i class="panel-count">{{ commentList.length }}</i>
                     </template>
                     <wang-editor
+                        :comment-list="commentList"
+                        :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
+                        @refreshComment="refreshComment"
                     ></wang-editor>
                 </bk-tab-panel>
             </bk-tab>
         </div>
+        <!-- v-model="$store.state.ticket.ticketProcessMap" -->
+        <bk-dialog
+            width="1280"
+            :mask-close="false"
+            :close-icon="true"
+            :show-footer="false"
+            v-model="isShow"
+            title="完整流程预览">
+            <order-preview
+                v-if="isShow"
+                :basic-infomation="ticketInfo"
+                :node-list="nodeList"
+                :current-step-list="currentStepList"
+                @reloadTicket="reloadTicket">
+            </order-preview>
+        </bk-dialog>
     </div>
 </template>
 
 <script>
     import BasicInformation from './BasicInformation.vue'
-    // import OrderPreview from './OrderPreview.vue'
+    import OrderPreview from './OrderPreview.vue'
     import CurrentSteps from './currentSteps/index.vue'
     import { deepClone } from '@/utils/util'
     import commonMix from '@/views/commonMix/common.js'
@@ -105,6 +124,8 @@
         },
         mixins: [commonMix, fieldMix, apiFieldsWatch],
         props: {
+            commentId: [Number, String],
+            commentList: Array,
             loading: Object,
             ticketInfo: Object,
             nodeList: Array,
@@ -121,7 +142,8 @@
                 currentStepList: [],
                 allFieldList: [],
                 currentStepLoading: false,
-                activeName: ['ticket']
+                activeName: ['ticket'],
+                isShow: false
             }
         },
         computed: {
@@ -186,6 +208,12 @@
                 this.$nextTick(() => {
                     this.currentStepLoading = false
                 })
+            },
+            changeDialogStatus (val) {
+                this.isShow = val
+            },
+            refreshComment () {
+                this.$emit('refreshComment')
             }
         }
     }
@@ -239,5 +267,8 @@
             background: #e1ecff;
         }
     }
+}
+.bk-order-preview {
+    background-color: #f5f7fa;
 }
 </style>

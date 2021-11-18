@@ -67,6 +67,7 @@
         <!-- 单个节点的详情信息 -->
         <div class="bk-node-content">
             <bk-sideslider
+                :show-mask="false"
                 :is-show.sync="nodeContent.isShow"
                 :title="nodeContent.title"
                 :width="nodeContent.width"

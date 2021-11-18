@@ -22,22 +22,24 @@
 
 <template>
     <div class="bk-correlationsla-info" v-bkloading="{ isLoading: loading }">
-        <div>
-            <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-            <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">响应倒计时</u>
-            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
-            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
-            <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
-            <i :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
-        </div>
-        <div>
-            <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-            <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">处理倒计时</u>
-            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
-            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
-            <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
-            <i v-if="false" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
-        </div>
+        <template v-if="slaList.length">
+            <div>
+                <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+                <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">响应倒计时</u>
+                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
+                <i :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+            </div>
+            <div>
+                <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+                <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">处理倒计时</u>
+                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
+                <i v-if="false" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+            </div>
+        </template>
         <!-- <div class="bk-correlationsla-li" v-for="(sla, index) in slaList" :key="index">
             <div class="bk-corr-sla-name">
                 <span
@@ -100,9 +102,9 @@
                 <span v-else :style="{ 'color': (sla.sla_status === 4 ? '#EA3536' : '#63656E') }">{{convertTimeArrToString(sla.resovle_cost)}}</span>
             </div>
         </div> -->
-        <div class="bk-no-content" v-if="!slaList.length">
+        <div class="bk-no-content" v-else>
             <img src="@/images/box.png">
-            <p>{{ $t('m.newCommon["未绑定SLA协议"]') }}</p>
+            <p>{{ $t('m.newCommon["暂时没有甚至SLA"]') }}<span>去设置</span></p>
         </div>
     </div>
 </template>
@@ -173,8 +175,8 @@
                     id: this.basicInfomation.id
                 }
                 this.$store.dispatch('change/getReceiptsSlaTask', params).then(res => {
-                    this.slaList = res.data
                     console.log(res.data)
+                    this.slaList = res.data
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -183,6 +185,8 @@
                 })
             },
             changeTimeoutStatus () {
+                const a = this.changeTime(new Date().getTime())
+                console.log(a)
                 this.slaList.forEach((item, index) => {
                     if (item.task_status === 2) {
                         const responseCost = convertTimeArrToMS(item.resovle_cost)
@@ -200,6 +204,9 @@
                 const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60
                 return { day, hour, minute, sec }
             },
+            // changeTimeFormat () {
+
+            // },
             runTime (currentSec, processCost, index) {
                 // 启动计时器
                 this.myInterval(() => {

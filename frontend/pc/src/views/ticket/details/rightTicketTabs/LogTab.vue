@@ -22,7 +22,7 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <div v-if="true" class="ticket-process"><i class="bk-itsm-icon icon-basic-info">  查看完整流程</i></div>
+        <div v-if="true" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
         <bk-timeline
             data-test-id="ticket_timeline_viewLog"
             ext-cls="log-time-line"
@@ -105,6 +105,9 @@
                 })
                 copyItem.form_data = copyItem.form_data.filter(form => form.showFeild)
                 this.dispalyLogInfo = copyItem
+            },
+            viewProcess () {
+                this.$emit('viewProcess', true)
             }
         }
     }

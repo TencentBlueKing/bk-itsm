@@ -2,11 +2,11 @@
     <div class="wang-editor">
         <div :id="editorId">
         </div>
-        <ul class="bullet-box" :style="{ left: left + 'px', top: top + 'px', display: showFlag }">
+        <!-- <ul class="bullet-box" :style="{ left: left + 'px', top: top + 'px', display: showFlag }">
             <li v-for="item in list" :key="item.key" @click="selectLine(item)">
                 {{item.name}}
             </li>
-        </ul>
+        </ul> -->
     </div>
 </template>
 
@@ -44,10 +44,10 @@
         watch: {
             editorData () {
                 const text = this.editor.txt.text()
+                this.$emit('changebuttonStatus', !!text)
                 if (text.charAt(text.length - 1) === '@') {
                     this.showFlag = 'block'
                     const textDom = this.editor.$textElem.elems[0]
-                    console.dir(textDom)
                     const pos = position(textDom) // { left: 15, top: 30, height: 20, pos: 15 }
                     const off = offset(textDom)
                     console.log(pos, off)
@@ -56,8 +56,8 @@
                     const menuH = wangED.offsetHeight - textDom.offsetHeight
                     this.left = pos.left
                     this.top = menuH + pos.height + pos.top
-                    const childEle = document.getElementsByClassName('bullet-box')[0]
-                    console.log(childEle)
+                    // const childEle = document.getElementsByClassName('bullet-box')[0]
+                    // console.log(childEle)
                 } else {
                     this.showFlag = 'none'
                 }

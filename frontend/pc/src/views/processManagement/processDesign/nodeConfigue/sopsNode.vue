@@ -461,7 +461,7 @@
                     constants.sort((a, b) => a.index - b.index)
                     constants.forEach(item => {
                         const list = this.configur.extras.sops_info.constants.filter(ite => ite.key === item.key)[0]
-                        if (list.is_quoted) {
+                        if (list.hasOwnProperty('is_quoted') && list.is_quoted) {
                             this.hookedVarList[item.key] = true
                             item.value = '${' + list.value + '}'
                         } else {

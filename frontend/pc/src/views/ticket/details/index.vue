@@ -36,12 +36,15 @@
                     <!-- 基础信息/工单预览 -->
                     <left-ticket-content
                         ref="leftTicketContent"
+                        :comment-list="commentList"
+                        :comment-id="commentId"
                         :loading="loading"
                         :ticket-info="ticketInfo"
                         :node-list="nodeList"
                         :first-state-fields="firstStateFields"
                         :node-trigger-list="nodeTriggerList"
-                        :ticket-id="ticketId">
+                        :ticket-id="ticketId"
+                        @refreshComment="refreshComment">
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
@@ -53,7 +56,8 @@
                     <right-ticket-tabs
                         v-if="!loading.ticketLoading"
                         :ticket-info="ticketInfo"
-                        :node-list="nodeList">
+                        :node-list="nodeList"
+                        @viewProcess="viewProcess">
                     </right-ticket-tabs>
                 </div>
             </div>
@@ -140,7 +144,9 @@
                 // 提单节点字段信息
                 firstStateFields: [],
                 // 所有字段列表
-                allFieldList: []
+                allFieldList: [],
+                commentList: [],
+                commentId: ''
             }
         },
         computed: {
@@ -174,6 +180,29 @@
                 this.getCurrTickeStatusColor()
                 this.initCurrentStepData()
                 this.initTicketTimer()
+                this.getComments()
+            },
+            async getComments () {
+                if (this.ticketId) {
+                    // 有项目id时加载内部评论
+                    const commentList = []
+                    const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
+                    if (this.$route.query.project_id) {
+                        const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
+                        commentList.push(...res.data.children)
+                    }
+                    commentList.push(...res.data.children)
+                    commentList.sort((a, b) => b.id - a.id)
+                    this.commentList = commentList
+                    this.commentId = res.data.id
+                }
+            },
+            refreshComment () {
+                this.getComments()
+            },
+            // 展示完整流程
+            viewProcess (val) {
+                this.$refs.leftTicketContent.changeDialogStatus(val)
             },
             // 是否需要循环
             isNeedToLoop () {
