@@ -1,9 +1,8 @@
 <template>
     <div class="comment">
         <div class="comment-info">
-            <!-- <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar> -->
             <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div>
-            <p><span class="user-name">{{ curComment.creator}}  </span><span class="issue-time">发布于 {{ curComment.create_at }}</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
+            <p><span class="user-name">{{ curComment.creator}}  </span><span class="issue-time">{{ $t('m["发布于"]') }} {{ curComment.create_at }}</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
             <div
                 v-if="curComment.update_log.length"
                 v-bk-tooltips.top-start="{
@@ -30,7 +29,7 @@
         </div>
         <div class="comment-reply">
             <div class="comment-message" v-for="(item, index) in curComment.children" :key="index">
-                <span>“ 回复 miffyyang 的评论：{{ $t('m["规则查看"]') }}</span>
+                <span>“ {{ $t('m["回复"]') }} {{ item.creator }} {{ $t('m["的评论"]') }} :</span>
                 <p>{{ item.content }}</p>
             </div>
         </div>

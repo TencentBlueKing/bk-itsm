@@ -2385,5 +2385,8 @@ export const m = {
     '全部评论': 'All comments',
     '仅内部可见': 'internally visible only',
     '确认删除该条评论？': 'Are you sure to delete this comment?',
-    '已被编辑': 'edited'
+    '已被编辑': 'edited',
+    '发布于': 'Released in',
+    '回复': 'reply',
+    '的评论': 'comment'
 }
