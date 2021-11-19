@@ -120,7 +120,7 @@
                 const params = {
                     content: text,
                     users: [],
-                    remark_type: this.$route.query.project_id ? 'INSIDE' : 'PUBLIC'
+                    remark_type: this.commentType
                 }
                 if (this.editType === 'edit') {
                     params.id = this.curCommentId
