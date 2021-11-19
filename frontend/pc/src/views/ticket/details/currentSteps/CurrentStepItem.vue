@@ -141,6 +141,12 @@
                             :ticket-info="ticketInfo"
                             @updateCurrentStep="successFn">
                         </node-task-list>
+                        <sops-task
+                            v-if="nodeInfo.status === 'FAILED'"
+                            :constants="constants"
+                            :hooked-var-list="hookedVarList"
+                            :node-info="nodeInfo">
+                        </sops-task>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
@@ -261,6 +267,7 @@
     import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
     import NodeDealDialog from './NodeDealDialog.vue'
     import NodeTaskList from './nodetask/NodeTaskList.vue'
+    import sopsTask from './nodetask/sopsTask.vue'
     import commonMix from '@/views/commonMix/common.js'
     import { errorHandler } from '@/utils/errorHandler.js'
     import { convertTimeArrToMS, convertTimeArrToString, convertMStoString } from '@/utils/util.js'
@@ -275,7 +282,8 @@
             apiNodeHandleBody,
             TicketTriggerDialog,
             NodeDealDialog,
-            NodeTaskList
+            NodeTaskList,
+            sopsTask
         },
         mixins: [commonMix],
         props: {
@@ -317,6 +325,8 @@
         },
         data () {
             return {
+                constants: [],
+                hookedVarList: {},
                 convertTimeArrToString,
                 replyBtnLoading: false,
                 unfold: false, // 是否展开
@@ -426,6 +436,23 @@
                     }
                     this.runTime()
                 }
+                this.getSopsPreview()
+            },
+            // 获取sops Constants
+            async getSopsPreview () {
+                // const { bk_biz_id, template_id, exclude_task_nodes_id} = this.nodeInfo.contexts.task_params
+                const params = {
+                    bk_biz_id: '2',
+                    template_id: '1018',
+                    exclude_task_nodes_id: []
+                }
+                
+                const res = await this.$store.dispatch('taskFlow/getSopsPreview', params)
+                const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
+                    this.$set(this.hookedVarList, item, false)
+                    return res.data.pipeline_tree.constants[item]
+                })
+                this.constants = constants
             },
             // 自动通过
             nodeAutoPass () {

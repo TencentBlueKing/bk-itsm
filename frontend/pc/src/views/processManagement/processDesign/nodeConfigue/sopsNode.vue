@@ -585,7 +585,8 @@
                         const biz = {
                             name: this.$t(`m.treeinfo["业务"]`),
                             value: this.basicsFormData.projectId,
-                            key: 1
+                            key: 1,
+                            value_type: 'custom'
                         }
                         this.constants.map(item => {
                             // renderForm的formData与constant匹配的key
