@@ -1,0 +1,902 @@
+[
+  {
+    "is_deleted": false,
+    "name": "TDM\u6570\u636e\u6e90\u63a5\u5165",
+    "desc": "\u84dd\u9cb8\u57fa\u7840\u5e73\u53f0 TDM\u6570\u636e\u6e90\u63a5\u5165",
+    "flow_type": "other",
+    "is_enabled": true,
+    "is_revocable": true,
+    "revoke_config": {
+      "type": 2,
+      "state": 0
+    },
+    "is_draft": false,
+    "is_builtin": false,
+    "is_task_needed": false,
+    "owners": ",admin,",
+    "notify_rule": "ONCE",
+    "notify_freq": 0,
+    "is_biz_needed": false,
+    "is_auto_approve": false,
+    "is_iam_used": false,
+    "is_supervise_needed": false,
+    "supervise_type": "EMPTY",
+    "supervisor": "",
+    "engine_version": "PIPELINE_V1",
+    "version_number": "20211117163759",
+    "table": {
+      "id": 28,
+      "is_deleted": false,
+      "name": "IEG\u6570\u636e\u5e73\u53f0\u57fa\u7840\u6a21\u578b",
+      "desc": "IEG\u6570\u636e\u5e73\u53f0\u57fa\u7840\u6a21\u578b",
+      "version": "EMPTY",
+      "fields": [
+        {
+          "id": 1,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": true,
+          "source_type": "CUSTOM",
+          "source_uri": "",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "STRING",
+          "key": "title",
+          "name": "\u6807\u9898",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {},
+          "custom_regex": "",
+          "desc": "\u8bf7\u8f93\u5165\u6807\u9898",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 2,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": true,
+          "source_type": "DATADICT",
+          "source_uri": "IMPACT",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "SELECT",
+          "key": "impact",
+          "name": "\u5f71\u54cd\u8303\u56f4",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {},
+          "custom_regex": "",
+          "desc": "\u8bf7\u9009\u62e9\u5f71\u54cd\u8303\u56f4",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 3,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": true,
+          "source_type": "DATADICT",
+          "source_uri": "URGENCY",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "SELECT",
+          "key": "urgency",
+          "name": "\u7d27\u6025\u7a0b\u5ea6",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {},
+          "custom_regex": "",
+          "desc": "\u8bf7\u9009\u62e9\u7d27\u6025\u7a0b\u5ea6",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 4,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": true,
+          "is_valid": true,
+          "display": true,
+          "source_type": "DATADICT",
+          "source_uri": "PRIORITY",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "SELECT",
+          "key": "priority",
+          "name": "\u4f18\u5148\u7ea7",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {},
+          "custom_regex": "",
+          "desc": "\u8bf7\u9009\u62e9\u4f18\u5148\u7ea7",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {
+            "rely_on": [
+              "urgency",
+              "impact"
+            ]
+          },
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 5,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": true,
+          "source_type": "RPC",
+          "source_uri": "ticket_status",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "SELECT",
+          "key": "current_status",
+          "name": "\u5de5\u5355\u72b6\u6001",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {},
+          "custom_regex": "",
+          "desc": "\u8bf7\u9009\u62e9\u5de5\u5355\u72b6\u6001",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 17,
+          "is_deleted": false,
+          "is_builtin": true,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": true,
+          "source_type": "CUSTOM",
+          "source_uri": "",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "TEXT",
+          "key": "apply_reason",
+          "name": "\u7533\u8bf7\u7406\u7531\u8bf4\u660e",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {
+            "rule": {
+              "expressions": [
+                {
+                  "condition": "",
+                  "key": "",
+                  "source": "field",
+                  "type": "TEXT",
+                  "value": ""
+                }
+              ],
+              "type": "and"
+            }
+          },
+          "custom_regex": "",
+          "desc": "\u8bf7\u8f93\u5165\u7406\u7531",
+          "tips": "",
+          "is_tips": false,
+          "default": "",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        },
+        {
+          "id": 19,
+          "is_deleted": false,
+          "is_builtin": false,
+          "is_readonly": false,
+          "is_valid": true,
+          "display": false,
+          "source_type": "CUSTOM",
+          "source_uri": "",
+          "api_instance_id": 0,
+          "kv_relation": {},
+          "type": "CUSTOM-FORM",
+          "key": "content",
+          "name": "\u7533\u8bf7\u5185\u5bb9",
+          "layout": "COL_12",
+          "validate_type": "REQUIRE",
+          "show_type": 1,
+          "show_conditions": {},
+          "regex": "EMPTY",
+          "regex_config": {
+            "rule": {
+              "expressions": [],
+              "type": "and"
+            }
+          },
+          "custom_regex": "",
+          "desc": "",
+          "tips": "",
+          "is_tips": false,
+          "default": "{\n    \"schemes\": {},\n    \"form_data\": []\n}",
+          "choice": [],
+          "related_fields": {},
+          "meta": {},
+          "flow_type": "DEFAULT",
+          "source": "BASE-MODEL"
+        }
+      ],
+      "fields_order": [
+        1,
+        19,
+        17,
+        5,
+        2,
+        3,
+        4
+      ],
+      "field_key_order": [
+        "title",
+        "content",
+        "apply_reason",
+        "current_status",
+        "impact",
+        "urgency",
+        "priority"
+      ]
+    },
+    "task_schemas": [],
+    "creator": "admin",
+    "updated_by": "admin",
+    "workflow_id": 189,
+    "version_message": "",
+    "states": {
+      "1314": {
+        "workflow": 189,
+        "id": 1314,
+        "key": 1314,
+        "name": "\u5f00\u59cb",
+        "desc": "",
+        "distribute_type": "PROCESS",
+        "axis": {
+          "x": 150,
+          "y": 150
+        },
+        "is_builtin": true,
+        "variables": {
+          "inputs": [],
+          "outputs": []
+        },
+        "tag": "DEFAULT",
+        "processors_type": "OPEN",
+        "processors": "",
+        "assignors": "",
+        "assignors_type": "EMPTY",
+        "delivers": "",
+        "delivers_type": "EMPTY",
+        "can_deliver": false,
+        "extras": {},
+        "is_draft": false,
+        "is_terminable": false,
+        "fields": [],
+        "type": "START",
+        "api_instance_id": 0,
+        "is_sequential": false,
+        "finish_condition": {},
+        "is_multi": false,
+        "is_allow_skip": false,
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null,
+        "is_first_state": false
+      },
+      "1315": {
+        "workflow": 189,
+        "id": 1315,
+        "key": 1315,
+        "name": "\u63d0\u5355",
+        "desc": "",
+        "distribute_type": "PROCESS",
+        "axis": {
+          "x": 285,
+          "y": 150
+        },
+        "is_builtin": true,
+        "variables": {
+          "inputs": [],
+          "outputs": []
+        },
+        "tag": "DEFAULT",
+        "processors_type": "OPEN",
+        "processors": ",admin,",
+        "assignors": "",
+        "assignors_type": "EMPTY",
+        "delivers": "",
+        "delivers_type": "EMPTY",
+        "can_deliver": false,
+        "extras": {
+          "ticket_status": {
+            "name": "",
+            "type": "keep"
+          }
+        },
+        "is_draft": false,
+        "is_terminable": false,
+        "fields": [
+          3023,
+          3024,
+          3028,
+          3029
+        ],
+        "type": "NORMAL",
+        "api_instance_id": 0,
+        "is_sequential": false,
+        "finish_condition": {},
+        "is_multi": false,
+        "is_allow_skip": false,
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null,
+        "is_first_state": true
+      },
+      "1316": {
+        "workflow": 189,
+        "id": 1316,
+        "key": 1316,
+        "name": "\u7ed3\u675f",
+        "desc": "",
+        "distribute_type": "PROCESS",
+        "axis": {
+          "x": 805,
+          "y": 150
+        },
+        "is_builtin": true,
+        "variables": {
+          "inputs": [],
+          "outputs": []
+        },
+        "tag": "DEFAULT",
+        "processors_type": "OPEN",
+        "processors": "",
+        "assignors": "",
+        "assignors_type": "EMPTY",
+        "delivers": "",
+        "delivers_type": "EMPTY",
+        "can_deliver": false,
+        "extras": {},
+        "is_draft": false,
+        "is_terminable": false,
+        "fields": [],
+        "type": "END",
+        "api_instance_id": 0,
+        "is_sequential": false,
+        "finish_condition": {},
+        "is_multi": false,
+        "is_allow_skip": false,
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null,
+        "is_first_state": false
+      },
+      "1317": {
+        "workflow": 189,
+        "id": 1317,
+        "key": 1317,
+        "name": "\u5ba1\u6279",
+        "desc": "",
+        "distribute_type": "PROCESS",
+        "axis": {
+          "x": 530,
+          "y": 150
+        },
+        "is_builtin": false,
+        "variables": {
+          "inputs": [],
+          "outputs": [
+            {
+              "source": "global",
+              "state": 1032,
+              "type": "STRING",
+              "key": "4d75e3fb1a28a68bd530a4b117caaf59",
+              "name": "Approval result",
+              "meta": {
+                "code": "NODE_APPROVE_RESULT",
+                "type": "SELECT",
+                "choice": [
+                  {
+                    "key": "false",
+                    "name": "Reject"
+                  },
+                  {
+                    "key": "true",
+                    "name": "Approve"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "tag": "DEFAULT",
+        "processors_type": "PERSON",
+        "processors": "admin",
+        "assignors": "",
+        "assignors_type": "EMPTY",
+        "delivers": "",
+        "delivers_type": "EMPTY",
+        "can_deliver": false,
+        "extras": {
+          "ticket_status": {
+            "name": "",
+            "type": "keep"
+          }
+        },
+        "is_draft": false,
+        "is_terminable": false,
+        "fields": [
+          3025,
+          3026,
+          3027
+        ],
+        "type": "APPROVAL",
+        "api_instance_id": 0,
+        "is_sequential": false,
+        "finish_condition": {},
+        "is_multi": false,
+        "is_allow_skip": false,
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": "admin",
+        "update_at": "2021-11-17 16:36:52",
+        "end_at": null,
+        "is_first_state": false
+      }
+    },
+    "transitions": {
+      "1444": {
+        "workflow": 189,
+        "id": 1444,
+        "from_state": 1314,
+        "to_state": 1315,
+        "name": "",
+        "axis": {
+          "start": "Right",
+          "end": "Left"
+        },
+        "condition": {
+          "expressions": [
+            {
+              "type": "and",
+              "expressions": [
+                {
+                  "key": "G_INT_1",
+                  "condition": "==",
+                  "value": 1
+                }
+              ]
+            }
+          ],
+          "type": "and"
+        },
+        "condition_type": "default",
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null
+      },
+      "1445": {
+        "workflow": 189,
+        "id": 1445,
+        "from_state": 1315,
+        "to_state": 1317,
+        "name": "\u9ed8\u8ba4",
+        "axis": {
+          "start": "Right",
+          "end": "Left"
+        },
+        "condition": {
+          "expressions": [
+            {
+              "type": "and",
+              "expressions": [
+                {
+                  "key": "G_INT_1",
+                  "condition": "==",
+                  "value": 1
+                }
+              ]
+            }
+          ],
+          "type": "and"
+        },
+        "condition_type": "default",
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null
+      },
+      "1446": {
+        "workflow": 189,
+        "id": 1446,
+        "from_state": 1317,
+        "to_state": 1316,
+        "name": "\u9ed8\u8ba4",
+        "axis": {
+          "start": "Right",
+          "end": "Left"
+        },
+        "condition": {
+          "expressions": [
+            {
+              "type": "and",
+              "expressions": [
+                {
+                  "key": "G_INT_1",
+                  "condition": "==",
+                  "value": 1
+                }
+              ]
+            }
+          ],
+          "type": "and"
+        },
+        "condition_type": "default",
+        "creator": null,
+        "create_at": "2021-11-17 16:36:32",
+        "updated_by": null,
+        "update_at": "2021-11-17 16:36:32",
+        "end_at": null
+      }
+    },
+    "triggers": [],
+    "fields": {
+      "3023": {
+        "id": 3023,
+        "is_deleted": false,
+        "is_builtin": true,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": true,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "STRING",
+        "key": "title",
+        "name": "\u6807\u9898",
+        "layout": "COL_12",
+        "validate_type": "REQUIRE",
+        "show_type": 1,
+        "show_conditions": {},
+        "regex": "EMPTY",
+        "regex_config": {},
+        "custom_regex": "",
+        "desc": "\u8bf7\u8f93\u5165\u6807\u9898",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": "",
+        "source": "TABLE"
+      },
+      "3024": {
+        "id": 3024,
+        "is_deleted": false,
+        "is_builtin": true,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": true,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "TEXT",
+        "key": "apply_reason",
+        "name": "\u7533\u8bf7\u7406\u7531",
+        "layout": "COL_12",
+        "validate_type": "REQUIRE",
+        "show_type": 1,
+        "show_conditions": {},
+        "regex": "EMPTY",
+        "regex_config": {},
+        "custom_regex": "",
+        "desc": "\u8bf7\u8f93\u5165\u7406\u7531",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": "",
+        "source": "TABLE"
+      },
+      "3025": {
+        "id": 3025,
+        "is_deleted": false,
+        "is_builtin": false,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": true,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "RADIO",
+        "key": "9acd7fb69764cea7f376d557341771fa",
+        "name": "Approval suggestion",
+        "layout": "COL_6",
+        "validate_type": "REQUIRE",
+        "show_type": 1,
+        "show_conditions": {},
+        "regex": "EMPTY",
+        "regex_config": {},
+        "custom_regex": "",
+        "desc": "",
+        "tips": "",
+        "is_tips": false,
+        "default": "true",
+        "choice": [
+          {
+            "key": "true",
+            "name": "Approve"
+          },
+          {
+            "key": "false",
+            "name": "Reject"
+          }
+        ],
+        "related_fields": {},
+        "meta": {
+          "code": "APPROVE_RESULT"
+        },
+        "workflow_id": 189,
+        "state_id": 1317,
+        "source": "CUSTOM"
+      },
+      "3026": {
+        "id": 3026,
+        "is_deleted": false,
+        "is_builtin": false,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": false,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "TEXT",
+        "key": "d860fce128cf72ff0faa8ec488b46173",
+        "name": "Remarks",
+        "layout": "COL_12",
+        "validate_type": "OPTION",
+        "show_type": 0,
+        "show_conditions": {
+          "expressions": [
+            {
+              "value": "false",
+              "type": "RADIO",
+              "condition": "==",
+              "key": "9acd7fb69764cea7f376d557341771fa"
+            }
+          ],
+          "type": "and"
+        },
+        "regex": "EMPTY",
+        "regex_config": {},
+        "custom_regex": "",
+        "desc": "",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": 1317,
+        "source": "CUSTOM"
+      },
+      "3027": {
+        "id": 3027,
+        "is_deleted": false,
+        "is_builtin": false,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": false,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "TEXT",
+        "key": "460add95821fc9dc84b20bb79c4d7b61",
+        "name": "Remarks",
+        "layout": "COL_12",
+        "validate_type": "REQUIRE",
+        "show_type": 0,
+        "show_conditions": {
+          "expressions": [
+            {
+              "value": "true",
+              "type": "RADIO",
+              "condition": "==",
+              "key": "9acd7fb69764cea7f376d557341771fa"
+            }
+          ],
+          "type": "and"
+        },
+        "regex": "EMPTY",
+        "regex_config": {},
+        "custom_regex": "",
+        "desc": "",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": 1317,
+        "source": "CUSTOM"
+      },
+      "3028": {
+        "id": 3028,
+        "is_deleted": false,
+        "is_builtin": false,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": false,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "STRING",
+        "key": "content",
+        "name": "\u5185\u5bb9",
+        "layout": "COL_12",
+        "validate_type": "REQUIRE",
+        "show_type": 1,
+        "show_conditions": {},
+        "regex": "EMPTY",
+        "regex_config": {
+          "rule": {
+            "expressions": [
+              {
+                "condition": "",
+                "key": "",
+                "source": "field",
+                "type": "STRING",
+                "value": ""
+              }
+            ],
+            "type": "and"
+          }
+        },
+        "custom_regex": "",
+        "desc": "\u5355\u636e\u5177\u4f53\u5185\u5bb9",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": 1315,
+        "source": "CUSTOM"
+      },
+      "3029": {
+        "id": 3029,
+        "is_deleted": false,
+        "is_builtin": false,
+        "is_readonly": false,
+        "is_valid": true,
+        "display": false,
+        "source_type": "CUSTOM",
+        "source_uri": "",
+        "api_instance_id": 0,
+        "kv_relation": {},
+        "type": "STRING",
+        "key": "process_id",
+        "name": "\u6570\u636e\u6e90ID",
+        "layout": "COL_12",
+        "validate_type": "REQUIRE",
+        "show_type": 0,
+        "show_conditions": {
+          "type": "and",
+          "expressions": [
+            {
+              "key": "title",
+              "condition": "!=",
+              "value": "1",
+              "type": "STRING"
+            }
+          ]
+        },
+        "regex": "EMPTY",
+        "regex_config": {
+          "rule": {
+            "expressions": [
+              {
+                "condition": "",
+                "key": "",
+                "source": "field",
+                "type": "STRING",
+                "value": ""
+              }
+            ],
+            "type": "and"
+          }
+        },
+        "custom_regex": "",
+        "desc": "\u6570\u636e\u6e90\u4fe1\u606f",
+        "tips": "",
+        "is_tips": false,
+        "default": "",
+        "choice": [],
+        "related_fields": {},
+        "meta": {},
+        "workflow_id": 189,
+        "state_id": 1315,
+        "source": "CUSTOM"
+      }
+    },
+    "notify": [
+      1
+    ]
+  }
+]
