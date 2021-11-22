@@ -37,6 +37,7 @@ from mako.template import Template
 
 from common.log import logger
 from common.mymako import render_mako_tostring
+from config import RUN_VER
 from config.default import AUTO_COMMENT_DAYS, CLOSE_NOTIFY
 
 from itsm.component.constants import (
@@ -318,6 +319,17 @@ def notify_task(ticket, receivers, message, action, **kwargs):
             logger.warning("send notify failed, error: %s" % str(error))
         except Exception as e:
             logger.exception("send email exception: %s" % str(e))
+
+
+@task
+def notify_fast_approval_task(ticket, state_id, receivers, message, action, **kwargs):
+    """发送快速审批通知"""
+    if RUN_VER == "ieod":
+        from platform_config.ieod.bkchat.utils import notify_fast_approval_message
+    else:
+        from platform_config.open.bkchat.utils import notify_fast_approval_message
+
+    notify_fast_approval_message(ticket, state_id, receivers, message, action, **kwargs)
 
 
 @periodic_task(run_every=(crontab(minute="*/1")), ignore_result=True)
