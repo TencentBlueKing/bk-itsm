@@ -89,7 +89,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
 
         display_role = request.query_params.get("display_role")
         if display_role:
-            queryset = queryset.filter(display_role__contains=dotted_name(display_role))
+            queryset = queryset.filter(display_role__contains=display_role)
 
         return Response(self.serializer_class(queryset, many=True).data)
 
