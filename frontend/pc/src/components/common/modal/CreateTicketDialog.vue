@@ -52,13 +52,13 @@
                 <template v-if="!loading">
                     <bk-tab :active="activeClassify" type="unborder-card">
                         <bk-tab-panel
-                            v-for="group in serviceList"
-                            :key="group.name"
+                            v-for="(group, index) in serviceList"
+                            :key="index"
                             v-bind="group">
                             <template v-slot:label>
                                 <i class="panel-icon bk-icon icon-cog-shape"></i>
                                 <span class="panel-name">{{ group.label }}</span>
-                                <i class="panel-count" v-if="group.data.length > 0">{{ group.data.length }}</i>
+                                <i class="panel-count" v-if="group.data.length > 0">{{ listNum[index] }}</i>
                             </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
@@ -134,7 +134,8 @@
                 searchModel: false,
                 selectedService: null,
                 latestLoading: false,
-                allLoading: false
+                allLoading: false,
+                listNum: [0, 0, 0, 0]
             }
         },
         computed: {
@@ -152,6 +153,10 @@
                     const group = list.find(item => item.name === service.key)
                     group.data.push(service)
                 })
+                const listNum = list.map(item => {
+                    return item.data.length
+                })
+                this.listNum = listNum
                 return list
             }
         },
