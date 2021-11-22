@@ -150,6 +150,7 @@
                             :constant-default-value="constantDefaultValue"
                             :ticket-info="ticketInfo"
                             :pipeline-rules="pipelineRules"
+                            @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
                         </sops-and-devops-task>
                         <!-- api 节点处理 -->
@@ -292,6 +293,7 @@
             sopsAndDevopsTask
         },
         mixins: [commonMix],
+        inject: ['reload'],
         props: {
             ticketInfo: {
                 type: Object,
@@ -333,19 +335,7 @@
             return {
                 constants: [],
                 hookedVarList: {},
-                pipelineList: [
-                    {
-                        id: 'BK_CI_BUILD_MSG',
-                        required: true,
-                        type: 'STRING',
-                        defaultValue: '',
-                        desc: 'Description of current build such as trigger type, purpose, reason, etc. Default value will be current build',
-                        label: '构建信息',
-                        placeholder: '手动触发',
-                        propertyType: 'BUILD',
-                        readOnly: false
-                    }
-                ],
+                pipelineList: [],
                 pipelineRules: {},
                 constantDefaultValue: {},
                 convertTimeArrToString,
@@ -461,22 +451,27 @@
                 this.getSopsPreview()
                 this.getpipelineDetail()
             },
+            reloadTicket () {
+                this.reload()
+            },
             // 获取sops Constants
             async getSopsPreview () {
-                const { bk_biz_id, template_id, exclude_task_nodes_id } = this.nodeInfo.contexts.task_params
-                const params = {
-                    bk_biz_id,
-                    template_id,
-                    exclude_task_nodes_id
+                if (this.nodeInfo.contexts) {
+                    const { bk_biz_id, template_id, exclude_task_nodes_id } = this.nodeInfo.contexts.task_params
+                    const params = {
+                        bk_biz_id,
+                        template_id,
+                        exclude_task_nodes_id
+                    }
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', params)
+                    const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
+                        this.$set(this.hookedVarList, item, false)
+                        this.constantDefaultValue[item] = this.nodeInfo.contexts.task_params.constants[item]
+                        res.data.pipeline_tree.constants[item].value = this.nodeInfo.contexts.task_params.constants[item]
+                        return res.data.pipeline_tree.constants[item]
+                    })
+                    this.constants = constants
                 }
-                const res = await this.$store.dispatch('taskFlow/getSopsPreview', params)
-                const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
-                    this.$set(this.hookedVarList, item, false)
-                    this.constantDefaultValue[item] = this.nodeInfo.contexts.task_params.constants[item]
-                    res.data.pipeline_tree.constants[item].value = this.nodeInfo.contexts.task_params.constants[item]
-                    return res.data.pipeline_tree.constants[item]
-                })
-                this.constants = constants
             },
             // 改变hook
             onChangeHook (key, value) {

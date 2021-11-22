@@ -38,8 +38,9 @@
             </bk-form-item>
         </bk-form>
         <div class="submit-btn">
-            <bk-button v-if="changeBtn" @click="submit">提交</bk-button>
-            <bk-button @click="reSetSopTask">{{ changeBtn ? '返回' : '重做' }}</bk-button>
+            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
+            <bk-button v-if="changeBtn" @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
+            <bk-button @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
         </div>
     </div>
 </template>
@@ -113,6 +114,20 @@
             onChangeHook (key, value) {
                 this.$emit('onChangeHook', key, value)
             },
+            ignore () {
+                const params = {
+                    inputs: {},
+                    is_direct: true,
+                    state_id: this.nodeInfo.state_id
+                }
+                this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m["忽略完成"]`),
+                        theme: 'success'
+                    })
+                    this.$emit('reloadTicket')
+                })
+            },
             submit () {
                 const params = {
                     inputs: {},
@@ -168,6 +183,7 @@
                         message: this.$t(`m.newCommon["提交成功"]`),
                         theme: 'success'
                     })
+                    this.$emit('reloadTicket')
                 })
             }
         }
