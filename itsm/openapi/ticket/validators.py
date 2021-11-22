@@ -45,6 +45,8 @@ def openapi_operate_validate(username, ticket, state_id=None, action_type=None):
 
         if not status:
             raise serializers.ValidationError(_('抱歉，没有找到该节点：{}').format(state_id))
+        if status.status == "FINISHED":
+            raise serializers.ValidationError(_('抱歉，当前节点：{} 已经结束').format(state_id))
         if not status.can_operate(username, action_type):
             raise serializers.ValidationError(_('抱歉，{}不能操作该节点（没有权限或操作类型不支持）').format(username))
     else:
