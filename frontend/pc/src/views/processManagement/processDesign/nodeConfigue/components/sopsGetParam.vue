@@ -200,11 +200,24 @@
                     return false
                 }
             },
-            hookedVarList: Object
+            hookedVarList: Object,
+            isHook: {
+                type: Boolean,
+                default () {
+                    return true
+                }
+            },
+            isEdit: {
+                type: Boolean,
+                default () {
+                    return true
+                }
+            }
         },
         data () {
             return {
                 disabled: false,
+                ticketDisable: false,
                 disabledRenderForm: false,
                 // quoteVarsLoading: false,
                 configLoading: false,
@@ -215,9 +228,9 @@
                     showRequired: true,
                     showGroup: true,
                     showLabel: true,
-                    showHook: true,
+                    showHook: this.isHook,
                     showDesc: true,
-                    formEdit: !this.disabled && !this.disabledRenderForm
+                    formEdit: !this.disabled && !this.disabledRenderForm && this.isEdit
                 },
                 fieldList: [],
                 checkInfo: {
@@ -276,6 +289,9 @@
         watch: {
             constants () {
                 this.renderKey = new Date().getTime()
+            },
+            isEdit () {
+                this.renderKey = new Date().getTime()
             }
         },
         mounted () {
@@ -304,6 +320,9 @@
                         this.quoteErrors.splice(index, 1)
                     }
                 }
+            },
+            changeTicketformDisable (val) {
+                this.$set(this.$refs.renderForm.formOption, 'formEdit', val)
             },
             onSelectVar (val, scheme) {
                 this.formData[scheme.tag_code] = `\${${val}}`

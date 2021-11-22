@@ -170,7 +170,7 @@
     import { deepClone } from '@/utils/util.js'
 
     export default {
-        name: 'sopsNode',
+        name: 'sopsDevopsTask',
         components: {
             BasicCard,
             sopsGetParam,
