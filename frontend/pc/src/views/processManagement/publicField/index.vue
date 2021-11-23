@@ -37,9 +37,9 @@
                 <template slot="btns">
                     <bk-button :theme="'primary'"
                         data-test-id="field_button_createField"
-                        v-cursor="{ active: !hasPermission(createFieldPerm) }"
+                        v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
                         :class="{
-                            'btn-permission-disable': !hasPermission(createFieldPerm)
+                            'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
                         }"
                         @click="addField">
                         {{ $t('m["立即创建"]') }}
