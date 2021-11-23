@@ -149,6 +149,7 @@
                             :pipeline-list="pipelineList"
                             :constant-default-value="constantDefaultValue"
                             :ticket-info="ticketInfo"
+                            :workflow="workflow"
                             :pipeline-rules="pipelineRules"
                             @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
@@ -366,7 +367,8 @@
                 slaInfo: {
                     color: '',
                     isTimeOut: false
-                }
+                },
+                workflow: ''
             }
         },
         computed: {
@@ -447,7 +449,7 @@
                     }
                     this.runTime()
                 }
-                // this.ticketInfo.table_fields[0].v=workflow
+                this.workflow = this.ticketInfo.table_fields[0].workflow
                 this.getSopsPreview()
                 this.getpipelineDetail()
             },

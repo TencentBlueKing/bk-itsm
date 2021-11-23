@@ -63,7 +63,8 @@
                 type: Array,
                 default: () => ([])
             },
-            pipelineRules: Object
+            pipelineRules: Object,
+            workflow: String | Number
         },
         data () {
             return {
@@ -92,7 +93,7 @@
         methods: {
             async getRelatedFields () {
                 const params = {
-                    workflow: 209,
+                    workflow: this.workflow,
                     state: this.nodeInfo.state_id,
                     field: ''
                 }
