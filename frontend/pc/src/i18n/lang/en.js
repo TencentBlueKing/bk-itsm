@@ -2367,5 +2367,9 @@ export const m = {
     '蓝盾节点': 'Devops Node',
     '流水线参数': 'Pipeline params',
     '必填项': 'required fields',
-    '跳转蓝盾查看': 'Link to Devops'
+    '跳转蓝盾查看': 'Link to Devops',
+    '忽略完成': 'Ignore the complete',
+    '提交': 'Submit',
+    '忽略': 'Ignore',
+    '重做': 'Rework'
 }
