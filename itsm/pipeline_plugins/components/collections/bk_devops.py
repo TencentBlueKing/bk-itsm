@@ -27,7 +27,7 @@ import logging
 
 from django.conf import settings
 
-from itsm.component.constants import SYSTEM_OPERATE, FINISHED
+from itsm.component.constants import SYSTEM_OPERATE, FINISHED, TRANSITION_OPERATE
 from itsm.component.apigw import client as apigw_client
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.ticket.serializers import StatusSerializer
@@ -105,12 +105,27 @@ class BkDevOpsService(ItsmBaseService):
         current_node.contexts.update(**kwargs)
         current_node.save()
 
+    def do_exit_plugins(self, result, **kwargs):
+        if not result:
+            current_node = kwargs.get("current_node")
+            devops_result = kwargs.get("devops_result")
+            error_message = kwargs.get("error")
+            processors = kwargs.get("processors")
+            error_message_template = kwargs.get("error_message_template")
+            ticket = kwargs.get("ticket")
+            state_id = kwargs.get("state_id")
+            self.update_info(current_node, devops_result, error_message=error_message,
+                             result=result)
+            current_node.set_failed_status(operator=processors, message=error_message_template,
+                                           detail_message=error_message)
+            ticket.node_status.filter(state_id=state_id).update(action_type=TRANSITION_OPERATE)
+
     def execute(self, data, parent_data):
         """
         执行流水线构建
         @param data: Type: object
         @param parent_data: Type: object
-        @return: True
+        @return: True为流程中，False为流程暂停
         """
         if super(BkDevOpsService, self).execute(data, parent_data):
             return True
@@ -119,6 +134,7 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
         ticket.do_before_enter_state(state_id, by_flow=self.by_flow)
+        processors = ticket.current_processors[1: -1]
 
         data.set_outputs("params_devops_result_{}".format(state_id), False)
         current_node = ticket.node_status.get(state_id=state_id)
@@ -137,16 +153,25 @@ class BkDevOpsService(ItsmBaseService):
         # 2.获取蓝盾节点参数
         state = ticket.state(state_id)
         try:
-            devops_info = state["extras"].get("devops_info")
+            devops_info = current_node.query_params if current_node.query_params else state[
+                "extras"].get("devops_info")
+
         except KeyError as error:
             logger.info(
                 "get devops_info error from State instance，error info: {}, state id: {}".format(
                     error, state_id)
             )
-            self.update_info(current_node, devops_result, error_message=str(error), result=False)
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=str(error))
-            return True
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=error,
+                processors=processors,
+                error_message_template=error_message_template,
+                ticket=ticket,
+                state_id=state_id
+            )
+            return False
 
         # 3.构建流水线启动参数
         build_params = self.prepare_build_params(devops_info)
@@ -175,10 +200,17 @@ class BkDevOpsService(ItsmBaseService):
             logger.info(
                 "check params error，error info: {}, build params: {}".format(error, build_params)
             )
-            self.update_info(current_node, devops_result, error_message=str(error), result=False)
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=str(error))
-            return True
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=str(error),
+                processors=processors,
+                error_message_template=error_message_template,
+                ticket=ticket,
+                state_id=state_id
+            )
+            return False
 
         # 6.执行流水线构建
         try:
@@ -193,11 +225,17 @@ class BkDevOpsService(ItsmBaseService):
             logger.info(
                 "build pipeline error，error info: {}, build params: {}".format(error, build_params)
             )
-            self.update_info(current_node, devops_result, error_message=str(error), result=False)
-
-            current_node.set_failed_status(message=error_message_template,
-                                           detail_message=str(error))
-            return True
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=str(error),
+                processors=processors,
+                error_message_template=error_message_template,
+                ticket=ticket,
+                state_id=state_id
+            )
+            return False
 
         # 7.设置outputs
         data.set_outputs("devops_username", devops_username)
@@ -214,7 +252,7 @@ class BkDevOpsService(ItsmBaseService):
         @param data: Type: object
         @param parent_data: Type: object
         @param callback_data: Type: object
-        @return: True
+        @return: True为流程中，False为流程暂停
         """
 
         # 1.拿到outputs中的username，项目id，流水线id，构建id
@@ -226,6 +264,7 @@ class BkDevOpsService(ItsmBaseService):
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=parent_data.inputs.ticket_id)
         current_node = ticket.node_status.get(state_id=state_id)
+        processors = ticket.current_processors[1: -1]
 
         # 2.创建全局变量
         devops_result, created = TicketGlobalVariable.objects.get_or_create(
@@ -244,10 +283,18 @@ class BkDevOpsService(ItsmBaseService):
                 "get devops_build_id error，error info: {}, data outputs: {}".format(error_message,
                                                                                     data.outputs)
             )
-            self.update_info(current_node, devops_result, error_message=error_message, result=False)
-            current_node.set_failed_status(message=error_message)
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=error_message,
+                processors=processors,
+                error_message_template=error_message,
+                ticket=ticket,
+                state_id=state_id
+            )
             self.finish_schedule()
-            return True
+            return False
 
         build_status_params = {
             "username": devops_username,
@@ -261,10 +308,18 @@ class BkDevOpsService(ItsmBaseService):
             status_info = apigw_client.devops.pipeline_build_status(build_status_params)
             current_status = status_info.get("status")
         except Exception as error:
-            self.update_info(current_node, devops_result, error_message=str(error), result=False)
-            current_node.set_failed_status(message=str(error))
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=str(error),
+                processors=processors,
+                error_message_template=str(error),
+                ticket=ticket,
+                state_id=state_id
+            )
             self.finish_schedule()
-            return True
+            return False
 
         # 5.判断流水线执行状态
         if current_status in ["QUEUE", "QUEUE_CACHE", "RUNNING"]:
@@ -275,21 +330,37 @@ class BkDevOpsService(ItsmBaseService):
             # 流水线取消，结束轮询，获取异常信息
             data.set_outputs("params_devops_result_{}".format(state_id), False)
             error_message = "蓝盾流水线【{}】构建已取消".format(current_node.name)
-            self.update_info(current_node, devops_result, error_message=error_message, result=False)
-            current_node.set_failed_status(message=error_message)
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=error_message,
+                processors=processors,
+                error_message_template=error_message,
+                ticket=ticket,
+                state_id=state_id
+            )
             # 结束轮询
             self.finish_schedule()
-            return True
+            return False
 
         if current_status == "QUEUE_TIMEOUT":
             # 队列超时，结束轮询，获取异常信息
             data.set_outputs("params_devops_result_{}".format(state_id), False)
             error_message = "蓝盾流水线【{}】构建排队超时".format(current_node.name)
-            self.update_info(current_node, devops_result, error_message=error_message, result=False)
-            current_node.set_failed_status(message=error_message)
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=error_message,
+                processors=processors,
+                error_message_template=error_message,
+                ticket=ticket,
+                state_id=state_id
+            )
             # 结束轮询
             self.finish_schedule()
-            return True
+            return False
 
         if current_status in ["FAILED", "TERMINATE"]:
             # 在异常状态，结束轮询，获取异常信息
@@ -303,11 +374,19 @@ class BkDevOpsService(ItsmBaseService):
             else:
                 error_message_detail = "status: {}".format(current_status)
             error_message = "{}, error message: {}".format(error_message_info, error_message_detail)
-            self.update_info(current_node, devops_result, error_message=error_message, result=False)
-            current_node.set_failed_status(message=error_message)
+            self.do_exit_plugins(
+                result=False,
+                current_node=current_node,
+                devops_result=devops_result,
+                error=error_message,
+                processors=processors,
+                error_message_template=error_message,
+                ticket=ticket,
+                state_id=state_id
+            )
             # 结束轮询
             self.finish_schedule()
-            return True
+            return False
 
         if current_status in ["SUCCEED", "STAGE_SUCCESS"]:
             # 在成功状态，结束轮询

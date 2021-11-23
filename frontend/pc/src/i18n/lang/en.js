@@ -2390,5 +2390,9 @@ export const m = {
     '回复': 'reply',
     '的评论': 'comment',
     '暂无模板': 'No template',
-    '模板选择': 'Select template'
+    '模板选择': 'Select template',
+    '忽略完成': 'Ignore the complete',
+    '提交': 'Submit',
+    '忽略': 'Ignore',
+    '重做': 'Rework'
 }

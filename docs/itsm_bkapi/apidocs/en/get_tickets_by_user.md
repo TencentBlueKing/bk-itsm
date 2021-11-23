@@ -12,6 +12,7 @@ Get a list of documents for a given user and work order type
 | -------------- | ------ | ---- | ------------------------------------------------------------ |
 | user           | string | YES   | filter by user name, formatted as user English id                           |
 | view_type      | string | YES   | filter by work order type                                           |
+| catalog_id     | int | NO  | filter by catalog id                                           |
 | create_at__gte | string | NO   | create_at <= create_at__lte，format："YYYY-MM-DD hh:mm:ss"             |
 | create_at__lte | string | NO   | create_at >= create_at__lte，format："YYYY-MM-DD hh:mm:ss, filter by work order type To use this filter, please configure both create_at_lte and create_at_gte parameters |
 | page           | int    | NO   | query page number, default is 1                                           |

@@ -333,6 +333,7 @@ class TicketFilterSerializer(serializers.Serializer):
             ("my_approval", "my_approval"),
         ],
     )
+    catalog_id = serializers.IntegerField(required=False)
     create_at__gte = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
     create_at__lte = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
     exclude_ticket_id__in = serializers.CharField(required=False)

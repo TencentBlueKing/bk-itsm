@@ -141,6 +141,19 @@
                             :ticket-info="ticketInfo"
                             @updateCurrentStep="successFn">
                         </node-task-list>
+                        <sops-and-devops-task
+                            v-if="nodeInfo.status === 'FAILED' && (nodeInfo.type === 'TASK-SOPS' || nodeInfo.type === 'TASK-DEVOPS')"
+                            :constants="constants"
+                            :hooked-var-list="hookedVarList"
+                            :node-info="nodeInfo"
+                            :pipeline-list="pipelineList"
+                            :constant-default-value="constantDefaultValue"
+                            :ticket-info="ticketInfo"
+                            :workflow="workflow"
+                            :pipeline-rules="pipelineRules"
+                            @reloadTicket="reloadTicket"
+                            @onChangeHook="onChangeHook">
+                        </sops-and-devops-task>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
@@ -261,9 +274,11 @@
     import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
     import NodeDealDialog from './NodeDealDialog.vue'
     import NodeTaskList from './nodetask/NodeTaskList.vue'
+    import sopsAndDevopsTask from './nodetask/sopsDevopsTask.vue'
     import commonMix from '@/views/commonMix/common.js'
     import { errorHandler } from '@/utils/errorHandler.js'
     import { convertTimeArrToMS, convertTimeArrToString, convertMStoString } from '@/utils/util.js'
+    import i18n from '@/i18n/index.js'
 
     export default {
         name: 'CurrentStepItem',
@@ -275,9 +290,11 @@
             apiNodeHandleBody,
             TicketTriggerDialog,
             NodeDealDialog,
-            NodeTaskList
+            NodeTaskList,
+            sopsAndDevopsTask
         },
         mixins: [commonMix],
+        inject: ['reload'],
         props: {
             ticketInfo: {
                 type: Object,
@@ -317,6 +334,11 @@
         },
         data () {
             return {
+                constants: [],
+                hookedVarList: {},
+                pipelineList: [],
+                pipelineRules: {},
+                constantDefaultValue: {},
                 convertTimeArrToString,
                 replyBtnLoading: false,
                 unfold: false, // 是否展开
@@ -345,7 +367,8 @@
                 slaInfo: {
                     color: '',
                     isTimeOut: false
-                }
+                },
+                workflow: ''
             }
         },
         computed: {
@@ -425,6 +448,52 @@
                         this.slaInfo.isTimeOut = true
                     }
                     this.runTime()
+                }
+                this.workflow = this.ticketInfo.table_fields[0].workflow_id
+                this.getSopsPreview()
+                this.getpipelineDetail()
+            },
+            reloadTicket () {
+                this.reload()
+            },
+            // 获取sops Constants
+            async getSopsPreview () {
+                if (this.nodeInfo.contexts) {
+                    const { bk_biz_id, template_id, exclude_task_nodes_id } = this.nodeInfo.contexts.task_params
+                    const params = {
+                        bk_biz_id,
+                        template_id,
+                        exclude_task_nodes_id
+                    }
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', params)
+                    const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
+                        this.$set(this.hookedVarList, item, false)
+                        this.constantDefaultValue[item] = this.nodeInfo.contexts.task_params.constants[item]
+                        res.data.pipeline_tree.constants[item].value = this.nodeInfo.contexts.task_params.constants[item]
+                        return res.data.pipeline_tree.constants[item]
+                    })
+                    this.constants = constants
+                }
+            },
+            // 改变hook
+            onChangeHook (key, value) {
+                this.hookedVarList[key] = value
+            },
+            // 获取流水线
+            getpipelineDetail () {
+                if (this.nodeInfo.api_info.devops_info) {
+                    const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
+                    const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
+                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                        this.pipelineList = res.data.properties
+                        res.data.properties.forEach(item => {
+                            this.pipelineRules[item.id] = [{
+                                required: item.required,
+                                message: i18n.t('m.treeinfo["字段必填"]'),
+                                trigger: 'blur'
+                            }]
+                        })
+                    })
                 }
             },
             // 自动通过

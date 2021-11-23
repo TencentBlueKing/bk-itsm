@@ -82,7 +82,6 @@ from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.misc import find_sub_string
 from itsm.role.models import UserRole
 from itsm.postman.models import RemoteApi, RemoteApiInstance
-from itsm.service.models import Service
 from itsm.trigger.api import copy_triggers_by_source, restore_trigger_data
 
 
@@ -257,6 +256,25 @@ class WorkflowManager(Manager):
                 self.restore(item)
         except Exception as err:
             logger.exception('init_iam_default_workflow error, msg is {}'.format(err))
+
+    def init_bkbase_workflow(self):
+        bkbase_path = os.path.join(settings.PROJECT_ROOT, "initials", "workflow", "bkbase")
+        bkbase_files = os.listdir(bkbase_path)
+        for file in bkbase_files:
+            file_path = os.path.join(bkbase_path, file)
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = f.read()
+
+            for flow_data in json.loads(data):
+                try:
+                    flow_data.update(is_builtin=True)
+                    self.restore(flow_data)
+                except BaseException as error:
+                    print(
+                        u"init workflow [{name}] error : {error}".format(
+                            name=flow_data.get("name", "none"), error=str(error)
+                        )
+                    )
 
     def create_workflow(self, content):
         # workflow
@@ -1530,6 +1548,7 @@ class WorkflowVersionManager(Manager):
     """
 
     def service_cnt(self, instance):
+        from itsm.service.models import Service
         return Service.objects.filter(workflow_id=instance["id"]).count()
 
     def get_or_create_version_from_workflow(self):

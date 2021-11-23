@@ -213,9 +213,9 @@ from itsm.component.utils.client_backend_query import (
     get_department_info,
     list_departments_info,
 )
+from platform_config import BaseTicket
 
 from .basic import Model
-from ..base import BaseTicket
 
 
 class SignTask(Model):
@@ -890,9 +890,11 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = TicketStatus.objects.filter(
-                service_type=service_type
-            ).filter(key=setting.get("name")).first()
+            to_ticket_status = (
+                TicketStatus.objects.filter(service_type=service_type)
+                .filter(key=setting.get("name"))
+                .first()
+            )
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
@@ -1023,7 +1025,7 @@ class Status(Model):
     def is_stopped(self):
         """结束/终止/失败"""
         stop_status = copy.deepcopy(self.STOPPED_STATUS)
-        if self.type == TASK_STATE:
+        if self.type in [TASK_STATE, TASK_SOPS_STATE, TASK_DEVOPS_STATE]:
             stop_status.pop()
         return self.status in stop_status
 
@@ -2180,17 +2182,23 @@ class Ticket(Model, BaseTicket):
             if self.service_instance:
                 # 1.在关联表中拿到sla_id
                 try:
-                    sla_id = ServiceSla.objects.get(service_id=self.service_instance.id).sla_id
+                    sla_id = ServiceSla.objects.get(
+                        service_id=self.service_instance.id
+                    ).sla_id
                 except ServiceSla.DoesNotExist as error:
                     logger.warning(
-                        "Failed to get sla_id from ServiceSla， error is {}".format(error))
+                        "Failed to get sla_id from ServiceSla， error is {}".format(
+                            error
+                        )
+                    )
                     return {}
                     # 2.拿到sla实例
                 try:
                     sla_instance = Sla.objects.get(id=sla_id)
                 except Sla.DoesNotExist as error:
                     logger.warning(
-                        "Failed to get sla_instance from Sla， error is {}".format(error))
+                        "Failed to get sla_instance from Sla， error is {}".format(error)
+                    )
                     return {}
                 default_priority = sla_instance.get_default_policy()
                 priorities = SysDict.list_data(
@@ -3421,6 +3429,10 @@ class Ticket(Model, BaseTicket):
 
         # Send notify
         processor = node_status.get_processor_in_sign_state()
+        # 快速审批通知
+        self.notify_fast_approval(
+            state_id, processor, "", action=TRANSITION_OPERATE, kwargs=kwargs
+        )
 
         # TODO 发送通知可用触发器替代
         self.notify(
@@ -3615,14 +3627,20 @@ class Ticket(Model, BaseTicket):
         if self.is_sla_end_state(state_id):
             self.stop_sla(state_id)
 
-        current_status = Status.objects.filter(ticket_id=self.id, state_id=state_id).first()
+        current_status = Status.objects.filter(
+            ticket_id=self.id, state_id=state_id
+        ).first()
         if current_status is None:
             logger.info(
-                "get status object does not exist, param: ticket_id={}, state_id={}".format(self.id,
-                                                                                            state_id))
+                "get status object does not exist, param: ticket_id={}, state_id={}".format(
+                    self.id, state_id
+                )
+            )
             raise ObjectNotExist(_("没有获取到当前节点处理状态"))
         if current_status.status == FINISHED:
-            self.send_trigger_signal(LEAVE_STATE, state_id, context={"operator": operator})
+            self.send_trigger_signal(
+                LEAVE_STATE, state_id, context={"operator": operator}
+            )
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
