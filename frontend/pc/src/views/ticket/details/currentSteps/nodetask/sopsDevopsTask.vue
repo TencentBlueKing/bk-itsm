@@ -64,7 +64,7 @@
                 default: () => ([])
             },
             pipelineRules: Object,
-            workflow: String | Number
+            workflow: Number
         },
         data () {
             return {
