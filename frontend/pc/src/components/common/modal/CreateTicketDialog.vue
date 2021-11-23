@@ -58,7 +58,7 @@
                             <template v-slot:label>
                                 <i class="panel-icon bk-icon icon-cog-shape"></i>
                                 <span class="panel-name">{{ group.label }}</span>
-                                <i class="panel-count" v-if="group.data.length > 0">{{ listNum[index] }}</i>
+                                <span class="panel-count" v-if="searchModel">{{ listNum[group.name] }}</span>
                             </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
@@ -134,8 +134,7 @@
                 searchModel: false,
                 selectedService: null,
                 latestLoading: false,
-                allLoading: false,
-                listNum: [0, 0, 0, 0]
+                allLoading: false
             }
         },
         computed: {
@@ -153,11 +152,14 @@
                     const group = list.find(item => item.name === service.key)
                     group.data.push(service)
                 })
-                const listNum = list.map(item => {
-                    return item.data.length
-                })
-                this.listNum = listNum
                 return list
+            },
+            listNum () {
+                const serviceCount = {}
+                this.serviceList.forEach(item => {
+                    serviceCount[item.name] = item.data.length
+                })
+                return serviceCount
             }
         },
         watch: {
@@ -282,7 +284,17 @@
         right: 8px;
         .search-input {
             width: 400px;
+            background-color: #ffb848;
         }
+    }
+    .panel-count {
+        padding: 0 4px;
+        background-color: #f5f7fa;
+    }
+    /deep/ .bk-form-input {
+        border: 0px;
+        border-bottom: 1px solid  #9a9ba5;
+        border-radius: 0;
     }
     /deep/.search-result {
         li {

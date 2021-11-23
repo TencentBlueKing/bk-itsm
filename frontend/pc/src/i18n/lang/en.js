@@ -2388,5 +2388,7 @@ export const m = {
     '已被编辑': 'edited',
     '发布于': 'Released in',
     '回复': 'reply',
-    '的评论': 'comment'
+    '的评论': 'comment',
+    '暂无模板': 'No template',
+    '模板选择': 'Select template'
 }

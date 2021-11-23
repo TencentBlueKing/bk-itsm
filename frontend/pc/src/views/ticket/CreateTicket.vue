@@ -52,7 +52,7 @@
                 </div>
             </section>
             <!-- 提单模板 -->
-            <section class="form-panel fields-params-tempalte">
+            <!-- <section class="form-panel fields-params-tempalte">
                 <div class="panel-label">
                     <h3 class="panel-label-name">{{ $t(`m.tickets['我的填单模版']`) }}</h3>
                     <p class="panel-label-des">{{ $t(`m.tickets['使用模板可快速完成填写']`) }}</p>
@@ -72,12 +72,22 @@
                         </bk-option>
                     </bk-select>
                 </div>
-            </section>
+            </section> -->
             <!-- 提单信息 -->
             <section class="form-panel creaet-fields" v-bkloading="{ isLoading: fieldListLoading }">
                 <div class="panel-label">
                     <h3 class="panel-label-name">{{ $t(`m.tickets['提单信息']`) }}</h3>
-                    <p class="panel-label-des">{{ $t(`m.tickets['填写服务提单']`) }}</p>
+                    <div class="select-template" @click="handleTemplateSelect">
+                        <span>{{ $t(`m['模板选择']`) }}</span>
+                        <i :class="['bk-itsm-icon', isShowTemplateList ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>
+                        <ul v-show="isShowTemplateList && templateList.length !== 0" class="template-list">
+                            <li v-for="option in templateList"
+                                :key="option.id"
+                                @click="handleTemplateChange(option.id)">
+                                {{ option.name }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="panel-content" v-if="!serviceLoading && !fieldListLoading">
                     <!-- 添加特定字段，提单人 -->
@@ -220,7 +230,8 @@
                 // 落地页
                 isRemindPageShow: false,
                 times: 25,
-                routerInfo: {}
+                routerInfo: {},
+                isShowTemplateList: false
             }
         },
         watch: {
@@ -230,6 +241,8 @@
         },
         created () {
             this.initData()
+        },
+        mounted () {
         },
         methods: {
             async initData () {
@@ -244,6 +257,17 @@
                 if (this.$route.query.rc_ticket_id) {
                     this.getReCreateTicketInfo()
                 }
+            },
+            // 展示模板选择
+            handleTemplateSelect () {
+                if (this.templateList.length === 0) {
+                    this.$bkMessage({
+                        message: this.$t(`m['暂无模板']`),
+                        offsetY: 80
+                    })
+                    return
+                }
+                this.isShowTemplateList = !this.isShowTemplateList
             },
             // 获取服务详情
             getServiceDetail () {
@@ -485,6 +509,7 @@
             },
             // 选择模板
             handleTemplateChange (id) {
+                this.tempalteId = id
                 const template = this.templateList.find(template => template.id === id).template || []
                 this.fieldList.forEach(item => {
                     template.forEach(node => {
@@ -540,6 +565,8 @@
     @include scroller;
 }
 .service-info {
+    width: 62.5%;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     padding: 20px;
@@ -547,7 +574,7 @@
     border-radius: 2px;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);
     .service-icon-wrap {
-        width: 100px;
+        width: 80px;
         .service-icon {
             display: block;
             width: 56px;
@@ -606,32 +633,67 @@
     height: 84px;
 }
 .form-panel {
-    margin-top: 20px;
+    width: 62.5%;
+    // margin-top: 20px;
+    margin: 20px auto;
+    padding: 20px 100px;
     display: flex;
-    align-items: center;
-    padding: 20px;
+    flex-direction: column;
+    // align-items: center;
     background: #ffffff;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);
     border-radius: 2px;
     .panel-label {
-        width: 226px;
-        flex-shrink: 0;
-        align-self: start;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        // flex-shrink: 0;
+        // align-self: start;
         .panel-label-name {
             margin: 0;
             line-height: 19px;
             font-size: 14px;
             color: #63656e;
         }
-        .panel-label-des {
-            margin-top: 5px;
-            line-height: 16px;
-            font-size: 12px;
-            color: #979Ba5;
+        .select-template {
+            height: 22px;
+            width: 82px;
+            font-size: 14px;
+            line-height: 22px;
+            color: #979BA5;
+            position: relative;
+            cursor: pointer;
+            i {
+                margin-left: 2px;
+            }
+            .template-list {
+                width: 170px;
+                max-height: 208px;
+                border: 1px solid #dcdee5;
+                border-radius: 2px;
+                background: #ffffff;
+                box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.10);
+                position: absolute;
+                top: 22px;
+                right: 0;
+                padding: 8px 0;
+                li {
+                    height: 32px;
+                    padding: 0 8px;
+                    line-height: 32px;
+                    font-size: 12px;
+                    color: #63656E;
+                    &:hover {
+                        color: #3A84FF;
+                        background: rgba(225,236,255,0.60);
+                    }
+                }
+            }
         }
     }
     .panel-content {
-        width: calc(100% - 226px);
+        width: 80%;
         .template-select {
             width: 50%;
         }
@@ -641,6 +703,10 @@
             color: #63656e;
         }
     }
+}
+.bottom-group {
+    width: 60%;
+    margin: 0 auto;
 }
 .save-template-pop {
     padding: 10px;
