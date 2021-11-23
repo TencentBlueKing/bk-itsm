@@ -449,7 +449,7 @@
                     }
                     this.runTime()
                 }
-                this.workflow = this.ticketInfo.table_fields[0].workflow
+                this.workflow = this.ticketInfo.table_fields[0].workflow_id
                 this.getSopsPreview()
                 this.getpipelineDetail()
             },
