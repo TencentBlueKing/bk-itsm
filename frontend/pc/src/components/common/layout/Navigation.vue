@@ -316,12 +316,16 @@
             setActive () {
                 const hasMatched = this.routerList.some(nav => {
                     const navId = nav.id
+                    this.getProjectList()
                     if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
                         const matched = this.traverseSubRouter(nav.subRouters, navId)
                         if (matched.navId) {
                             this.activeNav = matched.navId
                             this.activeSideRouter = matched.sideRouterId
                             this.sideRouters = nav.subRouters
+                            if (!this.$route.query.project_id && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
+                                this.sideRouters = []
+                            }
                             return true
                         } else if (this.isMatchedByPrefix(nav.prefix)) {
                             this.activeNav = nav.id

@@ -26,7 +26,7 @@
             :title-name="$t(`m.navigation['提单']`)"
             @goBack="onBackIconClick">
         </nav-title>
-        <div class="create-ticket-body" v-bkloading="{ isLoading: serviceLoading }">
+        <div class="create-ticket-body" v-if="!isRemindPageShow" v-bkloading="{ isLoading: serviceLoading }">
             <!-- 服务信息 -->
             <section class="service-info">
                 <div class="service-icon-wrap">
@@ -52,7 +52,7 @@
                 </div>
             </section>
             <!-- 提单模板 -->
-            <section class="form-panel fields-params-tempalte">
+            <!-- <section class="form-panel fields-params-tempalte">
                 <div class="panel-label">
                     <h3 class="panel-label-name">{{ $t(`m.tickets['我的填单模版']`) }}</h3>
                     <p class="panel-label-des">{{ $t(`m.tickets['使用模板可快速完成填写']`) }}</p>
@@ -72,12 +72,22 @@
                         </bk-option>
                     </bk-select>
                 </div>
-            </section>
+            </section> -->
             <!-- 提单信息 -->
             <section class="form-panel creaet-fields" v-bkloading="{ isLoading: fieldListLoading }">
                 <div class="panel-label">
                     <h3 class="panel-label-name">{{ $t(`m.tickets['提单信息']`) }}</h3>
-                    <p class="panel-label-des">{{ $t(`m.tickets['填写服务提单']`) }}</p>
+                    <div class="select-template" @click="handleTemplateSelect">
+                        <span>{{ $t(`m['模板选择']`) }}</span>
+                        <i :class="['bk-itsm-icon', isShowTemplateList ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>
+                        <ul v-show="isShowTemplateList && templateList.length !== 0" class="template-list">
+                            <li v-for="option in templateList"
+                                :key="option.id"
+                                @click="handleTemplateChange(option.id)">
+                                {{ option.name }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="panel-content" v-if="!serviceLoading && !fieldListLoading">
                     <!-- 添加特定字段，提单人 -->
@@ -166,6 +176,11 @@
             </div>
         </div>
         <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
+        <create-ticket-success
+            v-if="isRemindPageShow"
+            :router-info="routerInfo"
+            @onBackIconClick="onBackIconClick">
+        </create-ticket-success>
     </div>
 </template>
 <script>
@@ -177,6 +192,7 @@
     import { errorHandler } from '@/utils/errorHandler'
     import { deepClone } from '../../utils/util'
     import memberSelect from '@/views/commonComponent/memberSelect'
+    import CreateTicketSuccess from './details/components/createTicketSuccess.vue'
 
     export default {
         name: 'CreateTicket',
@@ -184,7 +200,8 @@
             NavTitle,
             FieldInfo,
             memberSelect,
-            CreateTicketDialog
+            CreateTicketDialog,
+            CreateTicketSuccess
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
@@ -208,7 +225,11 @@
                 fieldList: [],
                 reCreateFieldList: [],
                 remindCheck: false,
-                isCreateTicketDialogShow: false
+                isCreateTicketDialogShow: false,
+                // 落地页
+                isRemindPageShow: false,
+                routerInfo: {},
+                isShowTemplateList: false
             }
         },
         watch: {
@@ -232,6 +253,17 @@
                 if (this.$route.query.rc_ticket_id) {
                     this.getReCreateTicketInfo()
                 }
+            },
+            // 展示模板选择
+            handleTemplateSelect () {
+                if (this.templateList.length === 0) {
+                    this.$bkMessage({
+                        message: this.$t(`m['暂无模板']`),
+                        offsetY: 80
+                    })
+                    return
+                }
+                this.isShowTemplateList = !this.isShowTemplateList
             },
             // 获取服务详情
             getServiceDetail () {
@@ -352,13 +384,13 @@
                         message: this.$t('m.common["提交成功！"]'),
                         theme: 'success'
                     })
-                    // 跳到单据详情页
-                    this.$router.push({
+                    this.isRemindPageShow = true
+                    this.routerInfo = {
                         name: 'TicketDetail',
                         query: {
-                            id: res.data.id, from: 'created'
+                            id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined
                         }
-                    })
+                    }
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -473,6 +505,7 @@
             },
             // 选择模板
             handleTemplateChange (id) {
+                this.tempalteId = id
                 const template = this.templateList.find(template => template.id === id).template || []
                 this.fieldList.forEach(item => {
                     template.forEach(node => {
@@ -528,6 +561,8 @@
     @include scroller;
 }
 .service-info {
+    width: 62.5%;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     padding: 20px;
@@ -535,7 +570,7 @@
     border-radius: 2px;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);
     .service-icon-wrap {
-        width: 100px;
+        width: 80px;
         .service-icon {
             display: block;
             width: 56px;
@@ -594,32 +629,67 @@
     height: 84px;
 }
 .form-panel {
-    margin-top: 20px;
+    width: 62.5%;
+    // margin-top: 20px;
+    margin: 20px auto;
+    padding: 20px 100px;
     display: flex;
-    align-items: center;
-    padding: 20px;
+    flex-direction: column;
+    // align-items: center;
     background: #ffffff;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.1);
     border-radius: 2px;
     .panel-label {
-        width: 226px;
-        flex-shrink: 0;
-        align-self: start;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        // flex-shrink: 0;
+        // align-self: start;
         .panel-label-name {
             margin: 0;
             line-height: 19px;
             font-size: 14px;
             color: #63656e;
         }
-        .panel-label-des {
-            margin-top: 5px;
-            line-height: 16px;
-            font-size: 12px;
-            color: #979Ba5;
+        .select-template {
+            height: 22px;
+            width: 82px;
+            font-size: 14px;
+            line-height: 22px;
+            color: #979ba5;
+            position: relative;
+            cursor: pointer;
+            i {
+                margin-left: 2px;
+            }
+            .template-list {
+                width: 170px;
+                max-height: 208px;
+                border: 1px solid #dcdee5;
+                border-radius: 2px;
+                background: #ffffff;
+                box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.10);
+                position: absolute;
+                top: 22px;
+                right: 0;
+                padding: 8px 0;
+                li {
+                    height: 32px;
+                    padding: 0 8px;
+                    line-height: 32px;
+                    font-size: 12px;
+                    color: #63656e;
+                    &:hover {
+                        color: #3a84ff;
+                        background: rgba(225,236,255,0.60);
+                    }
+                }
+            }
         }
     }
     .panel-content {
-        width: calc(100% - 226px);
+        width: 80%;
         .template-select {
             width: 50%;
         }
@@ -629,6 +699,10 @@
             color: #63656e;
         }
     }
+}
+.bottom-group {
+    width: 60%;
+    margin: 0 auto;
 }
 .save-template-pop {
     padding: 10px;
@@ -654,5 +728,11 @@
         color: #666;
         font-size: 14px;
     }
+}
+.remind-page {
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    border: 1px solid red;
 }
 </style>

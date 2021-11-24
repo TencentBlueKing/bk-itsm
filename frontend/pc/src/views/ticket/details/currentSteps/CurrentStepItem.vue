@@ -458,7 +458,7 @@
             },
             // 获取sops Constants
             async getSopsPreview () {
-                if (this.nodeInfo.contexts) {
+                if (this.nodeInfo.contexts.hasOwnProperty('task_params')) {
                     const { bk_biz_id, template_id, exclude_task_nodes_id } = this.nodeInfo.contexts.task_params
                     const params = {
                         bk_biz_id,
@@ -481,7 +481,7 @@
             },
             // 获取流水线
             getpipelineDetail () {
-                if (this.nodeInfo.api_info.devops_info) {
+                if (this.nodeInfo.hasOwnProperty('api_info')) {
                     const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
                     const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
                     this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {

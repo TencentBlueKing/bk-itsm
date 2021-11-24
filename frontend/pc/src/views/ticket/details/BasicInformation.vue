@@ -23,14 +23,18 @@
 <template>
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
+            <!-- <div class="bk-basic-form">
+            </div> -->
             <div class="bk-basic-form">
                 <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
-            </div>
-            <div class="bk-basic-form">
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
                         <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
+                    </li>
+                    <li>
+                        <span class="bk-info-title">{{ $t('m.newCommon["单号："]') }}</span>
+                        <span class="bk-info-content">{{basicInfomation.sn || '--'}}</span>
                     </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["服务目录："]') }}</span>
@@ -38,13 +42,8 @@
                             :title="basicInfomation.catalog_fullname + '>' + basicInfomation.service_name">{{basicInfomation.catalog_fullname}}>{{basicInfomation.service_name}}</span>
                     </li>
                     <li>
-                        <business-card :basic-infomation="basicInfomation"></business-card>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单人："]') }}</span>
-                        <span class="bk-info-content pl5">{{basicInfomation.creator || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单时间："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.create_at || '--'}}</span>
+                        <span class="bk-info-title">{{ $t('m.newCommon["关联业务："]') }}</span>
+                        <span class="bk-info-content pl5">{{basicInfomation.service_name || '--'}}</span>
                     </li>
                 </ul>
             </div>
@@ -60,13 +59,11 @@
 
 <script>
     import tableFields from './components/tableFields.vue'
-    import businessCard from '@/components/common/BusinessCard.vue'
 
     export default {
         name: 'BasicInformation',
         components: {
-            tableFields,
-            businessCard
+            tableFields
         },
         props: {
             basicInfomation: {
@@ -159,11 +156,12 @@
         }
 
         li {
-            width: 50%;
+            width: 33.33%;
             float: left;
-            font-size: 12px;
-            color: #63656E;
-            line-height: 26px;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #63656e;
+            line-height: 22px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -176,13 +174,17 @@
         }
 
         .bk-info-title {
+            text-align: right;
             float: left;
+            color: #979ba5;
             font-weight: bold;
         }
 
         .bk-info-content {
+            font-weight: 400;
             word-wrap: break-word;
             padding-left: 5px;
+            color: #313238;
         }
 
         .bk-basic-li {

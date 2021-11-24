@@ -331,10 +331,11 @@
         .bk-li-left,
         .bk-li-right {
             line-height: 26px;
-            color: #63656E;
+            color: #313238;
         }
         .bk-li-left {
             font-weight: bold;
+            color: #979Ba5;
         }
 
         .bk-member-edit {

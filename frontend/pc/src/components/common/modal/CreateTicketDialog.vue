@@ -27,11 +27,10 @@
         ext-cls="create-ticket-dialog"
         :width="980"
         :value="isShow"
+        :show-footer="false"
         :mask-close="false"
         :auto-close="false"
-        :close-icon="false"
-        :ok-text="$t(`m.common['下一步']`)"
-        @confirm="onConfirm"
+        :close-icon="true"
         @cancel="onCloseDialog">
         <div class="select-service">
             <div class="tab-wrapper">
@@ -49,20 +48,25 @@
                     @change="searchHandler">
                 </bk-input>
             </div>
-            <div style="height: 100%;" v-bkloading="{ isLoading: loading }">
+            <div style="height: calc(100% - 40px);" v-bkloading="{ isLoading: loading }">
                 <template v-if="!loading">
                     <bk-tab :active="activeClassify" type="unborder-card">
                         <bk-tab-panel
-                            v-for="group in serviceList"
-                            :key="group.name"
-                            v-bind="group">
+                            v-for="(group, index) in serviceList"
+                            v-bind="group"
+                            :key="index">
+                            <template v-slot:label>
+                                <i class="panel-icon bk-icon icon-cog-shape"></i>
+                                <span class="panel-name">{{ group.label }}</span>
+                                <span class="panel-count" v-if="searchModel">{{ listNum[group.name] }}</span>
+                            </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
-                                    :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
                                     v-for="service in group.data"
+                                    :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
                                     :key="service.id"
                                     @click="onSelectService(service)">
-                                    <div class="service-name"
+                                    <div
                                         v-html="service.name"
                                         v-bk-tooltips="{
                                             allowHtml: true,
@@ -72,15 +76,14 @@
                                             width: 354,
                                             delay: [500, 0],
                                             content: `#serviceTips_${service.id}`
-                                        }">
+                                        }"
+                                        class="service-name">
                                     </div>
                                     <div :id="`serviceTips_${service.id}`" class="service-tooltip-content"><h4 v-html="service.name"></h4><pre>{{service.desc}}</pre></div>
                                     <div class="active-tag">
                                         <i class="bk-itsm-icon icon-itsm-icon-fill-fit"></i>
                                     </div>
                                     <i
-                                        data-test-id="createTicket-i-favorite"
-                                        :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
                                         v-bk-tooltips="{
                                             placement: 'top',
                                             boundary: 'window',
@@ -88,6 +91,8 @@
                                             content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
                                             delay: [300, 0]
                                         }"
+                                        data-test-id="createTicket-i-favorite"
+                                        :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
                                         @click.stop="onCollectClick(service)">
                                     </i>
                                 </li>
@@ -148,8 +153,14 @@
                     const group = list.find(item => item.name === service.key)
                     group.data.push(service)
                 })
-
                 return list
+            },
+            listNum () {
+                const serviceCount = {}
+                this.serviceList.forEach(item => {
+                    serviceCount[item.name] = item.data.length
+                })
+                return serviceCount
             }
         },
         watch: {
@@ -227,29 +238,16 @@
             },
             // 点击服务
             onSelectService (service) {
-                if (this.selectedService && this.selectedService.id === service.id) {
-                    this.selectedService = null
-                } else {
-                    this.selectedService = service
-                }
-            },
-            onConfirm () {
-                if (!this.selectedService) {
-                    this.$bkMessage({
-                        message: '请选择服务',
-                        theme: 'error'
-                    })
-                } else {
-                    const { id, project_key } = this.selectedService
-                    this.onCloseDialog()
-                    this.$router.push({
-                        name: 'CreateTicket',
-                        query: {
-                            service_id: id,
-                            project_id: project_key
-                        }
-                    })
-                }
+                const { id, key } = service
+                this.onCloseDialog()
+                this.$router.push({
+                    name: 'CreateTicket',
+                    query: {
+                        service_id: id,
+                        key: key,
+                        project_id: this.$route.query.project_id
+                    }
+                })
             },
             onCloseDialog () {
                 this.$emit('update:isShow', false)
@@ -287,7 +285,17 @@
         right: 8px;
         .search-input {
             width: 400px;
+            background-color: #ffb848;
         }
+    }
+    .panel-count {
+        padding: 0 4px;
+        background-color: #f5f7fa;
+    }
+    /deep/ .bk-form-input {
+        border: 0px;
+        border-bottom: 1px solid  #9a9ba5;
+        border-radius: 0;
     }
     /deep/.search-result {
         li {
@@ -428,7 +436,11 @@
     }
     .create-ticket-dialog {
         &.bk-dialog-wrapper .bk-dialog-tool {
-            min-height: 14px;
+            min-height: 16px;
+            height: calc(100% - 40px);
+            .bk-dialog-close {
+                top: 20px;
+            }
         }
     }
     .service-title-desc-tooltip {

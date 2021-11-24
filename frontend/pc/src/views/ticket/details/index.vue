@@ -36,16 +36,20 @@
                     <!-- 基础信息/工单预览 -->
                     <left-ticket-content
                         ref="leftTicketContent"
+                        :comment-list="commentList"
+                        :comment-id="commentId"
                         :loading="loading"
                         :ticket-info="ticketInfo"
                         :node-list="nodeList"
                         :first-state-fields="firstStateFields"
                         :node-trigger-list="nodeTriggerList"
-                        :ticket-id="ticketId">
+                        :ticket-id="ticketId"
+                        :comment-loading="commentLoading"
+                        @refreshComment="refreshComment">
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
-                <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div>
+                <!-- <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div> -->
                 <div class="show-right-icon" @click="onShowRightContent" v-show="!showRightTabs">
                     <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
                 </div>
@@ -53,7 +57,8 @@
                     <right-ticket-tabs
                         v-if="!loading.ticketLoading"
                         :ticket-info="ticketInfo"
-                        :node-list="nodeList">
+                        :node-list="nodeList"
+                        @viewProcess="viewProcess">
                     </right-ticket-tabs>
                 </div>
             </div>
@@ -103,6 +108,7 @@
         data () {
             return {
                 showRightTabs: true,
+                commentLoading: false,
                 ticketTimer: null, // 单据详情轮询器
                 containerLeftWidth: 0,
                 ticketId: '',
@@ -140,7 +146,9 @@
                 // 提单节点字段信息
                 firstStateFields: [],
                 // 所有字段列表
-                allFieldList: []
+                allFieldList: [],
+                commentList: [],
+                commentId: ''
             }
         },
         computed: {
@@ -174,6 +182,31 @@
                 this.getCurrTickeStatusColor()
                 this.initCurrentStepData()
                 this.initTicketTimer()
+                this.getComments()
+            },
+            async getComments () {
+                if (this.ticketId) {
+                    // 有项目id时加载内部评论
+                    this.commentLoading = true
+                    const commentList = []
+                    const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
+                    if (this.$route.query.project_id) {
+                        const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
+                        commentList.push(...insideRes.data.children)
+                    }
+                    commentList.push(...publicRes.data.children)
+                    commentList.sort((a, b) => b.id - a.id)
+                    this.commentList = commentList
+                    this.commentId = publicRes.data.id
+                    this.commentLoading = false
+                }
+            },
+            refreshComment () {
+                this.getComments()
+            },
+            // 展示完整流程
+            viewProcess (val) {
+                this.$refs.leftTicketContent.changeDialogStatus(val)
             },
             // 是否需要循环
             isNeedToLoop () {
@@ -453,10 +486,10 @@
     }
     .ticket-container-right {
         margin-left: 4px;
-        width: 32%;
+        // width: 320px;
         height: 100%;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        background: #ffffff;
+        // box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        // background: #ffffff;
     }
 }
 </style>

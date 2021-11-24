@@ -21,68 +21,74 @@
   -->
 
 <template>
-    <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
-        <bk-tab-panel
-            name="log"
-            :label="$t(`m.newCommon['流转日志']`)">
-            <log-tab v-if="activeTab === 'log'">
-            </log-tab>
-        </bk-tab-panel>
-        <bk-tab-panel
-            name="slaLog"
-            :label="$t(`m.task['SLA记录']`)">
-            <sla-record-tab :basic-infomation="ticketInfo"
-                :node-list="nodeList">
-            </sla-record-tab>
-        </bk-tab-panel>
-        <bk-tab-panel
-            name="all-task"
-            :label="$t(`m.newCommon['所有任务']`)">
-            <all-task-tab
-                v-if="activeTab === 'all-task'"
-                :ticket-info="ticketInfo">
-            </all-task-tab>
-        </bk-tab-panel>
-        <bk-tab-panel
-            name="triggerLog"
-            :label="$t(`m.task['触发器记录']`)">
-            <task-history v-if="activeTab === 'triggerLog'" :basic-infomation="ticketInfo" :node-list="nodeList"></task-history>
-        </bk-tab-panel>
-        <bk-tab-panel
-            v-if="ticketInfo.can_invite_followers"
-            name="email-notice"
-            :label="$t(`m.newCommon['邮件通知']`)">
-            <email-notice-tab
-                v-if="activeTab === 'email-notice'"
-                :ticket-info="ticketInfo">
-            </email-notice-tab>
-        </bk-tab-panel>
-        <bk-tab-panel
-            v-if="(Number(ticketInfo.comment_id) !== -1)"
-            name="comment"
-            :label="$t(`m.newCommon['评价']`)">
-            <comment-tab
-                v-if="activeTab === 'comment'"
-                :ticket-info="ticketInfo">
-            </comment-tab>
-        </bk-tab-panel>
-        <bk-tab-panel
-            v-if="openFunction.CHILD_TICKET_SWITCH"
-            name="mother-child"
-            :label="$t(`m.newCommon['母子单']`)">
-            <div class="bk-log-flow" v-if="activeTab === 'mother-child'">
-                <inherit-ticket :ticket-info="ticketInfo"></inherit-ticket>
+    <div class="right-content">
+        <div class="sla-information">
+            <div class="sla-view">
+                <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', !isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>{{ $t('m["SLA信息"]') }}</span>
+                <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
             </div>
-        </bk-tab-panel>
-        <bk-tab-panel
-            name="related-ticket"
-            :label="$t(`m.newCommon['关联单']`)">
-            <associated-tab
-                v-if="activeTab === 'related-ticket'"
-                :ticket-info="ticketInfo">
-            </associated-tab>
-        </bk-tab-panel>
-    </bk-tab>
+            <div :class="['ishowSlaRecord', isShowSla ? 'hide' : '']">
+                <sla-record-tab :basic-infomation="ticketInfo"
+                    :node-list="nodeList">
+                </sla-record-tab>
+            </div>
+        </div>
+        <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
+            <bk-tab-panel
+                name="log"
+                :label="$t(`m.newCommon['流转进程']`)">
+                <log-tab v-if="activeTab === 'log'" @viewProcess="viewProcess">
+                </log-tab>
+            </bk-tab-panel>
+            <bk-tab-panel
+                name="all-task"
+                :label="$t(`m.newCommon['所有任务']`)">
+                <all-task-tab
+                    v-if="activeTab === 'all-task'"
+                    :ticket-info="ticketInfo">
+                </all-task-tab>
+            </bk-tab-panel>
+            <bk-tab-panel
+                name="triggerLog"
+                :label="$t(`m.task['触发器记录']`)">
+                <task-history v-if="activeTab === 'triggerLog'" :basic-infomation="ticketInfo" :node-list="nodeList"></task-history>
+            </bk-tab-panel>
+            <bk-tab-panel
+                v-if="ticketInfo.can_invite_followers"
+                name="email-notice"
+                :label="$t(`m.newCommon['邮件通知']`)">
+                <email-notice-tab
+                    v-if="activeTab === 'email-notice'"
+                    :ticket-info="ticketInfo">
+                </email-notice-tab>
+            </bk-tab-panel>
+            <bk-tab-panel
+                v-if="(Number(ticketInfo.comment_id) !== -1)"
+                name="comment"
+                :label="$t(`m.newCommon['评价']`)">
+                <comment-tab
+                    v-if="activeTab === 'comment'"
+                    :ticket-info="ticketInfo">
+                </comment-tab>
+            </bk-tab-panel>
+            <bk-tab-panel
+                v-if="openFunction.CHILD_TICKET_SWITCH"
+                name="mother-child"
+                :label="$t(`m.newCommon['母子单']`)">
+                <div class="bk-log-flow" v-if="activeTab === 'mother-child'">
+                    <inherit-ticket :ticket-info="ticketInfo"></inherit-ticket>
+                </div>
+            </bk-tab-panel>
+            <bk-tab-panel
+                name="related-ticket"
+                :label="$t(`m.newCommon['关联单']`)">
+                <associated-tab
+                    v-if="activeTab === 'related-ticket'"
+                    :ticket-info="ticketInfo">
+                </associated-tab>
+            </bk-tab-panel>
+        </bk-tab>
+    </div>
 </template>
 
 <script>
@@ -101,11 +107,11 @@
         components: {
             LogTab,
             AssociatedTab,
+            SlaRecordTab,
             InheritTicket,
             EmailNoticeTab,
             CommentTab,
             AllTaskTab,
-            SlaRecordTab,
             taskHistory
         },
         props: {
@@ -120,21 +126,86 @@
         },
         data () {
             return {
-                activeTab: 'log'
+                activeTab: 'log',
+                isUseSla: true,
+                isShowSla: true,
+                isResponseTimeout: true,
+                isDisposeTimeout: false,
+                isNormal: false // sla正常时间内
             }
         },
         computed: {
             ...mapState({
                 openFunction: state => state.openFunction
             })
+        },
+        methods: {
+            handleClickShowSla () {
+                this.isShowSla = !this.isShowSla
+            },
+            // 跳转对应项目下sla
+            viewSlaRule () {
+                this.$router.push({
+                    name: 'slaAgreement',
+                    query: {
+                        project_id: this.$route.query.project_id || 0
+                    }
+                })
+            },
+            viewProcess (val) {
+                this.$emit('viewProcess', val)
+            }
         }
     }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../scss/mixins/scroller.scss';
-.right-tiket-tabs {
+.icon-itsm-icon-mark-eight {
+    color: red;
+}
+.icon-itsm-icon-three-eight {
+    color: #ff9c01;
+}
+.right-content {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.sla-information {
+    width: 320px;
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+    background: #ffffff;
+    margin-bottom: 16px;
+    .sla-view {
+        height: 46px;
+        line-height: 16px;
+        padding: 16px;
+        .sla-title {
+            font-size: 14px;
+            color: #63656E;
+        }
+        .view-sla-rule {
+            cursor: pointer;
+            float: right;
+            color: #3A84FF;
+            font-size: 12px;
+        }
+    }
+    .ishowSlaRecord {
+        transition: all 0.5s;
+        height: 134px;
+        overflow: hidden;
+    }
+    .hide {
+        height: 0;
+    }
+}
+.right-tiket-tabs {
+    width: 320px;
+    flex: 1;
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+    background: #ffffff;
     /deep/ .bk-tab-section {
         height: calc(100% - 42px);
         overflow: auto;
