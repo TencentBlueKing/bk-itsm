@@ -5,7 +5,7 @@
             <p><span class="user-name">{{ curComment.creator}}  </span><span class="issue-time">{{ $t('m["发布于"]') }} {{ curComment.create_at }}</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
             <div
                 v-if="curComment.update_log.length"
-                v-bk-tooltips.top-start="{
+                v-bk-tooltips="{
                     placement: 'top-start',
                     content: curComment.update_log
                 }"
@@ -15,13 +15,6 @@
             <div class="reply-praise">
                 <i class="bk-itsm-icon icon-itsm-icon-speak" title="回复" @click="$emit('editComment', curComment , 'add')"></i>
                 <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i>
-                <!-- <ul v-if="isAgree" class="expression">
-                    <li>😘</li>
-                    <li>😭</li>
-                    <li>😊</li>
-                    <li>😁</li>
-                    <li>👍</li>
-                </ul> -->
             </div>
         </div>
         <div class="comment-content">
@@ -35,7 +28,7 @@
         </div>
         <div class="operation">
             <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>|
-            <span @click="isShowDeleteDialog(1)">{{ $t('m["删除"]') }}</span>
+            <span @click="handleDeleteDialogShow(true)">{{ $t('m["删除"]') }}</span>
         </div>
         <bk-dialog
             ext-cls="delete-dialog"
@@ -46,7 +39,7 @@
             <div class="delete-tip">{{ $t('m["确认删除该条评论？"]') }}</div>
             <div class="delete-option">
                 <bk-button :theme="'primary'" @click="deleteComment(curComment.id)">{{ $t('m["确定"]') }}</bk-button>
-                <bk-button @click="isShowDeleteDialog(0)">{{ $t('m["取消"]') }}</bk-button>
+                <bk-button @click="handleDeleteDialogShow(false)">{{ $t('m["取消"]') }}</bk-button>
             </div>
         </bk-dialog>
     </div>
@@ -82,8 +75,8 @@
                 this.isAgree = !this.isAgree
                 console.log('agree', '暂不支持')
             },
-            isShowDeleteDialog (val) {
-                this.deleteCommentDialog = !!val
+            handleDeleteDialogShow (val) {
+                this.deleteCommentDialog = val
             }
         }
     }

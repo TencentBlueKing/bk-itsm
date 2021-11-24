@@ -189,15 +189,15 @@
                     // 有项目id时加载内部评论
                     this.commentLoading = true
                     const commentList = []
-                    const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
+                    const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
                     if (this.$route.query.project_id) {
-                        const res = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
-                        commentList.push(...res.data.children)
+                        const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
+                        commentList.push(...insideRes.data.children)
                     }
-                    commentList.push(...res.data.children)
+                    commentList.push(...publicRes.data.children)
                     commentList.sort((a, b) => b.id - a.id)
                     this.commentList = commentList
-                    this.commentId = res.data.id
+                    this.commentId = publicRes.data.id
                     this.commentLoading = false
                 }
             },

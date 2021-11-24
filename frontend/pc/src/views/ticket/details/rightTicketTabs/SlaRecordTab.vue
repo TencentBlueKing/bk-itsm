@@ -25,7 +25,7 @@
         <template v-if="slaList.length">
             <div>
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <u v-bk-tooltips.top="{ content: '响应倒计时' }" class="time-type">{{ $t('m["响应"]') }}{{ isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</u>
+                <span v-bk-tooltips.top="{ content: '首次响应时间' + slaList[0].begin_at }" class="underline time-type">{{ $t('m["响应"]') }}{{ isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[3]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[4]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{responseTime[5]}}</span>
@@ -33,7 +33,7 @@
             </div>
             <div>
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <u v-bk-tooltips.top="{ content: '处理倒计时' }" class="time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</u>
+                <span v-bk-tooltips.top="{ content: '首次处理时间' + slaList[0].replied_at }" class="underline time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[3]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[4]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{processingTime[5]}}</span>
@@ -182,6 +182,7 @@
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
                     const curSla = res.data.find(item => item.name === this.basicInfomation.sla[0])
+                    console.log(curSla)
                     const condition = curSla.action_policies.map(item => {
                         return item.condition.expressions[0].value
                     })
@@ -338,5 +339,8 @@
     }
     .icon-itsm-icon-three-eight {
         color: #ff9c01;
+    }
+    .underline {
+        text-decoration: underline;
     }
 </style>

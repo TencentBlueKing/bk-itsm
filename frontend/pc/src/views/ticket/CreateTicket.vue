@@ -176,12 +176,11 @@
             </div>
         </div>
         <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
-        <create-ticker-succer
-            :router-info="routerInfo"
-            :times="times"
+        <create-ticket-succer
             v-if="isRemindPageShow"
+            :router-info="routerInfo"
             @onBackIconClick="onBackIconClick">
-        </create-ticker-succer>
+        </create-ticket-succer>
     </div>
 </template>
 <script>
@@ -193,7 +192,7 @@
     import { errorHandler } from '@/utils/errorHandler'
     import { deepClone } from '../../utils/util'
     import memberSelect from '@/views/commonComponent/memberSelect'
-    import CreateTickerSuccer from './details/components/createTickerSuccer.vue'
+    import CreateTicketSuccer from './details/components/createTicketSuccer.vue'
 
     export default {
         name: 'CreateTicket',
@@ -202,7 +201,7 @@
             FieldInfo,
             memberSelect,
             CreateTicketDialog,
-            CreateTickerSuccer
+            CreateTicketSuccer
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
@@ -229,7 +228,6 @@
                 isCreateTicketDialogShow: false,
                 // 落地页
                 isRemindPageShow: false,
-                times: 25,
                 routerInfo: {},
                 isShowTemplateList: false
             }

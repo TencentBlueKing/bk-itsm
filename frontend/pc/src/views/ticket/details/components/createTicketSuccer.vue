@@ -37,18 +37,11 @@
     export default {
         name: 'CreateTickerSuccer',
         props: {
-            routerInfo: Object,
-            times: {
-                type: Number,
-                default () {
-                    return 30
-                }
-            }
+            routerInfo: Object
         },
         data () {
-            const time = this.times
             return {
-                time,
+                time: 30,
                 isStart: true
             }
         },
@@ -57,13 +50,15 @@
         },
         methods: {
             countDown () {
-                this.timer = setInterval(() => {
-                    this.time--
-                    if (this.time === 0 && this.isStart) {
-                        clearInterval(this.timer)
-                        this.jumpPage()
-                    }
-                }, 1000)
+                if (this.isStart) {
+                    this.timer = setInterval(() => {
+                        this.time--
+                        if (this.time === 0) {
+                            clearInterval(this.timer)
+                            this.jumpPage()
+                        }
+                    }, 1000)
+                }
             },
             jumpPage () {
                 this.isStart = false

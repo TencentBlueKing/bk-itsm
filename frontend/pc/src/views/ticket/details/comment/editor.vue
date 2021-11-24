@@ -25,20 +25,7 @@
                 left: '0px',
                 top: '0px',
                 showFlag: 'none',
-                list: [
-                    {
-                        name: 'admin',
-                        key: '1'
-                    },
-                    {
-                        name: 'zyx',
-                        key: '2'
-                    },
-                    {
-                        name: 'mark',
-                        key: '3'
-                    }
-                ]
+                list: []
             }
         },
         watch: {

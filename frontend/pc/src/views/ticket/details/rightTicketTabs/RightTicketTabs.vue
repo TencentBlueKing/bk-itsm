@@ -40,13 +40,6 @@
                 <log-tab v-if="activeTab === 'log'" @viewProcess="viewProcess">
                 </log-tab>
             </bk-tab-panel>
-            <!-- <bk-tab-panel
-                name="slaLog"
-                :label="$t(`m.task['SLA记录']`)">
-                <sla-record-tab :basic-infomation="ticketInfo"
-                    :node-list="nodeList">
-                </sla-record-tab>
-            </bk-tab-panel>
             <bk-tab-panel
                 name="all-task"
                 :label="$t(`m.newCommon['所有任务']`)">
@@ -85,7 +78,7 @@
                 <div class="bk-log-flow" v-if="activeTab === 'mother-child'">
                     <inherit-ticket :ticket-info="ticketInfo"></inherit-ticket>
                 </div>
-            </bk-tab-panel> -->
+            </bk-tab-panel>
             <bk-tab-panel
                 name="related-ticket"
                 :label="$t(`m.newCommon['关联单']`)">
@@ -102,19 +95,24 @@
     import { mapState } from 'vuex'
     import LogTab from './LogTab.vue'
     import AssociatedTab from './AssociatedTab/AssociatedTab.vue'
-    // import InheritTicket from './InheritTicketTab.vue'
-    // import EmailNoticeTab from './EmailNoticeTab.vue'
-    // import CommentTab from './CommentTab.vue'
-    // import AllTaskTab from './AllTaskTab.vue'
+    import InheritTicket from './InheritTicketTab.vue'
+    import EmailNoticeTab from './EmailNoticeTab.vue'
+    import CommentTab from './CommentTab.vue'
+    import AllTaskTab from './AllTaskTab.vue'
     import SlaRecordTab from './SlaRecordTab.vue'
-    // import taskHistory from '../taskInfo/taskHistory.vue'
+    import taskHistory from '../taskInfo/taskHistory.vue'
 
     export default {
         name: 'RightTiketTabs',
         components: {
             LogTab,
             AssociatedTab,
-            SlaRecordTab
+            SlaRecordTab,
+            InheritTicket,
+            EmailNoticeTab,
+            CommentTab,
+            AllTaskTab,
+            taskHistory
         },
         props: {
             ticketInfo: {

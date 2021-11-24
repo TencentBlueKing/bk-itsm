@@ -27,7 +27,7 @@
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
                         :key="index"
-                        :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+                        class="bk-field-line">
                         <!-- 静态展示 -->
                         <fields-done
                             :item="item"
@@ -172,9 +172,10 @@
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
     .bk-field-line {
-        width: 100%;
+        width: 33.33%;
         position: relative;
-        padding-right: 10px;
+        padding: 4px;
+        font-size: 14px;
         display: inline-block;
     }
     .bk-field-half {

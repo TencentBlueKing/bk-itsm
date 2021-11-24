@@ -24,18 +24,10 @@
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
             <!-- <div class="bk-basic-form">
-                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
             </div> -->
             <div class="bk-basic-form">
+                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["标题："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.title || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["影响范围："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.table_fields.find(item => item.key === 'impact').display_value || '--'}}</span>
-                    </li>
                     <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
                         <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
@@ -45,22 +37,13 @@
                         <span class="bk-info-content">{{basicInfomation.sn || '--'}}</span>
                     </li>
                     <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["紧急程度："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.table_fields.find(item => item.key === 'urgency').display_value || '--'}}</span>
-                    </li>
-                    <li>
                         <span class="bk-info-title">{{ $t('m.newCommon["服务目录："]') }}</span>
                         <span class="bk-info-content"
                             :title="basicInfomation.catalog_fullname + '>' + basicInfomation.service_name">{{basicInfomation.catalog_fullname}}>{{basicInfomation.service_name}}</span>
                     </li>
                     <li>
-                        <!-- <business-card :basic-infomation="basicInfomation"></business-card> -->
                         <span class="bk-info-title">{{ $t('m.newCommon["关联业务："]') }}</span>
                         <span class="bk-info-content pl5">{{basicInfomation.service_name || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["优先级："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.priority_name || '--'}}</span>
                     </li>
                 </ul>
             </div>
@@ -75,13 +58,13 @@
 </template>
 
 <script>
-    // import tableFields from './components/tableFields.vue'
+    import tableFields from './components/tableFields.vue'
     // import businessCard from '@/components/common/BusinessCard.vue'
 
     export default {
         name: 'BasicInformation',
         components: {
-            // tableFields,
+            tableFields
             // businessCard
         },
         props: {
@@ -150,7 +133,6 @@
 <style scoped lang='scss'>
     @import '../../../scss/mixins/clearfix.scss';
     .basic-info-wrap {
-        height: 138px;
         position: relative;
         padding-bottom: 14px;
         &.fold {
@@ -194,10 +176,10 @@
         }
 
         .bk-info-title {
-            width: 70px;
             text-align: right;
             float: left;
             color: #979BA5;
+            font-weight: bold;
         }
 
         .bk-info-content {

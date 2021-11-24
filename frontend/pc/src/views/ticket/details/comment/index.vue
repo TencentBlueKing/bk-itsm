@@ -31,18 +31,18 @@
         </ul>
         <editor v-if="isShowEditor" ref="editorAdd" :editor-id="'editor1'" @changebuttonStatus="changebuttonStatus"></editor>
         <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
-        <!-- <bk-button title="loading" icon="loading" :disabled="true" class="mr10">loading</bk-button> -->
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
         <ul v-bkloading="{ isLoading: commentLoading }">
             <li v-for="(item, index) in commentList" :key="index">
-                <commment-item
+                <comment-item
                     :cur-comment="item"
                     @refreshComment="refreshComment"
                     @editComment="editComment">
-                </commment-item>
+                </comment-item>
             </li>
         </ul>
+        <div v-if="commentList.length === 0" class="no-comment">暂无评论</div>
         <bk-dialog
             :title="editType === 'edit' ? '编辑评论' : '回复评论'"
             width="800"
@@ -56,11 +56,11 @@
 </template>
 <script>
     import editor from './editor.vue'
-    import commmentItem from './commmentIitem.vue'
+    import commentItem from './commentIitem.vue'
     export default {
-        name: 'wangEditor',
+        name: 'ticketComment',
         components: {
-            commmentItem,
+            commentItem,
             editor
         },
         props: {
@@ -135,6 +135,7 @@
                 })
             },
             refreshComment () {
+                this.isEditEditor = false
                 this.$emit('refreshComment')
             },
             postComment (type) {
@@ -144,6 +145,7 @@
             },
             submit () {
                 // 评论内容
+                this.isShowEditor = false
                 if (this.$refs.editorAdd) {
                     const _this = this.$refs.editorAdd.editor
                     const text = _this.txt.text()
@@ -162,7 +164,6 @@
                             this.refreshComment()
                         })
                     }
-                    this.isShowEditor = false
                 }
             }
         }
@@ -185,19 +186,19 @@
                 padding: 40px;
                 flex-direction: column;
                 &:hover {
-                    background-color: #F0F1F5;
+                    background-color: #f0f1f5;
                 }
                 i{
                     font-size: 30px;
                 }
                 span {
                     font-weight: 400;
-                    color: #3A84FF;
+                    color: #3a84ff;
                     font-size: 14px;
                     line-height: 24px;
                 }
                 p {
-                    color: #979BA5;
+                    color: #979ba5;
                     font-size: 12px;
                     line-height: 20px;
                 }
@@ -205,6 +206,13 @@
         }
         .submit {
             margin: 10px 0;
+        }
+        .no-comment {
+            height: 50px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 50px;
+            color: #979ba5;
         }
     }
 </style>
