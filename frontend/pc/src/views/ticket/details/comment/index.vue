@@ -44,9 +44,9 @@
         </ul>
         <div v-if="commentList.length === 0" class="no-comment">暂无评论</div>
         <bk-dialog
+            v-model="isEdit"
             :title="editType === 'edit' ? '编辑评论' : '回复评论'"
             width="800"
-            v-model="isEdit"
             theme="primary"
             :mask-close="false"
             @confirm="submitEdit">
@@ -56,7 +56,7 @@
 </template>
 <script>
     import editor from './editor.vue'
-    import commentItem from './commentIitem.vue'
+    import commentItem from './commentItem.vue'
     export default {
         name: 'ticketComment',
         components: {

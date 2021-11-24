@@ -164,7 +164,7 @@
             word-break: break-all;
             margin-bottom: 5px;
             &:hover{
-                background: #EAEBF0;
+                background: #eaebf0;
         }
         }
         p {

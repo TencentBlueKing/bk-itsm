@@ -59,13 +59,11 @@
 
 <script>
     import tableFields from './components/tableFields.vue'
-    // import businessCard from '@/components/common/BusinessCard.vue'
 
     export default {
         name: 'BasicInformation',
         components: {
             tableFields
-            // businessCard
         },
         props: {
             basicInfomation: {
@@ -162,7 +160,7 @@
             float: left;
             margin: 8px 0;
             font-size: 14px;
-            color: #63656E;
+            color: #63656e;
             line-height: 22px;
             overflow: hidden;
             white-space: nowrap;
@@ -178,7 +176,7 @@
         .bk-info-title {
             text-align: right;
             float: left;
-            color: #979BA5;
+            color: #979ba5;
             font-weight: bold;
         }
 

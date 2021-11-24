@@ -14,7 +14,7 @@
     import E from 'wangeditor'
     import { position, offset } from 'caret-pos'
     export default {
-        name: 'wangEditor',
+        name: 'commentEditor',
         props: {
             editorId: String
         },

@@ -53,8 +53,8 @@
                     <bk-tab :active="activeClassify" type="unborder-card">
                         <bk-tab-panel
                             v-for="(group, index) in serviceList"
-                            :key="index"
-                            v-bind="group">
+                            v-bind="group"
+                            :key="index">
                             <template v-slot:label>
                                 <i class="panel-icon bk-icon icon-cog-shape"></i>
                                 <span class="panel-name">{{ group.label }}</span>
@@ -62,11 +62,11 @@
                             </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
-                                    :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
                                     v-for="service in group.data"
+                                    :class="['service-item', { active: selectedService && selectedService.id === service.id }]"
                                     :key="service.id"
                                     @click="onSelectService(service)">
-                                    <div class="service-name"
+                                    <div
                                         v-html="service.name"
                                         v-bk-tooltips="{
                                             allowHtml: true,
@@ -76,15 +76,14 @@
                                             width: 354,
                                             delay: [500, 0],
                                             content: `#serviceTips_${service.id}`
-                                        }">
+                                        }"
+                                        class="service-name">
                                     </div>
                                     <div :id="`serviceTips_${service.id}`" class="service-tooltip-content"><h4 v-html="service.name"></h4><pre>{{service.desc}}</pre></div>
                                     <div class="active-tag">
                                         <i class="bk-itsm-icon icon-itsm-icon-fill-fit"></i>
                                     </div>
                                     <i
-                                        data-test-id="createTicket-i-favorite"
-                                        :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
                                         v-bk-tooltips="{
                                             placement: 'top',
                                             boundary: 'window',
@@ -92,6 +91,8 @@
                                             content: service.favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
                                             delay: [300, 0]
                                         }"
+                                        data-test-id="createTicket-i-favorite"
+                                        :class="['bk-itsm-icon', 'collect-icon', service.favorite ? 'icon-favorite' : 'icon-rate']"
                                         @click.stop="onCollectClick(service)">
                                     </i>
                                 </li>

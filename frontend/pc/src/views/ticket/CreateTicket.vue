@@ -176,11 +176,11 @@
             </div>
         </div>
         <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
-        <create-ticket-succer
+        <create-ticket-success
             v-if="isRemindPageShow"
             :router-info="routerInfo"
             @onBackIconClick="onBackIconClick">
-        </create-ticket-succer>
+        </create-ticket-success>
     </div>
 </template>
 <script>
@@ -192,7 +192,7 @@
     import { errorHandler } from '@/utils/errorHandler'
     import { deepClone } from '../../utils/util'
     import memberSelect from '@/views/commonComponent/memberSelect'
-    import CreateTicketSuccer from './details/components/createTicketSuccer.vue'
+    import CreateTicketSuccess from './details/components/createTicketSuccess.vue'
 
     export default {
         name: 'CreateTicket',
@@ -201,7 +201,7 @@
             FieldInfo,
             memberSelect,
             CreateTicketDialog,
-            CreateTicketSuccer
+            CreateTicketSuccess
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
@@ -239,8 +239,6 @@
         },
         created () {
             this.initData()
-        },
-        mounted () {
         },
         methods: {
             async initData () {
@@ -659,7 +657,7 @@
             width: 82px;
             font-size: 14px;
             line-height: 22px;
-            color: #979BA5;
+            color: #979ba5;
             position: relative;
             cursor: pointer;
             i {
@@ -681,9 +679,9 @@
                     padding: 0 8px;
                     line-height: 32px;
                     font-size: 12px;
-                    color: #63656E;
+                    color: #63656e;
                     &:hover {
-                        color: #3A84FF;
+                        color: #3a84ff;
                         background: rgba(225,236,255,0.60);
                     }
                 }
