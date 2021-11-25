@@ -182,7 +182,6 @@
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
                     const curSla = res.data.find(item => item.name === this.basicInfomation.sla[0])
-                    console.log(curSla)
                     const condition = curSla.action_policies.map(item => {
                         return item.condition.expressions[0].value
                     })
@@ -250,13 +249,13 @@
                 this.myInterval(() => {
                     responseCost--
                     processCost--
-                    if (responseCost < this.responseCost - (this.rTimeOutThreshold * this.responseCost)) {
+                    if (responseCost < this.responseCost - (this.rTimeOutThreshold * this.responseCost) || responseCost < 0) {
                         this.isResponseTimeout = true
                         this.isResponseNormal = false
                     } else if (responseCost < this.rWarningThreshold * this.responseCost) {
                         this.isResponseNormal = false
                     }
-                    if (processCost < this.processCost - (this.pTimeOutThreshold * this.processCost)) {
+                    if (processCost < this.processCost - (this.pTimeOutThreshold * this.processCost) || processCost < 0) {
                         this.isProcessTimeout = true
                         this.isProcessNormal = false
                     } else if (processCost < this.pWarningThreshold * this.processCost) { // 预警time
