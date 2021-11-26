@@ -37,6 +37,8 @@ from config import (
 )
 
 # 请在这里加入你的自定义 APP
+from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
+
 INSTALLED_APPS += (
     # 配置项
     "itsm.iadmin",
@@ -84,6 +86,7 @@ INSTALLED_APPS += (
     "weixin",
     # 'flower',
     # 'monitors',
+    "itsm.monitor",
 )
 
 # IAM 开启开关
@@ -135,6 +138,8 @@ MIDDLEWARE = (
     # 'pyinstrument.middleware.ProfilerMiddleware',
 )
 
+MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
+
 # 所有环境的日志级别可以在这里配置
 # LOG_LEVEL = 'DEBUG'
 
@@ -177,6 +182,16 @@ CELERY_IMPORTS = (
 
 # load logging settings
 LOGGING = get_logging_config_dict(locals())
+
+# 需要添加的 trace 相关信息格式
+inject_formatters = ("verbose",)
+# 注入到日志配置，会直接在对应 formatter 格式之后添加 trace_format
+# 日志中添加trace_id
+ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
+if ENABLE_OTEL_TRACE:
+    INSTALLED_APPS += ("itsm.monitor.opentelemetry.instrument_app",)
+    trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
+    inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
 
 # 初始化管理员列表，列表中的人员将拥有预发布环境和正式环境的管理员权限
 # 注意：请在首次提测和上线前修改，之后的修改将不会生效
@@ -356,19 +371,19 @@ else:
 
 CACHES.update(
     {
-        'db': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'django_cache',
+        "db": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "django_cache",
         },
-        'login_db': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'account_cache',
+        "login_db": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "account_cache",
         },
-        'dummy': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        "dummy": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         },
-        'locmem': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "locmem": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         },
     }
 )
@@ -789,5 +804,8 @@ BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # 通知消息模版
-CONTENT_CREATOR_WITH_TRANSLATION = True if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION",
-                                                     "true").lower() == "true" else False
+CONTENT_CREATOR_WITH_TRANSLATION = (
+    True
+    if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION", "true").lower() == "true"
+    else False
+)

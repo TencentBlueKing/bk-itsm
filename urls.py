@@ -34,7 +34,7 @@ from django.views import static
 # 公共URL配置
 urlpatterns = [
     # Django后台数据库管理®
-    url(r'^admin/', admin.site.urls),
+    url(r"^admin/", admin.site.urls),
     # 用户登录鉴权
     # url(r'^account/', include('account.urls')),
     url(r"^account/", include("blueapps.account.urls")),
@@ -42,6 +42,8 @@ urlpatterns = [
     url(r"^api/", include("itsm.api.v1")),
     # 对外开放的接口
     url(r"^openapi/", include("itsm.api.open_v1")),
+    # 监控，普罗米修斯相关的接口
+    url(r"^monitor/", include("itsm.monitor.urls")),
     # 各种入口：微信/wiki/首页等
     url(r"^", include("itsm.sites.urls")),
 ]
