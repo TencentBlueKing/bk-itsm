@@ -263,18 +263,19 @@
                     color: #767880;
                     margin-right: 20px;
                 }
-                .bk-no-content {
-                    margin: 0 auto;
-                    text-align: center;
-                    p {
-                        font-size: 12px;
-                        line-height: 20px;
-                        color: #63656E;
-                        span {
-                            cursor: pointer;
-                            color: #3A84FF;
-                        }
-                    }
+                
+            }
+        }
+        .bk-no-content {
+            margin: 0 auto;
+            text-align: center;
+            p {
+                font-size: 12px;
+                line-height: 20px;
+                color: #63656E;
+                span {
+                    cursor: pointer;
+                    color: #3A84FF;
                 }
             }
         }
