@@ -243,7 +243,7 @@
     }
 }
 .current-step-content {
-    margin-top: 16px;
+    margin-top: 12px;
     padding: 10px;
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;

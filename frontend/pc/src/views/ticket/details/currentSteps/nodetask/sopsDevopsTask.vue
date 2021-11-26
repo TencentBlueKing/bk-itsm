@@ -38,7 +38,7 @@
             </bk-form-item>
         </bk-form>
         <div class="submit-btn">
-            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
+            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交是"]`) }}</bk-button>
             <bk-button v-if="changeBtn" @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
             <bk-button @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
         </div>
@@ -184,6 +184,7 @@
                         message: this.$t(`m.newCommon["提交成功"]`),
                         theme: 'success'
                     })
+                    this.changeBtn = false
                     this.$emit('reloadTicket')
                 })
             }

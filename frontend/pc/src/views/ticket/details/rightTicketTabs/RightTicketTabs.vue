@@ -22,17 +22,6 @@
 
 <template>
     <div class="right-content">
-        <div class="sla-information">
-            <div class="sla-view">
-                <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', !isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>{{ $t('m["SLA信息"]') }}</span>
-                <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
-            </div>
-            <div :class="['ishowSlaRecord', isShowSla ? 'hide' : '']">
-                <sla-record-tab :basic-infomation="ticketInfo"
-                    :node-list="nodeList">
-                </sla-record-tab>
-            </div>
-        </div>
         <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
             <bk-tab-panel
                 name="log"
@@ -99,7 +88,6 @@
     import EmailNoticeTab from './EmailNoticeTab.vue'
     import CommentTab from './CommentTab.vue'
     import AllTaskTab from './AllTaskTab.vue'
-    import SlaRecordTab from './SlaRecordTab.vue'
     import taskHistory from '../taskInfo/taskHistory.vue'
 
     export default {
@@ -107,7 +95,6 @@
         components: {
             LogTab,
             AssociatedTab,
-            SlaRecordTab,
             InheritTicket,
             EmailNoticeTab,
             CommentTab,
@@ -172,42 +159,13 @@
     display: flex;
     flex-direction: column;
 }
-.sla-information {
-    width: 320px;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-    background: #ffffff;
-    margin-bottom: 16px;
-    .sla-view {
-        height: 46px;
-        line-height: 16px;
-        padding: 16px;
-        .sla-title {
-            font-size: 14px;
-            color: #63656E;
-        }
-        .view-sla-rule {
-            cursor: pointer;
-            float: right;
-            color: #3A84FF;
-            font-size: 12px;
-        }
-    }
-    .ishowSlaRecord {
-        transition: all 0.5s;
-        height: 134px;
-        overflow: hidden;
-    }
-    .hide {
-        height: 0;
-    }
-}
 .right-tiket-tabs {
-    width: 320px;
+    // width: 320px;
     flex: 1;
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;
     /deep/ .bk-tab-section {
-        height: calc(100% - 42px);
+        height: calc(100% - 50px);
         overflow: auto;
         @include scroller;
     }

@@ -87,7 +87,7 @@
                     },
                     {
                         type: 'PUBLIC',
-                        icon: 'bk-itsm-icon icon-itsm-icon-lock-small',
+                        icon: 'bk-itsm-icon icon-itsm-icon-lock-two public-icon',
                         name: '外部评论',
                         docs: '发布的评论所有人可见'
                     }
@@ -139,6 +139,13 @@
                 this.$emit('refreshComment')
             },
             postComment (type) {
+                if (!this.$route.query.project_id && type === 'INSIDE') {
+                    this.$bkMessage({
+                        message: this.$t('m["你当前无法发表内部评论"]'),
+                        theme: 'warning '
+                    })
+                    return
+                }
                 this.commentType = type
                 this.isShowSelect = false
                 this.isShowEditor = true
@@ -170,6 +177,9 @@
     }
 </script>
 <style scoped lang="scss">
+    .public-icon {
+        color: #e2e3e5;
+    }
     .wang-editor-template {
         padding: 20px;
         .select-pattern {

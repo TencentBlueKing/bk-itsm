@@ -23,6 +23,8 @@
         <div class="comment-reply">
             <div class="comment-message" v-for="(item, index) in curComment.children" :key="index">
                 <span>“ {{ $t('m["回复"]') }} {{ item.creator }} {{ $t('m["的评论"]') }} :</span>
+                <span class="reply-right" @click="deleteComment(item.id)"> {{ $t('m["删除"]') }}</span>
+                <span class="reply-right" @click="$emit('editComment', item, 'edit')">{{ $t('m["编辑"]') }} |</span>
                 <p>{{ item.content }}</p>
             </div>
         </div>
@@ -60,7 +62,12 @@
         },
         methods: {
             randomHex () {
-                return `#${Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')}`
+                let authorbgc
+                do {
+                    authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')}`
+                }
+                while (authorbgc === '#ffffff')
+                return authorbgc
             },
             avatar (str) {
                 return str.substr(0, 1).toLocaleUpperCase()
@@ -101,6 +108,7 @@
             font-size: 20px;
             text-align: center;
             opacity: 0.8;
+            color: #fff;
         }
         .user-name {
             color: #3a3b41;
@@ -163,8 +171,16 @@
             white-space: pre-wrap;
             word-break: break-all;
             margin-bottom: 5px;
+            .reply-right {
+                display: none;
+                cursor: pointer;
+                float: right;
+            }
             &:hover{
                 background: #eaebf0;
+                .reply-right {
+                    display: inline-block;
+                }
         }
         }
         p {

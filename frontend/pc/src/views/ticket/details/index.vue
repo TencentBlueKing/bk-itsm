@@ -49,12 +49,26 @@
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
-                <!-- <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div> -->
+                <div data-test-id="ticket_line_screen_drag" class="drag-line" @mousedown="handleLineMouseDown" v-show="showRightTabs"></div>
                 <div class="show-right-icon" @click="onShowRightContent" v-show="!showRightTabs">
                     <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
                 </div>
                 <div id="ticketContainerRight" class="ticket-container-right" v-show="showRightTabs">
+                    <div :class="['sla-information', isShowSla ? 'hide' : '']">
+                        <div class="sla-view">
+                            <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', !isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>&nbsp;{{ $t('m["SLA信息"]') }}</span>
+                            <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
+                        </div>
+                        <sla-record-tab
+                            v-if="!isShowSla"
+                            :threshold="threshold"
+                            :ticket-id="ticketId"
+                            :basic-infomation="ticketInfo"
+                            :node-list="nodeList">
+                        </sla-record-tab>
+                    </div>
                     <right-ticket-tabs
+                        class="right-ticket-tabs"
                         v-if="!loading.ticketLoading"
                         :ticket-info="ticketInfo"
                         :node-list="nodeList"
@@ -79,6 +93,7 @@
 </template>
 
 <script>
+    import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue'
     import TicketHeader from './TicketHeader.vue'
     import NoTicketContent from './components/NoTicketContent.vue'
     import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue'
@@ -96,6 +111,7 @@
             NoTicketContent,
             leftTicketContent,
             TicketHeader,
+            SlaRecordTab,
             RightTicketTabs
         },
         inject: ['reload'],
@@ -107,6 +123,8 @@
         mixins: [fieldMix, commonMix, apiFieldsWatch],
         data () {
             return {
+            
+                isShowSla: true,
                 showRightTabs: true,
                 commentLoading: false,
                 ticketTimer: null, // 单据详情轮询器
@@ -148,7 +166,8 @@
                 // 所有字段列表
                 allFieldList: [],
                 commentList: [],
-                commentId: ''
+                commentId: '',
+                threshold: []
             }
         },
         computed: {
@@ -159,11 +178,21 @@
                 return this.$route.query.token
             }
         },
+        watch: {
+            isShowSla (val) {
+                if (val) {
+                    const slaCount = this.ticketInfo.sla.Length
+                    const slaDom = document.querySelector('.sla-information')
+                    slaDom.style.height = (134 * slaCount) + 'px'
+                }
+            }
+        },
         async mounted () {
             await this.initData()
             if (this.$route.query.cache_key) { // 通知链接进入
                 this.getTicketNoticeInfo()
             }
+            this.getProtocolsList()
         },
         beforeDestroy () {
             this.clearTicketTimer()
@@ -184,6 +213,17 @@
                 this.initTicketTimer()
                 this.getComments()
             },
+            handleClickShowSla () {
+                this.isShowSla = !this.isShowSla
+            },
+            viewSlaRule () {
+                this.$router.push({
+                    name: 'slaAgreement',
+                    query: {
+                        project_id: this.$route.query.project_id || 0
+                    }
+                })
+            },
             async getComments () {
                 if (this.ticketId) {
                     // 有项目id时加载内部评论
@@ -203,6 +243,27 @@
             },
             refreshComment () {
                 this.getComments()
+            },
+            getProtocolsList () {
+                const params = {
+                    project_id: this.ticketInfo.project_key
+                }
+                this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
+                    const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
+                    const slathreshold = curSlas.map(item => {
+                        const condition = item.action_policies.map(ite => {
+                            return ite.condition.expressions[0].value
+                        })
+                        return {
+                            sla_name: item.name,
+                            rWarningThreshold: condition[0] / 100 || 1, // 1为100%
+                            rTimeOutThreshold: condition[1] / 100 || 1,
+                            pWarningThreshold: condition[2] / 100 || 1,
+                            pTimeOutThreshold: condition[3] / 100 || 1
+                        }
+                    })
+                    this.threshold = [...slathreshold]
+                })
             },
             // 展示完整流程
             viewProcess (val) {
@@ -395,7 +456,7 @@
                 }
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
-                    el.style.width = `calc(32% - ${moveX}px)`
+                    el.style.width = `calc(320px - ${moveX}px)`
                 })
             },
             onShowRightContent () {
@@ -403,7 +464,7 @@
                 // 还原到最小宽度
                 this.$nextTick(() => {
                     const el = document.getElementById('ticketContainerRight')
-                    el.style.width = `calc(32% - ${this.dragLine.base}px)`
+                    el.style.width = `calc(320px - ${this.dragLine.base}px)`
                 })
             },
             getTicketNoticeInfo () {
@@ -443,7 +504,7 @@
 }
 .ticket-container {
     display: flex;
-    padding: 12px 20px;
+    padding: 12px 12px 0 12px;
     height: calc(100% - 50px);
     .ticket-container-left {
         flex: 1;
@@ -485,11 +546,40 @@
         }
     }
     .ticket-container-right {
+        width: 320px;
         margin-left: 4px;
-        // width: 320px;
         height: 100%;
-        // box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        // background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        .sla-information {
+            transition: all 0.5s;
+            // height: 100%;
+            box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+            background: #ffffff;
+            margin-bottom: 12px;
+            .sla-view {
+                height: 46px;
+                line-height: 16px;
+                padding: 16px;
+                .sla-title {
+                    font-size: 14px;
+                    color: #63656E;
+                }
+                .view-sla-rule {
+                    cursor: pointer;
+                    float: right;
+                    color: #3A84FF;
+                    font-size: 12px;
+                }
+            }
+        }
+        .hide {
+            height: 46px;
+        }
+        .right-ticket-tabs {
+            flex: 1;
+        }
     }
 }
+
 </style>

@@ -429,6 +429,12 @@
                 if (this.nodeInfo.sla_task_status === 2 && this.nodeInfo.is_reply_need === true) {
                     return false
                 }
+                if (this.nodeInfo.type === 'TASK-SOPS' && this.nodeInfo.status === 'RUNNING') {
+                    return false
+                }
+                if (this.nodeInfo.type === 'TASK-DEVOPS' && this.nodeInfo.status === 'RUNNING') {
+                    return false
+                }
                 return true
             }
         },
@@ -481,10 +487,10 @@
             },
             // 获取流水线
             getpipelineDetail () {
-                if (this.nodeInfo.hasOwnProperty('api_info')) {
+                if (this.nodeInfo.hasOwnProperty('api_info') && this.nodeInfo.type === 'TASK-DEVOPS') {
                     const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
                     const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
-                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
                         this.pipelineList = res.data.properties
                         res.data.properties.forEach(item => {
                             this.pipelineRules[item.id] = [{

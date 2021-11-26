@@ -58,13 +58,26 @@
             }
             editor.config.height = 150
             editor.config.zIndex = 400
+            editor.config.excludeMenus = [
+                'emoticon',
+                'video',
+                'table',
+                'strikeThrough',
+                'indent',
+                'image',
+                'lineHeight',
+                'foreColor',
+                'backColor',
+                'link',
+                'list',
+                'quote'
+            ]
             editor.create()
             this.editor = editor
         },
         methods: {
             selectLine (item) {
                 const text = this.editor.txt.text()
-                console.log(text)
                 this.editor.txt.html(text + `<span class="at-person">${item.name}<span>` + '  ')
             }
         }
