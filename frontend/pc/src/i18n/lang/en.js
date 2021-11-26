@@ -2394,5 +2394,6 @@ export const m = {
     '忽略完成': 'Ignore the complete',
     '提交': 'Submit',
     '忽略': 'Ignore',
-    '重做': 'Rework'
+    '重做': 'Rework',
+    '你当前无法发表内部评论': 'You are not available for internal comment at this time'
 }

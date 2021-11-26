@@ -23,27 +23,11 @@
 <template>
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
-            <!-- <div class="bk-basic-form">
-            </div> -->
             <div class="bk-basic-form">
-                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["单号："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.sn || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["服务目录："]') }}</span>
-                        <span class="bk-info-content"
-                            :title="basicInfomation.catalog_fullname + '>' + basicInfomation.service_name">{{basicInfomation.catalog_fullname}}>{{basicInfomation.service_name}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["关联业务："]') }}</span>
-                        <span class="bk-info-content pl5">{{basicInfomation.service_name || '--'}}</span>
+                    <li v-for="item in basicInfomationList" :key="item.name">
+                        <span class="bk-info-title">{{ item.name }} :</span>
+                        <span class="bk-info-content">{{ item.value || '--'}}</span>
                     </li>
                 </ul>
             </div>
@@ -58,13 +42,9 @@
 </template>
 
 <script>
-    import tableFields from './components/tableFields.vue'
 
     export default {
         name: 'BasicInformation',
-        components: {
-            tableFields
-        },
         props: {
             basicInfomation: {
                 type: Object,
@@ -83,7 +63,8 @@
             return {
                 showMore: false,
                 showInfo: true,
-                displayMoreIcon: true
+                displayMoreIcon: true,
+                basicInfomationList: []
             }
         },
         computed: {
@@ -99,6 +80,7 @@
             }
         },
         mounted () {
+            this.tableFields()
             // 这里是为了等 dom 加载完后计算真实高度
             setTimeout(() => {
                 const contentsDom = document.querySelectorAll('.basic-info-wrap > .bk-basic-info > .bk-basic-form')
@@ -123,6 +105,23 @@
             },
             changeShow () {
                 this.showMore = !this.showMore
+            },
+            // 处理基本信息字段
+            tableFields () {
+                const { service_type_name, sn, catalog_fullname, service_name } = this.basicInfomation
+                const list = [
+                    { name: '工单类型', value: service_type_name },
+                    { name: '单号', value: sn },
+                    { name: '服务目录', value: catalog_fullname + '>' + service_name },
+                    { name: '关联业务', value: service_name }
+                ]
+                const fields = this.firstStateFields.map(item => {
+                    return {
+                        name: item.name,
+                        value: item.display_value
+                    }
+                })
+                this.basicInfomationList = fields.concat(list)
             }
         }
     }
@@ -174,16 +173,15 @@
         }
 
         .bk-info-title {
+            width: 70px;
             text-align: right;
             float: left;
             color: #979ba5;
-            font-weight: bold;
         }
 
         .bk-info-content {
-            font-weight: 400;
             word-wrap: break-word;
-            padding-left: 5px;
+            padding-left: 10px;
             color: #313238;
         }
 

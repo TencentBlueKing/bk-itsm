@@ -115,9 +115,11 @@
 
 <style lang='scss' scoped>
 .ticket-process {
+    margin-left: -5px;
+    cursor: pointer;
     padding: 0px 0px 10px;
     font-size: 12px;
-    color: #3A84FF;
+    color: #3a84ff;
 
 }
 .log-list {

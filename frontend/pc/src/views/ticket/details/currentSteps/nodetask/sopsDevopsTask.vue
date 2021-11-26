@@ -184,6 +184,7 @@
                         message: this.$t(`m.newCommon["提交成功"]`),
                         theme: 'success'
                     })
+                    this.changeBtn = false
                     this.$emit('reloadTicket')
                 })
             }
