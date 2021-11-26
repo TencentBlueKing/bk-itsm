@@ -272,10 +272,10 @@
             p {
                 font-size: 12px;
                 line-height: 20px;
-                color: #63656E;
+                color: #63656e;
                 span {
                     cursor: pointer;
-                    color: #3A84FF;
+                    color: #3a84ff;
                 }
             }
         }
