@@ -266,7 +266,6 @@ export default {
             })
         },
         getReceiptsSlaTask ({ commit, state, dispatch }, params) {
-            console.log(params)
             return ajax.get(`ticket/receipts/${params.id}/sla_task/`).then(response => {
                 const res = response.data
                 return res
