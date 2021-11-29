@@ -32,6 +32,10 @@ class TicketRemarkModelViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         ticket_id = request.query_params.get("ticket_id", "")
         show_type = request.query_params.get("show_type", "PUBLIC")
+
+        # 对于历史单据，自动init
+        TicketRemark.init_root_node(ticket_id)
+
         queryset = self.get_queryset().filter(
             remark_type__in=["ROOT", show_type], ticket_id=ticket_id
         )
