@@ -33,14 +33,15 @@ from common.sub_string import sub_string
 
 logger = logging.getLogger(__name__)
 
-WEB_HOOK_URL = 'http://in.qyapi.weixin.qq.com/cgi-bin/webhook/send?key={}'
+WEB_HOOK_URL = "http://in.qyapi.weixin.qq.com/cgi-bin/webhook/send?key={}"
 
 
 class Announcement(Thread):
-    def __init__(self, web_hook_id, content):
+    def __init__(self, web_hook_id, content, mentioned_list):
         super(Announcement, self).__init__()
         self.web_hook_id = web_hook_id
         self.content = content
+        self.mentioned_list = mentioned_list
         self.status_code = 200
         self.result = None
 
@@ -51,8 +52,18 @@ class Announcement(Thread):
             content = self.content.encode()
             while len(content) > 0:
                 sub_content, index = sub_string(content, 5120)
-                data = {"msgtype": "text", "text": {"content": sub_content.decode(), "mentioned_list": ["@all"]}}
-                resp = session.post(url=WEB_HOOK_URL.format(self.web_hook_id), data=json.dumps(data), verify=False)
+                data = {
+                    "msgtype": "text",
+                    "text": {
+                        "content": sub_content.decode(),
+                        "mentioned_list": self.mentioned_list,
+                    },
+                }
+                resp = session.post(
+                    url=WEB_HOOK_URL.format(self.web_hook_id),
+                    data=json.dumps(data),
+                    verify=False,
+                )
                 self.status_code = resp.status_code
                 self.result = resp.json()
                 if self.status_code != 200 or self.result["errcode"] != 0:
@@ -61,9 +72,17 @@ class Announcement(Thread):
                     break
                 else:
                     content = content[index:]
-            logger.info("[ROBOT] call robot end, status_code is {}, result is {}".format(self.status_code, self.result))
+            logger.info(
+                "[ROBOT] call robot end, status_code is {}, result is {}".format(
+                    self.status_code, self.result
+                )
+            )
         except Exception as err:
-            logger.error("[ROBOT] call robot {} error, message is {}".format(self.web_hook_id, err))
+            logger.error(
+                "[ROBOT] call robot {} error, message is {}".format(
+                    self.web_hook_id, err
+                )
+            )
             self.status_code = 500
             self.result = {"errcode": 500, "errmsg": err}
 
@@ -182,7 +201,7 @@ if __name__ == "__main__":
   - 画布导出图片按钮和小地图样式调整
   - API接口增强，get_task_status支持获取失败节点的异常数据
 """
-    t = Announcement('caf235f1-f7fe-4e1b-adde-2c3ba324ae57', tt)
+    t = Announcement("caf235f1-f7fe-4e1b-adde-2c3ba324ae57", tt)
     t.start()
     t.join()
     print(t.is_success())
