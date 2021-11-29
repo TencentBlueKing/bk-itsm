@@ -28,11 +28,21 @@ CREATE_SERVICE_DATA = {
     "desc": "测试服务",
     "key": "request",
     "catalog_id": 2,
-    "project_key": "0"
+    "project_key": "0",
 }
 
-CONFIGS = {'workflow_config': {'is_revocable': True, 'revoke_config': {'type': 2, 'state': 0},
-                               'is_supervise_needed': False, 'supervise_type': 'EMPTY',
-                               'supervisor': '', 'notify': [], 'notify_rule': 'NONE',
-                               'notify_freq': 0}, 'display_type': 'OPEN',
-           'can_ticket_agency': False}
+CONFIGS = {
+    "workflow_config": {
+        "is_auto_approve": False,
+        "is_revocable": True,
+        "revoke_config": {"type": 2, "state": 0},
+        "is_supervise_needed": False,
+        "supervise_type": "EMPTY",
+        "supervisor": "",
+        "notify": [],
+        "notify_rule": "NONE",
+        "notify_freq": 0,
+    },
+    "display_type": "OPEN",
+    "can_ticket_agency": False,
+}
