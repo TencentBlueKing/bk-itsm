@@ -30,7 +30,13 @@ class TicketRemarkModelViewSet(ModelViewSet):
     serializer_class = TicketRemarkSerializer
 
     def list(self, request, *args, **kwargs):
-        return Response()
+        ticket_id = request.query_params.get("ticket_id", "")
+        show_type = request.query_params.get("show_type", "PUBLIC")
+        queryset = self.get_queryset().filter(
+            remark_type__in=["ROOT", show_type], ticket_id=ticket_id
+        )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def tree_view(self, request):
