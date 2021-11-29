@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # 不支持的 字段附件，表格， API字段
 
 import copy
+import datetime
 import re
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
@@ -210,8 +211,19 @@ class ApiInfoField(BaseField):
                 clean_data.append(_clean_value)
             return clean_data
 
+        def _datetime_clean(_value):
+            return _value.strftime('%Y-%m-%d %H:%M:%S')
+
+        def _date_clean(_value):
+            return _value.strftime('%Y-%m-%d')
+        
         def _leaf_clean(_value):
-            return self.validate(parse_tool(param=_value, **kwargs))
+            result = self.validate(parse_tool(param=_value, **kwargs))
+            if isinstance(result, datetime.datetime):
+                return _datetime_clean(result)
+            if isinstance(result, datetime.date):
+                return _date_clean(result)
+            return result
 
         value = value.get("value")
         if not isinstance(value, (dict, list)):
