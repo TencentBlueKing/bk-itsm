@@ -2,10 +2,10 @@
 
 # 单元测试
 # coverage 需要统计覆盖率的文件（夹）
-COVERAGE_INCLUDE_MODULES="apps/*,config/*,urls.py,settings.py"
+COVERAGE_INCLUDE_MODULES="itsm/*,config/*,urls.py,settings.py"
 
 # coverage 忽略文件
-COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*"
+COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*,*/blueking/*"
 
 # 删除coverage历史归档文件
 coverage erase
