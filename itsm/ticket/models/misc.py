@@ -460,6 +460,14 @@ class TicketRemark(BaseMpttModel):
         return cls.subtree(root_node, show_type)
 
     @classmethod
+    def init_root_node(cls, ticket_id):
+        # 获取当前节点的根节点
+        try:
+            cls._objects.get(ticket_id=ticket_id, remark_type="ROOT")
+        except cls.DoesNotExist:
+            TicketRemark.create_root(ticket_id=ticket_id)
+
+    @classmethod
     def subtree(cls, node, show_type):
         """获取以node为根的子树"""
 
