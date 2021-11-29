@@ -178,12 +178,9 @@ class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):
         context = ticket.get_notify_context()
         context.update({'message': notify_log.message, 'action': ACTION_CHOICES_DICT.get(FOLLOW_OPERATE, _('待处理'))})
 
-        follow_link = '{site_url}#/ticket/{ticket_id}/?activeNname=all&router={service}&token={token}'.format(
-            site_url=settings.TICKET_NOTIFY_HOST,
-            service=ticket.service_type,
-            ticket_id=ticket.id,
-            title=SERVICE_CATEGORY.get(ticket.service_type, ''),
-            token=ticket_token,
+        follow_link = '{site_url}#/ticket/detail?id={ticket_id}'.format(
+            site_url=settings.FRONTEND_URL,
+            ticket_id=ticket.id
         )
         context['ticket_url'] = follow_link
 
