@@ -5,7 +5,7 @@
 COVERAGE_INCLUDE_MODULES="itsm/*,config/*,urls.py,settings.py"
 
 # coverage 忽略文件
-COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*,*/blueking/*"
+COVERAGE_OMIT_PATH="*/test/*,*/virtualenv/*,*/venv/*,*/migrations/*,*/tests/*,*/blueking/*,*/business_rules/*,*/common/*,*/iam/*,*/pipeline/*"
 
 # 删除coverage历史归档文件
 coverage erase
