@@ -67,7 +67,7 @@ class TestComponentsUtilsInstance(TestCase):
             validate_type=["en", "ch", "num", "special"], special_char="()_ .-"
         )
         file_name_validator.validate("1.jpg")
-        self.assertRaises(file_name_validator.validate("##"), ValidationError)
+        self.assertRaises(ValidationError, file_name_validator.validate, "###")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_complex_regex(self):
