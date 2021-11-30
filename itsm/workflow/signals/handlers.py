@@ -39,6 +39,10 @@ from itsm.component.constants import (
     APPROVAL_VARIABLES,
     DEVOPS_TASK,
     DEVOPS_TASK_FIELDS_SCHEMA,
+    TASK_DEVOPS_STATE,
+    TASK_SOPS_STATE,
+    TASK_STATE,
+    TASK_VARIABLES,
 )
 from itsm.component.exceptions import WorkFlowError
 from itsm.component.utils.basic import get_random_key
@@ -63,6 +67,27 @@ def state_created_handler(sender, flow_id, state_id, state_type, **kwargs):
         sign_update(state_id, flow_id)
     elif state_type == APPROVAL_STATE:
         approval_update(state_id, flow_id)
+    elif state_type in [TASK_DEVOPS_STATE, TASK_SOPS_STATE, TASK_STATE]:
+        task_update(state_id, flow_id)
+
+
+def task_update(state_id, flow_id):
+    global_variables = []
+    state = State.objects.get(id=state_id)
+    for variable in TASK_VARIABLES:
+        variable["flow_id"] = flow_id
+        variable["state_id"] = state_id
+        variable["key"] = get_random_key(variable["name"])
+        global_variables.append(GlobalVariable(**variable))
+        state.add_variables(
+            variable["key"],
+            variable["type"],
+            name=variable["name"],
+            source="global",
+            meta=variable["meta"],
+        )
+    GlobalVariable.objects.bulk_create(global_variables)
+    state.save()
 
 
 def sign_update(state_id, flow_id):

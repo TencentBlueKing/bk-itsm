@@ -764,9 +764,15 @@ class StateGlobalVariablesValidator(object):
         """
         和其他相关联的model校验
         """
-        path_key_dict = {
-            item["ref_path"]: item["key"] for item in self.instance.variables["outputs"]
-        }
+        path_key_dict = {}
+        for item in self.instance.variables["outputs"]:
+            if (
+                item["source"] == "global"
+                and item["meta"].get("code") == "TASK_EXECUTE_RESULT"
+            ):
+                continue
+            path_key_dict[item["ref_path"]] = item["key"]
+
         refs = [output.get("ref_path") for output in outputs]
         deleted_variable = []
         for ref, key in six.iteritems(path_key_dict):
