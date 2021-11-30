@@ -225,19 +225,27 @@
                 })
             },
             async getComments () {
-                if (this.ticketId) {
-                    // 有项目id时加载内部评论
+                try {
                     this.commentLoading = true
                     const commentList = []
-                    const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'PUBLIC' })
+                    const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', {
+                        'ticket_id': this.ticketId,
+                        'show_type': 'PUBLIC'
+                    })
+                    this.commentId = publicRes.data.find(item => item.remark_type === 'ROOT').id
                     if (this.$route.query.project_id) {
-                        const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': 'INSIDE' })
-                        commentList.push(...insideRes.data.children)
+                        const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', {
+                            'ticket_id': this.ticketId,
+                            'show_type': 'INSIDE'
+                        })
+                        commentList.push(...insideRes.data)
                     }
-                    commentList.push(...publicRes.data.children)
+                    commentList.push(...publicRes.data)
                     commentList.sort((a, b) => b.id - a.id)
-                    this.commentList = commentList
-                    this.commentId = publicRes.data.id
+                    this.commentList = commentList.filter(item => item.remark_type !== 'ROOT')
+                } catch (e) {
+                    console.log(e)
+                } finally {
                     this.commentLoading = false
                 }
             },
@@ -504,13 +512,14 @@
 }
 .ticket-container {
     display: flex;
-    padding: 12px 12px 0 12px;
+    padding: 24px 24px 0 24px;
     height: calc(100% - 50px);
     .ticket-container-left {
         flex: 1;
-        margin-right: 4px;
+        margin-right: 22px;
         height: 100%;
         overflow: auto;
+        background-color: #f5f7fa;
         @include scroller;
     }
     .drag-line {
@@ -553,12 +562,11 @@
         flex-direction: column;
         .sla-information {
             transition: all 0.5s;
-            // height: 100%;
             box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
             background: #ffffff;
-            margin-bottom: 12px;
+            margin-bottom: 24px;
             .sla-view {
-                height: 46px;
+                height: 54px;
                 line-height: 16px;
                 padding: 16px;
                 .sla-title {
@@ -574,7 +582,7 @@
             }
         }
         .hide {
-            height: 46px;
+            height: 54px;
         }
         .right-ticket-tabs {
             flex: 1;
