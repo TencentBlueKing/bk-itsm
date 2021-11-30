@@ -256,7 +256,8 @@ class StatusSerializer(serializers.ModelSerializer):
         elif inst.state["type"] == TASK_DEVOPS_STATE:
             remote_info = {
                 "devops_info": self.build_devops_info(
-                    inst.state["extras"]["devops_info"], data["contexts"].get("build_params", {})
+                    inst.state["extras"]["devops_info"],
+                    data["contexts"].get("build_params", {}),
                 ),
                 "devops_result": TASK_STATUS_DICT.get(data["status"], _("执行中")),
                 "devops_build_url": data["contexts"].get("build_url", ""),
@@ -409,7 +410,8 @@ class StatusSerializer(serializers.ModelSerializer):
                 "name": devops_info["pipeline_id"]["name"],
                 "value": devops_info["pipeline_id"]["value"],
                 "params_value": task_params["pipeline_id"],
-            }]
+            },
+        ]
         if devops_info["constants"]:
             info.extend(
                 [
@@ -1413,9 +1415,6 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         parent_id = validated_data["parent"]["id"]
         parent_node = TicketRemark.objects.get(id=parent_id)
-        if parent_node.level > 1:
-            raise serializers.ValidationError("被引用的评论不允许被再次回复")
-
         validated_data["parent_id"] = parent_id
         validated_data["ticket_id"] = parent_node.ticket_id
         validated_data.pop("parent")
@@ -1444,6 +1443,10 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             "update_log",
             "users",
             "remark_type",
+            "creator",
+            "create_at",
+            "update_at",
+            "updated_by",
         )
         # 只读字段在创建和更新时均被忽略
         read_only_fields = (
@@ -1455,4 +1458,8 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
             "parent__name",
             "ticket_id",
             "update_log",
+            "creator",
+            "create_at",
+            "update_at",
+            "updated_by",
         )
