@@ -223,7 +223,7 @@
 <style lang='scss' scoped>
 .base-info-content {
     padding: 0 10px;
-    min-height: 46px;
+    min-height: 54px;
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;
     /deep/ .bk-tab-section {
@@ -234,6 +234,7 @@
         font-size: 14px;
     }
     .ticket-creator {
+        line-height: 54px;
         display: inline-block;
         color: #979BA5;
         font-size: 12px;
@@ -241,9 +242,12 @@
             margin-left: 30px;
         }
     }
+    /deep/ .bk-icon {
+        line-height: 54px;
+    }
 }
 .current-step-content {
-    margin-top: 12px;
+    margin-top: 24px;
     padding: 10px;
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;

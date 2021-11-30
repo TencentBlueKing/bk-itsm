@@ -2,7 +2,10 @@
     <div class="comment">
         <div class="comment-info">
             <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div>
-            <p><span class="user-name">{{ curComment.creator}}  </span><span class="issue-time">{{ $t('m["发布于"]') }} {{ curComment.create_at }}</span><i v-if="curComment.remark === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
+            <p>
+                <span class="user-name">{{ curComment.creator}}  </span>
+                <span class="issue-time">{{ $t('m["发布于"]') }} {{ curComment.create_at }}</span>
+                <i v-if="curComment.remark_type === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
             <div
                 v-if="curComment.update_log.length"
                 v-bk-tooltips="{
@@ -19,13 +22,14 @@
         </div>
         <div class="comment-content">
             <p>{{ curComment.content }}</p>
-        </div>
-        <div class="comment-reply">
-            <div class="comment-message" v-for="(item, index) in curComment.children" :key="index">
-                <span>“ {{ $t('m["回复"]') }} {{ item.creator }} {{ $t('m["的评论"]') }} :</span>
-                <span class="reply-right" @click="deleteComment(item.id)"> {{ $t('m["删除"]') }}</span>
-                <span class="reply-right" @click="$emit('editComment', item, 'edit')">{{ $t('m["编辑"]') }} |</span>
-                <p>{{ item.content }}</p>
+            <div
+                v-if="parentComment"
+                class="comment-reply"
+                @click="jumpTargetComment(curComment)">
+                <div class="comment-message">
+                    <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ parentComment.creator }} {{ $t('m["的评论"]') }} :</span>
+                    <p>{{ parentComment.content }}</p>
+                </div>
             </div>
         </div>
         <div class="operation">
@@ -51,13 +55,23 @@
     export default {
         name: 'commentItem',
         props: {
-            curComment: Object
+            curComment: Object,
+            commentList: Array
         },
         data () {
             return {
                 isEditComment: false,
                 deleteCommentDialog: false,
                 isAgree: false
+            }
+        },
+        computed: {
+            parentComment () {
+                const parentComment = this.commentList.find(item => item.id === this.curComment.parent)
+                if (parentComment && parentComment.remark_type === 'ROOT') {
+                    return null
+                }
+                return parentComment
             }
         },
         methods: {
@@ -84,6 +98,9 @@
             },
             handleDeleteDialogShow (val) {
                 this.deleteCommentDialog = val
+            },
+            jumpTargetComment (curComment) {
+                this.$emit('jumpTargetComment', curComment)
             }
         }
     }
@@ -92,7 +109,6 @@
 <style scoped lang="scss">
 .comment {
     width: 100%;
-    margin: 20px 0;
     color: #6d6f77;
     font-size: 12px;
     .comment-info {
@@ -162,7 +178,8 @@
     }
     .comment-reply {
         line-height: 28px;
-        margin-left: 40px;
+        cursor: pointer;
+        margin: 8px 0;
         .comment-message {
             padding: 10px 24px 10px 16px;
             min-height: 74px;
@@ -194,6 +211,17 @@
             margin: 0 2px;
         }
     }
+}
+.icon-yinyong {
+    position: relative;
+    top: -4px;
+    left: 0px;
+    font-size: 16px;
+    margin-right: 10px;
+    width: 12px;
+    height: 10px;
+    opacity: 1;
+    color: #c4c6cc;
 }
 /deep/ .bk-dialog-body {
         text-align: center;

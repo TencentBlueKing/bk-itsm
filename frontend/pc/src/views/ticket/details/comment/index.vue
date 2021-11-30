@@ -33,11 +33,13 @@
         <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
-        <ul v-bkloading="{ isLoading: commentLoading }">
+        <ul v-bkloading="{ isLoading: commentLoading }" class="comment-list">
             <li v-for="(item, index) in commentList" :key="index">
                 <comment-item
+                    :comment-list="commentList"
                     :cur-comment="item"
                     @refreshComment="refreshComment"
+                    @jumpTargetComment="jumpTargetComment"
                     @editComment="editComment">
                 </comment-item>
             </li>
@@ -72,8 +74,8 @@
         },
         data () {
             return {
-                // commentId: '',
                 curCommentId: '',
+                commentListDom: document.querySelector('.ticket-container-left'),
                 commentType: '', // 评论类型
                 isShowSelect: true,
                 isShowEditor: false, // 打开富文本
@@ -105,7 +107,7 @@
                 this.curCommentId = curComment.id
                 if (type === 'edit') _this.txt.html(curComment.content)
                 // 新增回复评论的类型取决于父级类型
-                this.commentType = curComment.remark
+                this.commentType = curComment.remark_type
                 this.isEdit = true
             },
             changebuttonStatus (val) {
@@ -132,6 +134,7 @@
                 }
                 this.$store.dispatch(url, params).then(res => {
                     this.refreshComment()
+                    this.commentListDom.scrollTop = 0
                 })
             },
             refreshComment () {
@@ -149,6 +152,20 @@
                 this.commentType = type
                 this.isShowSelect = false
                 this.isShowEditor = true
+            },
+            jumpTargetComment (curComment) {
+                const commentDom = document.querySelector('.ticket-container-left').childNodes[0] // 左边内容
+                const basicDomHeight = commentDom.children[0].clientHeight
+                // 获取parent的评论下标
+                const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0])
+                if (curCommentIndex !== -1) {
+                    const commentListDom = document.querySelector('.comment-list')
+                    const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex).map(item => {
+                        return item.clientHeight
+                    })
+                    const sumHeight = heights.reduce((pre, cur) => pre + cur)
+                    commentDom.parentNode.scrollTop = sumHeight + commentListDom.offsetTop + basicDomHeight
+                }
             },
             submit () {
                 // 评论内容
@@ -169,6 +186,7 @@
                     if (text) {
                         this.$store.dispatch('ticket/addTicketComment', params).then(res => {
                             this.refreshComment()
+                            this.commentListDom.scrollTop = 0
                         })
                     }
                 }
@@ -177,6 +195,7 @@
     }
 </script>
 <style scoped lang="scss">
+// @import '../../../../scss/mixins/scroller.scss';
     .public-icon {
         color: #e2e3e5;
     }
@@ -212,6 +231,12 @@
                     font-size: 12px;
                     line-height: 20px;
                 }
+            }
+        }
+        .comment-list {
+            min-height: 100px;
+            li {
+                padding-top: 20px;
             }
         }
         .submit {

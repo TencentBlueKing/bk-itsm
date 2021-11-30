@@ -119,8 +119,9 @@ export default {
             return ajax.get(`ticket/receipts/${id}/get_ticket_output/`).then(response => response.data)
         },
         // 获取单据下的所有评论
+        // api/ticket/remark/?ticket_id=132&show_type=INSIDE
         getTicketAllComments ({ commit, state, dispatch }, params) {
-            return ajax.get('ticket/remark/tree_view/', { params }).then(response => {
+            return ajax.get('ticket/remark/', { params }).then(response => {
                 let res = response.data
                 return res
             })
