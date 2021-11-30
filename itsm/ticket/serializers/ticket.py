@@ -1378,6 +1378,11 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
 
     """服务目录序列化"""
 
+    REMARK_TYPE = [
+        ("PUBLIC", "公开评论"),
+        ("INSIDE", "内部评论"),
+    ]
+
     level = serializers.IntegerField(required=False, min_value=0)
     # allow_blank -> 允许字段为空字符串
     content = serializers.CharField(
@@ -1387,9 +1392,7 @@ class TicketRemarkSerializer(serializers.ModelSerializer):
     parent_key = serializers.CharField(required=False, allow_blank=True)
     update_log = serializers.JSONField(required=False)
     users = serializers.ListField(required=True, initial=[])
-    remark_type = serializers.ChoiceField(
-        required=True, choices=TicketRemark.REMARK_TYPE
-    )
+    remark_type = serializers.ChoiceField(required=True, choices=REMARK_TYPE)
 
     def update(self, instance, validated_data):
         update_by = validated_data["updated_by"]
