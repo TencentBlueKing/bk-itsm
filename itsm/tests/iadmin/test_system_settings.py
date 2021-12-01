@@ -23,29 +23,29 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+__author__ = "蓝鲸智云"
+__copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
+
 from django.test import TestCase, override_settings
 
 
-class TestRemoteSystem(TestCase):
-    def setUp(self) -> None:
-        pass
+class SystemSettingsTest(TestCase):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_configrations(self):
+        url = "/api/iadmin/system_settings/configrations/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data, dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_list(self):
-        url = "/api/postman/remote_system/"
-
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.data["result"], True)
-        self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
-
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_get_systems(self):
-        url = "/api/postman/remote_system/get_systems/"
-
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.data["result"], True)
-        self.assertEqual(resp.data["code"], "OK")
-        self.assertEqual(len(resp.data["data"]), 6)
+    def test_change_settings(self):
+        url = "/api/iadmin/system_settings/3/"
+        data = {"key": "FIRST_STATE_SWITCH", "type": "FUNCTION", "value": "off"}
+        rsp = self.client.put(path=url, data=data, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertEqual(rsp.data["data"]["id"], 3)
+        self.assertEqual(rsp.data["data"]["type"], "FUNCTION")
+        self.assertEqual(rsp.data["data"]["key"], "FIRST_STATE_SWITCH")
+        self.assertEqual(rsp.data["data"]["value"], "off")
