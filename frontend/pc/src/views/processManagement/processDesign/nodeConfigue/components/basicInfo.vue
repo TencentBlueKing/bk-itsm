@@ -72,7 +72,7 @@
                 </p>
             </bk-form-item>
             <template v-if="assignorsTypeList.some(assignor => assignor === formInfo.distribute_type)">
-                <bk-form-item :label="$t(`m.treeinfo['派单人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-select-assignors" :label="$t(`m.treeinfo['派单人：']`)" :required="true">
                     <div @click="checkStatus.assignors = false">
                         <deal-person
                             ref="assignors"
