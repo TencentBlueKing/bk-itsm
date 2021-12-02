@@ -36,8 +36,13 @@ class TicketRemarkModelViewSet(ModelViewSet):
         # 对于历史单据，自动init
         TicketRemark.init_root_node(ticket_id)
 
+        remark_type = ["ROOT", show_type]
+
+        if show_type == "ALL":
+            remark_type = ["ROOT", "INSIDE", "PUBLIC"]
+
         queryset = self.get_queryset().filter(
-            remark_type__in=["ROOT", show_type], ticket_id=ticket_id
+            remark_type__in=remark_type, ticket_id=ticket_id
         )
         page = self.paginate_queryset(queryset)
         if page is not None:
