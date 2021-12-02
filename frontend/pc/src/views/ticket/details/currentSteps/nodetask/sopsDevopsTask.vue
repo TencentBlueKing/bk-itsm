@@ -17,7 +17,7 @@
         </sops-get-param>
         <!-- DEVOPS -->
         <bk-form
-            v-else
+            v-if="nodeInfo.type === 'TASK-DEVOPS'"
             ref="devopsVariable"
             ext-cls="pipelineForm"
             form-type="vertical"
@@ -37,6 +37,10 @@
                 </bk-input>
             </bk-form-item>
         </bk-form>
+        <devops-preview
+            v-if="nodeInfo.type === 'TASK-DEVOPS'"
+            :stages="pipelineStages">
+        </devops-preview>
         <div class="submit-btn">
             <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
             <bk-button v-if="changeBtn" @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
@@ -46,12 +50,13 @@
 </template>
 
 <script>
-
+    import DevopsPreview from '@/components/task/DevopsPreview.vue'
     import sopsGetParam from '../../../../processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue'
     export default {
         name: 'sopsTask',
         components: {
-            sopsGetParam
+            sopsGetParam,
+            DevopsPreview
         },
         props: {
             ticketInfo: Object,
@@ -64,7 +69,8 @@
                 default: () => ([])
             },
             pipelineRules: Object,
-            workflow: Number
+            workflow: [Number, String],
+            pipelineStages: Array
         },
         data () {
             return {

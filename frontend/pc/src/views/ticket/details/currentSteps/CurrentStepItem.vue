@@ -150,6 +150,7 @@
                             :constant-default-value="constantDefaultValue"
                             :ticket-info="ticketInfo"
                             :workflow="workflow"
+                            :pipeline-stages="pipelineStages"
                             :pipeline-rules="pipelineRules"
                             @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
@@ -338,6 +339,7 @@
                 hookedVarList: {},
                 pipelineList: [],
                 pipelineRules: {},
+                pipelineStages: [],
                 constantDefaultValue: {},
                 convertTimeArrToString,
                 replyBtnLoading: false,
@@ -499,6 +501,9 @@
                                 trigger: 'blur'
                             }]
                         })
+                    })
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                        this.pipelineStages = res.data.stages
                     })
                 }
             },
