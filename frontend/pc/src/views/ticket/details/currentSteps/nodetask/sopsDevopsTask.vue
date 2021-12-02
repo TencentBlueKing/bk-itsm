@@ -70,7 +70,8 @@
             },
             pipelineRules: Object,
             workflow: [Number, String],
-            pipelineStages: Array
+            pipelineStages: Array,
+            pipelineConstants: Array
         },
         data () {
             return {
@@ -95,6 +96,11 @@
         },
         mounted () {
             this.getRelatedFields()
+            if (this.pipelineConstants.length > 0) {
+                this.pipelineConstants.map(item => {
+                    this.$set(this.pipelineData, item.key, item.value)
+                })
+            }
         },
         methods: {
             async getRelatedFields () {
