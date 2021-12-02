@@ -37,6 +37,7 @@
                 :font-size="'medium'"
                 @selected="onFirstLevelChange">
                 <bk-option v-for="option in firstLevelList"
+                    :data-test-id="`dealPerson-select-first-${option.id}`"
                     :key="option.id"
                     :id="option.id"
                     :name="option.name">
@@ -62,6 +63,7 @@
                     searchable
                     :font-size="'medium'">
                     <bk-option v-for="option in secondLevelList"
+                        :data-test-id="`dealPerson-select-second-${option.id}`"
                         :key="option.id"
                         :id="option.id"
                         :name="option.name">
