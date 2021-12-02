@@ -129,7 +129,7 @@
                 leftTicketDom: '',
                 isRequsetComment: false,
                 totalPages: 0, // 评论总页数
-                page: 0, // 评论当前页数
+                page: 1, // 评论当前页数
                 page_size: 10,
                 isShowSla: true,
                 showRightTabs: true,
@@ -242,17 +242,22 @@
                     const commentList = []
                     const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                         'ticket_id': this.ticketId,
-                        'show_type': 'PUBLIC'
+                        'show_type': 'PUBLIC',
+                        page: this.page,
+                        page_size: this.page_size
                     })
-                    this.commentId = publicRes.data.find(item => item.remark_type === 'ROOT').id
+                    console.log(publicRes)
+                    this.commentId = publicRes.data.items.find(item => item.remark_type === 'ROOT').id
                     if (this.$route.query.project_id) {
                         const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                             'ticket_id': this.ticketId,
-                            'show_type': 'INSIDE'
+                            'show_type': 'INSIDE',
+                            page: this.page,
+                            page_size: this.page_size
                         })
-                        commentList.push(...insideRes.data)
+                        commentList.push(...insideRes.data.items)
                     }
-                    commentList.push(...publicRes.data)
+                    commentList.push(...publicRes.data.items)
                     commentList.sort((a, b) => b.id - a.id)
                     this.commentList = commentList.filter(item => item.remark_type !== 'ROOT')
                 } catch (e) {
