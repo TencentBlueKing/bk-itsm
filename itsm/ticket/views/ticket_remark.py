@@ -39,6 +39,10 @@ class TicketRemarkModelViewSet(ModelViewSet):
         queryset = self.get_queryset().filter(
             remark_type__in=["ROOT", show_type], ticket_id=ticket_id
         )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
