@@ -800,3 +800,36 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-yinyong:before {
 	content: "\e20f";
 }
+.icon-chenggong:before {
+	content: "\e210";
+}
+.icon-shuxian:before {
+	content: "\e211";
+}
+.icon-xiangyou:before {
+	content: "\e212";
+}
+.icon-xiangxia:before {
+	content: "\e213";
+}
+.icon-shuaxin:before {
+	content: "\e214";
+}
+.icon-emoji-add:before {
+	content: "\e215";
+}
+.icon-xiaoxi:before {
+	content: "\e217";
+}
+.icon-jiesuo:before {
+	content: "\e216";
+}
+.icon-suoding:before {
+	content: "\e218";
+}
+.icon-morenyonghutouxiang:before {
+	content: "\e21a";
+}
+.icon-chaoshigaojing:before {
+	content: "\e219";
+}

@@ -26,7 +26,7 @@
         <!-- 线条 -->
         <div class="bk-content-line" v-if="!isLastNode"></div>
         <!-- 圆圈 -->
-        <div class="bk-node-circle"></div>
+        <!-- <div class="bk-node-circle"></div> -->
         <!-- content -->
         <div :class="['bk-node-info', { 'full-screen': isFullScreen }]">
             <div class="bk-node-header">
@@ -792,7 +792,7 @@
             .bk-node-title {
                 margin-bottom: 4px;
                 outline: none;
-                background-color: #F0F1F5;
+                background-color: #ffffff;
                 color: #737987;
                 padding: 0;
                 width: 100%;
@@ -831,7 +831,7 @@
                 padding: 8px 15px;
                 width: 100%;
                 color: #737987;
-                background-color: #F0F1F5;
+                background-color: #ffffff;
                 border-radius: 2px;
                 .icon-angle-down {
                     font-size: 22px;

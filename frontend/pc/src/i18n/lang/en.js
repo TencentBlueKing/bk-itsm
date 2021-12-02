@@ -2363,9 +2363,9 @@ export const m = {
     '该项目不允许删除': 'This project is not allowed to be deleted',
     '分析': 'Analysis',
     '提单成功': 'Create Ticket Sucess',
-    '当前流程已跳转至下一流程节点': 'The current process has moved to the next process node',
+    '当前流程已跳转至下一节点': 'The current process has moved to the next node',
     '后将自动跳转至流程详情查看': 'automatically jump to flow details',
-    '返回列表': 'Return list',
+    '返回单据列表': 'Return ticket list',
     '查看流程详情': 'Viewing Process Details',
     '审批节点已自动处理': 'The approval node is automatically processed',
     '流水线': 'Pipeline',
@@ -2395,5 +2395,12 @@ export const m = {
     '提交': 'Submit',
     '忽略': 'Ignore',
     '重做': 'Rework',
-    '你当前无法发表内部评论': 'You are not available for internal comment at this time'
+    '你当前无法发表内部评论': 'You are not available for internal comment at this time',
+    '刚刚': 'a few seconds ago',
+    '秒钟前': 'seconds ago',
+    '分钟前': 'minutes ago',
+    '小时前': 'hours ago',
+    '天前': 'days ago',
+    '月前': 'months ago',
+    '年前': 'years ago'
 }

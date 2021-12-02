@@ -83,13 +83,13 @@
                 selectPatternList: [
                     {
                         type: 'INSIDE',
-                        icon: 'bk-itsm-icon icon-itsm-icon-lock-two',
+                        icon: 'bk-itsm-icon icon-suoding common-color',
                         name: '内部评论',
                         docs: '发布的评论仅内部人员可用'
                     },
                     {
                         type: 'PUBLIC',
-                        icon: 'bk-itsm-icon icon-itsm-icon-lock-two public-icon',
+                        icon: 'bk-itsm-icon icon-jiesuo common-color',
                         name: '外部评论',
                         docs: '发布的评论所有人可见'
                     }
@@ -196,8 +196,8 @@
 </script>
 <style scoped lang="scss">
 // @import '../../../../scss/mixins/scroller.scss';
-    .public-icon {
-        color: #e2e3e5;
+    .common-color {
+        color: #c4c6cc;
     }
     .wang-editor-template {
         padding: 20px;

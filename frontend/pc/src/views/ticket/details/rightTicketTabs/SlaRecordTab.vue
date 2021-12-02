@@ -49,7 +49,7 @@
             </div>
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <span v-bk-tooltips.top="{ content: '首次处理时间' + sla.replied_at }" class="underline time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
+                <span v-bk-tooltips.top="{ content: '首次处理时间' + (sla.replied_at || '00-00-00 00:00:00') }" class="underline time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[5]}}</span>
@@ -229,7 +229,7 @@
 
 <style scoped lang='scss'>
     .bk-correlationsla-info {
-        min-height: 134px;
+        min-height: 118px;
         padding: 10px 28px;
         .bk-correlationsla-li{
             height: 134px;

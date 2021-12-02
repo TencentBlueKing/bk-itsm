@@ -56,7 +56,10 @@
                 <div id="ticketContainerRight" class="ticket-container-right" v-show="showRightTabs">
                     <div :class="['sla-information', isShowSla ? 'hide' : '']">
                         <div class="sla-view">
-                            <span class="sla-title" @click="handleClickShowSla"><i :class="['bk-itsm-icon', !isShowSla ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>&nbsp;{{ $t('m["SLA信息"]') }}</span>
+                            <div class="sla-title" @click="handleClickShowSla">
+                                <i :class="['bk-itsm-icon', !isShowSla ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                                <span>{{ $t('m["SLA信息"]') }}</span>
+                            </div>
                             <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
                         </div>
                         <sla-record-tab
@@ -123,7 +126,11 @@
         mixins: [fieldMix, commonMix, apiFieldsWatch],
         data () {
             return {
-            
+                leftTicketDom: '',
+                isRequsetComment: false,
+                totalPages: 0, // 评论总页数
+                page: 0, // 评论当前页数
+                page_size: 10,
                 isShowSla: true,
                 showRightTabs: true,
                 commentLoading: false,
@@ -193,9 +200,14 @@
                 this.getTicketNoticeInfo()
             }
             this.getProtocolsList()
+            this.$nextTick(function () {
+                this.leftTicketDom = document.querySelector('.ticket-container-left')
+                this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
+            })
         },
         beforeDestroy () {
             this.clearTicketTimer()
+            // this.leftTicketDom.removeEventListener('scroll', this.handleTicketScroll)
         },
         methods: {
             // 同步数据，需等待 ticketInfo 返回
@@ -248,6 +260,23 @@
                 } finally {
                     this.commentLoading = false
                 }
+            },
+            handleTicketScroll () {
+                const el = this.leftTicketDom
+                console.log(el.scrollHeight - el.offsetHeight - el.scrollTop)
+                // if (!this.isPageOver && !this.isThrottled) {
+                //     this.isThrottled = true
+                //     this.pollingTimer = setTimeout(() => {
+                //         this.isThrottled = false
+                //         const el = this.leftTicketDom
+                //         if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+                //             this.currentPage += 1
+                //             this.isPageOver = this.currentPage === this.totalPage
+                //             clearTimeout(this.pollingTimer)
+                //             this.getSubflowList()
+                //         }
+                //     }, 500)
+                // }
             },
             refreshComment () {
                 this.getComments()
@@ -567,11 +596,16 @@
             margin-bottom: 24px;
             .sla-view {
                 height: 54px;
-                line-height: 16px;
-                padding: 16px;
+                line-height: 20px;
+                padding: 17px 24px;
                 .sla-title {
-                    font-size: 14px;
+                    display: inline-block;
                     color: #63656E;
+                    i {
+                        display: inline-block;
+                        font-size: 12px;
+                        margin-right: 8px;
+                    }
                 }
                 .view-sla-rule {
                     cursor: pointer;
