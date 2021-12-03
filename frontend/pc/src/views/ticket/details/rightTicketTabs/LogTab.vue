@@ -22,7 +22,7 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <div v-if="true" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+        <div v-if="$store.state.ticket.hasTicketNodeOptAuth" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
         <bk-timeline
             data-test-id="ticket_timeline_viewLog"
             ext-cls="log-time-line"
@@ -36,6 +36,15 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
+        <!-- <div v-if="$store.state.ticket.hasTicketNodeOptAuth" class="process-detail">
+            <span class="process-title">流转进程</span>
+            <div class="process-header" @click="isShowDetail = !isShowDetail">
+                <i :class="['bk-itsm-icon', isShowDetail ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                <span>流程详情</span>
+            </div>
+            <div v-show="isShowDetail" class="process-content">
+            </div>
+        </div> -->
     </div>
 </template>
 
@@ -55,7 +64,8 @@
                 dispalyLogInfo: null,
                 flowStartText: this.$t(`m.newCommon["流程开始"]`),
                 loading: false,
-                list: []
+                list: [],
+                isShowDetail: false
             }
         },
         created () {
@@ -140,6 +150,32 @@
         .bk-timeline-dot {
             padding-bottom: 10px;
         }
+    }
+}
+.process-detail {
+    width: 272px;
+    .process-title {
+        width: 56px;
+        height: 22px;
+        font-size: 14px;
+        color: #63656e;
+        font-weight: 700;
+    }
+    .process-header {
+        margin-top: 11px;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        background: #f5f7fa;
+        border-radius: 2px;
+        color: #63656e;
+        i {
+            color: #c4c6cc;
+        }
+    }
+    .process-content {
+        height: 300px;
+        background-color: rgb(194, 89, 89);
     }
 }
 </style>

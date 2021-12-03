@@ -38,6 +38,7 @@
             <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
+                    v-if="hasNodeOptAuth"
                     name="currentStep"
                     :label="$t(`m.newCommon['单据处理']`)">
                     <!-- 当前节点 -->
@@ -65,11 +66,15 @@
                         <i class="panel-count">{{ commentList.length }}</i>
                     </template>
                     <wang-editor
+                        ref="comment"
                         :comment-list="commentList"
                         :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
+                        :is-page-over="isPageOver"
+                        :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment"
                     ></wang-editor>
                 </bk-tab-panel>
@@ -122,7 +127,9 @@
             firstStateFields: Array,
             nodeTriggerList: Array,
             ticketId: [Number, String],
-            commentLoading: Boolean
+            commentLoading: Boolean,
+            isPageOver: Boolean,
+            hasNodeOptAuth: Boolean
         },
         inject: ['reloadTicket'],
         data () {
@@ -206,6 +213,9 @@
             },
             refreshComment () {
                 this.$emit('refreshComment')
+            },
+            addTargetComment (val) {
+                this.$emit('addTargetComment', val)
             }
         }
     }

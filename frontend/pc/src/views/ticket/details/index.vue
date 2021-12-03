@@ -44,7 +44,10 @@
                         :first-state-fields="firstStateFields"
                         :node-trigger-list="nodeTriggerList"
                         :ticket-id="ticketId"
+                        :is-page-over="isPageOver"
+                        :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment">
                     </left-ticket-content>
                 </div>
@@ -54,7 +57,7 @@
                     <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
                 </div>
                 <div id="ticketContainerRight" class="ticket-container-right" v-show="showRightTabs">
-                    <div :class="['sla-information', isShowSla ? 'hide' : '']">
+                    <div v-if="hasNodeOptAuth" :class="['sla-information', isShowSla ? 'hide' : '']">
                         <div class="sla-view">
                             <div class="sla-title" @click="handleClickShowSla">
                                 <i :class="['bk-itsm-icon', !isShowSla ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
@@ -74,6 +77,7 @@
                         class="right-ticket-tabs"
                         v-if="!loading.ticketLoading"
                         :ticket-info="ticketInfo"
+                        :has-node-opt-auth="hasNodeOptAuth"
                         :node-list="nodeList"
                         @viewProcess="viewProcess">
                     </right-ticket-tabs>
@@ -127,10 +131,14 @@
         data () {
             return {
                 leftTicketDom: '',
+                isPageOver: false,
+                isThrottled: false,
                 isRequsetComment: false,
+                curCommentLength: 10, // 默认为10条
                 totalPages: 0, // 评论总页数
                 page: 1, // 评论当前页数
                 page_size: 10,
+                commentCount: 0,
                 isShowSla: true,
                 showRightTabs: true,
                 commentLoading: false,
@@ -174,7 +182,8 @@
                 allFieldList: [],
                 commentList: [],
                 commentId: '',
-                threshold: []
+                threshold: [],
+                hasNodeOptAuth: false
             }
         },
         computed: {
@@ -192,6 +201,11 @@
                     const slaDom = document.querySelector('.sla-information')
                     slaDom.style.height = (134 * slaCount) + 'px'
                 }
+            },
+            commentList (val) {
+                if (val.length > 0) {
+                    this.curCommentLength = val.length
+                }
             }
         },
         async mounted () {
@@ -204,10 +218,14 @@
                 this.leftTicketDom = document.querySelector('.ticket-container-left')
                 this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
             })
+            console.log(this.$refs.leftTicketContent)
+            if (this.$refs.leftTicketContent) {
+                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList[0].can_operate
+                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.$refs.leftTicketContent.currentStepList[0].can_operate)
+            }
         },
         beforeDestroy () {
             this.clearTicketTimer()
-            // this.leftTicketDom.removeEventListener('scroll', this.handleTicketScroll)
         },
         methods: {
             // 同步数据，需等待 ticketInfo 返回
@@ -223,7 +241,7 @@
                 this.getCurrTickeStatusColor()
                 this.initCurrentStepData()
                 this.initTicketTimer()
-                this.getComments()
+                this.initComments()
             },
             handleClickShowSla () {
                 this.isShowSla = !this.isShowSla
@@ -236,55 +254,69 @@
                     }
                 })
             },
-            async getComments () {
+            async initComments () {
                 try {
                     this.commentLoading = true
-                    const commentList = []
-                    const publicRes = await this.$store.dispatch('ticket/getTicketAllComments', {
-                        'ticket_id': this.ticketId,
-                        'show_type': 'PUBLIC',
-                        page: this.page,
-                        page_size: this.page_size
-                    })
-                    console.log(publicRes)
-                    this.commentId = publicRes.data.items.find(item => item.remark_type === 'ROOT').id
-                    if (this.$route.query.project_id) {
-                        const insideRes = await this.$store.dispatch('ticket/getTicketAllComments', {
-                            'ticket_id': this.ticketId,
-                            'show_type': 'INSIDE',
-                            page: this.page,
-                            page_size: this.page_size
-                        })
-                        commentList.push(...insideRes.data.items)
-                    }
-                    commentList.push(...publicRes.data.items)
-                    commentList.sort((a, b) => b.id - a.id)
-                    this.commentList = commentList.filter(item => item.remark_type !== 'ROOT')
+                    // 获取root id
+                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': '' })
+                    this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id
+                    this.commentList = await this.getComments(1, 10)
                 } catch (e) {
                     console.log(e)
                 } finally {
                     this.commentLoading = false
                 }
             },
-            handleTicketScroll () {
-                const el = this.leftTicketDom
-                console.log(el.scrollHeight - el.offsetHeight - el.scrollTop)
-                // if (!this.isPageOver && !this.isThrottled) {
-                //     this.isThrottled = true
-                //     this.pollingTimer = setTimeout(() => {
-                //         this.isThrottled = false
-                //         const el = this.leftTicketDom
-                //         if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
-                //             this.currentPage += 1
-                //             this.isPageOver = this.currentPage === this.totalPage
-                //             clearTimeout(this.pollingTimer)
-                //             this.getSubflowList()
-                //         }
-                //     }, 500)
-                // }
+            async getComments (page, page_size) {
+                this.commentLoading = true
+                const commentList = []
+                const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
+                    'ticket_id': this.ticketId,
+                    'show_type': this.$route.query.project_id ? 'ALL' : 'PUBLIC',
+                    page: page,
+                    page_size: page_size
+                })
+                commmentRes.data.items.forEach((item, index) => {
+                    if (item.parent__id !== this.commentId) {
+                        this.getReplyCommet(item.parent__id, index)
+                    }
+                })
+                this.commentCount = commmentRes.data.count
+                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size)
+                commentList.push(...commmentRes.data.items)
+                commentList.sort((a, b) => b.id - a.id)
+                this.commentLoading = false
+                return commentList.filter(item => item.remark_type !== 'ROOT')
             },
-            refreshComment () {
-                this.getComments()
+            async getReplyCommet (id, index) {
+                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
+                this.$set(this.commentList[index], 'parent_creator', res.data.creator)
+                this.$set(this.commentList[index], 'parent_content', res.data.content)
+            },
+            async addTargetComment (curComment) {
+                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
+                this.commentList.push(res.data)
+                console.log(this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment))
+            },
+            handleTicketScroll () {
+                if (!this.isPageOver && !this.isThrottled) {
+                    this.isThrottled = true
+                    const timer = setTimeout(async () => {
+                        this.isThrottled = false
+                        const el = this.leftTicketDom
+                        if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+                            this.page += 1
+                            this.isPageOver = this.page === this.totalPages
+                            clearTimeout(timer)
+                            const result = await this.getComments(this.page, this.page_size)
+                            this.commentList.push(...result)
+                        }
+                    }, 500)
+                }
+            },
+            async refreshComment () {
+                this.commentList = await this.getComments(1, this.curCommentLength + 1)
+                this.page = 1
             },
             getProtocolsList () {
                 const params = {

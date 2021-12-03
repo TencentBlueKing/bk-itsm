@@ -34,7 +34,7 @@
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
         <ul v-bkloading="{ isLoading: commentLoading }" class="comment-list">
-            <li v-for="(item, index) in commentList" :key="index">
+            <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
                 <comment-item
                     :comment-list="commentList"
                     :cur-comment="item"
@@ -44,6 +44,9 @@
                 </comment-item>
             </li>
         </ul>
+        <div v-bkloading="{ isLoading: commentLoading }" class="page-over">
+            <span v-if="isPageOver">已经到底了</span>
+        </div>
         <div v-if="commentList.length === 0" class="no-comment">暂无评论</div>
         <bk-dialog
             v-model="isEdit"
@@ -70,7 +73,9 @@
             commentList: Array,
             ticketInfo: Object,
             ticketId: [Number, String],
-            commentLoading: Boolean
+            commentLoading: Boolean,
+            isPageOver: Boolean,
+            hasNodeOptAuth: Boolean
         },
         data () {
             return {
@@ -96,7 +101,8 @@
                 ],
                 // commentList: [],
                 editType: '',
-                isEdit: false
+                isEdit: false,
+                flash: {}
             }
         },
         methods: {
@@ -142,7 +148,7 @@
                 this.$emit('refreshComment')
             },
             postComment (type) {
-                if (!this.$route.query.project_id && type === 'INSIDE') {
+                if (!this.hasNodeOptAuth && type === 'INSIDE') {
                     this.$bkMessage({
                         message: this.$t('m["你当前无法发表内部评论"]'),
                         theme: 'warning '
@@ -164,7 +170,14 @@
                         return item.clientHeight
                     })
                     const sumHeight = heights.reduce((pre, cur) => pre + cur)
+                    this.$set(this.flash, curComment.parent__id, true)
+                    const timer = setTimeout(() => {
+                        this.$set(this.flash, curComment.parent__id, false)
+                        clearTimeout(timer)
+                    }, 2000)
                     commentDom.parentNode.scrollTop = sumHeight + commentListDom.offsetTop + basicDomHeight
+                } else {
+                    this.$emit('addTargetComment', curComment)
                 }
             },
             submit () {
@@ -196,6 +209,21 @@
 </script>
 <style scoped lang="scss">
 // @import '../../../../scss/mixins/scroller.scss';
+    @keyframes flash{
+        0% {
+            opacity: 0.1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    .twinkling{
+        background: rgb(240, 238, 238);
+        animation: flash 1s linear infinite;
+    }
     .common-color {
         color: #c4c6cc;
     }
@@ -248,6 +276,13 @@
             font-size: 14px;
             line-height: 50px;
             color: #979ba5;
+        }
+        .page-over {
+            height: 20px;
+            color: #6d6f77;
+            font-size: 12px;
+            text-align: center;
+            line-height: 20px;
         }
     }
 </style>

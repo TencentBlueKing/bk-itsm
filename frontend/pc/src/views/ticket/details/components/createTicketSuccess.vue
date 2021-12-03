@@ -46,7 +46,7 @@
             }
         },
         mounted () {
-            // this.countDown()
+            this.countDown()
         },
         methods: {
             countDown () {
@@ -62,11 +62,11 @@
             },
             jumpPage () {
                 this.isStart = false
-                // this.$router.push(this.routerInfo)
+                this.$router.push(this.routerInfo)
             },
             onBackClick () {
-                // this.isStart = false
-                // this.$emit('onBackIconClick')
+                this.isStart = false
+                this.$emit('onBackIconClick')
             }
         }
     }

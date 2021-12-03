@@ -45,7 +45,7 @@
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[3]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[4]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[5]}}</span>
-                <i v-if="!isResponseNormal" :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+                <i v-if="!isResponseNormal" :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
@@ -53,7 +53,7 @@
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:&nbsp;
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[5]}}</span>
-                <i v-if="!isProcessNormal" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-mark-eight' : 'icon-itsm-icon-three-eight']"></i>
+                <i v-if="!isProcessNormal" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
         </div>
         <div class="bk-no-content" v-if="slaList.length === 0 && !loading">
@@ -280,13 +280,13 @@
             }
         }
     }
-    .icon-itsm-icon-mark-eight {
+    .icon-itsm-icon-square-one {
         color: red;
     }
-    .icon-itsm-icon-three-eight {
+    .icon-chaoshigaojing {
         color: #ff9c01;
     }
     .underline {
-        text-decoration: underline;
+        border-bottom: 1px dashed #979ba5
     }
 </style>
