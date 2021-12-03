@@ -117,6 +117,7 @@
                             @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
                         <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
                         <bk-button theme="primary"
+                            data-test-id="common-trigger-confirm"
                             class="mr10"
                             :title="$t(`m.taskTemplate['确定']`)"
                             @click="citeTrigger">

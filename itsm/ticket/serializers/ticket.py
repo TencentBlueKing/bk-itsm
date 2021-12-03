@@ -809,6 +809,10 @@ class TicketSerializer(AuthModelSerializer):
         )
         return ret
 
+    def get_remark_root_id(self, ticket_id):
+        node = TicketRemark.init_root_node(ticket_id=ticket_id)
+        return node.id
+
     def to_representation(self, inst):
         """单据详情
         add extra property: can_operate, can_comment, comment_id
@@ -833,6 +837,7 @@ class TicketSerializer(AuthModelSerializer):
 
         can_comment = inst.can_comment(username) or is_email_invite_token
         can_operate = inst.can_operate(username)
+
         can_view = (
             username in self.ticket_followers.get(inst.id, [])
             or can_operate
@@ -847,6 +852,7 @@ class TicketSerializer(AuthModelSerializer):
             can_comment=can_comment,
             can_operate=can_operate,
             can_view=can_view,
+            remark_root_id=self.get_remark_root_id(inst.id),
         )
 
         # 提单人、代提单人才有权限看评价，无权查看评论信息则置设置comment_id为-1

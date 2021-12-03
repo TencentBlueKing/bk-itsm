@@ -75,7 +75,7 @@
                     </bk-radio-group>
                     <template v-if="isShowSignSwitch">
                         <span class="bk-condtion-switch">{{ $t(`m.treeinfo['提前结束条件']`) }}</span>
-                        <bk-switcher v-model="isShowSignOptions" theme="primary"></bk-switcher>
+                        <bk-switcher data-test-id="approve-switcher-condtion" v-model="isShowSignOptions" theme="primary"></bk-switcher>
                         <i class="bk-itsm-icon icon-icon-info tooltip-icon" v-bk-tooltips="$t(`m.treeinfo['若配置了会签提前结束条件，满足条件，将提前结束']`)"></i>
                         <div class="bk-condition-content" v-if="isShowSignOptions">
                             <div class="bk-condition-group" v-for="(group, gIndex) in finishCondition.expressions" :key="gIndex">
@@ -96,6 +96,7 @@
                                             </div>
                                             <bk-select
                                                 v-model="expression.key"
+                                                data-test-id="approve-select-condtionType"
                                                 :font-size="'medium'"
                                                 :clearable="false"
                                                 :ext-cls="'bk-form-width-long'"
@@ -109,6 +110,7 @@
                                         </bk-form-item>
                                         <bk-form-item :ext-cls="'bk-form-item-cus'">
                                             <bk-select v-model="expression.condition"
+                                                data-test-id="approve-select-condtion"
                                                 :font-size="'medium'"
                                                 :clearable="false"
                                                 :ext-cls="'bk-form-width-short'">
@@ -121,6 +123,7 @@
                                         </bk-form-item>
                                         <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'value'">
                                             <bk-input v-model="expression.value"
+                                                data-test-id="approve-condtion-value"
                                                 :ext-cls="'bk-form-width-long'"
                                                 v-bk-tooltips="expression.tooltipInfo"
                                                 :disabled="(!$refs.processors.getValue().value && expression.meta.unit === 'INT') ||
@@ -147,7 +150,7 @@
                                     </bk-form>
                                 </div>
                             </div>
-                            <p class="bk-add-group" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
+                            <p class="bk-add-group" data-test-id="approve-condtion-addGroup" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
                                 {{$t(`m.treeinfo['添加“或”条件组']`)}}</p>
                         </div>
                     </template>

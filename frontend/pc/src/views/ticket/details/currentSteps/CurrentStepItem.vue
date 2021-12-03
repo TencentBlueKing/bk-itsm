@@ -127,6 +127,8 @@
                             :constant-default-value="constantDefaultValue"
                             :ticket-info="ticketInfo"
                             :workflow="workflow"
+                            :pipeline-constants="pipelineConstants"
+                            :pipeline-stages="pipelineStages"
                             :pipeline-rules="pipelineRules"
                             @reloadTicket="reloadTicket"
                             @onChangeHook="onChangeHook">
@@ -315,6 +317,8 @@
                 hookedVarList: {},
                 pipelineList: [],
                 pipelineRules: {},
+                pipelineStages: [],
+                pipelineConstants: [],
                 constantDefaultValue: {},
                 convertTimeArrToString,
                 replyBtnLoading: false,
@@ -470,6 +474,11 @@
                     const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
                     this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
                         this.pipelineList = res.data.properties
+                        this.pipelineConstants = res.data.properties.map(ite => {
+                            const constants = {}
+                            constants[ite.key] = ite.value
+                            return constants
+                        })
                         res.data.properties.forEach(item => {
                             this.pipelineRules[item.id] = [{
                                 required: item.required,
@@ -477,6 +486,9 @@
                                 trigger: 'blur'
                             }]
                         })
+                    })
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                        this.pipelineStages = res.data.stages
                     })
                 }
             },
