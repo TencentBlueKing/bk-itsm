@@ -55,7 +55,7 @@ workflow = {
     "service": "change",
     "service_property": service_property,
     "is_biz_needed": False,
-    "creator": "itsm_admin",
+    "creator": "admin",
 }
 
 states = {

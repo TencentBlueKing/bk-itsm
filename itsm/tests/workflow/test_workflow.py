@@ -34,13 +34,14 @@ import sys
 import datetime
 import copy
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from itsm.auth_iam.utils import IamRequest
 from itsm.component.utils.misc import JsonEncoder
 from itsm.workflow.models import State, Transition, Workflow
 
 from . import data
+from ...component.db.managers import SoftDeleteQuerySet
 
 
 class WorkflowTest(TestCase):
@@ -50,7 +51,7 @@ class WorkflowTest(TestCase):
     def setUp(self):
         """准备数据"""
         self.workflow = None
-        self.operator = "itsm_admin"
+        self.operator = "admin"
 
     def test_create_workflow(self):
         """测试创建workflow"""
@@ -60,6 +61,7 @@ class WorkflowTest(TestCase):
         self.workflow_id = obj.id
         self.workflow = obj
 
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_create_workflow_actions_auth(self):
         """测试创建流程关联权限"""
         print(sys._getframe().f_code.co_name)
@@ -73,7 +75,9 @@ class WorkflowTest(TestCase):
         }
         self.assertTrue(self.auth_result(self.workflow.creator, apply_actions, resource_info))
 
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_deploy_flow_version_actions_auth(self):
+        # jamzzhu
         """
         测试部署时候的权限校验
         """
@@ -90,7 +94,9 @@ class WorkflowTest(TestCase):
 
         self.assertTrue(self.auth_result(self.operator, apply_actions, resource_info))
 
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_restore_workflow_actions_auth(self):
+        # jamzzhu
         """测试创建流程关联权限"""
         print(sys._getframe().f_code.co_name)
         self.test_create_workflow()
@@ -161,3 +167,10 @@ class WorkflowTest(TestCase):
         workflow = Workflow.objects.get(pk=self.workflow_id)
         for attr, attr_value in content.items():
             self.assertEqual(getattr(workflow, attr), attr_value)
+            
+    def test_clear_orphan_states(self):
+        """测试根据流转关系清理孤儿状态"""
+        print(sys._getframe().f_code.co_name)
+        self.test_create_workflow()
+        result = self.workflow.clear_orphan_states()
+        self.assertIsInstance(result, SoftDeleteQuerySet)

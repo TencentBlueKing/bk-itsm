@@ -42,5 +42,5 @@ class TestPipeline(TestCase):
         print(sys._getframe().f_code.co_name)
 
         # TODO：从workflow转换得到PIPELINE_DATA
-        parser_obj = PipelineParser(PIPELINE_DATA)
+        parser_obj = PipelineParser(PIPELINE_DATA, cycle_tolerate=True)
         self.assertIsInstance(parser_obj.parse(), Pipeline)
