@@ -833,3 +833,6 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-chaoshigaojing:before {
 	content: "\e219";
 }
+.icon-jiantou_zuoyouqiehuan:before {
+	content: "\e21b";
+}

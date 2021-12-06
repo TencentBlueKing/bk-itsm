@@ -34,7 +34,7 @@
             <div class="reply-title">
                 <i class="bk-itsm-icon icon-yinyong"></i>
                 <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
-                <span class="repeal-reply" @click="repealReply">取消回复</span>
+                <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
             </div>
             <div class="reply-content">
                 <p>{{ replyContent.content }}</p>

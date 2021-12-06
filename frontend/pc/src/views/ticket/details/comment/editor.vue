@@ -3,7 +3,7 @@
         <div class="change-comment" @click="handleChangeType" :title="commentType ? '点击切换评论类型' : '回复当前类型评论'">
             <i :class="['bk-itsm-icon', isInsideComment ? 'icon-suoding' : 'icon-jiesuo']"></i>
             <span>{{ isInsideComment ? $t('m["内部评论"]') : $t('m["外部评论"]') }}</span>
-            <i class="bk-itsm-icon icon-itsm-icon-three-two change-type"></i>
+            <i class="bk-itsm-icon icon-jiantou_zuoyouqiehuan change-type"></i>
         </div>
         <div :id="editorId">
         </div>
