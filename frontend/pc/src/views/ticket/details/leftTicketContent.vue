@@ -2,7 +2,21 @@
     <div>
         <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
-                <bk-collapse v-model="activeName">
+                <div class="ticket-creator" @click="isShowbasicInfo = !isShowbasicInfo">
+                    <i :class="['bk-itsm-icon', isShowbasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                    <span class="ticket-title">提单信息</span>
+                    <span>提单人: {{ ticketInfo.creator}}</span>
+                    <span>提单时间: {{ ticketInfo.create_at}}</span>
+                </div>
+                <div :class="['basic-content', isShowbasicInfo ? '' : 'hide']">
+                    <basic-information
+                        ref="basicInfo"
+                        v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
+                        :basic-infomation="ticketInfo"
+                        :first-state-fields="firstStateFields">
+                    </basic-information>
+                </div>
+                <!-- <bk-collapse v-model="activeName">
                     <bk-collapse-item name="ticket">
                         <span class="ticket-title">提单信息</span>
                         <div class="ticket-creator">
@@ -17,38 +31,14 @@
                             </basic-information>
                         </div>
                     </bk-collapse-item>
-                </bk-collapse>
-                <!-- <bk-tab :active.sync="baseActiveTab" type="unborder-card">
-                    <bk-tab-panel
-                        name="base"
-                        :label="$t(`m.slaContent['基本信息']`)">
-                        基础信息
-                        <basic-information
-                            ref="basicInfo"
-                            v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
-                            :basic-infomation="ticketInfo"
-                            :first-state-fields="firstStateFields">
-                        </basic-information>
-                    </bk-tab-panel>
-                    <bk-tab-panel
-                        name="preview"
-                        :label="$t(`m.newCommon['工单进度预览']`)">
-                        工单预览
-                        <order-preview
-                            v-if="baseActiveTab === 'preview' && !loading.ticketLoading && !loading.nodeInfoLoading"
-                            :basic-infomation="ticketInfo"
-                            :node-list="nodeList"
-                            :current-step-list="currentStepList"
-                            @reloadTicket="reloadTicket">
-                        </order-preview>
-                    </bk-tab-panel>
-                </bk-tab> -->
+                </bk-collapse> -->
             </div>
         </div>
         <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
             <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
+                    v-if="hasNodeOptAuth"
                     name="currentStep"
                     :label="$t(`m.newCommon['单据处理']`)">
                     <!-- 当前节点 -->
@@ -76,11 +66,15 @@
                         <i class="panel-count">{{ commentList.length }}</i>
                     </template>
                     <wang-editor
+                        ref="comment"
                         :comment-list="commentList"
                         :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
+                        :is-page-over="isPageOver"
+                        :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment"
                     ></wang-editor>
                 </bk-tab-panel>
@@ -133,11 +127,14 @@
             firstStateFields: Array,
             nodeTriggerList: Array,
             ticketId: [Number, String],
-            commentLoading: Boolean
+            commentLoading: Boolean,
+            isPageOver: Boolean,
+            hasNodeOptAuth: Boolean
         },
         inject: ['reloadTicket'],
         data () {
             return {
+                isShowbasicInfo: true,
                 baseActiveTab: 'base',
                 stepActiveTab: 'currentStep',
                 // 当前步骤
@@ -216,6 +213,9 @@
             },
             refreshComment () {
                 this.$emit('refreshComment')
+            },
+            addTargetComment (val) {
+                this.$emit('addTargetComment', val)
             }
         }
     }
@@ -229,18 +229,35 @@
     /deep/ .bk-tab-section {
         padding: 0;
     }
-    .ticket-title {
-        font-weight: 700;
-        font-size: 14px;
-    }
     .ticket-creator {
-        line-height: 54px;
+        width: 100%;
+        cursor: pointer;
+        line-height: 52px;
         display: inline-block;
         color: #979BA5;
         font-size: 12px;
+        .ticket-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #63656e;
+        }
+        i {
+            font-size: 12px;
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+            margin: 0 -22px 0 24px;
+        }
         span{
             margin-left: 30px;
         }
+    }
+    .basic-content {
+        overflow: hidden;
+        transition: 1s all linear;
+    }
+    .hide{
+        height: 0;
     }
     /deep/ .bk-icon {
         line-height: 54px;
@@ -273,6 +290,9 @@
             background: #e1ecff;
         }
     }
+}
+/deep/ .bk-dialog {
+    top: 120px;
 }
 .bk-order-preview {
     background-color: #f5f7fa;

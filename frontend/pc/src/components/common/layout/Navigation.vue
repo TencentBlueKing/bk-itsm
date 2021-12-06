@@ -323,7 +323,7 @@
                             this.activeNav = matched.navId
                             this.activeSideRouter = matched.sideRouterId
                             this.sideRouters = nav.subRouters
-                            if (!this.$route.query.project_id && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
+                            if (this.$route.query.from !== 'projectTicket' && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
                                 this.sideRouters = []
                             }
                             return true

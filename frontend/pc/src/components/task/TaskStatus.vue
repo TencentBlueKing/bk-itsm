@@ -68,7 +68,7 @@
                     },
                     'FAILED': {
                         cls: 'failed',
-                        icon: 'bk-icon icon-exclamation',
+                        icon: 'bk-itsm-icon icon-itsm-icon-square-one',
                         text: this.$t(`m.task["执行失败"]`)
                     }
                 }
@@ -119,13 +119,14 @@
         }
         &.failed {
             color: #ea3536;
-            .status-icon {
-                font-size: 12px;
-                padding: 1px;
-                color: #ffffff;
-                background: #ea3536;
-                border-radius: 50%;
-            }
+            font-size: 14px;
+            // .status-icon {
+            //     font-size: 12px;
+            //     padding: 1px;
+            //     color: #ffffff;
+            //     background: #ea3536;
+            //     // border-radius: 50%;
+            // }
         }
     }
 </style>

@@ -1,5 +1,10 @@
 <template>
     <div class="wang-editor">
+        <div class="change-comment" @click="handleChangeType" :title="commentType ? '点击切换评论类型' : '回复当前类型评论'">
+            <i :class="['bk-itsm-icon', isInsideComment ? 'icon-suoding' : 'icon-jiesuo']"></i>
+            <span>{{ isInsideComment ? $t('m["内部评论"]') : $t('m["外部评论"]') }}</span>
+            <i class="bk-itsm-icon icon-jiantou_zuoyouqiehuan change-type"></i>
+        </div>
         <div :id="editorId">
         </div>
         <!-- <ul class="bullet-box" :style="{ left: left + 'px', top: top + 'px', display: showFlag }">
@@ -16,7 +21,9 @@
     export default {
         name: 'commentEditor',
         props: {
-            editorId: String
+            editorId: String,
+            commentType: String,
+            commentTypeReply: String
         },
         data () {
             return {
@@ -25,7 +32,8 @@
                 left: '0px',
                 top: '0px',
                 showFlag: 'none',
-                list: []
+                list: [],
+                isInsideComment: false
             }
         },
         watch: {
@@ -47,6 +55,15 @@
                     // console.log(childEle)
                 } else {
                     this.showFlag = 'none'
+                }
+            },
+            commentType (val) {
+                this.isInsideComment = val === 'INSIDE' || false
+            },
+            // 回复类型根据当前评论类型
+            commentTypeReply (val) {
+                if (val) {
+                    this.isInsideComment = val === 'INSIDE' || false
                 }
             }
         },
@@ -79,6 +96,17 @@
             selectLine (item) {
                 const text = this.editor.txt.text()
                 this.editor.txt.html(text + `<span class="at-person">${item.name}<span>` + '  ')
+            },
+            handleChangeType () {
+                if (this.commentTypeReply) {
+                    return
+                }
+                if (this.ticketInfo.is_over) {
+                    return
+                }
+                this.isInsideComment = !this.isInsideComment
+                const type = this.isInsideComment ? 'INSIDE' : 'PUBLIC'
+                this.$emit('postComment', type)
             }
         }
     }
@@ -86,7 +114,11 @@
 
 <style lang="scss" scoped>
 .at-person {
-    color: #3A84FF;
+    color: #3a84ff;
+}
+.change-type {
+    font-size: 16px;
+    color: #3a84ff;
 }
 .wang-editor {
     position: relative;
@@ -96,6 +128,18 @@
         background-color: darkgray;
         z-index: 501;
         position: absolute;
+    }
+    .change-comment {
+        font-size: 12px;
+        line-height: 42px;
+        z-index: 402;
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 0 10px;
+        height: 42px;
+        color: #979ba5;
+        cursor: pointer;
     }
 }
 </style>

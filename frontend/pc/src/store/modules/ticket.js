@@ -29,7 +29,8 @@ export default {
          * 我的单据列表已选字段缓存
          * todo: { size: '', fields: [] }
          */
-        settingCache: {}
+        settingCache: {},
+        hasTicketNodeOptAuth: true
     },
     mutations: {
         setSettingCache (state, { type, value }) {
@@ -37,7 +38,11 @@ export default {
         },
         clearSettingCache () {
             state.settingCache = {}
+        },
+        setHasTicketNodeOptAuth (state, value) {
+            state.hasTicketNodeOptAuth = value
         }
+        
     },
     actions: {
         // 获取单据数量（待办、审批）
@@ -119,9 +124,16 @@ export default {
             return ajax.get(`ticket/receipts/${id}/get_ticket_output/`).then(response => response.data)
         },
         // 获取单据下的所有评论
-        // api/ticket/remark/?ticket_id=132&show_type=INSIDE
         getTicketAllComments ({ commit, state, dispatch }, params) {
             return ajax.get('ticket/remark/', { params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 获取有回复的评论
+        getReplyComment ({ commit, state, dispatch }, params) {
+            const { id } = params
+            return ajax.get(`ticket/remark/${id}/`, { params }).then(response => {
                 let res = response.data
                 return res
             })

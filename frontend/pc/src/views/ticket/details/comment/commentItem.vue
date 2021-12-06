@@ -1,10 +1,11 @@
 <template>
     <div class="comment">
         <div class="comment-info">
-            <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div>
+            <i class="author bk-itsm-icon icon-itsm-icon-my"></i>
+            <!-- <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div> -->
             <p>
                 <span class="user-name">{{ curComment.creator}}  </span>
-                <span class="issue-time">{{ $t('m["发布于"]') }} {{ curComment.create_at }}</span>
+                <span class="issue-time">{{ $t('m["发布于"]') }} {{ createTime }}</span>
                 <i v-if="curComment.remark_type === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
             <div
                 v-if="curComment.update_log.length"
@@ -16,24 +17,25 @@
                 <span>{{ $t('m["已被编辑"]') }}</span>
             </div>
             <div class="reply-praise">
-                <i class="bk-itsm-icon icon-itsm-icon-speak" title="回复" @click="$emit('editComment', curComment , 'add')"></i>
-                <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i>
+                <i class="bk-itsm-icon icon-itsm-icon-speak" title="回复" @click="$emit('replyComment', curComment)"></i>
+                <!-- <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i> -->
             </div>
         </div>
         <div class="comment-content">
             <p>{{ curComment.content }}</p>
             <div
-                v-if="parentComment"
+                v-if="curComment.hasOwnProperty('parent_creator')"
                 class="comment-reply"
                 @click="jumpTargetComment(curComment)">
                 <div class="comment-message">
-                    <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ parentComment.creator }} {{ $t('m["的评论"]') }} :</span>
-                    <p>{{ parentComment.content }}</p>
+                    <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
+                    <p>{{ curComment.parent_content }}</p>
                 </div>
             </div>
         </div>
         <div class="operation">
-            <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>|
+            <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>
+            <i class="line"></i>
             <span @click="handleDeleteDialogShow(true)">{{ $t('m["删除"]') }}</span>
         </div>
         <bk-dialog
@@ -52,6 +54,8 @@
 </template>
 
 <script>
+    import dayjs from 'dayjs'
+    import relativeTime from 'dayjs/plugin/relativeTime'
     export default {
         name: 'commentItem',
         props: {
@@ -62,16 +66,44 @@
             return {
                 isEditComment: false,
                 deleteCommentDialog: false,
-                isAgree: false
+                isAgree: false,
+                timeFormat: {
+                    'seconds ago': this.$t(`m['秒钟前']`),
+                    'minutes ago': this.$t(`m['分钟前']`),
+                    'minute ago': this.$t(`m['分钟前']`),
+                    'hours ago': this.$t(`m['小时前']`),
+                    'hour ago': this.$t(`m['小时前']`),
+                    'days ago': this.$t(`m['天前']`),
+                    'day ago': this.$t(`m['天前']`),
+                    'months ago': this.$t(`m['月前']`),
+                    'month ago': this.$t(`m['月前']`),
+                    'years ago': this.$t(`m['年前']`),
+                    'year ago': this.$t(`m['年前']`)
+                }
             }
         },
         computed: {
-            parentComment () {
-                const parentComment = this.commentList.find(item => item.id === this.curComment.parent)
-                if (parentComment && parentComment.remark_type === 'ROOT') {
-                    return null
+            // parentComment () {
+            //     const parentComment = this.commentList.find(item => item.id === this.curComment.parent)
+            //     if (parentComment && parentComment.remark_type === 'ROOT') {
+            //         return null
+            //     }
+            //     return parentComment
+            // },
+            createTime () {
+                dayjs.extend(relativeTime)
+                const timestamp = dayjs(this.curComment.create_at).unix() * 1000
+                const time = dayjs(timestamp).fromNow()
+                // 0 to 44 seconds
+                const timeStr = time.split(' ')[1]
+                const timeType = time.split(' ').slice(1, 3).join(' ')
+                if (timeStr === 'few') {
+                    return this.$t(`m['刚刚']`)
                 }
-                return parentComment
+                if (time.split(' ')[0] === 'an' || time.split(' '[0] === 'a')) {
+                    return 1 + ' ' + this.timeFormat[timeType]
+                }
+                return time.split(' ')[0] + ' ' + this.timeFormat[timeType]
             }
         },
         methods: {
@@ -107,6 +139,18 @@
 </script>
 
 <style scoped lang="scss">
+.icon-itsm-icon-one-five {
+    display: inline-block;
+    width: 1px;
+    margin: 0 12px;
+}
+.icon-itsm-icon-my {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    font-size: 30px;
+    color: #c4c6cc;
+}
 .comment {
     width: 100%;
     color: #6d6f77;
@@ -117,14 +161,13 @@
         .author {
             width: 30px;
             height: 30px;
-            border: 1px solid #dcdee5;
+            // border: 1px solid #dcdee5;
             border-radius: 50%;
             margin-right: 10px;
-            line-height: 28px;
-            font-size: 20px;
+            line-height: 30px;
+            font-size: 30px;
             text-align: center;
             opacity: 0.8;
-            color: #fff;
         }
         .user-name {
             color: #3a3b41;
@@ -139,6 +182,7 @@
             text-align: center;
             line-height: 22px;
             background-color: #dcdee5;
+            border-radius: 2px
         }
         .issue-time {
             color: #989ca6;
@@ -206,9 +250,23 @@
     }
     .operation {
         margin: 8px 0px 8px 40px;
+        line-height: 20px;
         span {
+            display: inline-block;
+            height: 20px;
+            width: 24px;
+            color: #979ba5;
             cursor: pointer;
-            margin: 0 2px;
+            &:hover {
+                color: #3a84ff;
+            }
+        }
+        .line {
+            display: inline-block;
+            width: 1px;
+            height: 12px;
+            margin: -2px 12px;
+            background-color: #dcdee5;
         }
     }
 }

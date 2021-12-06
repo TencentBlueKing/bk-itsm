@@ -22,12 +22,14 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <div v-if="true" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
-        <bk-timeline
-            data-test-id="ticket_timeline_viewLog"
-            ext-cls="log-time-line"
-            :list="list"
-            @select="handleSelect"></bk-timeline>
+        <template v-if="!ticketInfo.is_over">
+            <div v-if="$store.state.ticket.hasTicketNodeOptAuth" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+            <bk-timeline
+                data-test-id="ticket_timeline_viewLog"
+                ext-cls="log-time-line"
+                :list="list"
+                @select="handleSelect"></bk-timeline>
+        </template>
         <!-- 操作日志详情 sideslider -->
         <ticket-log-detail
             :log-info.sync="dispalyLogInfo"
@@ -36,6 +38,20 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
+        <div v-if="ticketInfo.is_over" class="process-detail">
+            <div class="process-header" @click="isShowDetail = !isShowDetail">
+                <i :class="['bk-itsm-icon', isShowDetail ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                <span>{{ $t(`m["流程详情"]`) }}</span>
+            </div>
+            <div v-show="isShowDetail" class="process-content">
+                <img :src="imgUrl" alt="单据结束">
+                <template v-if="!ticketInfo.is_commented">
+                    <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
+                    <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
+                </template>
+                <p>{{ $t(`m["已完成评价"]`) }}</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -50,12 +66,17 @@
             ticketLogDetail
         },
         mixins: [fieldMix],
+        props: {
+            ticketInfo: Object
+        },
         data () {
             return {
                 dispalyLogInfo: null,
                 flowStartText: this.$t(`m.newCommon["流程开始"]`),
                 loading: false,
-                list: []
+                list: [],
+                isShowDetail: false,
+                imgUrl: require('@/images/orderFinished.png')
             }
         },
         created () {
@@ -108,6 +129,9 @@
             },
             viewProcess () {
                 this.$emit('viewProcess', true)
+            },
+            handleEvaluate () {
+                console.log('去评价')
             }
         }
     }
@@ -139,6 +163,44 @@
         }
         .bk-timeline-dot {
             padding-bottom: 10px;
+        }
+    }
+}
+.process-detail {
+    .process-title {
+        width: 56px;
+        height: 22px;
+        font-size: 14px;
+        color: #63656e;
+        font-weight: 700;
+    }
+    .process-header {
+        margin-top: 11px;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        background: #f5f7fa;
+        border-radius: 2px;
+        color: #63656e;
+        i {
+            color: #c4c6cc;
+        }
+    }
+    .process-content {
+        text-align: center;
+        font-size: 14px;
+        line-height: 22px;
+        img {
+            margin-top: 55px;
+            width: 110px;
+            height: 89px;
+        }
+        p {
+            font-size: 14px;
+        }
+        .appraise {
+            color: #3a84ff;
+            cursor: pointer;
         }
     }
 }

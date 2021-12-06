@@ -25,10 +25,10 @@
         <div class="tip-content">
             <i class="bk-itsm-icon icon-success-fill"></i>
             <span>{{ $t(`m['提单成功']`) }}</span>
-            <p>{{ $t(`m['当前流程已跳转至下一流程节点']`) }}，{{ time }}s{{ $t(`m['后将自动跳转至流程详情查看']`) }}</p>
+            <p>{{ $t(`m['当前流程已跳转至下一节点']`) }}，{{ time }}s{{ $t(`m['后将自动跳转至流程详情查看']`) }}</p>
             <div class="tip-operation">
-                <bk-button :theme="'default'" type="submit" @click="onBackClick">{{ $t(`m['返回列表']`) }}</bk-button>
-                <bk-button :theme="'primary'" @click="jumpPage">{{ $t(`m['查看流程详情']`) }}</bk-button>
+                <bk-button class="back-list-btn" :theme="'default'" type="submit" @click="onBackClick">{{ $t(`m['返回单据列表']`) }}</bk-button>
+                <bk-button class="view-detail-btn" :theme="'primary'" @click="jumpPage">{{ $t(`m['查看流程详情']`) }}</bk-button>
             </div>
         </div>
     </div>
@@ -83,18 +83,39 @@
             height: 250px;
             display: flex;
             padding: 20px;
-            justify-content: space-between;
             flex-direction: column;
+            font-weight: 400;
             i {
-                font-size: 60px;
+                width: 64px;
+                margin: 0 auto;
+                font-size: 64px;
                 color: rgb(45, 243, 128);
             }
             span {
-                font-weight: 600;
-                font-size: 20px;
+                margin-top: 16px;
+                color: #000000;
+                font-size: 16px;
             }
             p {
-                color: #777880;
+                color: #63656e;
+                font-size: 12px;
+                margin-top: 8px;
+            }
+            .tip-operation {
+                font-size: 16px;
+                line-height: 40px;
+                height: 40px;
+                margin-top: 40px;
+                .back-list-btn {
+                    color: #63656e;
+                    width: 128px;
+                    height: 40px;
+                    margin-right: 8px;
+                }
+                .view-detail-btn {
+                    width: 128px;
+                    height: 40px;
+                }
             }
 
         }

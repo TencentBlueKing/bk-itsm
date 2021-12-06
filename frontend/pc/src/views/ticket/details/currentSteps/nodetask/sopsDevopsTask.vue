@@ -205,11 +205,15 @@
 </script>
 
 <style lang="scss" scoped>
+    /deep/ .rf-tag-hook {
+        top: 100px;
+        left: 48px;
+    }
     .sops-form {
         width: 100%;
         min-height: 100px;
     }
     .submit-btn {
-        margin-top: 20px;
+        margin-top: 60px;
     }
 </style>
