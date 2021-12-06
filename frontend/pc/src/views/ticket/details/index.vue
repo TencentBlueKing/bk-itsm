@@ -24,6 +24,7 @@
     <div class="ticket-detail-panel" v-bkloading="{ isLoading: loading.ticketLoading }">
         <template v-if="!ticketErrorMessage">
             <ticket-header
+                ref="ticketHeader"
                 v-if="!loading.ticketLoading"
                 :header-info="headerInfo"
                 :ticket-info="ticketInfo"
@@ -79,6 +80,7 @@
                         :ticket-info="ticketInfo"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :node-list="nodeList"
+                        @ticketFinishAppraise="ticketFinishAppraise"
                         @viewProcess="viewProcess">
                     </right-ticket-tabs>
                 </div>
@@ -218,8 +220,7 @@
                 this.leftTicketDom = document.querySelector('.ticket-container-left')
                 this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
             })
-            console.log(this.$refs.leftTicketContent)
-            if (this.$refs.leftTicketContent) {
+            if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
                 this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList[0].can_operate
                 this.$store.commit('ticket/setHasTicketNodeOptAuth', this.$refs.leftTicketContent.currentStepList[0].can_operate)
             }
@@ -342,6 +343,10 @@
             // 展示完整流程
             viewProcess (val) {
                 this.$refs.leftTicketContent.changeDialogStatus(val)
+            },
+            // 单据完成评价
+            ticketFinishAppraise () {
+                this.$refs.ticketHeader.onTicketBtnClick('comment')
             },
             // 是否需要循环
             isNeedToLoop () {

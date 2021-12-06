@@ -779,7 +779,7 @@
                 background: #ffffff;
             }
             .bk-node-title {
-                margin: 17px 0;
+                margin: 17px 10px;
                 outline: none;
                 background-color: #ffffff;
                 color: #737987;

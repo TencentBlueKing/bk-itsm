@@ -2402,5 +2402,12 @@ export const m = {
     '小时前': 'hours ago',
     '天前': 'days ago',
     '月前': 'months ago',
-    '年前': 'years ago'
+    '年前': 'years ago',
+    '已完成评价': 'Completed evaluate',
+    '当前流程已结束，快去评价吧': 'The current process is over. Go ahead and evaluate',
+    '去评价': 'To evaluate',
+    '流程详情': 'Details',
+    '取消回复': 'Cancel the reply',
+    '内部评论': 'Inside Comment',
+    '外部评论': 'Public Comment'
 }

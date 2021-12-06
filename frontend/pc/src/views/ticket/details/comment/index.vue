@@ -29,7 +29,25 @@
                 <p>{{ item.docs }}</p>
             </li>
         </ul>
-        <editor v-if="isShowEditor" ref="editorAdd" :editor-id="'editor1'" @changebuttonStatus="changebuttonStatus"></editor>
+        <!-- 回复评论 -->
+        <div v-if="isReplyComment" class="reply-comment">
+            <div class="reply-title">
+                <i class="bk-itsm-icon icon-yinyong"></i>
+                <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
+                <span class="repeal-reply" @click="repealReply">取消回复</span>
+            </div>
+            <div class="reply-content">
+                <p>{{ replyContent.content }}</p>
+            </div>
+        </div>
+        <editor
+            v-if="isShowEditor"
+            ref="editorAdd"
+            :editor-id="'editor1'"
+            :comment-type="commentType"
+            @postComment="postComment"
+            @changebuttonStatus="changebuttonStatus">
+        </editor>
         <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
@@ -38,6 +56,7 @@
                 <comment-item
                     :comment-list="commentList"
                     :cur-comment="item"
+                    @replyComment="replyComment"
                     @refreshComment="refreshComment"
                     @jumpTargetComment="jumpTargetComment"
                     @editComment="editComment">
@@ -47,7 +66,10 @@
         <div v-bkloading="{ isLoading: commentLoading }" class="page-over">
             <span v-if="isPageOver">已经到底了</span>
         </div>
-        <div v-if="commentList.length === 0" class="no-comment">暂无评论</div>
+        <div v-if="commentList.length === 0" class="no-comment">
+            <img :src="imgUrl">
+            <p>当前暂无评论，快去评论吧！</p>
+        </div>
         <bk-dialog
             v-model="isEdit"
             :title="editType === 'edit' ? '编辑评论' : '回复评论'"
@@ -55,7 +77,10 @@
             theme="primary"
             :mask-close="false"
             @confirm="submitEdit">
-            <editor ref="editorEdit" :editor-id="'editor2'"></editor>
+            <editor ref="editorEdit"
+                :editor-id="'editor2'"
+                :comment-type-reply="commentType">
+            </editor>
         </bk-dialog>
     </div>
 </template>
@@ -102,7 +127,14 @@
                 // commentList: [],
                 editType: '',
                 isEdit: false,
-                flash: {}
+                flash: {},
+                imgUrl: require('@/images/box.png'),
+                isReplyComment: false,
+                replyCommnetId: '',
+                replyContent: {
+                    creator: '',
+                    content: ''
+                }
             }
         },
         methods: {
@@ -115,6 +147,21 @@
                 // 新增回复评论的类型取决于父级类型
                 this.commentType = curComment.remark_type
                 this.isEdit = true
+            },
+            replyComment (curComment) {
+                this.replyCommnetId = curComment.id
+                this.isReplyComment = true
+                this.commentType = curComment.remark_type
+                this.postComment(curComment.remark_type)
+                this.replyContent.creator = curComment.creator
+                this.replyContent.content = curComment.content
+                this.commentListDom.scrollTop = 0
+            },
+            repealReply () {
+                this.replyCommnetId = ''
+                this.isReplyComment = false
+                this.isShowSelect = true
+                this.isShowEditor = false
             },
             changebuttonStatus (val) {
                 this.isEditEditor = val
@@ -183,6 +230,7 @@
             submit () {
                 // 评论内容
                 this.isShowEditor = false
+                this.isReplyComment = false
                 if (this.$refs.editorAdd) {
                     const _this = this.$refs.editorAdd.editor
                     const text = _this.txt.text()
@@ -192,12 +240,13 @@
                     const params = {
                         content: text,
                         ticket_id: this.ticketId,
-                        parent__id: this.commentId,
+                        parent__id: this.replyCommnetId || this.commentId,
                         remark_type: this.commentType,
                         users: []
                     }
                     if (text) {
                         this.$store.dispatch('ticket/addTicketComment', params).then(res => {
+                            this.replyCommnetId = ''
                             this.refreshComment()
                             this.commentListDom.scrollTop = 0
                         })
@@ -262,7 +311,7 @@
             }
         }
         .comment-list {
-            min-height: 100px;
+            // min-height: 100px;
             li {
                 padding-top: 20px;
             }
@@ -271,11 +320,15 @@
             margin: 10px 0;
         }
         .no-comment {
-            height: 50px;
             text-align: center;
             font-size: 14px;
             line-height: 50px;
             color: #979ba5;
+            p {
+                font-size: 12px;
+                color: #63656E;
+                margin-top: -14px;
+            }
         }
         .page-over {
             height: 20px;
@@ -283,6 +336,43 @@
             font-size: 12px;
             text-align: center;
             line-height: 20px;
+        }
+    }
+    .reply-comment {
+        font-size: 12px;
+        padding: 12px 16px;
+        min-height: 74px;
+        background: #f5f7fa;
+        border-radius: 2px;
+        margin-bottom: 10px;
+        position: relative;
+        color: #c4c6cc;
+        .reply-title {
+            line-height: 20px;
+            i {
+                font-size: 16px;
+                position: relative;
+                top: -4px;
+                left: 0;
+                color: #c4c6cc;
+            }
+            .quote-creator {
+                margin-left: 5px;
+                color: #313238;
+            }
+            .repeal-reply {
+                float: right;
+                color: #3a84ff;
+                cursor: pointer;
+            }
+        }
+        .reply-content {
+            color: #63656E;
+            padding: 10px 0px 10px 25px;
+            p {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
         }
     }
 </style>

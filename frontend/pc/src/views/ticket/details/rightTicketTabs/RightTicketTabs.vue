@@ -26,7 +26,11 @@
             <bk-tab-panel
                 name="log"
                 :label="$t(`m.newCommon['流转进程']`)">
-                <log-tab v-if="activeTab === 'log'" @viewProcess="viewProcess">
+                <log-tab
+                    v-if="activeTab === 'log'"
+                    :ticket-info="ticketInfo"
+                    @ticketFinishAppraise="$emit('ticketFinishAppraise')"
+                    @viewProcess="viewProcess">
                 </log-tab>
             </bk-tab-panel>
             <template v-if="hasNodeOptAuth">
