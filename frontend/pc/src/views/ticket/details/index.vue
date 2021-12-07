@@ -290,9 +290,11 @@
                 return commentList.filter(item => item.remark_type !== 'ROOT')
             },
             async getReplyCommet (id, index) {
-                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
-                this.$set(this.commentList[index], 'parent_creator', res.data.creator)
-                this.$set(this.commentList[index], 'parent_content', res.data.content)
+                if (id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
+                    this.$set(this.commentList[index], 'parent_creator', res.data.creator)
+                    this.$set(this.commentList[index], 'parent_content', res.data.content)
+                }
             },
             async addTargetComment (curComment) {
                 const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
@@ -300,7 +302,8 @@
                 console.log(this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment))
             },
             handleTicketScroll () {
-                if (!this.isPageOver && !this.isThrottled) {
+                if (this.totalPages === 1) return
+                if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
                     this.isThrottled = true
                     const timer = setTimeout(async () => {
                         this.isThrottled = false
