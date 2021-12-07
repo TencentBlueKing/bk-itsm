@@ -101,7 +101,14 @@
                 if (this.commentTypeReply) {
                     return
                 }
-                if (this.ticketInfo.is_over) {
+                if (this.ticketInfo && this.ticketInfo.is_over) {
+                    return
+                }
+                if (!this.$store.state.ticket.hasTicketNodeOptAuth) {
+                    this.$bkMessage({
+                        message: this.$t('m["你当前无法发表内部评论"]'),
+                        theme: 'warning '
+                    })
                     return
                 }
                 this.isInsideComment = !this.isInsideComment
