@@ -49,7 +49,7 @@
                     <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
                     <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
                 </template>
-                <p>{{ $t(`m["已完成评价"]`) }}</p>
+                <p v-else>{{ $t(`m["已完成评价"]`) }}</p>
             </div>
         </div>
     </div>

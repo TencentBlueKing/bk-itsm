@@ -242,6 +242,7 @@
             color: #63656e;
         }
         i {
+            color: #c4c6cc;
             font-size: 12px;
             display: inline-block;
             height: 12px;
