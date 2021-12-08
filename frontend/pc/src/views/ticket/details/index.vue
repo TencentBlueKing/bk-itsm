@@ -330,14 +330,19 @@
                     const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
                     const slathreshold = curSlas.map(item => {
                         const condition = item.action_policies.map(ite => {
-                            return ite.condition.expressions[0].value
+                            const obj = {}
+                            obj[ite.type] = ite.condition.expressions[0].value
+                            return obj
                         })
+                        // 1 3 2 4
+                        // type 1  2 为响应
+                        // type 3  4 为处理
                         return {
                             sla_name: item.name,
-                            rWarningThreshold: condition[0] / 100 || 1, // 1为100%
-                            rTimeOutThreshold: condition[1] / 100 || 1,
-                            pWarningThreshold: condition[2] / 100 || 1,
-                            pTimeOutThreshold: condition[3] / 100 || 1
+                            rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
+                            pWarningThreshold: condition[1][3] / 100 || 1,
+                            rTimeOutThreshold: condition[2][2] / 100 || 1,
+                            pTimeOutThreshold: condition[3][4] / 100 || 1
                         }
                     })
                     this.threshold = [...slathreshold]
@@ -645,8 +650,9 @@
                 padding: 17px 24px;
                 .sla-title {
                     display: inline-block;
-                    color: #63656E;
+                    color: #63656e;
                     i {
+                        color: #c4c6cc;
                         display: inline-block;
                         font-size: 12px;
                         margin-right: 8px;
@@ -655,7 +661,7 @@
                 .view-sla-rule {
                     cursor: pointer;
                     float: right;
-                    color: #3A84FF;
+                    color: #3a84ff;
                     font-size: 12px;
                 }
             }

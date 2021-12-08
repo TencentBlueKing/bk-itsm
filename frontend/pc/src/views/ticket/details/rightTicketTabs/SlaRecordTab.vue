@@ -42,18 +42,18 @@
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
                 <span v-bk-tooltips.top="{ content: '首次响应时间' + sla.begin_at }" class="underline time-type">{{ $t('m["响应"]') }}{{ isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
-                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[3]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[3]}}</span>&nbsp;:
+                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[4]}}</span>&nbsp;:
                 <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[5]}}</span>
-                <i v-if="!isResponseNormal" :class="['bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
+                <i v-if="!isResponseNormal" :class="['status-icon', 'bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
                 <span v-bk-tooltips.top="{ content: '首次处理时间' + (sla.replied_at || '00-00-00 00:00:00') }" class="underline time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
-                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:&nbsp;
-                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:&nbsp;
+                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:
+                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:
                 <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[5]}}</span>
-                <i v-if="!isProcessNormal" :class="['bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
+                <i v-if="!isProcessNormal" :class="['status-icon', 'bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
         </div>
         <div class="bk-no-content" v-if="slaList.length === 0 && !loading">
@@ -288,5 +288,8 @@
     }
     .underline {
         border-bottom: 1px dashed #979ba5
+    }
+    .status-icon {
+        margin-left: 4px;
     }
 </style>

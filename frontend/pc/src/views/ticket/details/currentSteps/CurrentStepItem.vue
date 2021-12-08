@@ -447,13 +447,14 @@
             // 获取sops Constants
             async getSopsPreview () {
                 if (this.nodeInfo.contexts.hasOwnProperty('task_params')) {
-                    const { bk_biz_id, template_id, exclude_task_nodes_id } = this.nodeInfo.contexts.task_params
+                    const { bk_biz_id, template_id, exclude_task_nodes_id, template_source } = this.nodeInfo.contexts.task_params
                     const params = {
                         bk_biz_id,
                         template_id,
                         exclude_task_nodes_id
                     }
-                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', params)
+                    const url = template_source === 'common' ? 'taskFlow/getSopsCommonPreview' : 'taskFlow/getSopsPreview'
+                    const res = await this.$store.dispatch(url, params)
                     const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
                         this.$set(this.hookedVarList, item, false)
                         this.constantDefaultValue[item] = this.nodeInfo.contexts.task_params.constants[item]

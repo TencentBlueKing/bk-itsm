@@ -181,8 +181,11 @@
             width: 68px;
             text-align: center;
             line-height: 22px;
-            background-color: #dcdee5;
-            border-radius: 2px
+            background-color: #f0f1f5;
+            border-radius: 2px;
+            &:hover {
+                background-color: #dcdee5;
+            }
         }
         .issue-time {
             color: #989ca6;
