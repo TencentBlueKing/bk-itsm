@@ -50,8 +50,17 @@ class WorkflowTest(TestCase):
 
     def setUp(self):
         """准备数据"""
+        State.objects.all().delete()
+        Transition.objects.all().delete()
+        Workflow.objects.all().delete()
         self.workflow = None
         self.operator = "admin"
+        
+    def tearDown(self):
+        State.objects.all().delete()
+        Transition.objects.all().delete()
+        Workflow.objects.all().delete()
+        
 
     def test_create_workflow(self):
         """测试创建workflow"""
@@ -77,7 +86,6 @@ class WorkflowTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_deploy_flow_version_actions_auth(self):
-        # jamzzhu
         """
         测试部署时候的权限校验
         """
@@ -96,7 +104,6 @@ class WorkflowTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_restore_workflow_actions_auth(self):
-        # jamzzhu
         """测试创建流程关联权限"""
         print(sys._getframe().f_code.co_name)
         self.test_create_workflow()
@@ -174,3 +181,25 @@ class WorkflowTest(TestCase):
         self.test_create_workflow()
         result = self.workflow.clear_orphan_states()
         self.assertIsInstance(result, SoftDeleteQuerySet)
+        
+    def test_create_workflow_element(self):
+        """测试创建State和Translation"""
+        self.test_create_workflow()
+        self.create_workflow_element()
+        self.assertEqual(State.objects.all().count(), 10)
+        self.assertEqual(Transition.objects.all().count(), 13)
+        state = State.objects.get(name="开始")
+        state.clone()
+        self.assertEqual(State.objects.all().count(), 11)
+
+    def test_edit_state_fields(self):
+        """测试添加/删除fields"""
+        self.test_create_workflow()
+        self.create_workflow_element()
+        state = State.objects.get(name="开始")
+        state.append_to_fields("instance1")
+        self.assertEqual(state.fields, ["instance1"])
+        state.append_to_read_only_fields("instance2")
+        self.assertEqual(state.fields, ["instance1"])
+        state.remove_fields("instance1")
+        self.assertEqual(state.fields, [])
