@@ -94,13 +94,15 @@
                 pipelineData: {} // 流水线参数
             }
         },
-        mounted () {
-            this.getRelatedFields()
-            if (this.pipelineConstants.length > 0) {
-                this.pipelineConstants.map(item => {
+        watch: {
+            pipelineConstants (val) {
+                val.map(item => {
                     this.$set(this.pipelineData, item.key, item.value)
                 })
             }
+        },
+        mounted () {
+            this.getRelatedFields()
         },
         methods: {
             async getRelatedFields () {
@@ -141,6 +143,16 @@
                     this.$emit('reloadTicket')
                 })
             },
+            retry (params) {
+                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.newCommon["提交成功"]`),
+                        theme: 'success'
+                    })
+                    this.changeBtn = false
+                    this.$emit('reloadTicket')
+                })
+            },
             submit () {
                 const params = {
                     inputs: {},
@@ -173,6 +185,7 @@
                         exclude_task_nodes_id,
                         template_source
                     }
+                    this.retry(params)
                 } else {
                     this.$refs.devopsVariable.validate().then(res => {
                         const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
@@ -191,16 +204,8 @@
                             constants
                         }
                     })
+                    this.retry(params)
                 }
-                if (Object.keys(params.inputs).length === 0) return
-                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
-                    this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
-                        theme: 'success'
-                    })
-                    this.changeBtn = false
-                    this.$emit('reloadTicket')
-                })
             }
         }
     }
