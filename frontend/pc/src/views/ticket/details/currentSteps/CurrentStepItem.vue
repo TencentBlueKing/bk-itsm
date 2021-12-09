@@ -475,10 +475,11 @@
                     const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
                     this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
                         this.pipelineList = res.data.properties
-                        this.pipelineConstants = res.data.properties.map(ite => {
+                        this.pipelineConstants = res.data.properties.map(item => {
                             const constants = {}
-                            if (this.nodeInfo.contexts.hasOwnProperty('build_params')) {
-                                constants[ite.key] = this.nodeInfo.contexts.build_params[ite.key] || ''
+                            const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id)
+                            if (findKey) {
+                                constants[item.id] = findKey.value
                             }
                             return constants
                         })
