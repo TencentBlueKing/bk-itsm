@@ -476,10 +476,14 @@
                     this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
                         this.pipelineList = res.data.properties
                         this.pipelineConstants = res.data.properties.map(item => {
-                            const constants = {}
+                            const constants = {
+                                key: '',
+                                value: ''
+                            }
                             const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id)
                             if (findKey) {
-                                constants[item.id] = findKey.value
+                                constants.key = findKey.key
+                                constants.value = findKey.value
                             }
                             return constants
                         })
