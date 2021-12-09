@@ -192,6 +192,7 @@
                         }
                     })
                 }
+                if (Object.keys(params.inputs).length === 0) return
                 this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
                     this.$bkMessage({
                         message: this.$t(`m.newCommon["提交成功"]`),
