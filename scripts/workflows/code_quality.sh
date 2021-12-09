@@ -59,6 +59,6 @@ then
 fi
 
 # 打印报告
-coverage report --include "$COVERAGE_INCLUDE_PATH" --omit "$COVERAGE_OMIT_PATH"
+coverage report --include "$COVERAGE_INCLUDE_MODULES" --omit "$COVERAGE_OMIT_PATH"
 
 exit 0
