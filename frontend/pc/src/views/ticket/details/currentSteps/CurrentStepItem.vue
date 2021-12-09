@@ -477,7 +477,9 @@
                         this.pipelineList = res.data.properties
                         this.pipelineConstants = res.data.properties.map(ite => {
                             const constants = {}
-                            constants[ite.key] = ite.value
+                            if (this.nodeInfo.contexts.hasOwnProperty('build_params')) {
+                                constants[ite.key] = this.nodeInfo.contexts.build_params[ite.key] || ''
+                            }
                             return constants
                         })
                         res.data.properties.forEach(item => {
@@ -488,7 +490,7 @@
                             }]
                         })
                     })
-                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
                         this.pipelineStages = res.data.stages
                     })
                 }
