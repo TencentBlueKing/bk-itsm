@@ -174,22 +174,23 @@
                         template_source
                     }
                 } else {
-                    if (!this.$refs.devopsVariable.validate()) return
-                    const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
-                        return {
-                            'value': this.$refs.devopsVariable.model[item],
-                            'name': item,
-                            'key': item
+                    this.$refs.devopsVariable.validate().then(res => {
+                        const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
+                            return {
+                                'value': this.$refs.devopsVariable.model[item],
+                                'name': item,
+                                'key': item
+                            }
+                        })
+                        const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
+                        const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
+                        params.inputs = {
+                            'username': window.username,
+                            project_id,
+                            pipeline_id,
+                            constants
                         }
                     })
-                    const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
-                    const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
-                    params.inputs = {
-                        'username': window.username,
-                        project_id,
-                        pipeline_id,
-                        constants
-                    }
                 }
                 this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
                     this.$bkMessage({
