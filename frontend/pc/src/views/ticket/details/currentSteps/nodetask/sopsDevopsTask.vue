@@ -203,8 +203,8 @@
                             pipeline_id,
                             constants
                         }
+                        this.retry(params)
                     })
-                    this.retry(params)
                 }
             }
         }
