@@ -28,6 +28,8 @@ __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
 
 from django.test import TestCase, override_settings
 
+from itsm.ticket_status.models import StatusTransit, TicketStatusConfig, TicketStatus
+
 
 class TicketStatusTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
@@ -112,6 +114,19 @@ class TicketStatusTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "name:请输入状态名称")
         self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_ticket_status_config_model(self):
+        config = TicketStatusConfig.objects.get(id=1)
+        config.init_ticket_status_config()
+        self.assertEqual(config.service_type_name, "变更管理")
+        self.assertEqual(config.ticket_status, "新/处理中/已解决/待确认/挂起/已完成/已终止/已撤销")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_ticket_status_model(self):
+        status = TicketStatus.objects.get(id=1)
+        status.init_ticket_status()
+        self.assertIsInstance(status.all_status_info(), dict)
 
 
 class TransitTest(TestCase):
@@ -213,3 +228,8 @@ class TransitTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertEqual(rsp.data["result"], True)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_ticket_transit_model(self):
+        transit = StatusTransit.objects.get(id=1)
+        transit.init_status_transit()
