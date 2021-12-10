@@ -24,7 +24,7 @@
     <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey">
         <!-- table -->
         <div v-if="item.type === 'TABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <div v-if="item.can_edit && !basicInfomation.is_over && origin === 'notLog'" class="bk-fields-done-edit"
                 @click="edit(item)">
                 <span class="bk-itsm-icon icon-edit-bold isOn"></span>
@@ -44,7 +44,7 @@
         </div>
         <!--  custom table  -->
         <div v-else-if="item.type === 'CUSTOMTABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <div v-if="item.can_edit && !basicInfomation.is_over && origin === 'notLog'" class="bk-fields-done-edit"
                 @click="edit(item)">
                 <span class="bk-itsm-icon icon-edit-bold isOn"></span>
@@ -64,14 +64,14 @@
         </div>
         <!-- select -->
         <div v-else-if="item.type === 'SELECT'" class="bk-fields-done-item">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right" :title="item.display_value">
                 <span class="bk-pot-after">{{item.display_value || '--'}}</span>
             </span>
         </div>
         <!-- 修改 附件处理 10/31-->
         <div v-else-if="item.type === 'FILE'" class="bk-fields-done-item">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <span v-for="(file, index) in fileList"
                 :key="index"
                 class="bk-li-right"
@@ -86,14 +86,14 @@
         </div>
         <!-- 富文本 -->
         <div v-else-if="item.type === 'RICHTEXT'" class="bk-fields-done-item">
-            <span class="bk-li-left" style="float: initial;">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}：</span>
             <span class="bk-li-right bk-fields-richtext tui-editor-contents"
                 v-html="item.value">
             </span>
         </div>
         <!-- 多行文本展现出后台保存的内容格式 -->
         <div v-else-if="item.type === 'TEXT'" class="bk-fields-done-item">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right"
                 :title="item.display_value">
                 <pre class="bk-pre">{{item.display_value || item.value || '--'}}</pre>
@@ -101,14 +101,14 @@
         </div>
         <!-- 链接 -->
         <div v-else-if="item.type === 'LINK'" class="bk-fields-done-item">
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right" :title="item.value">
                 <span class="bk-pot-after bk-li-link" @click="goToLink(item.value)">{{ $t('m.newCommon["点击查看"]') }}</span>
             </span>
         </div>
         <!-- 自定义表单 -->
         <div v-else-if="item.type === 'CUSTOM-FORM'" style="width: 100%">
-            <span class="bk-li-left" style="float: initial;">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}：</span>
             <render-view
                 :form-data="customForm.formData"
                 :context="customForm.context">
@@ -116,7 +116,7 @@
         </div>
         <!-- 默认 -->
         <div class="bk-fields-done-item" v-else>
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <business-card
                 v-if="(item.type === 'MEMBERS' || item.type === 'MEMBER') && origin === 'notLog'"
                 :item="item">
@@ -184,6 +184,10 @@
                 type: String,
                 required: false,
                 default: () => 'notLog'
+            },
+            isShowName: {
+                type: Boolean,
+                default: () => true
             }
         },
         data () {
