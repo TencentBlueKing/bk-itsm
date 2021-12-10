@@ -799,6 +799,13 @@ USE_TZ = False
 DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
 DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 
+# bkchat快速审批
+USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
+if USE_BKCHAT:
+    BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
+    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
+    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
