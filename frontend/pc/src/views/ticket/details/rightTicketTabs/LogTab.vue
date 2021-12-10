@@ -22,8 +22,8 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <template v-if="!ticketInfo.is_over">
-            <div v-if="$store.state.ticket.hasTicketNodeOptAuth" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+        <template>
+            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
@@ -39,11 +39,7 @@
             }">
         </ticket-log-detail>
         <div v-if="ticketInfo.is_over" class="process-detail">
-            <div class="process-header" @click="isShowDetail = !isShowDetail">
-                <i :class="['bk-itsm-icon', isShowDetail ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
-                <span>{{ $t(`m["流程详情"]`) }}</span>
-            </div>
-            <div v-show="isShowDetail" class="process-content">
+            <div class="process-content">
                 <img :src="imgUrl" alt="单据结束">
                 <template v-if="!ticketInfo.is_commented">
                     <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>

@@ -31,7 +31,7 @@
                         <bk-popover
                             v-else
                             placement="Bottom "
-                            width="525"
+                            width="530"
                             trigger="click"
                             theme="light">
                             <span class="view-content">点击查看</span>
