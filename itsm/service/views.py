@@ -228,7 +228,7 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
 
     serializer_class = CatalogServiceSerializer
     queryset = CatalogService.objects.filter(is_deleted=False)
-    permission_classes = (perm.IamAuthWithoutResourcePermit,)
+    permission_classes = ()
     filter_fields = {
         "id": ["exact", "in"],
         "catalog": ["exact", "in"],
