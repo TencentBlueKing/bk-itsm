@@ -273,7 +273,7 @@
                 const commentList = []
                 const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                     'ticket_id': this.ticketId,
-                    'show_type': this.$route.query.project_id ? 'ALL' : 'PUBLIC',
+                    'show_type': this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
                     page: page,
                     page_size: page_size
                 })

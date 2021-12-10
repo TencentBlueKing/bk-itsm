@@ -63,7 +63,7 @@
                 </comment-item>
             </li>
         </ul>
-        <div v-bkloading="{ isLoading: commentLoading }" class="page-over">
+        <div v-bkloading="{ isLoading: false }" class="page-over">
             <span v-if="isPageOver">已经到底了</span>
         </div>
         <div v-if="commentList.length === 0" class="no-comment">
@@ -195,7 +195,7 @@
                 this.$emit('refreshComment')
             },
             postComment (type) {
-                if (!this.hasNodeOptAuth && type === 'INSIDE') {
+                if (!(this.hasNodeOptAuth && this.ticketInfo.updated_by.split(',').includes(window.username)) && type === 'INSIDE') {
                     this.$bkMessage({
                         message: this.$t('m["你当前无法发表内部评论"]'),
                         theme: 'warning '
