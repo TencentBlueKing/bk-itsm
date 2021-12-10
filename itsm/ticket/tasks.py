@@ -61,6 +61,7 @@ from itsm.task.models import Task as TicketTask
 from itsm.ticket.rules import TicketRuleManager
 from itsm.ticket.rules.actions import TicketActions
 from itsm.ticket.rules.variables import TicketVariables
+from itsm.ticket.utils import build_message
 from itsm.ticket_status.models import StatusTransit
 
 
@@ -271,50 +272,11 @@ def notify_task(ticket, receivers, message, action, **kwargs):
 
     # 根据流程设定的通知方式通知
     for _notify in ticket.flow.notify.all():
-        if task_id:
-            custom_notify = CustomNotice.objects.get(
-                action=action, notify_type=_notify.type, used_by="TASK"
-            )
-        else:
-            custom_notify = CustomNotice.objects.get(
-                action=action, notify_type=_notify.type
-            )
-
-        # 获取单据上下文
-        context = ticket.get_notify_context()
-        context.update(
-            message=message, action=_(ACTION_CHOICES_DICT.get(action, "待处理")), **kwargs
-        )
-
-        # 获取任务上下文
-        if task_id:
-            try:
-                task = TicketTask.objects.get(id=task_id)
-                context.update(
-                    {item["key"]: item["value"] for item in task.get_output_context()}
-                )
-            except TicketTask.DoesNotExist:
-                return
-
+        content, title = build_message(_notify, task_id, ticket, message, action, **kwargs)
         try:
-            content = Template(custom_notify.content_template).render(**context)
-            title = Template(custom_notify.title_template).render(**context)
-            logger.info(
-                "[tasks->notify_task] is executed, title={}, receivers={}, ticket_id={}, "
-                "custom_notify={}".format(title, receivers, ticket.id, custom_notify)
-            )
+            logger.info("[tasks->notify_task] is executed, title={}, receivers={}, ticket_id={}"
+                        .format(title, receivers, ticket.id))
             _notify.send_message(title, receivers, content, ticket_id=ticket.id)
-        except NameError as error:
-            logger.error(
-                "context render failed, error: %s, title: %s->%s, content: %s->%s"
-                % (
-                    str(error),
-                    context,
-                    custom_notify.title_template,
-                    context,
-                    custom_notify.content_template,
-                )
-            )
         except ComponentCallError as error:
             logger.warning("send notify failed, error: %s" % str(error))
         except Exception as e:

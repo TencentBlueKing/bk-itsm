@@ -25,8 +25,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 from django.utils.translation import ugettext as _
+from mako.template import Template
 
+from common.log import logger
 from itsm.component.utils.misc import transform_single_username
+from itsm.iadmin.contants import ACTION_CHOICES_DICT
+from itsm.iadmin.models import CustomNotice
+from itsm.task.models import Task as TicketTask
 
 
 def translate(message, cxt, related_operators=None):
@@ -62,3 +67,35 @@ def compute_list_difference(current, new):
     计算A列表相较于B列表多出来的部分
     """
     return list(set(new).difference(set(current)))
+
+
+def build_message(_notify, task_id, ticket, message, action, **kwargs):
+    if task_id:
+        custom_notify = CustomNotice.objects.get(action=action, notify_type=_notify.type, used_by="TASK")
+    else:
+        custom_notify = CustomNotice.objects.get(action=action, notify_type=_notify.type)
+
+    # 获取单据上下文
+    context = ticket.get_notify_context()
+    context.update(message=message, action=_(ACTION_CHOICES_DICT.get(action, "待处理")), **kwargs)
+
+    # 获取任务上下文
+    if task_id:
+        try:
+            task = TicketTask.objects.get(id=task_id)
+            context.update({item['key']: item['value'] for item in task.get_output_context()})
+        except TicketTask.DoesNotExist:
+            logger.error('Failed to get task context: task_id={}'.format(task_id))
+            return None
+
+    try:
+        content = Template(custom_notify.content_template).render(**context)
+        title = Template(custom_notify.title_template).render(**context)
+        return content, title
+    except NameError as error:
+        logger.error(
+            "context render failed, error: {}, title: {}->{}, content: {}->{}".format(
+                error, context, custom_notify.title_template, context,
+                custom_notify.content_template)
+        )
+        return None
