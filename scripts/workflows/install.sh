@@ -32,5 +32,5 @@ else
 fi
 
 # 构建数据库表
-python manage.py migrate --fake
+python manage.py migrate
 python manage.py createcachetable
