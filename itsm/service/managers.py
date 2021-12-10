@@ -130,10 +130,12 @@ class ServiceManager(managers.Manager):
                     workflow=original_workflow.create_version(),
                 )
 
-            if builtin_service.get("bind"):
-                obj.display_role = dotted_name(builtin_service.get("display_role", ""))
-                obj.bind_catalog_by_key(builtin_service["bind"])
-                obj.save()
+                if builtin_service.get("bind"):
+                    obj.display_role = dotted_name(
+                        builtin_service.get("display_role", "")
+                    )
+                    obj.bind_catalog_by_key(builtin_service["bind"])
+                    obj.save()
 
     def insert_services(self, services, catalog=None):
         from itsm.workflow.models import Workflow
