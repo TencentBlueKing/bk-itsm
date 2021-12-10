@@ -48,6 +48,7 @@
                         :is-page-over="isPageOver"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment">
                     </left-ticket-content>
@@ -132,6 +133,7 @@
         mixins: [fieldMix, commonMix, apiFieldsWatch],
         data () {
             return {
+                moreLoading: false, // 底部加载loading
                 leftTicketDom: '',
                 isPageOver: false,
                 isThrottled: false,
@@ -273,7 +275,7 @@
                 const commentList = []
                 const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                     'ticket_id': this.ticketId,
-                    'show_type': this.$route.query.project_id ? 'ALL' : 'PUBLIC',
+                    'show_type': this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
                     page: page,
                     page_size: page_size
                 })
@@ -305,6 +307,7 @@
                 if (this.totalPages === 1) return
                 if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
                     this.isThrottled = true
+                    this.moreLoading = true
                     const timer = setTimeout(async () => {
                         this.isThrottled = false
                         const el = this.leftTicketDom
@@ -316,6 +319,7 @@
                             this.commentList.push(...result)
                         }
                     }, 500)
+                    this.this.moreLoading = false
                 }
             },
             async refreshComment () {
