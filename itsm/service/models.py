@@ -824,6 +824,8 @@ class CatalogService(Model):
         "Service", help_text=_("关联服务条目"), on_delete=models.CASCADE
     )
     order = models.IntegerField("service序列", default=FIRST_ORDER)
+    auth_resource = {}
+    resource_operations = []
 
     objects = managers.CatalogServiceManager()
 
