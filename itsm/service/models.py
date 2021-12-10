@@ -275,7 +275,7 @@ class Service(ObjectManagerMixin, Model):
 
     need_auth_grant = True
     auth_resource = {"resource_type": "service", "resource_type_name": "服务"}
-    resource_operations = ["service_manage", "service_view"]
+    resource_operations = ["service_manage"]
 
     def __unicode__(self):
         return self.name
