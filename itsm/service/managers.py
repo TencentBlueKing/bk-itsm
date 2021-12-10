@@ -63,19 +63,24 @@ class ServiceManager(managers.Manager):
         for builtin_service in BUILTIN_SERVICES:
 
             try:
-                original_workflow = Workflow.objects.get(name=builtin_service['flow_name'], is_builtin=True)
+                original_workflow = Workflow.objects.get(
+                    name=builtin_service["flow_name"], is_builtin=True
+                )
             except Workflow.DoesNotExist:
                 continue
-            if self.filter(Q(workflow__workflow_id=original_workflow.id) | Q(name=builtin_service['name'])).exists():
+            if self.filter(
+                Q(workflow__workflow_id=original_workflow.id)
+                | Q(name=builtin_service["name"])
+            ).exists():
                 # 关联的流程已经存在，不再做初始化
                 continue
 
             self.create(
-                name=builtin_service['name'],
-                display_type=builtin_service.get('display_type', OPEN),
-                display_role=dotted_name(builtin_service.get('display_role', "")),
+                name=builtin_service["name"],
+                display_type=builtin_service.get("display_type", OPEN),
+                display_role=dotted_name(builtin_service.get("display_role", "")),
                 key="request",
-                desc=builtin_service.get('desc', "内置服务"),
+                desc=builtin_service.get("desc", "内置服务"),
                 workflow=original_workflow.create_version(),
             )
 
@@ -84,21 +89,25 @@ class ServiceManager(managers.Manager):
         from itsm.component.constants import BUILTIN_IAM_SERVICES
 
         for builtin_service in BUILTIN_IAM_SERVICES:
-            original_workflow = Workflow.objects.get(name=builtin_service['flow_name'], is_iam_used=True)
-            obj = self.filter(workflow__workflow_id=original_workflow.id, name=builtin_service['name']).first()
+            original_workflow = Workflow.objects.get(
+                name=builtin_service["flow_name"], is_iam_used=True
+            )
+            obj = self.filter(
+                workflow__workflow_id=original_workflow.id, name=builtin_service["name"]
+            ).first()
             if not obj:
                 obj = self.create(
-                    name=builtin_service['name'],
-                    display_type=builtin_service['display_type'],
-                    display_role=dotted_name(builtin_service.get('display_role', '')),
+                    name=builtin_service["name"],
+                    display_type=builtin_service["display_type"],
+                    display_role=dotted_name(builtin_service.get("display_role", "")),
                     key="request",
-                    desc=builtin_service.get('desc', "内置服务"),
+                    desc=builtin_service.get("desc", "内置服务"),
                     workflow=original_workflow.create_version(),
                 )
 
             if builtin_service.get("bind"):
-                obj.display_role = dotted_name(builtin_service.get('display_role', ''))
-                obj.bind_catalog_by_key(builtin_service['bind'])
+                obj.display_role = dotted_name(builtin_service.get("display_role", ""))
+                obj.bind_catalog_by_key(builtin_service["bind"])
                 obj.save()
 
     def init_bkbase_services(self):
@@ -106,22 +115,24 @@ class ServiceManager(managers.Manager):
         from itsm.component.constants import BUILTIN_BKBASE_SERVICES
 
         for builtin_service in BUILTIN_BKBASE_SERVICES:
-            original_workflow = Workflow.objects.get(name=builtin_service['flow_name'])
-            obj = self.filter(workflow__workflow_id=original_workflow.id,
-                              name=builtin_service['name']).first()
+            original_workflow = Workflow.objects.filter(
+                name=builtin_service["flow_name"]
+            )
+
+            obj = self.filter(name=builtin_service["name"]).first()
             if not obj:
                 obj = self.create(
-                    name=builtin_service['name'],
-                    display_type=builtin_service['display_type'],
-                    display_role=dotted_name(builtin_service.get('display_role', '')),
+                    name=builtin_service["name"],
+                    display_type=builtin_service["display_type"],
+                    display_role=dotted_name(builtin_service.get("display_role", "")),
                     key="request",
-                    desc=builtin_service.get('desc', "内置服务"),
+                    desc=builtin_service.get("desc", "内置服务"),
                     workflow=original_workflow.create_version(),
                 )
 
             if builtin_service.get("bind"):
-                obj.display_role = dotted_name(builtin_service.get('display_role', ''))
-                obj.bind_catalog_by_key(builtin_service['bind'])
+                obj.display_role = dotted_name(builtin_service.get("display_role", ""))
+                obj.bind_catalog_by_key(builtin_service["bind"])
                 obj.save()
 
     def insert_services(self, services, catalog=None):
@@ -129,30 +140,38 @@ class ServiceManager(managers.Manager):
 
         if not services:
             return {"result": True, "message": "success"}
-        all_flow_name = [new_service['flow_name'] for new_service in services]
-        all_service_name = [new_service['name'] for new_service in services]
+        all_flow_name = [new_service["flow_name"] for new_service in services]
+        all_service_name = [new_service["name"] for new_service in services]
 
-        all_original_workflow = {flow.name: flow for flow in Workflow.objects.filter(name__in=all_flow_name)}
+        all_original_workflow = {
+            flow.name: flow for flow in Workflow.objects.filter(name__in=all_flow_name)
+        }
 
-        existed_services = self.filter(name__in=all_service_name).values_list("name", flat=True)
+        existed_services = self.filter(name__in=all_service_name).values_list(
+            "name", flat=True
+        )
 
         for new_service in services:
-            original_workflow = all_original_workflow.get(new_service['flow_name'])
-            if original_workflow is None or new_service['name'] in existed_services:
+            original_workflow = all_original_workflow.get(new_service["flow_name"])
+            if original_workflow is None or new_service["name"] in existed_services:
                 # 流程不存在, 可以忽略
                 # 导入的服务已经存在，忽略不处理
                 continue
 
             instance = self.create(
-                name=new_service['name'],
-                display_type=new_service.get('display_type', OPEN),
-                display_role=dotted_name(new_service.get('display_role', "")),
+                name=new_service["name"],
+                display_type=new_service.get("display_type", OPEN),
+                display_role=dotted_name(new_service.get("display_role", "")),
                 key="request",
-                desc=new_service.get('desc', "内置服务"),
+                desc=new_service.get("desc", "内置服务"),
                 workflow=original_workflow.create_version(),
             )
             if new_service.get("bind_default_catalog"):
-                print("bind service {name} to {catalog}".format(name=instance.name, catalog=catalog.name))
+                print(
+                    "bind service {name} to {catalog}".format(
+                        name=instance.name, catalog=catalog.name
+                    )
+                )
                 instance.bind_catalog(catalog.id)
 
         if existed_services:
@@ -180,18 +199,26 @@ class ServiceManager(managers.Manager):
                 continue
 
             flow_services.setdefault(service.workflow.id, []).append(service.id)
-        print(("group services by flow version: %s" % json.dumps(flow_services, indent=2)))
+        print(
+            ("group services by flow version: %s" % json.dumps(flow_services, indent=2))
+        )
 
         for old_flow_id, services in list(flow_services.items()):
             # upgrade old flow version to pipeline version
             print("upgrade flow version(%s) for services: %s" % (old_flow_id, services))
-            new_flow, states_map, transitions_map = WorkflowVersion.objects.upgrade_version(
+            (
+                new_flow,
+                states_map,
+                transitions_map,
+            ) = WorkflowVersion.objects.upgrade_version(
                 old_flow_id, for_migrate=True, **kwargs
             )
             self.filter(id__in=services).update(workflow=new_flow)
 
         # upgrade old non bind flow version to pipeline version
-        for non_bind_flow in WorkflowVersion.objects.exclude(engine_version=DEFAULT_ENGINE_VERSION):
+        for non_bind_flow in WorkflowVersion.objects.exclude(
+            engine_version=DEFAULT_ENGINE_VERSION
+        ):
             print("upgrade non_bind_flows version: %s" % non_bind_flow)
             WorkflowVersion.objects.upgrade_version(non_bind_flow.id, **kwargs)
 
@@ -227,14 +254,20 @@ class ServiceManager(managers.Manager):
             # 关联目录
             try:
                 catalog = ServiceCatalog._objects.get(
-                    key=ver.extras["service_property"].get("public", {}).get("service_category")
+                    key=ver.extras["service_property"]
+                    .get("public", {})
+                    .get("service_category")
                 )
 
-                catalog_service, created = CatalogService.objects.get_or_create(service=obj, catalog=catalog)
+                catalog_service, created = CatalogService.objects.get_or_create(
+                    service=obj, catalog=catalog
+                )
 
                 ver_for_service[ver.pk] = catalog_service
 
-                print("create service({}) and bind catalog({})".format(obj.id, catalog.id))
+                print(
+                    "create service({}) and bind catalog({})".format(obj.id, catalog.id)
+                )
             except ServiceCatalog.DoesNotExist:
                 print("catalog not found: {} - {}".format(ver.id, ver.name))
 
@@ -263,7 +296,9 @@ class SysDictManager(managers.Manager):
             )
 
             if builtin_dict["init_by"] == "jsonfile":
-                json_file_path = os.path.join(settings.PROJECT_ROOT, "initials", builtin_dict["items"])
+                json_file_path = os.path.join(
+                    settings.PROJECT_ROOT, "initials", builtin_dict["items"]
+                )
 
                 with open(json_file_path) as json_file:
                     json_data = json.loads(json_file.read())
@@ -329,7 +364,9 @@ class SysDictManager(managers.Manager):
                         parent=event_type_fault,
                     )
 
-                    for record in PropertyRecord.objects.filter(service_property=property):
+                    for record in PropertyRecord.objects.filter(
+                        service_property=property
+                    ):
                         if record.data.get("level") == 3:
                             DictData.create_item(
                                 dict_table=event_type,
@@ -372,7 +409,9 @@ class ServiceCatalogManager(BaseMpttManager):
 
         from itsm.service.models import PropertyRecord
 
-        service_categories = PropertyRecord._objects.filter(service_property=service_category)
+        service_categories = PropertyRecord._objects.filter(
+            service_property=service_category
+        )
 
         if self.filter(key="root", is_deleted=False).exists():
             print("skip exist migrate_from_service_category")
@@ -384,10 +423,16 @@ class ServiceCatalogManager(BaseMpttManager):
         for level1 in service_categories:
             if level1.data.get("level") == 1:
                 grandfather = self.model.create_catalog(
-                    key=level1.key, name=level1.data.get("name"), parent=root, is_deleted=level1.is_deleted
+                    key=level1.key,
+                    name=level1.data.get("name"),
+                    parent=root,
+                    is_deleted=level1.is_deleted,
                 )
                 for level2 in service_categories:
-                    if level2.data.get("level") == 2 and level2.data.get("parent_key") == grandfather.key:
+                    if (
+                        level2.data.get("level") == 2
+                        and level2.data.get("parent_key") == grandfather.key
+                    ):
                         father = self.model.create_catalog(
                             key=level2.key,
                             name=level2.data.get("name"),
@@ -395,7 +440,10 @@ class ServiceCatalogManager(BaseMpttManager):
                             is_deleted=level2.is_deleted,
                         )
                         for level3 in service_categories:
-                            if level3.data.get("level") == 3 and level3.data.get("parent_key") == father.key:
+                            if (
+                                level3.data.get("level") == 3
+                                and level3.data.get("parent_key") == father.key
+                            ):
                                 self.model.create_catalog(
                                     key=level3.key,
                                     name=level3.data.get("name"),
@@ -415,10 +463,16 @@ class ServiceCatalogManager(BaseMpttManager):
         level_3 = [item for item in catalog if item["level"] == 3]
         root = self.model.create_root(key="root", name=_("根目录"), is_deleted=False)
         for level1 in level_1:
-            l_1 = self.model.create_catalog(key=level1["key"], name=level1["name"], parent=root)
+            l_1 = self.model.create_catalog(
+                key=level1["key"], name=level1["name"], parent=root
+            )
             for level2 in level_2:
                 if l_1.key == level2["parent_key"]:
-                    l_2 = self.model.create_catalog(key=level2["key"], name=level2["name"], parent=l_1)
+                    l_2 = self.model.create_catalog(
+                        key=level2["key"], name=level2["name"], parent=l_1
+                    )
                     for level3 in level_3:
                         if l_2.key == level3["parent_key"]:
-                            self.model.create_catalog(key=level3["key"], name=level3["name"], parent=l_2)
+                            self.model.create_catalog(
+                                key=level3["key"], name=level3["name"], parent=l_2
+                            )
