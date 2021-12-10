@@ -63,7 +63,7 @@
                 </comment-item>
             </li>
         </ul>
-        <div v-bkloading="{ isLoading: false }" class="page-over">
+        <div v-bkloading="{ isLoading: moreLoading }" class="page-over">
             <span v-if="isPageOver">已经到底了</span>
         </div>
         <div v-if="commentList.length === 0" class="no-comment">
@@ -99,6 +99,7 @@
             ticketInfo: Object,
             ticketId: [Number, String],
             commentLoading: Boolean,
+            moreLoading: Boolean,
             isPageOver: Boolean,
             hasNodeOptAuth: Boolean
         },
