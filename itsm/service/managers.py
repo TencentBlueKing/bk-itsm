@@ -117,7 +117,7 @@ class ServiceManager(managers.Manager):
         for builtin_service in BUILTIN_BKBASE_SERVICES:
             original_workflow = Workflow.objects.filter(
                 name=builtin_service["flow_name"]
-            )
+            ).first()
 
             obj = self.filter(name=builtin_service["name"]).first()
             if not obj:

@@ -44,15 +44,23 @@ from itsm.component.constants import (
     LEN_X_LONG,
     LEN_XX_LONG,
     ResponseCodeStatus,
-    API_PERMISSION_ERROR_CODE, PUBLIC_PROJECT_PROJECT_KEY,
+    API_PERMISSION_ERROR_CODE,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.db import managers
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.esb.backend_component import bk
 from itsm.component.exceptions import DeleteError, ParamError, IamPermissionDenied
-from itsm.component.utils.conversion import build_params_by_mako_template, params_type_conversion
+from itsm.component.utils.conversion import (
+    build_params_by_mako_template,
+    params_type_conversion,
+)
 from itsm.component.utils.misc import find_json_file
-from itsm.component.utils.bk_bunch import Bunch, bunchify, unbunchify  # noqa need in exec
+from itsm.component.utils.bk_bunch import (  # noqa
+    Bunch,
+    bunchify,  # noqa
+    unbunchify,  # noqa
+)  # noqa
 
 
 class Model(models.Model):
@@ -91,21 +99,32 @@ class RemoteSystem(Model):
     system_id = models.IntegerField(_("系统id"), default=0)
     name = models.CharField(_("系统名称"), max_length=LEN_NORMAL, null=False)
     code = models.CharField(_("系统编码"), max_length=LEN_NORMAL, null=False)
-    desc = models.CharField(_("系统描述"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                            blank=True)
-    owners = models.CharField(_("系统责任人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True,
-                              blank=True)
+    desc = models.CharField(
+        _("系统描述"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
+    owners = models.CharField(
+        _("系统责任人"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+    )
     contact_information = models.TextField(_("联系方式"), blank=True)
     is_builtin = models.BooleanField(_("是否内置系统"), default=False)
 
     # 公共配置信息
-    domain = models.CharField(_("系统域名"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True,
-                              blank=True)
+    domain = models.CharField(
+        _("系统域名"), max_length=LEN_XX_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
     is_activated = models.BooleanField(_("是否启用"), default=False)
-    headers = jsonfield.JSONField(_("系统公共头部"), default=EMPTY_LIST, null=True, blank=True)
-    cookies = jsonfield.JSONField(_("系统公共cookies"), default=EMPTY_LIST, null=True, blank=True)
-    variables = jsonfield.JSONField(_("系统变量"), default=EMPTY_LIST, null=True, blank=True)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    headers = jsonfield.JSONField(
+        _("系统公共头部"), default=EMPTY_LIST, null=True, blank=True
+    )
+    cookies = jsonfield.JSONField(
+        _("系统公共cookies"), default=EMPTY_LIST, null=True, blank=True
+    )
+    variables = jsonfield.JSONField(
+        _("系统变量"), default=EMPTY_LIST, null=True, blank=True
+    )
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     class Meta:
         app_label = "postman"
@@ -134,8 +153,9 @@ class RemoteSystem(Model):
 
     @classmethod
     def init_default_system(cls):
-        file_path = os.path.join(settings.PROJECT_ROOT, "initials", "remote", "system",
-                                 "remote_system.json")
+        file_path = os.path.join(
+            settings.PROJECT_ROOT, "initials", "remote", "system", "remote_system.json"
+        )
         with open(file_path, "r", encoding="utf-8") as f:
             data = f.read()
 
@@ -148,7 +168,7 @@ class RemoteSystem(Model):
                 defaults={
                     "system_id": sys["id"],
                     "name": sys["label"],
-                    "desc": sys["remark"],
+                    "desc": "",
                     "is_builtin": True,
                     "is_activated": True,
                     "project_key": PUBLIC_PROJECT_PROJECT_KEY,
@@ -173,24 +193,39 @@ class RemoteApi(ObjectManagerMixin, Model):
     """
 
     # 基本信息
-    remote_system = models.ForeignKey("postman.RemoteSystem", help_text=_("对应的对接系统"),
-                                      related_name="apis", on_delete=models.CASCADE)
+    remote_system = models.ForeignKey(
+        "postman.RemoteSystem",
+        help_text=_("对应的对接系统"),
+        related_name="apis",
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(_("API名称"), max_length=LEN_NORMAL, null=False)
     path = models.CharField(_("API路径"), max_length=LEN_X_LONG, null=False)
     version = models.CharField(_("API版本"), max_length=LEN_SHORT, null=True)
     func_name = models.CharField(_("API调用函数"), max_length=LEN_NORMAL, null=False)
     method = models.CharField(
-        _("请求方法"), max_length=LEN_SHORT, choices=[("GET", "GET"), ("POST", "POST")], default="GET"
+        _("请求方法"),
+        max_length=LEN_SHORT,
+        choices=[("GET", "GET"), ("POST", "POST")],
+        default="GET",
     )
     desc = models.CharField(_("描述"), max_length=LEN_LONG, default="")
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
 
     # 参数格式
-    req_headers = jsonfield.JSONField(_("headers参数"), default=EMPTY_LIST, null=True, blank=True)
-    req_params = jsonfield.JSONField(_("query参数"), default=EMPTY_LIST, null=True, blank=True)
-    req_body = jsonfield.JSONField(_("body参数"), default=EMPTY_DICT, null=True, blank=True)
+    req_headers = jsonfield.JSONField(
+        _("headers参数"), default=EMPTY_LIST, null=True, blank=True
+    )
+    req_params = jsonfield.JSONField(
+        _("query参数"), default=EMPTY_LIST, null=True, blank=True
+    )
+    req_body = jsonfield.JSONField(
+        _("body参数"), default=EMPTY_DICT, null=True, blank=True
+    )
     # 属性提取路径列表：data.attr1.attr2,data.attr1.attr3
-    rsp_data = jsonfield.JSONField(_("rsp_data"), default=EMPTY_DICT, null=True, blank=True)
+    rsp_data = jsonfield.JSONField(
+        _("rsp_data"), default=EMPTY_DICT, null=True, blank=True
+    )
     before_req = models.TextField(_("request预处理代码"), default=EMPTY_STRING)
     map_code = models.TextField(_("response后处理代码"), default=EMPTY_STRING)
     is_activated = models.BooleanField(_("是否启用"), default=False)
@@ -244,12 +279,13 @@ class RemoteApi(ObjectManagerMixin, Model):
                 try:
                     cls.restore_api(api, "system", True)
                 except Exception as e:
-                    logger.info("创建默认api失败：%s api name %s" % (str(e), api['name']))
+                    logger.info("创建默认api失败：%s api name %s" % (str(e), api["name"]))
 
     def tag_data(self):
         """Api数据"""
-        data = model_to_dict(self,
-                             exclude=["id", "req_headers", "req_params", "req_body", "rsp_data"])
+        data = model_to_dict(
+            self, exclude=["id", "req_headers", "req_params", "req_body", "rsp_data"]
+        )
 
         data.update(
             req_headers=self.req_headers,
@@ -285,8 +321,9 @@ class RemoteApi(ObjectManagerMixin, Model):
         item["remote_system"] = remote_system
         item.pop("is_deleted", None)
         if is_builtin:
-            api, created = RemoteApi.objects.update_or_create(is_builtin=is_builtin,
-                                                              name=item['name'], defaults=item)
+            api, created = RemoteApi.objects.update_or_create(
+                is_builtin=is_builtin, name=item["name"], defaults=item
+            )
         else:
             api = RemoteApi.objects.create(**item)
         return api
@@ -297,8 +334,12 @@ class RemoteApiInstance(Model):
     接口调用参数实例化
     """
 
-    remote_api = models.ForeignKey("postman.RemoteApi", help_text=_("api基础信息"),
-                                   related_name="api_instances", on_delete=models.CASCADE)
+    remote_api = models.ForeignKey(
+        "postman.RemoteApi",
+        help_text=_("api基础信息"),
+        related_name="api_instances",
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(_("配置名称"), max_length=LEN_SHORT, default="")
     desc = models.CharField(_("配置描述"), max_length=LEN_X_LONG, default="", null=True)
 
@@ -306,8 +347,9 @@ class RemoteApiInstance(Model):
     req_body = jsonfield.JSONField(_("body实例化参数"), default=EMPTY_DICT)
     rsp_data = models.CharField(_("返回参数"), max_length=LEN_XX_LONG, default="")
     succeed_conditions = jsonfield.JSONField(_("成功条件"), default=EMPTY_DICT)
-    end_conditions = jsonfield.JSONField(_("结束条件（api节点可用）"), default=EMPTY_DICT, null=True,
-                                         blank=True)
+    end_conditions = jsonfield.JSONField(
+        _("结束条件（api节点可用）"), default=EMPTY_DICT, null=True, blank=True
+    )
     need_poll = models.BooleanField(_("是否轮询"), default=False)
     map_code = models.TextField(_("response后处理代码"), default=EMPTY_STRING)
     before_req = models.TextField(_("request预处理代码"), default=EMPTY_STRING)
@@ -329,7 +371,9 @@ class RemoteApiInstance(Model):
     @classmethod
     def create_default_api_instance(cls, func_name, req_params, req_body, rsp_data):
         return cls.objects.create(
-            remote_api=RemoteApi.objects.get(read_only=True, is_builtin=True, func_name=func_name),
+            remote_api=RemoteApi.objects.get(
+                read_only=True, is_builtin=True, func_name=func_name
+            ),
             req_params=req_params,
             req_body=req_body,
             rsp_data=rsp_data,
@@ -369,7 +413,9 @@ class RemoteApiInstance(Model):
             "rsp_data": self.rsp_data,
             "map_code": self.map_code,
             "before_req": self.before_req,
-            "query_params": self.req_body if remote_api.method == "POST" else self.req_params,
+            "query_params": self.req_body
+            if remote_api.method == "POST"
+            else self.req_params,
         }
 
     def get_api_choice(self, kv_relation, params):
@@ -380,7 +426,9 @@ class RemoteApiInstance(Model):
         """
 
         api_config = self.get_config()
-        result, query_params = build_params_by_mako_template(api_config["query_params"], params)
+        result, query_params = build_params_by_mako_template(
+            api_config["query_params"], params
+        )
         # 构造参数不成功
         if not result:
             return {
@@ -398,8 +446,9 @@ class RemoteApiInstance(Model):
                 jsonschema.validate(query_params, remote_api.req_body)
             except Exception as e:
                 logger.error(
-                    "get_api_choice query_params {}, remote_api.req_body {}".format(query_params,
-                                                                                    remote_api.req_body)
+                    "get_api_choice query_params {}, remote_api.req_body {}".format(
+                        query_params, remote_api.req_body
+                    )
                 )
                 logger.error("get_api_choice err {}".format(e))
                 return {
@@ -415,7 +464,7 @@ class RemoteApiInstance(Model):
             if rsp.get("code") == API_PERMISSION_ERROR_CODE:
                 raise IamPermissionDenied(
                     data=rsp["permission"],
-                    detail=_("用户没有对应的第三方系统接口【%s】权限" % api_config.get('path'))
+                    detail=_("用户没有对应的第三方系统接口【%s】权限" % api_config.get("path")),
                 )
             return rsp
 
@@ -425,17 +474,32 @@ class RemoteApiInstance(Model):
                 "result": True,
                 "code": ResponseCodeStatus.OK,
                 "message": "success",
-                "data": [{"key": index, "name": str(item)} for index, item in enumerate(rsp_data)],
+                "data": [
+                    {"key": index, "name": str(item)}
+                    for index, item in enumerate(rsp_data)
+                ],
             }
 
         try:
             data = []
             for item in rsp_data:
-                exec("key = unbunchify(bunchify(item).{key})".format(key=kv_relation["key"]))
-                exec("name = unbunchify(bunchify(item).{name})".format(name=kv_relation["name"]))
+                exec(
+                    "key = unbunchify(bunchify(item).{key})".format(
+                        key=kv_relation["key"]
+                    )
+                )
+                exec(
+                    "name = unbunchify(bunchify(item).{name})".format(
+                        name=kv_relation["name"]
+                    )
+                )
                 data.append({"key": locals()["key"], "name": locals()["name"]})
-            return {"result": True, "code": ResponseCodeStatus.OK, "message": "success",
-                    "data": data}
+            return {
+                "result": True,
+                "code": ResponseCodeStatus.OK,
+                "message": "success",
+                "data": data,
+            }
         except (KeyError, AttributeError):
             return {
                 "result": False,
