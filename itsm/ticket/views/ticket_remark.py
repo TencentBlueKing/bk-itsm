@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from itsm.component.drf import viewsets as component_viewsets
-from itsm.ticket.models import TicketRemark
+from itsm.ticket.models import TicketRemark, Ticket
 from itsm.ticket.serializers import TicketRemarkSerializer
 
 
@@ -30,13 +30,23 @@ class TicketRemarkModelViewSet(ModelViewSet):
     serializer_class = TicketRemarkSerializer
 
     def list(self, request, *args, **kwargs):
+        # 后面这个接口要重构一部分
         ticket_id = request.query_params.get("ticket_id", "")
         show_type = request.query_params.get("show_type", "PUBLIC")
+
+        ticket = Ticket.objects.get(id=ticket_id)
+        history_operators = ticket.updated_by.split(",")
 
         remark_type = ["ROOT", show_type]
 
         if show_type == "ALL":
             remark_type = ["ROOT", "INSIDE", "PUBLIC"]
+
+        if not (
+            request.user.username in history_operators
+            or ticket.can_operate(request.user.username)
+        ):
+            remark_type = ["ROOT", "PUBLIC"]
 
         queryset = self.get_queryset().filter(
             remark_type__in=remark_type, ticket_id=ticket_id
