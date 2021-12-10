@@ -22,14 +22,17 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import importlib
+from urllib.parse import urljoin
 from config import RUN_VER, BK_PAAS_HOST, OPEN_VER  # noqa
 
 if RUN_VER == "open":
     from blueapps.patch.settings_open_saas import *  # noqa
-    BK_STATIC_URL = STATIC_URL.rstrip('/')
+
+    BK_STATIC_URL = STATIC_URL.rstrip("/")
 else:
     from blueapps.patch.settings_paas_services import *  # noqa
+
     BK_STATIC_URL = "/static"
 
     # 正式环境 static_url 设置为 https
