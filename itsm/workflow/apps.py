@@ -107,7 +107,7 @@ class WorkflowConfig(AppConfig):
         )
 
         signals.post_migrate.connect(app_ready_handler, sender=self)
-        signals.pre_migrate.connect(fix_migrate_error, sender=self)
+        # signals.pre_migrate.connect(fix_migrate_error, sender=self)
 
         signals.post_save.connect(init_after_workflow_created, Workflow)
         signals.post_save.connect(after_basic_model_saved, Table)
