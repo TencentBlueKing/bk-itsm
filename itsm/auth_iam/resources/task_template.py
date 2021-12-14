@@ -45,7 +45,7 @@ class TaskSchemaResourceProvider(ItsmResourceProvider):
         """
         flow 没有定义属性，只处理 filter 中的 ids 字段
         """
-        queryset = self.queryset.filter(key__in=filter.ids)
+        queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
         results = [{"id": task_schema.id, "display_name": task_schema.name} for task_schema in
                    queryset]
