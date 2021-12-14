@@ -41,7 +41,11 @@ from itsm.component.exceptions import (
 from itsm.component.constants import ResponseCodeStatus
 from itsm.component.constants.iam import HTTP_499_IAM_FORBIDDEN
 from itsm.component.utils.basic import build_tree
-from itsm.component.utils.client_backend_query import get_biz_choices, get_list_departments, get_list_department_profiles
+from itsm.component.utils.client_backend_query import (
+    get_biz_choices,
+    get_list_departments,
+    get_list_department_profiles,
+)
 from itsm.component.utils.response import Fail, Success
 from itsm.component.apigw import client as apigw_client
 
@@ -96,9 +100,11 @@ def get_batch_users(request):
                 "data": {"results": res, "count": len(res)},
                 "code": 0,
             }
-            return HttpResponse(
+            response = HttpResponse(
                 "{}({})".format(callback_func_name, json.dumps(response))
             )
+            response["Content-Type"] = "application/x-javascript; charset=utf-8"
+            return response
         return Success(res).json()
     except Exception as error:
         logger.warning(_("批量获取用户信息出错，%s"), str(error))
@@ -186,11 +192,7 @@ def get_departments(request):
     """
     try:
         # 获取所有部门的扁平化列表信息
-        res = get_list_departments(
-            {
-                "fields": "id,name,parent,level,order"
-            }
-        )
+        res = get_list_departments({"fields": "id,name,parent,level,order"})
 
         # 转换成树状结构
         res = build_tree(res, "parent", need_route=True)
@@ -208,11 +210,7 @@ def get_department_users(request):
         recursive = request.GET.get("recursive") == "true"
 
         res = get_list_department_profiles(
-            {
-                "id": department_id,
-                "recursive": recursive,
-                "detail": True
-            }
+            {"id": department_id, "recursive": recursive, "detail": True}
         )
 
     except ComponentCallError as e:
