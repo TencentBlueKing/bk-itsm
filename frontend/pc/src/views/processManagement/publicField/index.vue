@@ -548,14 +548,14 @@
                                 name: projectInfo.name
                             }],
                             field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
                     } else {
                         resourceData = {
                             public_field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
