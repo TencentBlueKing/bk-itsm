@@ -74,6 +74,7 @@
                         :is-page-over="isPageOver"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment"
                     ></wang-editor>
@@ -129,7 +130,8 @@
             ticketId: [Number, String],
             commentLoading: Boolean,
             isPageOver: Boolean,
-            hasNodeOptAuth: Boolean
+            hasNodeOptAuth: Boolean,
+            moreLoading: Boolean
         },
         inject: ['reloadTicket'],
         data () {

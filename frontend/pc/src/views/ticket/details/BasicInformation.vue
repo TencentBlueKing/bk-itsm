@@ -27,7 +27,18 @@
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li v-for="item in basicInfomationList" :key="item.name">
                         <span class="bk-info-title">{{ item.name }} :</span>
-                        <span class="bk-info-content">{{ item.value || '--'}}</span>
+                        <span v-if="item.type === 'STRING'" class="bk-info-content">{{ item.value || '--'}}</span>
+                        <bk-popover
+                            v-else
+                            placement="Bottom "
+                            width="530"
+                            trigger="click"
+                            theme="light">
+                            <span class="view-content">点击查看</span>
+                            <div slot="content">
+                                <fields-done class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
+                            </div>
+                        </bk-popover>
                     </li>
                 </ul>
             </div>
@@ -42,9 +53,12 @@
 </template>
 
 <script>
-
+    import fieldsDone from './components/fieldsDone.vue'
     export default {
         name: 'BasicInformation',
+        components: {
+            fieldsDone
+        },
         props: {
             basicInfomation: {
                 type: Object,
@@ -110,16 +124,13 @@
             tableFields () {
                 const { service_type_name, sn, catalog_fullname, service_name } = this.basicInfomation
                 const list = [
-                    { name: '工单类型', value: service_type_name },
-                    { name: '单号', value: sn },
-                    { name: '服务目录', value: catalog_fullname + '>' + service_name },
-                    { name: '关联业务', value: service_name }
+                    { name: '工单类型', value: service_type_name, type: 'STRING' },
+                    { name: '单号', value: sn, type: 'STRING' },
+                    { name: '服务目录', value: catalog_fullname + '>' + service_name, type: 'STRING' },
+                    { name: '关联业务', value: service_name, type: 'STRING' }
                 ]
                 const fields = this.firstStateFields.map(item => {
-                    return {
-                        name: item.name,
-                        value: item.display_value
-                    }
+                    return item
                 })
                 this.basicInfomationList = fields.concat(list)
             }
@@ -129,6 +140,13 @@
 
 <style scoped lang='scss'>
     @import '../../../scss/mixins/clearfix.scss';
+    @import '../../../scss/mixins/scroller.scss';
+    .show {
+        width: 500px;
+        height: 200px;
+        overflow: auto;
+        @include scroller;
+    }
     .basic-info-wrap {
         position: relative;
         padding-bottom: 14px;
@@ -178,7 +196,11 @@
             float: left;
             color: #979ba5;
         }
-
+        .view-content {
+            padding-left: 10px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
         .bk-info-content {
             word-wrap: break-word;
             padding-left: 10px;

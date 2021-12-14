@@ -28,16 +28,37 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
+def have_is_allow_skip():
+    from django.db import connection
 
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'show columns from workflow_state;'
+            )
+            rows = cursor.fetchall()
+            fields = [item[0] for item in rows]
+            if "is_allow_skip" in fields:
+                return True
+
+    except Exception:
+        return False
+
+
+def skip_migrate():
+    if have_is_allow_skip():
+        return []
+
+    return [migrations.AddField(
+        model_name='state',
+        name='is_allow_skip',
+        field=models.BooleanField(default=False, verbose_name='是否允许在单据处理人为空时跳过'),
+    )]
+
+
+class Migration(migrations.Migration):
     dependencies = [
         ('workflow', '0046_auto_20211021_0948'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='state',
-            name='is_allow_skip',
-            field=models.BooleanField(default=False, verbose_name='是否允许在单据处理人为空时跳过'),
-        ),
-    ]
+    operations = skip_migrate()
