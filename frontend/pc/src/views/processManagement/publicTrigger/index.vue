@@ -256,7 +256,7 @@
                             name: projectInfo.name
                         }],
                         trigger: [{
-                            id: item.key,
+                            id: item.id,
                             name: item.name
                         }]
                     }
@@ -280,7 +280,7 @@
                             name: projectInfo.name
                         }],
                         trigger: [{
-                            id: item.key,
+                            id: item.id,
                             name: item.name
                         }]
                     }

@@ -285,7 +285,7 @@
                     }
                 })
                 this.commentCount = commmentRes.data.count
-                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size)
+                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size) || 1
                 commentList.push(...commmentRes.data.items)
                 commentList.sort((a, b) => b.id - a.id)
                 this.commentLoading = false
