@@ -417,6 +417,13 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             data["fields"], request.data.get("from_ticket_id", None)
         )
         start_pipeline.apply_async([instance])
+
+        logger.info(
+            "[openapi][create_ticket]-> 单据创建成功，sn={}, request_data={}".format(
+                instance.sn, data
+            )
+        )
+
         return Response(
             {"sn": instance.sn, "id": instance.id, "ticket_url": instance.pc_ticket_url}
         )
