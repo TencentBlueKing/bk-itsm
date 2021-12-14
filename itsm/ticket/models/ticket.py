@@ -736,9 +736,13 @@ class Status(Model):
         if self.processors_type in ["GENERAL", "CMDB"]:
             role_ids = list_by_separator(self.processors)
             role_name_list = list(
-                UserRole.objects.filter(id__in=role_ids).values_list("name", flat=True)
+                UserRole.objects.filter(id__in=role_ids).values_list("name", "members")
             )
-            display_name = ",".join(role_name_list)
+            role_name_members_list = [
+                "{}({})".format(role_name[0], role_name[1].strip(","))
+                for role_name in role_name_list
+            ]
+            display_name = ",".join(role_name_members_list)
 
         if self.processors_type == "PERSON":
             users = self.get_processor_in_sign_state()
