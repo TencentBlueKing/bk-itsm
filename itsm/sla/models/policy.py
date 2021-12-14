@@ -63,36 +63,51 @@ class PriorityPolicy(Model):
 
     name = models.CharField(_("策略名称"), max_length=LEN_LONG)
     priority = models.CharField(_("优先级"), max_length=LEN_LONG)
-    schedule = models.ForeignKey(help_text=_("服务时间"), to='Schedule', related_name='policies',
-                                 on_delete=models.CASCADE)
+    schedule = models.ForeignKey(
+        help_text=_("服务时间"),
+        to="Schedule",
+        related_name="policies",
+        on_delete=models.CASCADE,
+    )
     handle_time = models.IntegerField(_("处理期限"), default=EMPTY_INT)
     handle_unit = models.CharField(
-        _("时长单位"), max_length=LEN_SHORT, default='m',
-        choices=[('m', "分钟"), ('h', "小时"), ('d', "天"), ]
+        _("时长单位"),
+        max_length=LEN_SHORT,
+        default="m",
+        choices=[
+            ("m", "分钟"),
+            ("h", "小时"),
+            ("d", "天"),
+        ],
     )
     reply_time = models.IntegerField(_("应答时长"), blank=True, null=True)
     reply_unit = models.CharField(
-        _("应答时长单位"), max_length=LEN_SHORT, default='m',
-        choices=[('m', "分钟"), ('h', "小时"), ('d', "天"), ]
+        _("应答时长单位"),
+        max_length=LEN_SHORT,
+        default="m",
+        choices=[
+            ("m", "分钟"),
+            ("h", "小时"),
+            ("d", "天"),
+        ],
     )
 
     class Meta:
-        app_label = 'sla'
+        app_label = "sla"
         verbose_name = _("服务策略")
         verbose_name_plural = _("服务策略")
 
     def __unicode__(self):
-        return '{}({})'.format(self.name, self.priority)
+        return "{}({})".format(self.name, self.priority)
 
     def schedule_days(self):
         """服务日"""
         from itsm.sla.models import Schedule
 
         ret = {}
-        schedule = Schedule.objects.prefetch_related("days__duration", "workdays__duration",
-                                                     "holidays__duration").get(
-            id=self.schedule_id
-        )
+        schedule = Schedule.objects.prefetch_related(
+            "days__duration", "workdays__duration", "holidays__duration"
+        ).get(id=self.schedule_id)
         for day_type in ["days", "workdays", "holidays"]:
             days = []
             ret.update({day_type: []})
@@ -125,8 +140,8 @@ class PriorityMatrix(Model):
     objects = managers.PriorityMatrixManager()
 
     class Meta:
-        unique_together = ('service_type', 'urgency', 'impact')
-        app_label = 'sla'
+        unique_together = ("service_type", "urgency", "impact")
+        app_label = "sla"
         verbose_name = _("优先级矩阵")
         verbose_name_plural = _("优先级矩阵")
 
@@ -146,7 +161,7 @@ class SlaTimerRule(Model):
         _("条件类型"),
         max_length=LEN_NORMAL,
         choices=[("START", _("开始")), ("STOP", _("结束")), ("PAUSE", _("暂停"))],
-        default='START',
+        default="START",
     )
     condition = JSONField(_("条件"), default=EMPTY_DICT)
 
@@ -169,7 +184,7 @@ class SlaTimerRule(Model):
     """
 
     class Meta:
-        app_label = 'sla'
+        app_label = "sla"
         verbose_name = _("计时规则")
         verbose_name_plural = _("计时规则")
 
@@ -185,20 +200,21 @@ class SlaTimerRule(Model):
             """获取表达式的value集合"""
             return set([expression["value"] for expression in expressions])
 
-        over_ticket_status_keys = TicketStatus.objects.filter(service_type=service_type,
-                                                              is_over=True).values_list(
-            "key", flat=True
-        )
+        over_ticket_status_keys = TicketStatus.objects.filter(
+            service_type=service_type, is_over=True
+        ).values_list("key", flat=True)
 
         # 获取sla不计时对应单据状态key
         not_sla_ticket_status_keys = set(over_ticket_status_keys)
-        sla_timer_rules = cls.objects.filter(service_type=service_type,
-                                             condition_type__in=["STOP", "PAUSE"])
+        sla_timer_rules = cls.objects.filter(
+            service_type=service_type, condition_type__in=["STOP", "PAUSE"]
+        )
 
         for sla_timer_rule in sla_timer_rules:
             expressions = sla_timer_rule.condition.get("expressions", [])
             not_sla_ticket_status_keys = not_sla_ticket_status_keys.union(
-                expression_values(expressions))
+                expression_values(expressions)
+            )
 
         return not_sla_ticket_status_keys
 
@@ -206,7 +222,7 @@ class SlaTimerRule(Model):
     def init_sla_timer_rule(cls):
         """初始化sla timer rule"""
         if cls.objects.exists():
-            print('sla timer rule exists, skip init sla timer rule')
+            print("sla timer rule exists, skip init sla timer rule")
             return
         timer_rules = []
         for service_type, v in list(SERVICE_CATEGORY.items()):
@@ -218,7 +234,12 @@ class SlaTimerRule(Model):
                     condition={
                         "type": "all",
                         "expressions": [
-                            {"name": "current_status", "value": "RUNNING", "operator": "equal_to"}],
+                            {
+                                "name": "current_status",
+                                "value": "RUNNING",
+                                "operator": "equal_to",
+                            }
+                        ],
                     },
                 )
             )
@@ -247,7 +268,12 @@ class Action(Model):
     """
 
     action_type = models.CharField(
-        "事件类型", max_length=LEN_SHORT, choices=[("alert", "告警事件"), ("update_ticket", "更新单据信息"), ]
+        "事件类型",
+        max_length=LEN_SHORT,
+        choices=[
+            ("alert", "告警事件"),
+            ("update_ticket", "更新单据信息"),
+        ],
     )
 
     config = JSONField("事件配置", help_text="类型详细配置", default=EMPTY_DICT)
@@ -277,7 +303,7 @@ class Action(Model):
     """
 
     class Meta:
-        app_label = 'sla'
+        app_label = "sla"
         verbose_name = _("升级事件配置")
         verbose_name_plural = _("升级事件配置")
 
@@ -290,7 +316,8 @@ class Action(Model):
         alert_config = bunchify(self.config)
 
         notify_objs = CustomNotice.objects.filter(
-            id__in=[notify["notify_template"] for notify in alert_config.notify])
+            id__in=[notify["notify_template"] for notify in alert_config.notify]
+        )
         # 获取变量上下文：单据/字段
         context = ticket.get_notify_context()
 
@@ -300,10 +327,9 @@ class Action(Model):
             title = Template(notify.title_template).render(**context)
             receivers = self.receivers(ticket, alert_config.receivers)
 
-            notifier = BaseNotifier(title=title, receivers=receivers,
-                                    message=content).get_notify_class(
-                notify.notify_type
-            )
+            notifier = BaseNotifier(
+                title=title, receivers=receivers, message=content
+            ).get_notify_class(notify.notify_type)
 
             notifier.send()
 
@@ -316,7 +342,7 @@ class Action(Model):
                 all_users.update(ticket.real_current_processors)
             elif role == "ADMIN":
                 all_users.update(ticket.service_instance.owners.split(","))
-            elif role == 'HISTORY_HANDLER':
+            elif role == "HISTORY_HANDLER":
                 all_users.update(ticket.history_handlers)
         return ",".join([user for user in all_users if user])
 
@@ -329,11 +355,11 @@ class ActionPolicy(Model):
     name = models.CharField(_("策略名称"), max_length=LEN_LONG)
     type = models.IntegerField(_("升级事件类型"), choices=ACTION_POLICY_TYPES, default=1)
     order = models.IntegerField(_("策略顺序"), default=-1)
-    condition = JSONField('升级条件', help_text="当达到条件的时候，可以触发不同的动作")
+    condition = JSONField("升级条件", help_text="当达到条件的时候，可以触发不同的动作")
     actions = models.ManyToManyField(Action, help_text=_("处理事件"))
 
     class Meta:
-        app_label = 'sla'
+        app_label = "sla"
         verbose_name = _("升级策略")
         verbose_name_plural = _("升级策略")
 
@@ -355,7 +381,13 @@ class ActionPolicy(Model):
             # 升级动作, 例如: 告警
             for action in self.actions.all():
                 upgrade_actions.append(
-                    {"name": action.action_type, "params": {"action_id": action.id, }})
+                    {
+                        "name": action.action_type,
+                        "params": {
+                            "action_id": action.id,
+                        },
+                    }
+                )
 
         return {
             "conditions": upgrade_condition,
@@ -373,7 +405,9 @@ class ActionPolicy(Model):
             expression["operator"] = "less_than_or_equal_to"
 
         # 降级动作: 取消/减弱单据高亮显示, 由于降级动作是由升级动作映射而来，所以没有匹配的可选动作
-        downgrade_actions = [{"name": "downgrade_sla", "params": {"sla_status": NORMAL}}]
+        downgrade_actions = [
+            {"name": "downgrade_sla", "params": {"sla_status": NORMAL}}
+        ]
 
         return {
             "conditions": {operator_type: expressions},
@@ -387,25 +421,33 @@ class Sla(Model):
     """
 
     name = models.CharField(_("Sla名称"), max_length=LEN_LONG)
-    policies = models.ManyToManyField(help_text=_("服务优先级策略"), to='PriorityPolicy',
-                                      related_name='p_slas')
-    action_policies = models.ManyToManyField(help_text=_("服务升级事件策略"), to='ActionPolicy',
-                                             related_name='a_slas')
+    policies = models.ManyToManyField(
+        help_text=_("服务优先级策略"), to="PriorityPolicy", related_name="p_slas"
+    )
+    action_policies = models.ManyToManyField(
+        help_text=_("服务升级事件策略"), to="ActionPolicy", related_name="a_slas"
+    )
     is_enabled = models.BooleanField(_("是否启用"), default=False)
     is_builtin = models.BooleanField(_("是否内置"), default=False)
     is_reply_need = models.BooleanField(_("是否启用响应约定"), default=False)
-    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT, null=False, default=0)
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=0
+    )
 
     need_auth_grant = True
 
     auth_resource = {"resource_type": "sla_agreement", "resource_type_name": "SLA 协议"}
-    resource_operations = ["sla_agreement_view", "sla_agreement_edit", "sla_agreement_delete"]
+    resource_operations = [
+        "sla_agreement_view",
+        "sla_agreement_edit",
+        "sla_agreement_delete",
+    ]
 
     class Meta:
-        app_label = 'sla'
+        app_label = "sla"
         verbose_name = _("服务协议")
         verbose_name_plural = _("服务协议")
-        ordering = ['-id']
+        ordering = ["-id"]
 
     def __unicode__(self):
         return "{}({})".format(self.name, self.is_enabled)
@@ -417,25 +459,36 @@ class Sla(Model):
     @property
     def service_count(self):
         """应用服务数"""
-        return ServiceSla.objects.filter(sla_id=self.id).values("service_id").distinct().count()
+        return (
+            ServiceSla.objects.filter(sla_id=self.id)
+            .values("service_id")
+            .distinct()
+            .count()
+        )
 
     @property
     def service_names(self):
         """应用了该协议的服务的名字"""
-        service_ids = ServiceSla.objects.filter(sla_id=self.id).values_list("service_id", flat=True)
+        service_ids = ServiceSla.objects.filter(sla_id=self.id).values_list(
+            "service_id", flat=True
+        )
         return Service.objects.filter(id__in=service_ids).values_list("name", flat=True)
 
     @property
     def has_response_time(self):
         """是否有约定响应时间"""
-        return self.action_policies.filter(type__in=[REPLY_WARING, REPLY_TIMEOUT]).exists()
+        return self.action_policies.filter(
+            type__in=[REPLY_WARING, REPLY_TIMEOUT]
+        ).exists()
 
     def get_tickets(self):
         """绑定当前sla的所有单据"""
         from itsm.ticket.models import Ticket
         from itsm.sla_engine.models import SlaTask
 
-        ticket_ids = SlaTask.objects.filter(sla_id=self.id).values_list("ticket_id", flat=True)
+        ticket_ids = SlaTask.objects.filter(sla_id=self.id).values_list(
+            "ticket_id", flat=True
+        )
         return Ticket.objects.filter(id__in=ticket_ids)
 
     def get_default_policy(self):
@@ -443,32 +496,43 @@ class Sla(Model):
         policies = self.policies.values("priority", "handle_time", "handle_unit")
         # 预期解决时长越长, 说明优先级越低
         # 没有以数据字典顺序做为优先级高低的衡量标准, 是因为在"服务协议管理"中, 可能会出现优先级未设定"服务模式"和"约定解决时长"的情况
-        lowest_policy = max(policies, key=lambda x: x["handle_time"] * TO_SECOND[x["handle_unit"]])
+        lowest_policy = max(
+            policies, key=lambda x: x["handle_time"] * TO_SECOND[x["handle_unit"]]
+        )
         return lowest_policy["priority"]
 
     @classmethod
     def init_sla(cls, default_schedules, project_key="0"):
         """初始化服务协议"""
-        default_sla_name = ['5*8', '7*24']
+        default_sla_name = ["5*8", "7*24"]
         default_keys = [priority[0] for priority in PRIORITYS]
 
         if cls.objects.filter(project_key=project_key).exists():
-            print('sla exists, skip init')
+            print("sla exists, skip init")
             return
+
+        sla_list = []
 
         for index, sla in enumerate(default_sla_name):
             priority_policies = []
 
             for key in default_keys:
                 priority_policy = PriorityPolicy.objects.create(
-                    priority=key, schedule=default_schedules[index], handle_time=1, handle_unit='h'
+                    priority=key,
+                    schedule=default_schedules[index],
+                    handle_time=1,
+                    handle_unit="h",
                 )
                 priority_policies.append(priority_policy)
 
-            sla = cls.objects.create(name=sla, is_builtin=True, is_enabled=True,
-                                     project_key=project_key)
+            sla = cls.objects.create(
+                name=sla, is_builtin=True, is_enabled=True, project_key=project_key
+            )
             sla.policies.add(*priority_policies)
             sla.save()
+            sla_list.append(sla)
+
+        return sla_list
 
 
 class SlaTicketHighlight(models.Model):
@@ -482,9 +546,10 @@ class SlaTicketHighlight(models.Model):
     @classmethod
     def init_sla_ticket_hightlight(cls):
         if cls.objects.exists():
-            print('sla ticket highlight exists, skip init')
+            print("sla ticket highlight exists, skip init")
             return
 
         SlaTicketHighlight.objects.create(
-            reply_timeout_color=REPLY_TIMEOUT_COLOR, handle_timeout_color=HANDLE_TIMEOUT_COLOR
+            reply_timeout_color=REPLY_TIMEOUT_COLOR,
+            handle_timeout_color=HANDLE_TIMEOUT_COLOR,
         )
