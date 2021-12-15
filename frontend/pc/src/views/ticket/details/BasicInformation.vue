@@ -25,29 +25,13 @@
         <div class="bk-basic-info" ref="basicInfo">
             <div class="bk-basic-form">
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
-                    <li v-for="item in basicInfomationList" :key="item.name">
-                        <span class="bk-info-title">{{ item.name }} :</span>
-                        <span v-if="item.type === 'STRING'" class="bk-info-content">{{ item.value || '--'}}</span>
-                        <bk-popover
-                            v-else
-                            placement="Bottom "
-                            width="530"
-                            trigger="click"
-                            theme="light">
-                            <span class="view-content">点击查看</span>
-                            <div slot="content">
-                                <fields-done class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
-                            </div>
-                        </bk-popover>
+                    <li v-for="item in basicInfomationList" :key="item.name" :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
+                        <span class="bk-info-title" :title="item.name">{{ item.name }} :</span>
+                        <span v-if="basicInfoType.includes(item.type)" class="bk-info-content">{{ item.display_value || '--'}}</span>
+                        <fields-done v-else class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
                     </li>
                 </ul>
             </div>
-        </div>
-        <!-- v-if="showMore" -->
-        <div v-if="displayMoreIcon" class="more-content-btn" @click="changeShow">
-            {{ showMore ? $t('m.newCommon["收起"]') : $t('m.user["更多"]') }}
-            <i class="bk-icon icon-angle-down" v-if="!showMore"></i>
-            <i class="bk-icon icon-angle-up" v-else></i>
         </div>
     </div>
 </template>
@@ -78,7 +62,8 @@
                 showMore: false,
                 showInfo: true,
                 displayMoreIcon: true,
-                basicInfomationList: []
+                basicInfomationList: [],
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE']
             }
         },
         computed: {
@@ -122,17 +107,26 @@
             },
             // 处理基本信息字段
             tableFields () {
-                const { service_type_name, sn, catalog_fullname, service_name } = this.basicInfomation
+                const tlist = [] // 表单表格类型的字段
+                const { service_type_name, sn, catalog_fullname, service_name, title } = this.basicInfomation
                 const list = [
-                    { name: '工单类型', value: service_type_name, type: 'STRING' },
-                    { name: '单号', value: sn, type: 'STRING' },
-                    { name: '服务目录', value: catalog_fullname + '>' + service_name, type: 'STRING' },
-                    { name: '关联业务', value: service_name, type: 'STRING' }
+                    { name: '标题', display_value: title, type: 'STRING' },
+                    { name: '单号', display_value: sn, type: 'STRING' },
+                    { name: '工单类型', display_value: service_type_name, type: 'STRING' },
+                    { name: '服务目录', display_value: catalog_fullname + '>' + service_name, type: 'STRING' },
+                    { name: '关联服务', display_value: service_name, type: 'STRING' }
                 ]
                 const fields = this.firstStateFields.map(item => {
                     return item
                 })
-                this.basicInfomationList = fields.concat(list)
+                fields.forEach(ite => {
+                    if (!this.basicInfoType.includes(ite.type)) {
+                        tlist.push(ite)
+                    } else {
+                        tlist.unshift(ite)
+                    }
+                })
+                this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'))
             }
         }
     }
@@ -143,7 +137,7 @@
     @import '../../../scss/mixins/scroller.scss';
     .show {
         width: 500px;
-        height: 200px;
+        margin-top: -10px;
         overflow: auto;
         @include scroller;
     }
@@ -153,7 +147,7 @@
         &.fold {
             .bk-basic-info {
                 max-height: 300px;
-                overflow: hidden;
+                // overflow: hidden;
             }
         }
         &.has-more-icon {
@@ -192,6 +186,9 @@
 
         .bk-info-title {
             width: 70px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
             text-align: right;
             float: left;
             color: #979ba5;

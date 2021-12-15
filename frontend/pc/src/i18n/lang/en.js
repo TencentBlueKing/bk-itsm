@@ -718,6 +718,7 @@ export const m = {
         '提单': 'Create Ticket'
     },
     'newCommon': {
+        '评价成功': 'Evaluation of success',
         '已超出最大值!': 'Maximum has been exceeded',
         '提示': 'Notice',
         '您要处理的节点已被': 'The node you want to process has been processed by ',
