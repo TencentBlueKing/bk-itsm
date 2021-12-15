@@ -23,33 +23,32 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-# """Collections for component client"""
+from ..base import ComponentAPI
 
-from .apis.api_gateway import CollectionsApiGateway
-from .apis.bk_login import CollectionsBkLogin
-from .apis.bk_paas import CollectionsBkPaas
-from .apis.cc import CollectionsCC
-from .apis.cmsi import CollectionsCMSI
-from .apis.gse import CollectionsGSE
-from .apis.itsm import CollectionsITSM
-from .apis.job import CollectionsJOB
-from .apis.sops import CollectionsSOPS
-from .apis.usermanage import CollectionsUSERMANAGE
-from .apis.doc_center import CollectionsDOCS
-from .apis.esb import CollectionsEsb
 
-# Available components
-AVAILABLE_COLLECTIONS = {
-    "bk_login": CollectionsBkLogin,
-    "bk_paas": CollectionsBkPaas,
-    "cc": CollectionsCC,
-    "cmsi": CollectionsCMSI,
-    "gse": CollectionsGSE,
-    "job": CollectionsJOB,
-    "sops": CollectionsSOPS,
-    "usermanage": CollectionsUSERMANAGE,
-    "api_gateway": CollectionsApiGateway,
-    "itsm": CollectionsITSM,
-    "esb": CollectionsEsb,
-    "doc_center": CollectionsDOCS,
-}
+class CollectionsEsb(object):
+    """Collections of ESB APIS"""
+
+    def __init__(self, client):
+        self.client = client
+
+        self.get_api_public_key = ComponentAPI(
+            client=self.client,
+            method="POST",
+            path="/api/c/compapi{bk_api_ver}/esb/get_api_public_key/",
+            description="get api public key",
+        )
+
+        self.get_systems = ComponentAPI(
+            client=self.client,
+            method="POST",
+            path="/api/c/compapi{bk_api_ver}/esb/get_systems/",
+            description="Get the list of systems accessing the ESB",
+        )
+
+        self.get_components = ComponentAPI(
+            client=self.client,
+            method="POST",
+            path="/api/c/compapi{bk_api_ver}/esb/get_components/",
+            description="Get the list of components for the specified system",
+        )

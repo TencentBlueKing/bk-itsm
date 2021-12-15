@@ -66,6 +66,7 @@ INSTALLED_APPS += (
     "itsm.misc",
     "itsm.trigger",
     "itsm.task",
+    "itsm.openapi",
     "data_migration",
     # 'silk',
     "mptt",
@@ -816,3 +817,6 @@ CONTENT_CREATOR_WITH_TRANSLATION = (
     if os.getenv("CONTENT_CREATOR_WITH_TRANSLATION", "true").lower() == "true"
     else False
 )
+
+# 系统api调用账户
+SYSTEM_USE_API_ACCOUNT = "admin"
