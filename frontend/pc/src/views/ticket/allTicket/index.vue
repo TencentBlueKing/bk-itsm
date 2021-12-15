@@ -425,7 +425,6 @@
             // },
             // 查询
             handleSearch (params) {
-                console.log(params)
                 this.pagination.limit = 10
                 this.pagination.current = 1
                 this.searchParams = params
@@ -441,13 +440,11 @@
             },
             // 展开高级搜索
             handleSearchFormChange (key, val) {
-                console.log(key, val)
                 if (key === 'catalog_id') {
                     const formItem = this.searchForms.find(item => item.key === 'service_id__in')
                     formItem.display = val.length
                     if (val.length) {
-                        debugger
-                        const serviceCatalogId = val[val.length - 1].id
+                        const serviceCatalogId = val[val.length - 1]
                         // 当服务目录的数据发生变化时，清空服务数据
                         formItem.value = []
                         this.getServiceData(serviceCatalogId)

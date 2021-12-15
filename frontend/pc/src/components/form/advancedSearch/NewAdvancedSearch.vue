@@ -89,16 +89,6 @@
                             </bk-form-item>
                             <!-- 级联类型 -->
                             <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
-                                <!-- <common-cascade
-                                    
-                                    v-model="item.value"
-                                    :options="item.list"
-                                    :iscollect_first="false"
-                                    :iscollect_two="false"
-                                    :isshow-number="false"
-                                    :isactive="true"
-                                    @change="onFormChange($event, item)">
-                                </common-cascade> -->
                                 <bk-cascade
                                     style="width: 100%;"
                                     v-model="item.value"
@@ -165,7 +155,6 @@
 
 <script>
     import collapseTransition from '../../../utils/collapse-transition'
-    // import commonCascade from '../../../views/commonComponent/commonCascade'
     import memberSelect from '../../../views/commonComponent/memberSelect'
     import commonMix from '../../../views/commonMix/common.js'
     import { isEmpty } from '@/utils/util.js'
@@ -174,7 +163,6 @@
         name: 'searchInfo',
         components: {
             collapseTransition,
-            // commonCascade,
             memberSelect
         },
         mixins: [commonMix],
