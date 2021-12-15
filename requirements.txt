@@ -82,8 +82,8 @@ typing_extensions==3.6.5
 anyjson==0.3.3
 
 #bkouth
-PyJWT==2.1.0
-cryptography==36.0.1
+PyJWT==1.6.1
+cryptography==3.3.2
 
 # prometheus
 django-prometheus==2.1.0
