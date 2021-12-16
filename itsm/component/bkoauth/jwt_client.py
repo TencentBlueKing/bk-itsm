@@ -18,6 +18,8 @@ from django.conf import settings
 from django.http import HttpResponse
 
 # 非强制安装PyJWT
+from common.log import logger
+
 try:
     from jwt import exceptions as jwt_exceptions
     import jwt
@@ -75,6 +77,10 @@ class JWTClient(object):
             self.error_message = "X_BKAPI_JWT not in http header or it is empty, please called API through API Gateway"
             return False
         try:
+            logger.info("self.raw_content ==== {}".format(self.raw_content))
+            logger.info(
+                "self.APIGW_PUBLIC_KEY ==== {}".format(settings.APIGW_PUBLIC_KEY)
+            )
             self.headers = jwt.get_unverified_header(self.raw_content)
             self.payload = jwt.decode(
                 self.raw_content, settings.APIGW_PUBLIC_KEY, issuer="APIGW"
@@ -84,6 +90,9 @@ class JWTClient(object):
             self.error_message = "APIGW_PUBLIC_KEY error"
         except jwt_exceptions.DecodeError:
             self.error_message = "Invalid X_BKAPI_JWT, wrong format or value"
+            import traceback
+
+            traceback.print_exc()
         except jwt_exceptions.ExpiredSignatureError:
             self.error_message = "Invalid X_BKAPI_JWT, which is expired"
         except jwt_exceptions.InvalidIssuerError:
