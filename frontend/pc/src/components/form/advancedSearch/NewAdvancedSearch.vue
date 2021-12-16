@@ -195,7 +195,8 @@
                 immediate: true
             }
         },
-        created () {
+        async created () {
+            await this.getCatalogList()
             this.getTicketHighlight()
             const query = this.$route.query
             const queryList = Object.keys(query)
@@ -234,6 +235,17 @@
         },
         methods: {
             // 过滤参数
+            async getCatalogList () {
+                const params = {
+                    show_deleted: true
+                }
+                if (this.$route.query.project_id) {
+                    params.project_key = this.$route.query.project_id
+                }
+                const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
+                const formItem = this.searchForms.find(item => item.key === 'catalog_id')
+                formItem.list = res.data[0] ? res.data[0]['children'] : []
+            },
             getParams () {
                 const params = {}
                 // 过滤条件
