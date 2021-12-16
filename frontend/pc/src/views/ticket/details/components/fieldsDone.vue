@@ -101,7 +101,7 @@
         </div>
         <!-- 链接 -->
         <div v-else-if="item.type === 'LINK'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span class="bk-li-left">{{item.name}}：</span>
             <span class="bk-li-right" :title="item.value">
                 <span class="bk-pot-after bk-li-link" @click="goToLink(item.value)">{{ $t('m.newCommon["点击查看"]') }}</span>
             </span>
