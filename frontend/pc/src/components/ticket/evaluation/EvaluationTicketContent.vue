@@ -244,7 +244,7 @@
                 this.$emit('beforeSubmit')
                 this.$store.dispatch('evaluation/postEvaluation', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
+                        message: this.$t(`m.newCommon["评价成功"]`),
                         theme: 'success'
                     })
                 }).catch((res) => {

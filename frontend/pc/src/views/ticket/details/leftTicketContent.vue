@@ -35,10 +35,10 @@
             </div>
         </div>
         <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
-            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading">
+            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
-                    v-if="hasNodeOptAuth"
+                    :visible="hasNodeOptAuth"
                     name="currentStep"
                     :label="$t(`m.newCommon['单据处理']`)">
                     <!-- 当前节点 -->
