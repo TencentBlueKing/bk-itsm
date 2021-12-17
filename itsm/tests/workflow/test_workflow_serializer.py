@@ -25,12 +25,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import json
 from datetime import datetime
 
+import mock
 from django.test import TestCase, override_settings
 
 
 class WorkflowSerializerTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_serializer(self):
+    @mock.patch("itsm.workflow.serializers.workflow.transform_single_username")
+    def test_serializer(self, transform_single_username):
+        transform_single_username.return_value = "admin(管理员)"
         workflow_name = "test_now_{}".format(datetime.now().strftime("%Y%m%d%H%M%S"))
         create_data = {
             "name": workflow_name,
