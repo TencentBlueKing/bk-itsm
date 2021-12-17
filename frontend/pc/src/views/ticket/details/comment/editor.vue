@@ -91,6 +91,9 @@
             ]
             editor.create()
             this.editor = editor
+            if (this.commentType === 'INSIDE' || this.commentTypeReply) {
+                this.isInsideComment = true
+            }
         },
         methods: {
             selectLine (item) {
