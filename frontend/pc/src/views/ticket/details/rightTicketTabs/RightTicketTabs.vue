@@ -165,14 +165,13 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
 }
 .right-tiket-tabs {
-    // width: 320px;
     flex: 1;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
     background: #ffffff;
     /deep/ .bk-tab-section {
-        height: calc(100% - 50px);
         overflow: auto;
         @include scroller;
     }

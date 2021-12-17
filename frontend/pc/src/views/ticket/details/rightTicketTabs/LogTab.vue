@@ -22,14 +22,14 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <template>
+        <div class="ticket-process-content">
             <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
                 :list="list"
                 @select="handleSelect"></bk-timeline>
-        </template>
+        </div>
         <!-- 操作日志详情 sideslider -->
         <ticket-log-detail
             :log-info.sync="dispalyLogInfo"
@@ -134,6 +134,7 @@
 </script>
 
 <style lang='scss' scoped>
+@import '../../../../scss/mixins/scroller.scss';
 .ticket-process {
     margin-left: -5px;
     cursor: pointer;
@@ -144,7 +145,12 @@
 }
 .log-list {
     width: 100%;
-    height: 100%;
+    .ticket-process-content {
+        overflow: auto;
+        padding: 5px;
+        height: calc(100vh - 680px);
+        @include scroller;
+    }
 }
 .log-time-line {
     /deep/ {
