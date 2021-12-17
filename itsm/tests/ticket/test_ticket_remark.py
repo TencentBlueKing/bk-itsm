@@ -140,6 +140,28 @@ class TicketRemarkTest(TestCase):
         self.assertEqual(rsp.data["result"], True)
         self.assertIsInstance(rsp.data["data"], dict)
 
+        remark_id = rsp.data["data"]["id"]
+
+        # 测试编辑
+        update_data = {
+            "content": "外部评论123",
+            "users": [],
+            "remark_type": "INSIDE",
+            "id": remark_id,
+        }
+
+        update_url = "/api/ticket/remark/{}/".format(remark_id)
+
+        rsp = self.client.put(
+            path=update_url,
+            data=update_data,
+            content_type="application/json",
+        )
+
+        self.assertEqual(rsp.data["result"], True)
+        self.assertIsInstance(rsp.data["data"], dict)
+        self.assertEqual(rsp.data["data"]["content"], "外部评论123")
+
         # 再次测试查询
         remark_list_url = "/api/ticket/remark/?ticket_id={}&show_type=PUBLIC&page=1&page_size=10".format(
             ticket_id
