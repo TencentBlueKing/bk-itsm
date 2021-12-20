@@ -46,6 +46,20 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
     serializer_class = ProjectSerializer
     queryset = Project.objects.filter(~Q(key="public"), is_deleted=False)
 
+    filter_fields = {
+        "name": ["exact", "contains", "startswith", "icontains"],
+    }
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def destroy(self, request, *args, **kwargs):
         raise DeleteError(_("删除失败，项目目前不允许删除！"))
 
@@ -54,7 +68,7 @@ class ProjectViewSet(component_viewsets.AuthModelViewSet):
         """
         查询当前用户所有项目依赖的权限
         @return: 所有项目的信息以及对应项目下当前用户依赖的权限
-        """    
+        """
         serializer = self.get_serializer(self.get_queryset(), many=True)
         serializer.context["request"] = request
         return Response(serializer.data)
