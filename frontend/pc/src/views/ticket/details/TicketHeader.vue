@@ -381,6 +381,10 @@
                             project_id: this.$route.query.project_id
                         }
                     })
+                } else if (from === 'created') {
+                    this.$router.push({
+                        name: 'myCreatedTicket'
+                    })
                 } else {
                     this.$router.push({
                         name: from
