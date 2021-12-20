@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import mock
 from django.test import TestCase, override_settings
 
-from adapter.config.sites.ieod.api import get_batch_users
+from adapter.config.sites.ieod.api import get_batch_users, get_all_users
 from itsm.tests.adapter.data import IEOD_MANAGER_RESPONSE
 
 
@@ -38,3 +38,15 @@ class TestAdapterApiInstance(TestCase):
         self.assertIsInstance(users, dict)
         self.assertEqual(users["id"], 1)
         self.assertEqual(users["username"], "admin")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.esb.esbclient.client_backend")
+    def test_get_all_users(self, patch_client):
+        patch_client.usermanage.list_users.return_value = {
+            "count": 1,
+            "results": [{"username": "admin", "display_name": "admin"}],
+        }
+        users = get_all_users(users=["admin"])
+        self.assertIsInstance(users, list)
+        self.assertEqual(users[0]["id"], "admin")
+        self.assertEqual(users[0]["bk_username"], "admin")

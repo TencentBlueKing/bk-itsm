@@ -96,7 +96,6 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response(self.serializer_class(queryset, many=True).data)
 
     @action(detail=False, methods=["get"], serializer_class=ServiceRetrieveSerializer)
-    @custom_apigw_required
     def get_service_detail(self, request):
         """
         服务项详情
