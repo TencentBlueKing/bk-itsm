@@ -51,7 +51,7 @@
         <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
         <bk-divider></bk-divider>
         <div>{{ $t('m["全部评论"]') }}</div>
-        <ul v-bkloading="{ isLoading: commentLoading }" class="comment-list">
+        <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list" :style="isShowEditor ? isReplyComment ? 'height: calc(100vh - 820px)': 'height: calc(100vh - 729px)' : 'height: calc(100vh - 647px)'">
             <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
                 <comment-item
                     :comment-list="commentList"
@@ -62,10 +62,11 @@
                     @editComment="editComment">
                 </comment-item>
             </li>
+            <li class="page-over">
+                <div v-bkloading="{ isLoading: moreLoading }"></div>
+                <span v-if="isPageOver">评论已经加载完了</span>
+            </li>
         </ul>
-        <div v-bkloading="{ isLoading: moreLoading }" class="page-over">
-            <span v-if="isPageOver">已经到底了</span>
-        </div>
         <div v-if="commentList.length === 0" class="no-comment">
             <img :src="imgUrl">
             <p>当前暂无评论，快去评论吧！</p>
@@ -106,7 +107,7 @@
         data () {
             return {
                 curCommentId: '',
-                commentListDom: document.querySelector('.ticket-container-left'),
+                commentListDom: '',
                 commentType: '', // 评论类型
                 isShowSelect: true,
                 isShowEditor: false, // 打开富文本
@@ -137,6 +138,9 @@
                     content: ''
                 }
             }
+        },
+        mounted () {
+            this.commentListDom = document.querySelector('.comment-list')
         },
         methods: {
             editComment (curComment, type) {
@@ -208,8 +212,6 @@
                 this.isShowEditor = true
             },
             jumpTargetComment (curComment) {
-                const commentDom = document.querySelector('.ticket-container-left').childNodes[0] // 左边内容
-                const basicDomHeight = commentDom.children[0].clientHeight
                 // 获取parent的评论下标
                 const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0])
                 if (curCommentIndex !== -1) {
@@ -223,7 +225,7 @@
                         this.$set(this.flash, curComment.parent__id, false)
                         clearTimeout(timer)
                     }, 2000)
-                    commentDom.parentNode.scrollTop = sumHeight + commentListDom.offsetTop + basicDomHeight
+                    commentListDom.scrollTop = sumHeight + 50
                 } else {
                     this.$emit('addTargetComment', curComment)
                 }
@@ -258,7 +260,7 @@
     }
 </script>
 <style scoped lang="scss">
-// @import '../../../../scss/mixins/scroller.scss';
+    @import '../../../../scss/mixins/scroller.scss';
     @keyframes flash{
         0% {
             opacity: 0.1;
@@ -312,6 +314,9 @@
             }
         }
         .comment-list {
+            overflow: auto;
+            height: calc(100vh - 647px);
+            @include scroller;
             // min-height: 100px;
             li {
                 padding-top: 20px;

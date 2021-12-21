@@ -1,0 +1,65 @@
+<table class="template-table" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; min-width: auto; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #fff; background: #fff;">
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="100%" style="padding: 16px;">
+        <table class="template-table" border="0" cellpadding="0" cellspacing="0" width="956" style="font-size: 14px; min-width: auto; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding-top:30px;"> <tbody>
+          <tr>
+            <td valign="top" align="center" style="padding: 24px;" bgcolor="#f9f8f6">
+              <table cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border: 1px solid #e6e6e6;">
+                <tr>
+                  <td class="email-title" style="padding: 20px 36px; line-height: 1.5; border-bottom: 1px solid #e6e6e6; background: #fff; font-size: 22px;">【蓝鲸流程服务】你有单据未处理</td>
+                </tr>
+                <tr>
+                  <td class="email-content" style="padding: 0 36px; background: #fff;">
+                    <table cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+                      <tr>
+                        <td class="email-source" style="padding: 14px 0; color: #bebebe;">来自 蓝鲸流程服务（ITSM） 的消息推送</td>
+                      </tr>
+                      <tr class="email-information">
+                        <td class="table-info">
+                          <table cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+                            <tr class="table-title">
+                              <td style="padding-top: 36px; padding-bottom: 14px; color: #707070;">您在ITSM有{{ count }}单据需要处理</td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <table cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border: 1px solid #e6e6e6; border-collapse: collapse;">
+                                  <tbody style="color: #707070;">
+                                    <tr>
+                                      <th width="25%" style=" padding: 16px; border: 1px solid #e6e6e6;text-align: center; font-weight: bold; background-color: #f3f3f3;">单号</th>
+                                      <th width="25%" style=" padding: 16px; border: 1px solid #e6e6e6;text-align: center; font-weight: bold; background-color: #f3f3f3;">标题</th>
+                                    </tr>
+                                    {% for ticket in data %}
+                                    <tr>
+                                      <td width="25%" style=" padding: 16px; border: 1px solid #e6e6e6;text-align: center; font-weight: normal;"><a href={{ticket.ticket_url}} target="_blank" style="color: #3c96ff">{{ticket.sn}}</a></td>
+                                      <td width="25%" style=" padding: 16px; border: 1px solid #e6e6e6;text-align: center; font-weight: normal;">{{ticket.title}}</td>
+                                    </tr>
+                                  </tbody>
+                                  {% endfor %}
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr class="prompt-tips">
+                        <td style="padding-top: 32px; padding-bottom: 10px; color: #707070;">如有任何疑问，请随时联系 <a href="#" style="color: #3c96ff">蓝鲸助手</a> 。</td>
+                      </tr>
+                      <tr class="info-remark">
+                        <td style="padding: 20px 0; text-align: right; line-height: 24px; color: #707070;"> <div>当前时间{{current_datetime}}</div> </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr class="email-footer">
+                  <td style=" padding: 20px 0 20px 36px; border-top: 1px solid #e6e6e6; background: #fff; color: #c7c7c7;">你收到此邮件，是因为你在单据当前处理环节的处理人名单中。</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</tbody>
+</table>

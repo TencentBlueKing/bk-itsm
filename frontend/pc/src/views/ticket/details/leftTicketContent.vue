@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="left-ticket">
         <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
                 <div class="ticket-creator" @click="isShowbasicInfo = !isShowbasicInfo">
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
-            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
+            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="false">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
                     :visible="hasNodeOptAuth"
@@ -155,6 +155,15 @@
                 return this.currentStepList.length
             }
         },
+        watch: {
+            hasNodeOptAuth (val) {
+                if (val) {
+                    this.stepActiveTab = 'currentStep'
+                } else {
+                    this.stepActiveTab = 'allComments'
+                }
+            }
+        },
         methods: {
             initCurrentStepData () {
                 this.currentStepLoading = true
@@ -223,74 +232,80 @@
     }
 </script>
 <style lang='scss' scoped>
-.base-info-content {
-    padding: 0 10px;
-    min-height: 54px;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-    background: #ffffff;
-    /deep/ .bk-tab-section {
-        padding: 0;
-    }
-    .ticket-creator {
-        width: 100%;
-        cursor: pointer;
-        line-height: 52px;
-        display: inline-block;
-        color: #979BA5;
-        font-size: 12px;
-        .ticket-title {
-            font-weight: 700;
-            font-size: 14px;
-            color: #63656e;
+.left-ticket {
+    display: flex;
+    flex-direction: column;
+    // height: 100%;
+    .base-info-content {
+        padding: 0 10px;
+        min-height: 54px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        background: #ffffff;
+        /deep/ .bk-tab-section {
+            padding: 0;
         }
-        i {
-            color: #c4c6cc;
-            font-size: 12px;
+        .ticket-creator {
+            width: 100%;
+            cursor: pointer;
+            line-height: 52px;
             display: inline-block;
-            height: 12px;
-            width: 12px;
-            margin: 0 -22px 0 24px;
+            color: #979BA5;
+            font-size: 12px;
+            .ticket-title {
+                font-weight: 700;
+                font-size: 14px;
+                color: #63656e;
+            }
+            i {
+                color: #c4c6cc;
+                font-size: 12px;
+                display: inline-block;
+                height: 12px;
+                width: 12px;
+                margin: 0 -22px 0 24px;
+            }
+            span{
+                margin-left: 30px;
+            }
         }
-        span{
-            margin-left: 30px;
+        .basic-content {
+            overflow: hidden;
+            transition: 1s all linear;
+        }
+        .hide{
+            height: 0;
+        }
+        /deep/ .bk-icon {
+            line-height: 54px;
         }
     }
-    .basic-content {
-        overflow: hidden;
-        transition: 1s all linear;
-    }
-    .hide{
-        height: 0;
-    }
-    /deep/ .bk-icon {
-        line-height: 54px;
-    }
-}
-.current-step-content {
-    margin-top: 24px;
-    padding: 10px;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-    background: #ffffff;
-    /deep/ .bk-tab-section {
-        padding: 0;
-    }
-    .panel-count {
-        display: inline-block;
-        min-width: 16px;
-        height: 16px;
-        padding: 0 4px;
-        line-height: 16px;
-        border-radius: 8px;
-        text-align: center;
-        font-style: normal;
-        font-size: 12px;
-        color: #fff;
-        background-color: #C4C6CC;
-    }
-    /deep/ .bk-tab-label-item.active {
+    .current-step-content {
+        flex: auto;
+        margin-top: 24px;
+        padding: 10px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        background: #ffffff;
+        /deep/ .bk-tab-section {
+            padding: 0;
+        }
         .panel-count {
-            color: #3a84ff;
-            background: #e1ecff;
+            display: inline-block;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            line-height: 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-style: normal;
+            font-size: 12px;
+            color: #fff;
+            background-color: #C4C6CC;
+        }
+        /deep/ .bk-tab-label-item.active {
+            .panel-count {
+                color: #3a84ff;
+                background: #e1ecff;
+            }
         }
     }
 }

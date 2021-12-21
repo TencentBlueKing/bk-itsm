@@ -351,14 +351,14 @@ class Service(ObjectManagerMixin, Model):
         for organization in UserRole.get_user_roles(username)["organization"]:
             conditions.append(
                 Q(display_type="ORGANIZATION")
-                & Q(display_role__contains=dotted_name(organization))
+                & Q(display_role__contains=organization)
             )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):
             conditions.append(
                 Q(display_type=role["role_type"])
-                & Q(display_role__contains=dotted_name(role["id"]))
+                & Q(display_role__contains=role["id"])
             )
 
         return conditions

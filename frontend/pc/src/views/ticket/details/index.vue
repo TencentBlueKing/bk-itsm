@@ -219,7 +219,7 @@
             }
             this.getProtocolsList()
             this.$nextTick(function () {
-                this.leftTicketDom = document.querySelector('.ticket-container-left')
+                this.leftTicketDom = document.querySelector('.comment-list')
                 this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
             })
             if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
@@ -299,27 +299,29 @@
                 }
             },
             async addTargetComment (curComment) {
-                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
-                this.commentList.push(res.data)
-                console.log(this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment))
+                if (this.commentId !== curComment.parent__id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
+                    this.commentList.push(res.data)
+                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment)
+                }
             },
             handleTicketScroll () {
                 if (this.totalPages === 1) return
                 if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
                     this.isThrottled = true
-                    this.moreLoading = true
                     const timer = setTimeout(async () => {
                         this.isThrottled = false
                         const el = this.leftTicketDom
                         if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+                            this.moreLoading = true
                             this.page += 1
-                            this.isPageOver = this.page === this.totalPages
                             clearTimeout(timer)
                             const result = await this.getComments(this.page, this.page_size)
                             this.commentList.push(...result)
+                            this.isPageOver = this.page === this.totalPages
+                            this.moreLoading = false
                         }
                     }, 500)
-                    this.this.moreLoading = false
                 }
             },
             async refreshComment () {
@@ -595,13 +597,13 @@
 }
 .ticket-container {
     display: flex;
-    padding: 24px 24px 0 24px;
+    padding: 24px;
     height: calc(100% - 50px);
     .ticket-container-left {
         flex: 1;
         margin-right: 22px;
         height: 100%;
-        overflow: auto;
+        overflow: hidden;
         background-color: #f5f7fa;
         @include scroller;
     }
@@ -653,6 +655,8 @@
                 line-height: 20px;
                 padding: 17px 24px;
                 .sla-title {
+                    font-size: 14px;
+                    font-weight: 700;
                     display: inline-block;
                     color: #63656e;
                     i {

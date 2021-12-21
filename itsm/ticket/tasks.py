@@ -22,11 +22,15 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import operator
+import os
 import threading
 import time
 from datetime import date, datetime, timedelta
+from functools import reduce
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from celery import Task
 from celery.schedules import crontab
 from celery.task import periodic_task, task
@@ -37,6 +41,7 @@ from mako.template import Template
 
 from common.log import logger
 from common.mymako import render_mako_tostring
+from common.redis import Cache
 from config import RUN_VER
 from config.default import AUTO_COMMENT_DAYS, CLOSE_NOTIFY
 
@@ -47,7 +52,7 @@ from itsm.component.constants import (
     ADMIN_SUPERUSER_KEY,
 )
 from itsm.component.exceptions import ComponentCallError
-from itsm.component.utils.basic import now, namedtuplefetchall
+from itsm.component.utils.basic import now, namedtuplefetchall, dotted_name
 from itsm.component.utils.lock import share_lock
 from itsm.component.notify import EmailNotifier
 from itsm.component.utils.client_backend_query import get_biz_choices
@@ -63,6 +68,7 @@ from itsm.ticket.rules.actions import TicketActions
 from itsm.ticket.rules.variables import TicketVariables
 from itsm.ticket.utils import build_message
 from itsm.ticket_status.models import StatusTransit
+from itsm.workflow.models import Notify
 
 
 @periodic_task(run_every=crontab(minute=0, hour="*/2"))
@@ -416,3 +422,82 @@ def remark_notify(ticket_id, creator, message, receivers):
         _notify.send_message(
             title=title, message=message, receivers=receivers, ticket_id=ticket_id
         )
+
+
+@periodic_task(run_every=crontab(minute=0, hour=8))
+def collection_near_users():
+    last_month = datetime.now() - timedelta(days=30)
+    BkUser = get_user_model()
+    users = BkUser.objects.filter(last_login__gte=last_month)
+    email_notify = Cache("email_notify_queue")
+    for user in users:
+        email_notify.lpush("notify_queue", user.username)
+
+
+def build_email_message(tickets):
+    def build_ticket_url(ticket_id):
+        return "{site_url}/#/ticket/{ticket_id}/".format(
+            site_url=settings.TICKET_NOTIFY_HOST.rstrip("/"), ticket_id=ticket_id
+        )
+
+    data = []
+    for ticket in tickets:
+        data.append(
+            {
+                "sn": ticket["sn"],
+                "ticket_url": build_ticket_url(ticket_id=ticket["id"]),
+                "title": ticket["title"],
+            }
+        )
+    return data
+
+
+def send_message(username, queryset):
+    from django.template import Template, Context
+
+    filters = [Q(current_processors__contains=",{},".format(username))]
+    general_roles = UserRole.get_general_role_by_user(username)
+    for role in general_roles:
+        filters.append(Q(current_processors__contains=dotted_name(role["id"])))
+
+    filters = reduce(operator.or_, filters)
+    tickets = queryset.filter(filters).values("sn", "title", "id")
+    count = len(tickets)
+    ticket_show_list = tickets[0:10]
+    contents = build_email_message(ticket_show_list)
+    file_path = os.path.join(
+        settings.PROJECT_ROOT,
+        "itsm",
+        "ticket",
+        "templates",
+        "itsm_ticket_remind_email_zh.html",
+    )
+    with open(file_path, "r", encoding="utf-8") as f:
+        email_template = f.read()
+    context = Context(
+        {"data": contents, "current_datetime": datetime.now(), "count": count}
+    )
+    template = Template(email_template)
+    email_content = template.render(context)
+    notify = Notify.objects.filter(type="EMAIL").first()
+    title = "您在流程服务(ITSM)有单据未处理"
+    notify.send_message(title, username, email_content)
+
+
+@periodic_task(run_every=crontab(minute="*/10", hour="9-12"))
+def consume_notify():
+    email_notify = Cache("email_notify_queue")
+    count = email_notify.llen("notify_queue")
+    if count <= 0:
+        return
+
+    end = 100
+
+    if count < end:
+        end = count
+
+    queryset = Ticket.objects.filter(current_status="RUNNING")
+
+    for item in range(1, end):
+        user = email_notify.lpop("notify_queue")
+        send_message(user, queryset)
