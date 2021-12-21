@@ -4,7 +4,7 @@
 ---
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/master/LICENSE)
 [![Release](https://img.shields.io/badge/release-3.3.30-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/releases)
-[![codecov](https://codecov.io/gh/TencentBlueKing/bk-itsm/branch/master/graph/badge.svg?token=OMFO8UFA21)](https://codecov.io/gh/TencentBlueKing/bk-itsm)
+[![codecov](https://codecov.io/gh/TencentBlueKing/bk-itsm/branch/v2.6.x_develop/graph/badge.svg?token=OMFO8UFA21)](https://codecov.io/gh/TencentBlueKing/bk-itsm)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/pulls)
 
 [(English Documents Available)](readme_en.md)
