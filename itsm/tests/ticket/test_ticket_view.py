@@ -73,7 +73,6 @@ class TicketViewTest(TestCase):
         rsp = self.client.post(
             path=url, data=json.dumps(data), content_type="application/json"
         )
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.data["code"], "OK")
         self.assertEqual(rsp.data["message"], "success")
 
@@ -87,7 +86,6 @@ class TicketViewTest(TestCase):
         get_user_departments.return_value = ['1']
         url = "/api/ticket/receipts/total_count/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -98,13 +96,11 @@ class TicketViewTest(TestCase):
         get_user_departments.return_value = ['1']
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
 
         url = "/api/ticket/receipts/{}/get_ticket_output/".format(
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -113,7 +109,6 @@ class TicketViewTest(TestCase):
     def test_get_first_state_fields(self):
         url = "/api/ticket/receipts/get_first_state_fields/?service_id=1"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -122,7 +117,6 @@ class TicketViewTest(TestCase):
     def test_api_field_choices_without_data(self):
         url = "/api/ticket/receipts/api_field_choices/"
         rsp = self.client.post(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "对应的api配置不存在，请查询")
         self.assertIsInstance(rsp.data["data"], list)
@@ -164,7 +158,6 @@ class TicketViewTest(TestCase):
         }
         url = "/api/ticket/receipts/api_field_choices/"
         rsp = self.client.post(path=url, data=data, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -182,7 +175,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.post(path=url, data=data, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["result"], False)
 
@@ -200,7 +192,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.post(path=url, data=data, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["result"], False)
 
@@ -233,7 +224,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -242,7 +232,6 @@ class TicketViewTest(TestCase):
     def test_get_global_choices(self):
         url = "/api/ticket/receipts/get_global_choices/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -259,7 +248,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -275,7 +263,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.post(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -291,7 +278,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -307,7 +293,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -323,7 +308,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -339,7 +323,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -355,7 +338,6 @@ class TicketViewTest(TestCase):
             rsp_base.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -371,7 +353,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -387,7 +368,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -398,7 +378,6 @@ class TicketViewTest(TestCase):
         get_user_departments.return_value = ['1']
         url = "/api/ticket/receipts/my_approval_ticket/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -414,7 +393,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
@@ -430,10 +408,6 @@ class TicketViewTest(TestCase):
             rsp.data["data"]["items"][0]["id"]
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
-        # a = role_filter:(OR: ('current_processors__contains', ',admin,'), ('current_processors__contains', ',1,'), ('current_processors__contains', ',2,'), ('current_processors__contains', ',3,'), ('current_processors__contains', ',4,'), ('current_processors__contains', ',5,'), ('current_processors__contains', ',6,'), ('current_processors__contains', ',7,'), ('current_processors__contains', ',8,'), ('current_processors__contains', ',9,'), ('current_processors__contains', ',10,'), ('current_processors__contains', ',11,'), ('current_processors__contains', ',12,'), ('current_processors__contains', ',O_1,'), ('current_task_processors__contains', ',admin,'), ('current_task_processors__contains', ',1,'), ('current_task_processors__contains', ',2,'), ('current_task_processors__contains', ',3,'), ('current_task_processors__contains', ',4,'), ('current_task_processors__contains', ',5,'), ('current_task_processors__contains', ',6,'), ('current_task_processors__contains', ',7,'), ('current_task_processors__contains', ',8,'), ('current_task_processors__contains', ',9,'), ('current_task_processors__contains', ',10,'), ('current_task_processors__contains', ',11,'), ('current_task_processors__contains', ',12,'))
-
-
