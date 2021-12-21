@@ -96,18 +96,7 @@
             return {
                 showMore: false,
                 showInfo: true,
-                fieldList: [
-                    {
-                        isEdit: false,
-                        name: 1,
-                        content: 'qwsqw'
-                    },
-                    {
-                        isEdit: false,
-                        name: 2,
-                        content: 'qw1q1qsqw'
-                    }
-                ]
+                fieldList: []
             }
         },
         computed: {
