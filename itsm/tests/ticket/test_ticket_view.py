@@ -165,10 +165,10 @@ class TicketViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.component.notify.SmsNotifier")
+    @mock.patch("itsm.ticket.views.ticket.sms_invite_validate")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_send_sms(self, get_user_departments, patch_notifier):
-        patch_notifier.send.return_value = True
+    def test_send_sms(self, get_user_departments, sms_invite_validate):
+        sms_invite_validate.send.return_value = None
         get_user_departments.return_value = ["1"]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
@@ -176,17 +176,17 @@ class TicketViewTest(TestCase):
         url = "/api/ticket/receipts/{}/send_sms/".format(
             rsp.data["data"]["items"][0]["id"]
         )
+        print(json.loads(rsp.content.decode("utf-8")))
         rsp = self.client.post(path=url, data=data, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["result"], False)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    @mock.patch("itsm.component.notify.EmailNotifier")
+    @mock.patch("itsm.ticket.views.ticket.email_invite_validate")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_send_email(self, get_user_departments, patch_notifier):
-        patch_notifier.send.return_value = True
+    def test_send_email(self, get_user_departments, email_invite_validate):
+        email_invite_validate.send.return_value = None
         get_user_departments.return_value = ["1"]
-        patch_notifier.send.return_value = True
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         data = {"receiver": "admin"}
@@ -427,10 +427,74 @@ class TicketViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
+        
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_remark(self, get_user_departments):
+        get_user_departments.return_value = ["1"]
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        url = "/api/ticket/remark/?ticket_id={}".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
 
 
 class OperationalDataViewTest(TestCase):
-    data_filter = "create_at__gte=2021-1-1&create_at__lte=2021-2-1"
+    data_filter = "create_at__gte=2021-01-01&create_at__lte=2031-01-01"
+    month_filter = "create_at__gte=2021-01&create_at__lte=2031-01"
+
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def setUp(self):
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=2, creator="admin"
+        )
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "测试内容",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "test",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(rsp.data["code"], "OK")
+        self.assertEqual(rsp.data["message"], "success")
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+        CatalogService.objects.all().delete()
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_overview_count(self):
@@ -580,7 +644,7 @@ class OperationalDataViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_tickets(self):
         tickets_filter = (
-            "{}&title=test&creator=admin&sn=123456&is_draft=1&service_type=1".format(
+            "{}&title=test&creator=admin&sn=123456&is_draft=1&service_type=request".format(
                 self.data_filter
             )
         )
@@ -608,8 +672,8 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_month_ticket_category(self):
-        url = "/api/ticket/operational/month_ticket_category/?{}&service_type=1".format(
-            self.data_filter
+        url = "/api/ticket/operational/month_ticket_category/?{}&service_type=request".format(
+            self.month_filter
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
@@ -618,7 +682,7 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_ticket_status(self):
-        url = "/api/ticket/operational/ticket_status/?{}&service_type=1".format(
+        url = "/api/ticket/operational/ticket_status/?{}&service_type=request".format(
             self.data_filter
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
@@ -636,11 +700,11 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_month_close_ratio(self):
-        url = "/api/ticket/operational/month_close_ratio/?{}".format(self.data_filter)
+        url = "/api/ticket/operational/month_close_ratio/?{}".format(self.month_filter)
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
-        self.assertIsInstance(rsp.data["data"], list)
+        self.assertIsInstance(rsp.data["data"], dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_ticket_processor_rank(self):
@@ -654,8 +718,8 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_ticket_score(self):
-        url = "/api/ticket/operational/ticket_score/?{}&service_type=1".format(
-            self.data_filter
+        url = "/api/ticket/operational/ticket_score/?{}&service_type=request".format(
+            self.month_filter
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
@@ -664,7 +728,17 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_ticket_time(self):
-        url = "/api/ticket/operational/ticket_time/?{}&service_type=1".format(
+        url = "/api/ticket/operational/ticket_time/?{}&service_type=request".format(
+            self.month_filter
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_new_tickets(self):
+        url = "/api/ticket/operational/new_tickets/?{}&service_type=request".format(
             self.data_filter
         )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
@@ -672,12 +746,3 @@ class OperationalDataViewTest(TestCase):
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
 
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_new_tickets(self):
-        url = "/api/ticket/operational/new_tickets/?{}&service_type=1".format(
-            self.data_filter
-        )
-        rsp = self.client.get(path=url, data=None, content_type="application/json")
-        self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["message"], "success")
-        self.assertIsInstance(rsp.data["data"], list)
