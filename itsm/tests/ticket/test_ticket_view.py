@@ -1,0 +1,439 @@
+# -*- coding: utf-8 -*-
+"""
+Tencent is pleased to support the open source community by making BK-ITSM 蓝鲸流程服务 available.
+
+Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+
+BK-ITSM 蓝鲸流程服务 is licensed under the MIT License.
+
+License for BK-ITSM 蓝鲸流程服务:
+--------------------------------------------------------------------
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+import json
+
+import mock
+from django.test import TestCase, override_settings
+
+from itsm.service.models import CatalogService
+from itsm.ticket.models import Ticket
+
+
+class TicketViewTest(TestCase):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def setUp(self):
+        CatalogService.objects.create(
+            service_id=1, is_deleted=False, catalog_id=2, creator="admin"
+        )
+        data = {
+            "catalog_id": 3,
+            "service_id": 1,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "测试内容",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "test",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.data["code"], "OK")
+        self.assertEqual(rsp.data["message"], "success")
+
+    def tearDown(self):
+        Ticket.objects.all().delete()
+        CatalogService.objects.all().delete()
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_total_count(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/total_count/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_get_ticket_output(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+
+        url = "/api/ticket/receipts/{}/get_ticket_output/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_get_first_state_fields(self):
+        url = "/api/ticket/receipts/get_first_state_fields/?service_id=1"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_api_field_choices_without_data(self):
+        url = "/api/ticket/receipts/api_field_choices/"
+        rsp = self.client.post(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "对应的api配置不存在，请查询")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.esb.backend_component.BaseClient.request")
+    def test_api_field_choices(self, request):
+        request.return_value = {
+            "result": True,
+            "code": 0,
+            "data": {
+                "count": 1,
+                "info": [{
+                    "bk_biz_developer": "",
+                    "bk_biz_id": 2,
+                    "bk_biz_maintainer": "admin",
+                    "bk_biz_name": "\xe8\x93\x9d\xe9\xb2\xb8",
+                    "bk_biz_productor": "",
+                    "bk_biz_tester": "",
+                    "bk_supplier_account": "0",
+                    "create_time": "2020-09-24T23:08:55.458+08:00",
+                    "default": 0,
+                    "language": "1",
+                    "last_time": "2021-07-18T11:45:13.27+08:00",
+                    "life_cycle": "2",
+                    "operator": "",
+                    "time_zone": "Asia/Shanghai"
+                }]
+            },
+            "message": "success",
+            "permission": None,
+            "request_id": "c760e0b8284b4b788e2664d35c2edece"
+        }
+
+        data = {
+            "api_instance_id": 1,
+            "kv_relation": {"name": "bk_biz_name", "key": "bk_biz_id"},
+            "fields": {"name": "test", "key": "001"},
+        }
+        url = "/api/ticket/receipts/api_field_choices/"
+        rsp = self.client.post(path=url, data=data, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.notify.SmsNotifier")
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_send_sms(self, get_user_departments, patch_notifier):
+        patch_notifier.send.return_value = True
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        data = {"receiver": "admin"}
+        url = "/api/ticket/receipts/{}/send_sms/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.post(path=url, data=data, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.component.notify.EmailNotifier")
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_send_email(self, get_user_departments, patch_notifier):
+        patch_notifier.send.return_value = True
+        get_user_departments.return_value = ['1']
+        patch_notifier.send.return_value = True
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        data = {"receiver": "admin"}
+        url = "/api/ticket/receipts/{}/send_email/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.post(path=url, data=data, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], False)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_export_excel(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/export_excel/?export_fields=sn"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_export_group_by_service(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/export_group_by_service/?export_fields=sn&service_id__in=1&service_fields=eyI2IjpbInRpdGxlIl19"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    @mock.patch("itsm.ticket.serializers.ticket.transform_single_username")
+    def test_print_ticket(self, get_user_departments, transform_single_username):
+        get_user_departments.return_value = ['1']
+        transform_single_username.return_value = "admin(管理员)"
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/print_ticket/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_get_global_choices(self):
+        url = "/api/ticket/receipts/get_global_choices/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+        self.assertIsInstance(rsp.data["data"]["export_fields"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_trigger_actions(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/trigger_actions/?operate_type=all".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_withdraw(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/withdraw/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.post(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_fields(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/fields/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_all_fields(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/all_fields/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_derive_tickets(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/derive_tickets/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_master_or_slave(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/master_or_slave/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_table_fields(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp_base = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/table_fields/".format(
+            rsp_base.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_sla_task(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/sla_task/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_ticket_base_info(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/{}/ticket_base_info/".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_my_approval_ticket(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/my_approval_ticket/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], list)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_tickets_processors(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/tickets_processors/?ids={}".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.role.models.get_user_departments")
+    def test_tickets_can_operate(self, get_user_departments):
+        get_user_departments.return_value = ['1']
+        url = "/api/ticket/receipts/"
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+
+        url = "/api/ticket/receipts/tickets_can_operate/?ids={}".format(
+            rsp.data["data"]["items"][0]["id"]
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        print(json.loads(rsp.content.decode("utf-8")))
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["message"], "success")
+        self.assertIsInstance(rsp.data["data"], dict)
+        # a = role_filter:(OR: ('current_processors__contains', ',admin,'), ('current_processors__contains', ',1,'), ('current_processors__contains', ',2,'), ('current_processors__contains', ',3,'), ('current_processors__contains', ',4,'), ('current_processors__contains', ',5,'), ('current_processors__contains', ',6,'), ('current_processors__contains', ',7,'), ('current_processors__contains', ',8,'), ('current_processors__contains', ',9,'), ('current_processors__contains', ',10,'), ('current_processors__contains', ',11,'), ('current_processors__contains', ',12,'), ('current_processors__contains', ',O_1,'), ('current_task_processors__contains', ',admin,'), ('current_task_processors__contains', ',1,'), ('current_task_processors__contains', ',2,'), ('current_task_processors__contains', ',3,'), ('current_task_processors__contains', ',4,'), ('current_task_processors__contains', ',5,'), ('current_task_processors__contains', ',6,'), ('current_task_processors__contains', ',7,'), ('current_task_processors__contains', ',8,'), ('current_task_processors__contains', ',9,'), ('current_task_processors__contains', ',10,'), ('current_task_processors__contains', ',11,'), ('current_task_processors__contains', ',12,'))
+
+
