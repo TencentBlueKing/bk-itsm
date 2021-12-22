@@ -37,7 +37,6 @@ from celery.task import periodic_task, task
 from django.db.models import Q
 from django.db import connection
 from django.utils.translation import ugettext as _
-from mako.template import Template
 
 from common.log import logger
 from common.mymako import render_mako_tostring
@@ -56,13 +55,11 @@ from itsm.component.utils.basic import now, namedtuplefetchall, dotted_name
 from itsm.component.utils.lock import share_lock
 from itsm.component.notify import EmailNotifier
 from itsm.component.utils.client_backend_query import get_biz_choices
-from itsm.iadmin.contants import ACTION_CHOICES_DICT
-from itsm.iadmin.models import CustomNotice, SystemSettings
+from itsm.iadmin.models import SystemSettings
 from itsm.sla_engine.constants import TO_SECOND
 from itsm.role.models import UserRole
 from itsm.service.models import Service
 from itsm.ticket.models import TicketToTicket, Ticket
-from itsm.task.models import Task as TicketTask
 from itsm.ticket.rules import TicketRuleManager
 from itsm.ticket.rules.actions import TicketActions
 from itsm.ticket.rules.variables import TicketVariables
@@ -278,10 +275,15 @@ def notify_task(ticket, receivers, message, action, **kwargs):
 
     # 根据流程设定的通知方式通知
     for _notify in ticket.flow.notify.all():
-        content, title = build_message(_notify, task_id, ticket, message, action, **kwargs)
+        content, title = build_message(
+            _notify, task_id, ticket, message, action, **kwargs
+        )
         try:
-            logger.info("[tasks->notify_task] is executed, title={}, receivers={}, ticket_id={}"
-                        .format(title, receivers, ticket.id))
+            logger.info(
+                "[tasks->notify_task] is executed, title={}, receivers={}, ticket_id={}".format(
+                    title, receivers, ticket.id
+                )
+            )
             _notify.send_message(title, receivers, content, ticket_id=ticket.id)
         except ComponentCallError as error:
             logger.warning("send notify failed, error: %s" % str(error))
@@ -429,6 +431,7 @@ def collection_near_users():
     last_month = datetime.now() - timedelta(days=30)
     BkUser = get_user_model()
     users = BkUser.objects.filter(last_login__gte=last_month)
+    logger.info("[collection_near_users] 检查到有{}位用户待通知".format(users.count()))
     email_notify = Cache("email_notify_queue")
     for user in users:
         email_notify.lpush("notify_queue", user.username)
@@ -453,7 +456,9 @@ def build_email_message(tickets):
 
 
 def send_message(username, queryset):
-    from django.template import Template, Context
+    from django.template import Template, Context  # noqa
+
+    logger.info("[send_message] 正在准备发送数据")
 
     filters = [Q(current_processors__contains=",{},".format(username))]
     general_roles = UserRole.get_general_role_by_user(username)
@@ -463,6 +468,10 @@ def send_message(username, queryset):
     filters = reduce(operator.or_, filters)
     tickets = queryset.filter(filters).values("sn", "title", "id")
     count = len(tickets)
+    if count == 0:
+        logger.info("[send_message] 当前用户有0条待处理单据，已跳过")
+        return
+
     ticket_show_list = tickets[0:10]
     contents = build_email_message(ticket_show_list)
     file_path = os.path.join(
@@ -488,6 +497,7 @@ def send_message(username, queryset):
 def consume_notify():
     email_notify = Cache("email_notify_queue")
     count = email_notify.llen("notify_queue")
+    logger.info("正在消费通知数据，当前有{}数据待处理".format(count))
     if count <= 0:
         return
 
