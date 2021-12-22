@@ -22,14 +22,16 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import datetime
 import json
 import os
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _
 
+from common.log import logger
 from itsm.component.constants import BUILTIN_SYSDICT_LIST, DEFAULT_ENGINE_VERSION
 from itsm.component.constants import BUILTIN_SERVICES, OPEN
 from itsm.component.db import managers
@@ -274,6 +276,21 @@ class ServiceManager(managers.Manager):
                 print("catalog not found: {} - {}".format(ver.id, ver.name))
 
         return ver_for_service
+
+    def clone(self, tag_data, username):
+        from itsm.workflow.models import Workflow
+
+        logger.info("正在开始克隆服务，name={}".format(tag_data["name"]))
+        with transaction.atomic():
+            workflow_tag_data = tag_data.pop("workflow")
+            workflow = Workflow.objects.restore(workflow_tag_data, username)[0]
+            version = workflow.create_version()
+            tag_data["workflow_id"] = version.id
+            version_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            tag_data["name"] = "{}_copy_{}".format(tag_data["name"], version_number)
+            service = self.create(**tag_data)
+            return service
+        return None
 
 
 class SysDictManager(managers.Manager):

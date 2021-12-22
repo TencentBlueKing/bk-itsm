@@ -234,3 +234,61 @@ class ServiceTest(TestCase):
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_clone(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        url = "/api/service/projects/"
+        resp = self.client.post(url, CREATE_SERVICE_DATA)
+
+        service_id = resp.data["data"]["id"]
+
+        url = "/api/service/projects/{}/clone/".format(service_id)
+
+        resp = self.client.post(path=url, data=None, content_type="application/json")
+        self.assertEqual(resp.data["result"], True)
+        self.assertIsInstance(resp.data["data"], dict)
+        self.assertEqual(resp.data["data"]["key"], "request")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_export_and_import(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        url = "/api/service/projects/"
+        resp = self.client.post(url, CREATE_SERVICE_DATA)
+
+        service_id = resp.data["data"]["id"]
+
+        url = "/api/service/projects/{}/export/".format(service_id)
+
+        resp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(resp.data["result"], True)
+        self.assertIsInstance(resp.data["data"], dict)
+
+        data = resp.data["data"]
+
+        # test_import
+        url = "/api/service/projects/import_service/"
+        resp = self.client.post(path=url, data=data, content_type="application/json")
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["code"], "VALIDATE_ERROR")
+
+        data["name"] = "xxxxx"
+        data["source"] = "service"
+        url = "/api/service/projects/import_service/"
+        resp = self.client.post(path=url, data=data, content_type="application/json")
+        self.assertEqual(resp.data["result"], True)
+        self.assertIsInstance(resp.data["data"], dict)
+
+        data.pop("name")
+        url = "/api/service/projects/import_service/"
+        resp = self.client.post(path=url, data=None, content_type="application/json")
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["code"], "VALIDATE_ERROR")

@@ -637,20 +637,20 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         instance = self.get_object()
         return Response(instance.tag_data())
 
+    @action(detail=True, methods=["post"], permission_classes=())
+    def clone(self, request, *args, **kwargs):
+        instance = self.get_object()
+        tag_data = instance.tag_data()
+        service = Service.objects.clone(tag_data, request.user.username)
+        return Response(
+            self.serializer_class(service, context=self.get_serializer_context()).data
+        )
+
     @action(detail=False, methods=["post"])
     def import_service(self, request, *args, **kwargs):
         data = request.data
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)
-        with transaction.atomic():
-            workflow_tag_data = data.pop("workflow")
-            workflow = Workflow.objects.restore(
-                workflow_tag_data, request.user.username
-            )[0]
-            version = workflow.create_version()
-            data["workflow_id"] = version.id
-            if Service.validate_service_name(data["name"]):
-                raise ParamError(_("导入失败，服务名称已经存在"))
-            service = Service.objects.create(**data)
+        service = Service.objects.clone(data, request.user.username)
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )
