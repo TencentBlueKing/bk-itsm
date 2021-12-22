@@ -1765,7 +1765,7 @@
                 "id": "ticket_state_manage",
                 "name": "单据状态管理",
                 "name_en": "Manage Ticket State",
-                "description": "单据状态查看",
+                "description": "单据状态管理",
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
@@ -2015,7 +2015,7 @@
                                     "id": "catalog_edit"
                                 },
                                 {
-                                     "id": "catalog_delete"
+                                    "id": "catalog_delete"
                                 }
                             ]
                         },
@@ -2028,10 +2028,10 @@
                                 },
                                 {
                                     "id": "field_view"
-                                }, 
+                                },
                                 {
                                     "id": "field_edit"
-                                }, 
+                                },
                                 {
                                     "id": "field_delete"
                                 }
@@ -2046,10 +2046,10 @@
                                 },
                                 {
                                     "id": "user_group_edit"
-                                }, 
+                                },
                                 {
                                     "id": "user_group_delete"
-                                }, 
+                                },
                                 {
                                     "id": "user_group_view"
                                 },
@@ -2058,15 +2058,9 @@
                                 },
                                 {
                                     "id": "triggers_view"
-                                }, 
-                                {
-                                    "id": "triggers_manage"
                                 },
                                 {
-                                    "id": "ticket_state_view"
-                                }, 
-                                {
-                                    "id": "ticket_state_manage"
+                                    "id": "triggers_manage"
                                 }
                             ]
                         },
@@ -2097,12 +2091,6 @@
                                 },
                                 {
                                     "id": "sla_agreement_delete"
-                                },
-                                {
-                                    "id": "sla_priority_view"
-                                },
-                                {
-                                    "id": "sla_priority_manage"
                                 }
                             ]
                         },
@@ -2176,7 +2164,7 @@
                     "name_en": "Administration",
                     "actions": [],
                     "sub_groups": [
-                         {
+                        {
                             "name": "公共字段",
                             "name_en": "Public Fields",
                             "actions": [
@@ -2203,7 +2191,7 @@
                                 },
                                 {
                                     "id": "public_api_manage"
-                                }, 
+                                },
                                 {
                                     "id": "public_api_create"
                                 }
@@ -2247,6 +2235,30 @@
                                     "id": "task_template_manage"
                                 }
                             ]
+                        },
+                        {
+                            "name": "单据状态",
+                            "name_en": "Ticket State",
+                            "actions": [
+                                {
+                                    "id": "ticket_state_view"
+                                },
+                                {
+                                    "id": "ticket_state_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SLA 优先级",
+                            "name_en": "SLA Priority",
+                            "actions": [
+                                {
+                                    "id": "sla_priority_view"
+                                },
+                                {
+                                    "id": "sla_priority_manage"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -2286,12 +2298,11 @@
                             {
                                 "id": "catalog_edit",
                                 "required": true
-                            },                            
+                            },
                             {
                                 "id": "catalog_delete",
                                 "required": true
                             },
-                            
                             {
                                 "id": "field_create",
                                 "required": true
@@ -2311,7 +2322,7 @@
                             {
                                 "id": "sla_agreement_create",
                                 "required": true
-                            },                            
+                            },
                             {
                                 "id": "settings_view",
                                 "required": true
