@@ -167,9 +167,12 @@ class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.views.ticket.sms_invite_validate")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_send_sms(self, get_user_departments, sms_invite_validate):
+    @mock.patch("itsm.component.tasks.adapter_api")
+    def test_send_sms(self, get_user_departments, sms_invite_validate, adapter_api):
         sms_invite_validate.send.return_value = None
         get_user_departments.return_value = ["1"]
+        adapter_api.get_all_users.return_value = [
+            {'id': 'admin', 'name': 'admin(admin)', 'bk_username': 'admin', 'chname': 'admin'}]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         data = {"receiver": "admin"}
@@ -184,9 +187,12 @@ class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.ticket.views.ticket.email_invite_validate")
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_send_email(self, get_user_departments, email_invite_validate):
+    @mock.patch("itsm.component.tasks.adapter_api")
+    def test_send_email(self, get_user_departments, email_invite_validate, adapter_api):
         email_invite_validate.send.return_value = None
         get_user_departments.return_value = ["1"]
+        adapter_api.get_all_users.return_value = [
+            {'id': 'admin', 'name': 'admin(admin)', 'bk_username': 'admin', 'chname': 'admin'}]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         data = {"receiver": "admin"}
@@ -634,7 +640,9 @@ class OperationalDataViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], list)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_sync_organization(self):
+    @mock.patch("itsm.component.utils.client_backend_query.update_user_departments")
+    def test_sync_organization(self, update_user_departments):
+        update_user_departments.return_value = [{'id': '1', 'name': '总公司', 'family': []}]
         url = "/api/ticket/operational/sync_organization/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
@@ -707,7 +715,9 @@ class OperationalDataViewTest(TestCase):
         self.assertIsInstance(rsp.data["data"], dict)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_ticket_processor_rank(self):
+    @mock.patch("itsm.component.tasks.adapter_api")
+    def test_ticket_processor_rank(self, adapter_api):
+        adapter_api.get_all_users.return_value = [{'id': 'admin', 'name': 'admin(admin)', 'bk_username': 'admin', 'chname': 'admin'}]
         url = "/api/ticket/operational/ticket_processor_rank/?{}".format(
             self.data_filter
         )
