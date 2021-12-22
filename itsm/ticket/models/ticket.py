@@ -2595,7 +2595,7 @@ class Ticket(Model, BaseTicket):
         **kwargs
     ):
         """发送单据和任务通知"""
-        from itsm.ticket.tasks import notify_task, dispatch_retry_notify_event
+        from itsm.ticket.tasks import notify_task
 
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
@@ -2624,7 +2624,8 @@ class Ticket(Model, BaseTicket):
 
             # 重复通知
             if self.flow.notify_rule == "RETRY" and retry:
-                dispatch_retry_notify_event(self, state_id, receivers)
+                # dispatch_retry_notify_event(self, state_id, receivers)
+                pass  # 去除重复通知相关的功能
 
         except Exception as e:
             logger.error("notify exception: %s" % e)
