@@ -54,7 +54,7 @@ export default {
                 })
         },
         cloneService ({ commit, state, dispatch }, id) {
-            return ajax.post(`service/projects/${id}/clone`)
+            return ajax.post(`service/projects/${id}/clone/`)
                 .then(response => {
                     let res = response.data
                     return res

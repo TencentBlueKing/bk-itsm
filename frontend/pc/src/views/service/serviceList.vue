@@ -451,25 +451,24 @@
                 }
             },
             // 编辑
-            changeEntry (item, type) {
+            async changeEntry (item, type) {
+                let serviceId = item.id
                 if (type === 'clone') {
                     // 获取克隆id
-                    console.log(item)
-                    this.$store.dispatch('serviceEntry/cloneService', { id: item.id }).then(res => {
-                        console.log(res)
-                    })
+                    const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
+                    serviceId = res.data.id
                 }
-                // this.$router.push({
-                //     name: 'projectServiceEdit',
-                //     params: {
-                //         type: 'edit',
-                //         step: 'basic'
-                //     },
-                //     query: {
-                //         serviceId: item.id,
-                //         project_id: this.$store.state.project.id
-                //     }
-                // })
+                this.$router.push({
+                    name: 'projectServiceEdit',
+                    params: {
+                        type: 'edit',
+                        step: 'basic'
+                    },
+                    query: {
+                        serviceId,
+                        project_id: this.$store.state.project.id
+                    }
+                })
             },
             /**
              * 单个服务操作项点击时校验
