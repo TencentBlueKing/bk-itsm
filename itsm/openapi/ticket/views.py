@@ -76,6 +76,7 @@ from itsm.openapi.ticket.serializers import (
     TicketStatusSerializer,
     TicketResultSerializer,
     TicketFilterSerializer,
+    ProceedApprovalSerializer,
 )
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -549,11 +550,21 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @catch_ticket_operate_exception
     def proceed_approval(self, request):
         # 审批节点的处理
-        ticket_id = request.data.get("process_inst_id")
-        state_id = request.data.get("activity")
-        ticket = self.queryset.get(sn=ticket_id)
-
-        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket.id)
+        serializer = ProceedApprovalSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        
+        ticket_id = serializer.validated_data["process_inst_id"]
+        state_id = serializer.validated_data["activity"]
+        try:
+            ticket = Ticket.objects.get(sn=ticket_id)
+        except Exception:
+            raise ValidationError("process_inst_id = {} 对应的单据不存在！".format(ticket_id))
+        try:
+            node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket.id)
+        except Exception:
+            raise ValidationError("activity = {}, process_inst_id = {} 对应的表单字段不存在！".format(state_id, ticket_id))
         fields = []
         remarked = False
         for field in node_fields:
@@ -564,7 +575,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                         "key": field.key,
                         "type": field.type,
                         "choice": field.choice,
-                        "value": request.data.get("submit_action"),
+                        "value": serializer.validated_data["submit_action"],
                     }
                 )
             else:
@@ -575,7 +586,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                             "key": field.key,
                             "type": field.type,
                             "choice": field.choice,
-                            "value": request.data.get("submit_opinion"),
+                            "value": serializer.validated_data["submit_opinion"],
                         }
                     )
                     remarked = True
@@ -584,13 +595,13 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         node_status = ticket.node_status.get(state_id=state_id)
         SignTask.objects.update_or_create(
             status_id=node_status.id,
-            processor=request.data.get("handler"),
+            processor=serializer.validated_data["handler"],
             defaults={
                 "status": "RUNNING",
             },
         )
         res = ticket.activity_callback(
-            state_id, request.data.get("handler"), fields, API
+            state_id, serializer.validated_data["handler"], fields, API
         )
         if not res.result:
             logger.warning(
