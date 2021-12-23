@@ -170,8 +170,6 @@
                 this.$emit('getBacicInfoStatus', val)
             }
         },
-        mounted () {
-        },
         methods: {
             initCurrentStepData () {
                 this.currentStepLoading = true
