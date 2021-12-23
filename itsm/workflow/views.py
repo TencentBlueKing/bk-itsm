@@ -680,7 +680,10 @@ class FieldViewSet(BaseFieldViewSet):
         自动从State的fields中移除该字段
         """
         with transaction.atomic():
-            if instance.key == "bk_biz_id" and instance.state.name == "提单":
+            if (
+                instance.key == "bk_biz_id"
+                and instance.id == instance.workflow.first_state.id
+            ):
                 instance.workflow.is_biz_needed = False
                 instance.workflow.save()
             if instance.source != TABLE:
