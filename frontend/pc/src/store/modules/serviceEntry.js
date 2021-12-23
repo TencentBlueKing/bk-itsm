@@ -53,6 +53,13 @@ export default {
                     return res
                 })
         },
+        cloneService ({ commit, state, dispatch }, id) {
+            return ajax.post(`service/projects/${id}/clone`)
+                .then(response => {
+                    let res = response.data
+                    return res
+                })
+        },
         deleteService ({ commit, state, dispatch }, id) {
             return ajax.delete(`service/projects/${id}/`)
                 .then(response => {

@@ -17,7 +17,7 @@
                 <span>{{ $t('m["已被编辑"]') }}</span>
             </div>
             <div class="reply-praise">
-                <i class="bk-itsm-icon icon-itsm-icon-speak" title="回复" @click="$emit('replyComment', curComment)"></i>
+                <i class="bk-itsm-icon icon-pinglun" title="回复" @click="$emit('replyComment', curComment)"></i>
                 <!-- <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i> -->
             </div>
         </div>

@@ -224,41 +224,64 @@
                             @click="changeEntry(props.row, 'edit')">
                             {{ $t('m.serviceConfig["编辑"]') }}
                         </bk-button>
-                        <!-- 删除 -->
+                        <!-- 克隆 -->
                         <bk-button
-                            data-test-id="service_button_deleteService1"
                             v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                             v-cursor
                             text
                             theme="primary"
                             class="btn-permission-disable"
                             @click="onServicePermissonCheck(['service_manage'], props.row)">
-                            {{ $t('m.serviceConfig["删除"]') }}
+                            {{ $t('m.serviceConfig["克隆"]') }}
                         </bk-button>
-                        <template v-else-if="!!props.row.bounded_catalogs[0]">
-                            <bk-popover placement="top">
+                        <bk-button
+                            v-else
+                            data-test-id="service_button_editService"
+                            theme="primary"
+                            text
+                            @click="changeEntry(props.row, 'clone')">
+                            {{ $t('m.serviceConfig["克隆"]') }}
+                        </bk-button>
+                        <bk-popover placement="bottom" theme="light">
+                            <i class="bk-itsm-icon icon-gengduo"></i>
+                            <div slot="content" style="white-space: normal;">
                                 <bk-button
-                                    data-test-id="service_button_deleteService2"
-                                    theme="primary"
+                                    data-test-id="service_button_deleteService1"
+                                    v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                    v-cursor
                                     text
-                                    :disabled="!!props.row.bounded_catalogs[0]"
-                                    @click="deleteOne(props.row)">
+                                    theme="primary"
+                                    class="btn-permission-disable"
+                                    @click="onServicePermissonCheck(['service_manage'], props.row)">
                                     {{ $t('m.serviceConfig["删除"]') }}
                                 </bk-button>
-                                <div slot="content" style="white-space: normal;">
-                                    <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
-                                </div>
-                            </bk-popover>
-                        </template>
-                        <template v-else>
-                            <bk-button
-                                data-test-id="service_button_deleteService3"
-                                theme="primary"
-                                text
-                                @click="deleteOne(props.row)">
-                                {{ $t('m.serviceConfig["删除"]') }}
-                            </bk-button>
-                        </template>
+                                <template v-else-if="!!props.row.bounded_catalogs[0]">
+                                    <bk-popover placement="top">
+                                        <bk-button
+                                            data-test-id="service_button_deleteService2"
+                                            theme="primary"
+                                            text
+                                            :disabled="!!props.row.bounded_catalogs[0]"
+                                            @click="deleteOne(props.row)">
+                                            {{ $t('m.serviceConfig["删除"]') }}
+                                        </bk-button>
+                                        <div slot="content" style="white-space: normal;">
+                                            <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
+                                        </div>
+                                    </bk-popover>
+                                </template>
+                                <template v-else>
+                                    <bk-button
+                                        data-test-id="service_button_deleteService3"
+                                        theme="primary"
+                                        text
+                                        @click="deleteOne(props.row)">
+                                        {{ $t('m.serviceConfig["删除"]') }}
+                                    </bk-button>
+                                </template>
+                            </div>
+                        </bk-popover>
+                        <!-- 删除 -->
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -429,17 +452,24 @@
             },
             // 编辑
             changeEntry (item, type) {
-                this.$router.push({
-                    name: 'projectServiceEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'basic'
-                    },
-                    query: {
-                        serviceId: item.id,
-                        project_id: this.$store.state.project.id
-                    }
-                })
+                if (type === 'clone') {
+                    // 获取克隆id
+                    console.log(item)
+                    this.$store.dispatch('serviceEntry/cloneService', { id: item.id }).then(res => {
+                        console.log(res)
+                    })
+                }
+                // this.$router.push({
+                //     name: 'projectServiceEdit',
+                //     params: {
+                //         type: 'edit',
+                //         step: 'basic'
+                //     },
+                //     query: {
+                //         serviceId: item.id,
+                //         project_id: this.$store.state.project.id
+                //     }
+                // })
             },
             /**
              * 单个服务操作项点击时校验

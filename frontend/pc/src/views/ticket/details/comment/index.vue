@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div class="wang-editor-template">
+    <div class="wang-editor-template" :style="{ 'height': isShowCommentScroll ? '' : `calc(100vh - 220px - ${ basicInDomHeight }px)` }">
         <ul v-show="isShowSelect" class="select-pattern">
             <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
                 <i :class="item.icon"></i>
@@ -102,7 +102,9 @@
             commentLoading: Boolean,
             moreLoading: Boolean,
             isPageOver: Boolean,
-            hasNodeOptAuth: Boolean
+            hasNodeOptAuth: Boolean,
+            isShowBasicInfo: Boolean,
+            stepActiveTab: String
         },
         data () {
             return {
@@ -136,13 +138,34 @@
                 replyContent: {
                     creator: '',
                     content: ''
+                },
+                commentDomHeight: '',
+                isShowCommentScroll: false,
+                basicInDomHeight: 54 // 基本信息初始高度
+            }
+        },
+        watch: {
+            stepActiveTab (val) {
+                if (val === 'allComments') {
+                    this.getCommentHeight()
                 }
             }
         },
         mounted () {
             this.commentListDom = document.querySelector('.comment-list')
+            this.getBasicHeight()
         },
         methods: {
+            getCommentHeight () {
+                const commentDom = document.querySelector('.wang-editor-template')
+                this.commentDomHeight = commentDom.clientHeight
+                console.log(this.commentDomHeight)
+                this.isShowCommentScroll = commentDom.clientHeight > 500
+            },
+            getBasicHeight () {
+                const basicDom = document.querySelector('.base-info-content')
+                this.basicInDomHeight = basicDom.clientHeight
+            },
             editComment (curComment, type) {
                 const _this = this.$refs.editorEdit.editor
                 _this.txt.clear()
@@ -280,6 +303,8 @@
         color: #c4c6cc;
     }
     .wang-editor-template {
+        overflow: auto;
+        @include scroller;
         padding: 20px;
         .select-pattern {
             cursor: pointer;
