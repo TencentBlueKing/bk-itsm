@@ -26,7 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from itsm.component.constants import ALL_ACTION_CHOICES, API, LEN_LONG
+from itsm.component.constants import ALL_ACTION_CHOICES, API, LEN_LONG, APPROVAL_CHOICES, LEN_NORMAL
 from itsm.component.exceptions import ParamError
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
 from itsm.ticket.validators import ticket_fields_validate
@@ -318,6 +318,16 @@ class TicketOperateSerializer(serializers.Serializer):
     operator = serializers.CharField(required=True)
     action_type = serializers.ChoiceField(choices=ALL_ACTION_CHOICES)
     action_message = serializers.CharField(required=False, max_length=LEN_LONG)
+
+
+class ProceedApprovalSerializer(serializers.Serializer):
+    """审批操作序列化"""
+
+    process_inst_id = serializers.CharField(required=False, max_length=LEN_NORMAL)
+    activity = serializers.IntegerField(required=True)
+    submit_action = serializers.ChoiceField(choices=APPROVAL_CHOICES)
+    submit_opinion = serializers.CharField(required=False, max_length=LEN_LONG)
+    handler = serializers.CharField(required=True)
 
 
 class TicketFilterSerializer(serializers.Serializer):

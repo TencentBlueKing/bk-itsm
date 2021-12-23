@@ -3533,9 +3533,15 @@ class Ticket(Model, BaseTicket):
         self.update_ticket_status(fields, operator)
 
         # Create sign task
-        task = SignTask.objects.get(status_id=node_status.id, processor=operator)
-        task.status = "RUNNING"
-        task.save()
+        if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
+            task, result = SignTask.objects.update_or_create(
+                status_id=node_status.id,
+                processor=operator,
+                defaults={"status": "RUNNING"},
+            )
+        else:
+            node_status.status = QUEUEING
+            node_status.save()
         # Create task fields
         task_field_objs = []
         field_map = {}
@@ -3556,6 +3562,8 @@ class Ticket(Model, BaseTicket):
                 continue
             update_dict = dict(field_map[node_field.key], task_id=task.id)
             node_field_dict.update(update_dict)
+            if node_field_dict.get("workflow_id", ""):
+                node_field_dict.pop("workflow_id")
             task_field_objs.append(TaskField(**node_field_dict))
 
             # Table field need sync to BASE-MODEL field

@@ -119,6 +119,10 @@ RETRY = "RETRY"
 IGNORE = "IGNORE"
 MANUAL = "MANUAL"
 
+# 单据审批意见标识别
+TONGYI = "true"
+JUJUE = "false"
+
 API_FAILED_CHOICES = [
     (RETRY, "重试"),
     (IGNORE, "忽略"),
@@ -166,6 +170,11 @@ ALL_ACTION_CHOICES = [
     (TERMINATE_OPERATE, "终止"),
     (WITHDRAW_OPERATE, "撤单"),
     (DELIVER_OPERATE, "转单"),
+]
+
+APPROVAL_CHOICES = [
+    (TONGYI, "同意"),
+    (JUJUE, "拒绝"),
 ]
 
 ACTION_DICT = dict(ALL_ACTION_CHOICES)
