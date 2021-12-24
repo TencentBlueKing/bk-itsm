@@ -7,7 +7,7 @@ from blueapps.core.celery.celery import app
 
 from itsm.service.models import Service, CatalogService
 from itsm.sla_engine.utils import seconds_format
-from itsm.tests.sla_engine.data import DATA
+from itsm.tests.data.datas import DATA
 from itsm.workflow.models import Workflow
 
 
