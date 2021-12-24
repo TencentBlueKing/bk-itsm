@@ -22,9 +22,12 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import json
+import copy
 
 from django.test import TestCase, override_settings
+
+from itsm.tests.data.datas import DATA
+from itsm.workflow.models import Workflow
 
 
 class WorkflowViewTest(TestCase):
@@ -32,38 +35,36 @@ class WorkflowViewTest(TestCase):
     def test_variable_list(self):
         url = "/api/workflow/templates/get_global_choices/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_regex_choice(self):
         url = "/api/workflow/templates/get_regex_choice/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
-        self.assertEqual(rsp.data["data"]["regex_choice"], [('EMPTY', '')])
-        
+        self.assertEqual(rsp.data["data"]["regex_choice"], [("EMPTY", "")])
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_variables(self):
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/variables/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_create_accept_transitions(self):
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        url = "/api/workflow/templates/{}/create_accept_transitions/".format(rsp.data["data"][0]["id"])
+        url = "/api/workflow/templates/{}/create_accept_transitions/".format(
+            rsp.data["data"][0]["id"]
+        )
         rsp = self.client.post(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -73,19 +74,20 @@ class WorkflowViewTest(TestCase):
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/deploy/".format(rsp.data["data"][0]["id"])
-        rsp = self.client.post(path=url, data={"name": "test_deploy"}, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
+        rsp = self.client.post(
+            path=url, data={"name": "test_deploy"}, content_type="application/json"
+        )
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"]["id"], int)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_exports(self):
         url = "/api/workflow/templates/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/exports/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        
+
         self.assertEqual(rsp.status_code, 200)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
@@ -94,7 +96,6 @@ class WorkflowViewTest(TestCase):
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         url = "/api/workflow/templates/{}/table/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(json.loads(rsp.content.decode("utf-8")))
 
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
@@ -108,23 +109,50 @@ class StateViewTest(TestCase):
         url = "/api/workflow/states/{}/variables/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-        
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_group_variables(self):
+        workflow_data = copy.deepcopy(DATA)
+        workflow, _, _ = Workflow.objects.restore(workflow_data)
+        version = workflow.create_version()
+        states = version.states
+        state_id = 1
+        workflow_id = 1
+        for state in states.values():
+            if state["name"] == "审批节点":
+                state_id = state["id"]
+                workflow_id = state["workflow"]
+                break
+        url = "/api/workflow/states/{}/variables/?workflow={}&state={}&exclude_self=true".format(
+            state_id, workflow_id, state_id
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.data["result"], True)
+        self.assertIsInstance(rsp.data["data"], list)
+
+        url = "/api/workflow/states/{}/group_variables/?workflow={}&state={}&exclude_self=true".format(
+            state_id, workflow_id, state_id
+        )
+        rsp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertEqual(rsp.data["result"], True)
+        self.assertIsInstance(rsp.data["data"], dict)
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_sign_variables(self):
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        url = "/api/workflow/states/{}/sign_variables/".format(rsp.data["data"][0]["id"])
+        url = "/api/workflow/states/{}/sign_variables/".format(
+            rsp.data["data"][0]["id"]
+        )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_pre_states(self):
         url = "/api/workflow/states/"
@@ -132,11 +160,10 @@ class StateViewTest(TestCase):
         url = "/api/workflow/states/{}/pre_states/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_post_states(self):
         url = "/api/workflow/states/"
@@ -144,19 +171,23 @@ class StateViewTest(TestCase):
         url = "/api/workflow/states/{}/post_states/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_add_fields_from_table(self):
         url = "/api/workflow/states/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        url = "/api/workflow/states/{}/add_fields_from_table/".format(rsp.data["data"][0]["id"])
-        rsp = self.client.post(path=url, data={"fields": [{"key": "value"}]}, content_type="application/json")
+        url = "/api/workflow/states/{}/add_fields_from_table/".format(
+            rsp.data["data"][0]["id"]
+        )
+        rsp = self.client.post(
+            path=url,
+            data={"fields": [{"key": "value"}]},
+            content_type="application/json",
+        )
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
 
@@ -165,14 +196,17 @@ class StateViewTest(TestCase):
         url1 = "/api/workflow/states/"
         rsp1 = self.client.get(path=url1, data=None, content_type="application/json")
         url = "/api/workflow/states/{}/clone/".format(rsp1.data["data"][0]["id"])
-        rsp = self.client.post(path=url, data={"fields": [{"key": "value"}]}, content_type="application/json")
-        
-        print(json.loads(rsp.content.decode("utf-8")))
+        rsp = self.client.post(
+            path=url,
+            data={"fields": [{"key": "value"}]},
+            content_type="application/json",
+        )
+
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         url2 = "/api/workflow/states/"
         rsp2 = self.client.get(path=url2, data=None, content_type="application/json")
-        self.assertEqual(len(rsp2.data["data"]), len(rsp1.data["data"])+1)
+        self.assertEqual(len(rsp2.data["data"]), len(rsp1.data["data"]) + 1)
 
 
 class TemplateFieldViewTest(TestCase):
@@ -181,7 +215,6 @@ class TemplateFieldViewTest(TestCase):
         url = "/api/workflow/template_fields/mix_list/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -195,7 +228,6 @@ class WorkflowVersionViewTest(TestCase):
         url = "/api/workflow/versions/{}/states/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -204,35 +236,33 @@ class WorkflowVersionViewTest(TestCase):
     def test_transitions(self):
         url = "/api/workflow/versions/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(rsp.data)
         url = "/api/workflow/versions/{}/transitions/".format(rsp.data["data"][0]["id"])
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_sla_validate(self):
         url = "/api/workflow/versions/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(rsp.data)
-        url = "/api/workflow/versions/{}/sla_validate/".format(rsp.data["data"][0]["id"])
+        url = "/api/workflow/versions/{}/sla_validate/".format(
+            rsp.data["data"][0]["id"]
+        )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_post_state(self):
         url = "/api/workflow/versions/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        print(rsp.data)
         url = "/api/workflow/versions/{}/post_state/".format(rsp.data["data"][0]["id"])
-        rsp = self.client.get(path=url, data={"from_state_id": 1}, content_type="application/json")
+        rsp = self.client.get(
+            path=url, data={"from_state_id": 1}, content_type="application/json"
+        )
 
-        print(json.loads(rsp.content.decode("utf-8")))
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
@@ -244,10 +274,11 @@ class TaskSchemaViewTest(TestCase):
         url = "/api/workflow/task_schemas/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
-        url = "/api/workflow/task_schemas/{}/variables/".format(rsp.data["data"][0]["id"])
+        url = "/api/workflow/task_schemas/{}/variables/".format(
+            rsp.data["data"][0]["id"]
+        )
         rsp = self.client.get(path=url, data=None, content_type="application/json")
-        
-        print(json.loads(rsp.content.decode("utf-8")))
+
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
