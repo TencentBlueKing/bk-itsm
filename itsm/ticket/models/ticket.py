@@ -769,6 +769,16 @@ class Status(Model):
     def get_organization_name(department_id):
         return get_department_info(department_id).get("name", "")
 
+    def get_appover_key_value(self, code_key):
+        code = code_key["NODE_APPROVER"]
+        key_value = {}
+        sign_tasks = SignTask.objects.filter(status_id=self.id)
+        processors = []
+        for sign_task in sign_tasks:
+            processors.append(sign_task.processor)
+        key_value[code] = ",".join(processors)
+        return key_value
+
     def get_sign_key_value(self, ticket, code_key):
         """
         获取会签节点output的键值对

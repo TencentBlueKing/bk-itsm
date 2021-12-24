@@ -128,14 +128,17 @@ class ItsmSignService(ItsmBaseService):
 
     @staticmethod
     def get_key_value(node_status, ticket, code_key):
+        approver_key_value = node_status.get_appover_key_value(code_key)
         is_multi = node_status.state["is_multi"]
         if not is_multi:
             key_value = {}
             reject_count = node_status.sign_reject_count()
             if reject_count > 0:
                 key_value[code_key[NODE_APPROVE_RESULT]] = "false"
+            key_value.update(approver_key_value)
             return key_value
         key_value = node_status.get_sign_key_value(ticket, code_key)
+        key_value.update(approver_key_value)
         return key_value
 
     @staticmethod
