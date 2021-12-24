@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-current-node">
-        <div class="bk-current-info" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
+        <div class="bk-current-info" :style="{ 'height': `calc(100vh - 220px - ${ basicInDomHeight }px)` }" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
             <template v-if="!basicInfomation.is_over">
                 <template v-if="currentStepList.length !== 0">
                     <current-step-item
@@ -106,7 +106,8 @@
             loading: {
                 type: Boolean,
                 default: false
-            }
+            },
+            isShowBasicInfo: Boolean
         },
         data () {
             return {
@@ -124,8 +125,17 @@
                     extCls: 'bk-processor-wrapper'
                 },
                 // 手动触发器下拉框状态
-                isDropdownShow: false
+                isDropdownShow: false,
+                basicInDomHeight: 54 // 基本信息初始高度
             }
+        },
+        watch: {
+            isShowBasicInfo () {
+                this.getBasicHeight()
+            }
+        },
+        mounted () {
+            this.getBasicHeight()
         },
         methods: {
             loadData () {
@@ -206,7 +216,10 @@
                     errorHandler(res, this)
                 })
             },
-            
+            getBasicHeight () {
+                const basicDom = document.querySelector('.base-info-content')
+                this.basicInDomHeight = basicDom.clientHeight
+            },
             // 成功后的回调事件
             successFn () {
                 this.$emit('handlerSubmitSuccess')
@@ -216,9 +229,12 @@
 </script>
 
 <style scoped lang='scss'>
+    @import '../../../../scss/mixins/scroller.scss';
     .bk-current-info {
+        overflow: auto;
         position: relative;
         padding: 10px;
+        @include scroller;
     }
 
     .bk-current-padding {

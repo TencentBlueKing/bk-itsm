@@ -50,7 +50,8 @@
                         :comment-loading="commentLoading"
                         :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
-                        @refreshComment="refreshComment">
+                        @refreshComment="refreshComment"
+                        @getBacicInfoStatus="getBacicInfoStatus">
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
@@ -187,7 +188,8 @@
                 commentList: [],
                 commentId: '',
                 threshold: [],
-                hasNodeOptAuth: false
+                hasNodeOptAuth: false,
+                basicStatus: true
             }
         },
         computed: {
@@ -269,6 +271,9 @@
                 } finally {
                     this.commentLoading = false
                 }
+            },
+            getBacicInfoStatus (val) {
+                this.basicStatus = val
             },
             async getComments (page, page_size) {
                 this.commentLoading = true

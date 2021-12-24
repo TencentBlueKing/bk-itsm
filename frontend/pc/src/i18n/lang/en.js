@@ -1115,6 +1115,7 @@ export const m = {
         '请输入搜索关键字': 'Please input the keywords ',
         '新增': 'Add ',
         '编辑': 'Edit ',
+        '克隆': 'Clone',
         '删除': 'Delete ',
         '服务已绑定关联目录，请先解绑后在进行删除操作': 'The service is bound to the associated directory. Please unbind it before deleting',
         '父级目录': 'Parent catalogue ',

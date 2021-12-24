@@ -2,13 +2,13 @@
     <div class="left-ticket">
         <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
-                <div class="ticket-creator" @click="isShowbasicInfo = !isShowbasicInfo">
-                    <i :class="['bk-itsm-icon', isShowbasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
+                    <i :class="['bk-itsm-icon', isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
                     <span class="ticket-title">提单信息</span>
                     <span>提单人: {{ ticketInfo.creator}}</span>
                     <span>提单时间: {{ ticketInfo.create_at}}</span>
                 </div>
-                <div :class="['basic-content', isShowbasicInfo ? '' : 'hide']">
+                <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
                     <basic-information
                         ref="basicInfo"
                         v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
@@ -49,6 +49,7 @@
                     <current-steps
                         v-if="!loading.ticketLoading && !loading.nodeInfoLoading"
                         ref="currentNode"
+                        :is-show-basic-info="isShowBasicInfo"
                         :loading="loading.ticketLoading"
                         :basic-infomation="ticketInfo"
                         :node-list="nodeList"
@@ -67,11 +68,13 @@
                     </template>
                     <wang-editor
                         ref="comment"
+                        :is-show-basic-info="isShowBasicInfo"
                         :comment-list="commentList"
                         :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
                         :is-page-over="isPageOver"
+                        :step-active-tab="stepActiveTab"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
                         :more-loading="moreLoading"
@@ -136,7 +139,7 @@
         inject: ['reloadTicket'],
         data () {
             return {
-                isShowbasicInfo: true,
+                isShowBasicInfo: true,
                 baseActiveTab: 'base',
                 stepActiveTab: 'currentStep',
                 // 当前步骤
@@ -162,6 +165,9 @@
                 } else {
                     this.stepActiveTab = 'allComments'
                 }
+            },
+            isShowBasicInfo (val) {
+                this.$emit('getBacicInfoStatus', val)
             }
         },
         methods: {
