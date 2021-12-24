@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import copy
 
 from django.test import TestCase, override_settings
 
@@ -114,7 +115,8 @@ class StateViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_group_variables(self):
-        workflow, _, _ = Workflow.objects.restore(DATA)
+        workflow_data = copy.deepcopy(DATA)
+        workflow, _, _ = Workflow.objects.restore(workflow_data)
         version = workflow.create_version()
         states = version.states
         state_id = 1

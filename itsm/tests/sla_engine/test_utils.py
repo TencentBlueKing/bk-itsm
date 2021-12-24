@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import json
 from datetime import datetime
 
@@ -21,7 +22,8 @@ class TestUtils(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_sla(self):
-        workflow, _, _ = Workflow.objects.restore(DATA)
+        workflow_data = copy.deepcopy(DATA)
+        workflow, _, _ = Workflow.objects.restore(workflow_data)
         version = workflow.create_version()
         data = {
             "name": "service_create_test_{}".format(
