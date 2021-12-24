@@ -24,7 +24,7 @@
     <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey">
         <!-- table -->
         <div v-if="item.type === 'TABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span class="bk-li-left">{{item.name}}：</span>
             <div v-if="item.can_edit && !basicInfomation.is_over && origin === 'notLog'" class="bk-fields-done-edit"
                 @click="edit(item)">
                 <span class="bk-itsm-icon icon-edit-bold isOn"></span>
@@ -340,7 +340,7 @@
             }
             .bk-li-left {
                 width: 70px;
-                font-weight: bold;
+                font-weight: 400;
                 color: #979Ba5;
                 text-align: right;
                 overflow: hidden;
@@ -381,7 +381,7 @@
     }
     .bk-li-left {
         width: 70px;
-        font-weight: bold;
+        font-weight: 400;
         text-align: right;
         overflow: hidden;
         text-overflow: ellipsis;

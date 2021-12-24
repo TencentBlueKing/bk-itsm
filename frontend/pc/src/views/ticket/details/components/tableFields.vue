@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-table-fields">
-        <!-- <template v-if="openFunction.FIRST_STATE_SWITCH">
+        <template v-if="openFunction.FIRST_STATE_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
@@ -37,7 +37,7 @@
                 </template>
             </bk-form>
         </template>
-        <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
+        <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
         <template v-if="openFunction.TABLE_FIELDS_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <div v-for="(item, index) in basicInfomation.table_fields"

@@ -150,7 +150,8 @@
         &.fold {
             .bk-basic-info {
                 max-height: 500px;
-                // overflow: hidden;
+                overflow: auto;
+                @include scroller;
             }
         }
         &.has-more-icon {
