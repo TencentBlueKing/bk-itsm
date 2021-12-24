@@ -119,6 +119,7 @@
             <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <business-card
                 v-if="(item.type === 'MEMBERS' || item.type === 'MEMBER') && origin === 'notLog'"
+                :martop="'margin-top: -13px'"
                 :item="item">
             </business-card>
             <span class="bk-li-right"
@@ -318,45 +319,73 @@
             // overflow: auto;
             max-width: calc(100% - 30px);
             overflow-wrap: break-word;
-        }
+            display: flex;
 
-        .bk-fields-done-edit {
-            display: inline-block;
-            margin-top: 2px;
-            padding-left: 10px;
-            cursor: pointer;
-            align-self: flex-start;
-        }
-        .bk-li-link{
-            color: #3a84ff;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .bk-li-left,
-        .bk-li-right {
-            line-height: 26px;
-            color: #313238;
-        }
-        .bk-li-left {
-            font-weight: bold;
-            color: #979Ba5;
-        }
-
-        .bk-member-edit {
-            margin-left: 30px;
+            .bk-fields-done-edit {
+                display: inline-block;
+                margin-top: 2px;
+                padding-left: 10px;
+                cursor: pointer;
+                align-self: flex-start;
+            }
+            .bk-li-link{
+                color: #3a84ff;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .bk-li-left,
+            .bk-li-right {
+                line-height: 26px;
+                color: #313238;
+            }
+            .bk-li-left {
+                width: 70px;
+                font-weight: bold;
+                color: #979Ba5;
+                text-align: right;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .bk-li-right {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .bk-member-edit {
+                margin-left: 30px;
+            }
         }
     }
 
     .bk-fields-log{
         .bk-fields-done-item{
+            display: flex;
             .bk-li-left,
             .bk-li-right {
-                line-height: 24px;
-                color: #63656E;
+                line-height: 26px;
+                color: #313238;
             }
         }
     }
     .bk-pre {
+        display: inline-block;
         white-space: pre-wrap;
+    }
+     .bk-li-right {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .bk-li-left {
+        width: 70px;
+        font-weight: bold;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #979Ba5;
     }
 </style>

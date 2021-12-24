@@ -22,13 +22,12 @@
 
 <template>
     <div class="bk-table-fields">
-        <template v-if="openFunction.FIRST_STATE_SWITCH">
+        <!-- <template v-if="openFunction.FIRST_STATE_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
                         :key="index"
                         class="bk-field-line">
-                        <!-- 静态展示 -->
                         <fields-done
                             :item="item"
                             :fields="firstStateFields"
@@ -38,12 +37,13 @@
                 </template>
             </bk-form>
         </template>
-        <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div>
+        <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
         <template v-if="openFunction.TABLE_FIELDS_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <div v-for="(item, index) in basicInfomation.table_fields"
                     :key="index"
-                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }"
+                    :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                     <!-- 静态展示 -->
                     <template v-if="!item.isEdit">
                         <fields-done
@@ -96,7 +96,8 @@
             return {
                 showMore: false,
                 showInfo: true,
-                fieldList: []
+                fieldList: [],
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER']
             }
         },
         computed: {

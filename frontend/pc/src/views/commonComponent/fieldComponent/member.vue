@@ -30,6 +30,7 @@
                     :disabled="item.is_readonly">
                 </member-select>
                 <business-card
+                    :martop="'margin-top: -13px'"
                     :item="item">
                 </business-card>
             </div>
