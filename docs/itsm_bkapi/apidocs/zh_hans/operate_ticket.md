@@ -80,4 +80,4 @@
 | result  | bool      | 返回结果，true为成功，false为失败   |
 | code    | int       | 返回码，0表示成功，其他值表示失败       |
 | message | string    | 错误信息                    |
-| data    | object | 返回数据 |
+| data    | object | 返回数据，为空 |
