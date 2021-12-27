@@ -24,24 +24,27 @@
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
             <div class="bk-basic-form">
-                <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
+                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
+                <!-- <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li v-for="item in basicInfomationList" :key="item.name" :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                         <span class="bk-info-title" :title="item.name">{{ item.name }} :</span>
                         <span v-if="basicInfoType.includes(item.type)" class="bk-info-content">{{ item.display_value || '--'}}</span>
                         <fields-done v-else class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
                     </li>
-                </ul>
+                </ul> -->
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import fieldsDone from './components/fieldsDone.vue'
+    import tableFields from './components/tableFields.vue'
+    // import fieldsDone from './components/fieldsDone.vue'
     export default {
         name: 'BasicInformation',
         components: {
-            fieldsDone
+            // fieldsDone,
+            tableFields
         },
         props: {
             basicInfomation: {
@@ -137,7 +140,7 @@
     @import '../../../scss/mixins/scroller.scss';
     .show {
         width: 500px;
-        margin-top: -10px;
+        // margin-top: -10px;
         overflow: auto;
         @include scroller;
     }
@@ -146,8 +149,9 @@
         padding-bottom: 14px;
         &.fold {
             .bk-basic-info {
-                max-height: 300px;
-                // overflow: hidden;
+                max-height: 500px;
+                overflow: auto;
+                @include scroller;
             }
         }
         &.has-more-icon {

@@ -282,7 +282,7 @@
             height: 0;
         }
         /deep/ .bk-icon {
-            line-height: 54px;
+            // line-height: 54px;
         }
     }
     .current-step-content {
