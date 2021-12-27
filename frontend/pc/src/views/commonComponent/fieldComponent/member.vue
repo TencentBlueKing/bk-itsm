@@ -30,7 +30,7 @@
                     :disabled="item.is_readonly">
                 </member-select>
                 <business-card
-                    :martop="'margin-top: -13px'"
+                    class="mar-top"
                     :item="item">
                 </business-card>
             </div>
@@ -107,5 +107,8 @@
     }
     .bk-ext-item {
         position: relative;
+    }
+    .mar-top {
+        margin-top: 3px;
     }
 </style>

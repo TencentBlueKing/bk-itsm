@@ -29,7 +29,7 @@
         :on-show="showMessage"
         trigger="click"
         theme="light">
-        <i class="bk-icon icon-id" v-if="memberVal" ref="icon" :style="martop"></i>
+        <i class="bk-icon icon-id" v-if="memberVal" ref="icon"></i>
         <div slot="content">
             <ul ref="message" class="bk-member-message" v-bkloading="{ isLoading: localLoading }">
                 <li v-for="(member, memIndex) in memberList"
@@ -65,8 +65,7 @@
                 default () {
                     return {}
                 }
-            },
-            martop: String
+            }
         },
         data () {
             return {
