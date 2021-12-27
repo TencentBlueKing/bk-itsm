@@ -118,8 +118,8 @@
         <div class="bk-fields-done-item" v-else>
             <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
             <business-card
-                class="mar-top"
                 v-if="(item.type === 'MEMBERS' || item.type === 'MEMBER') && origin === 'notLog'"
+                style="margin-top: 3px"
                 :item="item">
             </business-card>
             <span class="bk-li-right"
@@ -295,9 +295,6 @@
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
-    .mar-top {
-        margin-top: 3px;
-    }
     .bk-fields-done {
         display: flex;
         flex-wrap: wrap;
