@@ -15,10 +15,16 @@ operate ticket's state
 | state_id  | int | YES   | state id |
 | action_type   | string | YES   | operation type： TRANSITION（submit）/CLAIM（claim）/DISTRIBUTE（assin）/DELIVER（deliver） |
 | fields    | array  | NO   | ticket fields (submit)|
-| processors_type    | string  | NO   | operator type（assign and deliver）： GENERAL（general role）/PERSON（person）|
-| processors    | string  | NO   | operator（assign and deliver）： role id when processors_type is GENERAL else username|
+| processors_type    | string  | NO   | operator type（assign and deliver）： GENERAL (general role list), ORGANIZATION (ORGANIZATION), PERSON (individual), STARTER (bill of lading person)|
+| processors    | string  | NO   | operator（assign and deliver）: When processors_type is GENERAL/ORGANIZATION, it is the role ID, when it is PERSON, it is the username of the blue whale user, and when it is STARTER, it is empty.|
 | action_message    | string  | NO   | operate message（deliver）|
 
+### fields
+
+| Field                     | Type    | Required | Description       |
+| ---------------------- | ------ | -------- |------|
+| key     | string |YES| Unique identification of bill of lading fields|
+| value | string |YES   |  Bill of lading field value|
 
 ### demo1：submit
 
