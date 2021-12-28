@@ -33,6 +33,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
+from common.log import logger
 from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -532,28 +533,43 @@ class TicketList(object):
             supervisors = supervisors.split(",") if supervisors else []
             real_supervisors = supervisors + [inst["creator"]]
             inst["meta"] = real_ticket["meta"]
-            inst.update(
-                service_name=service_info[inst["service_id"]],
-                current_status=real_ticket["current_status"],
-                current_status_display=all_status.get(status_key, {}).get("name", "--"),
-                current_steps=steps.get(real_ticket["id"], []),
-                priority_name=inst["meta"]["priority"]["name"] if "priority" in inst[
-                    "meta"] else "--",
-                create_at=inst["create_at"].strftime("%Y-%m-%d %H:%M:%S"),
-                current_processors="",  # ",".join(self.ticket_processors.get(inst.id, "")),
-                can_comment=self.can_comment(inst, comments, is_email_invite_token),
-                can_operate=False,
-                waiting_approve=waiting_approve.get(inst["id"], False),
-                followers=ticket_followers.get(inst["id"], []),
-                comment_id=comments.get(inst["id"], {}).get("id", ""),
-                can_supervise=all(
-                    [inst["is_supervise_needed"], not is_over, self.username in real_supervisors]),
-                can_withdraw=self.can_withdraw(workflow_version[inst["flow_id"]],
-                                               ticket_status[inst["id"]], is_over),
-                sla=sla_task_info.get(inst["id"], {}).get("name", []),
-                sla_color=sla_task_info.get(inst["id"], {}).get("color", ""),
-                project_key=inst["project_key"]
-            )
+            try:
+                inst.update(
+                    service_name=service_info[inst["service_id"]],
+                    current_status=real_ticket["current_status"],
+                    current_status_display=all_status.get(status_key, {}).get(
+                        "name", "--"
+                    ),
+                    current_steps=steps.get(real_ticket["id"], []),
+                    priority_name=inst["meta"]["priority"]["name"]
+                    if "priority" in inst["meta"]
+                    else "--",
+                    create_at=inst["create_at"].strftime("%Y-%m-%d %H:%M:%S"),
+                    current_processors="",  # ",".join(self.ticket_processors.get(inst.id, "")),
+                    can_comment=self.can_comment(inst, comments, is_email_invite_token),
+                    can_operate=False,
+                    waiting_approve=waiting_approve.get(inst["id"], False),
+                    followers=ticket_followers.get(inst["id"], []),
+                    comment_id=comments.get(inst["id"], {}).get("id", ""),
+                    can_supervise=all(
+                        [
+                            inst["is_supervise_needed"],
+                            not is_over,
+                            self.username in real_supervisors,
+                        ]
+                    ),
+                    can_withdraw=self.can_withdraw(
+                        workflow_version[inst["flow_id"]],
+                        ticket_status[inst["id"]],
+                        is_over,
+                    ),
+                    sla=sla_task_info.get(inst["id"], {}).get("name", []),
+                    sla_color=sla_task_info.get(inst["id"], {}).get("color", ""),
+                    project_key=inst["project_key"],
+                )
+            except Exception as e:
+                logger.info("单据序列化计算失败, error = {}".format(e))
+                pass
 
             # 提单人、代提单人才有权限看评价，无权查看评论信息则置设置comment_id为-1
             if not (self.username in [inst["creator"],
