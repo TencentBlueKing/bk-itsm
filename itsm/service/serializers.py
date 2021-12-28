@@ -731,6 +731,7 @@ class WorkFlowConfigSerializer(serializers.Serializer):
     supervisor = serializers.CharField(
         required=True, max_length=LEN_LONG, allow_blank=True
     )
+    is_auto_approve = serializers.BooleanField(required=True)
 
 
 class ServiceConfigSerializer(serializers.Serializer):
