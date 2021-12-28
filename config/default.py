@@ -750,7 +750,7 @@ BK_IAM_INNER_HOST = os.environ.get("BK_IAM_V3_INNER_HOST", None)
 TAM_PROJECT_ID = os.environ.get("TAM_PROJECT_ID", "")
 
 # 是否初始化蓝盾
-INIT_DEVOPS_TEMPLATE = os.environ.get("INIT_DEVOPS_TEMPLATE", False)
+INIT_DEVOPS_TEMPLATE = os.environ.get("INIT_DEVOPS_TEMPLATE", False) or os.environ.get("BKAPP_INIT_DEVOPS_TEMPLATE", False)
 
 # 权限中心 SaaS host
 BK_IAM_APP_CODE = os.getenv("BK_IAM_V3_APP_CODE", "bk_iam")
@@ -797,8 +797,10 @@ timezone = "Asia/Shanghai"
 CELERY_TIMEZONE = "Asia/Shanghai"
 USE_TZ = False
 # 蓝盾
-DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
-DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
+DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "") or os.environ.get(
+    "BKAPP_DEVOPS_CLIENT_URL", "")
+DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "") or os.environ.get("BKAPP_DEVOPS_BASE_URL",
+                                                                          "")
 
 # bkchat快速审批
 USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
