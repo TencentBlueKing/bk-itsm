@@ -1346,6 +1346,8 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '自动处理：': 'Automatic processing：',
+        '自动处理': 'Automatic processing',
         '请输入选项ID': 'Please enter the option ID',
         '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
