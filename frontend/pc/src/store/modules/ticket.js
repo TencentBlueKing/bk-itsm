@@ -161,5 +161,10 @@ export default {
                 return res
             })
         },
+        // 获取单据评价
+        getTicktComment ({ commit, state, dispatch }, params) {
+            const id = params
+            return ajax.get(`ticket/comments/${id}/`).then(response => response.data)
+        },
     }
 }

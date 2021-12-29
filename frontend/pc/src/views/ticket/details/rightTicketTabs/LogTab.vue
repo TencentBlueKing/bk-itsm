@@ -38,14 +38,33 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
-        <div v-if="ticketInfo.is_over" class="process-detail">
+        <div v-if="ticketInfo.is_over && ticketInfo.comment_id !== -1" class="process-detail">
             <div class="process-content">
                 <img :src="imgUrl" alt="单据结束">
                 <template v-if="!ticketInfo.is_commented">
                     <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
                     <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
                 </template>
-                <p v-else>{{ $t(`m["已完成评价"]`) }}</p>
+                <div v-else>{{ $t(`m["已完成评价"]`) }}
+                    <div class="comment-content">
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["星级"]`) }}:</span>
+                            <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价人"]`) }}:</span>
+                            <p>{{commentInfo.creator}}</p>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价时间"]`) }}:</span>
+                            <p>{{commentInfo.create_at}}</p>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价内容"]`) }}:</span>
+                            <p>{{commentInfo.comments}}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -72,11 +91,13 @@
                 loading: false,
                 list: [],
                 isShowDetail: false,
-                imgUrl: require('@/images/orderFinished.png')
+                imgUrl: require('@/images/orderFinished.png'),
+                commentInfo: {}
             }
         },
         created () {
             this.getOperationLogList()
+            this.getTicktComment()
         },
         // 方法集合
         methods: {
@@ -112,6 +133,12 @@
                     errorHandler(res, this)
                 }).finally(() => {
                     this.loading = false
+                })
+            },
+            getTicktComment () {
+                if (this.ticketInfo.is_over) return
+                this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then(res => {
+                    this.commentInfo = res.data
                 })
             },
             handleSelect (item) {
@@ -203,6 +230,30 @@
         .appraise {
             color: #3a84ff;
             cursor: pointer;
+        }
+        .hide-comment {
+            height: 0;
+        }
+        .comment-content {
+            width: 100%;
+            height: 250px;
+            .comment-content-item {
+                display: flex;
+                margin-top: 5px;
+                padding: 0 45px;
+                span {
+                    width: 70px;
+                    text-align: left;
+                }
+                p {
+                    text-align: left;
+                    font-size: 12px;
+                    flex: 1;
+                    color: #9da0a9;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                }
+            }
         }
     }
 }

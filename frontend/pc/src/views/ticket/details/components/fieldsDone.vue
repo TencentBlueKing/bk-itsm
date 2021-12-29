@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey">
+    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey" :style="{ 'width': fieldType ? '' : '40%' }">
         <!-- table -->
         <div v-if="item.type === 'TABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
             <span class="bk-li-left">{{item.name}}：</span>
@@ -189,7 +189,8 @@
             isShowName: {
                 type: Boolean,
                 default: () => true
-            }
+            },
+            basicInfoType: Array
         },
         data () {
             return {
@@ -217,6 +218,9 @@
                     phone: this.basicInfomation.profile.phone,
                     department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
                 }
+            },
+            fieldType () {
+                return this.basicInfoType.includes(this.item.type)
             }
         },
         created () {

@@ -94,7 +94,7 @@
                     size="small"
                     class="mr10"
                     theme="default"
-                    :disabled="ticketInfo.is_commented || !ticketInfo.can_comment"
+                    :disabled="ticketInfo.is_commented || !ticketInfo.can_comment || ticketInfo.comment_id === -1"
                     @click="onTicketBtnClick('comment')">
                     {{ $t(`m.newCommon["评价"]`) }}
                 </bk-button>

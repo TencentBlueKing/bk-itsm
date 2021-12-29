@@ -27,9 +27,11 @@
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
                         :key="index"
-                        class="bk-field-line">
+                        class="bk-field-line"
+                        :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                         <fields-done
                             :item="item"
+                            :basic-info-type="basicInfoType"
                             :fields="firstStateFields"
                             :basic-infomation="basicInfomation">
                         </fields-done>
@@ -40,7 +42,7 @@
         <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
         <template v-if="openFunction.TABLE_FIELDS_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <div v-for="(item, index) in basicInfomation.table_fields"
+                <div v-for="(item, index) in tableFields"
                     :key="index"
                     :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }"
                     :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
@@ -48,6 +50,7 @@
                     <template v-if="!item.isEdit">
                         <fields-done
                             :item="item"
+                            :basic-info-type="basicInfoType"
                             :fields="basicInfomation.table_fields"
                             :basic-infomation="basicInfomation">
                         </fields-done>
@@ -113,6 +116,18 @@
             },
             openFunction: function () {
                 return this.$store.state.openFunction
+            },
+            tableFields () {
+                const list = []
+                const fields = this.basicInfomation.table_fields
+                fields.forEach(ite => {
+                    if (!this.basicInfoType.includes(ite.type)) {
+                        list.push(ite)
+                    } else {
+                        list.unshift(ite)
+                    }
+                })
+                return list
             }
         },
         watch: {

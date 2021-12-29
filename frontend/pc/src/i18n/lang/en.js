@@ -2411,5 +2411,9 @@ export const m = {
     '流程详情': 'Details',
     '取消回复': 'Cancel the reply',
     '内部评论': 'Inside Comment',
-    '外部评论': 'Public Comment'
+    '外部评论': 'Public Comment',
+    '星级': 'star',
+    '评价人': 'appraiser',
+    '评价时间': 'Evaluation of time',
+    '评价内容': 'Evaluation content'
 }
