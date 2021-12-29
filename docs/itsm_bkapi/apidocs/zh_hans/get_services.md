@@ -13,7 +13,7 @@
 | catalog_id   | int    | 否   | 服务目录id，可在`服务目录查询`接口中`data["id"]`字段获取 |
 | service_type | string | 否   | 服务类型：change(变更)，event(事件)，request(请求)，question(问题)  |
 | display_type | string | 否   | 可见范围类型：GENERAL(通用角色表)，组织架构(ORGANIZATION)，第三方系统(API)  |
-| display_role | string | 否   | 可见范围: display_type是GENERAL/ORGANIZATION时为角色ID，第三方系统为系统唯一标识   |
+| display_role | string | 否   | 可见范围: display_type是ORGANIZATION时为角色ID，GENERAL/API时为系统唯一标识   |
 
 ### 请求参数示例
 
@@ -24,7 +24,8 @@
     "bk_token": "xxxx",
     "catalog_id": 12,
     "service_type": "request",
-    "display_type": "IAM"
+    "display_type": "GENERAL",
+    "display_role": "GENERAL_8"
 }
 ```
 
