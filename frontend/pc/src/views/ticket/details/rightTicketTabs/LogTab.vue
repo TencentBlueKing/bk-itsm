@@ -136,7 +136,8 @@
                 })
             },
             getTicktComment () {
-                this.$store.dispatch('ticket/getTicktComment', 202).then(res => {
+                if (this.ticketInfo.is_over) return
+                this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then(res => {
                     this.commentInfo = res.data
                 })
             },
