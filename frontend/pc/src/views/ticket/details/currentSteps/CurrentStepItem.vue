@@ -429,7 +429,7 @@
             },
             nodeAutoPass () {
                 if (this.ticketInfo.hasOwnProperty('is_auto_approve') && this.nodeInfo.type === 'APPROVAL') {
-                    return this.ticketInfo.is_auto_approve && window.username === this.ticketInfo.creator.split('(')[0] && this.nodeInfo.tasks.some(item => item.processors === this.ticketInfo.creator)
+                    return this.ticketInfo.is_auto_approve && window.username === this.ticketInfo.creator.split('(')[0] && this.nodeInfo.tasks.some(item => item.processor === this.ticketInfo.creator)
                 }
                 return false
             },
@@ -588,7 +588,9 @@
             },
             // 展开收起
             closeUnflod (e) {
-                if (this.nodeAutoPass()) return
+                if (this.nodeAutoPass()) {
+                    return
+                }
                 // 禁止冒泡
                 if (e.target.className.indexOf('bk-processor-check') === -1) {
                     if (!this.nodeInfo.can_operate && !this.currSignProcessorInfo) {
