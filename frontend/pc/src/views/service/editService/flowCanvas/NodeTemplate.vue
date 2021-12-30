@@ -202,7 +202,6 @@
             },
             // 右键事件
             rightClickNode (node, event) {
-                console.log(node)
                 if (!node) {
                     return
                 }
@@ -240,7 +239,6 @@
                     // 获取当前节点的输出连线
                     const lineList = this.canvasData.lines.filter(item => item.source.id === node.id)
                     const xValue = (node.type === 'NORMAL' || node.type === 'TASK') ? 310 : 210
-                    console.log(lineList, xValue)
                     // 节点前后id值
                     const params = {
                         workflow: node.nodeInfo.workflow,
