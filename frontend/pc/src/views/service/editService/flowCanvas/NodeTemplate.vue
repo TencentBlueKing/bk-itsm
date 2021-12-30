@@ -202,6 +202,7 @@
             },
             // 右键事件
             rightClickNode (node, event) {
+                console.log(node)
                 if (!node) {
                     return
                 }
@@ -239,6 +240,7 @@
                     // 获取当前节点的输出连线
                     const lineList = this.canvasData.lines.filter(item => item.source.id === node.id)
                     const xValue = (node.type === 'NORMAL' || node.type === 'TASK') ? 310 : 210
+                    console.log(lineList, xValue)
                     // 节点前后id值
                     const params = {
                         workflow: node.nodeInfo.workflow,
@@ -262,7 +264,7 @@
                             nodeInfo: res.data
                         }
                         this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
+                        this.$emit('updateNode', this.valueInfo, value.type)
                         this.addNewLine(node, res.data.id)
                     }).catch(res => {
                         this.$bkMessage({
@@ -278,15 +280,15 @@
                     this.$store.dispatch('deployCommon/copyNode', id).then((res) => {
                         this.valueInfo.node = {
                             id: 'node_' + res.data.id,
-                            x: res.data.axis.x,
-                            y: res.data.axis.y,
+                            x: res.data.axis.x - 250,
+                            y: res.data.axis.y + 100, // 复制后新节点的处于原节点下100px
                             type: res.data.type,
                             name: res.data.name,
                             showMore: false,
                             nodeInfo: res.data
                         }
                         this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
+                        this.$emit('updateNode', this.valueInfo, value.type)
                         // this.addNewLine(node, res.data.id)
                     }).catch(res => {
                         this.$bkMessage({
