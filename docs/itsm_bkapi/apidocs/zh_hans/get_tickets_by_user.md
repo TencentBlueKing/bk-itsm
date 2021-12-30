@@ -13,6 +13,7 @@
 | user           | string | 是   | 根据用户名来过滤，格式为用户英文id                           |
 | view_type      | string | 是   | 根据工单类型来过滤                                           |
 | catalog_id     | int    | 否   | 根据服务目录id来过滤                                           |
+| service_id     | int    | 否   | 根据服务id来过滤                                           |
 | create_at__gte | string | 否   | 创建时间大于或等于，格式："YYYY-MM-DD hh:mm:ss"              |
 | create_at__lte | string | 否   | 创建时间小于或等于，格式："YYYY-MM-DD hh:mm:ss"，如要使用该过滤条件，请同时配置create_at_lte和create_at_gte两个参数 |
 | page           | int    | 否   | 请求页码，默认为1                                            |
@@ -27,7 +28,7 @@
 | my_history   | 用户的历史单据         |
 | my_approval  | 用户的待审批单据       |
 | my_attention | 用户关注的单据         |
-| my_dealt     | 用户需要处理的单据 |
+| my_dealt     | 用户拥有查看权限的单据 |
 
 ### 请求参数示例
 
