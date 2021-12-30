@@ -770,8 +770,10 @@ class Status(Model):
         return get_department_info(department_id).get("name", "")
 
     def get_appover_key_value(self, code_key):
-        code = code_key["NODE_APPROVER"]
+        code = code_key.get("NODE_APPROVER", None)
         key_value = {}
+        if code is None:
+            return key_value
         sign_tasks = SignTask.objects.filter(status_id=self.id)
         processors = []
         for sign_task in sign_tasks:
