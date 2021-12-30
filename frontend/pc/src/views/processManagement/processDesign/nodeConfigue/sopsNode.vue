@@ -23,7 +23,7 @@
 <template>
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'">
+            <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'" form-type="vertical">
                 <bk-form-item data-test-id="sopsNode-select-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
                     <bk-input
                         :ext-cls="'bk-form-width'"
@@ -114,9 +114,11 @@
                 </bk-form-item>
             </bk-form>
         </basic-card>
-        <basic-card class="mt20"
-            :card-label="$t(`m.treeinfo['输入参数']`)"
-            :card-desc="$t(`m.treeinfo['调用该API需要传递的参数信息']`)">
+        <basic-card>
+            <div class="sops-params-title">
+                <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
+                <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
+            </div>
             <div class="bk-param" v-bkloading="{ isLoading: sopsFormLoading }">
                 <sops-get-param
                     v-if="constants.length !== 0"
@@ -134,30 +136,30 @@
                     @onChangeHook="onChangeHook">
                 </sops-get-param>
                 <no-data v-else></no-data>
+                <common-trigger-list :origin="'state'"
+                    :node-type="configur.type"
+                    :source-id="flowInfo.id"
+                    :sender="configur.id"
+                    :table="flowInfo.table">
+                </common-trigger-list>
+                <div class="mt20" style="font-size: 0">
+                    <bk-button :theme="'primary'"
+                        data-test-id="sopsNode-button-submit"
+                        :title="$t(`m.treeinfo['确定']`)"
+                        class="mr10"
+                        @click="submit">
+                        {{$t(`m.treeinfo['确定']`)}}
+                    </bk-button>
+                    <bk-button :theme="'default'"
+                        data-test-id="sopsNode-button-close"
+                        :title="$t(`m.treeinfo['取消']`)"
+                        class="mr10"
+                        @click="closeNode">
+                        {{$t(`m.treeinfo['取消']`)}}
+                    </bk-button>
+                </div>
             </div>
         </basic-card>
-        <common-trigger-list :origin="'state'"
-            :node-type="configur.type"
-            :source-id="flowInfo.id"
-            :sender="configur.id"
-            :table="flowInfo.table">
-        </common-trigger-list>
-        <div class="mt20" style="font-size: 0">
-            <bk-button :theme="'primary'"
-                data-test-id="sopsNode-button-submit"
-                :title="$t(`m.treeinfo['确定']`)"
-                class="mr10"
-                @click="submit">
-                {{$t(`m.treeinfo['确定']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="sopsNode-button-close"
-                :title="$t(`m.treeinfo['取消']`)"
-                class="mr10"
-                @click="closeNode">
-                {{$t(`m.treeinfo['取消']`)}}
-            </bk-button>
-        </div>
     </div>
 </template>
 <script>
@@ -650,6 +652,26 @@
         background-color: #FAFBFD;
         overflow: auto;
         @include scroller;
+        /deep/ .common-section-card-label {
+            display: none;
+        }
+        /deep/ .common-section-card-body {
+            padding: 20px;
+        }
+        /deep/ .bk-form-width {
+            width: 480px;
+        }
+        .sops-params-title {
+            font-size: 14px;
+            p:nth-child(1) {
+                color: #63656e;
+                margin-bottom: 4px;
+            }
+            p:nth-child(2) {
+                font-size: 12px;
+                color: #929397;
+            }
+        }
     }
     .bk-basic-info {
         padding-bottom: 20px;
@@ -658,7 +680,7 @@
     }
 
     .bk-form-width {
-        width: 328px;
+        width: 480px;
     }
     .bk-form-display {
         float: left;

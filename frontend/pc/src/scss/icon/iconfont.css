@@ -836,3 +836,12 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-jiantou_zuoyouqiehuan:before {
 	content: "\e21b";
 }
+.icon-xiangzuo1:before {
+	content: "\e21c";
+}
+.icon-xiangyou1:before {
+	content: "\e21d";
+}
+.icon-jia-2:before {
+	content: "\e21e";
+}

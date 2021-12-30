@@ -23,16 +23,23 @@
 <template>
     <div class="bk-tree-info" @click="hidden">
         <div class="bk-tree-content" v-bkloading="{ isLoading: isTreeLoading }">
-            <div class="bk-tree-search">
-                <bk-input
-                    data-test-id="directory-input-search"
-                    :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
-                    :clearable="true"
-                    :right-icon="'bk-icon icon-search'"
-                    v-model="searchWord"
-                    @enter="searchInfo"
-                    @clear="clearInfo">
-                </bk-input>
+            <div style="overflow: hidden">
+                <div class="bk-tree-addService">
+                    <span>服务目录</span>
+                    <i class="bk-itsm-icon icon-jia-2" @click="openAdd"></i>
+                </div>
+                <div class="bk-tree-search">
+                    <bk-input
+                        class="bk-tree-input"
+                        data-test-id="directory-input-search"
+                        :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
+                        :clearable="true"
+                        :right-icon="'bk-icon icon-search'"
+                        v-model="searchWord"
+                        @enter="searchInfo"
+                        @clear="clearInfo">
+                    </bk-input>
+                </div>
             </div>
             <div class="bk-tree-div" id="treeOther">
                 <div ref="treeTree">
@@ -86,7 +93,49 @@
             </div>
         </div>
         <!-- 新增条目 -->
-        <div class="bk-add-data">
+        <bk-dialog
+            width="480"
+            :value.sync="addDirectory.show"
+            :title="addDirectory.title"
+            :mask-close="false"
+            @confirm="submitAdd"
+            @cancel="toggleDialog">
+            <bk-form
+                :label-width="200"
+                form-type="vertical"
+                :model="addDirectory.formInfo"
+                :rules="rules"
+                ref="dynamicForm">
+                <bk-form-item
+                    v-if="addDirectory.formInfo.parent__id !== 1"
+                    :label="$t(`m.serviceConfig['父级目录']`)"
+                    :required="true">
+                    <bk-input disabled
+                        v-model.trim="addDirectory.formInfo.parent___name">
+                    </bk-input>
+                </bk-form-item>
+                <bk-form-item
+                    :label="$t(`m.serviceConfig['目录名称']`)"
+                    :required="true"
+                    :property="'name'">
+                    <bk-input v-model.trim="addDirectory.formInfo.name"
+                        maxlength="120"
+                        :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
+                    </bk-input>
+                </bk-form-item>
+                <bk-form-item
+                    :label="$t(`m.serviceConfig['目录描述']`)">
+                    <bk-input
+                        :placeholder="$t(`m.serviceConfig['请输入目录描述']`)"
+                        :type="'textarea'"
+                        :rows="3"
+                        :maxlength="255"
+                        v-model="addDirectory.formInfo.desc">
+                    </bk-input>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
+        <!-- <div class="bk-add-data">
             <bk-sideslider
                 :is-show.sync="addDirectory.show"
                 :title="addDirectory.title"
@@ -143,7 +192,7 @@
                     </div>
                 </div>
             </bk-sideslider>
-        </div>
+        </div> -->
     </div>
 </template>
 <script>
@@ -234,6 +283,7 @@
             },
             // 点击节点方法
             nodeClick (node) {
+                console.log(node, '节点方法')
                 this.treeInfo.node = node
                 this.$store.commit('serviceCatalog/changeTreeOperat', false)
             },
@@ -340,11 +390,12 @@
             },
             toggleDialog (optType) {
                 if (optType === 'add') {
-                    this.addDirectory.title = this.$t('m.serviceConfig["新增目录"]')
+                    this.addDirectory.title = this.$t('m.serviceConfig["新增服务目录"]')
                 } else if (optType === 'update') {
-                    this.addDirectory.title = this.$t('m.serviceConfig["编辑目录"]')
+                    this.addDirectory.title = this.$t('m.serviceConfig["编辑服务目录"]')
                 }
                 this.addDirectory.show = !this.addDirectory.show
+                this.$refs.dynamicForm.clearError()
             },
             submitAdd () {
                 this.$refs.dynamicForm.validate().then(validator => {
@@ -505,6 +556,7 @@
     @import '../../../scss/mixins/scroller.scss';
 
     .bk-tree-info {
+        // overflow: hidden;
         height: 100%;
         .bk-tree-div {
             height: calc(100% - 56px);
@@ -521,10 +573,30 @@
         .bk-tree-search {
             padding: 0 10px;
             margin-bottom: 20px;
+            // .bk-tree-input {
+            //     display: none;
+            // }
         }
         .bk-tree-class {
             color: #737987;
             padding: 0 10px;
+        }
+        .bk-tree-addService {
+            height: 20px;
+            padding: 0 10px;
+            margin: 14px 0;
+            line-height: 20px;
+            font-size: 12px;
+            color: #979ba5;
+            span {
+                float: left;
+            }
+            i {
+                margin: 5px 5px 2px 2px;
+                float: right;
+                font-size: 12px;
+                cursor: pointer;
+            }
         }
     }
 

@@ -26,25 +26,34 @@
             <div class="bk-basic-form">
                 <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li v-for="item in basicInfomationList" :key="item.name">
-                        <span class="bk-info-title">{{ item.name }} :</span>
-                        <span class="bk-info-content">{{ item.value || '--'}}</span>
+                        <span class="bk-info-title">{{ item.name }}:</span>
+                        <span v-if="item.type === 'STRING'" class="bk-info-content">{{ item.value || '--'}}</span>
+                        <div v-else class="bk-itsm-icon icon-basic-info">
+                            <div class="show">
+
+                            </div>
+                        </div>
+                        <!-- <fields-done
+                            v-else
+                            :item="item"
+                            :is-show-name="false"
+                            :fields="basicInfomation.table_fields"
+                            :basic-infomation="basicInfomation">
+                        </fields-done> -->
                     </li>
                 </ul>
             </div>
-        </div>
-        <!-- v-if="showMore" -->
-        <div v-if="displayMoreIcon" class="more-content-btn" @click="changeShow">
-            {{ showMore ? $t('m.newCommon["收起"]') : $t('m.user["更多"]') }}
-            <i class="bk-icon icon-angle-down" v-if="!showMore"></i>
-            <i class="bk-icon icon-angle-up" v-else></i>
         </div>
     </div>
 </template>
 
 <script>
-
+    // import fieldsDone from './components/fieldsDone.vue'
     export default {
         name: 'BasicInformation',
+        components: {
+            // fieldsDone
+        },
         props: {
             basicInfomation: {
                 type: Object,
@@ -110,16 +119,13 @@
             tableFields () {
                 const { service_type_name, sn, catalog_fullname, service_name } = this.basicInfomation
                 const list = [
-                    { name: '工单类型', value: service_type_name },
-                    { name: '单号', value: sn },
-                    { name: '服务目录', value: catalog_fullname + '>' + service_name },
-                    { name: '关联业务', value: service_name }
+                    { name: '工单类型', value: service_type_name, type: 'STRING' },
+                    { name: '单号', value: sn, type: 'STRING' },
+                    { name: '服务目录', value: catalog_fullname + '>' + service_name, type: 'STRING' },
+                    { name: '关联业务', value: service_name, type: 'STRING' }
                 ]
                 const fields = this.firstStateFields.map(item => {
-                    return {
-                        name: item.name,
-                        value: item.display_value
-                    }
+                    return item
                 })
                 this.basicInfomationList = fields.concat(list)
             }
@@ -135,7 +141,7 @@
         &.fold {
             .bk-basic-info {
                 max-height: 300px;
-                overflow: hidden;
+                // overflow: hidden;
             }
         }
         &.has-more-icon {
@@ -166,6 +172,24 @@
             text-overflow: ellipsis;
             padding-right: 10px;
             @include clearfix;
+            .icon-basic-info {
+                display: inline-block;
+                position: relative;
+                &:hover {
+                    .show {
+                        display: block;
+                    }
+                }
+                .show {
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background-color: blue;
+                    width: 300px;
+                    height: 200px;
+                }
+            }
         }
 
         .ul-no-border {

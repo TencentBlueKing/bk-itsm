@@ -22,6 +22,7 @@
 
 <template>
     <div class="bk-field-info mb20">
+        <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
         <div class="bk-node-btn">
             <bk-button
                 data-test-id="fieldConfig-button-addField"
@@ -227,6 +228,12 @@
                 type: Object,
                 default () {
                     return {}
+                }
+            },
+            isShowTitle: {
+                type: Boolean,
+                default () {
+                    return false
                 }
             }
         },
@@ -559,6 +566,12 @@
     .bk-field-info{
         color: #63656E;
         font-size: 14px;
+        .bk-field-title {
+            display: block;
+            height: 22px;
+            margin: 8px 0px;
+            color: #63656e;
+        }
     }
     .bk-node-btn{
         font-size: 0;

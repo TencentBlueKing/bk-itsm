@@ -95,6 +95,7 @@
             text-align: center;
             position: relative;
             &:hover {
+                background-color: #e1ecff;
                 .entry-title {
                     display: block;
                 }

@@ -23,6 +23,7 @@
 <template>
     <div class="bk-add-field" v-bkloading="{ isLoading: isDataLoading }">
         <bk-form
+            class="bk-add-field bk-form-vertical"
             :label-width="200"
             :form-type="formAlign"
             :model="formInfo"
@@ -34,6 +35,7 @@
                     :label="$t(`m.treeinfo['前置节点']`)"
                     :required="true"
                     :property="'prevId'"
+                    :error-display-type="'normal'"
                     :ext-cls="'bk-mt0-item'">
                     <bk-select v-model="formInfo.prevId"
                         searchable>
@@ -51,6 +53,7 @@
                 :label="$t(`m.treeinfo['字段名']`)"
                 :required="true"
                 :property="'name'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-halfline-margin'">
                 <bk-input maxlength="120"
                     v-model="formInfo.name"
@@ -65,6 +68,7 @@
                 :label="$t(`m.treeinfo['唯一标识']`)"
                 :required="true"
                 :property="'key'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item'">
                 <bk-input
                     v-model="formInfo.key"
@@ -77,6 +81,7 @@
                 :label="$t(`m.treeinfo['字段类型']`)"
                 :required="true"
                 :property="'type'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
                 <bk-select v-model="formInfo.type"
                     :clearable="false"
@@ -93,6 +98,7 @@
             <bk-form-item
                 :label="$t(`m.treeinfo['校验方式']`)"
                 :required="true"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-mt20-item'">
                 <bk-select v-model="formInfo.regex"
                     :clearable="false"
@@ -153,6 +159,7 @@
                     :label="$t(`m.treeinfo['正则规则']`)"
                     :required="true"
                     :property="'key'"
+                    :error-display-type="'normal'"
                     :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
                     <bk-input
                         v-model="formInfo.customRegex"
@@ -163,6 +170,7 @@
             </template>
         </bk-form>
         <bk-form :label-width="200"
+            class="bk-form-vertical"
             :form-type="formAlign"
             :model="formInfo"
             ref="dataForm">
@@ -600,12 +608,22 @@
                     customFormStatus: false
                 },
                 // 任务内置字段特殊处理
-                fieldTypeList: []
+                fieldTypeList: [],
+                hiddenConditionStatus: true
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
+            }
+        },
+        watch: {
+            formInfo: {
+                handler (val) {
+                    // const hiddenStatus = val.show_type ? this.hiddenConditionStatus : true
+                    this.$emit('getAddFieldStatus', val.name !== '')
+                },
+                deep: true
             }
         },
         async mounted () {
@@ -1079,6 +1097,7 @@
                 // 隐藏字段值
                 if (this.$refs.hiddenConditions) {
                     if (this.$refs.hiddenConditions.checkList()) {
+                        this.hiddenConditionStatus = false
                         return false
                     }
                     const hiddenList = this.$refs.hiddenConditions.listInfo

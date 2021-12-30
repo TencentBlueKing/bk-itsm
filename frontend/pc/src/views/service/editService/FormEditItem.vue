@@ -23,12 +23,14 @@
 <template>
     <div ref="formEditItem" class="form-edit-item">
         <add-field
+            ref="addField"
             form-align="horizontal"
             :change-info="formData"
             :workflow="workflowId"
             :state="nodeId"
             :auto-selected-type="false"
             @onConfirm="onConfirmClick"
+            @getAddFieldStatus="getAddFieldStatus"
             @onCancel="$emit('onEditCancel')">
         </add-field>
     </div>
@@ -55,16 +57,25 @@
         },
         mounted () {
             this.$refs.formEditItem.scrollIntoView({ block: 'center' })
+            this.$nextTick(function () {
+                console.log(this.$refs.addField)
+            })
         },
         methods: {
             onConfirmClick (form) {
                 this.$emit('onEditConfirm', deepClone(form))
+            },
+            getAddFieldStatus (status) {
+                // console.log(arguments)
+                this.$emit('getAddFieldStatus', status)
             }
         }
     }
 </script>
 <style lang="scss" scoped>
     .form-edit-item {
+        width: 100%;
+        padding: 24px;
         background: #fcfcfc;
         border-top: 1px solid #dde4eb;
         border-bottom: 1px solid #dde4eb;
@@ -79,14 +90,14 @@
     /deep/.bk-add-field {
         & > .bk-form {
             margin: 0 auto;
-            width: 600px;
+            max-width: 600px;
             & > .bk-form-item {
                 & > .bk-label {
-                    width: 150px !important;
+                    width: 100px !important;
                 }
                 & > .bk-form-content {
                     clear: unset;
-                    margin-left: 150px !important;
+                    margin-left: 100px !important;
                 }
             }
             .bk-data-source {

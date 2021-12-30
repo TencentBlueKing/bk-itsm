@@ -21,12 +21,12 @@
   -->
 
 <template>
-    <div class="service-form">
+    <div class="service-ticket-form">
         <div v-if="formList.length" class="form-list">
             <bk-form form-type="vertical">
                 <draggable
                     data-test-id="service_draggable_serviceFormDrag"
-                    handle=".form-view-item"
+                    handle=".hhh"
                     :value="formList"
                     :group="{
                         name: 'view-form',
@@ -44,6 +44,7 @@
                             :node-id="nodeId"
                             :fields="forms"
                             :row-forms="form"
+                            :add-field-status="addFieldStatus"
                             :crt-form="crtForm"
                             @onHalfRowDragToHalfRow="onHalfRowDragToHalfRow"
                             @onFormEditClick="onFormEditClick"
@@ -54,7 +55,7 @@
                         </half-row-form>
                         <!-- 全行表单 -->
                         <template v-else>
-                            <form-edit-item
+                            <!-- <form-edit-item
                                 v-if="form.id === crtForm"
                                 :key="form.id"
                                 :fields="forms"
@@ -63,16 +64,20 @@
                                 :node-id="nodeId"
                                 @onEditCancel="onEditCancel"
                                 @onEditConfirm="onEditConfirm">
-                            </form-edit-item>
+                            </form-edit-item> -->
                             <form-view-item
-                                v-else
                                 :data-id="form.id"
                                 :key="form.id"
                                 :fields="forms"
                                 :form="form"
+                                :add-field-status="addFieldStatus"
+                                :crt-form="crtForm"
                                 @onFormEditClick="onFormEditClick"
                                 @onFormCloneClick="onFormCloneClick"
                                 @onFormDeleteClick="$emit('fieldDelete', $event)">
+                                <div class="hhh" slot="draggable">
+                                    <i class="bk-itsm-icon icon-move-new"></i>
+                                </div>
                             </form-view-item>
                         </template>
                     </template>
@@ -89,7 +94,7 @@
 <script>
     import draggable from 'vuedraggable'
     import HalfRowForm from './HalfRowForm'
-    import FormEditItem from './FormEditItem'
+    // import FormEditItem from './FormEditItem'
     import FormViewItem from './FormViewItem'
 
     export default {
@@ -97,14 +102,15 @@
         components: {
             draggable,
             HalfRowForm,
-            FormEditItem,
+            // FormEditItem,
             FormViewItem
         },
         props: {
             serviceInfo: Object,
             nodeId: Number,
             forms: Array,
-            crtForm: [String, Number]
+            crtForm: [String, Number],
+            addFieldStatus: Boolean
         },
         data () {
             return {
@@ -115,6 +121,9 @@
             forms (val) {
                 this.formList = this.transFieldsToDraggable(val)
             }
+        },
+        mounted () {
+            console.log(this.$attrs)
         },
         methods: {
             // 将字段列表转换为拖拽组件所需格式
@@ -190,10 +199,7 @@
             },
             // 切换为字段编辑
             onFormEditClick (form) {
-                if (this.crtForm) {
-                    return
-                }
-                this.$emit('update:crtForm', form.id)
+                this.$emit('onFormEditClick', form)
             },
             // 字段克隆
             onFormCloneClick (form) {
@@ -232,10 +238,10 @@
     }
 </script>
 <style lang='scss' scoped>
-.service-form {
-    margin-top: 16px;
+.service-ticket-form {
+    // margin-top: 16px;
     position: relative;
-    padding: 20px 0;
+    // padding: 20px 40px;
     background: #ffffff;
     box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
     min-height: 207px;
@@ -254,6 +260,10 @@
             font-size: 12px;
             color: #979ba5;
         }
+    }
+    .hhh {
+        // width: 36px;
+        // height: 100%;
     }
 }
 </style>
