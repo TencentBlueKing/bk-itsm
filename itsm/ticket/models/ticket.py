@@ -3503,9 +3503,11 @@ class Ticket(Model, BaseTicket):
         self.update_ticket_status(fields, operator)
 
         # Create sign task
-        task = SignTask.objects.get(status_id=node_status.id, processor=operator)
-        task.status = "RUNNING"
-        task.save()
+        task, result = SignTask.objects.update_or_create(
+            status_id=node_status.id,
+            processor=operator,
+            defaults={"status": "RUNNING"},
+        )
         # Create task fields
         task_field_objs = []
         field_map = {}
