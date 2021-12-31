@@ -26,7 +26,7 @@
             <div style="overflow: hidden">
                 <div class="bk-tree-addService">
                     <span>服务目录</span>
-                    <i class="bk-itsm-icon icon-jia-2" @click="openAdd"></i>
+                    <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
                 </div>
                 <div class="bk-tree-search">
                     <bk-input
@@ -283,7 +283,7 @@
             },
             // 点击节点方法
             nodeClick (node) {
-                console.log(node, '节点方法')
+                console.log(node)
                 this.treeInfo.node = node
                 this.$store.commit('serviceCatalog/changeTreeOperat', false)
             },
@@ -357,7 +357,7 @@
                 this.$refs.tree5.searchNode(this.searchWord)
             },
             // 新增目录
-            openAdd () {
+            openAdd (catalog) {
                 if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
@@ -382,7 +382,7 @@
                 this.toggleDialog('add')
                 this.addDirectory.optType = 'add'
                 this.addDirectory.formInfo = {
-                    parent__id: this.treeInfo.node.id,
+                    parent__id: catalog === 'root' ? 1 : this.treeInfo.node.id,
                     parent___name: this.treeInfo.node.name,
                     name: '',
                     desc: ''

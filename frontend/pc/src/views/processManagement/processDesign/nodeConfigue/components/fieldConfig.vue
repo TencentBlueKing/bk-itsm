@@ -46,8 +46,10 @@
                 data-test-id="fieldConfig-button-previewField"
                 :title="$t(`m.treeinfo['字段预览']`)"
                 class="mr10"
+                style="float: right; border: 0"
                 :disabled="!showTabList.length"
                 @click="previewField">
+                <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
                 {{$t(`m.treeinfo['字段预览']`)}}
             </bk-button>
         </div>

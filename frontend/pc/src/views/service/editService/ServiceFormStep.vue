@@ -23,7 +23,7 @@
 <template>
     <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
         <!-- 字段选择 -->
-        <div :class="['field-option', isShowField ? 'field-hide' : '']">
+        <div v-if="showFieldOption" :class="['field-option', isShowField ? 'field-hide' : '']">
             <div style="overflow: hidden">
                 <div class="field-type">字段类型</div>
                 <div class="show-field" @click="handleShowField">
@@ -51,7 +51,7 @@
         <div class="basic-body">
             <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
                 <!-- 选择服务模板1 -->
-                <div class="service-template">
+                <div class="service-template" v-if="showFieldOption">
                     <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
                         :key="index"
                         data-test-id="servie_section_QuicklyCreateForm"
@@ -101,6 +101,7 @@
                 </div>
             </section>
         </div>
+        <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
         <div class="edit-service-field" v-show="isShowRightEdit">
             <div class="edit-service-title">字段属性</div>
             <div class="edit-service-forms">
@@ -221,7 +222,14 @@
                 serviceTemplateDisable: false,
                 isShowField: false,
                 isShowRightEdit: false,
-                addFieldStatus: true
+                addFieldStatus: true,
+                dragLine: {
+                    base: 0,
+                    move: 0,
+                    startX: null,
+                    maxLength: 0,
+                    canMove: false
+                }
             }
         },
         computed: {
@@ -257,9 +265,36 @@
                 this.getCreateTicketNodeForm()
                 this.getCreateTicketNodeDetail()
             }
-            console.log(this.isBasicFormEditting)
         },
         methods: {
+            handleDragLine (e) {
+                document.addEventListener('mouseup', this.handleMouseUp, false)
+                document.addEventListener('mousemove', this.handleLineMouseMove, false)
+                const el = document.querySelector('.edit-service-field')
+                this.dragLine.maxLength = el.clientWidth
+                this.dragLine.startX = e.pageX
+                this.dragLine.canMove = true
+            },
+            handleMouseUp (e) {
+                document.removeEventListener('mouseup', this.handleMouseUp, false)
+                document.removeEventListener('mousemove', this.handleLineMouseMove, false)
+                this.dragLine.base = this.dragLine.move
+                this.dragLine.canMove = false
+            },
+            handleLineMouseMove (e) {
+                if (!this.dragLine.canMove) return
+                const el = document.querySelector('.edit-service-field')
+                const { startX, base } = this.dragLine
+                const offsetX = e.pageX - startX
+                // console.log(offsetX)
+                const moveX = base + offsetX
+                console.log(600 - moveX)
+                if (offsetX > 0 && 600 - moveX <= 300) return
+                window.requestAnimationFrame(() => {
+                    this.dragLine.move = moveX
+                    el.style.width = `calc(600px - ${moveX}px)`
+                })
+            },
             onFormEditClick (form) {
                 this.isShowRightEdit = true
                 this.crtForm = form.id
@@ -751,6 +786,16 @@
         height: calc(100vh - 225px);
         overflow: auto;
         @include scroller;
+    }
+    .drag-line {
+        width: 2px;
+        height: 100%;
+        background-color: #fff;
+        &:hover {
+            width: 4px;
+            background-color: saddlebrown;
+            cursor: col-resize;
+        }
     }
     .edit-service-field {
         width: 600px;
