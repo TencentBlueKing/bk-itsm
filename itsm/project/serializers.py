@@ -30,8 +30,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from itsm.auth_iam.utils import IamRequest
-from itsm.component.constants import CATALOG
-from itsm.project.models import Project, ProjectSettings
+from itsm.component.constants import CATALOG, FIRST_ORDER
+from itsm.project.models import Project, ProjectSettings, CostomTab
 
 project_name_pattern = re.compile("^[0-9a-zA-Z_-]{1,}$")
 
@@ -130,3 +130,23 @@ class ProjectMigrateSerializer(serializers.Serializer):
     resource_id = serializers.IntegerField(required=True)
     old_project_key = serializers.CharField(required=True)
     new_project_key = serializers.CharField(required=True)
+
+
+class CostomTabSerializer(serializers.ModelSerializer):
+    # 自定义单据序列化
+    conditions = serializers.JSONField(required=False)
+    
+    class Meta:
+        model = CostomTab
+        fields = ("id", "name", "desc", "project_key", "conditions", "order")
+
+    def create(self, validated_data):
+        # 1.获取当前项目key
+        project_key = validated_data.get("project_key", "")
+        # 2.获取当前项目下的tab数量
+        order = CostomTab.objects.filter(
+            project_key=project_key, is_deleted=False
+        ).count()
+        # 3.当前新增的tab序号为tab数量+1
+        validated_data["order"] = order + FIRST_ORDER
+        return super(CostomTabSerializer, self).create(validated_data)
