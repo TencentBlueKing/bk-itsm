@@ -341,7 +341,6 @@
 
                     // 处理信息
                     this.dealFields = res.data.fields.operate_fields.filter(item => !this.specialFieldTypes.includes(item.type))
-                    console.log(this.dealFields)
                     this.dealFields.forEach(item => {
                         if (item.type === 'CASCADE') {
                             item.type = 'SELECT'
