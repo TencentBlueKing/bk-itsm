@@ -220,7 +220,7 @@
                 }
             },
             fieldType () {
-                return this.basicInfoType.includes(this.item.type)
+                return this.basicInfoType ? this.basicInfoType.includes(this.item.type) : []
             }
         },
         created () {
