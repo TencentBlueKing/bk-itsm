@@ -28,7 +28,7 @@
             <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
                 <tree-info :tree-info="treeInfo"></tree-info>
                 <div class="hidden-tree" @click="hiddenTree">
-                    <i class="bk-itsm-icon icon-arrow-right"></i>
+                    <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
                 </div>
             </div>
             <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
@@ -729,6 +729,7 @@
             height: 61px;
             line-height: 61px;
             background-color: #dcdee5;
+            cursor: pointer;
             color: #ffffff;
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
@@ -740,6 +741,9 @@
         float: left;
         transition: width 0.5s ease-in;
         width: calc(100% - 288px);
+        /deep/ .bk-table-body-wrapper {
+            background: #ffffff;
+        }
     }
     .bk-only-btn {
         padding: 12px 0;

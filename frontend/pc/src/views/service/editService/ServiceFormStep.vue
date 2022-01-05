@@ -51,15 +51,7 @@
         <div class="basic-body">
             <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
                 <!-- 选择服务模板1 -->
-                <div class="service-template" v-if="showFieldOption">
-                    <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
-                        :key="index"
-                        data-test-id="servie_section_QuicklyCreateForm"
-                        @click="onCreateFormWayCLick(way)">
-                        <i class="bk-itsm-icon icon-it-new-globalview"></i>
-                        <span>{{way.name}}</span>
-                    </div>
-                </div>
+                
                 <!-- 选择服务模板 2-->
                 <ul class="create-way" v-if="!showFieldOption">
                     <li class="create-way-item" v-for="way in serviceFormCreateWays" :key="way.key">
@@ -84,6 +76,15 @@
                     </li>
                 </ul>
                 <div v-else class="create-service-form" v-bkloading="{ isLoading: formLoading }">
+                    <div class="service-template" v-if="showFieldOption">
+                        <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
+                            :key="index"
+                            data-test-id="servie_section_QuicklyCreateForm"
+                            @click="onCreateFormWayCLick(way)">
+                            <i class="bk-itsm-icon icon-it-new-globalview"></i>
+                            <span>{{way.name}}</span>
+                        </div>
+                    </div>
                     <ServiceForm
                         ref="serviceForm"
                         :add-field-status="addFieldStatus"
@@ -692,7 +693,7 @@
         cursor: pointer;
         font-weight: normal;
         &:hover {
-            color: #3A84FF;
+            color: #3a84ff;
             background: #f4f6fa;
         }
     }
@@ -792,8 +793,8 @@
         height: 100%;
         background-color: #fff;
         &:hover {
-            width: 4px;
-            background-color: saddlebrown;
+            // width: px;
+            background-color: #3a84ff;
             cursor: col-resize;
         }
     }

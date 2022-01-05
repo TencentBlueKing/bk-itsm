@@ -408,6 +408,7 @@
     .first-level, .second-level {
         float: left;
         height: 32px;
+        margin-top: 10px;
     }
     .person-vertical {
         .first-level, .second-level {
