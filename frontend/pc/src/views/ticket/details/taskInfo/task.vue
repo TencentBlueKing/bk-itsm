@@ -217,6 +217,7 @@
         </div>
         <bk-sideslider
             :is-show.sync="taskInfo.show"
+            :quick-close="true"
             :title="taskInfo.title"
             :width="taskInfo.width">
             <div slot="content"
@@ -231,6 +232,7 @@
             </div>
         </bk-sideslider>
         <bk-sideslider
+            :quick-close="true"
             :is-show.sync="dealTaskInfo.show"
             :width="dealTaskInfo.width">
             <div slot="header">
@@ -252,6 +254,7 @@
         <bk-sideslider
             :is-show.sync="libraryInfo.show"
             :title="libraryInfo.title"
+            :quick-close="true"
             :width="libraryInfo.width">
             <div slot="content"
                 v-bkloading="{ isLoading: libraryInfo.loading }">
