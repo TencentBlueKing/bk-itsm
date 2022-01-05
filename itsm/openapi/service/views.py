@@ -30,6 +30,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from blueapps.account.decorators import login_exempt
+
+from itsm.component.decorators import custom_apigw_required
 from itsm.component.utils.basic import dotted_name
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
@@ -212,6 +214,7 @@ class ServiceViewSet(ApiGatewayMixin, component_viewsets.AuthModelViewSet):
         return Response()
 
     @action(detail=False, methods=["post"])
+    @custom_apigw_required
     def import_service(self, request):
         data = request.data
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)

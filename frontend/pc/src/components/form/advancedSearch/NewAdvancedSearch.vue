@@ -89,16 +89,14 @@
                             </bk-form-item>
                             <!-- 级联类型 -->
                             <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
-                                <common-cascade
+                                <bk-cascade
                                     style="width: 100%;"
                                     v-model="item.value"
-                                    :options="item.list"
-                                    :iscollect_first="false"
-                                    :iscollect_two="false"
-                                    :isshow-number="false"
-                                    :isactive="true"
-                                    @change="onFormChange($event, item)">
-                                </common-cascade>
+                                    :list="item.list"
+                                    :check-any-level="true"
+                                    clearable
+                                    :ext-popover-cls="'custom-cls'">
+                                </bk-cascade>
                             </bk-form-item>
                             <!-- 人员 -->
                             <bk-form-item :label="item.name" v-if="item.type === 'member'">
@@ -157,7 +155,6 @@
 
 <script>
     import collapseTransition from '../../../utils/collapse-transition'
-    import commonCascade from '../../../views/commonComponent/commonCascade'
     import memberSelect from '../../../views/commonComponent/memberSelect'
     import commonMix from '../../../views/commonMix/common.js'
     import { isEmpty } from '@/utils/util.js'
@@ -166,7 +163,6 @@
         name: 'searchInfo',
         components: {
             collapseTransition,
-            commonCascade,
             memberSelect
         },
         mixins: [commonMix],
@@ -199,11 +195,57 @@
                 immediate: true
             }
         },
-        created () {
+        async created () {
+            await this.getCatalogList()
             this.getTicketHighlight()
+            const query = this.$route.query
+            const queryList = Object.keys(query)
+            const formKey = this.searchForms.map(item => item.key)
+            this.searchForms.forEach(item => {
+                if (queryList.includes(item.key)) {
+                    if (item.type === 'select') {
+                        query[item.key].split(',').map(ite => {
+                            item.value.push(ite)
+                        })
+                    } else if (item.type === 'member') {
+                        item.value.push(query[item.key])
+                    } else if (item.type === 'cascade') {
+                        item.list.map(ite => {
+                            if (ite.id === Number(query[item.key])) {
+                                item.value.push(ite.id)
+                            } else {
+                                ite.children.map(ites => {
+                                    if (ites.id === Number(query[item.key])) {
+                                        item.value.push(ite.id)
+                                        item.value.push(ites.id)
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        item.value = query[item.key]
+                    }
+                }
+            })
+            // 判断url参数有没有搜索字段
+            if (formKey.some(item => queryList.includes(item))) {
+                this.showMore = true
+                this.onSearchClick()
+            }
         },
         methods: {
             // 过滤参数
+            async getCatalogList () {
+                const params = {
+                    show_deleted: true
+                }
+                if (this.$route.query.project_id) {
+                    params.project_key = this.$route.query.project_id
+                }
+                const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
+                const formItem = this.searchForms.find(item => item.key === 'catalog_id')
+                formItem.list = res.data[0] ? res.data[0]['children'] : []
+            },
             getParams () {
                 const params = {}
                 // 过滤条件
@@ -212,7 +254,7 @@
                         continue
                     }
                     if (item.type === 'cascade') { // 服务目录
-                        params[item.key] = item.value[item.value.length - 1].id
+                        params[item.key] = item.value[item.value.length - 1]
                     } else if (item.type === 'datetime') { // 时间
                         if (item.value[0] && item.value[1]) {
                             const gteTime = this.standardTime(item.value[0])

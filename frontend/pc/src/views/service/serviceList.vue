@@ -178,87 +178,141 @@
                                 {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
                             </span>
                         </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务说明']`)" width="200">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
-                        <template slot-scope="props">
-                            <!-- sla -->
-                            <bk-button
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                SLA
-                            </bk-button>
-                            <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
-                            <!-- 编辑 -->
-                            <bk-button
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                {{ $t('m.serviceConfig["编辑"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-else
-                                data-test-id="service_button_editService"
-                                theme="primary"
-                                text
-                                @click="changeEntry(props.row, 'edit')">
-                                {{ $t('m.serviceConfig["编辑"]') }}
-                            </bk-button>
-                            <!-- 删除 -->
-                            <bk-button
-                                data-test-id="service_button_deleteService1"
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                {{ $t('m.serviceConfig["删除"]') }}
-                            </bk-button>
-                            <template v-else-if="!!props.row.bounded_catalogs[0]">
-                                <bk-popover placement="top">
+                    </template>
+                </bk-table-column>
+                <!-- <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
+                    <template slot-scope="props">
+                        <span class="bk-lable-primary"
+                            @click="processShow(props.row)"
+                            :title="props.row.workflow_name + '(' + props.row.version_number + ')'">
+                            {{ props.row.workflow_name }} ({{ props.row.version_number }})
+                        </span>
+                    </template>
+                </bk-table-column> -->
+                <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
+                    <template slot-scope="props">
+                        <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>
+                    </template>
+                </bk-table-column>
+
+                <bk-table-column :label="$t(`m.common['创建人']`)">
+                    <template slot-scope="props">
+                        <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t(`m.common['更新人']`)">
+                    <template slot-scope="props">
+                        <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
+                    </template>
+                </bk-table-column>
+
+                <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" min-width="150">
+                    <template slot-scope="props">
+                        <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
+                    <template slot-scope="props">
+                        <span class="bk-status-color"
+                            :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
+                        <span style="margin-left: 5px;"
+                            :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
+                            {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
+                        </span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
+                    <template slot-scope="props">
+                        <!-- sla -->
+                        <bk-button
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                            v-cursor
+                            text
+                            theme="primary"
+                            class="btn-permission-disable"
+                            @click="onServicePermissonCheck(['service_manage'], props.row)">
+                            SLA
+                        </bk-button>
+                        <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
+                        <!-- 编辑 -->
+                        <bk-button
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                            v-cursor
+                            text
+                            theme="primary"
+                            class="btn-permission-disable"
+                            @click="onServicePermissonCheck(['service_manage'], props.row)">
+                            {{ $t('m.serviceConfig["编辑"]') }}
+                        </bk-button>
+                        <bk-button
+                            v-else
+                            data-test-id="service_button_editService"
+                            theme="primary"
+                            text
+                            @click="changeEntry(props.row, 'edit')">
+                            {{ $t('m.serviceConfig["编辑"]') }}
+                        </bk-button>
+                        <!-- 克隆 -->
+                        <bk-button
+                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                            v-cursor
+                            text
+                            theme="primary"
+                            class="btn-permission-disable"
+                            @click="onServicePermissonCheck(['service_manage'], props.row)">
+                            {{ $t('m.serviceConfig["克隆"]') }}
+                        </bk-button>
+                        <bk-button
+                            v-else
+                            data-test-id="service_button_editService"
+                            theme="primary"
+                            text
+                            @click="changeEntry(props.row, 'clone')">
+                            {{ $t('m.serviceConfig["克隆"]') }}
+                        </bk-button>
+                        <bk-popover placement="bottom" theme="light">
+                            <i class="bk-itsm-icon icon-gengduo"></i>
+                            <div slot="content" style="white-space: normal;">
+                                <bk-button
+                                    data-test-id="service_button_deleteService1"
+                                    v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                    v-cursor
+                                    text
+                                    theme="primary"
+                                    class="btn-permission-disable"
+                                    @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                    {{ $t('m.serviceConfig["删除"]') }}
+                                </bk-button>
+                                <template v-else-if="!!props.row.bounded_catalogs[0]">
+                                    <bk-popover placement="top">
+                                        <bk-button
+                                            data-test-id="service_button_deleteService2"
+                                            theme="primary"
+                                            text
+                                            :disabled="!!props.row.bounded_catalogs[0]"
+                                            @click="deleteOne(props.row)">
+                                            {{ $t('m.serviceConfig["删除"]') }}
+                                        </bk-button>
+                                        <div slot="content" style="white-space: normal;">
+                                            <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
+                                        </div>
+                                    </bk-popover>
+                                </template>
+                                <template v-else>
                                     <bk-button
-                                        data-test-id="service_button_deleteService2"
+                                        data-test-id="service_button_deleteService3"
                                         theme="primary"
                                         text
-                                        :disabled="!!props.row.bounded_catalogs[0]"
                                         @click="deleteOne(props.row)">
                                         {{ $t('m.serviceConfig["删除"]') }}
                                     </bk-button>
-                                    <div slot="content" style="white-space: normal;">
-                                        <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
-                                    </div>
-                                </bk-popover>
-                            </template>
-                            <template v-else>
-                                <bk-button
-                                    data-test-id="service_button_deleteService3"
-                                    theme="primary"
-                                    text
-                                    @click="deleteOne(props.row)">
-                                    {{ $t('m.serviceConfig["删除"]') }}
-                                </bk-button>
-                            </template>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
+                                </template>
+                            </div>
+                        </bk-popover>
+                        <!-- 删除 -->
+                    </template>
+                </bk-table-column>
+            </bk-table>
         </div>
         <bk-dialog
             width="800"
@@ -544,7 +598,13 @@
                 }
             },
             // 编辑
-            changeEntry (item, type) {
+            async changeEntry (item, type) {
+                let serviceId = item.id
+                if (type === 'clone') {
+                    // 获取克隆id
+                    const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
+                    serviceId = res.data.id
+                }
                 this.$router.push({
                     name: 'projectServiceEdit',
                     params: {
@@ -552,7 +612,7 @@
                         step: 'basic'
                     },
                     query: {
-                        serviceId: item.id,
+                        serviceId,
                         project_id: this.$store.state.project.id
                     }
                 })

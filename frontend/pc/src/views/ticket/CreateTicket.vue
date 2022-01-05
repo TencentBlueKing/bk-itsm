@@ -701,7 +701,7 @@
     }
 }
 .bottom-group {
-    width: 60%;
+    width: 62.5%;
     margin: 0 auto;
 }
 .save-template-pop {

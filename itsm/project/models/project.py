@@ -115,7 +115,18 @@ class Project(Model):
             )
 
     def init_project_sla(self):
-        Sla.init_sla(Schedule.init_schedule(project_key=self.key), project_key=self.key)
+        schedules = Schedule.init_schedule(project_key=self.key)
+        sla_list = Sla.init_sla(schedules, project_key=self.key)
+        self.grant_instance_permit(schedules)
+        self.grant_instance_permit(sla_list)
+
+    def grant_instance_permit(self, instances):
+        from itsm.auth_iam.utils import grant_instance_creator_related_actions
+
+        for instance in instances:
+            instance.creator = self.creator
+            instance.save()
+            grant_instance_creator_related_actions(instance)
 
     def delete(self, using=None):
         self.is_deleted = True

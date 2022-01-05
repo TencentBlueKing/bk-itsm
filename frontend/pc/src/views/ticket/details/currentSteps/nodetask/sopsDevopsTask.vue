@@ -94,13 +94,15 @@
                 pipelineData: {} // 流水线参数
             }
         },
-        mounted () {
-            this.getRelatedFields()
-            if (this.pipelineConstants.length > 0) {
-                this.pipelineConstants.map(item => {
+        watch: {
+            pipelineConstants (val) {
+                val.map(item => {
                     this.$set(this.pipelineData, item.key, item.value)
                 })
             }
+        },
+        mounted () {
+            this.getRelatedFields()
         },
         methods: {
             async getRelatedFields () {
@@ -141,6 +143,16 @@
                     this.$emit('reloadTicket')
                 })
             },
+            retry (params) {
+                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.newCommon["提交成功"]`),
+                        theme: 'success'
+                    })
+                    this.changeBtn = false
+                    this.$emit('reloadTicket')
+                })
+            },
             submit () {
                 const params = {
                     inputs: {},
@@ -173,42 +185,33 @@
                         exclude_task_nodes_id,
                         template_source
                     }
+                    this.retry(params)
                 } else {
-                    if (!this.$refs.devopsVariable.validate()) return
-                    const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
-                        return {
-                            'value': this.$refs.devopsVariable.model[item],
-                            'name': item,
-                            'key': item
+                    this.$refs.devopsVariable.validate().then(res => {
+                        const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
+                            return {
+                                'value': this.$refs.devopsVariable.model[item],
+                                'name': item,
+                                'key': item
+                            }
+                        })
+                        const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
+                        const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
+                        params.inputs = {
+                            'username': window.username,
+                            project_id,
+                            pipeline_id,
+                            constants
                         }
+                        this.retry(params)
                     })
-                    const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
-                    const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
-                    params.inputs = {
-                        'username': window.username,
-                        project_id,
-                        pipeline_id,
-                        constants
-                    }
                 }
-                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
-                    this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
-                        theme: 'success'
-                    })
-                    this.changeBtn = false
-                    this.$emit('reloadTicket')
-                })
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
-    /deep/ .rf-tag-hook {
-        top: 100px;
-        left: 48px;
-    }
     .sops-form {
         width: 100%;
         min-height: 100px;

@@ -4,7 +4,7 @@
 ---
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/master/LICENSE)
 [![Release](https://img.shields.io/badge/release-3.3.30-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/releases)
-[![codecov](https://codecov.io/gh/TencentBlueKing/bk-itsm/branch/master/graph/badge.svg?token=OMFO8UFA21)](https://codecov.io/gh/TencentBlueKing/bk-itsm)
+[![codecov](https://codecov.io/gh/TencentBlueKing/bk-itsm/branch/v2.6.x_develop/graph/badge.svg?token=OMFO8UFA21)](https://codecov.io/gh/TencentBlueKing/bk-itsm)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/bk-itsm/pulls)
 
 [(English Documents Available)](readme_en.md)
@@ -32,6 +32,7 @@ ITSM (IT 服务管理)是一套帮助企业对 IT 系统的规划、研发、实
 - [开发环境部署](docs/install/dev_deploy.md)
 - [正式环境源码部署](docs/install/source_code_deploy.md)
 - [正式环境上传部署](docs/install/upload_pack_deploy.md)
+- [V2.6.0 -> V2.6.1升级指南](docs/install/V2_6_0_to_V2_6_1_upgrade_guide.md)
 
 
 ## Usage

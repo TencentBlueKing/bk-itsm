@@ -22,14 +22,14 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <template v-if="!ticketInfo.is_over">
-            <div v-if="$store.state.ticket.hasTicketNodeOptAuth" class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+        <div class="ticket-process-content">
+            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
                 :list="list"
                 @select="handleSelect"></bk-timeline>
-        </template>
+        </div>
         <!-- 操作日志详情 sideslider -->
         <ticket-log-detail
             :log-info.sync="dispalyLogInfo"
@@ -38,18 +38,33 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
-        <div v-if="ticketInfo.is_over" class="process-detail">
-            <div class="process-header" @click="isShowDetail = !isShowDetail">
-                <i :class="['bk-itsm-icon', isShowDetail ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
-                <span>{{ $t(`m["流程详情"]`) }}</span>
-            </div>
-            <div v-show="isShowDetail" class="process-content">
+        <div v-if="ticketInfo.is_over && ticketInfo.comment_id !== -1" class="process-detail">
+            <div class="process-content">
                 <img :src="imgUrl" alt="单据结束">
                 <template v-if="!ticketInfo.is_commented">
                     <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
                     <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
                 </template>
-                <p>{{ $t(`m["已完成评价"]`) }}</p>
+                <div v-else>{{ $t(`m["已完成评价"]`) }}
+                    <div class="comment-content">
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["星级"]`) }}:</span>
+                            <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价人"]`) }}:</span>
+                            <p>{{commentInfo.creator}}</p>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价时间"]`) }}:</span>
+                            <p>{{commentInfo.create_at}}</p>
+                        </div>
+                        <div class="comment-content-item">
+                            <span>{{ $t(`m["评价内容"]`) }}:</span>
+                            <p>{{commentInfo.comments}}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -76,11 +91,13 @@
                 loading: false,
                 list: [],
                 isShowDetail: false,
-                imgUrl: require('@/images/orderFinished.png')
+                imgUrl: require('@/images/orderFinished.png'),
+                commentInfo: {}
             }
         },
         created () {
             this.getOperationLogList()
+            this.getTicktComment()
         },
         // 方法集合
         methods: {
@@ -118,6 +135,12 @@
                     this.loading = false
                 })
             },
+            getTicktComment () {
+                if (this.ticketInfo.is_over) return
+                this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then(res => {
+                    this.commentInfo = res.data
+                })
+            },
             handleSelect (item) {
                 const copyItem = JSON.parse(JSON.stringify(item))
                 copyItem.form_data.forEach(form => {
@@ -138,6 +161,7 @@
 </script>
 
 <style lang='scss' scoped>
+@import '../../../../scss/mixins/scroller.scss';
 .ticket-process {
     margin-left: -5px;
     cursor: pointer;
@@ -148,7 +172,12 @@
 }
 .log-list {
     width: 100%;
-    height: 100%;
+    .ticket-process-content {
+        overflow: auto;
+        padding: 5px;
+        height: calc(100vh - 680px);
+        @include scroller;
+    }
 }
 .log-time-line {
     /deep/ {
@@ -201,6 +230,30 @@
         .appraise {
             color: #3a84ff;
             cursor: pointer;
+        }
+        .hide-comment {
+            height: 0;
+        }
+        .comment-content {
+            width: 100%;
+            height: 250px;
+            .comment-content-item {
+                display: flex;
+                margin-top: 5px;
+                padding: 0 45px;
+                span {
+                    width: 70px;
+                    text-align: left;
+                }
+                p {
+                    text-align: left;
+                    font-size: 12px;
+                    flex: 1;
+                    color: #9da0a9;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                }
+            }
         }
     }
 }

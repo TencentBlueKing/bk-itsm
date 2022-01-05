@@ -368,7 +368,10 @@ class FieldSerializer(TemplateFieldSerializer):
         workflow = validated_data["workflow"]
         instance = super(FieldSerializer, self).create(validated_data)
         with transaction.atomic():
-            if state.name == "提单" and validated_data["key"] == "bk_biz_id":
+            if (
+                workflow.first_state.id == state.id
+                and validated_data["key"] == "bk_biz_id"
+            ):
                 workflow.is_biz_needed = True
                 workflow.save()
             instance.state.fields.append(instance.pk)

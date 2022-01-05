@@ -24,35 +24,27 @@
     <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
         <div class="bk-basic-info" ref="basicInfo">
             <div class="bk-basic-form">
-                <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
-                    <li v-for="item in basicInfomationList" :key="item.name">
-                        <span class="bk-info-title">{{ item.name }}:</span>
-                        <span v-if="item.type === 'STRING'" class="bk-info-content">{{ item.value || '--'}}</span>
-                        <div v-else class="bk-itsm-icon icon-basic-info">
-                            <div class="show">
-
-                            </div>
-                        </div>
-                        <!-- <fields-done
-                            v-else
-                            :item="item"
-                            :is-show-name="false"
-                            :fields="basicInfomation.table_fields"
-                            :basic-infomation="basicInfomation">
-                        </fields-done> -->
+                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
+                <!-- <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
+                    <li v-for="item in basicInfomationList" :key="item.name" :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
+                        <span class="bk-info-title" :title="item.name">{{ item.name }} :</span>
+                        <span v-if="basicInfoType.includes(item.type)" class="bk-info-content">{{ item.display_value || '--'}}</span>
+                        <fields-done v-else class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
                     </li>
-                </ul>
+                </ul> -->
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import tableFields from './components/tableFields.vue'
     // import fieldsDone from './components/fieldsDone.vue'
     export default {
         name: 'BasicInformation',
         components: {
-            // fieldsDone
+            // fieldsDone,
+            tableFields
         },
         props: {
             basicInfomation: {
@@ -73,7 +65,8 @@
                 showMore: false,
                 showInfo: true,
                 displayMoreIcon: true,
-                basicInfomationList: []
+                basicInfomationList: [],
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE']
             }
         },
         computed: {
@@ -117,17 +110,26 @@
             },
             // 处理基本信息字段
             tableFields () {
-                const { service_type_name, sn, catalog_fullname, service_name } = this.basicInfomation
+                const tlist = [] // 表单表格类型的字段
+                const { service_type_name, sn, catalog_fullname, service_name, title } = this.basicInfomation
                 const list = [
-                    { name: '工单类型', value: service_type_name, type: 'STRING' },
-                    { name: '单号', value: sn, type: 'STRING' },
-                    { name: '服务目录', value: catalog_fullname + '>' + service_name, type: 'STRING' },
-                    { name: '关联业务', value: service_name, type: 'STRING' }
+                    { name: '标题', display_value: title, type: 'STRING' },
+                    { name: '单号', display_value: sn, type: 'STRING' },
+                    { name: '工单类型', display_value: service_type_name, type: 'STRING' },
+                    { name: '服务目录', display_value: catalog_fullname + '>' + service_name, type: 'STRING' },
+                    { name: '关联服务', display_value: service_name, type: 'STRING' }
                 ]
                 const fields = this.firstStateFields.map(item => {
                     return item
                 })
-                this.basicInfomationList = fields.concat(list)
+                fields.forEach(ite => {
+                    if (!this.basicInfoType.includes(ite.type)) {
+                        tlist.push(ite)
+                    } else {
+                        tlist.unshift(ite)
+                    }
+                })
+                this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'))
             }
         }
     }
@@ -135,13 +137,21 @@
 
 <style scoped lang='scss'>
     @import '../../../scss/mixins/clearfix.scss';
+    @import '../../../scss/mixins/scroller.scss';
+    .show {
+        width: 500px;
+        // margin-top: -10px;
+        overflow: auto;
+        @include scroller;
+    }
     .basic-info-wrap {
         position: relative;
         padding-bottom: 14px;
         &.fold {
             .bk-basic-info {
-                max-height: 300px;
-                // overflow: hidden;
+                max-height: 500px;
+                overflow: auto;
+                @include scroller;
             }
         }
         &.has-more-icon {
@@ -198,11 +208,18 @@
 
         .bk-info-title {
             width: 70px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
             text-align: right;
             float: left;
             color: #979ba5;
         }
-
+        .view-content {
+            padding-left: 10px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
         .bk-info-content {
             word-wrap: break-word;
             padding-left: 10px;

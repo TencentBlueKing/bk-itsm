@@ -845,3 +845,9 @@ url("scss/icon/fonts/commonicon.eot?#iefix") format("embedded-opentype");
 .icon-jia-2:before {
 	content: "\e21e";
 }
+.icon-gengduo:before {
+	content: "\e21f";
+}
+.icon-pinglun:before {
+	content: "\e220";
+}

@@ -24,7 +24,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from django.test import TestCase, override_settings
 
-from itsm.component.drf.exception import ValidationError
 from itsm.component.utils.basic import (
     merge_dict_list,
     get_random_key,
@@ -63,6 +62,8 @@ class TestComponentsUtilsInstance(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_complex_regex_field(self):
+        from rest_framework.exceptions import ValidationError
+
         file_name_validator = ComplexRegexField(
             validate_type=["en", "ch", "num", "special"], special_char="()_ .-"
         )

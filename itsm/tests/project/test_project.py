@@ -22,16 +22,20 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import mock
 from django.test import TestCase, override_settings
 
-from itsm.project.models import ServiceCatalog, ProjectSettings, Project, UserProjectAccessRecord
+from itsm.project.models import (
+    ServiceCatalog,
+    ProjectSettings,
+    Project,
+    UserProjectAccessRecord,
+)
 from itsm.sla.models import Sla
 from itsm.tests.project.params import CREATE_PROJECT_DATA
 
 
 class TestProject(TestCase):
-
     def setUp(self) -> None:
         ProjectSettings.objects.all().delete()
         Project.objects.all().delete()
@@ -42,8 +46,10 @@ class TestProject(TestCase):
         Project.objects.all().delete()
         ServiceCatalog.objects.all().delete()
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_create_project(self):
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.auth_iam.utils.grant_instance_creator_related_actions")
+    def test_create_project(self, grant_instance_creator_related_actions):
+        grant_instance_creator_related_actions.return_value = True
         resp = self.client.post("/api/project/projects/", {})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data["result"], False)
@@ -63,10 +69,14 @@ class TestProject(TestCase):
 
         self.assertEqual(service_catalog, 10)
 
-        self.assertEqual(ProjectSettings.objects.filter(project_id=project_key).exists(), True)
+        self.assertEqual(
+            ProjectSettings.objects.filter(project_id=project_key).exists(), True
+        )
 
-    @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_update_records(self) -> None:
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.auth_iam.utils.grant_instance_creator_related_actions")
+    def test_update_records(self, grant_instance_creator_related_actions) -> None:
+        grant_instance_creator_related_actions.return_value = True
         resp = self.client.post("/api/project/projects/", CREATE_PROJECT_DATA)
 
         project_key = resp.data["data"]["key"]
@@ -76,5 +86,8 @@ class TestProject(TestCase):
 
         self.assertEqual(update_project_record_resp.data["result"], True)
         self.assertEqual(update_project_record_resp.data["code"], "OK")
-        
-        self.assertEqual(UserProjectAccessRecord.objects.filter(project_key=project_key).exists(), True)
+
+        self.assertEqual(
+            UserProjectAccessRecord.objects.filter(project_key=project_key).exists(),
+            True,
+        )

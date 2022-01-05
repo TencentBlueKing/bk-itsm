@@ -28,13 +28,28 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
+def have_is_auto_approve():
+    from django.db import connection
 
-    dependencies = [
-        ('workflow', '0045_auto_20210621_1206'),
-    ]
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'show columns from workflow_workflow;'
+            )
+            rows = cursor.fetchall()
+            fields = [item[0] for item in rows]
+            if "is_auto_approve" in fields:
+                return True
 
-    operations = [
+    except Exception:
+        return False
+
+
+def skip_migrate():
+    if have_is_auto_approve():
+        return []
+
+    return [
         migrations.AddField(
             model_name='workflow',
             name='is_auto_approve',
@@ -46,3 +61,11 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='是否自动过单'),
         ),
     ]
+
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ('workflow', '0045_auto_20210621_1206'),
+    ]
+
+    operations = skip_migrate()

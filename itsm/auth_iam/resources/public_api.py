@@ -47,7 +47,7 @@ class PublicApiResourceProvider(ItsmResourceProvider):
         """
         flow 没有定义属性，只处理 filter 中的 ids 字段
         """
-        queryset = self.queryset.filter(key__in=filter.ids)
+        queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
         results = [{"id": remote_api.id, "display_name": remote_api.name} for remote_api in queryset]
         return ListResult(results=results, count=count)

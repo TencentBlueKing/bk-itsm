@@ -41,7 +41,7 @@ class ProjectSerializer(ModelSerializer):
         """
         检验项目名是否符合规范
         """
-        if Project.objects.filter(name=attrs["name"]).exists():
+        if Project.objects.filter(name=attrs["name"], is_deleted=False).exists():
             raise serializers.ValidationError(
                 "创建失败: 已存在项目名称为{}的项目".format(attrs["name"])
             )

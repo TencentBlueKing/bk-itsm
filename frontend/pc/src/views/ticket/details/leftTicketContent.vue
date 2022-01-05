@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div class="left-ticket">
         <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
-                <div class="ticket-creator" @click="isShowbasicInfo = !isShowbasicInfo">
-                    <i :class="['bk-itsm-icon', isShowbasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
+                    <i :class="['bk-itsm-icon', isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
                     <span class="ticket-title">提单信息</span>
                     <span>提单人: {{ ticketInfo.creator}}</span>
                     <span>提单时间: {{ ticketInfo.create_at}}</span>
                 </div>
-                <div :class="['basic-content', isShowbasicInfo ? '' : 'hide']">
+                <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
                     <basic-information
                         ref="basicInfo"
                         v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
-            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading">
+            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
                     v-if="hasNodeOptAuth"
@@ -49,6 +49,7 @@
                     <current-steps
                         v-if="!loading.ticketLoading && !loading.nodeInfoLoading"
                         ref="currentNode"
+                        :is-show-basic-info="isShowBasicInfo"
                         :loading="loading.ticketLoading"
                         :basic-infomation="ticketInfo"
                         :node-list="nodeList"
@@ -67,13 +68,16 @@
                     </template>
                     <wang-editor
                         ref="comment"
+                        :is-show-basic-info="isShowBasicInfo"
                         :comment-list="commentList"
                         :comment-id="commentId"
                         :ticket-info="ticketInfo"
                         :ticket-id="ticketId"
                         :is-page-over="isPageOver"
+                        :step-active-tab="stepActiveTab"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
                         @refreshComment="refreshComment"
                     ></wang-editor>
@@ -129,12 +133,13 @@
             ticketId: [Number, String],
             commentLoading: Boolean,
             isPageOver: Boolean,
-            hasNodeOptAuth: Boolean
+            hasNodeOptAuth: Boolean,
+            moreLoading: Boolean
         },
         inject: ['reloadTicket'],
         data () {
             return {
-                isShowbasicInfo: true,
+                isShowBasicInfo: true,
                 baseActiveTab: 'base',
                 stepActiveTab: 'currentStep',
                 // 当前步骤
@@ -151,6 +156,18 @@
                     return 0
                 }
                 return this.currentStepList.length
+            }
+        },
+        watch: {
+            hasNodeOptAuth (val) {
+                if (val) {
+                    this.stepActiveTab = 'currentStep'
+                } else {
+                    this.stepActiveTab = 'allComments'
+                }
+            },
+            isShowBasicInfo (val) {
+                this.$emit('getBacicInfoStatus', val)
             }
         },
         methods: {
@@ -221,73 +238,80 @@
     }
 </script>
 <style lang='scss' scoped>
-.base-info-content {
-    padding: 0 10px;
-    min-height: 54px;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-    background: #ffffff;
-    /deep/ .bk-tab-section {
-        padding: 0;
-    }
-    .ticket-creator {
-        width: 100%;
-        cursor: pointer;
-        line-height: 52px;
-        display: inline-block;
-        color: #979BA5;
-        font-size: 12px;
-        .ticket-title {
-            font-weight: 700;
-            font-size: 14px;
-            color: #63656e;
+.left-ticket {
+    display: flex;
+    flex-direction: column;
+    // height: 100%;
+    .base-info-content {
+        padding: 0 10px;
+        min-height: 54px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        background: #ffffff;
+        /deep/ .bk-tab-section {
+            padding: 0;
         }
-        i {
-            font-size: 12px;
+        .ticket-creator {
+            width: 100%;
+            cursor: pointer;
+            line-height: 52px;
             display: inline-block;
-            height: 12px;
-            width: 12px;
-            margin: 0 -22px 0 24px;
+            color: #979BA5;
+            font-size: 12px;
+            .ticket-title {
+                font-weight: 700;
+                font-size: 14px;
+                color: #63656e;
+            }
+            i {
+                color: #c4c6cc;
+                font-size: 12px;
+                display: inline-block;
+                height: 12px;
+                width: 12px;
+                margin: 0 -22px 0 24px;
+            }
+            span{
+                margin-left: 30px;
+            }
         }
-        span{
-            margin-left: 30px;
+        .basic-content {
+            overflow: hidden;
+            transition: 1s all linear;
+        }
+        .hide{
+            height: 0;
+        }
+        /deep/ .bk-icon {
+            // line-height: 54px;
         }
     }
-    .basic-content {
-        overflow: hidden;
-        transition: 1s all linear;
-    }
-    .hide{
-        height: 0;
-    }
-    /deep/ .bk-icon {
-        line-height: 54px;
-    }
-}
-.current-step-content {
-    margin-top: 24px;
-    padding: 10px;
-    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-    background: #ffffff;
-    /deep/ .bk-tab-section {
-        padding: 0;
-    }
-    .panel-count {
-        display: inline-block;
-        min-width: 16px;
-        height: 16px;
-        padding: 0 4px;
-        line-height: 16px;
-        border-radius: 8px;
-        text-align: center;
-        font-style: normal;
-        font-size: 12px;
-        color: #fff;
-        background-color: #C4C6CC;
-    }
-    /deep/ .bk-tab-label-item.active {
+    .current-step-content {
+        flex: auto;
+        margin-top: 24px;
+        padding: 10px;
+        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+        background: #ffffff;
+        /deep/ .bk-tab-section {
+            padding: 0;
+        }
         .panel-count {
-            color: #3a84ff;
-            background: #e1ecff;
+            display: inline-block;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            line-height: 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-style: normal;
+            font-size: 12px;
+            color: #fff;
+            background-color: #C4C6CC;
+        }
+        /deep/ .bk-tab-label-item.active {
+            .panel-count {
+                color: #3a84ff;
+                background: #e1ecff;
+            }
         }
     }
 }

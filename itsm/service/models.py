@@ -275,7 +275,7 @@ class Service(ObjectManagerMixin, Model):
 
     need_auth_grant = True
     auth_resource = {"resource_type": "service", "resource_type_name": "服务"}
-    resource_operations = ["service_manage", "service_view"]
+    resource_operations = ["service_manage"]
 
     def __unicode__(self):
         return self.name
@@ -351,14 +351,14 @@ class Service(ObjectManagerMixin, Model):
         for organization in UserRole.get_user_roles(username)["organization"]:
             conditions.append(
                 Q(display_type="ORGANIZATION")
-                & Q(display_role__contains=dotted_name(organization))
+                & Q(display_role__contains=organization)
             )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):
             conditions.append(
                 Q(display_type=role["role_type"])
-                & Q(display_role__contains=dotted_name(role["id"]))
+                & Q(display_role__contains=role["id"])
             )
 
         return conditions
@@ -824,6 +824,8 @@ class CatalogService(Model):
         "Service", help_text=_("关联服务条目"), on_delete=models.CASCADE
     )
     order = models.IntegerField("service序列", default=FIRST_ORDER)
+    auth_resource = {}
+    resource_operations = []
 
     objects = managers.CatalogServiceManager()
 

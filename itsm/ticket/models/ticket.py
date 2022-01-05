@@ -736,9 +736,13 @@ class Status(Model):
         if self.processors_type in ["GENERAL", "CMDB"]:
             role_ids = list_by_separator(self.processors)
             role_name_list = list(
-                UserRole.objects.filter(id__in=role_ids).values_list("name", flat=True)
+                UserRole.objects.filter(id__in=role_ids).values_list("name", "members")
             )
-            display_name = ",".join(role_name_list)
+            role_name_members_list = [
+                "{}({})".format(role_name[0], role_name[1].strip(","))
+                for role_name in role_name_list
+            ]
+            display_name = ",".join(role_name_members_list)
 
         if self.processors_type == "PERSON":
             users = self.get_processor_in_sign_state()
@@ -764,6 +768,18 @@ class Status(Model):
     @staticmethod
     def get_organization_name(department_id):
         return get_department_info(department_id).get("name", "")
+
+    def get_appover_key_value(self, code_key):
+        code = code_key.get("NODE_APPROVER", None)
+        key_value = {}
+        if code is None:
+            return key_value
+        sign_tasks = SignTask.objects.filter(status_id=self.id)
+        processors = []
+        for sign_task in sign_tasks:
+            processors.append(sign_task.processor)
+        key_value[code] = ",".join(processors)
+        return key_value
 
     def get_sign_key_value(self, ticket, code_key):
         """
@@ -2591,7 +2607,7 @@ class Ticket(Model, BaseTicket):
         **kwargs
     ):
         """发送单据和任务通知"""
-        from itsm.ticket.tasks import notify_task, dispatch_retry_notify_event
+        from itsm.ticket.tasks import notify_task
 
         logger.info(
             "[ticket->notify] is executed, state_id={}, receivers={}, message={}, action={}".format(
@@ -2620,7 +2636,8 @@ class Ticket(Model, BaseTicket):
 
             # 重复通知
             if self.flow.notify_rule == "RETRY" and retry:
-                dispatch_retry_notify_event(self, state_id, receivers)
+                # dispatch_retry_notify_event(self, state_id, receivers)
+                pass  # 去除重复通知相关的功能
 
         except Exception as e:
             logger.error("notify exception: %s" % e)
@@ -3528,9 +3545,11 @@ class Ticket(Model, BaseTicket):
         self.update_ticket_status(fields, operator)
 
         # Create sign task
-        task = SignTask.objects.get(status_id=node_status.id, processor=operator)
-        task.status = "RUNNING"
-        task.save()
+        task, result = SignTask.objects.update_or_create(
+            status_id=node_status.id,
+            processor=operator,
+            defaults={"status": "RUNNING"},
+        )
         # Create task fields
         task_field_objs = []
         field_map = {}

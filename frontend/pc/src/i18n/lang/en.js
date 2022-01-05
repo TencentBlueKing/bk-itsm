@@ -718,6 +718,7 @@ export const m = {
         '提单': 'Create Ticket'
     },
     'newCommon': {
+        '评价成功': 'Evaluation of success',
         '已超出最大值!': 'Maximum has been exceeded',
         '提示': 'Notice',
         '您要处理的节点已被': 'The node you want to process has been processed by ',
@@ -1116,6 +1117,7 @@ export const m = {
         '请输入搜索关键字': 'Please input the keywords ',
         '新增': 'Add ',
         '编辑': 'Edit ',
+        '克隆': 'Clone',
         '删除': 'Delete ',
         '服务已绑定关联目录，请先解绑后在进行删除操作': 'The service is bound to the associated directory. Please unbind it before deleting',
         '父级目录': 'Parent catalogue ',
@@ -2416,5 +2418,9 @@ export const m = {
     '自动节点': 'Automatic Node',
     '任务节点': 'Task Node',
     '审批节点': 'Approve Node',
-    '会签节点': 'Countersign Node'
+    '会签节点': 'Countersign Node',
+    '星级': 'star',
+    '评价人': 'appraiser',
+    '评价时间': 'Evaluation of time',
+    '评价内容': 'Evaluation content'
 }

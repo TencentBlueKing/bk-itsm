@@ -430,6 +430,23 @@ class StateViewSet(BaseWorkflowElementViewSet):
         return Response(valid_inputs)
 
     @action(detail=True, methods=["get"])
+    def group_variables(self, request, *args, **kwargs):
+        state = self.get_object()
+
+        # 默认先把field和全局的变量都获取出来
+        resource_type = request.GET.get("resource_type", "both")
+        exclude_self = request.GET.get("exclude_self", False)
+
+        valid_inputs = state.get_valid_inputs_by_group(
+            exclude_self=exclude_self, resource_type=resource_type, scope="state"
+        )
+
+        # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
+        if not state.is_first_state:
+            valid_inputs["系统变量"] = TICKET_GLOBAL_VARIABLES
+        return Response(valid_inputs)
+
+    @action(detail=True, methods=["get"])
     def sign_variables(self, request, *args, **kwargs):
         """获取会签节点输出变量"""
         state = self.get_object()
@@ -680,7 +697,10 @@ class FieldViewSet(BaseFieldViewSet):
         自动从State的fields中移除该字段
         """
         with transaction.atomic():
-            if instance.key == "bk_biz_id" and instance.state.name == "提单":
+            if (
+                instance.key == "bk_biz_id"
+                and instance.id == instance.workflow.first_state.id
+            ):
                 instance.workflow.is_biz_needed = False
                 instance.workflow.save()
             if instance.source != TABLE:

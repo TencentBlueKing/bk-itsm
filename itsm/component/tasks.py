@@ -111,7 +111,7 @@ def update_user_departments(cache_key, username, id_only):
     return result if result else []
 
 
-@periodic_task(run_every=crontab(minute=0, hour=0))
+@periodic_task(run_every=crontab(minute=0, hour='0,1,2,3,4'))
 def delete_tracker_record():
     now = datetime.datetime.now()
     last_month_time = now - datetime.timedelta(days=30)

@@ -48,8 +48,10 @@
                         :is-page-over="isPageOver"
                         :has-node-opt-auth="hasNodeOptAuth"
                         :comment-loading="commentLoading"
+                        :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
-                        @refreshComment="refreshComment">
+                        @refreshComment="refreshComment"
+                        @getBacicInfoStatus="getBacicInfoStatus">
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
@@ -132,6 +134,7 @@
         mixins: [fieldMix, commonMix, apiFieldsWatch],
         data () {
             return {
+                moreLoading: false, // 底部加载loading
                 leftTicketDom: '',
                 isPageOver: false,
                 isThrottled: false,
@@ -185,7 +188,8 @@
                 commentList: [],
                 commentId: '',
                 threshold: [],
-                hasNodeOptAuth: false
+                hasNodeOptAuth: false,
+                basicStatus: true
             }
         },
         computed: {
@@ -217,7 +221,7 @@
             }
             this.getProtocolsList()
             this.$nextTick(function () {
-                this.leftTicketDom = document.querySelector('.ticket-container-left')
+                this.leftTicketDom = document.querySelector('.comment-list')
                 this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
             })
             if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
@@ -268,12 +272,15 @@
                     this.commentLoading = false
                 }
             },
+            getBacicInfoStatus (val) {
+                this.basicStatus = val
+            },
             async getComments (page, page_size) {
                 this.commentLoading = true
                 const commentList = []
                 const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                     'ticket_id': this.ticketId,
-                    'show_type': this.$route.query.project_id ? 'ALL' : 'PUBLIC',
+                    'show_type': this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
                     page: page,
                     page_size: page_size
                 })
@@ -283,34 +290,41 @@
                     }
                 })
                 this.commentCount = commmentRes.data.count
-                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size)
+                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size) || 1
                 commentList.push(...commmentRes.data.items)
                 commentList.sort((a, b) => b.id - a.id)
                 this.commentLoading = false
                 return commentList.filter(item => item.remark_type !== 'ROOT')
             },
             async getReplyCommet (id, index) {
-                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
-                this.$set(this.commentList[index], 'parent_creator', res.data.creator)
-                this.$set(this.commentList[index], 'parent_content', res.data.content)
+                if (id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
+                    this.$set(this.commentList[index], 'parent_creator', res.data.creator)
+                    this.$set(this.commentList[index], 'parent_content', res.data.content)
+                }
             },
             async addTargetComment (curComment) {
-                const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
-                this.commentList.push(res.data)
-                console.log(this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment))
+                if (this.commentId !== curComment.parent__id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
+                    this.commentList.push(res.data)
+                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment)
+                }
             },
             handleTicketScroll () {
-                if (!this.isPageOver && !this.isThrottled) {
+                if (this.totalPages === 1) return
+                if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
                     this.isThrottled = true
                     const timer = setTimeout(async () => {
                         this.isThrottled = false
                         const el = this.leftTicketDom
                         if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+                            this.moreLoading = true
                             this.page += 1
-                            this.isPageOver = this.page === this.totalPages
                             clearTimeout(timer)
                             const result = await this.getComments(this.page, this.page_size)
                             this.commentList.push(...result)
+                            this.isPageOver = this.page === this.totalPages
+                            this.moreLoading = false
                         }
                     }, 500)
                 }
@@ -327,14 +341,19 @@
                     const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
                     const slathreshold = curSlas.map(item => {
                         const condition = item.action_policies.map(ite => {
-                            return ite.condition.expressions[0].value
+                            const obj = {}
+                            obj[ite.type] = ite.condition.expressions[0].value
+                            return obj
                         })
+                        // 1 3 2 4
+                        // type 1  2 为响应
+                        // type 3  4 为处理
                         return {
                             sla_name: item.name,
-                            rWarningThreshold: condition[0] / 100 || 1, // 1为100%
-                            rTimeOutThreshold: condition[1] / 100 || 1,
-                            pWarningThreshold: condition[2] / 100 || 1,
-                            pTimeOutThreshold: condition[3] / 100 || 1
+                            rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
+                            pWarningThreshold: condition[1][3] / 100 || 1,
+                            rTimeOutThreshold: condition[2][2] / 100 || 1,
+                            pTimeOutThreshold: condition[3][4] / 100 || 1
                         }
                     })
                     this.threshold = [...slathreshold]
@@ -584,13 +603,13 @@
 }
 .ticket-container {
     display: flex;
-    padding: 24px 24px 0 24px;
+    padding: 24px;
     height: calc(100% - 50px);
     .ticket-container-left {
         flex: 1;
         margin-right: 22px;
         height: 100%;
-        overflow: auto;
+        overflow: hidden;
         background-color: #f5f7fa;
         @include scroller;
     }
@@ -642,9 +661,12 @@
                 line-height: 20px;
                 padding: 17px 24px;
                 .sla-title {
+                    font-size: 14px;
+                    font-weight: 700;
                     display: inline-block;
-                    color: #63656E;
+                    color: #63656e;
                     i {
+                        color: #c4c6cc;
                         display: inline-block;
                         font-size: 12px;
                         margin-right: 8px;
@@ -653,7 +675,7 @@
                 .view-sla-rule {
                     cursor: pointer;
                     float: right;
-                    color: #3A84FF;
+                    color: #3a84ff;
                     font-size: 12px;
                 }
             }

@@ -21,10 +21,10 @@
   -->
 
 <template>
-    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey">
+    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey" :style="{ 'width': fieldType ? '' : '40%' }">
         <!-- table -->
         <div v-if="item.type === 'TABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span class="bk-li-left">{{item.name}}</span>
             <div v-if="item.can_edit && !basicInfomation.is_over && origin === 'notLog'" class="bk-fields-done-edit"
                 @click="edit(item)">
                 <span class="bk-itsm-icon icon-edit-bold isOn"></span>
@@ -44,7 +44,7 @@
         </div>
         <!--  custom table  -->
         <div v-else-if="item.type === 'CUSTOMTABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}</span>
             <div v-if="item.can_edit && !basicInfomation.is_over && origin === 'notLog'" class="bk-fields-done-edit"
                 @click="edit(item)">
                 <span class="bk-itsm-icon icon-edit-bold isOn"></span>
@@ -64,14 +64,14 @@
         </div>
         <!-- select -->
         <div v-else-if="item.type === 'SELECT'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}</span>
             <span class="bk-li-right" :title="item.display_value">
                 <span class="bk-pot-after">{{item.display_value || '--'}}</span>
             </span>
         </div>
         <!-- 修改 附件处理 10/31-->
         <div v-else-if="item.type === 'FILE'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}</span>
             <span v-for="(file, index) in fileList"
                 :key="index"
                 class="bk-li-right"
@@ -86,14 +86,14 @@
         </div>
         <!-- 富文本 -->
         <div v-else-if="item.type === 'RICHTEXT'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}</span>
             <span class="bk-li-right bk-fields-richtext tui-editor-contents"
                 v-html="item.value">
             </span>
         </div>
         <!-- 多行文本展现出后台保存的内容格式 -->
         <div v-else-if="item.type === 'TEXT'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}</span>
             <span class="bk-li-right"
                 :title="item.display_value">
                 <pre class="bk-pre">{{item.display_value || item.value || '--'}}</pre>
@@ -101,14 +101,14 @@
         </div>
         <!-- 链接 -->
         <div v-else-if="item.type === 'LINK'" class="bk-fields-done-item">
-            <span v-if="isShowName" class="bk-li-left">{{item.name}}：</span>
+            <span class="bk-li-left">{{item.name}}</span>
             <span class="bk-li-right" :title="item.value">
                 <span class="bk-pot-after bk-li-link" @click="goToLink(item.value)">{{ $t('m.newCommon["点击查看"]') }}</span>
             </span>
         </div>
         <!-- 自定义表单 -->
         <div v-else-if="item.type === 'CUSTOM-FORM'" style="width: 100%">
-            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left" style="float: initial;">{{item.name}}</span>
             <render-view
                 :form-data="customForm.formData"
                 :context="customForm.context">
@@ -116,9 +116,10 @@
         </div>
         <!-- 默认 -->
         <div class="bk-fields-done-item" v-else>
-            <span class="bk-li-left">{{item.name}}：</span>
+            <span v-if="isShowName" class="bk-li-left">{{item.name}}</span>
             <business-card
                 v-if="(item.type === 'MEMBERS' || item.type === 'MEMBER') && origin === 'notLog'"
+                style="margin-top: 3px"
                 :item="item">
             </business-card>
             <span class="bk-li-right"
@@ -188,7 +189,8 @@
             isShowName: {
                 type: Boolean,
                 default: () => true
-            }
+            },
+            basicInfoType: Array
         },
         data () {
             return {
@@ -216,6 +218,9 @@
                     phone: this.basicInfomation.profile.phone,
                     department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
                 }
+            },
+            fieldType () {
+                return this.basicInfoType ? this.basicInfoType.includes(this.item.type) : []
             }
         },
         created () {
@@ -294,7 +299,6 @@
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
-
     .bk-fields-done {
         display: flex;
         flex-wrap: wrap;
@@ -318,45 +322,87 @@
             // overflow: auto;
             max-width: calc(100% - 30px);
             overflow-wrap: break-word;
-        }
+            display: flex;
 
-        .bk-fields-done-edit {
-            display: inline-block;
-            margin-top: 2px;
-            padding-left: 10px;
-            cursor: pointer;
-            align-self: flex-start;
-        }
-        .bk-li-link{
-            color: #3a84ff;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .bk-li-left,
-        .bk-li-right {
-            line-height: 26px;
-            color: #313238;
-        }
-        .bk-li-left {
-            font-weight: bold;
-            color: #979Ba5;
-        }
-
-        .bk-member-edit {
-            margin-left: 30px;
+            .bk-fields-done-edit {
+                display: inline-block;
+                margin-top: 2px;
+                padding-left: 10px;
+                cursor: pointer;
+                align-self: flex-start;
+            }
+            .bk-li-link{
+                color: #3a84ff;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .bk-li-left,
+            .bk-li-right {
+                line-height: 26px;
+                color: #313238;
+            }
+            .bk-li-left {
+                width: 70px;
+                font-weight: 400;
+                margin-right: 8px;
+                color: #979Ba5;
+                text-align: right;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                &::before {
+                    content: (':');
+                    top: 3px;
+                    left: 76px;
+                    position: absolute;
+                }
+            }
+            .bk-li-right {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .bk-member-edit {
+                margin-left: 30px;
+            }
         }
     }
 
     .bk-fields-log{
         .bk-fields-done-item{
+            display: flex;
             .bk-li-left,
             .bk-li-right {
-                line-height: 24px;
-                color: #63656E;
+                line-height: 26px;
+                color: #313238;
             }
         }
     }
     .bk-pre {
+        display: inline-block;
         white-space: pre-wrap;
+    }
+     .bk-li-right {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .bk-li-left {
+        width: 70px;
+        font-weight: 400;
+        text-align: right;
+        overflow: hidden;
+        margin-right: 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #979Ba5;
+        &::before {
+            content: (':');
+            top: 3px;
+            left: 76px;
+            position: absolute;
+        }
     }
 </style>
