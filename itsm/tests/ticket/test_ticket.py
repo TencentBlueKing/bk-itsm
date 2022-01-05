@@ -90,8 +90,8 @@ class TicketTest(TestCase):
         rsp = self.client.post(
             path=url, data=json.dumps(data), content_type="application/json"
         )
-        self.assertEqual(rsp.data["code"], "OK")
-        self.assertEqual(rsp.data["message"], "success")
+        self.assertEqual(rsp.data["code"], "")
+        self.assertEqual(rsp.data["message"], "")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
