@@ -170,7 +170,6 @@
             </template>
         </bk-form>
         <bk-form :label-width="200"
-            class="bk-form-vertical"
             :form-type="formAlign"
             :model="formInfo"
             ref="dataForm">
@@ -198,17 +197,25 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <data-content ref="dataContent"
-                                :form-info="formInfo"
-                                :workflow="workflow"
-                                :state="state"
-                                :change-info="assignValue"
-                                :api-detail="apiDetail"
-                                :api-info="apiInfo.api_info"
-                                :kv-relation="apiInfo.kv_relation"
-                                :prc-table="prcTable"
-                                :field-info="fieldInfo">
-                            </data-content>
+                            <bk-button class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-dialog
+                                v-model="isShowDataSource"
+                                width="960"
+                                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
+                                theme="primary"
+                                :mask-close="false">
+                                <data-content ref="dataContent"
+                                    :form-info="formInfo"
+                                    :workflow="workflow"
+                                    :state="state"
+                                    :change-info="assignValue"
+                                    :api-detail="apiDetail"
+                                    :api-info="apiInfo.api_info"
+                                    :kv-relation="apiInfo.kv_relation"
+                                    :prc-table="prcTable"
+                                    :field-info="fieldInfo">
+                                </data-content>
+                            </bk-dialog>
                         </bk-form-item>
                     </template>
                 </template>
@@ -461,6 +468,7 @@
         },
         data () {
             return {
+                isShowDataSource: false,
                 isDataLoading: false,
                 trueStatus: true,
                 falseStatus: false,
@@ -624,6 +632,13 @@
                     this.$emit('getAddFieldStatus', val.name !== '')
                 },
                 deep: true
+            },
+            'formInfo.source_type' (val) {
+                if (val === 'API') {
+                    this.$nextTick(function () {
+                        this.openDataSource()
+                    })
+                }
             }
         },
         async mounted () {
@@ -640,6 +655,9 @@
             }
         },
         methods: {
+            openDataSource () {
+                this.isShowDataSource = true
+            },
             fieldNameChange () {
                 const keyElement = this.$refs.fieldForm.$data.formItems.find(item => item.property === 'key')
                 if (keyElement.fieldValue) {
@@ -1337,6 +1355,16 @@
 <style lang='scss' scoped>
     @import '../../../../../scss/mixins/clearfix.scss';
     @import "../../../../../scss/mixins/scroller";
+    .configuration-data-source {
+        width: 102px;
+        height: 32px;
+        border: 1px solid #3a84ff;
+        border-radius: 4px;
+        color: #3a84ff;
+        font-size: 14px;
+        line-height: 30px;
+        text-align: center;
+    }
     .bk-tanble-height {
         .bk-textarea-tanble {
             overflow-y: scroll;
