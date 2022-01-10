@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import importlib
 from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
@@ -35,6 +35,18 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
 )
+
+# 标准运维页面服务地址
+SITE_URL_SOPS = "/o/bk_sops/"
+
+# 针对 paas_v3 容器化差异化配置
+ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
+if ENGINE_REGION == "default":
+    env_settings = importlib.import_module("adapter.config.sites.%s.env" % "v3")
+    for _setting in dir(env_settings):
+        if _setting.upper() == _setting:
+            locals()[_setting] = getattr(env_settings, _setting)
+    SITE_URL_SOPS = "/bk--sops/"
 
 # 请在这里加入你的自定义 APP
 from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
@@ -642,7 +654,10 @@ CLOSE_NOTIFY = os.environ.get("BKAPP_CLOSE_NOTIFY", None)
 BK_CC_HOST = os.environ.get("BK_CC_HOST", "#")
 BK_JOB_HOST = os.environ.get("BK_JOB_HOST", "#")
 
-BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", BK_PAAS_HOST)
+# 适配容器化
+USER_MANGE_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_HOST)
+
+BK_USER_MANAGE_HOST = os.environ.get("BK_USER_MANAGE_HOST", USER_MANGE_HOST)
 
 BK_USER_MANAGE_WEIXIN_HOST = os.environ.get("BK_USER_MANAGE_WEIXIN_HOST", BK_PAAS_HOST)
 
@@ -700,22 +715,19 @@ PROFILER = {
 # The name of the class to use to run the test suite
 TEST_RUNNER = "itsm.tests.runner.ItsmTestRunner"
 
-# 标准运维页面服务地址
-SITE_URL_SOPS = "/o/bk_sops/"
-
 # 统一转发前缀
 PREFIX_SOPS = ""
 
 # 设置被代理的标准运维插件AJAX请求地址，比如API网关的接口
 # 'https://paasee-dev.XX.com/t/bk_sops/apigw/dispatch_plugin_query/'
 SOPS_PROXY_URL = os.environ.get(
-    "BKAPP_SOPS_PROXY_URL", "{}/o/bk_sops/".format(BK_PAAS_INNER_HOST)
+    "BKAPP_SOPS_PROXY_URL", "{}{}".format(BK_PAAS_INNER_HOST, SITE_URL_SOPS)
 )
 
 # 设置被代理的标准运维插件静态资源地址，比如标准运维的site_url或API网关接口
 # 'https://paasee-dev.XX.com/t/bk_sops'
 SOPS_SITE_URL = os.environ.get(
-    "BKAPP_SOPS_SITE_URL", "{}/o/bk_sops/".format(BK_PAAS_HOST)
+    "BKAPP_SOPS_SITE_URL", "{}{}".format(BK_PAAS_HOST, SITE_URL_SOPS)
 )
 
 # 允许转发的非静态内容路径
@@ -764,7 +776,11 @@ BK_DESKTOP_URL = os.environ.get("BK_DESKTOP_URL") or BK_PAAS_HOST
 
 BK_IAM_API_PREFIX = SITE_URL + "openapi"
 BK_API_USE_TEST_ENV = True if os.environ.get("BK_API_USE_TEST_ENV") == "True" else False
-BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", BK_PAAS_INNER_HOST)
+
+# iam适配容器化
+IAM_ESB_PAAS_HOST = os.environ.get("BK_COMPONENT_API_URL", BK_PAAS_INNER_HOST)
+BK_IAM_ESB_PAAS_HOST = os.environ.get("BK_IAM_ESB_PAAS_HOST", IAM_ESB_PAAS_HOST)
+
 IAM_INITIAL_FILE = os.environ.get("BKAPP_IAM_INITIAL_FILE", "")
 
 CALLBACK_AES_KEY = "APPROVAL_RESULT"
