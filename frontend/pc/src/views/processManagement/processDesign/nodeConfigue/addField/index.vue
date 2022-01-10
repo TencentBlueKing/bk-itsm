@@ -169,7 +169,8 @@
                 </bk-form-item>
             </template>
         </bk-form>
-        <bk-form :label-width="200"
+        <bk-form :label-width="100"
+            class="bk-form-vertical"
             :form-type="formAlign"
             :model="formInfo"
             ref="dataForm">
@@ -197,7 +198,7 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <bk-button class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-button v-if="isShowDataSourcebtn" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
                             <bk-dialog
                                 v-model="isShowDataSource"
                                 width="960"
@@ -623,22 +624,17 @@
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
+            },
+            isShowDataSourcebtn () {
+                return (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'CUSTOM') && (Object.keys(this.apiDetail).length !== 0 || this.fieldInfo.list.length !== 0)
             }
         },
         watch: {
             formInfo: {
                 handler (val) {
-                    // const hiddenStatus = val.show_type ? this.hiddenConditionStatus : true
                     this.$emit('getAddFieldStatus', val.name !== '')
                 },
                 deep: true
-            },
-            'formInfo.source_type' (val) {
-                if (val === 'API') {
-                    this.$nextTick(function () {
-                        this.openDataSource()
-                    })
-                }
             }
         },
         async mounted () {
@@ -1364,6 +1360,11 @@
         font-size: 14px;
         line-height: 30px;
         text-align: center;
+    }
+    .data-source-tip {
+        color: red;
+        font-size: 14px;
+        line-height: 32px;
     }
     .bk-tanble-height {
         .bk-textarea-tanble {

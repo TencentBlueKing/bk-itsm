@@ -109,10 +109,12 @@
                 margin-right: 0;
             }
             .field-input-tips {
-                width: 280px;
+                width: 100%;
             }
             .field-tips-checkbox {
-                margin-left: 300px !important;
+                margin-left: 0px !important;
+                position: relative;
+                top: 36px;
             }
             .bk-label-tips {
                 right: 0;

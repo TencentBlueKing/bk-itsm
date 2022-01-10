@@ -103,9 +103,9 @@
             </section>
         </div>
         <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
-        <div class="edit-service-field" v-show="isShowRightEdit">
+        <div class="edit-service-field">
             <div class="edit-service-title">字段属性</div>
-            <div class="edit-service-forms">
+            <div class="edit-service-forms" v-show="isShowRightEdit">
                 <template v-for="form in ticketNodeForm">
                     <form-edit-item
                         v-if="form.id === crtForm"
@@ -290,7 +290,7 @@
                 // console.log(offsetX)
                 const moveX = base + offsetX
                 console.log(600 - moveX)
-                if (offsetX > 0 && 600 - moveX <= 300) return
+                if (offsetX > 0 && 600 - moveX <= 400) return
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
                     el.style.width = `calc(600px - ${moveX}px)`
@@ -505,6 +505,9 @@
             // 添加字段
             addField (field) {
                 if (this.crtForm !== '') {
+                    this.$bkMessage({
+                        message: this.$t(`m["请先将字段属性关闭"]`)
+                    })
                     return
                 }
                 this.isShowRightEdit = true
@@ -799,7 +802,7 @@
         }
     }
     .edit-service-field {
-        width: 600px;
+        width: 400px;
         background: #ffffff;
         border-left: 1px solid #dde4eb;
         border-top: 1px solid #dde4eb;

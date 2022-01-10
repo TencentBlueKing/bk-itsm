@@ -2422,5 +2422,6 @@ export const m = {
     '星级': 'star',
     '评价人': 'appraiser',
     '评价时间': 'Evaluation of time',
-    '评价内容': 'Evaluation content'
+    '评价内容': 'Evaluation content',
+    '请先将字段属性关闭': 'Close the field properties first'
 }
