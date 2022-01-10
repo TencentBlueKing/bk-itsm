@@ -82,7 +82,6 @@ gunicorn==19.6.0
 bkstorages==1.0.1
 pytz==2019.3
 suds-jurko==0.6
-mysqlclient==1.4.4
 mock==2.0.0
 
 # excel
