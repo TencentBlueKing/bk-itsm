@@ -22,13 +22,42 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <div class="ticket-process-content" :style="{ height: isShowComment ? 'calc(100vh - 680px)' : 'calc(100vh - 320px)' }">
+        <div class="ticket-process-content">
             <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
                 :list="list"
                 @select="handleSelect"></bk-timeline>
+            <div v-if="isShowComment" class="process-detail">
+                <div class="process-content">
+                    <img :src="imgUrl" alt="单据结束">
+                    <template v-if="!ticketInfo.is_commented">
+                        <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
+                        <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
+                    </template>
+                    <div v-else>{{ $t(`m["已完成评价"]`) }}
+                        <div class="comment-content">
+                            <div class="comment-content-item">
+                                <span>{{ $t(`m["星级"]`) }}:</span>
+                                <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
+                            </div>
+                            <div class="comment-content-item">
+                                <span>{{ $t(`m["评价人"]`) }}:</span>
+                                <p>{{commentInfo.creator}}</p>
+                            </div>
+                            <div class="comment-content-item">
+                                <span>{{ $t(`m["评价时间"]`) }}:</span>
+                                <p>{{commentInfo.create_at}}</p>
+                            </div>
+                            <div class="comment-content-item">
+                                <span>{{ $t(`m["评价内容"]`) }}:</span>
+                                <p>{{commentInfo.comments}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- 操作日志详情 sideslider -->
         <ticket-log-detail
@@ -38,35 +67,6 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
-        <div v-if="isShowComment" class="process-detail">
-            <div class="process-content">
-                <img :src="imgUrl" alt="单据结束">
-                <template v-if="!ticketInfo.is_commented">
-                    <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
-                    <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
-                </template>
-                <div v-else>{{ $t(`m["已完成评价"]`) }}
-                    <div class="comment-content">
-                        <div class="comment-content-item">
-                            <span>{{ $t(`m["星级"]`) }}:</span>
-                            <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
-                        </div>
-                        <div class="comment-content-item">
-                            <span>{{ $t(`m["评价人"]`) }}:</span>
-                            <p>{{commentInfo.creator}}</p>
-                        </div>
-                        <div class="comment-content-item">
-                            <span>{{ $t(`m["评价时间"]`) }}:</span>
-                            <p>{{commentInfo.create_at}}</p>
-                        </div>
-                        <div class="comment-content-item">
-                            <span>{{ $t(`m["评价内容"]`) }}:</span>
-                            <p>{{commentInfo.comments}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -180,7 +180,7 @@
     .ticket-process-content {
         overflow: auto;
         padding: 5px;
-        height: calc(100vh - 680px);
+        height: calc(100vh - 240px);
         @include scroller;
     }
 }
