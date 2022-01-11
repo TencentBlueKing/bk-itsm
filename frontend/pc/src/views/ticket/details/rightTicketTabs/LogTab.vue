@@ -22,7 +22,7 @@
 
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
-        <div class="ticket-process-content">
+        <div class="ticket-process-content" :style="{ height: isShowComment ? 'calc(100vh - 680px)' : 'calc(100vh - 320px)' }">
             <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
@@ -38,7 +38,7 @@
                 dispalyLogInfo = null
             }">
         </ticket-log-detail>
-        <div v-if="ticketInfo.is_over && ticketInfo.comment_id !== -1" class="process-detail">
+        <div v-if="isShowComment" class="process-detail">
             <div class="process-content">
                 <img :src="imgUrl" alt="单据结束">
                 <template v-if="!ticketInfo.is_commented">
@@ -93,6 +93,11 @@
                 isShowDetail: false,
                 imgUrl: require('@/images/orderFinished.png'),
                 commentInfo: {}
+            }
+        },
+        computed: {
+            isShowComment () {
+                return this.ticketInfo.is_over && this.ticketInfo.comment_id !== -1
             }
         },
         created () {
