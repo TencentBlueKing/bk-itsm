@@ -50,7 +50,7 @@
             </div>
             <div style="height: calc(100% - 40px);" v-bkloading="{ isLoading: loading }">
                 <template v-if="!loading">
-                    <bk-tab :active="activeClassify" type="unborder-card">
+                    <bk-tab :active="activeClassify" type="unborder-card" @tab-change="handleTabChange">
                         <bk-tab-panel
                             v-for="(group, index) in serviceList"
                             v-bind="group"
@@ -59,6 +59,7 @@
                                 <i class="panel-icon bk-icon icon-cog-shape"></i>
                                 <span class="panel-name">{{ group.label }}</span>
                                 <span class="panel-count" v-if="searchModel">{{ listNum[group.name] }}</span>
+                                <i :class="[group.name === activeName ? 'active-line' : '']"></i>
                             </template>
                             <ul v-if="group.data.length > 0" class="service-content">
                                 <li
@@ -135,7 +136,8 @@
                 searchModel: false,
                 selectedService: null,
                 latestLoading: false,
-                allLoading: false
+                allLoading: false,
+                activeName: 'requset'
             }
         },
         computed: {
@@ -249,6 +251,9 @@
                     }
                 })
             },
+            handleTabChange (name) {
+                this.activeName = name
+            },
             onCloseDialog () {
                 this.$emit('update:isShow', false)
                 this.selectedService = null
@@ -260,7 +265,15 @@
 </script>
 <style lang="scss" scoped>
     @import '../../../scss/mixins/scroller.scss';
-
+    .active-line {
+        display: inline-block;
+        position: absolute;
+        height: 2px;
+        width: 100%;
+        background-color: #3a84ff;
+        top: 48px;
+        left: 0;
+    }
     .select-service {
         position: relative;
         height: 498px;
