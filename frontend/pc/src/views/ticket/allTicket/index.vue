@@ -42,7 +42,10 @@
                                         class="advanced-search"
                                         ref="advancedSearch"
                                         :forms="searchForms"
+                                        :panel="panel.key"
+                                        :search-result-list="searchResultList"
                                         @search="handleSearch"
+                                        @deteleSearchResult="deteleSearchResult"
                                         @onChangeHighlight="getAllTicketList()"
                                         @formChange="handleSearchFormChange"
                                         @clear="handleClearSearch">
@@ -220,7 +223,14 @@
                 // 查询
                 searchForms: SEARCH_FORM.slice(0),
                 searchParams: {}, // 高级搜索内容
-                orderKey: '-create_at' // 排序
+                orderKey: '-create_at', // 排序
+                searchResultList: { // 搜索结果
+                    request: [],
+                    change: [],
+                    event: [],
+                    question: []
+                },
+                searchToggle: true // 点击搜索记录搜索是否添加记录
             }
         },
         computed: {
@@ -424,10 +434,21 @@
             // onTimeoutTicketChange (val) {
             // },
             // 查询
-            handleSearch (params) {
+            // 处理搜索结果
+            handleSearchResult (params) {
+                if (Object.keys(params).length === 0 || !this.searchToggle) return
+                this.searchResultList[this.sereveType].push(params)
+            },
+            // 删除搜索结果
+            deteleSearchResult (type, index) {
+                this.searchResultList[type].splice(index, 1)
+            },
+            handleSearch (params, toggle) {
+                this.searchToggle = toggle
                 this.pagination.limit = 10
                 this.pagination.current = 1
                 this.searchParams = params
+                this.handleSearchResult(params)
                 this.getAllTicketList(this.sereveType)
             },
             // 清空搜索表单
