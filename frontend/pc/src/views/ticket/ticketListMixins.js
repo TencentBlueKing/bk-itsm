@@ -129,7 +129,13 @@ const ticketListMixins = {
                 count: 10,
                 limit: 10
             },
-            listLoading: false
+            listLoading: false,
+            searchResultList: {
+                todo: [],
+                approval: [],
+                attention: [],
+                created: []
+            }
         }
     },
     computed: {
@@ -331,9 +337,14 @@ const ticketListMixins = {
                 ? { 'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}` }
                 : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
         },
-        handleSearch (params) {
+        handleSearch (params, toggle) {
             this.lastSearchParams = params
             this.getTicketList()
+            if (Object.keys(params).length === 0 || !toggle) return
+            this.searchResultList[this.type].push(params)
+        },
+        deteleSearchResult (type, index) {
+            this.searchResultList[type].splice(index, 1)
         },
         handleClearSearch () {
             this.searchForms.forEach(item => {

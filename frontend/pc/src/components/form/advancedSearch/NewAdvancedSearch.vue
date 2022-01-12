@@ -126,6 +126,21 @@
                 </div>
             </div>
         </collapse-transition>
+        <div class="search-result" v-if="searchResult.length !== 0">
+            <ul>
+                <li v-for="(result, index) in searchResult" :key="index">
+                    <bk-popover placement="bottom" theme="light">
+                        <span class="search-reult-content" @click="onSearchResult(index)">{{ result[0] }}</span>
+                        <div slot="content">
+                            <template v-for="(item, index1) in result">
+                                <p :key="index1">{{ item }}</p>
+                            </template>
+                        </div>
+                    </bk-popover>
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
+                </li>
+            </ul>
+        </div>
         <!-- 单据高亮设置 -->
         <bk-dialog
             v-model="isHighlightSetting"
@@ -172,7 +187,14 @@
                 default () {
                     return []
                 }
-            }
+            },
+            searchResultList: {
+                type: Object,
+                default () {
+                    return {}
+                }
+            },
+            panel: String
         },
         data () {
             return {
@@ -183,7 +205,32 @@
                 },
                 showMore: false,
                 searchWord: '',
-                searchForms: []
+                searchForms: [],
+                formField: {
+                    keyword: this.$t('m["单号/标题"]'),
+                    catalog_id: this.$t('m["服务目录"]'),
+                    creator__in: this.$t('m["提单人"]'),
+                    current_processor: this.$t('m["处理人"]'),
+                    current_status__in: this.$t('m["状态"]'),
+                    create_at__gte: this.$t('m["提单时间开始"]'),
+                    create_at__lte: this.$t('m["提单时间结束"]'),
+                    bk_biz_id: this.$t('m["业务"]')
+                }
+            }
+        },
+        computed: {
+            searchResult () {
+                if (this.searchResultList[this.panel]) {
+                    const result = this.searchResultList[this.panel].map(item => {
+                        const list = Object.keys(item).map(ite => {
+                            return `${this.formField[ite]}: ${item[ite]}`
+                        })
+                        return list
+                    })
+                    return result
+                } else {
+                    return []
+                }
             }
         },
         watch: {
@@ -271,7 +318,11 @@
                 return params
             },
             onSearchClick () {
-                this.$emit('search', this.getParams())
+                this.$emit('search', this.getParams(), true)
+            },
+            onSearchResult (index) {
+                const params = this.searchResultList[this.panel][index]
+                this.$emit('search', params, false)
             },
             onClearClick () {
                 this.searchForms.forEach(item => {
@@ -324,7 +375,38 @@
 <style lang="scss" scoped>
     @import '../../../scss/mixins/clearfix.scss';
     @import '../../../scss/mixins/scroller.scss';
-
+    .search-result {
+        height: 30px;
+        width: 100%;
+        margin-top: 10px;
+        ul {
+            font-size: 12px;
+            li {
+                padding: 4px;
+                background-color: #f0f1f5;
+                float: left;
+                margin: 4px 4px 4px 0;
+                border-radius: 2px;
+                display: flex;
+                align-items: center;
+                max-height: 26px;
+                .search-reult-content {
+                    cursor: pointer;
+                    span {
+                        display: block;
+                        margin: 1px;
+                    }
+                }
+                i {
+                    font-size: 14px;
+                    cursor: pointer;
+                    &:hover {
+                        color: red;
+                    }
+                }
+            }
+        }
+    }
     .bk-search-info {
         position: relative;
         width: 100%;
