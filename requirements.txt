@@ -82,7 +82,7 @@ gunicorn==19.6.0
 bkstorages==1.0.1
 pytz==2019.3
 suds-jurko==0.6
-mock==2.0.0
+mock==3.0.5
 
 # excel
 xlrd==1.2.0
