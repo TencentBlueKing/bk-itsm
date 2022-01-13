@@ -920,4 +920,7 @@
         }
     }
 }
+/deep/ .bk-tab-label-item {
+    border-bottom: 2px solid #3a84ff;
+}
 </style>

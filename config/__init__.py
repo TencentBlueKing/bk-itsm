@@ -36,7 +36,9 @@ def get_env_or_raise(key):
     value = os.environ.get(key)
     if not value:
         raise RuntimeError(
-            ('Environment variable "{}" not found, you must set this variable to run this application.').format(key)
+            (
+                'Environment variable "{}" not found, you must set this variable to run this application.'
+            ).format(key)
         )
     return value
 
@@ -61,10 +63,11 @@ __all__ = [
 # SaaS运行版本，如非必要请勿修改
 RUN_VER = "open"
 # SaaS应用ID
-APP_ID = ""
+APP_ID = os.environ.get("BKPAAS_APP_ID", "")
 # SaaS安全密钥，注意请勿泄露该密钥
-APP_TOKEN = ""
+APP_TOKEN = os.environ.get("BKPAAS_APP_SECRET", "")
 # 蓝鲸SaaS平台URL，例如 http://paas.bking.com
+BK_PAAS_HOST = os.environ.get("BKAPP_PAAS_HOST", "")
 
 RUN_VER = os.environ.get("RUN_VER", RUN_VER)
 OPEN_VER = "enterprise"

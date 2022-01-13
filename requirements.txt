@@ -75,6 +75,15 @@ idna==2.8
 urllib3==1.25.9
 pycrypto==2.6.1
 
+#others
+raven==6.1.0
+ddtrace==0.14.1
+gunicorn==19.6.0
+bkstorages==1.0.1
+pytz==2019.3
+suds-jurko==0.6
+mock==2.0.0
+
 # excel
 xlrd==1.2.0
 typing_extensions==3.6.5

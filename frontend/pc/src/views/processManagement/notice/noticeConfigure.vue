@@ -158,26 +158,27 @@
 
     .bk-notice-tab {
         @include clearfix;
-        border-bottom: 1px solid #DDE4EB;
-        margin-bottom: 10px;
-
+        border-bottom: 1px solid #dde4eb;
+        margin: -20px -20px 20px;
+        padding: 0 20px;
+        background-color: #ffffff;
         li {
             float: left;
             padding: 0 10px;
             line-height: 46px;
             text-align: center;
-            color: #63656E;
+            color: #63656e;
             cursor: pointer;
             font-size: 14px;
 
             &:hover {
-                color: #3A84FF;
+                color: #3a84ff;
             }
         }
 
         .bk-check-notice {
-            border-bottom: 2px solid #3A84FF;
-            color: #3A84FF;
+            border-bottom: 2px solid #3a84ff;
+            color: #3a84ff;
         }
     }
     .bk-table-permission {
@@ -189,7 +190,7 @@
         min-height: 200px;
 
         .bk-lable-primary {
-            color: #3A84FF;
+            color: #3a84ff;
             cursor: pointer;
         }
     }

@@ -69,7 +69,8 @@ def init_super_user():
     for name in settings.INIT_SUPERUSER:
         try:
             User.objects.update_or_create(
-                username=name, defaults={'is_staff': True, 'is_active': True, 'is_superuser': True}
+                username=name,
+                defaults={"is_staff": True, "is_active": True, "is_superuser": True},
             )
         except BaseException as error:
             print("init superuser %s error： %s" % (name, str(error)))
@@ -85,8 +86,8 @@ class IadminConfig(AppConfig):
                 "host": os.getenv("BKAPP_REDIS_HOST"),
                 "port": os.getenv("BKAPP_REDIS_PORT"),
                 "password": os.getenv("BKAPP_REDIS_PASSWORD"),
-                "service_name": os.getenv("BKAPP_REDIS_SERVICE_NAME"),
-                "mode": os.getenv("BKAPP_REDIS_MODE"),
-                "db": os.getenv("BKAPP_REDIS_DB"),
+                "service_name": os.getenv("BKAPP_REDIS_SERVICE_NAME", "mymaster"),
+                "mode": os.getenv("BKAPP_REDIS_MODE", "single"),
+                "db": os.getenv("BKAPP_REDIS_DB", 0),
             }
         post_migrate.connect(app_ready_handler, sender=self)

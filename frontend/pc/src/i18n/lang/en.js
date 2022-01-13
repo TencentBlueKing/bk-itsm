@@ -2423,5 +2423,12 @@ export const m = {
     '评价人': 'appraiser',
     '评价时间': 'Evaluation of time',
     '评价内容': 'Evaluation content',
-    '请先将字段属性关闭': 'Close the field properties first'
+    '请先将字段属性关闭': 'Close the field properties first',
+    '单号/标题': 'keyword',
+    '提单人': 'creator__in',
+    '处理人': 'current_processor',
+    '状态': 'current_status__in',
+    '提单时间开始': 'create_at__gte',
+    '提单时间结束': 'create_at__lte',
+    '业务': 'bk_biz_id'
 }
