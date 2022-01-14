@@ -35,7 +35,7 @@
             <template v-for="(group, index) in localForms">
                 <draggable
                     class="form-drag-wrap"
-                    handle=".hhh"
+                    handle=".view-form"
                     :data-rowindex="rowIndex"
                     :value="group"
                     :key="index"
@@ -53,7 +53,7 @@
                             @onFormEditClick="$emit('onFormEditClick', $event)"
                             @onFormCloneClick="$emit('onFormCloneClick', $event)"
                             @onFormDeleteClick="$emit('onFormDeleteClick', $event)">
-                            <div class="hhh" slot="draggable">
+                            <div class="view-form" slot="draggable">
                                 <i class="bk-itsm-icon icon-move-new"></i>
                             </div>
                         </form-view-item>

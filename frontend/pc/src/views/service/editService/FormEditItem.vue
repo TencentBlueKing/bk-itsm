@@ -57,9 +57,6 @@
         },
         mounted () {
             this.$refs.formEditItem.scrollIntoView({ block: 'center' })
-            this.$nextTick(function () {
-                console.log(this.$refs.addField)
-            })
         },
         methods: {
             onConfirmClick (form) {

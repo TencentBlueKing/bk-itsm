@@ -26,7 +26,7 @@
             <bk-form form-type="vertical">
                 <draggable
                     data-test-id="service_draggable_serviceFormDrag"
-                    handle=".hhh"
+                    handle=".dragElement"
                     :value="formList"
                     :group="{
                         name: 'view-form',
@@ -75,7 +75,7 @@
                                 @onFormEditClick="onFormEditClick"
                                 @onFormCloneClick="onFormCloneClick"
                                 @onFormDeleteClick="$emit('fieldDelete', $event)">
-                                <div class="hhh" slot="draggable">
+                                <div class="dragElement" slot="draggable">
                                     <i class="bk-itsm-icon icon-move-new"></i>
                                 </div>
                             </form-view-item>
@@ -123,7 +123,6 @@
             }
         },
         mounted () {
-            console.log(this.$attrs)
         },
         methods: {
             // 将字段列表转换为拖拽组件所需格式
@@ -146,7 +145,7 @@
             },
             // 整行表单拖拽
             onRowDragEnd (evt) {
-                console.log('整行拖拽', evt)
+                // console.log('整行拖拽', evt)
                 const id = Number(evt.item.dataset.id)
                 const field = this.forms.find(item => item.id === id)
                 let targetIndex = evt.newIndex
@@ -161,41 +160,77 @@
             onHalfRowDragToRow (evt) {
                 console.log('半行表单拖拽到整行', evt)
                 const id = Number(evt.item.dataset.id)
-                const field = this.forms.find(item => item.id === id)
                 let targetIndex = evt.newIndex
-                for (let i = 0; i < evt.newIndex; i++) { // 考虑半行表单的情况
-                    const rowForms = this.formList[i]
-                    if (Array.isArray(rowForms)) {
-                        // 存在包含两个半行表单行，且不存在当前拖拽表单
-                        if (rowForms.every(item => item !== undefined && item.id !== id)) {
-                            targetIndex += 1
-                        }
-                        // 存在包含一个半行表单行，且该表单为当前拖拽表单
-                        if (rowForms.some(item => item === undefined) && rowForms.find(item => item && item.id === id)) {
-                            targetIndex -= 1
+                if (this.forms.find(item => item.id === id)) {
+                    const field = this.forms.find(item => item.id === id)
+                    for (let i = 0; i < evt.newIndex; i++) { // 考虑半行表单的情况
+                        const rowForms = this.formList[i]
+                        if (Array.isArray(rowForms)) {
+                            // 存在包含两个半行表单行，且不存在当前拖拽表单
+                            if (rowForms.every(item => item !== undefined && item.id !== id)) {
+                                targetIndex += 1
+                            }
+                            // 存在包含一个半行表单行，且该表单为当前拖拽表单
+                            if (rowForms.some(item => item === undefined) && rowForms.find(item => item && item.id === id)) {
+                                targetIndex -= 1
+                            }
                         }
                     }
+                    field.meta.layout_position = 'left'
+                    this.$emit('dragUpdateList', targetIndex, field)
+                } else {
+                    this.$emit('onAddFormClick', targetIndex, evt.item._underlying_vm_)
                 }
-                field.meta.layout_position = 'left'
-                this.$emit('dragUpdateList', targetIndex, field)
             },
             // 半行表单拖拽到半行
             onHalfRowDragToHalfRow (evt) {
                 let targetIndex
                 const id = Number(evt.item.dataset.id)
-                const field = this.forms.find(item => item.id === id)
                 const rowIndex = Number(evt.target.dataset.rowindex)
                 const rowForms = this.formList[rowIndex]
                 const otherForm = rowForms.find(item => item)
                 const otherFormIndex = this.forms.findIndex(item => item.id === otherForm.id)
-                if (rowForms[0] === undefined) {
-                    field.meta.layout_position = 'left'
-                    targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
+                if (this.forms.find(item => item.id === id)) {
+                    const field = this.forms.find(item => item.id === id)
+                    if (rowForms[0] === undefined) {
+                        field.meta.layout_position = 'left'
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
+                    } else {
+                        field.meta.layout_position = 'right'
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
+                    }
+                    console.log(targetIndex)
+                    this.$emit('dragUpdateList', targetIndex, field)
                 } else {
-                    field.meta.layout_position = 'right'
-                    targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
+                    const field = {
+                        workflow: '',
+                        id: '',
+                        key: '',
+                        name: '',
+                        type: evt.item._underlying_vm_.type,
+                        desc: '',
+                        layout: 'COL_6',
+                        validate_type: 'REQUIRE',
+                        choice: [],
+                        is_builtin: false,
+                        source_type: 'CUSTOM',
+                        source_uri: '',
+                        regex: 'EMPTY',
+                        custom_regex: '',
+                        is_tips: false,
+                        tips: '',
+                        meta: {},
+                        default: ''
+                    }
+                    if (rowForms[0] === undefined) {
+                        field.meta.layout_position = 'left'
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
+                    } else {
+                        field.meta.layout_position = 'right'
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
+                    }
+                    this.$emit('onAddFormClick', targetIndex, field)
                 }
-                this.$emit('dragUpdateList', targetIndex, field)
             },
             // 切换为字段编辑
             onFormEditClick (form) {
@@ -260,10 +295,6 @@
             font-size: 12px;
             color: #979ba5;
         }
-    }
-    .hhh {
-        // width: 36px;
-        // height: 100%;
     }
 }
 </style>

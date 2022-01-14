@@ -304,7 +304,7 @@
                 </bk-table>
             </div>
         </div>
-        <bk-dialog
+        <!-- <bk-dialog
             width="800"
             v-model="isBasicFormEditting"
             :mask-close="false"
@@ -339,7 +339,7 @@
                     </bk-select>
                 </bk-form-item>
             </bk-form>
-        </bk-dialog>
+        </bk-dialog> -->
     </div>
 </template>
 
@@ -351,15 +351,15 @@
     import commonMix from '@/views/commonMix/common.js'
     import { errorHandler } from '../../utils/errorHandler'
     import treeInfo from './directoryCom/treeInfo.vue'
-    import selectTree from '@/components/form/selectTree/index.vue'
+    // import selectTree from '@/components/form/selectTree/index.vue'
 
     export default {
         name: 'ServiceList',
         components: {
             NavTitle,
             searchInfo,
-            treeInfo,
-            selectTree
+            treeInfo
+            // selectTree
         },
         mixins: [permission, commonMix],
         data () {
@@ -520,7 +520,7 @@
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
-                            type: 'edit',
+                            type: 'new',
                             step: 'basic'
                         },
                         query: {
@@ -574,17 +574,17 @@
                     }
                     this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
-                    this.isBasicFormEditting = true
-                    // this.$router.push({
-                    //     name: 'projectServiceEdit',
-                    //     params: {
-                    //         type: 'new',
-                    //         step: 'basic'
-                    //     },
-                    //     query: {
-                    //         project_id: this.$store.state.project.id
-                    //     }
-                    // })
+                    // this.isBasicFormEditting = true
+                    this.$router.push({
+                        name: 'projectServiceEdit',
+                        params: {
+                            type: 'new',
+                            step: 'basic'
+                        },
+                        query: {
+                            project_id: this.$store.state.project.id
+                        }
+                    })
                 }
             },
             // 编辑
