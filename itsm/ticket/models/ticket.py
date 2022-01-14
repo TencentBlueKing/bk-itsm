@@ -260,7 +260,7 @@ class Status(Model):
     RUNNING_STATUS = [RUNNING, RECEIVING, DISTRIBUTING, QUEUEING]
     CAN_OPERATE_STATUS = RUNNING_STATUS + PAUSED_STATUS
 
-    ticket_id = models.IntegerField(_("单据ID"))
+    ticket_id = models.IntegerField(_("单据ID"), db_index=True)
     by_flow = models.CharField(_("进入节点的线条ID"), max_length=64, default="")
     state_id = models.IntegerField(_("节点ID"))
     bk_biz_id = models.IntegerField(_("业务ID"), default=DEFAULT_BK_BIZ_ID)
@@ -270,10 +270,15 @@ class Status(Model):
         max_length=LEN_SHORT,
         choices=STATE_TYPE_CHOICES,
         default=NORMAL_STATE,
+        db_index=True,
     )
     is_sequential = models.BooleanField(_("是否是串行任务"), default=False)
     status = models.CharField(
-        _("节点状态"), max_length=LEN_SHORT, choices=STATUS_CHOICES, default="WAIT"
+        _("节点状态"),
+        max_length=LEN_SHORT,
+        choices=STATUS_CHOICES,
+        default="WAIT",
+        db_index=True,
     )
     tag = models.CharField(_("节点标签"), max_length=LEN_LONG, default=DEFAULT_STRING)
     action_type = models.CharField(
