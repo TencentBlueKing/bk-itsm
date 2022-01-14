@@ -179,7 +179,28 @@
                     field.meta.layout_position = 'left'
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
-                    this.$emit('onAddFormClick', targetIndex, evt.item._underlying_vm_)
+                    const field = {
+                        workflow: '',
+                        id: '',
+                        key: '',
+                        name: evt.item._underlying_vm_.name,
+                        type: evt.item._underlying_vm_.type,
+                        desc: '',
+                        layout: 'COL_12',
+                        validate_type: 'REQUIRE',
+                        choice: [],
+                        showFeild: true,
+                        is_builtin: false,
+                        source_type: 'CUSTOM',
+                        source_uri: '',
+                        regex: 'EMPTY',
+                        custom_regex: '',
+                        is_tips: false,
+                        tips: '',
+                        meta: {},
+                        default: ''
+                    }
+                    this.$emit('onAddFormClick', targetIndex, field)
                 }
             },
             // 半行表单拖拽到半行
@@ -206,12 +227,13 @@
                         workflow: '',
                         id: '',
                         key: '',
-                        name: '',
+                        name: evt.item._underlying_vm_.name,
                         type: evt.item._underlying_vm_.type,
                         desc: '',
                         layout: 'COL_6',
                         validate_type: 'REQUIRE',
                         choice: [],
+                        showFeild: true,
                         is_builtin: false,
                         source_type: 'CUSTOM',
                         source_uri: '',

@@ -543,7 +543,7 @@
                     workflow: '',
                     id: '',
                     key: '',
-                    name: '',
+                    name: val.name,
                     type: val.type,
                     desc: '',
                     layout: val.layout || 'COL_12',
@@ -552,12 +552,15 @@
                     is_builtin: false,
                     source_type: 'CUSTOM',
                     source_uri: '',
+                    showFeild: true,
+                    api_instance_id: null, // 源数据的kv关系配置
+                    kv_relation: {}, // 源数据的kv关系配置
+                    default: '', // 默认值
                     regex: 'EMPTY',
                     custom_regex: '',
                     is_tips: false,
                     tips: '',
-                    meta: val.meta || {},
-                    default: ''
+                    meta: val.meta || {}
                 }
                 this.addField(field)
             },
