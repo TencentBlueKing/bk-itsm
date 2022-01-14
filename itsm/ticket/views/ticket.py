@@ -194,14 +194,14 @@ class TicketOrderingFilter(object):
         if service_type:
             ticket_status_keys = (
                 TicketStatus.objects.filter(service_type=service_type)
-                .order_by(order_name)
-                .values_list("key", flat=True)
+                    .order_by(order_name)
+                    .values_list("key", flat=True)
             )
         else:
             ticket_status_keys = (
                 TicketStatus.objects.all()
-                .order_by(order_name)
-                .values_list("key", flat=True)
+                    .order_by(order_name)
+                    .values_list("key", flat=True)
             )
         ordering = "FIELD(`current_status`, {})".format(
             ",".join(["'{}'".format(key) for key in ticket_status_keys])
@@ -358,13 +358,15 @@ class TicketModelViewSet(ModelViewSet):
 
         # creator(实际提单人)和updated_by在serializer.to_internal_value(data)中获取
         instance = serializer.save(meta=meta)
-        print("----- create ticket do_after_create begin")
-        instance.do_after_create(
-            request.data["fields"], request.data.get("from_ticket_id", None)
-        )
-        print("----- create ticket do_after_create end")
-        start_pipeline.apply_async([instance])
-        print("----- create ticket start_pipeline end")
+        try:
+            instance.do_after_create(
+                request.data["fields"], request.data.get("from_ticket_id", None)
+            )
+            start_pipeline.apply_async([instance])
+        except BaseException as error:
+            Ticket._objects.filter(id=instance.id).delete()
+            logger.error("failed create ticket: {%s}", data)
+            raise ValidationError(_("创建单据失败，报错信息：{}".format(str(error))))
         return Response({"sn": instance.sn, "id": instance.id}, status=201)
 
     @action(detail=True, methods=["get"])
@@ -460,8 +462,8 @@ class TicketModelViewSet(ModelViewSet):
 
         queryset = (
             queryset.values("current_status")
-            .annotate(cnt=Count("current_status"))
-            .order_by("current_status")
+                .annotate(cnt=Count("current_status"))
+                .order_by("current_status")
         )
 
         data = {item["current_status"]: item["cnt"] for item in queryset}
@@ -478,8 +480,8 @@ class TicketModelViewSet(ModelViewSet):
 
         operate_at__gte = (
             (datetime.datetime.now() - datetime.timedelta(days=days))
-            .date()
-            .strftime("%Y-%m-%d %H:%M:%S")
+                .date()
+                .strftime("%Y-%m-%d %H:%M:%S")
         )
         data = dictfetchall(
             connection, get_my_deal_tickets_sql, request.user.username, operate_at__gte
@@ -626,8 +628,8 @@ class TicketModelViewSet(ModelViewSet):
             TicketField.objects.filter(
                 ticket_id__in=queryset.values_list("id", flat=True)
             )
-            .exclude(key__in=["bk_biz_id", "title"])
-            .order_by("-create_at"),
+                .exclude(key__in=["bk_biz_id", "title"])
+                .order_by("-create_at"),
             many=True,
         ).data
         ticket_releate_fields = group_by(ticket_fields, ["ticket_id"], dict_result=True)
@@ -1500,8 +1502,8 @@ class TicketModelViewSet(ModelViewSet):
                 related_type=validated_data["related_type"],
                 related_status="UNBIND_SUCCESS",
             )
-            .filter(Q(from_ticket_id=ticket.id) | Q(to_ticket_id=ticket.id))
-            .values(
+                .filter(Q(from_ticket_id=ticket.id) | Q(to_ticket_id=ticket.id))
+                .values(
                 "from_ticket_id",
                 "to_ticket_id",
                 "from_ticket__sn",

@@ -36,7 +36,8 @@ class TicketCreateService(ItsmService):
     __need_schedule__ = True
 
     def execute(self, data, parent_data):
-        logger.info("itsm_create execute: data=%s, parent_data=%s" % (data.inputs, parent_data.inputs))
+        logger.info(
+            "itsm_create execute: data=%s, parent_data=%s" % (data.inputs, parent_data.inputs))
         if parent_data.outputs.get("is_first_execute", True) is True:
             if parent_data.inputs.get("is_cloning", False) is True:
                 parent_data.set_outputs("is_cloning", True)
@@ -54,7 +55,8 @@ class TicketCreateService(ItsmService):
         return super(TicketCreateService, self).execute(data, parent_data)
 
     def schedule(self, data, parent_data, callback_data=None):
-        logger.info("itsm_create schedule: data=%s, parent_data=%s" % (data.inputs, parent_data.inputs))
+        logger.info(
+            "itsm_create schedule: data=%s, parent_data=%s" % (data.inputs, parent_data.inputs))
         if parent_data.outputs.get("is_first_execute", True) is False:
             return super(TicketCreateService, self).schedule(data, parent_data, callback_data)
 
@@ -62,10 +64,11 @@ class TicketCreateService(ItsmService):
         state_id = data.inputs.state_id
 
         # 输出字段变量和基础模型变量到pipeline
-        logger.info("\n-------  itsm_auto add table fields to pipeline data  ----------\n")
+        logger.info(
+            "------- itsm_auto add table fields to pipeline data for ticket(%s)-state(%s) ----------",
+            ticket_id, state_id)
         ticket = Ticket.objects.get(id=ticket_id)
         for field in ticket.get_output_fields(state_id):
-            logger.info('set_output: "params_{}" = {}'.format(field["key"], field["value"]))
             data.set_outputs("params_%s" % field["key"], field["value"])
         parent_data.set_outputs("is_first_execute", False)
 
@@ -75,7 +78,8 @@ class TicketCreateService(ItsmService):
         """
         编写特殊逻辑：克隆的时候跳过调度，直至恢复
         """
-        if pipeline_data is not None and pipeline_data.outputs.get("is_first_execute", True) is True:
+        if pipeline_data is not None and pipeline_data.outputs.get("is_first_execute",
+                                                                   True) is True:
             pipeline_data.set_outputs("is_first_execute", False)
             return False
         return super(TicketCreateService, self).need_schedule(pipeline_data)
