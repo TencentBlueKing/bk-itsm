@@ -314,7 +314,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             )
             start_pipeline.apply_async([instance])
         except BaseException as error:
-            Ticket._objects.filter(id=instance.id).delete()
+            Ticket.objects.filter(id=instance.id).delete()
             logger.error("failed create ticket: {%s}", data)
             raise ValidationError(_("创建单据失败，报错信息：{}".format(str(error))))
         return Response(
