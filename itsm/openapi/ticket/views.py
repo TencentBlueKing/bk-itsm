@@ -63,6 +63,7 @@ from itsm.component.exceptions import (
     ParamError,
     ServerError,
     TicketNotFoundError,
+    CreateTicketError,
 )
 from itsm.component.utils.drf import format_validation_message
 from itsm.openapi.ticket.serializers import (
@@ -401,7 +402,9 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         fields: 提单节点字段信息
         """
         # 创建单据
+
         data = copy.deepcopy(request.data)
+        logger.info("[openapi][create_ticket]-> 正在开始创建单据, request_data={}".format(data))
         fast_approval = data.pop("fast_approval", False)
         if fast_approval:
             data["catalog_id"] = ServiceCatalog.objects.get(
@@ -414,10 +417,17 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         serializer = TicketCreateSerializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        instance.do_after_create(
-            data["fields"], request.data.get("from_ticket_id", None)
-        )
-        start_pipeline.apply_async([instance])
+        try:
+            instance.do_after_create(
+                data["fields"], request.data.get("from_ticket_id", None)
+            )
+            start_pipeline.apply_async([instance])
+        except Exception as e:
+            logger.exception(
+                "[openapi][create_ticket]-> 单据创建失败， 错误原因 error={}".format(e)
+            )
+            instance.delete()
+            raise CreateTicketError()
 
         logger.info(
             "[openapi][create_ticket]-> 单据创建成功，sn={}, request_data={}".format(
@@ -554,7 +564,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        
+
         ticket_id = serializer.validated_data["process_inst_id"]
         state_id = serializer.validated_data["activity"]
         try:
@@ -562,9 +572,15 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         except Exception:
             raise ValidationError("process_inst_id = {} 对应的单据不存在！".format(ticket_id))
         try:
-            node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=ticket.id)
+            node_fields = TicketField.objects.filter(
+                state_id=state_id, ticket_id=ticket.id
+            )
         except Exception:
-            raise ValidationError("activity = {}, process_inst_id = {} 对应的表单字段不存在！".format(state_id, ticket_id))
+            raise ValidationError(
+                "activity = {}, process_inst_id = {} 对应的表单字段不存在！".format(
+                    state_id, ticket_id
+                )
+            )
         fields = []
         remarked = False
         for field in node_fields:
