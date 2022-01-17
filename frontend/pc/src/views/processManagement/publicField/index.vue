@@ -190,9 +190,12 @@
             <bk-sideslider
                 :is-show.sync="sliderInfo.show"
                 :title="sliderInfo.title"
+                :quick-close="true"
+                :before-close="closeSideslider"
                 :width="sliderInfo.width">
                 <div class="p20" slot="content" v-if="sliderInfo.show">
                     <add-field
+                        ref="addField"
                         :change-info="changeInfo"
                         :table-list="listInfo"
                         :is-edit-public="isEditPublic"
@@ -567,6 +570,19 @@
                 this.changeInfo.is_tips = item.is_tips || false
                 this.sliderInfo.title = this.$t(`m.treeinfo["编辑字段"]`)
                 this.sliderInfo.show = true
+            },
+            // 关闭前验证字段表单
+            closeSideslider () {
+                this.$bkInfo({
+                    title: '是否修改保存？',
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        this.$refs.addField.checkInfo()
+                    },
+                    cancelFn: () => {
+                        this.sliderInfo.show = false
+                    }
+                })
             }
         }
     }

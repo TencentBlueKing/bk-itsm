@@ -68,9 +68,12 @@
             <bk-sideslider
                 :is-show.sync="noticeInfo.show"
                 :title="noticeInfo.title"
+                :quick-close="true"
+                :before-close="closeSideslider"
                 :width="noticeInfo.width">
                 <div slot="content" style="padding: 20px 34px;" v-if="noticeInfo.show">
                     <editor-notice
+                        ref="editorNotice"
                         :check-id="checkId"
                         :notice-info="noticeInfo.formInfo"
                         @closeEditor="closeEditor">
@@ -147,6 +150,18 @@
             },
             closeEditor () {
                 this.noticeInfo.show = false
+            },
+            closeSideslider () {
+                this.$bkInfo({
+                    title: '是否修改保存？',
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        this.$refs.editorNotice.submitNotice()
+                    },
+                    cancelFn: () => {
+                        this.noticeInfo.show = false
+                    }
+                })
             }
         }
     }
