@@ -158,6 +158,7 @@ class CustomNotice(models.Model):
                     },
                     action=template[2],
                     notify_type=template[3],
+                    updated_by="system",
                 )
             except CustomNotice.MultipleObjectsReturned:
                 CustomNotice.objects.filter(action=template[2], notify_type=template[3]).delete()
