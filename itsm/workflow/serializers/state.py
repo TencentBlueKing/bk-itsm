@@ -109,6 +109,7 @@ class StateSerializer(serializers.ModelSerializer):
             'is_sequential',
             'finish_condition',
             'is_multi',
+            'is_allow_skip',
         ) + model.FIELDS
 
         read_only_fields = model.FIELDS

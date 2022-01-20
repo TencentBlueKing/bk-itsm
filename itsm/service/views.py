@@ -562,6 +562,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
             "display_role": 8,
             "display_type": "display_type",
             "workflow_config": {
+                "is_auto_approve": true,
                 "is_revocable": true,
                 "revoke_config": {
                     "type": 1,
