@@ -1346,6 +1346,8 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '自动处理：': 'Automatic processing：',
+        '自动处理': 'Automatic processing',
         '请输入选项ID': 'Please enter the option ID',
         '请输入选项名': 'Please enter the option name',
         '指定节点前可以撤回': 'Can be withdrawn before the designated node',
@@ -2353,5 +2355,6 @@ export const m = {
     '选择执行方案，默认选择全部任务节点': 'Select the execution scheme. By default, all task nodes are selected',
     '请输入表单参数': 'Please enter form parameters',
     '请先创建服务后再进行操作': 'Create the service before performing the operation',
-    '该项目不允许删除': 'This project is not allowed to be deleted'
+    '该项目不允许删除': 'This project is not allowed to be deleted',
+    '审批节点已自动处理': 'The approval node is automatically processed'
 }

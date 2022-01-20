@@ -140,6 +140,14 @@
                         </div>
                     </bk-form-item>
                 </template>
+                <bk-form-item :label="$t(`m.treeinfo['自动处理：']`)">
+                    <bk-checkbox
+                        :true-value="true"
+                        :false-value="false"
+                        v-model="formInfo.is_allow_skip">
+                        节点处理人为空时，直接跳过且不视为异常
+                    </bk-checkbox>
+                </bk-form-item>
             </bk-form>
         </basic-card>
         <basic-card :card-label="$t(`m.treeinfo['字段配置']`)" class="mt20">
@@ -219,7 +227,8 @@
                     ticket_key: '',
                     is_sequential: false,
                     is_multi: true,
-                    processors: []
+                    processors: [],
+                    is_allow_skip: false
                 },
                 nodeTagList: [],
                 allCondition: [],
@@ -277,6 +286,7 @@
                 this.formInfo.is_multi = this.configur.is_multi === true
                 // this.formInfo.can_deliver = this.configur.can_deliver === true
                 this.formInfo.is_sequential = this.configur.is_sequential
+                this.formInfo.is_allow_skip = this.configur.is_allow_skip
                 this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : []
                 this.formInfo.ticket_type = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.type : 'keep'
                 this.formInfo.ticket_key = this.configur.extras.ticket_status ? this.configur.extras.ticket_status.name : ''
@@ -359,7 +369,8 @@
                         workflow: this.flowInfo.id,
                         type: this.configur.type,
                         is_terminable: false,
-                        processors_type: 'PERSON'
+                        processors_type: 'PERSON',
+                        is_allow_skip: false
                     }
                     // 基本信息
                     params.name = this.formInfo.name
@@ -386,6 +397,7 @@
                         params.delivers_type = data.type
                         params.delivers = data.value
                     }
+                    params.is_allow_skip = this.formInfo.is_allow_skip
                     params.is_multi = this.formInfo.is_multi
                     params.tag = this.formInfo.tag
                     params.can_deliver = this.formInfo.can_deliver
