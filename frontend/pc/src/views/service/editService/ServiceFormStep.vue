@@ -36,7 +36,7 @@
                             :list="fieldsLibrary"
                             handle=".field-item"
                             :group="{ name: 'view-form', pull: 'clone', put: false }">
-                            <li class="field-item" v-for="field in fieldsLibrary" :key="field.type" @click="onAddFormClick(field)" :date-type="field.type">
+                            <li class="field-item drag-entry" v-for="field in fieldsLibrary" :key="field.type" @click="onAddFormClick(field)" :date-type="field.type">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </draggable>
@@ -48,9 +48,8 @@
                         <draggable
                             :list="publicFields"
                             handle=".field-item"
-                            :group="{ name: 'view-form', pull: 'clone', put: false }"
-                            @move="handleMove">
-                            <li class="field-item" v-for="field in publicFields" :key="field.id" @click="addField(field)">
+                            :group="{ name: 'view-form', pull: 'clone', put: false }">
+                            <li class="field-item drag-entry" v-for="field in publicFields" :key="field.id" @click="addField(field)">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </draggable>
@@ -322,9 +321,6 @@
             }
         },
         methods: {
-            handleMove (evt) {
-                console.log(evt)
-            },
             handleDragLine (e) {
                 document.addEventListener('mouseup', this.handleMouseUp, false)
                 document.addEventListener('mousemove', this.handleLineMouseMove, false)
@@ -344,9 +340,7 @@
                 const el = document.querySelector('.edit-service-field')
                 const { startX, base } = this.dragLine
                 const offsetX = e.pageX - startX
-                // console.log(offsetX)
                 const moveX = base + offsetX
-                console.log(600 - moveX)
                 if (offsetX > 0 && 600 - moveX <= 400) return
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
@@ -529,6 +523,13 @@
             },
             // 更新原字段列表顺序
             dragUpdateList (targetIndex, field) {
+                if (!field) {
+                    this.$bkMessage({
+                        message: this.$t(`m["请先保存字段"]`),
+                        offsetY: 80
+                    })
+                    return
+                }
                 const index = this.ticketNodeForm.findIndex(item => item.id === field.id)
                 this.ticketNodeForm.splice(index, 1)
                 this.ticketNodeForm.splice(targetIndex, 0, field)
@@ -553,9 +554,9 @@
                     source_type: 'CUSTOM',
                     source_uri: '',
                     showFeild: true,
-                    api_instance_id: null, // 源数据的kv关系配置
-                    kv_relation: {}, // 源数据的kv关系配置
-                    default: '', // 默认值
+                    api_instance_id: null,
+                    kv_relation: {},
+                    default: '',
                     regex: 'EMPTY',
                     custom_regex: '',
                     is_tips: false,
@@ -846,11 +847,7 @@
     }
     .basic-body {
         flex: 1;
-        // width: 632px;
         margin: 24px;
-        // float: left;
-        // padding: 15px;create-info-card
-        // width: calc(100% - 280px);
         height: calc(100vh - 225px);
         overflow: auto;
         @include scroller;
@@ -890,7 +887,6 @@
 }
 .settion-card {
     margin: auto;
-    // max-width: 1000px;
     .card-title {
         margin: 0;
         font-size: 14px;
@@ -1015,6 +1011,16 @@
             span {
                 color: #737987;
                 margin-left: 14px;
+            }
+            &:hover {
+                border: 1px dashed #3a84ff;
+                background-color: #f0f5ff;
+                i{
+                    color: #3a84ff;
+                }
+                span {
+                    color: #3a84ff;
+                }
             }
         }
     }

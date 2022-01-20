@@ -135,64 +135,6 @@
                 </bk-form-item>
             </bk-form>
         </bk-dialog>
-        <!-- <div class="bk-add-data">
-            <bk-sideslider
-                :is-show.sync="addDirectory.show"
-                :title="addDirectory.title"
-                :width="addDirectory.width">
-                <div slot="content" style="padding: 20px 34px;" v-if="addDirectory.show">
-                    <bk-form
-                        :label-width="200"
-                        form-type="vertical"
-                        :model="addDirectory.formInfo"
-                        :rules="rules"
-                        ref="dynamicForm">
-                        <bk-form-item
-                            :label="$t(`m.serviceConfig['父级目录']`)"
-                            :required="true">
-                            <bk-input disabled
-                                v-model.trim="addDirectory.formInfo.parent___name">
-                            </bk-input>
-                        </bk-form-item>
-                        <bk-form-item
-                            :label="$t(`m.serviceConfig['目录名称']`)"
-                            :required="true"
-                            :property="'name'">
-                            <bk-input v-model.trim="addDirectory.formInfo.name"
-                                maxlength="120"
-                                :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
-                            </bk-input>
-                        </bk-form-item>
-                        <bk-form-item
-                            :label="$t(`m.serviceConfig['目录描述']`)">
-                            <bk-input
-                                :placeholder="$t(`m.serviceConfig['请输入目录描述']`)"
-                                :type="'textarea'"
-                                :rows="3"
-                                :maxlength="255"
-                                v-model="addDirectory.formInfo.desc">
-                            </bk-input>
-                        </bk-form-item>
-                    </bk-form>
-                    <div class="bk-add-btn">
-                        <bk-button :theme="'primary'"
-                            :title="$t(`m.serviceConfig['确认']`)"
-                            class="mr10"
-                            :loading="clickSecond"
-                            @click="submitAdd">
-                            {{$t(`m.serviceConfig['确认']`)}}
-                        </bk-button>
-                        <bk-button :theme="'default'"
-                            :title="$t(`m.serviceConfig['取消']`)"
-                            class="mr10"
-                            :loading="clickSecond"
-                            @click="toggleDialog">
-                            {{$t(`m.serviceConfig['取消']`)}}
-                        </bk-button>
-                    </div>
-                </div>
-            </bk-sideslider>
-        </div> -->
     </div>
 </template>
 <script>
@@ -283,8 +225,8 @@
             },
             // 点击节点方法
             nodeClick (node) {
-                console.log(node)
                 this.treeInfo.node = node
+                this.$route.query.fromCatalog = node.id
                 this.$store.commit('serviceCatalog/changeTreeOperat', false)
             },
             iconNode (node) {
@@ -567,23 +509,17 @@
     }
     .bk-tree-content {
         height: 100%;
-        padding: 20px 0;
+        padding: 0px 16px;
         @include scroller;
         @include clearfix;
         .bk-tree-search {
-            padding: 0 10px;
             margin-bottom: 20px;
-            // .bk-tree-input {
-            //     display: none;
-            // }
         }
         .bk-tree-class {
             color: #737987;
-            padding: 0 10px;
         }
         .bk-tree-addService {
             height: 20px;
-            padding: 0 10px;
             margin: 14px 0;
             line-height: 20px;
             font-size: 12px;

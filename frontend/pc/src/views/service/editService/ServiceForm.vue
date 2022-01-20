@@ -30,7 +30,8 @@
                     :value="formList"
                     :group="{
                         name: 'view-form',
-                        pull: false
+                        pull: false,
+                        put: ['view-form', 'half-row-field', 'form-view-item']
                     }"
                     @end="onRowDragEnd"
                     @add="onHalfRowDragToRow">
@@ -55,16 +56,6 @@
                         </half-row-form>
                         <!-- 全行表单 -->
                         <template v-else>
-                            <!-- <form-edit-item
-                                v-if="form.id === crtForm"
-                                :key="form.id"
-                                :fields="forms"
-                                :form="form"
-                                :workflow-id="serviceInfo.workflow_id"
-                                :node-id="nodeId"
-                                @onEditCancel="onEditCancel"
-                                @onEditConfirm="onEditConfirm">
-                            </form-edit-item> -->
                             <form-view-item
                                 :data-id="form.id"
                                 :key="form.id"
@@ -158,7 +149,7 @@
             },
             // 半行表单拖拽到整行
             onHalfRowDragToRow (evt) {
-                console.log('半行表单拖拽到整行', evt)
+                // console.log('半行表单拖拽到整行', evt)
                 const id = Number(evt.item.dataset.id)
                 let targetIndex = evt.newIndex
                 if (this.forms.find(item => item.id === id)) {
@@ -220,7 +211,6 @@
                         field.meta.layout_position = 'right'
                         targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
                     }
-                    console.log(targetIndex)
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
                     const field = {
@@ -318,5 +308,12 @@
             color: #979ba5;
         }
     }
+}
+/deep/ .drag-entry {
+    position: relative;
+    width: 100%;
+    height: 0;
+    font-size: 0;
+    border-top: 2px solid #bdd1f0;
 }
 </style>

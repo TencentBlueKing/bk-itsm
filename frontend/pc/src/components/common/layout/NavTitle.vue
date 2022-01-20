@@ -59,6 +59,7 @@
 <style lang="scss" scoped>
     .nav {
         position: relative;
+        z-index: 101;
         box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.1);
         .nav-title {
             height: 52px;

@@ -2430,5 +2430,6 @@ export const m = {
     '状态': 'current_status__in',
     '提单时间开始': 'create_at__gte',
     '提单时间结束': 'create_at__lte',
-    '业务': 'bk_biz_id'
+    '业务': 'bk_biz_id',
+    '请先保存字段': 'Please save the fields'
 }
