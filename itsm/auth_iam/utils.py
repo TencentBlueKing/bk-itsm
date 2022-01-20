@@ -125,11 +125,6 @@ class IamRequest(object):
         获取批量资源的权限
         :return:
         """
-        logger.info(
-            "获取批量资源的权限，actions={}, resources={}, project_key={}".format(
-                actions, resources, project_key
-            )
-        )
         if settings.ENVIRONMENT == "dev":
             # dev 环境不走权限中心
             actions_result = {action: True for action in actions}
@@ -264,10 +259,12 @@ def grant_resource_creator_related_actions(
         "name": resource_name,
         "creator": creator,
     }
+    logger.info("正在向权限中心主动授权, request_data={}".format(request_data))
     result, message = iam_client.grant_resource_creator_actions(
         bk_token=bk_token, bk_username="admin", data=request_data
     )
     if not result:
+        logger.info("权限中心主动授权发生异常, 权限中心报错: {}".format(message))
         logger.error(message)
         raise IamGrantCreatorActionError(message)
 
