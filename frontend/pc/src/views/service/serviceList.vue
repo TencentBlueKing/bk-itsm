@@ -304,42 +304,6 @@
                 </bk-table>
             </div>
         </div>
-        <!-- <bk-dialog
-            width="800"
-            v-model="isBasicFormEditting"
-            :mask-close="false"
-            :title="'创建服务'"
-            @confirm="onBasicFormSubmit"
-            @cancel="onBasicFormCancel">
-            <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
-                <bk-form-item data-test-id="service-input-serviceName" :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
-                    <bk-input v-model="formData.name"></bk-input>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.serviceConfig['服务描述']`)" property="desc">
-                    <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
-                </bk-form-item>
-                <bk-form-item data-test-id="service-select-serviceDirectory" :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
-                    <select-tree
-                        v-model="formData.catalog_id"
-                        :list="dirList"
-                        ext-cls="bk-form-width">
-                    </select-tree>
-                </bk-form-item>
-                <bk-form-item data-test-id="service-select-serviceType" :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
-                    <bk-select v-model="formData.key"
-                        :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'">
-                        <bk-option v-for="option in serviceTypeList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-            </bk-form>
-        </bk-dialog> -->
     </div>
 </template>
 
@@ -459,7 +423,7 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    catalog_id: this.treeInfo.node.id,
+                    catalog_id: this.$route.query.fromCatalog || this.treeInfo.node.id,
                     ordering: '-update_at'
                 }
 
@@ -525,7 +489,8 @@
                         },
                         query: {
                             serviceId: res.data.id,
-                            project_id: this.$store.state.project.id
+                            project_id: this.$store.state.project.id,
+                            fromCatalog: this.treeInfo.node.id
                         }
                     })
                     this.isBasicFormEditting = false
@@ -603,7 +568,8 @@
                     },
                     query: {
                         serviceId,
-                        project_id: this.$store.state.project.id
+                        project_id: this.$store.state.project.id,
+                        fromCatalog: this.treeInfo.node.id
                     }
                 })
             },
@@ -758,14 +724,15 @@
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';
 .page-content {
-    padding: 2px;
+    position: relative;
+    z-index: 100;
     height: calc(100vh - 104px);
     overflow: auto;
     @include scroller;
     .service-left {
         position: relative;
         height: 100%;
-        padding-bottom: 24px;
+        padding-bottom: 48px;
         width: 240px;
         float: left;
         background-color: #fafbfd;

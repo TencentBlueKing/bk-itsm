@@ -237,7 +237,8 @@
                     this.$router.push({
                         name: 'projectServiceList',
                         query: {
-                            project_id: this.$store.state.project.id
+                            project_id: this.$store.state.project.id,
+                            ...this.$route.query
                         }
                     })
                 } else {

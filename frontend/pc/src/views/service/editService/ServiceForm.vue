@@ -30,7 +30,8 @@
                     :value="formList"
                     :group="{
                         name: 'view-form',
-                        pull: false
+                        pull: false,
+                        put: ['view-form', 'half-row-field', 'form-view-item']
                     }"
                     @end="onRowDragEnd"
                     @add="onHalfRowDragToRow">
@@ -55,16 +56,6 @@
                         </half-row-form>
                         <!-- 全行表单 -->
                         <template v-else>
-                            <!-- <form-edit-item
-                                v-if="form.id === crtForm"
-                                :key="form.id"
-                                :fields="forms"
-                                :form="form"
-                                :workflow-id="serviceInfo.workflow_id"
-                                :node-id="nodeId"
-                                @onEditCancel="onEditCancel"
-                                @onEditConfirm="onEditConfirm">
-                            </form-edit-item> -->
                             <form-view-item
                                 :data-id="form.id"
                                 :key="form.id"
@@ -158,7 +149,7 @@
             },
             // 半行表单拖拽到整行
             onHalfRowDragToRow (evt) {
-                console.log('半行表单拖拽到整行', evt)
+                // console.log('半行表单拖拽到整行', evt)
                 const id = Number(evt.item.dataset.id)
                 let targetIndex = evt.newIndex
                 if (this.forms.find(item => item.id === id)) {
@@ -179,7 +170,28 @@
                     field.meta.layout_position = 'left'
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
-                    this.$emit('onAddFormClick', targetIndex, evt.item._underlying_vm_)
+                    const field = {
+                        workflow: '',
+                        id: '',
+                        key: '',
+                        name: evt.item._underlying_vm_.name,
+                        type: evt.item._underlying_vm_.type,
+                        desc: '',
+                        layout: 'COL_12',
+                        validate_type: 'REQUIRE',
+                        choice: [],
+                        showFeild: true,
+                        is_builtin: false,
+                        source_type: 'CUSTOM',
+                        source_uri: '',
+                        regex: 'EMPTY',
+                        custom_regex: '',
+                        is_tips: false,
+                        tips: '',
+                        meta: {},
+                        default: ''
+                    }
+                    this.$emit('onAddFormClick', targetIndex, field)
                 }
             },
             // 半行表单拖拽到半行
@@ -199,19 +211,19 @@
                         field.meta.layout_position = 'right'
                         targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
                     }
-                    console.log(targetIndex)
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
                     const field = {
                         workflow: '',
                         id: '',
                         key: '',
-                        name: '',
+                        name: evt.item._underlying_vm_.name,
                         type: evt.item._underlying_vm_.type,
                         desc: '',
                         layout: 'COL_6',
                         validate_type: 'REQUIRE',
                         choice: [],
+                        showFeild: true,
                         is_builtin: false,
                         source_type: 'CUSTOM',
                         source_uri: '',
@@ -296,5 +308,12 @@
             color: #979ba5;
         }
     }
+}
+/deep/ .drag-entry {
+    position: relative;
+    width: 100%;
+    height: 0;
+    font-size: 0;
+    border-top: 2px solid #bdd1f0;
 }
 </style>

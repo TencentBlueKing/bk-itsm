@@ -678,7 +678,9 @@
         border-bottom: 1px solid #E9EDF1;
         margin-bottom: 20px;
     }
-
+    /deep/ .bk-form-content {
+        width: 480px;
+    }
     .bk-form-width {
         width: 480px;
     }
