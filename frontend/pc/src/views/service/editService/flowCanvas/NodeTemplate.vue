@@ -28,9 +28,13 @@
         @mousemove="moveFn"
         @mouseup="onNodeClick(node, $event)"
         @contextmenu.prevent="rightClickNode(node, $event)"
-        @click="clickNode(node, $event)"
         @mouseout="hoverNode(node)"
-        v-bk-clickoutside="closeNode">
+        v-bk-clickoutside="closeNode"
+        v-bk-tooltips="{
+            placement: 'auto',
+            content: node.name,
+            theme: 'light'
+        }">
         <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
             {{ $t(`m.treeinfo['开始']`) }}
         </div>
@@ -48,6 +52,7 @@
                         <span v-else style="font-size: 11px; font-weight: bold;">API</span>
                     </span>
                     <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
+                    <i class="bk-itsm-icon icon-edit-bold" @click="clickNode(node, $event)"></i>
                     <span class="bk-node-delete"
                         v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
                         @click.stop="clickDelete(node)"

@@ -25,6 +25,7 @@
         <bk-form :label-width="150"
             :model="formInfo"
             :rules="rules"
+            form-type="vertical"
             ref="basicForm">
             <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)"
                 data-test-id="basicInfo-input-nodeName"
@@ -448,7 +449,7 @@
         width: 480px;
     }
     .bk-form-width {
-        width: 330px;
+        width: 480px;
     }
     .bk-form-display {
         float: left;
@@ -458,5 +459,8 @@
         line-height: 32px;
         color: #ff5656;
         font-size: 12px;
+    }
+    /deep/ .bk-form-width {
+        width: 480px;
     }
 </style>

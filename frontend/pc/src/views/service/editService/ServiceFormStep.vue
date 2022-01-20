@@ -23,126 +23,56 @@
 <template>
     <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
         <!-- 字段选择 -->
-        <div class="field-option" v-show="showFieldOption">
-            <bk-tab data-test-id="service_tab_servcieField" :active.sync="active" type="unborder-card" ext-cls="field-tab">
-                <bk-tab-panel name="library-fields">
-                    <template slot="label">
-                        <i class="panel-icon bk-icon icon-apps"></i>
-                        <span class="panel-name">{{ $t(`m.tickets['控件库']`) }}</span>
-                    </template>
+        <div :class="['field-option', isShowField ? 'field-hide' : '']">
+            <div style="overflow: hidden">
+                <div class="field-type">字段类型</div>
+                <div class="show-field" @click="handleShowField">
+                    <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
+                </div>
+                <div class="field-content">
+                    <div class="field-title">控件库</div>
                     <ul class="field-list">
-                        <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
-                            <i class="bk-icon" :class="field.icon"></i><span class="field-name">{{ field.name }}</span>
-                        </li>
+                        <draggable
+                            :list="fieldsLibrary"
+                            handle=".field-item"
+                            :group="{ name: 'view-form', pull: 'clone', put: false }">
+                            <li class="field-item" v-for="field in fieldsLibrary" :key="field.type" @click="onAddFormClick(field)" :date-type="field.type">
+                                <span class="field-name">{{ field.name }}</span>
+                            </li>
+                        </draggable>
                     </ul>
-                </bk-tab-panel>
-                <bk-tab-panel name="public-fields">
-                    <template slot="label">
-                        <i class="panel-icon bk-icon icon-cog-shape"></i>
-                        <span class="panel-name">{{ $t(`m.tickets['已有字段']`) }}</span>
-                    </template>
+                </div>
+                <div class="field-content">
+                    <div class="field-title">已有字段</div>
                     <ul class="field-list">
-                        <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
-                            <i class="bk-icon icon-apps"></i><span class="field-name">{{ field.name }}</span>
-                        </li>
+                        <draggable
+                            :list="publicFields"
+                            handle=".field-item"
+                            :group="{ name: 'view-form', pull: 'clone', put: false }"
+                            @move="handleMove">
+                            <li class="field-item" v-for="field in publicFields" :key="field.id" @click="addField(field)">
+                                <span class="field-name">{{ field.name }}</span>
+                            </li>
+                        </draggable>
                     </ul>
-                </bk-tab-panel>
-            </bk-tab>
+                </div>
+            </div>
         </div>
         <!-- 基础信息 -->
         <div class="basic-body">
-            <section data-test-id="servie_section_serviceBasicInformation" class="settion-card basic-info-card">
-                <h2 class="card-title">{{ $t(`m.tickets['服务基础信息']`) }}</h2>
-                <div class="card-content">
-                    <!-- 编辑状态 -->
-                    <div v-if="isBasicFormEditting" class="service-basic-form">
-                        <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
-                            <bk-form-item data-test-id="service-input-serviceName" :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
-                                <bk-input v-model="formData.name"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item :label="$t(`m.serviceConfig['服务描述']`)" property="desc">
-                                <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
-                            </bk-form-item>
-                            <bk-form-item data-test-id="service-select-serviceDirectory" :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
-                                <select-tree
-                                    v-model="formData.catalog_id"
-                                    :list="dirList"
-                                    ext-cls="bk-form-width">
-                                </select-tree>
-                            </bk-form-item>
-                            <bk-form-item data-test-id="service-select-serviceType" :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
-                                <bk-select v-model="formData.key"
-                                    :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
-                                    :clearable="false"
-                                    searchable
-                                    :font-size="'medium'">
-                                    <bk-option v-for="option in serviceTypeList"
-                                        :key="option.key"
-                                        :id="option.key"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </bk-form-item>
-                        </bk-form>
-                        <div class="sbmit-buttons">
-                            <bk-button ext-cls="button-item"
-                                theme="default"
-                                :title="$t(`m.treeinfo['取消']`)"
-                                :disabled="isSubmitting"
-                                @click="onBasicFormCancel()">
-                                {{ $t(`m.treeinfo['取消']`) }}
-                            </bk-button>
-                            <bk-button ext-cls="button-item"
-                                data-test-id="service-button-submit"
-                                theme="primary"
-                                :loading="isSubmitting"
-                                :title="$t(`m.eventdeploy['确认']`)"
-                                @click="onBasicFormSubmit()">
-                                {{ $t(`m.eventdeploy['确认']`) }}
-                            </bk-button>
-                        </div>
-                    </div>
-                    <!-- 显示状态 -->
-                    <div v-else class="service-basic-info">
-                        <h2 class="service-title">{{ serviceInfo.name }}<span class="service-dir">({{ catalogDisplayName || '--' }})</span></h2>
-                        <p class="service-desc">{{ serviceInfo.desc || '--' }}</p>
-                        <div class="mask"></div>
-                        <div class="opt-btns">
-                            <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four" @click="isBasicFormEditting = true"></i>
-                        </div>
+            <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
+                <!-- 选择服务模板1 -->
+                <div class="service-template">
+                    <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
+                        :key="index"
+                        data-test-id="servie_section_QuicklyCreateForm"
+                        @click="onCreateFormWayCLick(way)">
+                        <i class="bk-itsm-icon icon-it-new-globalview"></i>
+                        <span>{{way.name}}</span>
                     </div>
                 </div>
-            </section>
-            <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
-                <h2 class="card-title">
-                    <span>{{ $t(`m.tickets['服务提单信息']`) }}</span>
-                    <bk-popover
-                        placement="bottom-end"
-                        ext-cls="create-service-popover"
-                        theme="light"
-                        :arrow="false"
-                        :distance="0"
-                        :tippy-options="{
-                            hideOnClick: false
-                        }"
-                        :disabled="!serviceTemplateDisable"
-                        :on-show="createServicePopoverShow"
-                        :on-hide="createServicePopoverHide">
-                        <span class="dropdown-trigger-text">
-                            快速创建表单
-                            <i :class="['bk-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
-                        </span>
-                        <ul class="bk-dropdown-list" slot="content">
-                            <li v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
-                                :key="index"
-                                data-test-id="servie_section_QuicklyCreateForm"
-                                @click="onCreateFormWayCLick(way)">
-                                {{ way.name }}
-                            </li>
-                        </ul>
-                    </bk-popover>
-                </h2>
-                <ul class="create-way" v-if="!showFieldOption">
+                <!-- 选择服务模板 2-->
+                <!-- <ul class="create-way" v-if="showFieldOption">
                     <li class="create-way-item" v-for="way in serviceFormCreateWays" :key="way.key">
                         <i class="bk-icon" :class="way.icon"></i>
                         <p class="create-way-desc">{{ way.name }}</p>
@@ -163,15 +93,19 @@
                             </bk-button>
                         </div>
                     </li>
-                </ul>
-                <div v-else class="create-service-form" v-bkloading="{ isLoading: formLoading }">
+                </ul> -->
+                <div class="create-service-form" v-bkloading="{ isLoading: formLoading }">
                     <ServiceForm
                         ref="serviceForm"
+                        :add-field-status="addFieldStatus"
                         :service-info="serviceInfo"
                         :node-id="createTicketNodeId"
                         :forms="ticketNodeForm"
                         :crt-form.sync="crtForm"
                         @dragUpdateList="dragUpdateList"
+                        @onAddFormClick="onAddFormClick"
+                        @addField="addField"
+                        @onFormEditClick="onFormEditClick"
                         @cancelAdd="cancelAddField"
                         @fieldClone="fieldClone"
                         @fieldDelete="fieldDelete"
@@ -180,6 +114,61 @@
                 </div>
             </section>
         </div>
+        <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
+        <div class="edit-service-field">
+            <div class="edit-service-title">字段属性</div>
+            <div class="edit-service-forms" v-show="isShowRightEdit">
+                <template v-for="form in ticketNodeForm">
+                    <form-edit-item
+                        v-if="form.id === crtForm"
+                        :key="form.id"
+                        :fields="ticketNodeForm"
+                        :form="form"
+                        :workflow-id="serviceInfo.workflow_id"
+                        :node-id="createTicketNodeId"
+                        @onEditCancel="onEditCancel"
+                        @getAddFieldStatus="getAddFieldStatus"
+                        @onEditConfirm="onEditConfirm">
+                    </form-edit-item>
+                </template>
+            </div>
+        </div>
+        <bk-dialog
+            width="800"
+            :value="isCreateService"
+            :mask-close="false"
+            :title="'创建服务'"
+            @confirm="onBasicFormSubmit"
+            @cancel="onBasicFormCancel">
+            <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
+                <bk-form-item data-test-id="service-input-serviceName" :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
+                    <bk-input v-model="formData.name"></bk-input>
+                </bk-form-item>
+                <bk-form-item :label="$t(`m.serviceConfig['服务描述']`)" property="desc">
+                    <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
+                </bk-form-item>
+                <bk-form-item data-test-id="service-select-serviceDirectory" :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
+                    <select-tree
+                        v-model="formData.catalog_id"
+                        :list="dirList"
+                        ext-cls="bk-form-width">
+                    </select-tree>
+                </bk-form-item>
+                <bk-form-item data-test-id="service-select-serviceType" :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
+                    <bk-select v-model="formData.key"
+                        :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                        :clearable="false"
+                        searchable
+                        :font-size="'medium'">
+                        <bk-option v-for="option in serviceTypeList"
+                            :key="option.key"
+                            :id="option.key"
+                            :name="option.name">
+                        </bk-option>
+                    </bk-select>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
         <!-- 选择服务模板 -->
         <choose-service-template-dialog
             :is-show.sync="isShowChooseSerTempDialog"
@@ -197,6 +186,8 @@
     import SelectTree from '../../../components/form/selectTree/index.vue'
     import ServiceForm from './ServiceForm.vue'
     import ChooseServiceTemplateDialog from './ChooseServiceTemplateDialog.vue'
+    import FormEditItem from './FormEditItem.vue'
+    import draggable from 'vuedraggable'
 
     const fieldsLibrary = [
         { name: '单行文本', icon: 'icon-apps', type: 'STRING' },
@@ -229,7 +220,9 @@
         components: {
             SelectTree,
             ServiceForm,
-            ChooseServiceTemplateDialog
+            ChooseServiceTemplateDialog,
+            FormEditItem,
+            draggable
         },
         mixins: [commonMix],
         props: {
@@ -249,6 +242,7 @@
         },
         data () {
             return {
+                isCreateService: false,
                 fieldsLibrary,
                 serviceFormCreateWays,
                 publicFields: [], // 已有字段
@@ -277,8 +271,18 @@
                     deleteField: false,
                     saveField: false
                 },
-                serviceTemplateDisable: false
-
+                serviceTemplateDisable: false,
+                isShowField: false,
+                isShowRightEdit: false,
+                addFieldStatus: true,
+                dragLine: {
+                    base: 0,
+                    move: 0,
+                    startX: null,
+                    maxLength: 0,
+                    canMove: false
+                },
+                fieldIndex: ''
             }
         },
         computed: {
@@ -313,9 +317,61 @@
             if (this.type === 'edit') {
                 this.getCreateTicketNodeForm()
                 this.getCreateTicketNodeDetail()
+            } else {
+                this.isCreateService = true
             }
         },
         methods: {
+            handleMove (evt) {
+                console.log(evt)
+            },
+            handleDragLine (e) {
+                document.addEventListener('mouseup', this.handleMouseUp, false)
+                document.addEventListener('mousemove', this.handleLineMouseMove, false)
+                const el = document.querySelector('.edit-service-field')
+                this.dragLine.maxLength = el.clientWidth
+                this.dragLine.startX = e.pageX
+                this.dragLine.canMove = true
+            },
+            handleMouseUp (e) {
+                document.removeEventListener('mouseup', this.handleMouseUp, false)
+                document.removeEventListener('mousemove', this.handleLineMouseMove, false)
+                this.dragLine.base = this.dragLine.move
+                this.dragLine.canMove = false
+            },
+            handleLineMouseMove (e) {
+                if (!this.dragLine.canMove) return
+                const el = document.querySelector('.edit-service-field')
+                const { startX, base } = this.dragLine
+                const offsetX = e.pageX - startX
+                // console.log(offsetX)
+                const moveX = base + offsetX
+                console.log(600 - moveX)
+                if (offsetX > 0 && 600 - moveX <= 400) return
+                window.requestAnimationFrame(() => {
+                    this.dragLine.move = moveX
+                    el.style.width = `calc(600px - ${moveX}px)`
+                })
+            },
+            onFormEditClick (form) {
+                this.isShowRightEdit = true
+                this.crtForm = form.id
+            },
+            onEditConfirm (form) {
+                this.$refs.serviceForm.onEditConfirm(form)
+                this.isShowRightEdit = false
+            },
+            onEditCancel () {
+                if (this.crtForm === 'add') {
+                    this.cancelAddField()
+                } else {
+                    this.crtForm = ''
+                }
+                this.isShowRightEdit = false
+            },
+            getAddFieldStatus (status) {
+                this.addFieldStatus = status
+            },
             // 获取已有字段（公共字段）
             getPublicFieldList () {
                 this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
@@ -344,6 +400,7 @@
                         item.val = item.hasOwnProperty('default') ? deepClone(item.default) : ''
                         item.showFeild = true
                     })
+                    console.log()
                     this.ticketNodeForm = res.data
                 }).catch((res) => {
                     errorHandler(res, this)
@@ -480,7 +537,8 @@
                 }
             },
             // 点击字段控件
-            onAddFormClick (val) {
+            onAddFormClick (targetIndex, val) {
+                this.fieldIndex = targetIndex
                 const field = {
                     workflow: '',
                     id: '',
@@ -488,7 +546,7 @@
                     name: '',
                     type: val.type,
                     desc: '',
-                    layout: 'COL_12',
+                    layout: val.layout || 'COL_12',
                     validate_type: 'REQUIRE',
                     choice: [],
                     is_builtin: false,
@@ -498,7 +556,7 @@
                     custom_regex: '',
                     is_tips: false,
                     tips: '',
-                    meta: {},
+                    meta: val.meta || {},
                     default: ''
                 }
                 this.addField(field)
@@ -506,10 +564,15 @@
             // 添加字段
             addField (field) {
                 if (this.crtForm !== '') {
+                    this.$bkMessage({
+                        message: this.$t(`m["请先将字段属性关闭"]`)
+                    })
                     return
                 }
+                this.isShowRightEdit = true
                 const form = Object.assign(deepClone(field), { id: 'add' })
-                this.ticketNodeForm.push(form)
+                // this.ticketNodeForm.push(form)
+                this.ticketNodeForm.splice(this.fieldIndex, 0, form)
                 this.crtForm = 'add'
             },
             // 取消添加字段
@@ -556,6 +619,7 @@
                         })
                     }
                 })
+                this.isShowRightEdit = false
             },
             // 保存字段
             saveField (field) {
@@ -566,7 +630,8 @@
                 if (index > -1) { // 编辑
                     this.ticketNodeForm.splice(index, 1, field)
                 } else { // 新增
-                    this.ticketNodeForm.splice(-1, 1, field)
+                    this.ticketNodeForm.splice(this.fieldIndex, 1, field)
+                    this.fieldIndex = ''
                 }
                 this.crtForm = ''
             },
@@ -596,13 +661,13 @@
                 if (this.isBasicFormEditting) {
                     await this.$refs.basicForm.validate()
                 }
-                if (!this.showFieldOption) {
-                    this.$bkMessage({
-                        message: '请选择服务提单信息创建方式',
-                        theme: 'error'
-                    })
-                    return { data: { result: false } }
-                }
+                // if (!this.showFieldOption) {
+                //     this.$bkMessage({
+                //         message: '请选择服务提单信息创建方式',
+                //         theme: 'error'
+                //     })
+                //     return { data: { result: false } }
+                // }
                 if (!this.formLoading && !this.detailLoading && this.$refs.serviceForm) {
                     // 用全量节点详情字段，传到后台接口，会抛出节点 desc 字段不能为空校验失败信息
                     const {
@@ -641,6 +706,9 @@
                         return Promise.reject(res)
                     })
                 }
+            },
+            handleShowField () {
+                this.isShowField = !this.isShowField
             }
         }
     }
@@ -689,58 +757,137 @@
         cursor: pointer;
         font-weight: normal;
         &:hover {
-            color: #3A84FF;
+            color: #3a84ff;
             background: #f4f6fa;
         }
     }
 }
 .service-form {
+    display: flex;
     height: 100%;
     &.hide-field-option {
         .basic-body {
             width: 100%;
         }
     }
+    .field-hide {
+        border-right: 0px solid #dde4eb !important;
+        width: 0 !important;
+    }
     .field-option {
+        height: 100%;
         float: left;
-        width: 272px;
+        width: 280px;
+        position: relative;
         background: #fcfcfc;
         border-right: 1px solid #dde4eb;
         border-top: 1px solid #dde4eb;
+        display: flex;
+        flex-direction: column;
+        // transition: width 0.5s ease-in;
+        .field-type {
+            width: 100%;
+            height: 45px;
+            padding: 0 21px;
+            line-height: 45px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #313238;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .show-field {
+            position: absolute;
+            right: -14px;
+            width: 14px;
+            height: 64px;
+            top: 50%;
+            background-color: #dcdee5;
+            border-radius: 0px 4px 4px 0px;
+            line-height: 64px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .field-content {
+            width: 100%;
+            padding: 0 7px 0px 12px;
+            margin: 4px 0;
+            .field-title {
+                width: 100%;
+                height: 36px;
+                padding: 8px 0;
+                line-height: 20px;
+                color: #c4c6cc;
+                font-size: 12px;
+            }
+            .field-list {
+                overflow: auto;
+                @include scroller;
+                width: 100%;
+                max-height: calc((100vh - 198px) / 2);
+                .field-item {
+                    width: 120px;
+                    padding: 0 20px;
+                    margin: 4px;
+                    float: left;
+                    height: 32px;
+                    line-height: 32px;
+                    border-radius: 2px;
+                    background: #ffffff;
+                    border: 1px solid #e0e0e0;
+                    color: #63656e;
+                    font-size: 12px;
+                    cursor: pointer;
+                }
+            }
+        }
     }
     .basic-body {
-        float: left;
-        padding: 15px;
-        width: calc(100% - 272px);
+        flex: 1;
+        // width: 632px;
+        margin: 24px;
+        // float: left;
+        // padding: 15px;create-info-card
+        // width: calc(100% - 280px);
         height: calc(100vh - 225px);
         overflow: auto;
         @include scroller;
     }
-}
-.field-list {
-    padding: 10px 12px;
-    .field-item {
-        margin-top: 4px;
-        padding: 0 10px;
-        width: 100%;
-        height: 32px;
-        line-height: 32px;
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        color: #63656e;
-        font-size: 12px;
-        cursor: pointer;
-        .bk-icon {
-            font-size: 14px;
+    .drag-line {
+        width: 2px;
+        height: 100%;
+        background-color: #fff;
+        &:hover {
+            // width: px;
+            background-color: #3a84ff;
+            cursor: col-resize;
         }
-        .field-name {
-            margin-left: 9px;
+    }
+    .edit-service-field {
+        width: 400px;
+        background: #ffffff;
+        border-left: 1px solid #dde4eb;
+        border-top: 1px solid #dde4eb;
+        box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.10);
+        .edit-service-title {
+            width: 100%;
+            height: 40px;
+            line-height: 22px;
+            font-size: 14px;
+            padding: 9px 24px;
+            border-bottom: 1px solid #dde4eb;
+        }
+        .edit-service-forms {
+            width: 100%;
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            @include scroller;
         }
     }
 }
 .settion-card {
     margin: auto;
-    max-width: 1000px;
+    // max-width: 1000px;
     .card-title {
         margin: 0;
         font-size: 14px;
@@ -841,7 +988,33 @@
 }
 // 提单信息
 .create-info-card {
-    margin-top: 32px;
+    box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.10);
+    background-color: #fff;
+    // margin-top: 32px;
+    .service-template {
+        width: 100%;
+        height: 96px;
+        padding: 24px 12px;
+        display: flex;
+        justify-content: space-between;
+        .template-type {
+            border: 1px dashed #dcdee5;
+            flex: 1;
+            margin: 0 12px;
+            height: 48px;
+            font-size: 14px;
+            text-align: center;
+            line-height: 48px;
+            cursor: pointer;
+            i {
+                color: #c4c6cc;
+            }
+            span {
+                color: #737987;
+                margin-left: 14px;
+            }
+        }
+    }
     .card-title {
         display: flex;
         justify-content: space-between;

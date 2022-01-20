@@ -50,6 +50,8 @@
 }
 
 .common-node {
+    display: flex;
+    align-items: center;
     width: 150px;
     height: 40px;
     line-height: 38px;
@@ -69,7 +71,9 @@
         border: 1px solid #3A84FF;
         border-radius: 20px;
         color: #3A84FF;
-
+        .icon-edit-bold {
+            display: block;
+        }
         .bk-node-delete {
             display: block;
         }
@@ -77,8 +81,15 @@
         .bk-toop-info {
             color: #63656E;
         }
+        .bk-more-word {
+            width: 80px;
+        }
     }
-
+    .icon-edit-bold {
+        display: none;
+        margin-left: -7px;
+        font-size: 28px;
+    }
     .common-auto-icon {
         position: absolute;
         top: 0;
@@ -145,8 +156,9 @@
 .bk-more-word {
     display: inline-block;
     box-sizing: border-box;
-    width: 110px;
-    padding: 0 10px 0 4px;
+    width: 80px;
+    text-align: center;
+    padding: 0 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

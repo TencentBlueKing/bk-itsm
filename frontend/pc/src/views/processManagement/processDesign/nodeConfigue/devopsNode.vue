@@ -1,7 +1,7 @@
 <template>
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form ref="basicInfo" :model="basicInfo" :label-width="150" :rules="basicInfoRules" :ext-cls="'bk-form'">
+            <bk-form ref="basicInfo" :model="basicInfo" :label-width="150" :rules="basicInfoRules" :ext-cls="'bk-form'" form-type="vertical">
                 <bk-form-item
                     data-test-id="devops-input-name"
                     :label="$t(`m.treeinfo['节点名称：']`)"
@@ -62,10 +62,11 @@
                 </bk-form-item>
             </bk-form>
         </basic-card>
-
-        <basic-card class="mt20"
-            :card-label="$t(`m['流水线参数']`)"
-            :card-desc="$t(`m.treeinfo['调用该API需要传递的参数信息']`)">
+        <basic-card>
+            <div class="piprline-title">
+                <p>{{ $t(`m['流水线参数']`) }}:</p>
+                <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
+            </div>
             <div class="bk-param" v-if="pipelineFormList.length !== 0" v-bkloading="{ isLoading: pipeFormLoading }">
                 <bk-form
                     ref="devopsVariable"
@@ -97,31 +98,31 @@
                 </devops-preview>
             </div>
             <no-data v-else></no-data>
+            <common-trigger-list :origin="'state'"
+                :node-type="configur.type"
+                :source-id="flowInfo.id"
+                :sender="configur.id"
+                :table="flowInfo.table">
+            </common-trigger-list>
+            
+            <div class="mt20" style="font-size: 0">
+                <bk-button :theme="'primary'"
+                    data-test-id="devops-button-submit"
+                    :title="$t(`m.treeinfo['确定']`)"
+                    class="mr10"
+                    @click="submit">
+                    {{$t(`m.treeinfo['确定']`)}}
+                </bk-button>
+                <bk-button :theme="'default'"
+                    data-test-id="devops-button-close"
+                    :title="$t(`m.treeinfo['取消']`)"
+                    class="mr10"
+                    @click="closeNode">
+                    {{$t(`m.treeinfo['取消']`)}}
+                </bk-button>
+            </div>
         </basic-card>
 
-        <common-trigger-list :origin="'state'"
-            :node-type="configur.type"
-            :source-id="flowInfo.id"
-            :sender="configur.id"
-            :table="flowInfo.table">
-        </common-trigger-list>
-        
-        <div class="mt20" style="font-size: 0">
-            <bk-button :theme="'primary'"
-                data-test-id="devops-button-submit"
-                :title="$t(`m.treeinfo['确定']`)"
-                class="mr10"
-                @click="submit">
-                {{$t(`m.treeinfo['确定']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="devops-button-close"
-                :title="$t(`m.treeinfo['取消']`)"
-                class="mr10"
-                @click="closeNode">
-                {{$t(`m.treeinfo['取消']`)}}
-            </bk-button>
-        </div>
     </div>
 </template>
 <script>
@@ -381,6 +382,26 @@
         background-color: #FAFBFD;
         overflow: auto;
         @include scroller;
+        /deep/ .common-section-card-label {
+            display: none;
+        }
+        /deep/ .common-section-card-body {
+            padding: 20px;
+        }
+        /deep/ .bk-form-width {
+            width: 480px;
+        }
+        .piprline-title {
+            font-size: 14px;
+            p:nth-child(1) {
+                color: #63656e;
+                margin-bottom: 4px;
+            }
+            p:nth-child(2) {
+                font-size: 12px;
+                color: #929397;
+            }
+        }
     }
     .bk-basic-info {
         padding-bottom: 20px;

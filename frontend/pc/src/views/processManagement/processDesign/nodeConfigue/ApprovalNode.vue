@@ -24,6 +24,8 @@
     <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
             <bk-form
+                form-type="vertical"
+                style="margin-bottom: 40px"
                 :label-width="150"
                 :model="formInfo"
                 :rules="nodeInfoRule" ref="nodeInfoForm">
@@ -234,38 +236,37 @@
                     </bk-checkbox>
                 </bk-form-item>
             </bk-form>
-        </basic-card>
-        <basic-card :card-label="$t(`m.treeinfo['字段配置']`)" class="mt20">
             <field-config
                 ref="field"
+                :is-show-title="true"
                 :flow-info="flowInfo"
                 :configur="configur">
             </field-config>
+            <common-trigger-list :origin="'state'"
+                :node-type="configur.type"
+                :source-id="flowInfo.id"
+                :sender="configur.id"
+                :table="flowInfo.table">
+            </common-trigger-list>
+            <div class="bk-node-btn">
+                <bk-button :theme="'primary'"
+                    data-test-id="approve-button-submit"
+                    :title="$t(`m.treeinfo['确定']`)"
+                    :loading="secondClick"
+                    class="mr10"
+                    @click="submitNode">
+                    {{$t(`m.treeinfo['确定']`)}}
+                </bk-button>
+                <bk-button :theme="'default'"
+                    data-test-id="approve-button-close"
+                    :title="$t(`m.treeinfo['取消']`)"
+                    :loading="secondClick"
+                    class="mr10"
+                    @click="closeNode">
+                    {{$t(`m.treeinfo['取消']`)}}
+                </bk-button>
+            </div>
         </basic-card>
-        <common-trigger-list :origin="'state'"
-            :node-type="configur.type"
-            :source-id="flowInfo.id"
-            :sender="configur.id"
-            :table="flowInfo.table">
-        </common-trigger-list>
-        <div class="bk-node-btn">
-            <bk-button :theme="'primary'"
-                data-test-id="approve-button-submit"
-                :title="$t(`m.treeinfo['确定']`)"
-                :loading="secondClick"
-                class="mr10"
-                @click="submitNode">
-                {{$t(`m.treeinfo['确定']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="approve-button-close"
-                :title="$t(`m.treeinfo['取消']`)"
-                :loading="secondClick"
-                class="mr10"
-                @click="closeNode">
-                {{$t(`m.treeinfo['取消']`)}}
-            </bk-button>
-        </div>
     </div>
 </template>
 <script>
@@ -798,10 +799,18 @@
     }
     .bk-basic-node {
         padding: 20px;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
         height: 100%;
         background-color: #FAFBFD;
         overflow: auto;
         @include scroller;
+        /deep/ .common-section-card-label {
+            display: none;
+        }
+        /deep/ .common-section-card-body {
+            padding: 20px;
+        }
 
         .bk-node-btn{
             font-size: 0;
@@ -821,12 +830,12 @@
             }
         }
 
-        .bk-form-width {
+        /deep/ .bk-form-width {
             width: 480px;
         }
         .inline-form-width {
             float: left;
-            width: 330px;
+            width: 480px;
             margin-right: 10px;
         }
         .form-cus-height{

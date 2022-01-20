@@ -182,6 +182,24 @@
             text-overflow: ellipsis;
             padding-right: 10px;
             @include clearfix;
+            .icon-basic-info {
+                display: inline-block;
+                position: relative;
+                &:hover {
+                    .show {
+                        display: block;
+                    }
+                }
+                .show {
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background-color: blue;
+                    width: 300px;
+                    height: 200px;
+                }
+            }
         }
 
         .ul-no-border {

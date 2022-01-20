@@ -474,6 +474,7 @@
                         this.$set(item, 'val', (item.value || ''))
                         this.conditionField(item, this.firstStateFields)
                     })
+                    console.log(this.firstStateFields)
                 }
                 copyList.forEach(
                     item => {

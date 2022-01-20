@@ -96,13 +96,13 @@ const ROUTE_LIST = [
                         icon: 'bk-itsm-icon icon-it-new-sevice',
                         path: '/project/service/list',
                         prefix: ['/project/service/']
-                    },
-                    {
-                        name: i18n.t(`m["服务目录"]`),
-                        id: 'serviceDirectory',
-                        icon: 'bk-itsm-icon icon-ticket_2',
-                        path: '/project/service_directory'
                     }
+                    // {
+                    //     name: i18n.t(`m["服务目录"]`),
+                    //     id: 'serviceDirectory',
+                    //     icon: 'bk-itsm-icon icon-ticket_2',
+                    //     path: '/project/service_directory'
+                    // }
                 ]
             },
             {

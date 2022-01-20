@@ -23,6 +23,7 @@
 <template>
     <div class="bk-add-field" v-bkloading="{ isLoading: isDataLoading }">
         <bk-form
+            class="bk-add-field bk-form-vertical"
             :label-width="200"
             :form-type="formAlign"
             :model="formInfo"
@@ -34,6 +35,7 @@
                     :label="$t(`m.treeinfo['前置节点']`)"
                     :required="true"
                     :property="'prevId'"
+                    :error-display-type="'normal'"
                     :ext-cls="'bk-mt0-item'">
                     <bk-select v-model="formInfo.prevId"
                         searchable>
@@ -51,6 +53,7 @@
                 :label="$t(`m.treeinfo['字段名']`)"
                 :required="true"
                 :property="'name'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-halfline-margin'">
                 <bk-input maxlength="120"
                     v-model="formInfo.name"
@@ -65,6 +68,7 @@
                 :label="$t(`m.treeinfo['唯一标识']`)"
                 :required="true"
                 :property="'key'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item'">
                 <bk-input
                     v-model="formInfo.key"
@@ -77,6 +81,7 @@
                 :label="$t(`m.treeinfo['字段类型']`)"
                 :required="true"
                 :property="'type'"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
                 <bk-select v-model="formInfo.type"
                     :clearable="false"
@@ -93,6 +98,7 @@
             <bk-form-item
                 :label="$t(`m.treeinfo['校验方式']`)"
                 :required="true"
+                :error-display-type="'normal'"
                 :ext-cls="'bk-halfline-item bk-mt20-item'">
                 <bk-select v-model="formInfo.regex"
                     :clearable="false"
@@ -153,6 +159,7 @@
                     :label="$t(`m.treeinfo['正则规则']`)"
                     :required="true"
                     :property="'key'"
+                    :error-display-type="'normal'"
                     :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
                     <bk-input
                         v-model="formInfo.customRegex"
@@ -162,7 +169,8 @@
                 </bk-form-item>
             </template>
         </bk-form>
-        <bk-form :label-width="200"
+        <bk-form :label-width="100"
+            class="bk-form-vertical"
             :form-type="formAlign"
             :model="formInfo"
             ref="dataForm">
@@ -190,17 +198,25 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <data-content ref="dataContent"
-                                :form-info="formInfo"
-                                :workflow="workflow"
-                                :state="state"
-                                :change-info="assignValue"
-                                :api-detail="apiDetail"
-                                :api-info="apiInfo.api_info"
-                                :kv-relation="apiInfo.kv_relation"
-                                :prc-table="prcTable"
-                                :field-info="fieldInfo">
-                            </data-content>
+                            <bk-button v-if="isShowDataSourcebtn" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-dialog
+                                v-model="isShowDataSource"
+                                width="960"
+                                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
+                                theme="primary"
+                                :mask-close="false">
+                                <data-content ref="dataContent"
+                                    :form-info="formInfo"
+                                    :workflow="workflow"
+                                    :state="state"
+                                    :change-info="assignValue"
+                                    :api-detail="apiDetail"
+                                    :api-info="apiInfo.api_info"
+                                    :kv-relation="apiInfo.kv_relation"
+                                    :prc-table="prcTable"
+                                    :field-info="fieldInfo">
+                                </data-content>
+                            </bk-dialog>
                         </bk-form-item>
                     </template>
                 </template>
@@ -453,6 +469,7 @@
         },
         data () {
             return {
+                isShowDataSource: false,
                 isDataLoading: false,
                 trueStatus: true,
                 falseStatus: false,
@@ -600,12 +617,24 @@
                     customFormStatus: false
                 },
                 // 任务内置字段特殊处理
-                fieldTypeList: []
+                fieldTypeList: [],
+                hiddenConditionStatus: true
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
+            },
+            isShowDataSourcebtn () {
+                return (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'CUSTOM') && (Object.keys(this.apiDetail).length !== 0 || this.fieldInfo.list.length !== 0)
+            }
+        },
+        watch: {
+            formInfo: {
+                handler (val) {
+                    this.$emit('getAddFieldStatus', val.name !== '')
+                },
+                deep: true
             }
         },
         async mounted () {
@@ -622,6 +651,9 @@
             }
         },
         methods: {
+            openDataSource () {
+                this.isShowDataSource = true
+            },
             fieldNameChange () {
                 const keyElement = this.$refs.fieldForm.$data.formItems.find(item => item.property === 'key')
                 if (keyElement.fieldValue) {
@@ -1079,6 +1111,7 @@
                 // 隐藏字段值
                 if (this.$refs.hiddenConditions) {
                     if (this.$refs.hiddenConditions.checkList()) {
+                        this.hiddenConditionStatus = false
                         return false
                     }
                     const hiddenList = this.$refs.hiddenConditions.listInfo
@@ -1318,6 +1351,21 @@
 <style lang='scss' scoped>
     @import '../../../../../scss/mixins/clearfix.scss';
     @import "../../../../../scss/mixins/scroller";
+    .configuration-data-source {
+        width: 102px;
+        height: 32px;
+        border: 1px solid #3a84ff;
+        border-radius: 4px;
+        color: #3a84ff;
+        font-size: 14px;
+        line-height: 30px;
+        text-align: center;
+    }
+    .data-source-tip {
+        color: red;
+        font-size: 14px;
+        line-height: 32px;
+    }
     .bk-tanble-height {
         .bk-textarea-tanble {
             overflow-y: scroll;

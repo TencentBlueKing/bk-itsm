@@ -22,7 +22,7 @@
 
 <template>
     <div class="half-row-form">
-        <form-edit-item
+        <!-- <form-edit-item
             v-if="isEdit"
             :fields="fields"
             :form="editForm"
@@ -30,12 +30,12 @@
             :node-id="nodeId"
             @onEditCancel="$emit('onEditCancel')"
             @onEditConfirm="$emit('onEditConfirm', $event)">
-        </form-edit-item>
-        <div v-else class="row-form-view">
+        </form-edit-item> -->
+        <div class="row-form-view">
             <template v-for="(group, index) in localForms">
                 <draggable
                     class="form-drag-wrap"
-                    handle=".form-view-item"
+                    handle=".view-form"
                     :data-rowindex="rowIndex"
                     :value="group"
                     :key="index"
@@ -48,9 +48,14 @@
                         <form-view-item
                             :fields="fields"
                             :form="item"
+                            :add-field-status="addFieldStatus"
+                            :crt-form="crtForm"
                             @onFormEditClick="$emit('onFormEditClick', $event)"
                             @onFormCloneClick="$emit('onFormCloneClick', $event)"
                             @onFormDeleteClick="$emit('onFormDeleteClick', $event)">
+                            <div class="view-form" slot="draggable">
+                                <i class="bk-itsm-icon icon-move-new"></i>
+                            </div>
                         </form-view-item>
                     </div>
                 </draggable>
@@ -60,14 +65,14 @@
 </template>
 <script>
     import draggable from 'vuedraggable'
-    import FormEditItem from './FormEditItem'
+    // import FormEditItem from './FormEditItem'
     import FormViewItem from './FormViewItem'
 
     export default {
         name: 'HalfRowForm',
         components: {
             draggable,
-            FormEditItem,
+            // FormEditItem,
             FormViewItem
         },
         props: {
@@ -82,7 +87,8 @@
             crtForm: {
                 type: [String, Number],
                 default: ''
-            }
+            },
+            addFieldStatus: Boolean
         },
         data () {
             return {
@@ -120,6 +126,10 @@
     }
 </script>
 <style lang="scss" scoped>
+    .click-status {
+        background: rgba(225,236,255,0.50);
+        border: 1px solid #a3c5fd;
+    }
     .half-row-form {
         min-height: 82px;
         .row-form-view {
@@ -138,13 +148,13 @@
                     /deep/ .form-view-item {
                         justify-content: flex-end;
                         .form-view-content {
-                            padding-right: 34px;
+                            // padding-right: 34px;
                         }
                     }
                 }
                 &:nth-child(2n) {
                     /deep/ .form-view-content {
-                        padding-left: 20px;
+                        // padding-left: 20px;
                     }
                 }
             }
@@ -153,8 +163,8 @@
                     display: flex;
                     border: none;
                     .form-view-content {
-                        margin: 0;
-                        width: 300px;
+                        flex: 1;
+                        margin: 0 35px 0 12px;
                     }
                 }
             }
