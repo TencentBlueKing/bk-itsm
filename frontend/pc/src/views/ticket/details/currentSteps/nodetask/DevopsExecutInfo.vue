@@ -89,6 +89,7 @@
         <bk-sideslider
             :is-show.sync="isShowBuildDetailDialog"
             :width="800"
+            :quick-close="true"
             :title="openBuildInfo.name">
             <div slot="header">
                 {{ $t(`m.tickets['构建详情']`) }} 【{{ openBuildInfo.name }}】

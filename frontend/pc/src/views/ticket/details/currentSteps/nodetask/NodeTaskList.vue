@@ -188,10 +188,15 @@
         <bk-sideslider
             :is-show.sync="createInfo.isShow"
             :title="createInfo.isAdd ? $t(`m.task['创建任务']`) : this.$t(`m.task['编辑任务']`)"
+            :quick-close="true"
+            :before-close="() => {
+                closeSideslider('newTask')
+            }"
             :width="800">
             <div slot="content"
                 style="min-height: 300px;">
                 <new-task v-if="createInfo.isShow"
+                    ref="newTask"
                     :node-info="nodeInfo"
                     :basic-infomation="ticketInfo"
                     :item-content="createInfo.taskInfo"
@@ -202,6 +207,7 @@
         </bk-sideslider>
         <bk-sideslider
             :is-show.sync="dealTaskInfo.show"
+            :quick-close="true"
             :width="800">
             <div slot="header">
                 <task-handle-trigger
@@ -249,10 +255,15 @@
         <bk-sideslider
             :is-show.sync="taskLibrary.show"
             :title="$t(`m.tickets['从任务库创建任务']`)"
+            :before-close="() => {
+                closeSideslider('taskLibrary')
+            }"
+            :quick-close="true"
             :width="800">
             <div slot="content"
                 style="min-height: 300px;">
                 <task-library
+                    ref="taskLibrary"
                     v-if="taskLibrary.show"
                     :ticket-info="ticketInfo"
                     :node-info="nodeInfo"
@@ -347,6 +358,24 @@
             this.refreshTaskList()
         },
         methods: {
+            closeSideslider (type) {
+                this.$bkInfo({
+                    type: 'warning',
+                    title: '是否保存修改',
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        if (type === 'newTask') {
+                            this.$refs[type].submitTask()
+                        } else {
+                            this.$refs[type].handleSubmitClick()
+                        }
+                    },
+                    cancelFn: () => {
+                        this.createInfo.isShow = false
+                        this.taskLibrary.show = false
+                    }
+                })
+            },
             // 获取任务列表
             getTaskList (source) {
                 const params = {
