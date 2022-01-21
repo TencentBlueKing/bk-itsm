@@ -380,7 +380,7 @@ class TicketModelViewSet(ModelViewSet):
         """
         获取提单节点字段
         """
-        service_id = request.query_params.get("service_id", None)
+        service_id = request.data["paths"].get("service_id", None)
         if not service_id:
             raise ValidationError(_("请输入service_id"))
 
