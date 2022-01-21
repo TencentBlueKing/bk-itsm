@@ -28,6 +28,7 @@ import requests
 from django.conf import settings
 
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from revproxy.views import ProxyView
 
 from sops_proxy.settings import (
@@ -37,7 +38,7 @@ from sops_proxy.settings import (
     SOPS_SITE_URL,
     BK_ESB_PAAS_HOST,
 )
-from sops_proxy.utils import normalize_request_headers
+from sops_proxy.utils import normalize_request_headers, get_django_response
 
 
 def dispatch_static(request, path):
@@ -136,7 +137,23 @@ class SopsProxy(ProxyView):
             return response
 
     def dispatch(self, request, path):
-        response = super(SopsProxy, self).dispatch(request, path)
+        self.request_headers = self.get_request_headers()
+
+        redirect_to = self._format_path_to_redirect(request)
+        if redirect_to:
+            return redirect(redirect_to)
+
+        proxy_response = self._created_proxy_response(request, path)
+
+        self._replace_host_on_redirect_location(request, proxy_response)
+        self._set_content_type(request, proxy_response)
+
+        response = get_django_response(
+            proxy_response, strict_cookies=self.strict_cookies
+        )
+
+        self.log.debug("RESPONSE RETURNED: %s", response)
+
         if settings.RUN_VER == "ieod":
             if path.startswith("api/v3/component/"):
                 response = self.process(response)
