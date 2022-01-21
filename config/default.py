@@ -35,6 +35,7 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
 )
+from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
 
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
@@ -49,8 +50,6 @@ if ENGINE_REGION == "default":
     SITE_URL_SOPS = "/bk--sops/"
 
 # 请在这里加入你的自定义 APP
-from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
-
 INSTALLED_APPS += (
     # 配置项
     "itsm.iadmin",
@@ -149,6 +148,7 @@ MIDDLEWARE = (
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
     # 'pyinstrument.middleware.ProfilerMiddleware',
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
 
 MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
