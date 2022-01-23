@@ -48,7 +48,9 @@ def requests_callback(span: Span, response):
     span.set_attribute("blueking_esb_request_id", json_result.get("request_id", ""))
     span.set_attribute("result_message", json_result.get("message", ""))
     span.set_attribute("result_errors", str(json_result.get("errors", "")))
-    http_url = span._attributes.get("http.url", None)
+    span_attributes = getattr(span, "_attributes")
+    http_url = span_attributes.get("http.url", None)
+    print(http_url)
     span.set_attribute("http.url", replace_http_url(http_url))
     if result:
         span.set_status(Status(StatusCode.OK))
