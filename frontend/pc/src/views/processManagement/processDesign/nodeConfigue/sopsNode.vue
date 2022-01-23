@@ -659,7 +659,7 @@
             padding: 20px;
         }
         /deep/ .bk-form-width {
-            width: 480px;
+            width: 448px;
         }
         .sops-params-title {
             font-size: 14px;
@@ -678,11 +678,11 @@
         border-bottom: 1px solid #E9EDF1;
         margin-bottom: 20px;
     }
-    /deep/ .bk-form-content {
-        width: 480px;
-    }
+    // /deep/ .bk-form-content {
+    //     width: 448px;
+    // }
     .bk-form-width {
-        width: 480px;
+        width: 448px;
     }
     .bk-form-display {
         float: left;

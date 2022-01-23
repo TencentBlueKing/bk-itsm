@@ -831,11 +831,11 @@
         }
 
         /deep/ .bk-form-width {
-            width: 480px;
+            width: 448px;
         }
         .inline-form-width {
             float: left;
-            width: 480px;
+            width: 448px;
             margin-right: 10px;
         }
         .form-cus-height{

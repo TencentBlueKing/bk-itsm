@@ -446,10 +446,10 @@
     }
 
     .bk-item-width {
-        width: 480px;
+        width: 448px;
     }
     .bk-form-width {
-        width: 480px;
+        width: 448px;
     }
     .bk-form-display {
         float: left;
@@ -461,6 +461,6 @@
         font-size: 12px;
     }
     /deep/ .bk-form-width {
-        width: 480px;
+        width: 448px;
     }
 </style>

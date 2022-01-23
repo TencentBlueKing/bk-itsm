@@ -389,7 +389,7 @@
             padding: 20px;
         }
         /deep/ .bk-form-width {
-            width: 480px;
+            width: 448px;
         }
         .piprline-title {
             font-size: 14px;
@@ -409,7 +409,7 @@
         margin-bottom: 20px;
     }
     .bk-form-width {
-        width: 480px;
+        width: 448px;
     }
     .bk-form-display {
         float: left;

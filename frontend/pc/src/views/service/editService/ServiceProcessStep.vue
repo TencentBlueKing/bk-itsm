@@ -32,7 +32,9 @@
                 @handleNodeClick="handleNodeClick">
             </second-flow>
             <div v-else>
-                <div class="node-type">{{ nodeType }}</div>
+                <div class="node-type">{{ nodeType }}
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
+                </div>
                 <basic-node
                     v-if="configur.type === 'NORMAL'"
                     :flow-info="flowInfo"
@@ -219,7 +221,8 @@
     height: 100%;
 }
 .process-step-node-conf {
-    padding: 24px 153px;
+    margin: 24px auto;
+    width: 1000px;
     /deep/ .bk-basic-node {
         padding: 0;
     }
@@ -231,5 +234,15 @@
     width: 100%;
     font-size: 14px;
     padding: 0 24px;
+}
+.close-node-conf {
+    font-size: 20px;
+    font-weight: 500;
+    float: right;
+    line-height: 48px;
+    cursor: pointer;
+    &:hover {
+        color: red;
+    }
 }
 </style>
