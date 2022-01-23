@@ -469,12 +469,17 @@ class StateViewSet(BaseWorkflowElementViewSet):
         当前节点的后置节点
         """
         instance = self.get_object()
+        include_self = request.query_params.get("include_self", "false")
         posts = instance.get_post_states(
             contain_auto=request.query_params.get("contain_auto", "false"),
             exclude_states=[instance.id],
         )
-        serializer = self.get_serializer(posts, many=True)
-        return Response(serializer.data)
+        data = self.get_serializer(posts, many=True).data
+
+        if include_self == "true":
+            instance_data = self.get_serializer(instance).data
+            data.insert(0, instance_data)
+        return Response(data)
 
     @action(detail=True, methods=["post"])
     def add_fields_from_table(self, request, *args, **kwargs):
