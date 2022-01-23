@@ -82,6 +82,8 @@
                     :data="dataList"
                     :size="'small'"
                     :pagination="pagination"
+                    @cell-mouse-enter="cellMouseEnter"
+                    @cell-mouse-leave="cellMouseLeave"
                     @page-change="handlePageChange"
                     @page-limit-change="handlePageLimitChange"
                     @select-all="handleSelectAll"
@@ -124,7 +126,7 @@
                             <span :title="props.row.id">{{ props.row.id || '--' }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150">
+                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150" :width="changeFrom.name ? '250' : '150'">
                         <template slot-scope="props">
                             <span
                                 v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
@@ -134,24 +136,55 @@
                                 @click="onServicePermissonCheck(['service_manage'], props.row)">
                                 {{ props.row.name }}
                             </span>
-                            <span
-                                v-else
-                                class="bk-lable-primary"
-                                :title="props.row.name"
-                                @click="changeEntry(props.row, 'edit')">
-                                {{ props.row.name }}
-                            </span>
+                            <template v-else>
+                                <span
+                                    v-if="props.row.id !== changeFrom.name"
+                                    class="bk-lable-primary"
+                                    :title="props.row.name"
+                                    @click="changeEntry(props.row, 'edit')">
+                                    {{ props.row.name }}
+                                    <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                                </span>
+                                <div v-else class="hover-show-icon">
+                                    <bk-input v-model="editValue"></bk-input>
+                                    <div class="operation">
+                                        <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name',props.row)"></i>
+                                        <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                    </div>
+                                </div>
+                            </template>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['类型']`)">
+                    <bk-table-column :label="$t(`m.serviceConfig['类型']`)" :width="changeFrom.serviceType ? '250' : '150'">
                         <template slot-scope="props">
-                            <template v-for="(type, typeIndex) in serviceTypesMap">
-                                <span v-if="props.row.key === type.key"
-                                    :title="type.name"
-                                    :key="typeIndex">
-                                    {{ type.name }}
-                                </span>
+                            <template v-if="props.row.id !== changeFrom.serviceType">
+                                <template v-for="(type, typeIndex) in serviceTypesMap">
+                                    <span v-if="props.row.key === type.key"
+                                        :title="type.name"
+                                        :key="typeIndex">
+                                        {{ type.name }}
+                                        <i v-show="tableHoverId === props.row.id" @click="handleChange('key', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                                    </span>
+                                </template>
                             </template>
+                            <div v-else class="hover-show-icon">
+                                <bk-select v-model="editValue"
+                                    :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                                    :clearable="false"
+                                    style="width: 150px"
+                                    searchable
+                                    :font-size="'medium'">
+                                    <bk-option v-for="option in serviceTypeList"
+                                        :key="option.key"
+                                        :id="option.key"
+                                        :name="option.name">
+                                    </bk-option>
+                                </bk-select>
+                                <div class="operation">
+                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key',props.row)"></i>
+                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                </div>
+                            </div>
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.common['创建人']`)">
@@ -179,9 +212,23 @@
                             </span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
+                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '150'">
                         <template slot-scope="props">
-                            <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>
+                            <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
+                            <div v-else class="hover-show-icon">
+                                <bk-cascade
+                                    :list="dirList"
+                                    clearable
+                                    :check-any-level="true"
+                                    style="width: 250px;"
+                                    :ext-popover-cls="'custom-cls'"
+                                    @change="handleChangeTree">
+                                </bk-cascade>
+                                <div class="operation">
+                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id',props.row)"></i>
+                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                </div>
+                            </div>
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.common['创建人']`)">
@@ -391,7 +438,14 @@
                     },
                     draggable: true,
                     loading: true
-                }
+                },
+                changeFrom: {
+                    name: '',
+                    serviceType: '',
+                    bounded_catalogs: ''
+                },
+                editValue: '',
+                tableHoverId: ''
             }
         },
         watch: {
@@ -411,6 +465,64 @@
             this.getServiceDirectory()
         },
         methods: {
+            cellMouseEnter (row) {
+                this.tableHoverId = row.id
+            },
+            cellMouseLeave (row) {
+                this.tableHoverId = ''
+            },
+            handleChangeTree (val) {
+                this.editValue = val[val.length - 1]
+            },
+            handleChange (type, row) {
+                // this.editValue = row.name
+                switch (type) {
+                    case 'name':
+                        this.changeFrom.name = row.id
+                        this.changeFrom.serviceType = ''
+                        this.changeFrom.bounded_catalogs = ''
+                        this.editValue = row.name
+                        break
+                    case 'key':
+                        this.changeFrom.name = ''
+                        this.changeFrom.serviceType = row.id
+                        this.changeFrom.bounded_catalogs = ''
+                        this.editValue = row.key
+                        break
+                    case 'catalog_id':
+                        this.changeFrom.name = ''
+                        this.changeFrom.serviceType = ''
+                        this.changeFrom.bounded_catalogs = row.id
+                        break
+                }
+            },
+            closeEdit () {
+                this.changeFrom.name = ''
+                this.changeFrom.serviceType = ''
+                this.changeFrom.bounded_catalogs = ''
+            },
+            submitEditService (type, row) {
+                const curRow = row
+                curRow[type] = this.editValue
+                const params = {
+                    catalog_id: curRow.catalog_id,
+                    id: curRow.id,
+                    key: curRow.key,
+                    name: curRow.name,
+                    project_key: curRow.project_key,
+                    desc: ''
+                }
+                console.log(params)
+                this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.serviceConfig["修改成功"]`),
+                        theme: 'success'
+                    })
+                    this.editValue = ''
+                    this.closeEdit()
+                    this.getList()
+                })
+            },
             // 获取数据
             getList (page) {
                 // 查询时复位页码
@@ -445,6 +557,8 @@
                         // 分页
                         this.pagination.current = res.data.page
                         this.pagination.count = res.data.count
+                    } else {
+                        this.dataList = []
                     }
                 }).catch(res => {
                     errorHandler(res, this)
@@ -723,6 +837,29 @@
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';
+.icon-itsm-icon-fill-fit {
+    color: #2bcb55;
+}
+.hover-show-icon {
+    display: flex;
+    align-items: center;
+    .operation {
+        height: 100%;
+        font-size: 20px;
+        display: flex;
+        i {
+            cursor: pointer;
+        }
+    }
+}
+.icon-itsm-icon-six {
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    &:hover {
+        color: #3a84ff;
+    }
+}
 .page-content {
     position: relative;
     z-index: 100;

@@ -409,6 +409,10 @@
         float: left;
         height: 32px;
         margin-top: 10px;
+        
+    }
+    .first-level {
+        margin-right: 14px;
     }
     .person-vertical {
         .first-level, .second-level {
@@ -418,6 +422,7 @@
         }
         .second-level {
             margin-top: 20px;
+            margin-left: 14px;
         }
     }
     .inline-auto-width {
@@ -432,11 +437,13 @@
         }
         .first-level {
             margin-right: 8px;
+           
         }
         .first-level, .second-level {
             flex: 1;
             .bk-form-width {
                 width: 100%;
+                margin-right: 24px;
             }
         }
     }
