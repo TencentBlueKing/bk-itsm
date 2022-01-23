@@ -246,7 +246,11 @@
                     return
                 }
                 this.$set(item, 'dealLoading', true)
-                return this.$store.dispatch('deployCommon/getOrderedStates', { id: createNodeId }).then(res => {
+                const params = {
+                    id: createNodeId,
+                    include_self: true
+                }
+                return this.$store.dispatch('deployCommon/getOrderedStates', params).then(res => {
                     item.dealList = res.data
                 }).catch(res => {
                     errorHandler(res, this)
