@@ -512,7 +512,6 @@
                     project_key: curRow.project_key,
                     desc: ''
                 }
-                console.log(params)
                 this.$store.dispatch('serviceEntry/updateService', params).then(res => {
                     this.$bkMessage({
                         message: this.$t(`m.serviceConfig["修改成功"]`),
