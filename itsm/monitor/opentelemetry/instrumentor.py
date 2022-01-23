@@ -30,6 +30,11 @@ def requests_callback(span: Span, response):
     """
     处理蓝鲸标准协议响应
     """
+
+    def replace_http_url(url):
+        url = url.split("?")[0]
+        return url
+
     try:
         json_result = response.json()
     except Exception:  # pylint: disable=broad-except
@@ -43,6 +48,8 @@ def requests_callback(span: Span, response):
     span.set_attribute("blueking_esb_request_id", json_result.get("request_id", ""))
     span.set_attribute("result_message", json_result.get("message", ""))
     span.set_attribute("result_errors", str(json_result.get("errors", "")))
+    http_url = span._attributes.get("http.url", None)
+    span.set_attribute("http.url", replace_http_url(http_url))
     if result:
         span.set_status(Status(StatusCode.OK))
         return
