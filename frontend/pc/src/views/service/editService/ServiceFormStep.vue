@@ -593,6 +593,10 @@
                 this.crtForm = 'add'
             },
             fieldDelete (form) {
+                if (form.id === 'add') {
+                    this.onEditCancel()
+                    return
+                }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t(`m.treeinfo["确认删除此字段？"]`),

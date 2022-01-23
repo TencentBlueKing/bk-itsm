@@ -548,14 +548,18 @@
                 }
                 this.isDataLoading = true
                 this.$store.dispatch('catalogService/getServices', params).then(res => {
-                    if (Object.keys(res.data).length > 0) {
-                        this.dataList = res.data.items
-                        this.dataList.forEach((item, index) => {
-                            this.$set(item, 'checkStatus', false)
-                        })
-                        // 分页
-                        this.pagination.current = res.data.page
-                        this.pagination.count = res.data.count
+                    if (res.data !== null) {
+                        if (Object.keys(res.data).length > 0) {
+                            this.dataList = res.data.items
+                            this.dataList.forEach((item, index) => {
+                                this.$set(item, 'checkStatus', false)
+                            })
+                            // 分页
+                            this.pagination.current = res.data.page
+                            this.pagination.count = res.data.count
+                        } else {
+                            this.dataList = []
+                        }
                     } else {
                         this.dataList = []
                     }
