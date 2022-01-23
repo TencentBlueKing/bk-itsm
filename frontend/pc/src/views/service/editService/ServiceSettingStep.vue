@@ -152,7 +152,7 @@
                         </basic-card>
                         <basic-card class="mt20"
                             :card-label="$t(`m.taskTemplate['任务配置']`)"
-                            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)">
+                            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的流程字段配置中，将已有字段中的“关联业务” 字段添加至流程中。']`)">
                             <TaskConfigPanel ref="taskConfigPanel" :service-info="serviceInfo"></TaskConfigPanel>
                         </basic-card>
                     </div>

@@ -44,7 +44,7 @@
         <!-- 手动节点 -->
         <template v-for="(item, index) in typeList">
             <template v-if="node.type === item.type">
-                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`">
+                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)">
                     <span class="common-auto-icon"
                         :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
                         @click.stop="openconfigu">
@@ -52,7 +52,7 @@
                         <span v-else style="font-size: 11px; font-weight: bold;">API</span>
                     </span>
                     <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
-                    <i class="bk-itsm-icon icon-edit-bold" @click="clickNode(node, $event)"></i>
+                    <i class="bk-itsm-icon icon-edit-bold"></i>
                     <span class="bk-node-delete"
                         v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
                         @click.stop="clickDelete(node)"

@@ -2053,7 +2053,8 @@ export const m = {
         '任务创建失败': 'Task creation failed',
         '错误信息：': 'Error message:',
         '尚未结束': 'Not over yet',
-        '如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。': 'If you need to call the Sops business process in the process to create a task, please turn on the switch of "Whether to associate business" in "Fill in process information" in the first step.'
+        '如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。': 'If you need to call the Sops business process in the process to create a task, please turn on the switch of "Whether to associate business" in "Fill in process information" in the first step.',
+        '如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的流程字段配置中，将已有字段中的“关联业务” 字段添加至流程中。': 'If you need to call the Sops business process in the process to create a task, add the Associated Service field in the existing field in the process field configuration in step 1 to the process. '
     },
     trigger: {
         '（基础模型）': '(Basic Model)',
