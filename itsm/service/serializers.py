@@ -52,7 +52,7 @@ from itsm.component.drf.serializers import (
     DynamicFieldsModelSerializer,
     AuthModelSerializer,
 )
-from itsm.component.exceptions import ServiceCatalogValidateError
+from itsm.component.exceptions import ServiceCatalogValidateError, ServerError
 from itsm.component.utils.basic import dotted_name, list_by_separator, normal_name
 from itsm.component.utils.misc import transform_single_username
 from itsm.service.models import (
@@ -465,8 +465,10 @@ class ServiceSerializer(AuthModelSerializer):
 
     def to_representation(self, instance):
         data = super(ServiceSerializer, self).to_representation(instance)
-
-        workflow_instance = Workflow.objects.get(id=instance.workflow.workflow_id)
+        try:
+            workflow_instance = Workflow.objects.get(id=instance.workflow.workflow_id)
+        except Workflow.DoesNotExist:
+            raise ServerError("当前服务绑定的流程已经被删除, service_name={}".format(instance.name))
 
         username = self.context["request"].user.username
         data["creator"] = transform_single_username(data["creator"])
