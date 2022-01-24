@@ -541,6 +541,7 @@
             onAddFormClick (targetIndex, val) {
                 this.fieldIndex = targetIndex
                 const field = {
+                    api_info: val.api_info,
                     workflow: '',
                     id: '',
                     key: '',
@@ -551,7 +552,7 @@
                     validate_type: 'REQUIRE',
                     choice: [],
                     is_builtin: false,
-                    source_type: 'CUSTOM',
+                    source_type: val.source_type,
                     source_uri: '',
                     showFeild: true,
                     api_instance_id: null,

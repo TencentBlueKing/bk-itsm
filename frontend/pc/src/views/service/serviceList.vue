@@ -26,7 +26,7 @@
         <div class="page-content">
             <!-- btn -->
             <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
-                <tree-info :tree-info="treeInfo"></tree-info>
+                <tree-info :tree-info="treeInfo" :dir-list="dirList"></tree-info>
                 <div class="hidden-tree" @click="hiddenTree">
                     <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
                 </div>
@@ -108,7 +108,7 @@
                                     data-test-id="service_checkbox_checkService"
                                     v-bk-tooltips.right="{
                                         content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
-                                        disabled: !props.row.bounded_catalogs[0],
+                                        disabled: tableHoverId !== props.row.id,
                                         boundary: 'window',
                                         always: true
                                     }"
