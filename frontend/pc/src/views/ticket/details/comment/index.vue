@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div class="wang-editor-template" :style="{ 'height': isShowCommentScroll ? '' : `calc(100vh - 220px - ${ basicInDomHeight }px)` }">
+    <div class="wang-editor-template">
         <ul v-show="isShowSelect" class="select-pattern">
             <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
                 <i :class="item.icon"></i>
