@@ -2432,5 +2432,6 @@ export const m = {
     '提单时间开始': 'create_at__gte',
     '提单时间结束': 'create_at__lte',
     '业务': 'bk_biz_id',
-    '请先保存字段': 'Please save the fields'
+    '请先保存字段': 'Please save the fields',
+    '未查找到改触发器': 'not found this triggers'
 }

@@ -171,6 +171,7 @@
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
                     const field = {
+                        api_info: evt.item._underlying_vm_.api_info,
                         workflow: '',
                         id: '',
                         key: '',
@@ -182,7 +183,7 @@
                         choice: [],
                         showFeild: true,
                         is_builtin: false,
-                        source_type: 'CUSTOM',
+                        source_type: evt.item._underlying_vm_.source_type || 'CUSTOM',
                         source_uri: '',
                         regex: 'EMPTY',
                         custom_regex: '',
@@ -214,6 +215,7 @@
                     this.$emit('dragUpdateList', targetIndex, field)
                 } else {
                     const field = {
+                        api_info: evt.item._underlying_vm_.api_info,
                         workflow: '',
                         id: '',
                         key: '',
@@ -225,7 +227,7 @@
                         choice: [],
                         showFeild: true,
                         is_builtin: false,
-                        source_type: 'CUSTOM',
+                        source_type: evt.item._underlying_vm_.source_type || 'CUSTOM',
                         source_uri: '',
                         regex: 'EMPTY',
                         custom_regex: '',

@@ -609,7 +609,7 @@
         flex: 1;
         margin-right: 22px;
         height: 100%;
-        overflow: hidden;
+        overflow: auto;
         background-color: #f5f7fa;
         @include scroller;
     }

@@ -198,7 +198,7 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <bk-button v-if="isShowDataSourcebtn" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
                             <bk-dialog
                                 v-model="isShowDataSource"
                                 width="960"
@@ -627,6 +627,9 @@
             },
             isShowDataSourcebtn () {
                 return (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'CUSTOM') && (Object.keys(this.apiDetail).length !== 0 || this.fieldInfo.list.length !== 0)
+            },
+            isDisabled () {
+                return this.formInfo.source_type === 'API' && !this.apiInfo.api_info.remote_api_id
             }
         },
         watch: {

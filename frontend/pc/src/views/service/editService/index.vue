@@ -70,7 +70,7 @@
                 </service-setting-step>
             </template>
         </div>
-        <div v-show="!isShowNodeConfig" class="submit-footer-bar">
+        <div v-show="!isShowNodeConfig || currStep !== 2" class="submit-footer-bar">
             <bk-button
                 data-test-id="service_button_prevStep"
                 ext-cls="button-item"
@@ -288,7 +288,8 @@
                         this.$router.push({
                             name: 'projectServiceList',
                             query: {
-                                project_id: this.$store.state.project.id
+                                project_id: this.$store.state.project.id,
+                                catalog_id: this.serviceInfo.bounded_relations[0].catalog_id
                             }
                         })
                     }

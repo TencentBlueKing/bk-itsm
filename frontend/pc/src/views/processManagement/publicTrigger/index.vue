@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="projectId && !isLoading && triggerList.length === 0"
+                v-if="projectId && !isLoading && triggerList.length === 0 && searchtoggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -101,6 +101,7 @@
                             </span>
                         </li>
                     </ul>
+                    <div v-if="!searchtoggle" class="search-tip">{{ $t('m["未查找到改触发器"]') }}</div>
                 </div>
             </template>
         </div>
@@ -144,6 +145,7 @@
             return {
                 versionStatus: true,
                 searchKey: '',
+                searchtoggle: false,
                 triggerList: [],
                 iconList: [
                     { key: 'icon-icon-notice-new', name: '', typeName: 'message' },
@@ -240,6 +242,7 @@
                             iconKey: this.iconList.find(icon => icon.typeName === trigger.icon).key
                         }
                     })
+                    this.searchtoggle = res.data.length !== 0
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -313,6 +316,12 @@
 
 <style lang='scss' scoped>
     @import './triggerCss/index.scss';
+    .search-tip {
+        text-align: center;
+        font-size: 14px;
+        color: #63656e;
+        margin: 40px;
+    }
     .itsm-notify {
         padding: 6px 10px;
         padding-right: 30px;

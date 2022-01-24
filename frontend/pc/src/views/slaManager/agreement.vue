@@ -30,7 +30,7 @@
             </div>
             <div class="itsm-page-content">
                 <empty-tip
-                    v-if="!isDataLoading && pagination.count === 0"
+                    v-if="!isDataLoading && pagination.count === 0 && searchtoggle"
                     :title="emptyTip.title"
                     :sub-title="emptyTip.subTitle"
                     :desc="emptyTip.desc"
@@ -272,6 +272,7 @@
                         ]
                     }
                 ],
+                searchtoggle: false,
                 emailNotifyEventList: [],
                 weixinNotifyEventList: [],
                 // 服务模式
@@ -344,6 +345,7 @@
                 this.isDataLoading = true
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
                     this.dataList = res.data.items
+                    this.searchtoggle = res.data.items.length !== 0
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count

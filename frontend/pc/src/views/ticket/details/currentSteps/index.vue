@@ -22,7 +22,7 @@
 
 <template>
     <div class="bk-current-node">
-        <div class="bk-current-info" :style="{ 'height': `calc(100vh - 220px - ${ basicInDomHeight }px)` }" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
+        <div class="bk-current-info" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
             <template v-if="!basicInfomation.is_over">
                 <template v-if="currentStepList.length !== 0">
                     <current-step-item
@@ -231,7 +231,7 @@
 <style scoped lang='scss'>
     @import '../../../../scss/mixins/scroller.scss';
     .bk-current-info {
-        overflow: auto;
+        // overflow: auto;
         position: relative;
         padding: 10px;
         @include scroller;
