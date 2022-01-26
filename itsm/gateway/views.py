@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import json
+
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_page
@@ -41,13 +42,21 @@ from itsm.component.exceptions import (
 from itsm.component.constants import ResponseCodeStatus
 from itsm.component.constants.iam import HTTP_499_IAM_FORBIDDEN
 from itsm.component.utils.basic import build_tree
-from itsm.component.utils.client_backend_query import get_biz_choices, get_list_departments, get_list_department_profiles
+from itsm.component.utils.client_backend_query import (
+    get_biz_choices,
+    get_list_departments,
+    get_list_department_profiles,
+)
 from itsm.component.utils.response import Fail, Success
 from itsm.component.apigw import client as apigw_client
 
 from django.conf import settings
 
 adapter_api = settings.ADAPTER_API
+
+
+MAX_PAGE_SIZE = 50
+MIN_PAGE_SIZE = 1
 
 
 def get_token(request):
@@ -63,7 +72,7 @@ def get_token(request):
 
 
 def get_batch_users(request):
-    """ 批量获取用户信息 """
+    """批量获取用户信息"""
     users = (
         request.GET.get("users")
         or request.GET.get("exact_lookups")
@@ -186,11 +195,7 @@ def get_departments(request):
     """
     try:
         # 获取所有部门的扁平化列表信息
-        res = get_list_departments(
-            {
-                "fields": "id,name,parent,level,order"
-            }
-        )
+        res = get_list_departments({"fields": "id,name,parent,level,order"})
 
         # 转换成树状结构
         res = build_tree(res, "parent", need_route=True)
@@ -208,11 +213,7 @@ def get_department_users(request):
         recursive = request.GET.get("recursive") == "true"
 
         res = get_list_department_profiles(
-            {
-                "id": department_id,
-                "recursive": recursive,
-                "detail": True
-            }
+            {"id": department_id, "recursive": recursive, "detail": True}
         )
 
     except ComponentCallError as e:
@@ -441,16 +442,37 @@ def get_sops_preview_common_task_tree(request):
 def get_user_pipeline_list(request):
     try:
         res = apigw_client.devops.project_pipeline_list(
-            {"project_id": request.GET["project_id"], "username": request.user.username}
+            {
+                "project_id": request.GET["project_id"],
+                "username": request.user.username,
+                "pageSize": MAX_PAGE_SIZE,
+            }
         )
-        return Success(res).json()
     except RemoteCallError as e:
         return Fail(str(e), "DEVOPS.GET_UESR_PIPELINE_LIST").json()
+
+    pipeline_list = []
+    kwarg_list = [
+        {
+            "project_id": request.GET["project_id"],
+            "username": request.user.username,
+            "page": i + 1,
+            "pageSize": MAX_PAGE_SIZE,
+        }
+        for i in range(0, int(res["totalPages"]))
+    ]
+    try:
+        pipeline_list.extend(batch_process(get_user_pipeline_singel_page, kwarg_list))
+        return Success(pipeline_list).json()
+    except Exception as e:
+        return Fail(_("批量获取流水线出错:{}".format(str(e))), "BK_LOGIN.GET_BATCH_USERS").json()
 
 
 def get_user_projects(request):
     try:
-        res = apigw_client.devops.projects_list({"username": request.user.username})
+        res = apigw_client.devops.projects_list(
+            {"username": request.user.username, "pageSize": MAX_PAGE_SIZE}
+        )
         return Success(res).json()
     except RemoteCallError as e:
         return Fail(str(e), "DEVOPS.GET_UESR_PROJECTS").json()
@@ -583,3 +605,11 @@ def get_pipeline_build_artifactory_download_url(request):
         return Success(res).json()
     except RemoteCallError as e:
         return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY_DOWNLOAD_URL").json()
+
+
+def get_user_pipeline_singel_page(kwargs):
+    try:
+        res = apigw_client.devops.project_pipeline_list(kwargs)
+        return res["records"]
+    except RemoteCallError as e:
+        logger.warning(_("批量获取流水线出错:{}, kwargs:{}".format(str(e), kwargs)))
