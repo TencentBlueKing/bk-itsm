@@ -73,7 +73,7 @@ class JWTClient(object):
             logger.info(
                 "self.APIGW_PUBLIC_KEY ==== {}".format(settings.APIGW_PUBLIC_KEY)
             )
-            self.payload = jwt.decode(self.raw_content, public_key, issuer="APIGW")
+            self.payload = jwt.decode(self.raw_content, public_key, algorithms=["RS512"], issuer="APIGW")
 
             self.is_valid = True
         except jwt_exceptions.InvalidKeyError:
