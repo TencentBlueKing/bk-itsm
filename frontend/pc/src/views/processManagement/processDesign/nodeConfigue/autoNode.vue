@@ -45,6 +45,7 @@
                     </bk-select>
                     <template v-if="formInfo.api_info.remote_system_id">
                         <bk-select :ext-cls="'bk-form-width bk-form-display'"
+                            style="margin-top: 10px;"
                             v-model="formInfo.api_info.remote_api_id"
                             :loading="isLoading"
                             :clearable="false"

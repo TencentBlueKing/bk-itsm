@@ -432,11 +432,15 @@
             },
             onBasicFormCancel () {
                 if (this.type === 'new') {
+                    this.isCreateService = false
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t(`m.slaContent["确认返回？"]`),
                         confirmFn: () => {
                             this.goBackToServiceList()
+                        },
+                        cancelFn: () => {
+                            this.isCreateService = true
                         }
                     })
                 } else {
