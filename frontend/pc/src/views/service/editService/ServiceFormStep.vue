@@ -318,6 +318,7 @@
                 this.getCreateTicketNodeDetail()
             } else {
                 this.isCreateService = true
+                this.formData.catalog_id = this.$route.query.fromCatalog || ''
             }
         },
         methods: {
