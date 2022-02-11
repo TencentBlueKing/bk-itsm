@@ -30,7 +30,10 @@
                     <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
                 </div>
                 <div class="field-content">
-                    <div class="field-title">控件库</div>
+                    <div class="field-title">
+                        <span>控件库</span>
+                        <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
+                    </div>
                     <ul class="field-list">
                         <draggable
                             :list="fieldsLibrary"
@@ -40,10 +43,14 @@
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </draggable>
+                        <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
                     </ul>
                 </div>
                 <div class="field-content">
-                    <div class="field-title">已有字段</div>
+                    <div class="field-title">
+                        <span>已有字段</span>
+                        <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
+                    </div>
                     <ul class="field-list">
                         <draggable
                             :list="publicFields"
@@ -53,6 +60,7 @@
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </draggable>
+                        <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
                     </ul>
                 </div>
             </div>
@@ -281,7 +289,9 @@
                     maxLength: 0,
                     canMove: false
                 },
-                fieldIndex: ''
+                fieldIndex: '',
+                fieldlist: [],
+                fieldsLibrarylist: fieldsLibrary
             }
         },
         computed: {
@@ -370,6 +380,7 @@
             // 获取已有字段（公共字段）
             getPublicFieldList () {
                 this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
+                    this.fieldlist = res.data
                     this.publicFields = res.data
                 }).catch(res => {
                     errorHandler(res, this)
@@ -723,6 +734,25 @@
             },
             handleShowField () {
                 this.isShowField = !this.isShowField
+            },
+            filterFiled (value, fieldlist, field) {
+                if (value !== '') {
+                    const list = fieldlist.filter(item => {
+                        const reg = RegExp(value)
+                        if (item.name.match(reg)) {
+                            return item
+                        }
+                    })
+                    this[`${field}`] = list
+                } else {
+                    this[`${field}`] = fieldlist
+                }
+            },
+            handleSearchLibrary (value) {
+                this.filterFiled(value, this.fieldsLibrarylist, 'fieldsLibrary')
+            },
+            handleSearchField (value) {
+                this.filterFiled(value, this.fieldlist, 'publicFields')
             }
         }
     }
@@ -832,6 +862,21 @@
                 line-height: 20px;
                 color: #c4c6cc;
                 font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .icon-search-more {
+                    cursor: pointer;
+                    margin-right: 5px;
+                    line-height: 2;
+                    &:hover {
+                        color: #3a84ff;
+                    }
+                }
+                .search-field {
+                    width: 150px;
+                    margin-right: 8px;
+                }
             }
             .field-list {
                 overflow: auto;
@@ -851,6 +896,14 @@
                     color: #63656e;
                     font-size: 12px;
                     cursor: pointer;
+                }
+                .public-field {
+                    height: 300px;
+                    width: 100%;
+                    line-height: 300px;
+                    font-size: 12px;
+                    text-align: center;
+                    color: #c4c6cc
                 }
             }
         }
