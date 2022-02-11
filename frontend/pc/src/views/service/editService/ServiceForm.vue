@@ -22,7 +22,7 @@
 
 <template>
     <div class="service-ticket-form">
-        <div v-if="formList.length" class="form-list">
+        <div v-if="formList.length" class="form-list" style="padding: 10px 0">
             <bk-form form-type="vertical">
                 <draggable
                     data-test-id="service_draggable_serviceFormDrag"

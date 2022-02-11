@@ -664,7 +664,8 @@
                             step: 'basic'
                         },
                         query: {
-                            project_id: this.$store.state.project.id
+                            project_id: this.$route.query.project_id,
+                            fromCatalog: this.$route.query.fromCatalog
                         }
                     })
                 }
