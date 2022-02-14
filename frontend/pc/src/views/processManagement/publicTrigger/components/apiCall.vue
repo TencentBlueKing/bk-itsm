@@ -104,8 +104,10 @@
                 })
             },
             getRemoteSystemData () {
-                const params = {}
-                this.$store.dispatch('apiRemote/get_remote_system', params).then(res => {
+                const params = {
+                    project_key: this.$route.query.project_id || 'public'
+                }
+                this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
                     this.apiSysList = res.data.filter(item => item.is_activated)
                 }).catch(res => {
                     errorHandler(res, this)
