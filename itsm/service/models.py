@@ -350,15 +350,13 @@ class Service(ObjectManagerMixin, Model):
         # 组织角色
         for organization in UserRole.get_user_roles(username)["organization"]:
             conditions.append(
-                Q(display_type="ORGANIZATION")
-                & Q(display_role__contains=organization)
+                Q(display_type="ORGANIZATION") & Q(display_role__contains=organization)
             )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):
             conditions.append(
-                Q(display_type=role["role_type"])
-                & Q(display_role__contains=role["id"])
+                Q(display_type=role["role_type"]) & Q(display_role__contains=role["id"])
             )
 
         return conditions
@@ -604,7 +602,7 @@ class ServiceCatalog(BaseMpttModel):
         return [child.id for child in node.get_descendants(include_self=True)]
 
     @staticmethod
-    def subtree(node, catalogs=None, show_deleted=False):
+    def subtree(node, catalogs=None, show_deleted=False, catalog_count=None):
         """获取以node为根的子树"""
 
         # 根据catalogs列表筛选
@@ -619,7 +617,8 @@ class ServiceCatalog(BaseMpttModel):
 
         # 递归查询，sql查询次数过多 TODO
         children = [
-            node.subtree(child, catalogs, show_deleted) for child in node_children
+            node.subtree(child, catalogs, show_deleted, catalog_count)
+            for child in node_children
         ]
 
         data = {
@@ -641,7 +640,19 @@ class ServiceCatalog(BaseMpttModel):
             "icon": "icon-folder",
         }
 
+        if catalog_count:
+            data["service_count"] = catalog_count.get(data["id"], 0)
+
         return data
+
+    @classmethod
+    def annotate_catalog_count(cls, project_key):
+        values = (
+            CatalogService.objects.filter(project_key=project_key)
+            .values("catalog_id")
+            .annotate(count=Count("catalog_id"))
+        )
+        return {v["catalog_id"]: v["count"] for v in values}
 
     @classmethod
     def tree_data(
@@ -655,6 +666,7 @@ class ServiceCatalog(BaseMpttModel):
         服务目录树
         根据服务编码过滤服务目录
         """
+        catalog_count = cls.annotate_catalog_count(project_key)
 
         def _catalog_services_filter(key, request, show_deleted):
             if key == "global":
@@ -713,7 +725,9 @@ class ServiceCatalog(BaseMpttModel):
 
         roots = roots.order_by("lft", "id")
 
-        tree = [cls.subtree(root, catalogs, show_deleted) for root in roots]
+        tree = [
+            cls.subtree(root, catalogs, show_deleted, catalog_count) for root in roots
+        ]
 
         return tree
 
