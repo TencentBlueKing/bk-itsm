@@ -61,6 +61,7 @@ def index(request):
         if "HTTP_REFERER" not in request.META or request.get_host() in request.META.get(
             "HTTP_REFERER", ""
         ):
+            logger.info("执行跳转: request.path = {}".format(request.path))
             return HttpResponseIndexRedirect(request.path)
 
     # 默认为当前pass host
