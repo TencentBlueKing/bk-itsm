@@ -100,9 +100,8 @@ class JWTClient(object):
         首先从请求 Header X-Bkapi-Public-Key 获取 JWT Public-Key，
         若 Header 中不存在，或者解析失败，则使用默认值
         """
-        logger.info("requests.META == {}".format(self.request.META))
         jwt_resource = self.request.META.get(self.JWT_RESOURCE, "ESB")
-        logger("the api resource is {}".format(jwt_resource))
+        logger.info("the api resource is {}".format(jwt_resource))
         if jwt_resource == "APIGW":
             return settings.APIGW_PUBLIC_KEY
         else:
