@@ -28,7 +28,7 @@ from django.apps import AppConfig
 from django.conf import settings
 
 
-class RoleConfig(AppConfig):
+class OpenapiConfig(AppConfig):
     name = "itsm.openapi"
 
     def ready(self):
@@ -39,5 +39,6 @@ class RoleConfig(AppConfig):
             if esb_result["result"]:
                 api_public_key = esb_result["data"]["public_key"]
                 settings.APIGW_PUBLIC_KEY = api_public_key
+                print("[API] get api public key success: %s" % api_public_key)
             else:
                 print("[API] get api public key error: %s" % esb_result["message"])
