@@ -31,7 +31,7 @@ LOG = logging.getLogger("component")
 class JWTClient(object):
     JWT_KEY_NAME = "HTTP_X_BKAPI_JWT"
     JWT_PUBLIC_KEY_HEADER_NAME = "HTTP_X_BKAPI_PUBLIC_KEY"
-    JWT_RESOURCE = "HTTP_X-BKAPI-SOURCE"
+    JWT_RESOURCE = "HTTP_X_BKAPI_SOURCE"
 
     def __init__(self, request):
         self.request = request
