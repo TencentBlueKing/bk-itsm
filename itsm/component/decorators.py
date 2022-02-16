@@ -37,10 +37,7 @@ from itsm.component.utils.basic import ComplexRegexField, size_mapper
 
 from common.log import logger
 
-try:
-    from bkoauth.jwt_client import JWTClient, jwt_invalid_view
-except ImportError:
-    from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
+from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
 
 
 def no_args_template(view_func):
