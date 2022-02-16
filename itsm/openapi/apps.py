@@ -33,7 +33,7 @@ class OpenapiConfig(AppConfig):
 
     def ready(self):
         print("init api public key")
-        if not hasattr(settings, "APIGW_PUBLIC_KEY"):
+        if not hasattr(settings, "ESB_PUBLIC_KEY"):
             client = get_client_by_user(settings.SYSTEM_USE_API_ACCOUNT)
             esb_result = client.esb.get_api_public_key()
             if esb_result["result"]:
