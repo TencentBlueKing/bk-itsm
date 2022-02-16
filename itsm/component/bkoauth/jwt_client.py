@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-import base64
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -32,6 +31,7 @@ LOG = logging.getLogger("component")
 class JWTClient(object):
     JWT_KEY_NAME = "HTTP_X_BKAPI_JWT"
     JWT_PUBLIC_KEY_HEADER_NAME = "HTTP_X_BKAPI_PUBLIC_KEY"
+    JWT_RESOURCE = "HTTP-X-BKAPI-SOURCE"
 
     def __init__(self, request):
         self.request = request
@@ -73,7 +73,9 @@ class JWTClient(object):
             logger.info(
                 "self.APIGW_PUBLIC_KEY ==== {}".format(settings.APIGW_PUBLIC_KEY)
             )
-            self.payload = jwt.decode(self.raw_content, public_key, algorithms=["RS512"], issuer="APIGW")
+            self.payload = jwt.decode(
+                self.raw_content, public_key, algorithms=["RS512"], issuer="APIGW"
+            )
 
             self.is_valid = True
         except jwt_exceptions.InvalidKeyError:
@@ -98,14 +100,11 @@ class JWTClient(object):
         首先从请求 Header X-Bkapi-Public-Key 获取 JWT Public-Key，
         若 Header 中不存在，或者解析失败，则使用默认值
         """
-        public_key = self.request.META.get(self.JWT_PUBLIC_KEY_HEADER_NAME, "")
-        if not public_key:
+        jwt_resource = self.request.META.get(self.JWT_RESOURCE, "ESB")
+        if jwt_resource == "APIGW":
             return settings.APIGW_PUBLIC_KEY
-
-        try:
-            return base64.b64decode(public_key)
-        except Exception:
-            return settings.APIGW_PUBLIC_KEY
+        else:
+            return settings.ESB_PUBLIC_KEY
 
     def __unicode__(self):
         return "<%s, %s>" % (self.headers, self.payload)
