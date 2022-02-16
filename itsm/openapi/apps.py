@@ -22,9 +22,6 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import base64
-import os
-
 from blueapps.utils import get_client_by_user
 from django.apps import AppConfig
 
@@ -37,16 +34,11 @@ class OpenapiConfig(AppConfig):
     def ready(self):
         print("init api public key")
         if not hasattr(settings, "APIGW_PUBLIC_KEY"):
-            if settings.RUN_VER != "ieod":
-                client = get_client_by_user(settings.SYSTEM_USE_API_ACCOUNT)
-                esb_result = client.esb.get_api_public_key()
-                if esb_result["result"]:
-                    esb_api_public_key = esb_result["data"]["public_key"]
-                    settings.ESB_PUBLIC_KEY = esb_api_public_key
-                    print("[API] get api public key success: %s" % esb_api_public_key)
-                else:
-                    print("[API] get api public key error: %s" % esb_result["message"])
+            client = get_client_by_user(settings.SYSTEM_USE_API_ACCOUNT)
+            esb_result = client.esb.get_api_public_key()
+            if esb_result["result"]:
+                esb_api_public_key = esb_result["data"]["public_key"]
+                settings.ESB_PUBLIC_KEY = esb_api_public_key
+                print("[API] get api public key success: %s" % esb_api_public_key)
             else:
-                api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
-                print("[API] get api public key ieod success: %s" % api_public_key)
-                settings.APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
+                print("[API] get api public key error: %s" % esb_result["message"])
