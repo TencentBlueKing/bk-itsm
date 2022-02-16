@@ -46,4 +46,6 @@ class OpenapiConfig(AppConfig):
                 else:
                     print("[API] get api public key error: %s" % esb_result["message"])
         else:
-            settings.APIGW_PUBLIC_KEY = os.environ.get("APIGW_PUBLIC_KEY", "")
+            api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
+            print("[API] get api public key ieod success: %s" % api_public_key)
+            settings.APIGW_PUBLIC_KEY = api_public_key
