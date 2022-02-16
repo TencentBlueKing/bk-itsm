@@ -534,7 +534,7 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    catalog_id: this.$route.query.fromCatalog || this.treeInfo.node.id,
+                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id,
                     ordering: '-update_at'
                 }
 
@@ -665,7 +665,7 @@
                         },
                         query: {
                             project_id: this.$route.query.project_id,
-                            fromCatalog: this.$route.query.fromCatalog
+                            catalog_id: this.$route.query.catalog_id
                         }
                     })
                 }
@@ -687,7 +687,7 @@
                     query: {
                         serviceId,
                         project_id: this.$store.state.project.id,
-                        fromCatalog: this.treeInfo.node.id
+                        catalog_id: this.$route.query.catalog_id
                     }
                 })
             },

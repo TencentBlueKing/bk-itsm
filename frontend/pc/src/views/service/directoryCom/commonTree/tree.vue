@@ -67,7 +67,7 @@
                         :class="{ 'node-selected': item.selected }"
                         style="padding-right: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: calc(100% - 50px); position: absolute; top: 0; left: 42px;"
                         @click="nodeSelected(item)">{{item.name}}</span>
-                    <span v-if="item.children.length" class="bk-tree-count">{{ item.children.length}}</span>
+                    <span v-if="item.service_count !== 0 && item.service_count !== undefined" class="bk-tree-count">{{ item.service_count }}</span>
                     <i class="bk-icon icon-more bk-tree-point"
                         :class="{ 'bk-point-selected': item.selected }"
                         @click.stop="iconSelected(item, $event)"></i>

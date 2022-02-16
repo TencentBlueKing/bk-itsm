@@ -137,6 +137,7 @@
             :value="isCreateService"
             :mask-close="false"
             :title="'创建服务'"
+            :auto-close="false"
             @confirm="onBasicFormSubmit"
             @cancel="onBasicFormCancel">
             <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
@@ -318,7 +319,7 @@
                 this.getCreateTicketNodeDetail()
             } else {
                 this.isCreateService = true
-                this.formData.catalog_id = this.$route.query.fromCatalog || ''
+                this.formData.catalog_id = this.$route.query.catalog_id || ''
             }
         },
         methods: {
@@ -452,7 +453,8 @@
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
+                        project_id: this.$store.state.project.id,
+                        catalog_id: this.$route.query.catalog_id
                     }
                 })
             },
