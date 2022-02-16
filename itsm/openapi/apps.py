@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import base64
 import os
 
 from blueapps.utils import get_client_by_user
@@ -48,4 +49,4 @@ class OpenapiConfig(AppConfig):
             else:
                 api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
                 print("[API] get api public key ieod success: %s" % api_public_key)
-                settings.APIGW_PUBLIC_KEY = api_public_key
+                settings.APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
