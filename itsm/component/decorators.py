@@ -23,7 +23,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-
 import os
 import traceback
 from functools import wraps
@@ -31,14 +30,17 @@ from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as RrfValidationError
 from django.http import JsonResponse
 from django.utils.translation import ugettext as _
-
-from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
 from itsm.component.exceptions import ServerError, ParamError
 from itsm.component.utils.response import Fail
 
 from itsm.component.utils.basic import ComplexRegexField, size_mapper
 
 from common.log import logger
+
+try:
+    from bkoauth.jwt_client import JWTClient, jwt_invalid_view
+except ImportError:
+    from itsm.component.bkoauth.jwt_client import JWTClient, jwt_invalid_view
 
 
 def no_args_template(view_func):
