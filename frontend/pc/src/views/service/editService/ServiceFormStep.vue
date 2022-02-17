@@ -29,22 +29,32 @@
                 <div class="show-field" @click="handleShowField">
                     <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
                 </div>
-                <div style="    display: flex; height: calc(100% - 46px); flex-direction: column;">
+                <div style="    display: flex; height: calc(100% - 100px); flex-direction: column;">
                     <div class="field-content">
-                        <div class="field-title">控件库</div>
+                        <!-- <div class="field-title">控件库</div> -->
+                        <div class="field-title">
+                            <span>控件库</span>
+                            <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
+                        </div>
                         <ul class="field-list">
                             <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </ul>
+                        <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
                     </div>
                     <div class="field-content">
-                        <div class="field-title">已有字段</div>
+                        <!-- <div class="field-title">已有字段</div> -->
+                        <div class="field-title">
+                            <span>已有字段</span>
+                            <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
+                        </div>
                         <ul class="field-list">
                             <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
                         </ul>
+                        <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
                     </div>
                 </div>
             </div>
@@ -273,7 +283,10 @@
                     startX: null,
                     maxLength: 0,
                     canMove: false
-                }
+                },
+                fieldIndex: '',
+                fieldlist: [],
+                fieldsLibrarylist: fieldsLibrary
             }
         },
         computed: {
@@ -362,10 +375,30 @@
             // 获取已有字段（公共字段）
             getPublicFieldList () {
                 this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
+                    this.fieldlist = res.data
                     this.publicFields = res.data
                 }).catch(res => {
                     errorHandler(res, this)
                 })
+            },
+            filterFiled (value, fieldlist, field) {
+                if (value !== '') {
+                    const list = fieldlist.filter(item => {
+                        const reg = RegExp(value)
+                        if (item.name.match(reg)) {
+                            return item
+                        }
+                    })
+                    this[`${field}`] = list
+                } else {
+                    this[`${field}`] = fieldlist
+                }
+            },
+            handleSearchLibrary (value) {
+                this.filterFiled(value, this.fieldsLibrarylist, 'fieldsLibrary')
+            },
+            handleSearchField (value) {
+                this.filterFiled(value, this.fieldlist, 'publicFields')
             },
             // 服务类型
             getServiceTypes () {
@@ -819,6 +852,13 @@
                 line-height: 20px;
                 color: #c4c6cc;
                 font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .search-field {
+                    width: 150px;
+                    margin-right: 8px;
+                }
             }
             .field-list {
                 overflow: auto;
@@ -839,6 +879,14 @@
                     font-size: 12px;
                     cursor: pointer;
                 }
+            }
+            .public-field {
+                height: 300px;
+                width: 100%;
+                line-height: 300px;
+                font-size: 12px;
+                text-align: center;
+                color: #c4c6cc
             }
         }
     }
