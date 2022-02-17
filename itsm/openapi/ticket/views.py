@@ -403,7 +403,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         fields: 提单节点字段信息
         """
         # 创建单据
-        print(request.META)
         data = copy.deepcopy(request.data)
         logger.info("[openapi][create_ticket]-> 正在开始创建单据, request_data={}".format(data))
         fast_approval = data.pop("fast_approval", False)
