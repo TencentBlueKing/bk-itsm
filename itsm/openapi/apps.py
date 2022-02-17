@@ -39,6 +39,6 @@ class OpenapiConfig(AppConfig):
             if esb_result["result"]:
                 esb_api_public_key = esb_result["data"]["public_key"]
                 settings.ESB_PUBLIC_KEY = esb_api_public_key
-                print("[API] get api public key success: %s" % esb_api_public_key)
+                print("[API] get api public key success")
             else:
                 print("[API] get api public key error: %s" % esb_result["message"])
