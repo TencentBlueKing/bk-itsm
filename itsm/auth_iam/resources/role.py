@@ -67,12 +67,17 @@ class RoleResourceProvider(ItsmResourceProvider):
                 flow_filter |= Q(name__icontains=keyword)
 
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = UserRole.objects.filter(project_key__in=list(project_ids)).filter(flow_filter)
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = UserRole.objects.filter(
+                project_key__in=list(project_ids)
+            ).filter(flow_filter)
 
         count = queryset.count()
         results = [
-            {"id": str(flow.id), "display_name": flow.name} for flow in queryset[page.slice_from : page.slice_to]
+            {"id": str(flow.id), "display_name": flow.name}
+            for flow in queryset[page.slice_from : page.slice_to]
         ]
 
         if with_path:
@@ -80,7 +85,15 @@ class RoleResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(flow.id),
                     "display_name": flow.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": flow.project.name}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": flow.project.name,
+                            }
+                        ]
+                    ],
                 }
                 for flow in queryset[page.slice_from : page.slice_to]
             ]
@@ -95,5 +108,12 @@ class RoleResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(flow.id), "display_name": flow.name} for flow in UserRole.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(user_role.id),
+                "display_name": user_role.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(user_role.creator),
+            }
+            for user_role in UserRole.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

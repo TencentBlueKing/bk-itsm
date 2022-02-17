@@ -65,13 +65,17 @@ class SlaAgreementResourceProvider(ItsmResourceProvider):
 
             # queryset = self.queryset
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = Sla.objects.filter(project_key__in=list(project_ids)).filter(flow_filter)
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = Sla.objects.filter(project_key__in=list(project_ids)).filter(
+                flow_filter
+            )
 
         count = queryset.count()
         results = [
-            {"id": str(sla.id), "display_name": sla.name} for sla in
-            queryset[page.slice_from: page.slice_to]
+            {"id": str(sla.id), "display_name": sla.name}
+            for sla in queryset[page.slice_from : page.slice_to]
         ]
 
         if with_path:
@@ -79,9 +83,17 @@ class SlaAgreementResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(sla.id),
                     "display_name": sla.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": self.get_project_name(sla.project_key)}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": self.get_project_name(sla.project_key),
+                            }
+                        ]
+                    ],
                 }
-                for sla in queryset[page.slice_from: page.slice_to]
+                for sla in queryset[page.slice_from : page.slice_to]
             ]
 
         return ListResult(results=results, count=count)
@@ -97,6 +109,12 @@ class SlaAgreementResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(sla.id), "display_name": sla.name} for sla in
-                   Sla.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(sla.id),
+                "display_name": sla.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(sla.creator),
+            }
+            for sla in Sla.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

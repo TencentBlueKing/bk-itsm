@@ -32,14 +32,16 @@ from ...project.models import Project
 
 
 class ProjectResourceProvider(ItsmResourceProvider):
-    queryset = Project.objects.filter(~Q(key='public'), is_deleted=False)
+    queryset = Project.objects.filter(~Q(key="public"), is_deleted=False)
 
     def list_instance(self, filter, page, **options):
         queryset = self.queryset
         count = queryset.count()
-        # return 
-        results = [{"id": project.key, "display_name": project.name} for project in
-                   queryset[page.slice_from: page.slice_to]]
+        # return
+        results = [
+            {"id": project.key, "display_name": project.name}
+            for project in queryset[page.slice_from : page.slice_to]
+        ]
 
         return ListResult(results=results, count=count)
 
@@ -49,7 +51,14 @@ class ProjectResourceProvider(ItsmResourceProvider):
         """
         queryset = self.queryset.filter(key__in=filter.ids)
         count = queryset.count()
-        results = [{"id": project.key, "display_name": project.name} for project in queryset]
+        results = [
+            {
+                "id": project.key,
+                "display_name": project.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(project.creator),
+            }
+            for project in queryset
+        ]
         return ListResult(results=results, count=count)
 
     def search_instance(self, filter, page, **options):
@@ -58,6 +67,8 @@ class ProjectResourceProvider(ItsmResourceProvider):
         """
         queryset = self.queryset.filter(key__contains=filter.keyword)
         count = queryset.count()
-        results = [{"id": project.key, "display_name": project.name} for project in
-                   queryset[page.slice_from: page.slice_to]]
+        results = [
+            {"id": project.key, "display_name": project.name}
+            for project in queryset[page.slice_from : page.slice_to]
+        ]
         return ListResult(results=results, count=count)

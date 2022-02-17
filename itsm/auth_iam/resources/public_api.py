@@ -31,15 +31,21 @@ from ...postman.models import RemoteSystem, RemoteApi
 
 
 class PublicApiResourceProvider(ItsmResourceProvider):
-    public_system_ids = RemoteSystem.objects.filter(project_key=PUBLIC_PROJECT_PROJECT_KEY).values_list("id", flat=True)
-    queryset = RemoteApi.objects.filter(remote_system_id__in=public_system_ids, is_deleted=False)
+    public_system_ids = RemoteSystem.objects.filter(
+        project_key=PUBLIC_PROJECT_PROJECT_KEY
+    ).values_list("id", flat=True)
+    queryset = RemoteApi.objects.filter(
+        remote_system_id__in=public_system_ids, is_deleted=False
+    )
 
     def list_instance(self, filter, page, **options):
         queryset = self.queryset
         count = queryset.count()
-        # return 
-        results = [{"id": remote_api.id, "display_name": remote_api.name} for remote_api in
-                   queryset[page.slice_from: page.slice_to]]
+        # return
+        results = [
+            {"id": remote_api.id, "display_name": remote_api.name}
+            for remote_api in queryset[page.slice_from : page.slice_to]
+        ]
 
         return ListResult(results=results, count=count)
 
@@ -49,5 +55,12 @@ class PublicApiResourceProvider(ItsmResourceProvider):
         """
         queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
-        results = [{"id": remote_api.id, "display_name": remote_api.name} for remote_api in queryset]
+        results = [
+            {
+                "id": remote_api.id,
+                "display_name": remote_api.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(remote_api.creator),
+            }
+            for remote_api in queryset
+        ]
         return ListResult(results=results, count=count)
