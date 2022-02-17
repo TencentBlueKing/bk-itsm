@@ -411,9 +411,6 @@
         margin-top: 10px;
         
     }
-    .first-level {
-        margin-right: 14px;
-    }
     .person-vertical {
         .first-level, .second-level {
             display: block;
@@ -422,7 +419,6 @@
         }
         .second-level {
             margin-top: 20px;
-            margin-left: 14px;
         }
     }
     .inline-auto-width {

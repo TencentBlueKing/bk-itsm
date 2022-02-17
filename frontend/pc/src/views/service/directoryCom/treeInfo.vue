@@ -202,6 +202,7 @@
                     project_key: this.$store.state.project.id
                 }).then(res => {
                     this.treeList = res.data
+
                     if (!this.firstStatus) {
                         this.treeInfo.node = this.treeList[0]
                     }
@@ -217,6 +218,9 @@
                             this.getNodeTree(item)
                         })
                     }
+                    if (this.$route.query.catalog_id !== 1) {
+                        this.treeList[0].selected = false
+                    }
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -226,7 +230,7 @@
             // 点击节点方法
             nodeClick (node) {
                 this.treeInfo.node = node
-                this.$route.query.fromCatalog = node.id
+                this.$route.query.catalog_id = node.id
                 this.$store.commit('serviceCatalog/changeTreeOperat', false)
             },
             iconNode (node) {
@@ -280,13 +284,17 @@
                 })
             },
             getNodeTree (tree) {
-                if (this.treeInfo.node.id === tree.id) {
+                if (this.$route.query.catalog_id === tree.id && tree.id !== 1) {
                     this.$set(tree, 'expanded', true)
+                    this.$set(tree, 'selected', true)
                 }
                 if (tree.children === null || (tree.children && !tree.children.length)) {
                     return
                 }
                 tree.children.forEach(item => {
+                    if (item.parent_id === tree.id && this.$route.query.catalog_id === item.id) {
+                        this.$set(tree, 'expanded', true)
+                    }
                     this.getNodeTree(item)
                 })
             },
