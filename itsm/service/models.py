@@ -345,7 +345,7 @@ class Service(ObjectManagerMixin, Model):
 
     @classmethod
     def permission_filter(cls, username):
-        conditions = [Q(display_type="OPEN")]
+        conditions = [Q(display_type__in=["OPEN", "API"])]
 
         # 组织角色
         for organization in UserRole.get_user_roles(username)["organization"]:
