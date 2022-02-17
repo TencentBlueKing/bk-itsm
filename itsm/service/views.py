@@ -259,9 +259,11 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         query_params = dict(pk__in=service_ids)
         if is_valid is not None:
             query_params.update({"is_valid": is_valid})
-        services = Service.objects.filter(
-            display_type__in=[OPEN, GENERAL, ORGANIZATION], **query_params
-        ).extra(select={"ordering": ordering}, order_by=["ordering"])
+        services = (
+            Service.objects.exclude(display_type=INVISIBLE)
+            .filter(**query_params)
+            .extra(select={"ordering": ordering}, order_by=["ordering"])
+        )
 
         # 支持额外过滤选项
         if name:
