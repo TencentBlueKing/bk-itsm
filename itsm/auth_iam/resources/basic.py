@@ -50,7 +50,7 @@ class ItsmResourceProvider(ResourceProvider):
 
     def get_bk_iam_approver(self, creator):
         if creator in ["system", None]:
-            return settings.INIT_SUPERUSER
+            return list(settings.INIT_SUPERUSER)
         return creator.split(",")
 
     @staticmethod
