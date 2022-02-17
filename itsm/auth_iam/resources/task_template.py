@@ -34,10 +34,11 @@ class TaskSchemaResourceProvider(ItsmResourceProvider):
     def list_instance(self, filter, page, **options):
         queryset = self.queryset
         count = queryset.count()
-        # return 
-        results = [{"id": task_schema.id, "display_name": task_schema.name}
-                   for task_schema in
-                   queryset[page.slice_from: page.slice_to]]
+        # return
+        results = [
+            {"id": task_schema.id, "display_name": task_schema.name}
+            for task_schema in queryset[page.slice_from : page.slice_to]
+        ]
 
         return ListResult(results=results, count=count)
 
@@ -47,6 +48,12 @@ class TaskSchemaResourceProvider(ItsmResourceProvider):
         """
         queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
-        results = [{"id": task_schema.id, "display_name": task_schema.name} for task_schema in
-                   queryset]
+        results = [
+            {
+                "id": task_schema.id,
+                "display_name": task_schema.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(task_schema.creator),
+            }
+            for task_schema in queryset
+        ]
         return ListResult(results=results, count=count)

@@ -50,7 +50,11 @@ class PublicFieldResourceProvider(ItsmResourceProvider):
         queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
         results = [
-            {"id": public_field.id, "display_name": public_field.name}
+            {
+                "id": public_field.id,
+                "display_name": public_field.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(public_field.creator),
+            }
             for public_field in queryset
         ]
         return ListResult(results=results, count=count)

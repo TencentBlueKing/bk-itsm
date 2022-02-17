@@ -68,12 +68,17 @@ class ServiceResourceProvider(ItsmResourceProvider):
 
             # queryset = self.queryset
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = Service.objects.filter(project_key__in=list(project_ids)).filter(flow_filter)
-    
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = Service.objects.filter(project_key__in=list(project_ids)).filter(
+                flow_filter
+            )
+
         count = queryset.count()
         results = [
-            {"id": str(flow.id), "display_name": flow.name} for flow in queryset[page.slice_from : page.slice_to]
+            {"id": str(flow.id), "display_name": flow.name}
+            for flow in queryset[page.slice_from : page.slice_to]
         ]
 
         if with_path:
@@ -81,7 +86,15 @@ class ServiceResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(flow.id),
                     "display_name": flow.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": flow.project.name}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": flow.project.name,
+                            }
+                        ]
+                    ],
                 }
                 for flow in queryset[page.slice_from : page.slice_to]
             ]
@@ -96,5 +109,12 @@ class ServiceResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(flow.id), "display_name": flow.name} for flow in Service.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(service.id),
+                "display_name": service.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(service.creator),
+            }
+            for service in Service.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

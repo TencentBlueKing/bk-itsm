@@ -66,9 +66,12 @@ class FieldResourceProvider(ItsmResourceProvider):
 
             # queryset = queryset
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = TemplateField.objects.filter(project_key__in=list(project_ids)).filter(
-                field_filter)
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = TemplateField.objects.filter(
+                project_key__in=list(project_ids)
+            ).filter(field_filter)
 
         count = queryset.count()
 
@@ -77,14 +80,22 @@ class FieldResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(field.id),
                     "display_name": field.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": field.prject.name}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": field.prject.name,
+                            }
+                        ]
+                    ],
                 }
-                for field in queryset[page.slice_from: page.slice_to]
+                for field in queryset[page.slice_from : page.slice_to]
             ]
         else:
             results = [
-                {"id": str(field.id), "display_name": field.name} for field in
-                queryset[page.slice_from: page.slice_to]
+                {"id": str(field.id), "display_name": field.name}
+                for field in queryset[page.slice_from : page.slice_to]
             ]
 
         return ListResult(results=results, count=count)
@@ -97,6 +108,12 @@ class FieldResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(template_field.id), "display_name": template_field.name} for
-                   template_field in TemplateField.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(template_field.id),
+                "display_name": template_field.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(template_field.creator),
+            }
+            for template_field in TemplateField.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

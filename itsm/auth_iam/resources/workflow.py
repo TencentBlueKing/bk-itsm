@@ -77,7 +77,8 @@ class WorkFlowResourceProvider(ItsmResourceProvider):
 
         count = queryset.count()
         results = [
-            {"id": str(flow.id), "display_name": flow.name} for flow in queryset[page.slice_from : page.slice_to]
+            {"id": str(flow.id), "display_name": flow.name}
+            for flow in queryset[page.slice_from : page.slice_to]
         ]
 
         if with_path:
@@ -85,7 +86,15 @@ class WorkFlowResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(flow.id),
                     "display_name": flow.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": flow.project.name}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": flow.project.name,
+                            }
+                        ]
+                    ],
                 }
                 for flow in queryset[page.slice_from : page.slice_to]
             ]
@@ -100,5 +109,12 @@ class WorkFlowResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(flow.id), "display_name": flow.name} for flow in Workflow.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(flow.id),
+                "display_name": flow.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(flow.creator),
+            }
+            for flow in Workflow.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)
