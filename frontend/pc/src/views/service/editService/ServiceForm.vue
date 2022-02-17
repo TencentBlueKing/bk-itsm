@@ -287,6 +287,7 @@
     }
 </script>
 <style lang='scss' scoped>
+@import '~@/scss/mixins/scroller.scss';
 .service-ticket-form {
     // margin-top: 16px;
     position: relative;
@@ -294,6 +295,12 @@
     background: #ffffff;
     box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
     min-height: 207px;
+    .form-list {
+        height: calc(100vh - 300px);
+        padding: 10px 0px;
+        overflow: auto;
+        @include scroller;
+    }
     .no-form {
         position: absolute;
         left: 50%;

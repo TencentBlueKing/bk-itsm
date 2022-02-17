@@ -422,7 +422,7 @@
         }
         .second-level {
             margin-top: 20px;
-            margin-left: 14px;
+            // margin-left: 14px;
         }
     }
     .inline-auto-width {

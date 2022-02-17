@@ -24,36 +24,28 @@
     <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
         <!-- 字段选择 -->
         <div :class="['field-option', isShowField ? 'field-hide' : '']">
-            <div style="overflow: hidden">
+            <div style="overflow: hidden; height: 100%;">
                 <div class="field-type">字段类型</div>
                 <div class="show-field" @click="handleShowField">
                     <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
                 </div>
-                <div class="field-content">
-                    <div class="field-title">控件库</div>
-                    <ul class="field-list">
-                        <draggable
-                            :list="fieldsLibrary"
-                            handle=".field-item"
-                            :group="{ name: 'view-form', pull: 'clone', put: false }">
-                            <li class="field-item drag-entry" v-for="field in fieldsLibrary" :key="field.type" @click="onAddFormClick(field)" :date-type="field.type">
+                <div style="    display: flex; height: calc(100% - 46px); flex-direction: column;">
+                    <div class="field-content">
+                        <div class="field-title">控件库</div>
+                        <ul class="field-list">
+                            <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
-                        </draggable>
-                    </ul>
-                </div>
-                <div class="field-content">
-                    <div class="field-title">已有字段</div>
-                    <ul class="field-list">
-                        <draggable
-                            :list="publicFields"
-                            handle=".field-item"
-                            :group="{ name: 'view-form', pull: 'clone', put: false }">
-                            <li class="field-item drag-entry" v-for="field in publicFields" :key="field.id" @click="addField(field)">
+                        </ul>
+                    </div>
+                    <div class="field-content">
+                        <div class="field-title">已有字段</div>
+                        <ul class="field-list">
+                            <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
                                 <span class="field-name">{{ field.name }}</span>
                             </li>
-                        </draggable>
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,29 +86,31 @@
                     </li>
                 </ul> -->
                 <div class="create-service-form" v-bkloading="{ isLoading: formLoading }">
-                    <ServiceForm
-                        ref="serviceForm"
-                        :add-field-status="addFieldStatus"
-                        :service-info="serviceInfo"
-                        :node-id="createTicketNodeId"
-                        :forms="ticketNodeForm"
-                        :crt-form.sync="crtForm"
-                        @dragUpdateList="dragUpdateList"
-                        @onAddFormClick="onAddFormClick"
-                        @addField="addField"
-                        @onFormEditClick="onFormEditClick"
-                        @cancelAdd="cancelAddField"
-                        @fieldClone="fieldClone"
-                        @fieldDelete="fieldDelete"
-                        @saveField="saveField">
-                    </ServiceForm>
+                    <div>
+                        <ServiceForm
+                            ref="serviceForm"
+                            :add-field-status="addFieldStatus"
+                            :service-info="serviceInfo"
+                            :node-id="createTicketNodeId"
+                            :forms="ticketNodeForm"
+                            :crt-form.sync="crtForm"
+                            @dragUpdateList="dragUpdateList"
+                            @onAddFormClick="onAddFormClick"
+                            @addField="addField"
+                            @onFormEditClick="onFormEditClick"
+                            @cancelAdd="cancelAddField"
+                            @fieldClone="fieldClone"
+                            @fieldDelete="fieldDelete"
+                            @saveField="saveField">
+                        </ServiceForm>
+                    </div>
                 </div>
             </section>
         </div>
         <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
-        <div class="edit-service-field">
+        <div v-show="crtForm" class="edit-service-field">
             <div class="edit-service-title">字段属性</div>
-            <div class="edit-service-forms" v-show="isShowRightEdit">
+            <div class="edit-service-forms">
                 <template v-for="form in ticketNodeForm">
                     <form-edit-item
                         v-if="form.id === crtForm"
@@ -187,7 +181,6 @@
     import ServiceForm from './ServiceForm.vue'
     import ChooseServiceTemplateDialog from './ChooseServiceTemplateDialog.vue'
     import FormEditItem from './FormEditItem.vue'
-    import draggable from 'vuedraggable'
 
     const fieldsLibrary = [
         { name: '单行文本', icon: 'icon-apps', type: 'STRING' },
@@ -221,8 +214,7 @@
             SelectTree,
             ServiceForm,
             ChooseServiceTemplateDialog,
-            FormEditItem,
-            draggable
+            FormEditItem
         },
         mixins: [commonMix],
         props: {
@@ -281,8 +273,7 @@
                     startX: null,
                     maxLength: 0,
                     canMove: false
-                },
-                fieldIndex: ''
+                }
             }
         },
         computed: {
@@ -396,7 +387,6 @@
                         item.val = item.hasOwnProperty('default') ? deepClone(item.default) : ''
                         item.showFeild = true
                     })
-                    console.log()
                     this.ticketNodeForm = res.data
                 }).catch((res) => {
                     errorHandler(res, this)
@@ -545,31 +535,26 @@
                 }
             },
             // 点击字段控件
-            onAddFormClick (targetIndex, val) {
-                this.fieldIndex = targetIndex
+            onAddFormClick (val) {
                 const field = {
-                    api_info: val.api_info,
                     workflow: '',
                     id: '',
                     key: '',
-                    name: val.name,
+                    name: '',
                     type: val.type,
                     desc: '',
-                    layout: val.layout || 'COL_12',
+                    layout: 'COL_12',
                     validate_type: 'REQUIRE',
                     choice: [],
                     is_builtin: false,
-                    source_type: val.source_type,
+                    source_type: 'CUSTOM',
                     source_uri: '',
-                    showFeild: true,
-                    api_instance_id: null,
-                    kv_relation: {},
-                    default: '',
                     regex: 'EMPTY',
                     custom_regex: '',
                     is_tips: false,
                     tips: '',
-                    meta: val.meta || {}
+                    meta: {},
+                    default: ''
                 }
                 this.addField(field)
             },
@@ -583,8 +568,7 @@
                 }
                 this.isShowRightEdit = true
                 const form = Object.assign(deepClone(field), { id: 'add' })
-                // this.ticketNodeForm.push(form)
-                this.ticketNodeForm.splice(this.fieldIndex, 0, form)
+                this.ticketNodeForm.push(form)
                 this.crtForm = 'add'
             },
             // 取消添加字段
@@ -646,8 +630,7 @@
                 if (index > -1) { // 编辑
                     this.ticketNodeForm.splice(index, 1, field)
                 } else { // 新增
-                    this.ticketNodeForm.splice(this.fieldIndex, 1, field)
-                    this.fieldIndex = ''
+                    this.ticketNodeForm.splice(-1, 1, field)
                 }
                 this.crtForm = ''
             },
@@ -780,7 +763,8 @@
 }
 .service-form {
     display: flex;
-    height: 100%;
+    height: calc(100vh - 164px);
+    overflow: hidden;
     &.hide-field-option {
         .basic-body {
             width: 100%;
@@ -791,7 +775,7 @@
         width: 0 !important;
     }
     .field-option {
-        height: 100%;
+        height: calc(100vh - 164px);
         float: left;
         width: 280px;
         position: relative;
@@ -824,6 +808,7 @@
             cursor: pointer;
         }
         .field-content {
+            flex: 1;
             width: 100%;
             padding: 0 7px 0px 12px;
             margin: 4px 0;
@@ -839,7 +824,7 @@
                 overflow: auto;
                 @include scroller;
                 width: 100%;
-                max-height: calc((100vh - 198px) / 2);
+                max-height: calc((100vh - 300px) / 2);
                 .field-item {
                     width: 120px;
                     padding: 0 20px;
@@ -859,8 +844,12 @@
     }
     .basic-body {
         flex: 1;
+        // width: 632px;
         margin: 24px;
-        height: calc(100vh - 225px);
+        // float: left;
+        // padding: 15px;create-info-card
+        // width: calc(100% - 280px);
+        // height: calc(100vh - 225px);
         overflow: auto;
         @include scroller;
     }
@@ -899,6 +888,7 @@
 }
 .settion-card {
     margin: auto;
+    // max-width: 1000px;
     .card-title {
         margin: 0;
         font-size: 14px;
@@ -999,6 +989,8 @@
 }
 // 提单信息
 .create-info-card {
+    height: calc(100vh - 212px);
+    overflow: hidden;
     box-shadow: 0px 2px 6px 0px rgba(6,6,6,0.10);
     background-color: #fff;
     // margin-top: 32px;
@@ -1023,16 +1015,6 @@
             span {
                 color: #737987;
                 margin-left: 14px;
-            }
-            &:hover {
-                border: 1px dashed #3a84ff;
-                background-color: #f0f5ff;
-                i{
-                    color: #3a84ff;
-                }
-                span {
-                    color: #3a84ff;
-                }
             }
         }
     }
