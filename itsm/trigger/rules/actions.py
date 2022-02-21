@@ -36,7 +36,13 @@ class ResponseActions(BaseActions):
         self.trigger = trigger
         self.context = context
 
-    @rule_action(params={"rule": FIELD_NUMERIC, "source_type": FIELD_TEXT, "source_id": FIELD_NUMERIC})
+    @rule_action(
+        params={
+            "rule": FIELD_NUMERIC,
+            "source_type": FIELD_TEXT,
+            "source_id": FIELD_NUMERIC,
+        }
+    )
     def trigger_handle(self, rule, source_type, source_id):
         """
         针对当前触发器规则满足条件的actions进行操作
@@ -45,18 +51,7 @@ class ResponseActions(BaseActions):
         for action in rule.actions:
             action_obj = self.check_and_create(source_type, source_id, action, rule)
             if action_obj:
-                tasks.append(
-                    Action.objects.create(
-                        signal=self.trigger.signal,
-                        sender=self.trigger.sender,
-                        context=self.context,
-                        source_type=source_type,
-                        source_id=source_id,
-                        schema_id=action.id,
-                        rule_id=rule.id,
-                        trigger_id=self.trigger.id,
-                    )
-                )
+                tasks.append(action_obj)
         for task in tasks:
             if task.action_schema.operate_type == BACKEND:
                 # 当任务为自动执行的时候，直接调用执行接口
@@ -64,7 +59,7 @@ class ResponseActions(BaseActions):
 
     @share_lock()
     def check_and_create(self, source_type, source_id, action, rule):
-        created = Action.objects.filter(
+        instance = Action.objects.filter(
             signal=self.trigger.signal,
             sender=self.trigger.sender,
             source_type=source_type,
@@ -72,9 +67,9 @@ class ResponseActions(BaseActions):
             schema_id=action.id,
             rule_id=rule.id,
             trigger_id=self.trigger.id,
-        ).exists()
-        if not created:
-            obj = Action.objects.create(
+        ).first()
+        if instance is None:
+            instance = Action.objects.create(
                 signal=self.trigger.signal,
                 sender=self.trigger.sender,
                 context=self.context,
@@ -84,4 +79,4 @@ class ResponseActions(BaseActions):
                 rule_id=rule.id,
                 trigger_id=self.trigger.id,
             )
-            return obj
+        return instance

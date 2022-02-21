@@ -63,7 +63,6 @@ from itsm.service.models import (
     ServiceSla,
 )
 from itsm.component.drf import permissions as perm
-from itsm.service.permissions import ServiceDeletePermit
 from itsm.service.serializers import (
     CatalogServiceEditSerializer,
     CatalogServiceSerializer,
@@ -360,9 +359,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
 
     serializer_class = ServiceSerializer
     queryset = Service.objects.exclude(display_type=INVISIBLE)
-    permission_classes = component_viewsets.AuthModelViewSet.permission_classes + (
-        ServiceDeletePermit,
-    )
+    permission_classes = component_viewsets.AuthModelViewSet.permission_classes
     permission_free_actions = ["retrieve"]
 
     ordering_fields = ("name", "create_at", "update_at")
@@ -394,7 +391,10 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     def perform_destroy(self, instance):
         # 先删除关联的SLA配置
         # TODO 删除服务在运行的SLA任务的处理方案
+        # 删除相关的服务绑定
+        CatalogService.objects.filter(service_id=instance.id).delete()
         ServiceSla.objects.filter(service_id=instance.id).delete()
+
         super().perform_destroy(instance)
 
     def get_queryset(self):
