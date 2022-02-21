@@ -644,6 +644,7 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         instance = self.get_object()
         tag_data = instance.tag_data()
         service = Service.objects.clone(tag_data, request.user.username)
+        service.bind_catalog(instance.catalog_id, instance.project_key)
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )
