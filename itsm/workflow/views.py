@@ -1024,7 +1024,7 @@ class TableViewSet(component_viewsets.ModelViewSet):
     """基础模型视图"""
 
     # permission_classes = (IamAuthWithoutResourcePermit,)
-    queryset = Table.objects.all().order_by("-create_at")
+    queryset = Table.objects.filter(is_builtin=True).order_by("-create_at")
     serializer_class = TableSerializer
     filter_fields = {
         "name": ["contains", "icontains"],
