@@ -101,7 +101,7 @@
                             </span>
                         </li>
                     </ul>
-                    <div v-if="!searchtoggle" class="search-tip">{{ $t('m["未查找到改触发器"]') }}</div>
+                    <div v-if="!searchtoggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
                 </div>
             </template>
         </div>
@@ -233,7 +233,7 @@
                 if (this.projectId) {
                     params.project_key = this.projectId
                 }
-
+                this.searchtoggle = !this.searchKey
                 this.isLoading = true
                 this.$store.dispatch('trigger/getTriggerTable', params).then((res) => {
                     this.triggerList = res.data.map(trigger => {
@@ -242,7 +242,6 @@
                             iconKey: this.iconList.find(icon => icon.typeName === trigger.icon).key
                         }
                     })
-                    this.searchtoggle = res.data.length !== 0
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {

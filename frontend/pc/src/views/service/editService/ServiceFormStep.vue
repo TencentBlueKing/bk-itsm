@@ -144,21 +144,40 @@
             :auto-close="false"
             @confirm="onBasicFormSubmit"
             @cancel="onBasicFormCancel">
-            <bk-form ref="basicForm" form-type="vertical" class="basic-form" :rules="rules" :model="formData">
-                <bk-form-item data-test-id="service-input-serviceName" :label="$t(`m.newCommon['服务名称']`)" :required="true" property="name">
-                    <bk-input v-model="formData.name"></bk-input>
+            <bk-form
+                ref="basicForm"
+                form-type="vertical"
+                class="basic-form"
+                :rules="rules"
+                :model="formData">
+                <bk-form-item
+                    data-test-id="service-input-serviceName"
+                    :label="$t(`m.newCommon['服务名称']`)"
+                    :required="true" property="name"
+                    error-display-type="normal">
+                    <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m.serviceConfig['服务描述']`)" property="desc">
                     <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
                 </bk-form-item>
-                <bk-form-item data-test-id="service-select-serviceDirectory" :label="$t(`m.tickets['所属目录']`)" :required="true" property="catalog_id">
+                <bk-form-item
+                    data-test-id="service-select-serviceDirectory"
+                    :label="$t(`m.tickets['所属目录']`)"
+                    :required="true"
+                    property="catalog_id"
+                    error-display-type="normal">
                     <select-tree
                         v-model="formData.catalog_id"
                         :list="dirList"
                         ext-cls="bk-form-width">
                     </select-tree>
                 </bk-form-item>
-                <bk-form-item data-test-id="service-select-serviceType" :label="$t(`m.serviceConfig['服务类型']`)" :required="true" property="key">
+                <bk-form-item
+                    data-test-id="service-select-serviceType"
+                    :label="$t(`m.serviceConfig['服务类型']`)"
+                    :required="true"
+                    property="key"
+                    error-display-type="normal">
                     <bk-select v-model="formData.key"
                         :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
                         :clearable="false"
@@ -912,7 +931,7 @@
         }
     }
     .edit-service-field {
-        width: 400px;
+        width: 500px;
         background: #ffffff;
         border-left: 1px solid #dde4eb;
         border-top: 1px solid #dde4eb;

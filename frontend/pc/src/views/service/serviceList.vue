@@ -231,22 +231,6 @@
                             </div>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['创建人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['更新人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-
-                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" min-width="150">
-                        <template slot-scope="props">
-                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                        </template>
-                    </bk-table-column>
                     <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
                         <template slot-scope="props">
                             <span class="bk-status-color"
@@ -320,7 +304,7 @@
                                         @click="onServicePermissonCheck(['service_manage'], props.row)">
                                         {{ $t('m.serviceConfig["删除"]') }}
                                     </bk-button>
-                                    <template v-else-if="!!props.row.bounded_catalogs[0]">
+                                    <!-- <template v-else-if="!!props.row.bounded_catalogs[0]">
                                         <bk-popover placement="top">
                                             <bk-button
                                                 data-test-id="service_button_deleteService2"
@@ -334,7 +318,7 @@
                                                 <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
                                             </div>
                                         </bk-popover>
-                                    </template>
+                                    </template> -->
                                     <template v-else>
                                         <bk-button
                                             data-test-id="service_button_deleteService3"
@@ -534,20 +518,22 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id,
                     ordering: '-update_at'
                 }
-
+                let url = 'catalogService/getServices'
                 this.moreSearch.forEach(item => {
                     if (item.value !== '' && item.typeKey) {
+                        url = 'serviceEntry/getList'
                         params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                    } else {
+                        params.catalog_id = this.$route.query.catalog_id || this.treeInfo.node.id
                     }
                 })
                 if (!this.treeInfo.node.id) {
                     return
                 }
                 this.isDataLoading = true
-                this.$store.dispatch('catalogService/getServices', params).then(res => {
+                this.$store.dispatch(url, params).then(res => {
                     if (res.data !== null) {
                         if (Object.keys(res.data).length > 0) {
                             this.dataList = res.data.items
@@ -834,7 +820,6 @@
             },
             hiddenTree () {
                 this.isHiddenDirectory = !this.isHiddenDirectory
-                console.log('隐藏')
             }
         }
     }

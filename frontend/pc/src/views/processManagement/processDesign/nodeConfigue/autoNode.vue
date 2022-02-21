@@ -45,7 +45,6 @@
                     </bk-select>
                     <template v-if="formInfo.api_info.remote_system_id">
                         <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                            style="margin-top: 10px;"
                             v-model="formInfo.api_info.remote_api_id"
                             :loading="isLoading"
                             :clearable="false"
@@ -824,7 +823,7 @@
             padding: 20px;
         }
         /deep/ .bk-form-width {
-            width: 480px;
+            width: 446px;
         }
         /deep/ .common-section-card-block {
             box-shadow: 0 0;
@@ -848,7 +847,7 @@
         margin-bottom: 20px;
     }
     .bk-form-width {
-        width: 480px;
+        width: 446px;
     }
     .bk-form-display {
         float: left;
