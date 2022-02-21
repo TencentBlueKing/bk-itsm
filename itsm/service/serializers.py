@@ -68,7 +68,7 @@ from itsm.service.models import (
     FavoriteService,
 )
 from itsm.service.validators import key_validator, name_validator, time_validator
-from itsm.workflow.models import Workflow
+from itsm.workflow.models import Workflow, Table
 from itsm.workflow.serializers import NotifySerializer
 
 
@@ -419,6 +419,12 @@ class ServiceSerializer(AuthModelSerializer):
 
         return instance
 
+    def get_default_table_id(self):
+        try:
+            return Table.objects.get(name="默认", is_builtin=True).id
+        except Table.DoesNotExist:
+            return 1
+
     def init_work_flow(self, validated_data):
         work_flow_instance = Workflow.objects.create(
             name="{}_work_flow".format(validated_data["name"]),
@@ -429,7 +435,7 @@ class ServiceSerializer(AuthModelSerializer):
             is_iam_used=False,
             is_enabled=True,
             is_draft=False,
-            table_id=1,
+            table_id=self.get_default_table_id(),
             owners="",
             engine_version=DEFAULT_ENGINE_VERSION,
             creator=validated_data["creator"],
