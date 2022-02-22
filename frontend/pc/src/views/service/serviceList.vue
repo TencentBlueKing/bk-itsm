@@ -304,21 +304,6 @@
                                         @click="onServicePermissonCheck(['service_manage'], props.row)">
                                         {{ $t('m.serviceConfig["删除"]') }}
                                     </bk-button>
-                                    <!-- <template v-else-if="!!props.row.bounded_catalogs[0]">
-                                        <bk-popover placement="top">
-                                            <bk-button
-                                                data-test-id="service_button_deleteService2"
-                                                theme="primary"
-                                                text
-                                                :disabled="!!props.row.bounded_catalogs[0]"
-                                                @click="deleteOne(props.row)">
-                                                {{ $t('m.serviceConfig["删除"]') }}
-                                            </bk-button>
-                                            <div slot="content" style="white-space: normal;">
-                                                <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
-                                            </div>
-                                        </bk-popover>
-                                    </template> -->
                                     <template v-else>
                                         <bk-button
                                             data-test-id="service_button_deleteService3"

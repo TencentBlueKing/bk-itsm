@@ -816,8 +816,14 @@
             flex-direction: column;
         }
         /deep/ .common-section-card-label {
-            // display: none;
+            width: 100%;
             padding: 0 24px;
+            .common-section-card-desc {
+                width: 100%;
+            }
+        }
+        /deep/ .bk-polling {
+            margin-top: -25px;
         }
         /deep/ .common-section-card-body {
             padding: 20px;

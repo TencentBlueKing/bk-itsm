@@ -517,4 +517,7 @@
         margin-top: 20px;
     }
 }
+/deep/ .common-section-card-desc {
+    width: 100%;
+}
 </style>

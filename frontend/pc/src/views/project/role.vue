@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="!isDataLoading && tableList.length === 0 && searchtoggle"
+                v-if="!isDataLoading && tableList.length === 0 && searchToggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -227,7 +227,7 @@
                 },
                 itemContent: {},
                 searchName: '',
-                searchtoggle: false,
+                searchToggle: false,
                 emptyTip: {
                     title: this.$t(`m['当前项目下还没有 <用户组>']`),
                     subTitle: this.$t(`m['同一个职能团队可能会出现在多个不同的服务处理流程中，为了达到人员配置的一致性管理目的，你只需将对应的人员设置到同一个<用户组>中即可，这样便可以在不同的服务中配置引用它。']`),
@@ -271,7 +271,7 @@
                 }
                 this.$store.dispatch('user/getRoleList', params).then((res) => {
                     this.tableList = res.data
-                    this.searchtoggle = res.data.length !== 0
+                    this.searchToggle = res.data.length !== 0
                     this.tableList.forEach(item => {
                         this.$set(item, 'staffInputValue', item.members ? item.members.split(',') : [])
                         this.$set(item, 'ownersInputValue', item.owners ? item.owners.split(',') : [])

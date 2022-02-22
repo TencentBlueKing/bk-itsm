@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="projectId && !isLoading && triggerList.length === 0 && searchtoggle"
+                v-if="projectId && !isLoading && triggerList.length === 0 && searchToggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -101,7 +101,7 @@
                             </span>
                         </li>
                     </ul>
-                    <div v-if="!searchtoggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
+                    <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
                 </div>
             </template>
         </div>
@@ -145,7 +145,7 @@
             return {
                 versionStatus: true,
                 searchKey: '',
-                searchtoggle: false,
+                searchToggle: false,
                 triggerList: [],
                 iconList: [
                     { key: 'icon-icon-notice-new', name: '', typeName: 'message' },
@@ -233,7 +233,7 @@
                 if (this.projectId) {
                     params.project_key = this.projectId
                 }
-                this.searchtoggle = !this.searchKey
+                this.searchToggle = !this.searchKey
                 this.isLoading = true
                 this.$store.dispatch('trigger/getTriggerTable', params).then((res) => {
                     this.triggerList = res.data.map(trigger => {

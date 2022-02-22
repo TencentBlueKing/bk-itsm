@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="projectId && !isDataLoading && pagination.count === 0 && searchtoggle"
+                v-if="projectId && !isDataLoading && pagination.count === 0 && searchToggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -286,7 +286,7 @@
                         list: []
                     }
                 ],
-                searchtoggle: false,
+                searchToggle: false,
                 listInfo: [],
                 // 新增
                 workflow: 0,
@@ -394,7 +394,7 @@
                 this.isDataLoading = true
                 this.$store.dispatch('publicField/get_template_fields', params).then((res) => {
                     this.dataList = res.data.items
-                    this.searchtoggle = res.data.items.length !== 0
+                    this.searchToggle = res.data.items.length !== 0
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count

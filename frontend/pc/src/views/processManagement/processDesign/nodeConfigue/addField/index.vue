@@ -169,7 +169,8 @@
                 </bk-form-item>
             </template>
         </bk-form>
-        <bk-form :label-width="100"
+        <bk-form
+            :label-width="200"
             class="bk-form-vertical"
             :form-type="formAlign"
             :model="formInfo"
