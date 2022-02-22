@@ -117,9 +117,11 @@
                 <bk-form-item
                     :label="$t(`m.serviceConfig['目录名称']`)"
                     :required="true"
+                    error-display-type="normal"
                     :property="'name'">
                     <bk-input v-model.trim="addDirectory.formInfo.name"
-                        maxlength="120"
+                        :maxlength="120"
+                        :show-word-limit="true"
                         :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
                     </bk-input>
                 </bk-form-item>

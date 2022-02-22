@@ -45,7 +45,6 @@
                     </bk-select>
                     <template v-if="formInfo.api_info.remote_system_id">
                         <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                            style="margin-top: 10px;"
                             v-model="formInfo.api_info.remote_api_id"
                             :loading="isLoading"
                             :clearable="false"
@@ -817,14 +816,20 @@
             flex-direction: column;
         }
         /deep/ .common-section-card-label {
-            // display: none;
+            width: 100%;
             padding: 0 24px;
+            .common-section-card-desc {
+                width: 100%;
+            }
+        }
+        /deep/ .bk-polling {
+            margin-top: -25px;
         }
         /deep/ .common-section-card-body {
             padding: 20px;
         }
         /deep/ .bk-form-width {
-            width: 480px;
+            width: 446px;
         }
         /deep/ .common-section-card-block {
             box-shadow: 0 0;
@@ -848,7 +853,7 @@
         margin-bottom: 20px;
     }
     .bk-form-width {
-        width: 480px;
+        width: 446px;
     }
     .bk-form-display {
         float: left;

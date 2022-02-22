@@ -301,6 +301,14 @@
                     valid = true
                 })
                 return valid
+            },
+            clearFromError () {
+                const refs = ['schedule', 'replyTime', 'handleTime']
+                refs.forEach(item => {
+                    this.$refs[item].forEach(ite => {
+                        ite.clearError()
+                    })
+                })
             }
         }
     }

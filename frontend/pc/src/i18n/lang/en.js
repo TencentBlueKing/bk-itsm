@@ -2433,5 +2433,6 @@ export const m = {
     '提单时间结束': 'create_at__lte',
     '业务': 'bk_biz_id',
     '请先保存字段': 'Please save the fields',
-    '未查找到改触发器': 'not found this triggers'
+    '未查找到触发器': 'not found this triggers',
+    '内置字段，不可删除': 'Built-in field and cannot be deleted'
 }

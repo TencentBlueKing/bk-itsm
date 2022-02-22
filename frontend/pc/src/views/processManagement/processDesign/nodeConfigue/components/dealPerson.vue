@@ -47,7 +47,7 @@
         <!-- 二级处理人 -->
         <div class="second-level">
             <!-- 个人 -->
-            <template v-if="formData.levelOne === 'PERSON'">
+            <template v-if="formData.levelOne === 'PERSON' && Array.isArray(formData.levelSecond)">
                 <member-select data-test-id="dealPerson-select-personSecondHandler" :ext-cls="'bk-form-width'"
                     v-model="formData.levelSecond" :specify-id-list="targetSpecifyIdList">
                 </member-select>
@@ -265,6 +265,7 @@
             },
             onFirstLevelChange (type) {
                 // 清空二级数据
+                this.$set(this.formData, 'levelSecond', [])
                 this.setDeaultSecondLeve(type)
                 this.getSecondLevelList(type)
             },
