@@ -268,6 +268,7 @@ class Workflow(WorkflowBase):
             engine_version=DEFAULT_ENGINE_VERSION,
             revoke_config=self.revoke_config,
             is_auto_approve=self.is_auto_approve,
+            extras=self.extras,
         )
         return data
 

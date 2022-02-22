@@ -283,7 +283,11 @@ class ServiceManager(managers.Manager):
         logger.info("正在开始克隆服务，name={}".format(tag_data["name"]))
         with transaction.atomic():
             workflow_tag_data = tag_data.pop("workflow")
-            workflow = Workflow.objects.restore(workflow_tag_data, username)[0]
+            task_settings = workflow_tag_data["extras"].pop("task_settings")
+            workflow, state_map, _ = Workflow.objects.restore(
+                workflow_tag_data, username
+            )
+            self.clone_task_settings(workflow, task_settings, state_map)
             version = workflow.create_version()
             tag_data["workflow_id"] = version.id
             version_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -291,6 +295,30 @@ class ServiceManager(managers.Manager):
             service = self.create(**tag_data)
             return service
         return None
+
+    def clone_task_settings(self, workflow, task_settings, state_map):
+        """
+        task_settings = [
+            {
+                "create_task_state": 97,
+                "task_schema_id": 1,
+                "execute_task_state": 97,
+                "need_task_finished": true,
+                "execute_can_create": true
+            }
+        ],
+        state_map = {84: 138, 85: 139, 86: 140, 96: 141, 97: 142}
+        """
+        if task_settings:
+
+            for task_setting in task_settings:
+                create_task_state = task_setting["create_task_state"]
+                task_setting["create_task_state"] = state_map.get(create_task_state)
+                execute_task_state = task_setting["execute_task_state"]
+                task_setting["execute_task_state"] = state_map.get(execute_task_state)
+            workflow.extras["task_settings"] = task_settings
+            workflow.create_task(task_settings)
+            workflow.save()
 
 
 class SysDictManager(managers.Manager):
