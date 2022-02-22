@@ -5242,6 +5242,18 @@ msgstr "BlueKing Official"
 msgid "蓝鲸智云桌面"
 msgstr "BlueKing Desktop"
 
+msgid "技术支持"
+msgstr "Support"
+
+msgid "产品官网"
+msgstr "Official"
+
+msgid "社区论坛"
+msgstr "Forum"
+
+msgid "腾讯蓝鲸智云"
+msgstr "Tencent BlueKing"
+
 msgid "蓝鲸桌面"
 msgstr "BlueKing Desktop"
 
