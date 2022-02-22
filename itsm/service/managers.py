@@ -310,7 +310,6 @@ class ServiceManager(managers.Manager):
         state_map = {84: 138, 85: 139, 86: 140, 96: 141, 97: 142}
         """
         if task_settings:
-
             for task_setting in task_settings:
                 create_task_state = task_setting["create_task_state"]
                 task_setting["create_task_state"] = state_map.get(create_task_state)
