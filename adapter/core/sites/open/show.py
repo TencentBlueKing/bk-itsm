@@ -32,32 +32,35 @@ def get_doc_url():
     from itsm.component.esb.esbclient import client_backend
 
     try:
-        res = client_backend.doc_center.get_doc_link_by_path({"md_path": "流程服务/产品白皮书/产品简介/README.md"})
+        res = client_backend.doc_center.get_doc_link_by_path(
+            {"md_path": "流程服务/产品白皮书/产品简介/README.md"}
+        )
         return os.path.join(settings.BK_PAAS_HOST, "o/bk_docs_center/", res)
     except Exception as err:
         print(err)
-        return os.path.join(settings.BK_PAAS_HOST, "o/bk_docs_center/markdown/流程服务/产品白皮书/产品简介/README.md")
+        return os.path.join(
+            settings.BK_PAAS_HOST, "o/bk_docs_center/markdown/流程服务/产品白皮书/产品简介/README.md"
+        )
 
 
 if settings.OPEN_VER == "enterprise":
-    TITLE = "{} | {}".format(_("流程服务"), _("蓝鲸智云企业版"))
+    TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
     DOC_URL = get_doc_url()
 else:
-    TITLE = "{} | {}".format(_("流程服务"), _("蓝鲸智云社区版"))
+    TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
     DOC_URL = "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
 
 FOOTER = """
         <div class="copyright">
             <ul class="link-list">
-                <a href="tencent://message/?uin=800802001&site=qq&menu=yes" class="link-item">{}(800802001)</a>
+                <a href="https://wpa1.qq.com/KziXGWJs?_type=wpa&qidian=true" class="link-item">{}</a>
                 <a href="http://bk.tencent.com/s-mart/community/" class="link-item" target="_blank">{}</a>
                 <a href="http://bk.tencent.com/" class="link-item" target="_blank">{}</a>
-                <a href="{}" class="link-item" target="_blank">{}</a>
             </ul>
-            <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.</div>
+            <div class="desc">Copyright &copy; 2012-${{year}} Tencent BlueKing. All Rights Reserved.V2.6.1</div>
         </div>
         """.format(
-    _("QQ咨询"), _("蓝鲸论坛"), _("蓝鲸官网"), settings.BK_PAAS_HOST, _("蓝鲸智云桌面")
+    _("技术支持"), _("社区论坛"), _("产品官网")
 )
 
 LOGIN_URL = settings.BK_PAAS_HOST + "/login/"
