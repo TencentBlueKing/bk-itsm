@@ -807,10 +807,6 @@
         @include scroller;
         /deep/ .common-section-card-label {
             display: none;
-            width: 100%;
-            .common-section-card-desc {
-                width: 100%;
-            }
         }
         /deep/ .common-section-card-body {
             padding: 20px;

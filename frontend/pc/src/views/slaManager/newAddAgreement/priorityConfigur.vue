@@ -304,8 +304,8 @@
             },
             clearFromError () {
                 const refs = ['schedule', 'replyTime', 'handleTime']
-                refs.map(item => {
-                    this.$refs[item].map(ite => {
+                refs.forEach(item => {
+                    this.$refs[item].forEach(ite => {
                         ite.clearError()
                     })
                 })
