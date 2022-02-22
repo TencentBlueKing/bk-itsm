@@ -295,6 +295,7 @@
                                 <i class="bk-itsm-icon icon-move-new"></i>
                                 <div slot="content" style="white-space: normal;">
                                     <bk-button
+                                        style="font-size: 12px;"
                                         data-test-id="service_button_deleteService1"
                                         v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                                         v-cursor
@@ -306,6 +307,7 @@
                                     </bk-button>
                                     <template v-else>
                                         <bk-button
+                                            style="font-size: 12px;"
                                             data-test-id="service_button_deleteService3"
                                             theme="primary"
                                             text
@@ -646,8 +648,12 @@
                 let serviceId = item.id
                 if (type === 'clone') {
                     // 获取克隆id
-                    const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
-                    serviceId = res.data.id
+                    try {
+                        const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
+                        serviceId = res.data.id
+                    } catch (e) {
+                        console.log(e)
+                    }
                 }
                 this.$router.push({
                     name: 'projectServiceEdit',
