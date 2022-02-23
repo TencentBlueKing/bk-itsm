@@ -38,7 +38,7 @@
         },
         watch: {
             editorData () {
-                const text = this.editor.txt.text()
+                const text = this.editor.txt.html()
                 this.$emit('changebuttonStatus', !!text)
                 if (text.charAt(text.length - 1) === '@') {
                     this.showFlag = 'block'
@@ -97,7 +97,7 @@
         },
         methods: {
             selectLine (item) {
-                const text = this.editor.txt.text()
+                const text = this.editor.txt.html()
                 this.editor.txt.html(text + `<span class="at-person">${item.name}<span>` + '  ')
             },
             handleChangeType () {

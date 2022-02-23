@@ -37,7 +37,7 @@
                 <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
             </div>
             <div class="reply-content">
-                <p>{{ replyContent.content }}</p>
+                <div v-html="replyContent.content"></div>
             </div>
         </div>
         <editor
@@ -196,7 +196,7 @@
             },
             submitEdit () {
                 const _this = this.$refs.editorEdit.editor
-                const text = _this.txt.text()
+                const text = _this.txt.html()
                 this.editorEditData = ''
                 _this.txt.clear()
                 let url = ''
@@ -259,7 +259,7 @@
                 this.isReplyComment = false
                 if (this.$refs.editorAdd) {
                     const _this = this.$refs.editorAdd.editor
-                    const text = _this.txt.text()
+                    const text = _this.txt.html()
                     this.editorData = ''
                     this.isShowSelect = true
                     _this.txt.clear()
@@ -303,7 +303,7 @@
         color: #c4c6cc;
     }
     .wang-editor-template {
-        overflow: auto;
+        // overflow: auto;
         @include scroller;
         padding: 20px;
         .select-pattern {

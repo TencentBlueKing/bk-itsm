@@ -386,7 +386,7 @@
                     {
                         name: this.$t(`m.serviceConfig["类型"]`),
                         type: 'select',
-                        typeKey: 'service_key',
+                        typeKey: 'key',
                         value: '',
                         list: []
                     },
