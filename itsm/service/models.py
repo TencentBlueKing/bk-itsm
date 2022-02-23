@@ -647,12 +647,15 @@ class ServiceCatalog(BaseMpttModel):
 
     @classmethod
     def annotate_catalog_count(cls, project_key):
-        values = (
-            CatalogService.objects.filter(project_key=project_key)
-            .values("catalog_id")
-            .annotate(count=Count("catalog_id"))
-        )
-        return {v["catalog_id"]: v["count"] for v in values}
+        """
+        计算每一节目录下的服务数量
+        """
+        catalog_count = {}
+        catalogs = ServiceCatalog.objects.filter(project_key=project_key)
+        for catalog in catalogs:
+            catalog_count[catalog.id] = catalog.included_services_count
+
+        return catalog_count
 
     @classmethod
     def tree_data(
