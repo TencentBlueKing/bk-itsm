@@ -126,7 +126,7 @@
                             <span :title="props.row.id">{{ props.row.id || '--' }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150" :width="changeFrom.name ? '250' : '150'">
+                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
                         <template slot-scope="props">
                             <span
                                 v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
@@ -197,7 +197,7 @@
                             <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" min-width="150">
+                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
                         <template slot-scope="props">
                             <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
                         </template>
@@ -212,7 +212,7 @@
                             </span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '150'">
+                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
                         <template slot-scope="props">
                             <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
                             <div v-else class="hover-show-icon">

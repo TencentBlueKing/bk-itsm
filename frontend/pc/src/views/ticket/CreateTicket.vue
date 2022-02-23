@@ -664,6 +664,7 @@
                 margin-left: 2px;
             }
             .template-list {
+                z-index: 10;
                 width: 170px;
                 max-height: 208px;
                 border: 1px solid #dcdee5;
