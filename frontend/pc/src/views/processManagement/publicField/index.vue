@@ -576,13 +576,13 @@
             // 关闭前验证字段表单
             closeSideslider () {
                 this.$bkInfo({
-                    title: '是否修改保存？',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.$refs.addField.checkInfo()
+                        this.sliderInfo.show = false
                     },
                     cancelFn: () => {
-                        this.sliderInfo.show = false
+                        this.sliderInfo.show = true
                     }
                 })
             }

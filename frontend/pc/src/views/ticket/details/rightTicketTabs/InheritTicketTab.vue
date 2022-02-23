@@ -239,15 +239,13 @@
             closeSideslider () {
                 this.$bkInfo({
                     type: 'warning',
-                    title: '是否保存修改',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        if (this.$refs.addInheritTicket) {
-                            this.$refs.addInheritTicket.submitTemplate()
-                        }
+                        this.isShowAddInheritTicket = false
                     },
                     cancelFn: () => {
-                        this.isShowAddInheritTicket = false
+                        this.isShowAddInheritTicket = true
                     }
                 })
             },

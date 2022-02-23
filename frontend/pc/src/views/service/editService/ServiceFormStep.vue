@@ -346,7 +346,7 @@
                 const { startX, base } = this.dragLine
                 const offsetX = e.pageX - startX
                 const moveX = base + offsetX
-                if (offsetX > 0 && 600 - moveX <= 400) return
+                if (offsetX > 0 && 600 - moveX <= 500) return
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
                     el.style.width = `calc(600px - ${moveX}px)`

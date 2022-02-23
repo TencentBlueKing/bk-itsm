@@ -2434,5 +2434,6 @@ export const m = {
     '业务': 'bk_biz_id',
     '请先保存字段': 'Please save the fields',
     '未查找到触发器': 'not found this triggers',
-    '内置字段，不可删除': 'Built-in field and cannot be deleted'
+    '内置字段，不可删除': 'Built-in field and cannot be deleted',
+    '内容未保存，离开将取消操作！': 'Content not saved, leave will cancel operation!'
 }

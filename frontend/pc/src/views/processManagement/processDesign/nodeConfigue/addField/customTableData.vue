@@ -118,18 +118,22 @@
     @import '../../../../../scss/mixins/clearfix.scss';
     @import '../../../../../scss/mixins/scroller';
     .bk-custom-line {
+        display: flex;
+        align-items: center;
         @include clearfix;
         .bk-custom-input {
-            float: left;
-            width: 180px;
-            margin-right: 10px;
+            flex: 1;
+        }
+        .bk-form-checkbox {
+            width: 50px;
+            margin: 0 5px;
         }
         .bk-custom-small {
-            float: left;
-            width: 120px;
-            margin-right: 10px;
+            flex: 1;
+            margin-right: 5px;
         }
         .bk-custom-icon {
+            margin: 0 5px;
             float: right;
             line-height: 32px;
             font-size: 18px;
@@ -150,8 +154,9 @@
             }
         }
         .bk-textarea-tanble {
+            flex: 1;
             overflow-y: scroll;
-            position: absolute;
+            // position: absolute;
             height: 32px;
             min-height: 32px;
             padding: 3px 10px;
