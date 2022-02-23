@@ -235,7 +235,6 @@
                 for (let i = 0; i < list.length; i++) {
                     const node = list[i]
                     if (node.id === id) {
-                        console.log(node.route)
                         node.route.forEach(item => {
                             this.parentIds.push(item.id)
                         })
