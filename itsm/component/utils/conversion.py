@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import copy
 import json
 import re
 
@@ -46,26 +46,26 @@ def params_type_conversion(params, schema):
 
     if params is None:
         return
-    if schema['type'] == 'object':
-        for k, v in list(schema['properties'].items()):
+    if schema["type"] == "object":
+        for k, v in list(schema["properties"].items()):
             result = params_type_conversion(params.get(k), v)
             if result is not None:
                 params[k] = result
-    if schema['type'] == 'array':
-        if not schema.get('items'):
+    if schema["type"] == "array":
+        if not schema.get("items"):
             return None
         for i in range(len(params)):
-            result = params_type_conversion(params[i], schema['items'])
+            result = params_type_conversion(params[i], schema["items"])
             if result is not None:
                 params[i] = result
-    if schema['type'] == 'number':
-        return int(params) if params else schema['default']
-    if schema['type'] == 'boolean':
+    if schema["type"] == "number":
+        return int(params) if params else schema["default"]
+    if schema["type"] == "boolean":
         if params:
             return True
         else:
             return False
-    if schema['type'] == 'string':
+    if schema["type"] == "string":
         import ast
 
         try:
@@ -83,7 +83,7 @@ def build_params_by_mako_template(api_config_query_params, params):
     根据引用内容进行渲染
     :param api_config_query_params: 输入的对象
     :param params: 对应的参数
-    :return: 
+    :return:
     """
     try:
         if not isinstance(api_config_query_params, dict):
@@ -95,7 +95,9 @@ def build_params_by_mako_template(api_config_query_params, params):
                 api_config_query_params[key] = Template(value).render(**params)
             elif isinstance(value, dict):
                 # 如果是字典，直接转换
-                result, api_config_query_params[key] = build_params_by_mako_template(value, params)
+                result, api_config_query_params[key] = build_params_by_mako_template(
+                    value, params
+                )
             elif isinstance(value, list):
                 str_value = json.dumps(value)
                 if not VAR_STR_MATCH.findall(json.dumps(str_value)):
@@ -115,27 +117,38 @@ def build_params_by_mako_template(api_config_query_params, params):
         return False, str(e)
 
 
-def format_exp_value(field_type, exp_value):
+def format_exp_value(field_type, exp_value, show_condition=False):
     """不同类型字段值的格式化"""
     if exp_value is None:
         return exp_value
 
-    if field_type in ['INT']:
+    if field_type in ["INT"]:
         if str(exp_value).isdigit():
             return int(exp_value)
         return float(exp_value)
 
-    if field_type in ['STRING', 'TEXT', 'DATE', 'DATETIME', 'BOOLEAN', 'SELECT', 'TREESELECT', 'RADIO']:
+    if field_type in [
+        "STRING",
+        "TEXT",
+        "DATE",
+        "DATETIME",
+        "BOOLEAN",
+        "SELECT",
+        "TREESELECT",
+        "RADIO",
+    ]:
         return exp_value
 
-    if field_type in ['MULTISELECT', 'CHECKBOX'] and exp_value is not None:
-        exp_value = tuple([str(x) for x in exp_value.split(',')])
+    if field_type in ["MULTISELECT", "CHECKBOX"] and exp_value is not None:
+        exp_value = tuple([str(x) for x in exp_value.split(",")])
         # 单元素元组无法正常规则判定
-        # if len(exp_value) == 1:
-        #     exp_value = exp_value[0]
-        return exp_value 
 
-    if field_type in ['CUSTOMTABLE', 'TABLE']:
+        if show_condition:
+            if len(exp_value) == 1:
+                exp_value = "('{}')".format(exp_value[0])
+        return exp_value
+
+    if field_type in ["CUSTOMTABLE", "TABLE"]:
         return json.dumps(exp_value)
     # 其他的直接返回字段
     return exp_value
@@ -144,13 +157,21 @@ def format_exp_value(field_type, exp_value):
 def get_exp_template(exp_type):
     """表达式模板"""
     # TODO 后面根据业务需求优化类型选择
-    if exp_type in ['INT', 'BOOLEAN']:
+    if exp_type in ["INT", "BOOLEAN"]:
         return "{key} {condition} {value}"
 
-    if exp_type in ['STRING', 'TEXT', 'SELECT', 'TREESELECT', 'RADIO', 'DATE', 'DATETIME']:
+    if exp_type in [
+        "STRING",
+        "TEXT",
+        "SELECT",
+        "TREESELECT",
+        "RADIO",
+        "DATE",
+        "DATETIME",
+    ]:
         return "'{key}' {condition} '{value}'"
 
-    if exp_type in ['MULTISELECT', 'CHECKBOX']:
+    if exp_type in ["MULTISELECT", "CHECKBOX"]:
         return "{key} {condition} {value}"
 
     return "'{key}' {condition} '{value}'"
@@ -166,19 +187,21 @@ def field_conditions_conversion(condition):
     inner_expressions = []
 
     for exp in condition.expressions:
-        if exp.key == 'G_INT_1':
+        if exp.key == "G_INT_1":
             evaluation = "1==1"
         else:
-            mapping = {'string': 'STRING', 'number': 'INT', 'boolean': 'BOOLEAN'}
+            mapping = {"string": "STRING", "number": "INT", "boolean": "BOOLEAN"}
             e_type = mapping.get(exp.type, exp.type)
 
             template = get_exp_template(e_type)
-            value = format_exp_value(e_type, exp.value)
+            value = format_exp_value(e_type, exp.value, show_condition=True)
 
-            evaluation = template.format(key='${params_%s}' % exp.key, condition=exp.condition, value=value)
+            evaluation = template.format(
+                key="${params_%s}" % exp.key, condition=exp.condition, value=value
+            )
         inner_expressions.append(evaluation)
 
-    expression_type = ' {} '.format(condition.type)
+    expression_type = " {} ".format(condition.type)
     return expression_type.join(inner_expressions)
 
 
@@ -194,22 +217,24 @@ def conditions_conversion(condition):
         inner_expressions = []
         for exp in expression.expressions:
 
-            if exp.key == 'G_INT_1':
+            if exp.key == "G_INT_1":
                 evaluation = "1==1"
             else:
-                mapping = {'string': 'STRING', 'number': 'INT', 'boolean': 'BOOLEAN'}
+                mapping = {"string": "STRING", "number": "INT", "boolean": "BOOLEAN"}
                 e_type = mapping.get(exp.type, exp.type)
 
                 template = get_exp_template(e_type)
                 value = format_exp_value(e_type, exp.value)
 
-                evaluation = template.format(key='${params_%s}' % exp.key, condition=exp.condition, value=value)
+                evaluation = template.format(
+                    key="${params_%s}" % exp.key, condition=exp.condition, value=value
+                )
             inner_expressions.append(evaluation)
 
-        expression_type = ' {} '.format(expression.type)
+        expression_type = " {} ".format(expression.type)
         expressions.append(expression_type.join(inner_expressions))
 
-    return condition.type.join([' ({}) '.format(e) for e in expressions])
+    return condition.type.join([" ({}) ".format(e) for e in expressions])
 
 
 def build_conditions_by_mako_template(condition, rsp):
@@ -236,7 +261,7 @@ rsp = {
             {"bk_set_name": _("管控平台")},
         ],
     },
-    "result": 'true',
+    "result": "true",
     "request_id": "fe61c60c11b34ec4881182532c39edba",
     "msg": "success",
 }
@@ -246,14 +271,19 @@ def rsp_conversion(rsp):
     for key, value in list(rsp.items()):
         if isinstance(value, dict):
             rsp_conversion(value)
-        rsp['params_' + key] = rsp.pop(key)
+        rsp["params_" + key] = rsp.pop(key)
 
 
 def show_conditions_validate(show_conditions, key_value):
     conditions = field_conditions_conversion(show_conditions)
+    key_value = copy.deepcopy(key_value)
+
+    for key, value in key_value.items():
+        if isinstance(value, tuple):
+            if len(value) == 1:
+                key_value[key] = "('{}')".format(value[0])
+
     b_result, b_conditions = build_conditions_by_mako_template(conditions, key_value)
-
     if not b_result:
-        raise ParamError(_('参数转换失败，请联系管理员'))
-
+        raise ParamError(_("参数转换失败，请联系管理员"))
     return BoolRule(b_conditions).test()
