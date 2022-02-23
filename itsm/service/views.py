@@ -246,8 +246,9 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         if not catalog_id:
             raise ParamError("请提供合法的目录ID！")
 
+        catalog_ids = ServiceCatalog.get_descendant_ids(catalog_id)
         catalog_services = CatalogService.objects.filter(
-            catalog_id=catalog_id
+            catalog_id__in=catalog_ids
         ).order_by("order")
         if not catalog_services.exists():
             return Response([])
