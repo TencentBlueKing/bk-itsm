@@ -183,7 +183,8 @@
                     }
                 },
                 // 校验规则
-                rules: {}
+                rules: {},
+                parentIds: []
             }
         },
         computed: {
@@ -204,7 +205,7 @@
                     project_key: this.$store.state.project.id
                 }).then(res => {
                     this.treeList = res.data
-
+                    this.getTreeParentId(res.data, this.$route.query.catalog_id)
                     if (!this.firstStatus) {
                         this.treeInfo.node = this.treeList[0]
                     }
@@ -228,6 +229,21 @@
                 }).finally(() => {
                     this.isTreeLoading = false
                 })
+            },
+            // 获取当前目录id 和parents id
+            getTreeParentId (list, id) {
+                for (let i = 0; i < list.length; i++) {
+                    const node = list[i]
+                    if (node.id === id) {
+                        node.route.forEach(item => {
+                            this.parentIds.push(item.id)
+                        })
+                    } else {
+                        if (node.children && node.children.length > 0) {
+                            this.getTreeParentId(node.children, id)
+                        }
+                    }
+                }
             },
             // 点击节点方法
             nodeClick (node) {
@@ -286,6 +302,9 @@
                 })
             },
             getNodeTree (tree) {
+                if (this.parentIds.includes(tree.id)) {
+                    this.$set(tree, 'expanded', true)
+                }
                 if (this.$route.query.catalog_id === tree.id && tree.id !== 1) {
                     this.$set(tree, 'expanded', true)
                     this.$set(tree, 'selected', true)

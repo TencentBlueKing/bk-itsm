@@ -340,6 +340,7 @@
             .bk-li-right {
                 line-height: 26px;
                 color: #313238;
+                display: inline-block;
             }
             .bk-li-left {
                 width: 70px;
@@ -374,6 +375,7 @@
             display: flex;
             .bk-li-left,
             .bk-li-right {
+                display: inline-block;
                 line-height: 26px;
                 color: #313238;
             }
@@ -390,6 +392,7 @@
         white-space: nowrap;
     }
     .bk-li-left {
+        display: inline-block;
         width: 70px;
         font-weight: 400;
         text-align: right;

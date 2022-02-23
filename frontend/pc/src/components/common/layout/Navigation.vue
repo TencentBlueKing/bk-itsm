@@ -448,7 +448,11 @@
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
                 // 申请权限页面新建项目跳到项目单据下
-                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : this.$route.name, query: { project_id: val } })
+                let path = this.$route.name
+                if (this.$route.name === 'projectServiceEdit') {
+                    path = 'projectServiceList'
+                }
+                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
             applyForProjectViewPerm (project, perm) {
                 if (!this.hasPermission([perm], project.auth_actions)) {

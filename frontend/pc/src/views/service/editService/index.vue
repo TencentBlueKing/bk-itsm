@@ -210,7 +210,8 @@
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
+                        project_id: this.$store.state.project.id,
+                        catalog_id: this.$route.query.catalog_id
                     }
                 })
             },
@@ -289,7 +290,7 @@
                             name: 'projectServiceList',
                             query: {
                                 project_id: this.$store.state.project.id,
-                                catalog_id: this.serviceInfo.bounded_relations[0].catalog_id
+                                catalog_id: this.$route.query.catalog_id
                             }
                         })
                     }

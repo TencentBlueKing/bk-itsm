@@ -630,7 +630,7 @@
                             return
                         }
                         this.pending.deleteField = true
-
+                        this.crtForm = ''
                         const data = {
                             id: form.id,
                             params: {

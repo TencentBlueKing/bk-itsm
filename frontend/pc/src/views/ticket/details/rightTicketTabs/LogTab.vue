@@ -32,7 +32,7 @@
             <div v-if="isShowComment" class="process-detail">
                 <div class="process-content">
                     <img :src="imgUrl" alt="单据结束">
-                    <template v-if="!ticketInfo.is_commented">
+                    <template v-if="!ticketInfo.is_commented && ticketInfo.comment_id !== '-1'">
                         <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
                         <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
                     </template>
@@ -44,15 +44,15 @@
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价人"]`) }}:</span>
-                                <p>{{commentInfo.creator}}</p>
+                                <p>{{commentInfo.creator || '--'}}</p>
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价时间"]`) }}:</span>
-                                <p>{{commentInfo.create_at}}</p>
+                                <p>{{commentInfo.create_at || '--'}}</p>
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价内容"]`) }}:</span>
-                                <p>{{commentInfo.comments}}</p>
+                                <p>{{commentInfo.comments || $t('m.newCommon["这个朋友很懒，什么也没留下"]')}}</p>
                             </div>
                         </div>
                     </div>
@@ -141,9 +141,11 @@
                 })
             },
             getTicktComment () {
-                if (this.ticketInfo.is_over) return
+                if (!this.ticketInfo.is_over) return
                 this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then(res => {
-                    this.commentInfo = res.data
+                    if (Object.keys(res.data).length !== 0) {
+                        this.commentInfo = res.data
+                    }
                 })
             },
             handleSelect (item) {
