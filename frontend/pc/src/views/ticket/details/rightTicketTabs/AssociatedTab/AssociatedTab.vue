@@ -181,26 +181,22 @@
                 })
             },
             closeSideslider () {
-                if (this.$refs.associated && this.$refs.associated.checkList.length !== 0) {
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: '是否保存修改',
-                        confirmLoading: true,
-                        confirmFn: () => {
-                            if (this.$refs.associated.typeSelected === 'associate') {
-                                this.$refs.associated.bindTicket()
-                            } else {
-                                this.$refs.associated.setFields()
-                            }
-                        },
-                        cancelFn: () => {
-                            this.isShowAddAssociation = false
-                        }
-                    })
-                } else {
-                    console.log('到这啦')
-                    this.isShowAddAssociation = false
-                }
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        // if (this.$refs.associated.typeSelected === 'associate') {
+                        //     this.$refs.associated.bindTicket()
+                        // } else {
+                        //     this.$refs.associated.setFields()
+                        // }
+                        this.isShowAddAssociation = false
+                    },
+                    cancelFn: () => {
+                        this.isShowAddAssociation = true
+                    }
+                })
             },
             // 获取关联历史
             getAssociatesHistory () {
