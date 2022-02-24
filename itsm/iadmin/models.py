@@ -149,7 +149,7 @@ class CustomNotice(models.Model):
 
         for template in NOTIFY_TEMPLATE:
             try:
-                CustomNotice.objects.update_or_create(
+                CustomNotice.objects.get_or_create(
                     defaults={
                         'title_template': template[0],
                         'content_template': template[1],
@@ -157,8 +157,7 @@ class CustomNotice(models.Model):
                         "version": "V2",
                     },
                     action=template[2],
-                    notify_type=template[3],
-                    updated_by="system",
+                    notify_type=template[3]
                 )
             except CustomNotice.MultipleObjectsReturned:
                 CustomNotice.objects.filter(action=template[2], notify_type=template[3]).delete()
