@@ -346,8 +346,8 @@ class TableNotExist(ServerError):
 
 
 class AuthMigrateError(ServerError):
-    MESSAGE = _("服务模板未找到")
-    ERROR_CODE = "TABLE_NOT_EXIST"
+    MESSAGE = _("权限迁移失败")
+    ERROR_CODE = "AUTH_MIGRATE_ERROR"
     ERROR_CODE_INT = 3900043
 
 
