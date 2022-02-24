@@ -348,10 +348,10 @@ class TableNotExist(ServerError):
 class AuthMigrateError(ServerError):
     MESSAGE = _("权限迁移失败")
     ERROR_CODE = "AUTH_MIGRATE_ERROR"
-    ERROR_CODE_INT = 3900043
+    ERROR_CODE_INT = 3900044
 
 
 class SlaParamError(ServerError):
     MESSAGE = _("Sla节点参数验证失败")
     ERROR_CODE = "SLA_VALIDATE_ERROR"
-    ERROR_CODE_INT = 3900044
+    ERROR_CODE_INT = 3900045
