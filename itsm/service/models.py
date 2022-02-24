@@ -956,6 +956,19 @@ class SysDict(ObjectManagerMixin, Model):
             .order_by("order")
         )
 
+        if key == "PRIORITY":
+            return [
+                dict(
+                    [
+                        (field, getattr(dict_data, field))
+                        for field in fields
+                        if hasattr(dict_data, field)
+                    ]
+                )
+                for dict_data in dict_datas
+                if dict_data.key in ["1", "2", "3"]
+            ]
+
         return [
             dict(
                 [
@@ -981,7 +994,6 @@ class SysDict(ObjectManagerMixin, Model):
     @classmethod
     def get_data_by_key(cls, key, view_type="list"):
         """根据字典表编码获取字典数据（支持列表视图和树状视图）"""
-
         try:
             if view_type == "tree":
                 return cls.tree_data(key)
