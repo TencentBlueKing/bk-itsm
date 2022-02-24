@@ -52,12 +52,15 @@ from itsm.component.apigw import client as apigw_client
 
 from django.conf import settings
 
+from itsm.gateway.utils import batch_process
+
 adapter_api = settings.ADAPTER_API
 
 MAX_PAGE_SIZE = 50
 MIN_PAGE_SIZE = 1
 
 
+@fbv_exception_handler
 def get_token(request):
     try:
         import bkoauth
@@ -70,6 +73,7 @@ def get_token(request):
         return Success({"access_token": err}).json()
 
 
+@fbv_exception_handler
 def get_batch_users(request):
     """批量获取用户信息"""
     users = (
@@ -115,6 +119,7 @@ def get_batch_users(request):
         return Fail(_("批量获取用户信息出错，%s") % str(error), "BK_LOGIN.GET_BATCH_USERS").json()
 
 
+@fbv_exception_handler
 def get_all_users(request):
     """获取所有用户列表"""
 
@@ -255,6 +260,7 @@ def get_user_info(request):
     return Success(res).json()
 
 
+@fbv_exception_handler
 def get_user_project_list(request):
     """
     获取标准运维用户有权限的项目
@@ -266,6 +272,7 @@ def get_user_project_list(request):
         return Fail(str(e), "SOPS.GET_USER_PROJECT_LIST").json()
 
 
+@fbv_exception_handler
 def get_template_list(request):
     """
     获取标准运维流程模版列表
@@ -292,6 +299,7 @@ def get_template_list(request):
         return Fail(str(e), "SOPS.GET_COMMON_TEMPLATE_LIST").json()
 
 
+@fbv_exception_handler
 def get_template_detail(request):
     """
     获取标准运维流程详情
@@ -352,6 +360,7 @@ def get_template_detail(request):
         return Fail(str(e), "SOPS.GET_TEMPLATE_DETAIL").json()
 
 
+@fbv_exception_handler
 def get_unfinished_sops_tasks(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
@@ -363,6 +372,7 @@ def get_unfinished_sops_tasks(request):
         return Fail(str(e), "SOPS.GET_UNFINISHED_SOPS_TASKS").json()
 
 
+@fbv_exception_handler
 def get_sops_tasks(request):
     try:
         support_params = ["is_started", "keyword", "is_finished", "limit", "offset"]
@@ -381,6 +391,7 @@ def get_sops_tasks(request):
         return Fail(str(e), "SOPS.GET_SOPS_TASKS").json()
 
 
+@fbv_exception_handler
 def get_sops_tasks_detail(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
@@ -393,6 +404,7 @@ def get_sops_tasks_detail(request):
         return Fail(str(e), "SOPS.GET_SOPS_TASKS_DETAIL").json()
 
 
+@fbv_exception_handler
 def get_sops_template_schemes(request):
     try:
         bk_biz_id = request.GET.get("bk_biz_id")
@@ -407,6 +419,7 @@ def get_sops_template_schemes(request):
         return Fail(str(e), "SOPS.GET_SOPS_TEMPLATE_SCHEMES").json()
 
 
+@fbv_exception_handler
 def get_sops_preview_task_tree(request):
     try:
         data = json.loads(request.body)
@@ -423,6 +436,7 @@ def get_sops_preview_task_tree(request):
         return Fail(str(e), "SOPS.GET_SOPS_PREVIEW_TASK_TREE").json()
 
 
+@fbv_exception_handler
 def get_sops_preview_common_task_tree(request):
     try:
         data = json.loads(request.body)
@@ -469,6 +483,7 @@ def get_user_pipeline_list(request):
         return Fail(_("批量获取流水线出错:{}".format(str(e))), "BK_LOGIN.GET_BATCH_USERS").json()
 
 
+@fbv_exception_handler
 def get_user_projects(request):
     try:
         res = apigw_client.devops.projects_list(
@@ -479,6 +494,7 @@ def get_user_projects(request):
         return Fail(str(e), "DEVOPS.GET_UESR_PROJECTS").json()
 
 
+@fbv_exception_handler
 def get_pipeline_build_list(request):
     try:
         res = apigw_client.devops.pipeline_build_list(
@@ -608,6 +624,7 @@ def get_pipeline_build_artifactory_download_url(request):
         return Fail(str(e), "DEVOPS.GET_PIPELINE_BUILD_ARTIFACTORY_DOWNLOAD_URL").json()
 
 
+@fbv_exception_handler
 def get_user_pipeline_singel_page(kwargs):
     try:
         res = apigw_client.devops.project_pipeline_list(kwargs)
