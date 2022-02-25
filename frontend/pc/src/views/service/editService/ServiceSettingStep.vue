@@ -86,6 +86,51 @@
                 </bk-form>
             </div>
         </section>
+        <section class="settion-card notic-card">
+            <h2 class="card-title">{{ $t(`m.tickets['通知设置']`) }}</h2>
+            <div class="card-content">
+                <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
+                    <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
+                        <bk-checkbox-group v-model="formData.notify">
+                            <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
+                                {{ $t(`m.treeinfo["企业微信"]`) }}
+                            </bk-checkbox>
+                            <bk-checkbox :value="'EMAIL'" :ext-cls="'mr40'">
+                                {{ $t(`m.treeinfo["邮件"]`) }}
+                            </bk-checkbox>
+                            <bk-checkbox :value="'SMS'">
+                                {{ $t('m.treeinfo["手机短信"]') }}
+                            </bk-checkbox>
+                        </bk-checkbox-group>
+                    </bk-form-item>
+                    <!-- <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
+                        <bk-radio-group v-model="formData.notify_rule">
+                            <bk-radio :value="'ONCE'"
+                                :ext-cls="'mr20 bk-line-radio'">
+                                {{ $t('m.treeinfo["首次通知，以后不再通知"]') }}
+                            </bk-radio>
+                            <div class="bk-line-radio">
+                                <bk-radio :value="'RETRY'" :ext-cls="'mr20 bk-float-radio'">
+                                    {{ $t('m.treeinfo["首次通知后，次日起每天定时通知"]') }}
+                                </bk-radio>
+                                <bk-select v-if="formData.notify_rule === 'RETRY'"
+                                    style="float: left; width: 200px;"
+                                    v-model="formData.notify_freq"
+                                    :clearable="false"
+                                    searchable
+                                    :font-size="'medium'">
+                                    <bk-option v-for="option in frequencyList"
+                                        :key="option.id"
+                                        :id="option.id"
+                                        :name="option.name">
+                                    </bk-option>
+                                </bk-select>
+                            </div>
+                        </bk-radio-group>
+                    </bk-form-item> -->
+                </bk-form>
+            </div>
+        </section>
         <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
             <div
                 class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
@@ -344,10 +389,8 @@
                 const {
                     revokeWay,
                     revokeState,
-                    otherSettings
-                    // notify,
-                    // notify_freq: notifyFreq,
-                    // notify_rule: notifyRule
+                    otherSettings,
+                    notify
                 } = this.formData
                 if (revokeWay === 'not_support') {
                     workflow.is_revocable = false
@@ -371,13 +414,19 @@
                         workflow.supervisor = value
                     }
                 }
-                // 通知方式 默认值
-                workflow.notify = [{
-                    type: 'WEIXIN',
-                    name: '微信通知'
-                }]
+                // 通知方式
+                workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
                 workflow.notify_freq = 0
                 workflow.notify_rule = 'ONCE'
+
+                // const canNotice = !!notify.length
+                // if (canNotice) {
+                //     workflow.notify_rule = notifyRule
+                //     workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
+                // } else {
+                //     workflow.notify_rule = 'NONE'
+                //     workflow.notify_freq = 0
+                // }
 
                 // 任务配置
                 if (this.$refs.taskConfigPanel) {
