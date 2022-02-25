@@ -353,7 +353,7 @@
                             rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
                             pWarningThreshold: condition[1][3] / 100 || 1,
                             rTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[2][2] / 100 : 1,
-                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100 
+                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100
                         }
                     })
                     this.threshold = [...slathreshold]
