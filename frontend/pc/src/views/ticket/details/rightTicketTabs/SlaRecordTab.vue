@@ -41,19 +41,19 @@
             </div>
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <span v-bk-tooltips.top="{ content: '首次响应时间' + sla.begin_at }" class="underline time-type">{{ $t('m["响应"]') }}{{ isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
-                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[3]}}</span>&nbsp;:
-                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[4]}}</span>&nbsp;:
-                <span :class="['time', isResponseNormal ? '' : isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[5]}}</span>
-                <i v-if="!isResponseNormal" :class="['status-icon', 'bk-itsm-icon', isResponseTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
+                <span v-bk-tooltips.top="{ content: '首次响应时间' + sla.begin_at }" class="underline time-type">{{ $t('m["响应"]') }}{{ sla.isResponseTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
+                <span :class="['time', sla.isResponseNormal ? '' : sla.isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[3]}}</span>&nbsp;:
+                <span :class="['time', sla.isResponseNormal ? '' : sla.isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[4]}}</span>&nbsp;:
+                <span :class="['time', sla.isResponseNormal ? '' : sla.isResponseTimeout ? 'timeout' : 'warn']">{{sla.sla_responseTime[5]}}</span>
+                <i v-if="!sla.isResponseNormal" :class="['status-icon', 'bk-itsm-icon', sla.isResponseTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
             <div class="bk-time-box">
                 <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <span v-bk-tooltips.top="{ content: '首次处理时间' + (sla.replied_at || '00-00-00 00:00:00') }" class="underline time-type">{{ $t('m["处理"]') }}{{ isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
-                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:
-                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:
-                <span :class="['time', isProcessNormal ? '' : isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[5]}}</span>
-                <i v-if="!isProcessNormal" :class="['status-icon', 'bk-itsm-icon', isProcessTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
+                <span v-bk-tooltips.top="{ content: '首次处理时间' + (sla.replied_at || '00-00-00 00:00:00') }" class="underline time-type">{{ $t('m["处理"]') }}{{ sla.isProcessTimeout ? $t('m["已超时"]') : $t('m["倒计时"]')}}</span>
+                <span :class="['time', sla.isProcessNormal ? '' : sla.isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[3]}}</span>&nbsp;:
+                <span :class="['time', sla.isProcessNormal ? '' : sla.isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[4]}}</span>&nbsp;:
+                <span :class="['time', sla.isProcessNormal ? '' : sla.isProcessTimeout ? 'timeout' : 'warn']">{{sla.sla_processTime[5]}}</span>
+                <i v-if="!sla.isProcessNormal" :class="['status-icon', 'bk-itsm-icon', sla.isProcessTimeout ? 'icon-itsm-icon-square-one' : 'icon-chaoshigaojing']"></i>
             </div>
         </div>
         <div class="bk-no-content" v-if="slaList.length === 0 && !loading">
@@ -80,10 +80,6 @@
         },
         data () {
             return {
-                isResponseTimeout: false,
-                isProcessTimeout: false,
-                isResponseNormal: true,
-                isProcessNormal: true,
                 convertTimeArrToString,
                 loading: false,
                 slaList: [],
@@ -179,6 +175,10 @@
                 })
             },
             runTime (responseCost, processCost, index, name) {
+                let isResponseTimeout = false
+                let isProcessTimeout = false
+                let isResponseNormal = true
+                let isProcessNormal = true
                 // sla的超时预警的阈值
                 const threshold = this.threshold.find(item => item.sla_name === name)
                 const curResponseCost = JSON.parse(JSON.stringify(responseCost)) // 当前响应时间
@@ -188,16 +188,16 @@
                     responseCost--
                     processCost--
                     if (responseCost < curResponseCost - (threshold.rTimeOutThreshold * curResponseCost) || responseCost < 0) {
-                        this.isResponseTimeout = true
-                        this.isResponseNormal = false
+                        isResponseTimeout = true
+                        isResponseNormal = false
                     } else if (responseCost < threshold.rWarningThreshold * curResponseCost) {
-                        this.isResponseNormal = false
+                        isResponseNormal = false
                     }
                     if (processCost < curProcessCost - (threshold.pTimeOutThreshold * curProcessCost) || processCost < 0) {
-                        this.isProcessTimeout = true
-                        this.isProcessNormal = false
+                        isProcessTimeout = true
+                        isProcessNormal = false
                     } else if (processCost < threshold.pWarningThreshold * curProcessCost) { // 预警time
-                        this.isProcessNormal = false
+                        isProcessNormal = false
                     }
                     const responseTime = [0, 0] // 响应时间
                     const processTime = [0, 0] // 处理时间
@@ -207,6 +207,10 @@
                     processTime.push(parseInt(pTime.day), parseInt(pTime.hour), parseInt(pTime.minute), pTime.sec)
                     this.slaList[index].sla_responseTime = responseTime
                     this.slaList[index].sla_processTime = processTime
+                    this.slaList[index].isResponseTimeout = isResponseTimeout
+                    this.slaList[index].isProcessTimeout = isProcessTimeout
+                    this.slaList[index].isResponseNormal = isResponseNormal
+                    this.slaList[index].isProcessNormal = isProcessNormal
                     this.$set(this.slaList, index, this.slaList[index])
                 }, 1000)
             },

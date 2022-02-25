@@ -51,28 +51,6 @@
                     <pre class="service-content">{{ service.desc || $t(`m.common['暂无描述']`) }}</pre>
                 </div>
             </section>
-            <!-- 提单模板 -->
-            <!-- <section class="form-panel fields-params-tempalte">
-                <div class="panel-label">
-                    <h3 class="panel-label-name">{{ $t(`m.tickets['我的填单模版']`) }}</h3>
-                    <p class="panel-label-des">{{ $t(`m.tickets['使用模板可快速完成填写']`) }}</p>
-                </div>
-                <div class="panel-content">
-                    <bk-select v-model="tempalteId"
-                        class="template-select"
-                        searchable
-                        :loading="templateListLoading"
-                        :placeholder="'请选择模版'"
-                        @change="handleTemplateChange">
-                        <bk-option v-for="option in templateList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name"
-                            searchable>
-                        </bk-option>
-                    </bk-select>
-                </div>
-            </section> -->
             <!-- 提单信息 -->
             <section class="form-panel creaet-fields" v-bkloading="{ isLoading: fieldListLoading }">
                 <div class="panel-label">

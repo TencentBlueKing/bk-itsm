@@ -228,9 +228,15 @@
                             it.choice.forEach(item => {
                                 if (it.value[0][item.key] !== '') {
                                     allEmpty1 = false
+                                } else {
+                                    msg += (item.name + ', ')
                                 }
                             })
                             checkValue = allEmpty1
+                            if (msg) {
+                                msg += this.$t('m.newCommon["为必填项！"]')
+                            }
+                            debugger
                             break
                         case 'CUSTOMTABLE':
                             let allEmpty2 = false
