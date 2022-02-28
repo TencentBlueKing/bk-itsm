@@ -236,7 +236,6 @@
                             if (msg) {
                                 msg += this.$t('m.newCommon["为必填项！"]')
                             }
-                            debugger
                             break
                         case 'CUSTOMTABLE':
                             let allEmpty2 = false
