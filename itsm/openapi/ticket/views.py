@@ -55,7 +55,6 @@ from itsm.component.constants import (
     FIELD_PY_IMPACT,
     FIELD_TITLE,
 )
-from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.drf.pagination import OpenApiPageNumberPagination
@@ -556,7 +555,6 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         return Response()
 
-    @custom_apigw_required
     @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
     def proceed_approval(self, request):
