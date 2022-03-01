@@ -23,7 +23,7 @@
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
         <div class="ticket-process-content">
-            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+            <!-- <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div> -->
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
@@ -100,6 +100,11 @@
                 return this.ticketInfo.is_over && this.ticketInfo.comment_id !== -1
             }
         },
+        // watch: {
+        //     ticketInfo (val) {
+        //         console.log(val)
+        //     }
+        // },
         created () {
             this.getOperationLogList()
             this.getTicktComment()
@@ -134,6 +139,29 @@
                             this.list.push(JSON.parse(JSON.stringify(item)))
                         }
                     })
+                    if (this.ticketInfo.current_status === 'RUNNING') {
+                        const processor = {
+                            action: '',
+                            content: this.ticketInfo.current_processors || '--',
+                            deal_time: '',
+                            detail_message: '',
+                            form_data: [],
+                            from_state_name: this.ticketInfo.current_steps[0].name,
+                            from_state_type: '',
+                            id: -1,
+                            message: this.ticketInfo.current_processors,
+                            operate_at: this.ticketInfo.update_at,
+                            operator: this.ticketInfo.current_processors,
+                            processors: '',
+                            processors_type: '',
+                            showMore: false,
+                            tag: '当前处理人' + this.ticketInfo.current_processors,
+                            ticket: this.ticketInfo.id,
+                            ticket_id: this.ticketInfo.id,
+                            type: 'primary'
+                        }
+                        this.list.push(processor)
+                    }
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {

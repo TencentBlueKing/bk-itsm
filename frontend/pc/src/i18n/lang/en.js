@@ -718,6 +718,7 @@ export const m = {
         '提单': 'Create Ticket'
     },
     'newCommon': {
+        '流水日志': 'Running loog',
         '评价成功': 'Evaluation of success',
         '已超出最大值!': 'Maximum has been exceeded',
         '提示': 'Notice',

@@ -29,7 +29,7 @@
                 @click="jumpTargetComment(curComment)">
                 <div class="comment-message">
                     <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
-                    <p>{{ curComment.parent_content }}</p>
+                    <div v-html="curComment.parent_content"></div>
                 </div>
             </div>
         </div>

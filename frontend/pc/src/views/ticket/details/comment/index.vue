@@ -119,7 +119,7 @@
                         type: 'INSIDE',
                         icon: 'bk-itsm-icon icon-suoding common-color',
                         name: '内部评论',
-                        docs: '发布的评论仅内部人员可用'
+                        docs: '仅单据相关人员可发布的评论'
                     },
                     {
                         type: 'PUBLIC',
@@ -255,6 +255,10 @@
             },
             submit () {
                 // 评论内容
+                if (!this.isEditEditor) {
+                    this.repealReply()
+                    return
+                }
                 this.isShowEditor = false
                 this.isReplyComment = false
                 if (this.$refs.editorAdd) {
@@ -271,11 +275,17 @@
                         users: []
                     }
                     if (text) {
-                        this.$store.dispatch('ticket/addTicketComment', params).then(res => {
-                            this.replyCommnetId = ''
-                            this.refreshComment()
-                            this.commentListDom.scrollTop = 0
-                        })
+                        try {
+                            this.$store.dispatch('ticket/addTicketComment', params).then(res => {
+                                this.replyCommnetId = ''
+                                this.refreshComment()
+                                this.commentListDom.scrollTop = 0
+                            })
+                        } catch (e) {
+                            console.log(e)
+                        } finally {
+                            this.isReplyComment = false
+                        }
                     }
                 }
             }
