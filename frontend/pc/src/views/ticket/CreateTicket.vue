@@ -365,6 +365,9 @@
                     this.isRemindPageShow = true
                     this.routerInfo = {
                         name: 'TicketDetail',
+                        params: {
+                            type: 'readOnly'
+                        },
                         query: {
                             id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined
                         }

@@ -2438,5 +2438,6 @@ export const m = {
     '未查找到触发器': 'not found this triggers',
     '内置字段，不可删除': 'Built-in field and cannot be deleted',
     '内容未保存，离开将取消操作！': 'Content not saved, leave will cancel operation!',
-    '当前服务协议配置未完成，确认要删除吗？': 'The current service protocol configuration is not complete. Do you want to delete it?'
+    '当前服务协议配置未完成，确认要删除吗？': 'The current service protocol configuration is not complete. Do you want to delete it?',
+    '服务名称重复，请重新输入': 'Duplicate service name, please re-enter'
 }

@@ -221,6 +221,7 @@
                 })
                 const validateList = requireValidList.filter(it => {
                     let checkValue = false
+                    it.checkValue = false
                     let msg = '' // 自定义校验报错内容
                     switch (it.type) {
                         case 'TABLE':
@@ -255,10 +256,11 @@
                         default:
                             checkValue = isEmpty(it.value)
                     }
-                    it.checkValue = checkValue
                     if (msg) {
                         it.checkMessage = msg
+                        checkValue = true
                     }
+                    it.checkValue = checkValue
                     return checkValue
                 })
                 const sopStatus = this.checkBuiltInTaskTemplate()

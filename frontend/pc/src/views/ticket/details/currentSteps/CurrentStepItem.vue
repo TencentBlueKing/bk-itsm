@@ -106,7 +106,7 @@
                     <task-status :status="nodeInfo.status"></task-status>
                 </p>
             </div>
-            <collapse-transition>
+            <collapse-transition v-if="!readOnly && !$route.params.type">
                 <div class="bk-node-form" v-show="unfold">
                     <!-- 禁用遮罩 -->
                     <div class="bk-node-disabled" v-if="nodeInfo.status === 'SUSPEND'"></div>
@@ -307,6 +307,10 @@
                 default: () => ([])
             },
             isLastNode: {
+                type: Boolean,
+                default: false
+            },
+            readOnly: {
                 type: Boolean,
                 default: false
             }

@@ -23,7 +23,7 @@
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
         <div class="ticket-process-content">
-            <!-- <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div> -->
+            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
@@ -142,7 +142,7 @@
                     if (this.ticketInfo.current_status === 'RUNNING') {
                         const processor = {
                             action: '',
-                            content: this.ticketInfo.current_processors || '--',
+                            // content: this.ticketInfo.current_processors || '--',
                             deal_time: '',
                             detail_message: '',
                             form_data: [],

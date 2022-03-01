@@ -32,7 +32,7 @@
             <span :class="{ 'bk-color-tree': displayName }">
                 {{ displayName || $t(`m.serviceConfig["请选择"]`)}}
             </span>
-            <i class="bk-select-angle bk-icon icon-framework"></i>
+            <i v-if="organizationLoading" class="bk-select-angle bk-itsm-icon icon-icon-loading"></i>
         </div>
         <transition name="common-fade">
             <div class="bk-search-tree-content" v-show="isShowTree">
@@ -78,7 +78,8 @@
             extCls: {
                 type: String,
                 default: ''
-            }
+            },
+            organizationLoading: Boolean
         },
         data () {
             return {
@@ -189,6 +190,23 @@
 </script>
 
 <style lang="scss" scoped>
+/* 图片动画 */
+@keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+@-webkit-keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
 .bk-search-tree {
     background: #ffffff;
     .bk-color-tree {
@@ -196,6 +214,16 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    .bk-select-angle {
+        margin-top: -4px;
+        font-size: 16px;
+        display: inline-block;
+        -webkit-transform: rotate(360deg);
+        animation: rotation 1.5s linear infinite;
+        -moz-animation: rotation 1.5s linear infinite;
+        -webkit-animation: rotation 1.5s linear infinite;
+        -o-animation: rotation 1.5s linear infinite;
     }
 }
 .bk-search-tree-content {

@@ -177,7 +177,7 @@
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
     .bk-field-line {
-        width: 33.33%;
+        width: 50%;
         position: relative;
         padding: 4px;
         font-size: 14px;
