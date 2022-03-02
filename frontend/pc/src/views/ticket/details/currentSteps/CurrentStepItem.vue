@@ -106,7 +106,7 @@
                     <task-status :status="nodeInfo.status"></task-status>
                 </p>
             </div>
-            <collapse-transition v-if="!readOnly && !$route.params.type">
+            <collapse-transition v-if="!readOnly">
                 <div class="bk-node-form" v-show="unfold">
                     <!-- 禁用遮罩 -->
                     <div class="bk-node-disabled" v-if="nodeInfo.status === 'SUSPEND'"></div>
