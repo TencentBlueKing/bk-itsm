@@ -159,7 +159,6 @@
             getCommentHeight () {
                 const commentDom = document.querySelector('.wang-editor-template')
                 this.commentDomHeight = commentDom.clientHeight
-                console.log(this.commentDomHeight)
                 this.isShowCommentScroll = commentDom.clientHeight > 500
             },
             getBasicHeight () {
