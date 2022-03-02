@@ -19,7 +19,7 @@
 - 请求方法及URL
 
 ```
-POST {BK_PAAS_HOST}/api/project/projects/migration_project/
+POST {ITSM_HOST}/api/project/projects/migration_project/
 ```
 
 - 请求参数示例
