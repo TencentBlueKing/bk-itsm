@@ -565,7 +565,6 @@
                 } else {
                     this.updateServiceSource('custom')
                 }
-                this.showFieldOption = true
             },
             createServicePopoverShow () {
                 this.isDropdownShow = true
