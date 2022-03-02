@@ -125,7 +125,7 @@
                 const nodoTypeList = {
                     'TASK-DEVOPS': this.$t(`m["蓝盾节点"]`),
                     'TASK-SOPS': this.$t(`m["标准运维节点"]`),
-                    'NORMAL': this.$t(`m["自动节点"]`),
+                    'NORMAL': this.$t(`m["手动节点"]`),
                     'TASK': this.$t(`m["任务节点"]`),
                     'APPROVAL': this.$t(`m["审批节点"]`),
                     'SIGN': this.$t(`m["会签节点"]`)
