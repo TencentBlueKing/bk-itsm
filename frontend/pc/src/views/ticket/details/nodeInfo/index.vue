@@ -65,6 +65,7 @@
                         </template>
                         <current-steps
                             v-else
+                            :read-only="readOnly"
                             :basic-infomation="basicInfomation"
                             :current-step-list="currentStepList"
                             :node-list="nodeListCurren"
@@ -150,6 +151,7 @@
             devopsNodeInfo
         },
         props: {
+            readOnly: Boolean,
             // 单据信息
             basicInfomation: {
                 type: Object,

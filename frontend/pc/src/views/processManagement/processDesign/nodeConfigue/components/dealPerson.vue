@@ -75,6 +75,7 @@
                 <select-tree
                     v-model="formData.levelSecond"
                     :list="organizationList"
+                    :organization-loading="organizationLoading"
                     ext-cls="bk-form-width">
                 </select-tree>
             </template>
@@ -139,6 +140,7 @@
                 showError: false,
                 initLoaing: false,
                 isLoading: false,
+                organizationLoading: false,
                 formData: {
                     levelOne: '',
                     levelSecond: []
@@ -321,11 +323,14 @@
             },
             // 组织架构
             getOrganization () {
+                this.organizationLoading = true
                 this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
                     // 操作角色组织架构
                     this.organizationList = res.data
                 }).catch(res => {
                     errorHandler(res, this)
+                }).finally(() => {
+                    this.organizationLoading = false
                 })
             },
             // 获取变量列表

@@ -271,6 +271,9 @@
                     // next
                     if (this.step !== 'setting') {
                         const nextStep = this.step === 'basic' ? 'process' : 'setting'
+                        if (this.step === 'basic' && !this.serviceInfo.source) {
+                            this.$refs[refName].updateServiceSource('custom')
+                        }
                         this.$router.push({
                             name: 'projectServiceEdit',
                             params: {
