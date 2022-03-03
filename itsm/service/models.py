@@ -431,7 +431,7 @@ class Service(ObjectManagerMixin, Model):
     def update_service_configs(self, service_config):
         self.can_ticket_agency = service_config["can_ticket_agency"]
         self.display_type = service_config["display_type"]
-        self.display_role = service_config.get("display_role", "")
+        self.display_role = dotted_name(service_config.get("display_role", ""))
         self.workflow_id = service_config["workflow_id"]
         self.is_valid = True
         self.save()
