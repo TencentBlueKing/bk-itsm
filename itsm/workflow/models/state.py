@@ -514,9 +514,19 @@ class State(Model):
 
         version_name = create_version_number()
 
+        def build_outputs(fields):
+            outputs = []
+            for f in fields:
+                outputs.append(
+                    {"key": f.key, "type": f.type, "source": "field", "state": self.id}
+                )
+            data = {"inputs": [], "outputs": outputs}
+            return data
+
         old_fields = self.fields
         field_id_map = {}
         field_key_map = {}
+        fields_obj_list = []
         for field in Field.objects.filter(id__in=old_fields):
             # key 长度 校验128，数据库225
             old_id = field.id
@@ -525,6 +535,7 @@ class State(Model):
                 "clone_{}_{}".format(old_field_key, version_name)
             )
             obj = field.clone(new_field_key)
+            fields_obj_list.append(obj)
             field_id_map[old_id] = obj.id
             field_key_map[old_field_key] = new_field_key
         new_fields = [field_id_map.get(f, f) for f in old_fields]
@@ -532,6 +543,7 @@ class State(Model):
         self.is_draft = True
         self.is_builtin = False
         self.axis.update(x=self.axis["x"] + 250)
+        self.variables = build_outputs(fields_obj_list)
         self.save()
         Field.objects.filter(id__in=new_fields).update(state_id=self.id)
         self.update_field_show_conditions(new_fields, field_key_map)
