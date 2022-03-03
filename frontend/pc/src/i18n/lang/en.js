@@ -2440,5 +2440,6 @@ export const m = {
     '内容未保存，离开将取消操作！': 'Content not saved, leave will cancel operation!',
     '当前服务协议配置未完成，确认要删除吗？': 'The current service protocol configuration is not complete. Do you want to delete it?',
     '服务名称重复，请重新输入': 'Duplicate service name, please re-enter',
-    '手动节点': 'Manual Node'
+    '手动节点': 'Manual Node',
+    '当前字段为自定义表单': 'The current field is a custom form'
 }
