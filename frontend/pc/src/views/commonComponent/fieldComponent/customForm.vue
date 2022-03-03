@@ -23,6 +23,7 @@
 <template>
     <div v-if="item.showFeild">
         <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+            <p style="color: #c4c6cc;" class="mt5 mb0 f12" slot="tip" v-if="item.type === 'CUSTOM-FORM'">{{$t('m["当前字段为自定义表单"]')}}</p>
             <render-view
                 :form-data="formData"
                 :context="context">

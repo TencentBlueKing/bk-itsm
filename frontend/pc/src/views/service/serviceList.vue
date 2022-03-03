@@ -488,22 +488,19 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    ordering: '-update_at'
+                    ordering: '-update_at',
+                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id
                 }
-                let url = 'catalogService/getServices'
                 this.moreSearch.forEach(item => {
                     if (item.value !== '' && item.typeKey) {
-                        url = 'serviceEntry/getList'
                         params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
-                    } else {
-                        params.catalog_id = this.$route.query.catalog_id || this.treeInfo.node.id
                     }
                 })
                 if (!this.treeInfo.node.id) {
                     return
                 }
                 this.isDataLoading = true
-                this.$store.dispatch(url, params).then(res => {
+                this.$store.dispatch('catalogService/getServices', params).then(res => {
                     if (res.data !== null) {
                         if (Object.keys(res.data).length > 0) {
                             this.dataList = res.data.items
@@ -634,22 +631,37 @@
                     try {
                         const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
                         serviceId = res.data.id
+                        if (res.data && res.data.id) {
+                            this.$router.push({
+                                name: 'projectServiceEdit',
+                                params: {
+                                    type: 'edit',
+                                    step: 'basic'
+                                },
+                                query: {
+                                    serviceId,
+                                    project_id: this.$store.state.project.id,
+                                    catalog_id: this.$route.query.catalog_id
+                                }
+                            })
+                        }
                     } catch (e) {
                         console.log(e)
                     }
+                } else {
+                    this.$router.push({
+                        name: 'projectServiceEdit',
+                        params: {
+                            type: 'edit',
+                            step: 'basic'
+                        },
+                        query: {
+                            serviceId,
+                            project_id: this.$store.state.project.id,
+                            catalog_id: this.$route.query.catalog_id
+                        }
+                    })
                 }
-                this.$router.push({
-                    name: 'projectServiceEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'basic'
-                    },
-                    query: {
-                        serviceId,
-                        project_id: this.$store.state.project.id,
-                        catalog_id: this.$route.query.catalog_id
-                    }
-                })
             },
             /**
              * 单个服务操作项点击时校验
