@@ -295,6 +295,7 @@ class ServiceManager(managers.Manager):
             tag_data["workflow_id"] = version.id
             version_number = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             tag_data["name"] = "{}_copy_{}".format(tag_data["name"], version_number)
+            tag_data["creator"] = tag_data["updated_by"] = username
             service = self.create(**tag_data)
             return service
         return None
