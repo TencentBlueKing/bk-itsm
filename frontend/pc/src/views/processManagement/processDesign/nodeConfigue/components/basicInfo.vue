@@ -333,11 +333,11 @@
                     excludeProcessor.push('STARTER_LEADER')
                 }
                 // 是否使用权限中心角色
-                if (!this.flowInfo.is_iam_used) {
-                    excludeProcessor.push('IAM')
-                    this.assignorExclude.push('IAM')
-                    this.deliversExclude.push('IAM')
-                }
+                // if (!this.flowInfo.is_iam_used) {
+                //     excludeProcessor.push('IAM')
+                //     this.assignorExclude.push('IAM')
+                //     this.deliversExclude.push('IAM')
+                // }
                 // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
                 if (this.nodeInfo.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.nodeInfo.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
                     excludeProcessor.push('BY_ASSIGNOR')
