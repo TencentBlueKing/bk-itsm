@@ -646,7 +646,10 @@
                             })
                         }
                     } catch (e) {
-                        console.log(e)
+                        this.$bkMessage({
+                            theme: 'warning',
+                            message: e.data.message
+                        })
                     }
                 } else {
                     this.$router.push({
