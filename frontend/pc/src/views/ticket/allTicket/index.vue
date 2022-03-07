@@ -25,7 +25,15 @@
         <template v-if="!loading">
             <div class="ticket-tab">
                 <nav-title :title-name="titleName">
-                    <bk-tab :active.sync="currentTab" type="unborder-card" @tab-change="changeTag" slot="tab">
+                    <bk-tab
+                        addable
+                        closable
+                        :active.sync="currentTab"
+                        type="unborder-card"
+                        @tab-change="changeTag"
+                        slot="tab"
+                        @add-panel="addPanel"
+                        @close-panel="closePanel">
                         <bk-tab-panel
                             v-for="(panel) in serviceList"
                             v-bind="panel"
@@ -258,6 +266,25 @@
                 // 获取全局视图状态
                 this.getGlobalStatus()
                 this.getBusinessList()
+            },
+            addPanel () {
+                console.log(this.$refs.advancedSearch[0].showMore = true)
+                // this.$refs.advancedSearchshowMove = true
+                this.serviceList.push({
+                    desc: '请求管理类相关服务',
+                    key: 'add',
+                    label: '新加的tab',
+                    name: '新加的tab',
+                    conditions: {}
+                })
+            },
+            // 删除自定义tab
+            closePanel (index, panel) {
+                const fixedTabs = ['request', 'change', 'event', 'question']
+                if (!fixedTabs.includes(panel.key)) {
+                    this.serviceList.splice(index, 1)
+                    this.$refs.advancedSearch[0].showMore = false
+                }
             },
             // 获取所有服务类型列表
             async getServiceTypeList () {
