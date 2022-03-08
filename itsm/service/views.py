@@ -22,10 +22,12 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import json
 import operator
 from functools import reduce
 
+from django.http import FileResponse
+from django.utils.encoding import escape_uri_path
 from django.utils.translation import ugettext as _
 from django_bulk_update.helper import bulk_update
 from rest_framework import serializers
@@ -50,6 +52,8 @@ from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import DynamicListModelMixin
 from itsm.component.exceptions import ParamError, CatalogDeleteError
 from itsm.component.exceptions import ServiceNotExist, TableNotExist
+from itsm.component.utils.basic import create_version_number
+from itsm.component.utils.misc import JsonEncoder
 from itsm.service.models import (
     CatalogService,
     DictData,
@@ -638,7 +642,19 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
     @action(detail=True, methods=["get"], permission_classes=())
     def export(self, request, *args, **kwargs):
         instance = self.get_object()
-        return Response(instance.tag_data())
+        # 统一导入导出格式为列表数据
+        data = instance.tag_data()
+        response = FileResponse(json.dumps(data, cls=JsonEncoder, indent=2))
+        response["Content-Type"] = "application/octet-stream"
+        # 中文文件名乱码问题
+        response[
+            "Content-Disposition"
+        ] = "attachment; filename*=UTF-8''bk_itsm_{}_{}.json".format(
+            escape_uri_path(instance.name),
+            create_version_number(),
+        )
+
+        return response
 
     @action(detail=True, methods=["post"], permission_classes=())
     def clone(self, request, *args, **kwargs):

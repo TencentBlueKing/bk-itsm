@@ -473,7 +473,7 @@ class Service(ObjectManagerMixin, Model):
             "is_valid": self.is_valid,
             "display_type": self.display_type,
             "display_role": self.display_role,
-            "source": self.source,
+            "source": "custom",
             "project_key": self.project_key,
         }
 
