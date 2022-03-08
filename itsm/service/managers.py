@@ -293,7 +293,7 @@ class ServiceManager(managers.Manager):
         logger.info("正在开始克隆服务，name={}".format(tag_data["name"]))
         with transaction.atomic():
             workflow_tag_data = tag_data.pop("workflow")
-            task_settings = workflow_tag_data["extras"].pop("task_settings")
+            task_settings = workflow_tag_data["extras"].pop("task_settings", None)
             workflow, state_map, _ = Workflow.objects.restore(
                 workflow_tag_data, username
             )
