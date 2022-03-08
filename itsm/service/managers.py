@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
 
 from common.log import logger
 from itsm.component.constants import BUILTIN_SYSDICT_LIST, DEFAULT_ENGINE_VERSION
-from itsm.component.constants import BUILTIN_SERVICES, OPEN
+from itsm.component.constants import BUILTIN_SERVICES, OPEN, DEFAULT_PROJECT_PROJECT_KEY
 from itsm.component.db import managers
 from itsm.component.utils.basic import dotted_name
 
@@ -280,6 +280,16 @@ class ServiceManager(managers.Manager):
     def clone(self, tag_data, username):
         from itsm.workflow.models import Workflow
 
+        def get_catalog_id(project_key):
+            from itsm.service.models import ServiceCatalog
+
+            if project_key == DEFAULT_PROJECT_PROJECT_KEY:
+                key = "FUWUFANKUI"
+            else:
+                key = "{}_FUWUFANKUI".format(project_key)
+            catalog_id = ServiceCatalog.objects.get(key=key).id
+            return catalog_id
+
         logger.info("正在开始克隆服务，name={}".format(tag_data["name"]))
         with transaction.atomic():
             workflow_tag_data = tag_data.pop("workflow")
@@ -287,9 +297,7 @@ class ServiceManager(managers.Manager):
             task_settings = []
             if workflow_tag_data["extras"].get("task_settings"):
                 task_settings = workflow_tag_data["extras"].pop("task_settings")
-            workflow, state_map, _ = Workflow.objects.clone(
-                workflow_tag_data, username
-            )
+            workflow, state_map, _ = Workflow.objects.clone(workflow_tag_data, username)
             self.clone_task_settings(workflow, task_settings, state_map)
             version = workflow.create_version()
             tag_data["workflow_id"] = version.id
@@ -297,6 +305,9 @@ class ServiceManager(managers.Manager):
             tag_data["name"] = "{}_copy_{}".format(tag_data["name"], version_number)
             tag_data["creator"] = tag_data["updated_by"] = username
             service = self.create(**tag_data)
+            project_key = tag_data["project_key"]
+            catalog_id = get_catalog_id(project_key=project_key)
+            service.bind_catalog(catalog_id, project_key)
             return service
         return None
 
