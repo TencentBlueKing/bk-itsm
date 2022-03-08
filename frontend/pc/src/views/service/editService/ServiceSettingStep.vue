@@ -103,7 +103,7 @@
                             </bk-checkbox>
                         </bk-checkbox-group>
                     </bk-form-item>
-                    <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
+                    <!-- <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
                         <bk-radio-group v-model="formData.notify_rule">
                             <bk-radio :value="'ONCE'"
                                 :ext-cls="'mr20 bk-line-radio'">
@@ -127,7 +127,7 @@
                                 </bk-select>
                             </div>
                         </bk-radio-group>
-                    </bk-form-item>
+                    </bk-form-item> -->
                 </bk-form>
             </div>
         </section>
@@ -390,9 +390,7 @@
                     revokeWay,
                     revokeState,
                     otherSettings,
-                    notify,
-                    notify_freq: notifyFreq,
-                    notify_rule: notifyRule
+                    notify
                 } = this.formData
                 if (revokeWay === 'not_support') {
                     workflow.is_revocable = false
@@ -418,14 +416,17 @@
                 }
                 // 通知方式
                 workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
-                const canNotice = !!notify.length
-                if (canNotice) {
-                    workflow.notify_rule = notifyRule
-                    workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
-                } else {
-                    workflow.notify_rule = 'NONE'
-                    workflow.notify_freq = 0
-                }
+                workflow.notify_freq = 0
+                workflow.notify_rule = 'ONCE'
+
+                // const canNotice = !!notify.length
+                // if (canNotice) {
+                //     workflow.notify_rule = notifyRule
+                //     workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
+                // } else {
+                //     workflow.notify_rule = 'NONE'
+                //     workflow.notify_freq = 0
+                // }
 
                 // 任务配置
                 if (this.$refs.taskConfigPanel) {
@@ -433,7 +434,6 @@
                     workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams()
                 }
                 const checkResult = await this.saveAndActionService(params)
-                
                 await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
                 if (!checkResult.result) {
                     this.slaValidateMsg = checkResult.data.messages

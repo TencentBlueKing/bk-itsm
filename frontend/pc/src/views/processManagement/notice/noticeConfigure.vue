@@ -153,13 +153,13 @@
             },
             closeSideslider () {
                 this.$bkInfo({
-                    title: '是否修改保存？',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.$refs.editorNotice.submitNotice()
+                        this.noticeInfo.show = false
                     },
                     cancelFn: () => {
-                        this.noticeInfo.show = false
+                        this.noticeInfo.show = true
                     }
                 })
             }

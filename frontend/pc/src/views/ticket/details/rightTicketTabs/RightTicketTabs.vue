@@ -25,14 +25,26 @@
         <bk-tab data-test-id="ticket_tab_rightMenu" :active.sync="activeTab" type="unborder-card" ext-cls="right-tiket-tabs">
             <bk-tab-panel
                 name="log"
-                :label="$t(`m.newCommon['流转进程']`)">
+                :label="$t(`m.newCommon['流水日志']`)">
                 <log-tab
                     v-if="activeTab === 'log'"
                     :ticket-info="ticketInfo"
+                    :node="nodeList"
                     @ticketFinishAppraise="$emit('ticketFinishAppraise')"
                     @viewProcess="viewProcess">
                 </log-tab>
             </bk-tab-panel>
+            <!-- 待设计稿 -->
+            <!-- <bk-tab-panel
+                name="log"
+                :label="$t(`m.newCommon['流转进程']`)">
+                <log-tab
+                    v-if="activeTab === 'process'"
+                    :ticket-info="ticketInfo"
+                    @ticketFinishAppraise="$emit('ticketFinishAppraise')"
+                    @viewProcess="viewProcess">
+                </log-tab>
+            </bk-tab-panel> -->
             <template v-if="hasNodeOptAuth">
                 <bk-tab-panel
                     name="all-task"

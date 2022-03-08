@@ -76,6 +76,7 @@
                     <node-info
                         @initInfo="initInfo"
                         :node-list="nodeInfo"
+                        :read-only="nodeContent.isShow"
                         :current-step-list="currentStepList"
                         :basic-infomation="basicInfomation"
                         :open-node-info="openNodeInfo"

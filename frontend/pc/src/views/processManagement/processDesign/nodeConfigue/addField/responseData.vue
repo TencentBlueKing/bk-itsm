@@ -745,7 +745,7 @@
             }
             .bk-form-content {
                 width: 180px;
-                margin-top: -20px;
+                margin-left: -200px;
             }
         }
 

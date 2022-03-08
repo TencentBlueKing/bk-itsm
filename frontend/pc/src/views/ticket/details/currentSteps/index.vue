@@ -33,6 +33,7 @@
                         :node-list="nodeList"
                         :ticket-info="basicInfomation"
                         :all-groups="allGroups"
+                        :read-only="readOnly"
                         :is-last-node="index === currentStepList.length - 1"
                         :node-trigger-list="nodeTriggerList"
                         :all-field-list="allFieldList"
@@ -107,7 +108,8 @@
                 type: Boolean,
                 default: false
             },
-            isShowBasicInfo: Boolean
+            isShowBasicInfo: Boolean,
+            readOnly: Boolean
         },
         data () {
             return {

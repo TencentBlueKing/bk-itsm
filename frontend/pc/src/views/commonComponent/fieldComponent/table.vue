@@ -43,6 +43,10 @@
                     </template>
                 </bk-table-column>
             </bk-table>
+            <template v-if="item.checkValue">
+                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+            </template>
         </bk-form-item>
     </div>
 </template>

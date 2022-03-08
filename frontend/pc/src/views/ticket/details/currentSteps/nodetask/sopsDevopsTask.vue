@@ -43,8 +43,8 @@
         </devops-preview>
         <div class="submit-btn">
             <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
-            <bk-button v-if="changeBtn" @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
-            <bk-button @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
+            <bk-button :theme="'primary'" @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
+            <bk-button @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
         </div>
     </div>
 </template>
@@ -87,7 +87,7 @@
                     bk_biz_id: '',
                     site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS
                 },
-                isHook: true,
+                isHook: false,
                 isEdit: false,
                 stateList: [],
                 pipelineFormList: [],
@@ -119,6 +119,7 @@
                 })
             },
             reSetSopTask () {
+                this.isHook = true
                 this.changeBtn = !this.changeBtn
                 this.isEdit = !this.isEdit
                 if (this.$refs.sopsGetParam) {

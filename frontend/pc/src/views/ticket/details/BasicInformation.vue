@@ -149,7 +149,7 @@
         padding-bottom: 14px;
         &.fold {
             .bk-basic-info {
-                max-height: 500px;
+                // max-height: 500px;
                 overflow: auto;
                 @include scroller;
             }

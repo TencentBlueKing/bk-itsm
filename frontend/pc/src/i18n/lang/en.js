@@ -718,6 +718,7 @@ export const m = {
         '提单': 'Create Ticket'
     },
     'newCommon': {
+        '流水日志': 'Running loog',
         '评价成功': 'Evaluation of success',
         '已超出最大值!': 'Maximum has been exceeded',
         '提示': 'Notice',
@@ -1154,7 +1155,8 @@ export const m = {
         '请输入服务名': 'Please input the service name',
         '编辑服务': 'Edit Service ',
         '删除成功': 'Success ',
-        '批量删除成功': 'Batch-deleted successfully '
+        '批量删除成功': 'Batch-deleted successfully ',
+        '未设置协议': 'Protocol Not Set'
     },
     'systemConfig': {
         '系统域名：': 'Domain: ',
@@ -2434,5 +2436,10 @@ export const m = {
     '业务': 'bk_biz_id',
     '请先保存字段': 'Please save the fields',
     '未查找到触发器': 'not found this triggers',
-    '内置字段，不可删除': 'Built-in field and cannot be deleted'
+    '内置字段，不可删除': 'Built-in field and cannot be deleted',
+    '内容未保存，离开将取消操作！': 'Content not saved, leave will cancel operation!',
+    '当前服务协议配置未完成，确认要删除吗？': 'The current service protocol configuration is not complete. Do you want to delete it?',
+    '服务名称重复，请重新输入': 'Duplicate service name, please re-enter',
+    '手动节点': 'Manual Node',
+    '当前字段为自定义表单': 'The current field is a custom form'
 }

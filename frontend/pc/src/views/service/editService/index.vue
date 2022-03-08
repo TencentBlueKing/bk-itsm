@@ -210,7 +210,8 @@
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
+                        project_id: this.$store.state.project.id,
+                        catalog_id: this.$route.query.catalog_id
                     }
                 })
             },
@@ -270,6 +271,9 @@
                     // next
                     if (this.step !== 'setting') {
                         const nextStep = this.step === 'basic' ? 'process' : 'setting'
+                        if (this.step === 'basic' && !this.serviceInfo.source) {
+                            this.$refs[refName].updateServiceSource('custom')
+                        }
                         this.$router.push({
                             name: 'projectServiceEdit',
                             params: {
@@ -289,7 +293,7 @@
                             name: 'projectServiceList',
                             query: {
                                 project_id: this.$store.state.project.id,
-                                catalog_id: this.serviceInfo.bounded_relations[0].catalog_id
+                                catalog_id: this.$route.query.catalog_id
                             }
                         })
                     }

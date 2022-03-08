@@ -352,8 +352,8 @@
                             sla_name: item.name,
                             rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
                             pWarningThreshold: condition[1][3] / 100 || 1,
-                            rTimeOutThreshold: condition[2][2] / 100 || 1,
-                            pTimeOutThreshold: condition[3][4] / 100 || 1
+                            rTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[2][2] / 100 : 1,
+                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100
                         }
                     })
                     this.threshold = [...slathreshold]
@@ -474,7 +474,6 @@
                         this.$set(item, 'val', (item.value || ''))
                         this.conditionField(item, this.firstStateFields)
                     })
-                    console.log(this.firstStateFields)
                 }
                 copyList.forEach(
                     item => {

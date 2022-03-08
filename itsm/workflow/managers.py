@@ -312,23 +312,8 @@ class WorkflowManager(Manager):
         content.update(is_draft=False)
         return self.create(**content)
 
-    @transaction.atomic
     def restore(self, data, operator="", for_migrate=False):
         """WorkflowVersion->Workflow's record"""
-
-        from django.db.models.signals import post_save
-        from itsm.workflow.signals.handlers import init_after_workflow_created
-        from itsm.workflow.models import (
-            State,
-            Field,
-            Transition,
-            Table,
-            TaskSchema,
-            TaskConfig,
-        )
-        from itsm.iadmin.models import SystemSettings
-        from distutils.dir_util import copy_tree
-
         case_one = (
             data.get("is_builtin")
             and self.filter(is_builtin=True, name=data.get("name")).exists()
@@ -344,7 +329,23 @@ class WorkflowManager(Manager):
             )
             print("workflow exist, skip restore workflow {}".format(data.get("name")))
             return
+        return self.clone(data, operator, for_migrate)
 
+    @transaction.atomic
+    def clone(self, data, operator="", for_migrate=False):
+        from django.db.models.signals import post_save
+        from itsm.workflow.signals.handlers import init_after_workflow_created
+        from itsm.workflow.models import (
+            State,
+            Field,
+            Transition,
+            Table,
+            TaskSchema,
+            TaskConfig,
+        )
+        from itsm.iadmin.models import SystemSettings
+        from distutils.dir_util import copy_tree
+        
         states = data.pop("states")
         transitions = data.pop("transitions")
         fields = data.pop("fields")

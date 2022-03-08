@@ -396,7 +396,7 @@
                 this.$bkInfo({
                     extCls: 'agreement-close',
                     type: 'warning',
-                    title: this.$t(`m.serviceConfig["确认删除服务协议"]`) + `<${this.getProtocolName(agree.sla_id)}>？`,
+                    title: this.getProtocolName(agree.sla_id) ? this.$t(`m.serviceConfig["确认删除服务协议"]`) + `<${this.getProtocolName(agree.sla_id)}>` : this.$t(`m["当前服务协议配置未完成，确认要删除吗？"]`),
                     confirmFn: () => {
                         const lastIndex = this.serviceData.sla.length - 1
                         if (lastIndex === agreeIndex && !this.serviceData.sla[lastIndex].end_node_id) {
@@ -505,7 +505,7 @@
                 })
             },
             goToServiceList () {
-                this.$router.push({ name: 'projectServiceList', query: { project_id: this.$route.query.project_id } })
+                this.$router.push({ name: 'projectServiceList', query: { project_id: this.$route.query.project_id, catalog_id: this.$route.query.catalog_id } })
             },
             // 跳转到新建服务协议
             handleCreateAgreement () {

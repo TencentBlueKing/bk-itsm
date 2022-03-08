@@ -106,15 +106,8 @@
                             <template v-else>
                                 <bk-checkbox
                                     data-test-id="service_checkbox_checkService"
-                                    v-bk-tooltips.right="{
-                                        content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
-                                        disabled: tableHoverId !== props.row.id,
-                                        boundary: 'window',
-                                        always: true
-                                    }"
                                     :true-value="trueStatus"
                                     :false-value="falseStatus"
-                                    :disabled="!!props.row.bounded_catalogs[0]"
                                     v-model="props.row.checkStatus"
                                     @change="changeCheck(props.row)">
                                 </bk-checkbox>
@@ -126,7 +119,7 @@
                             <span :title="props.row.id">{{ props.row.id || '--' }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150" :width="changeFrom.name ? '250' : '150'">
+                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
                         <template slot-scope="props">
                             <span
                                 v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
@@ -197,22 +190,12 @@
                             <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" min-width="150">
+                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
                         <template slot-scope="props">
                             <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
-                        <template slot-scope="props">
-                            <span class="bk-status-color"
-                                :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
-                            <span style="margin-left: 5px;"
-                                :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
-                                {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '150'">
+                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
                         <template slot-scope="props">
                             <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
                             <div v-else class="hover-show-icon">
@@ -253,7 +236,7 @@
                                 @click="onServicePermissonCheck(['service_manage'], props.row)">
                                 SLA
                             </bk-button>
-                            <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
+                            <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
                             <!-- 编辑 -->
                             <bk-button
                                 v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
@@ -295,6 +278,7 @@
                                 <i class="bk-itsm-icon icon-move-new"></i>
                                 <div slot="content" style="white-space: normal;">
                                     <bk-button
+                                        style="font-size: 12px;"
                                         data-test-id="service_button_deleteService1"
                                         v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
                                         v-cursor
@@ -306,6 +290,7 @@
                                     </bk-button>
                                     <template v-else>
                                         <bk-button
+                                            style="font-size: 12px;"
                                             data-test-id="service_button_deleteService3"
                                             theme="primary"
                                             text
@@ -384,7 +369,7 @@
                     {
                         name: this.$t(`m.serviceConfig["类型"]`),
                         type: 'select',
-                        typeKey: 'service_key',
+                        typeKey: 'key',
                         value: '',
                         list: []
                     },
@@ -503,22 +488,19 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    ordering: '-update_at'
+                    ordering: '-update_at',
+                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id
                 }
-                let url = 'catalogService/getServices'
                 this.moreSearch.forEach(item => {
                     if (item.value !== '' && item.typeKey) {
-                        url = 'serviceEntry/getList'
                         params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
-                    } else {
-                        params.catalog_id = this.$route.query.catalog_id || this.treeInfo.node.id
                     }
                 })
                 if (!this.treeInfo.node.id) {
                     return
                 }
                 this.isDataLoading = true
-                this.$store.dispatch(url, params).then(res => {
+                this.$store.dispatch('catalogService/getServices', params).then(res => {
                     if (res.data !== null) {
                         if (Object.keys(res.data).length > 0) {
                             this.dataList = res.data.items
@@ -646,21 +628,43 @@
                 let serviceId = item.id
                 if (type === 'clone') {
                     // 获取克隆id
-                    const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
-                    serviceId = res.data.id
-                }
-                this.$router.push({
-                    name: 'projectServiceEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'basic'
-                    },
-                    query: {
-                        serviceId,
-                        project_id: this.$store.state.project.id,
-                        catalog_id: this.$route.query.catalog_id
+                    try {
+                        const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
+                        serviceId = res.data.id
+                        if (res.data && res.data.id) {
+                            this.$router.push({
+                                name: 'projectServiceEdit',
+                                params: {
+                                    type: 'edit',
+                                    step: 'basic'
+                                },
+                                query: {
+                                    serviceId,
+                                    project_id: this.$store.state.project.id,
+                                    catalog_id: this.$route.query.catalog_id
+                                }
+                            })
+                        }
+                    } catch (e) {
+                        this.$bkMessage({
+                            theme: 'warning',
+                            message: e.data.message
+                        })
                     }
-                })
+                } else {
+                    this.$router.push({
+                        name: 'projectServiceEdit',
+                        params: {
+                            type: 'edit',
+                            step: 'basic'
+                        },
+                        query: {
+                            serviceId,
+                            project_id: this.$store.state.project.id,
+                            catalog_id: this.$route.query.catalog_id
+                        }
+                    })
+                }
             },
             /**
              * 单个服务操作项点击时校验

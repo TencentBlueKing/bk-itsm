@@ -63,7 +63,7 @@
         <div class="basic-body">
             <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
                 <!-- 选择服务模板1 -->
-                <div class="service-template">
+                <div v-if="!showFieldOption" class="service-template">
                     <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
                         :key="index"
                         data-test-id="servie_section_QuicklyCreateForm"
@@ -285,7 +285,8 @@
                 },
                 fieldIndex: '',
                 fieldlist: [],
-                fieldsLibrarylist: fieldsLibrary
+                fieldsLibrarylist: fieldsLibrary,
+                servcieList: []
             }
         },
         computed: {
@@ -303,6 +304,13 @@
         },
         created () {
             this.rules.name = this.checkCommonRules('name').name
+            this.rules.name.push(
+                {
+                    validator: this.handleRepeatServiceName,
+                    message: this.$t(`m['服务名称重复，请重新输入']`),
+                    trigger: 'blur'
+                }
+            )
             this.rules.directory_id = this.checkCommonRules('required').required
             this.rules.key = this.checkCommonRules('required').required
             this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source
@@ -310,6 +318,7 @@
             this.serviceTemplateDisable = this.serviceId !== ''
         },
         async mounted () {
+            this.getAllServcie()
             this.getPublicFieldList()
             this.getServiceTypes()
             const { name, desc, catalog_id: catalogId, key } = this.serviceInfo
@@ -326,6 +335,18 @@
             }
         },
         methods: {
+            getAllServcie () {
+                const params = {
+                    project_key: this.$store.state.project.id,
+                    catalog_id: 1
+                }
+                this.$store.dispatch('catalogService/getServices', params).then(res => {
+                    this.servcieList = res.data || []
+                })
+            },
+            async handleRepeatServiceName (val) {
+                return !this.servcieList.find(item => item.name === val)
+            },
             handleDragLine (e) {
                 document.addEventListener('mouseup', this.handleMouseUp, false)
                 document.addEventListener('mousemove', this.handleLineMouseMove, false)
@@ -346,7 +367,7 @@
                 const { startX, base } = this.dragLine
                 const offsetX = e.pageX - startX
                 const moveX = base + offsetX
-                if (offsetX > 0 && 600 - moveX <= 400) return
+                if (offsetX > 0 && 600 - moveX <= 500) return
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
                     el.style.width = `calc(600px - ${moveX}px)`
@@ -374,6 +395,8 @@
             // 获取已有字段（公共字段）
             getPublicFieldList () {
                 this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
+                    // 隐藏字段
+                    // const list = res.data.filter(item => item.key !== 'title' && !item.is_builtin && item.key !== 'bk_biz_id')
                     this.fieldlist = res.data
                     this.publicFields = res.data
                 }).catch(res => {
@@ -542,7 +565,6 @@
                 } else {
                     this.updateServiceSource('custom')
                 }
-                this.showFieldOption = true
             },
             createServicePopoverShow () {
                 this.isDropdownShow = true
@@ -630,7 +652,7 @@
                             return
                         }
                         this.pending.deleteField = true
-
+                        this.crtForm = ''
                         const data = {
                             id: form.id,
                             params: {

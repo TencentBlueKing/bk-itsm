@@ -361,18 +361,18 @@
             closeSideslider (type) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: '是否保存修改',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        if (type === 'newTask') {
-                            this.$refs[type].submitTask()
-                        } else {
-                            this.$refs[type].handleSubmitClick()
-                        }
-                    },
-                    cancelFn: () => {
                         this.createInfo.isShow = false
                         this.taskLibrary.show = false
+                    },
+                    cancelFn: () => {
+                        if (type === 'newTask') {
+                            this.createInfo.isShow = true
+                        } else {
+                            this.taskLibrary.show = true
+                        }
                     }
                 })
             },

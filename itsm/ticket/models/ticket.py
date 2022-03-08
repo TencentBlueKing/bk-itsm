@@ -2397,19 +2397,24 @@ class Ticket(Model, BaseTicket):
 
         if return_format == "list":
             cxt = [
-                {"key": var["key"], "value": getattr(self, var["key"][start_from:], "")}
+                {"key": var["key"], "value": self.datetime_clean(getattr(self, var["key"][start_from:], ""))}
                 for var in TICKET_GLOBAL_VARIABLES
             ]
         else:
             cxt = {
-                "{0}{1}".format(prefix, var["key"]): getattr(
+                "{0}{1}".format(prefix, var["key"]): self.datetime_clean(getattr(
                     self, var["key"][start_from:], ""
-                )
+                ))
                 for var in TICKET_GLOBAL_VARIABLES
             }
 
         return cxt
 
+    def datetime_clean(self, value):
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return value
+    
     @property
     def sops_task_summary(self):
         """

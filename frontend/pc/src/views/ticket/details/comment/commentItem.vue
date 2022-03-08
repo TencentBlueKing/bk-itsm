@@ -17,19 +17,19 @@
                 <span>{{ $t('m["已被编辑"]') }}</span>
             </div>
             <div class="reply-praise">
-                <i class="bk-itsm-icon icon-pinglun" title="回复" @click="$emit('replyComment', curComment)"></i>
+                <i class="bk-itsm-icon icon-xiaoxi" title="回复" @click="$emit('replyComment', curComment)"></i>
                 <!-- <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i> -->
             </div>
         </div>
         <div class="comment-content">
-            <p>{{ curComment.content }}</p>
+            <div v-html="curComment.content"></div>
             <div
                 v-if="curComment.hasOwnProperty('parent_creator')"
                 class="comment-reply"
                 @click="jumpTargetComment(curComment)">
                 <div class="comment-message">
                     <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
-                    <p>{{ curComment.parent_content }}</p>
+                    <div v-html="curComment.parent_content"></div>
                 </div>
             </div>
         </div>

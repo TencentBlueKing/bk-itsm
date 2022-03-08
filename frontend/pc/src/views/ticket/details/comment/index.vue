@@ -37,7 +37,7 @@
                 <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
             </div>
             <div class="reply-content">
-                <p>{{ replyContent.content }}</p>
+                <div v-html="replyContent.content"></div>
             </div>
         </div>
         <editor
@@ -119,7 +119,7 @@
                         type: 'INSIDE',
                         icon: 'bk-itsm-icon icon-suoding common-color',
                         name: '内部评论',
-                        docs: '发布的评论仅内部人员可用'
+                        docs: '仅单据相关人员可发布的评论'
                     },
                     {
                         type: 'PUBLIC',
@@ -159,7 +159,6 @@
             getCommentHeight () {
                 const commentDom = document.querySelector('.wang-editor-template')
                 this.commentDomHeight = commentDom.clientHeight
-                console.log(this.commentDomHeight)
                 this.isShowCommentScroll = commentDom.clientHeight > 500
             },
             getBasicHeight () {
@@ -196,7 +195,7 @@
             },
             submitEdit () {
                 const _this = this.$refs.editorEdit.editor
-                const text = _this.txt.text()
+                const text = _this.txt.html()
                 this.editorEditData = ''
                 _this.txt.clear()
                 let url = ''
@@ -255,11 +254,15 @@
             },
             submit () {
                 // 评论内容
+                if (!this.isEditEditor) {
+                    this.repealReply()
+                    return
+                }
                 this.isShowEditor = false
                 this.isReplyComment = false
                 if (this.$refs.editorAdd) {
                     const _this = this.$refs.editorAdd.editor
-                    const text = _this.txt.text()
+                    const text = _this.txt.html()
                     this.editorData = ''
                     this.isShowSelect = true
                     _this.txt.clear()
@@ -271,11 +274,17 @@
                         users: []
                     }
                     if (text) {
-                        this.$store.dispatch('ticket/addTicketComment', params).then(res => {
-                            this.replyCommnetId = ''
-                            this.refreshComment()
-                            this.commentListDom.scrollTop = 0
-                        })
+                        try {
+                            this.$store.dispatch('ticket/addTicketComment', params).then(res => {
+                                this.replyCommnetId = ''
+                                this.refreshComment()
+                                this.commentListDom.scrollTop = 0
+                            })
+                        } catch (e) {
+                            console.log(e)
+                        } finally {
+                            this.isReplyComment = false
+                        }
                     }
                 }
             }
@@ -303,7 +312,7 @@
         color: #c4c6cc;
     }
     .wang-editor-template {
-        overflow: auto;
+        // overflow: auto;
         @include scroller;
         padding: 20px;
         .select-pattern {
