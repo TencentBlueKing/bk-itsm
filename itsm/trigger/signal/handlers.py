@@ -25,24 +25,35 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 __author__ = "蓝鲸智云"
 __copyright__ = "Copyright © 2012-2020 Tencent BlueKing. All Rights Reserved."
+
+from common.log import logger
 from itsm.trigger.models import Trigger, Action
 from itsm.trigger.rules.manager import TriggerRuleManager
 from itsm.component.constants import SOURCE_TICKET
 from .signals import post_action_finish
 
 
-def event_dispatcher(sender, source_type=SOURCE_TICKET, source_id=None, context=None, **kwargs):
+def event_dispatcher(
+    sender, source_type=SOURCE_TICKET, source_id=None, context=None, **kwargs
+):
     """
     :param sender:   {"signal":"真实信号", "sender": "发送者", "source_type":"规则类型", source_id}
-    :param context: 
-    :param kwargs: 
-    :return: 
+    :param context:
+    :param kwargs:
+    :return:
     """
     # first 根据sender的内容获取 trigger rules
     triggers = Trigger.objects.filter(**sender)
-
+    logger.info(
+        "[handlers->event_dispatcher] 收到一个触发器事件, source_type={}, sender={}, trigger_num={}".format(
+            source_type, sender, len(triggers)
+        )
+    )
     # 每个触发器进行各自的规则运行
     for trigger in triggers:
+        logger.info(
+            "[handlers->event_dispatcher] 正在执行触发器 -> name={}".format(trigger.name)
+        )
         rule_manager = TriggerRuleManager(trigger, source_type, source_id, context)
         rule_manager.run()
 
