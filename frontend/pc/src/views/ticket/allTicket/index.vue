@@ -90,7 +90,76 @@
                 </nav-title>
             </div>
         </template>
-       
+        <!-- 自定义tab -->
+        <bk-dialog v-model="showCustomTabEdit"
+            width="600"
+            :draggable="false"
+            theme="primary"
+            :mask-close="false"
+            title="这是标题"
+            @confirm="handleAddTabs"
+            @cancel="handleCloseTabs">
+            <bk-form
+                form-type="vertical"
+                :label-width="200"
+                :model="customTabForm">
+                <template>
+                    <bk-form-item label="自定义tab名称" :required="true">
+                        <bk-input v-model="customTabForm.name" :placeholder="'请输入名称'">
+                        </bk-input>
+                    </bk-form-item>
+                    <div
+                        v-for="(item, index) in customForm"
+                        :key="index">
+                        <bk-form-item :label="item.name" v-if="item.type === 'input'">
+                            <bk-input v-model="customTabForm[item.key]"
+                                :placeholder="item.placeholder">
+                            </bk-input>
+                        </bk-form-item>
+                        <bk-form-item :label="item.name" v-if="item.type === 'select'">
+                            <bk-select
+                                searchable
+                                :placeholder="item.placeholder"
+                                :show-select-all="item.multiSelect"
+                                :multiple="item.multiSelect"
+                                v-model="customTabForm[item.key]">
+                                <bk-option v-for="option in item.list"
+                                    :key="option.key"
+                                    :id="option.key"
+                                    :name="option.name">
+                                </bk-option>
+                            </bk-select>
+                        </bk-form-item>
+                        <bk-form-item :label="item.name" v-if="item.type === 'datetime'">
+                            <bk-date-picker
+                                style="width: 100%;"
+                                v-model="customTabForm[item.key]"
+                                :placeholder="item.placeholder"
+                                :type="'datetimerange'">
+                            </bk-date-picker>
+                        </bk-form-item>
+                        <!-- 级联类型 -->
+                        <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
+                            <bk-cascade
+                                style="width: 100%;"
+                                v-model="customTabForm[item.key]"
+                                :list="item.list"
+                                :check-any-level="true"
+                                clearable
+                                :ext-popover-cls="'custom-cls'">
+                            </bk-cascade>
+                        </bk-form-item>
+                        <!-- 人员 -->
+                        <bk-form-item :label="item.name" v-if="item.type === 'member'">
+                            <member-select
+                                v-model="customTabForm[item.key]"
+                                :multiple="false"
+                                :placeholder="item.placeholder"></member-select>
+                        </bk-form-item>
+                    </div>
+                </template>
+            </bk-form>
+        </bk-dialog>
         <!-- 导出 -->
         <export-ticket-dialog
             :is-show="isExportDialogShow"
@@ -101,7 +170,9 @@
         </export-ticket-dialog>
     </div>
 </template>
+<!-- 自定义tab 选择服务目录是只能选择下级目录 -->
 <script>
+    import memberSelect from '../../../views/commonComponent/memberSelect'
     import NavTitle from '@/components/common/layout/NavTitle'
     import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
     import TableContent from './tableContent'
@@ -115,7 +186,8 @@
             NavTitle,
             AdvancedSearch,
             TableContent,
-            ExportTicketDialog
+            ExportTicketDialog,
+            memberSelect
         },
         mixins: [ticketListMixins],
         props: {
@@ -238,7 +310,19 @@
                     event: [],
                     question: []
                 },
-                searchToggle: true // 点击搜索记录搜索是否添加记录
+                searchToggle: true, // 点击搜索记录搜索是否添加记录
+                isAddTab: false, // 点击tab +
+                showCustomTabEdit: false,
+                customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
+                customTabForm: {
+                    name: '',
+                    keyword: '',
+                    catalog_id: [],
+                    creator__in: [],
+                    current_processor: [],
+                    current_status__in: [],
+                    bk_biz_id: ''
+                }
             }
         },
         computed: {
@@ -267,21 +351,42 @@
                 this.getGlobalStatus()
                 this.getBusinessList()
             },
-            addPanel () {
-                console.log(this.$refs.advancedSearch[0].showMore = true)
-                // this.$refs.advancedSearchshowMove = true
-                this.serviceList.push({
-                    desc: '请求管理类相关服务',
-                    key: 'add',
-                    label: '新加的tab',
-                    name: '新加的tab',
-                    conditions: {}
+            handleAddTabs () {
+                console.log('add')
+            },
+            handleCloseTabs () {
+                console.log('close')
+            },
+            // 获取自定义tab列表
+            getProjectTabList () {
+                const params = {
+                    project_key: this.$route.query.project_id
+                }
+                this.$store.dispatch('project/getProjectTab', params).then(res => {
+                    console.log(res)
                 })
+            },
+            // 新增自定义tab
+            addProjectTab () {
+                const params = {
+                    name: 'test_1',
+                    desc: 'description_1',
+                    project_key: '0',
+                    conditions: {}
+                }
+                this.$store.dispatch('project/createProjectTab', params).then(res => {
+                    console.log(res)
+                })
+            },
+            addPanel () {
+                this.isAddTab = true
+                this.showCustomTabEdit = true
             },
             // 删除自定义tab
             closePanel (index, panel) {
-                const fixedTabs = ['request', 'change', 'event', 'question']
-                if (!fixedTabs.includes(panel.key)) {
+                // 固定tab
+                const fixedTabs = ['请求管理', '变更管理', '事件管理', '问题管理']
+                if (!fixedTabs.includes(panel.name)) {
                     this.serviceList.splice(index, 1)
                     this.$refs.advancedSearch[0].showMore = false
                 }
@@ -471,6 +576,17 @@
                 this.searchResultList[type].splice(index, 1)
             },
             handleSearch (params, toggle) {
+                if (this.isAddTab) {
+                    console.log(params)
+                    this.serviceList.push({
+                        desc: '请求管理类相关服务',
+                        key: 'add',
+                        label: '新加的tab',
+                        name: '新加的tab',
+                        conditions: {}
+                    })
+                }
+                this.isAddTab = false
                 this.searchToggle = toggle
                 this.pagination.limit = 10
                 this.pagination.current = 1
