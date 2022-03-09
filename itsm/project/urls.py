@@ -25,11 +25,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from rest_framework.routers import DefaultRouter
 
-from itsm.project.views import ProjectViewSet
+from itsm.project.views import ProjectViewSet, CostomTabViewSet
 
 
 routers = DefaultRouter(trailing_slash=True)
 
 routers.register(r"projects", ProjectViewSet, basename="projects")
+routers.register(r"tabs", CostomTabViewSet, basename="tabs")
 
 urlpatterns = routers.urls
