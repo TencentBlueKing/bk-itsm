@@ -87,6 +87,13 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "close" and obj.can_close(username):
             return True
 
+        if view.action == "exception_distribute":
+            if not Service.is_service_owner(obj.service_id, request.user.username):
+                self.message = _("抱歉，您无权执行此操作，因为您不是该服务的管理员")
+                return False
+            else:
+                return True
+
         if view.action == "operate":
             try:
                 node = obj.node_status.get(state_id=request.data.get("state_id"))

@@ -433,6 +433,8 @@ class Service(ObjectManagerMixin, Model):
         self.display_type = service_config["display_type"]
         self.display_role = dotted_name(service_config.get("display_role", ""))
         self.workflow_id = service_config["workflow_id"]
+        if "owners" in service_config:
+            self.owners = dotted_name(service_config["owners"])
         self.is_valid = True
         self.save()
 

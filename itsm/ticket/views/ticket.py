@@ -142,6 +142,7 @@ from itsm.ticket.serializers import (
     UnmergeTicketsSerializer,
     RecentlyTicketFilterSerializer,
     TicketList,
+    TicketStateOperateExceptionSerializer,
 )
 from itsm.ticket.tasks import clone_pipeline, start_pipeline
 from itsm.ticket.utils import (
@@ -1097,6 +1098,32 @@ class TicketModelViewSet(ModelViewSet):
         ticket = self.get_object()
 
         operate_serializer = TicketStateOperateSerializer(
+            request=request, ticket=ticket, operator=request.user.username
+        )
+        operate_serializer.is_valid(raise_exception=True)
+        data = operate_serializer.data
+
+        data["source"] = request.source
+        current_node = data["current_node"]
+        data["ticket"] = ticket
+        current_node.set_next_action(operator=request.user.username, **data)
+
+        return Response()
+
+    @action(detail=True, methods=["get"])
+    def can_exception_distribute(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        is_owner = Service.is_service_owner(ticket.service_id, request.user.username)
+        return Response({"can_exception_distribute": is_owner})
+
+    @action(detail=True, methods=["post"])
+    def exception_distribute(self, request, *args, **kwargs):
+        """
+        异常分派
+        """
+        ticket = self.get_object()
+
+        operate_serializer = TicketStateOperateExceptionSerializer(
             request=request, ticket=ticket, operator=request.user.username
         )
         operate_serializer.is_valid(raise_exception=True)

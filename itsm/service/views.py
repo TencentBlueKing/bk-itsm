@@ -594,7 +594,8 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
                 "notify_rule": "ONCE",
                 "is_supervise_needed": true,
                 "supervise_type": "EMPTY",
-                "supervisor": ""
+                "supervisor": "",
+                "owners":"",
             }
         }
         """

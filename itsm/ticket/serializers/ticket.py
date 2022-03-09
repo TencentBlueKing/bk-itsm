@@ -70,6 +70,7 @@ from itsm.component.constants import (
     START_STATE,
     STARTER,
     LEN_XXX_LONG,
+    EXCEPTION_DISTRIBUTE_OPERATE,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.exceptions import TriggerValidateError
@@ -1276,6 +1277,62 @@ class TicketStateOperateSerializer(serializers.Serializer):
 
         self.run_validators(data)
 
+        return validated_data
+
+    def to_representation(self, instance):
+        return self.validated_data
+
+
+class TicketStateOperateExceptionSerializer(serializers.Serializer):
+    choices = [(EXCEPTION_DISTRIBUTE_OPERATE, "异常分派")]
+    # 只支持异常分派
+    action_type = serializers.ChoiceField(choices=choices)
+    state_id = serializers.IntegerField(required=True)
+    processors = serializers.CharField(max_length=LEN_LONG, allow_blank=True)
+    processors_type = serializers.ChoiceField(choices=PROCESSOR_CHOICES)
+    action_message = serializers.CharField(required=False, max_length=LEN_LONG)
+
+    def __init__(self, *args, **kwargs):
+        self.ticket = kwargs.pop("ticket", None)
+        self.request = kwargs.pop("request", None)
+        self.operator = kwargs.pop("operator", None)
+
+        kwargs["data"] = self.request.data
+        super(TicketStateOperateExceptionSerializer, self).__init__(*args, **kwargs)
+
+    def to_internal_value(self, data):
+        data = super(TicketStateOperateExceptionSerializer, self).to_internal_value(
+            data
+        )
+
+        if "action_message" in data:
+            data["action_message"] = html_escape(data["action_message"])
+
+        data.update(source=self.request.source, ticket=self.ticket)
+
+        return data
+
+    def run_validation(self, data):
+        validated_data = super(
+            TicketStateOperateExceptionSerializer, self
+        ).run_validation(data)
+
+        try:
+            validated_data["current_node"] = self.ticket.node_status.get(
+                state_id=validated_data["state_id"]
+            )
+        except Status.DoesNotExist:
+            raise serializers.ValidationError(_("操作的任务不存在，请确认后再提交"))
+
+        # 校验节点操作的合法性
+        self.validators = [
+            StateOperateValidator(
+                validated_data["current_node"], bk_biz_id=self.ticket.bk_biz_id
+            )
+        ]
+
+        self.run_validators(data)
+        print(validated_data)
         return validated_data
 
     def to_representation(self, instance):
