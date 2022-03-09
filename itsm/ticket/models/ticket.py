@@ -3790,6 +3790,9 @@ class Ticket(Model, BaseTicket):
         context.update({"dst_ticket": self.id})
 
         try:
+            logger.info(
+                "[ticket->send_trigger_signal] 正在发送触发器事件, ticket_id={}".format(self.id)
+            )
             trigger_signal.send(
                 signal,
                 sender=sender,
@@ -3799,7 +3802,13 @@ class Ticket(Model, BaseTicket):
                 rule_source_id=self.flow.id,
                 rule_source_type=SOURCE_TICKET,
             )
+            logger.info(
+                "[ticket->send_trigger_signal] 触发器发送发生成功, ticket_id={}".format(self.id)
+            )
         except BaseException:
+            logger.info(
+                "[ticket->send_trigger_signal] 触发器事件发送失败, ticket_id={}".format(self.id)
+            )
             logger.exception(
                 _("触发器事件发送失败, ticket_sn {} signal ：{}").format(self.sn, signal)
             )

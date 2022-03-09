@@ -97,24 +97,16 @@
             },
             async handleApplyProject () {
                 const projectInfo = this.$store.state.project.projectInfo
-                if (this.$route.query.project_id) {
-                    const resourceData = {
-                        project: [{
-                            id: projectInfo.key || '--',
-                            name: projectInfo.name || '--'
-                        }]
-                    }
-                    this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData)
-                } else {
-                    const params = {
-                        'action': [],
-                        'system_id': 'itsm',
-                        'system_name': '流程服务'
-                    }
-                    const res = await this.$store.dispatch('common/getIamUrl', params)
-                    if (res.data) {
-                        window.open(res.data.url, '__blank')
-                    }
+                const resourceData = {
+                    project: [{
+                        id: projectInfo.key || '0',
+                        name: projectInfo.name || '默认项目'
+                    }]
+                }
+                const params = this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData, true)
+                const res = await this.$store.dispatch('common/getIamUrl', params)
+                if (res.data) {
+                    window.open(res.data.url, '__blank')
                 }
             }
         }

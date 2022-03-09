@@ -55,6 +55,7 @@ from itsm.component.drf.serializers import (
 from itsm.component.exceptions import ServiceCatalogValidateError, ServerError
 from itsm.component.utils.basic import dotted_name, list_by_separator, normal_name
 from itsm.component.utils.misc import transform_single_username
+from itsm.project.models import Project
 from itsm.service.models import (
     CatalogService,
     DictData,
@@ -830,3 +831,10 @@ class ServiceImportSerializer(serializers.Serializer):
         required=False, error_messages={"blank": _("服务负责人不能为空")}
     )
     workflow = WorkflowImportSerializer(required=True)
+
+    def validate(self, attrs):
+        project_key = attrs["project_key"]
+        if not Project.objects.filter(key=project_key).exists():
+            raise serializers.ValidationError(_("导入失败，project_key 对应的项目不存在"))
+
+        return attrs
