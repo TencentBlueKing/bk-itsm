@@ -176,7 +176,8 @@
                 }
             },
             // 当前服务
-            sereveType: {
+            // serviceType
+            serviceType: {
                 type: String,
                 default: ''
             }
@@ -201,7 +202,7 @@
                 return this.$store.state.openFunction
             },
             currTabSettingCache () {
-                return this.$store.state.ticket.settingCache['all_' + this.sereveType]
+                return this.$store.state.ticket.settingCache['all_' + this.serviceType]
             }
         },
         watch: {
@@ -359,7 +360,7 @@
                 this.setting.selectedFields = fields
                 const fieldIds = fields.map(m => m.id)
                 this.$store.commit('ticket/setSettingCache', {
-                    type: 'all_' + this.sereveType,
+                    type: 'all_' + this.serviceType,
                     value: { fields: fieldIds, size }
                 })
             },
