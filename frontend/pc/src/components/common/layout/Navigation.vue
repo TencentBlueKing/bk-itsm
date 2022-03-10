@@ -251,7 +251,6 @@
             // 侧边栏导航项
             sideNav () {
                 const list = []
-
                 this.sideRouters.forEach(router => {
                     if (router.id === 'sla') {
                         this.openFunction.SLA_SWITCH && list.push(router)
@@ -279,7 +278,15 @@
             },
             '$store.state.project.id' (val) {
                 if (val) {
+                    console.log(this.projectList)
                     this.selectedProject = val
+                }
+            },
+            projectList (val) {
+                if (val.length !== 0) {
+                    const current = val.find(item => item.key === this.$route.query.project_id)
+                    this.applyForProjectViewPerm(current, 'project_view')
+                    this.onSelectProject('0')
                 }
             },
             isEditDialogShow (val) {
@@ -312,6 +319,9 @@
                     this.$store.commit('project/setProjectListLoading', false)
                 }
             },
+            // getCurrent () {
+            //     this.projectList
+            // },
             // 高亮顶部和侧边栏导航项
             setActive () {
                 const hasMatched = this.routerList.some(nav => {
@@ -455,6 +465,8 @@
                 this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
             applyForProjectViewPerm (project, perm) {
+                // console.log(project, perm)
+                // debugger
                 if (!this.hasPermission([perm], project.auth_actions)) {
                     const resourceData = {
                         project: [{
