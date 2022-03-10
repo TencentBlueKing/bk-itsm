@@ -103,7 +103,7 @@ export default {
         },
         // 获取指定项目下的tab
         getProjectTab ({ commit }, params) {
-            return ajax.get('project/tabs/', params).then(response => response.data)
+            return ajax.get('project/tabs/', { params }).then(response => response.data)
         },
         // 编辑指定项目下的tab
         editProjectTab ({ commit }, params) {
@@ -111,9 +111,12 @@ export default {
             return ajax.patch(`project/tabs/${id}/`, params).then(response => response.data)
         },
         // 删除指定项目下的tab
-        deleteProjectTab ({ commit }, params) {
-            const { id } = params
-            return ajax.post(`project/tabs/${id}/`, params).then(response => response.data)
+        deleteProjectTab ({ commit }, id) {
+            return ajax.delete(`project/tabs/${id}/`).then(response => response.data)
         },
+        getProjectTabList({ commit }, params) {
+            const { page_size, page, ordering} = params
+            return ajax.post(`ticket/receipts/get_filter_tickets/?page_size=${ page_size }&page=${ page }&ordering=${ ordering }`, params).then(response => response.data)
+        }
     }
 }

@@ -41,7 +41,8 @@
                             <template slot="label">
                                 <div class="list-wrapper">
                                     <span>{{ panel.name }}</span>
-                                    <span class="ticket-file-count">{{ counts[panel.key] }}</span>
+                                    <span class="ticket-file-count">{{ counts[panel.key] || 0 }}</span>
+                                    <span v-if="!fixedTabs.includes(panel.name)" style="font-size: 16px" class="bk-itsm-icon icon-edit-new" @click.stop="editProjectTab(panel)"></span>
                                 </div>
                             </template>
                             <div class="ticket-content" v-if="sereveType === panel.key">
@@ -97,7 +98,7 @@
             theme="primary"
             :mask-close="false"
             title="这是标题"
-            @confirm="handleAddTabs"
+            @confirm="handleAddTabs('add')"
             @cancel="handleCloseTabs">
             <bk-form
                 form-type="vertical"
@@ -105,14 +106,16 @@
                 :model="customTabForm">
                 <template>
                     <bk-form-item label="自定义tab名称" :required="true">
-                        <bk-input v-model="customTabForm.name" :placeholder="'请输入名称'">
-                        </bk-input>
+                        <bk-input v-model="customTabForm.name" :placeholder="'请输入名称'"></bk-input>
+                    </bk-form-item>
+                    <bk-form-item label="描述信息" :required="true">
+                        <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="'请输入描述信息'"></bk-input>
                     </bk-form-item>
                     <div
                         v-for="(item, index) in customForm"
                         :key="index">
                         <bk-form-item :label="item.name" v-if="item.type === 'input'">
-                            <bk-input v-model="customTabForm[item.key]"
+                            <bk-input v-model="customTabForm.conditions[item.key]"
                                 :placeholder="item.placeholder">
                             </bk-input>
                         </bk-form-item>
@@ -122,7 +125,7 @@
                                 :placeholder="item.placeholder"
                                 :show-select-all="item.multiSelect"
                                 :multiple="item.multiSelect"
-                                v-model="customTabForm[item.key]">
+                                v-model="customTabForm.conditions[item.key]">
                                 <bk-option v-for="option in item.list"
                                     :key="option.key"
                                     :id="option.key"
@@ -133,7 +136,7 @@
                         <bk-form-item :label="item.name" v-if="item.type === 'datetime'">
                             <bk-date-picker
                                 style="width: 100%;"
-                                v-model="customTabForm[item.key]"
+                                v-model="customTabForm.conditions[item.key]"
                                 :placeholder="item.placeholder"
                                 :type="'datetimerange'">
                             </bk-date-picker>
@@ -142,7 +145,7 @@
                         <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
                             <bk-cascade
                                 style="width: 100%;"
-                                v-model="customTabForm[item.key]"
+                                v-model="customTabForm.conditions[item.key]"
                                 :list="item.list"
                                 :check-any-level="true"
                                 clearable
@@ -152,7 +155,7 @@
                         <!-- 人员 -->
                         <bk-form-item :label="item.name" v-if="item.type === 'member'">
                             <member-select
-                                v-model="customTabForm[item.key]"
+                                v-model="customTabForm.conditions[item.key]"
                                 :multiple="false"
                                 :placeholder="item.placeholder"></member-select>
                         </bk-form-item>
@@ -289,10 +292,12 @@
                 changeList: [],
                 eventList: [],
                 questionList: [],
+                customTabList: [],
                 requestLoading: false,
                 changeLoading: false,
                 eventLoading: false,
                 questionLoading: false,
+                customTabLoading: false,
                 pagination: {
                     current: 1,
                     count: 10,
@@ -311,26 +316,32 @@
                     question: []
                 },
                 searchToggle: true, // 点击搜索记录搜索是否添加记录
-                isAddTab: false, // 点击tab +
                 showCustomTabEdit: false,
+                customList: [],
+                isEditTab: false,
+                editTabId: '',
+                fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
                 customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
                 customTabForm: {
                     name: '',
-                    keyword: '',
-                    catalog_id: [],
-                    creator__in: [],
-                    current_processor: [],
-                    current_status__in: [],
-                    bk_biz_id: ''
+                    desc: '',
+                    conditions: {
+                        keyword: '',
+                        catalog_id: [],
+                        creator__in: [],
+                        current_processor: [],
+                        current_status__in: [],
+                        bk_biz_id: ''
+                    }
                 }
             }
         },
         computed: {
             tableLoading () {
-                return this[`${this.sereveType}Loading`]
+                return this[`${this.sereveType}Loading`] || this.customTabLoading
             },
             dataList () {
-                return this[`${this.sereveType}List`]
+                return this[`${this.sereveType}List`] || this.customTabList
             }
         },
         created () {
@@ -350,45 +361,89 @@
                 // 获取全局视图状态
                 this.getGlobalStatus()
                 this.getBusinessList()
+                this.getProjectTabList()
             },
             handleAddTabs () {
-                console.log('add')
+                const params = {
+                    name: this.customTabForm.name,
+                    desc: this.customTabForm.desc,
+                    conditions: this.customTabForm.conditions
+                }
+                let url = 'project/createProjectTab'
+                if (this.isEditTab) {
+                    params.id = this.editTabId
+                    url = 'project/editProjectTab'
+                } else {
+                    params.project_key = this.$route.query.project_id
+                }
+                this.$store.dispatch(url, params).then(res => {
+                    if (Object.keys(res.data).length !== 0) {
+                        this.$set(this.counts, res.data.id, 0)
+                        console.log(this.counts)
+                        this.getProjectTabList()
+                        this.editTabId = ''
+                    }
+                })
             },
             handleCloseTabs () {
                 console.log('close')
             },
             // 获取自定义tab列表
             getProjectTabList () {
+                this.customList = []
+                this.isEditTab = false
                 const params = {
                     project_key: this.$route.query.project_id
                 }
                 this.$store.dispatch('project/getProjectTab', params).then(res => {
-                    console.log(res)
+                    res.data.forEach(item => {
+                        item.key = String(item.id)
+                        this.customList.push(item)
+                    })
+                    this.serviceList.splice(4)
+                    this.customList.forEach(ite => {
+                        this.serviceList.push(ite)
+                    })
+                }).catch(e => {
+                    console.log(e)
                 })
+            },
+            editProjectTab (panel) {
+                this.isEditTab = true
+                this.editTabId = panel.id
+                this.showCustomTabEdit = true
+                this.customTabForm.name = panel.name
+                this.customTabForm.desc = panel.desc
+                this.customTabForm.conditions = panel.conditions
             },
             // 新增自定义tab
-            addProjectTab () {
-                const params = {
-                    name: 'test_1',
-                    desc: 'description_1',
-                    project_key: '0',
-                    conditions: {}
-                }
-                this.$store.dispatch('project/createProjectTab', params).then(res => {
-                    console.log(res)
-                })
-            },
             addPanel () {
-                this.isAddTab = true
+                // this.isAddTab = true
+                this.isEditTab = false
+                this.customTabForm = {
+                    name: '',
+                    desc: '',
+                    conditions: {
+                        keyword: '',
+                        catalog_id: [],
+                        creator__in: [],
+                        current_processor: [],
+                        current_status__in: [],
+                        bk_biz_id: ''
+                    }
+                }
                 this.showCustomTabEdit = true
             },
             // 删除自定义tab
             closePanel (index, panel) {
                 // 固定tab
-                const fixedTabs = ['请求管理', '变更管理', '事件管理', '问题管理']
-                if (!fixedTabs.includes(panel.name)) {
-                    this.serviceList.splice(index, 1)
-                    this.$refs.advancedSearch[0].showMore = false
+                if (!this.fixedTabs.includes(panel.name)) {
+                    this.$store.dispatch('project/deleteProjectTab', this.serviceList[index].id).then(res => {
+                        if (res.result) {
+                            this.serviceList.splice(index, 1)
+                            this.getProjectTabList()
+                        }
+                    })
                 }
             },
             // 获取所有服务类型列表
@@ -414,8 +469,7 @@
                 })
             },
             // 获取所有单据列表
-            getAllTicketList (type = this.sereveType) {
-                this[`${type}Loading`] = true
+            getAllTicketList (type = this.sereveType, sereve) {
                 const fixParams = {
                     page_size: this.pagination.limit,
                     page: this.pagination.current,
@@ -424,20 +478,44 @@
                     view_type: '',
                     service_type: type
                 }
+                const excludeList = ['request', 'change', 'event', 'question']
+                let url = 'change/getList'
                 // 项目下的所有单据
                 if (this.projectId) {
                     fixParams.project_key = this.projectId
                 }
-
+                if (!excludeList.includes(type)) {
+                    this.customTabLoading = true
+                    console.log(sereve)
+                    url = 'project/getProjectTabList'
+                    fixParams.project_key = this.$route.query.project_id
+                    fixParams.tab_conditions = {
+                        'bk_biz_id': sereve.conditions.bk_biz_id || undefined,
+                        'catalog_id': sereve.conditions.catalog_id.slice(-1).join() || undefined,
+                        'creator__in': sereve.conditions.creator__in || undefined,
+                        'current_processor': sereve.conditions.current_processor.join() || undefined,
+                        'current_status__in': sereve.conditions.current_status__in || undefined,
+                        'keyword': sereve.conditions.keyword || undefined
+                    }
+                    fixParams.extra_conditions = {}
+                } else {
+                    this[`${type}Loading`] = true
+                }
                 const searchParams = JSON.stringify(this.searchParams) === '{}'
                     ? { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
                     : this.searchParams
                 Object.assign(fixParams, searchParams)
-                return this.$store.dispatch('change/getList', fixParams).then(res => {
-                    this[`${type}List`] = res.data.items
-                    // 异步加载列表中的某些字段信息
-                    this.__asyncReplaceTicketListAttr(this[`${type}List`])
-                    this.$set(this.counts, type, res.data.count)
+                return this.$store.dispatch(url, fixParams).then(res => {
+                    if (!excludeList.includes(type)) {
+                        console.log(sereve.key)
+                        this.$set(this.counts, sereve.key, res.data.count)
+                        this.customTabList = res.data.items
+                    } else {
+                        this[`${type}List`] = res.data.items
+                        // 异步加载列表中的某些字段信息
+                        this.__asyncReplaceTicketListAttr(this[`${type}List`])
+                        this.$set(this.counts, type, res.data.count)
+                    }
                     // 分页
                     this.pagination.current = res.data.page
                     if (this.sereveType === type) {
@@ -450,6 +528,7 @@
                     })
                 }).finally(() => {
                     this[`${type}Loading`] = false
+                    this.customTabLoading = false
                 })
             },
             // 获取所有tab的单据列表
@@ -543,6 +622,7 @@
             },
             // 切换不同的标签卡
             changeTag (val) {
+                // console.log('点击选项卡', val)
                 this.pagination.limit = 10
                 this.pagination.current = 1
                 this.searchParams = {}
@@ -553,19 +633,12 @@
                 const service = this.serviceList.find(item => item.name === val)
                 this.sereveType = service.key
                 this.getServiceTree()
-                this.getAllTicketList(service.key)
+                this.getAllTicketList(service.key, service)
             },
             // 导出弹框
             openExportList () {
                 this.isExportDialogShow = true
             },
-            // 预警单据变化
-            // onWarnTicketChange (val) {
-            // },
-            // 超时单据变化
-            // onTimeoutTicketChange (val) {
-            // },
-            // 查询
             // 处理搜索结果
             handleSearchResult (params) {
                 if (Object.keys(params).length === 0 || !this.searchToggle) return
@@ -576,17 +649,7 @@
                 this.searchResultList[type].splice(index, 1)
             },
             handleSearch (params, toggle) {
-                if (this.isAddTab) {
-                    console.log(params)
-                    this.serviceList.push({
-                        desc: '请求管理类相关服务',
-                        key: 'add',
-                        label: '新加的tab',
-                        name: '新加的tab',
-                        conditions: {}
-                    })
-                }
-                this.isAddTab = false
+                // this.isAddTab = false
                 this.searchToggle = toggle
                 this.pagination.limit = 10
                 this.pagination.current = 1
