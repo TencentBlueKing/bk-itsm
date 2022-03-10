@@ -389,6 +389,8 @@ class Status(Model):
         """
         Determine whether sign node finished
         """
+        if not finish_condition:
+            finish_condition = {"expressions": [], "type": "or"}
         conditions = conditions_conversion(finish_condition)
         # 如果未配置条件就不需要进行规则判断，直接判定is_finished为False
         if conditions:
@@ -2397,14 +2399,19 @@ class Ticket(Model, BaseTicket):
 
         if return_format == "list":
             cxt = [
-                {"key": var["key"], "value": self.datetime_clean(getattr(self, var["key"][start_from:], ""))}
+                {
+                    "key": var["key"],
+                    "value": self.datetime_clean(
+                        getattr(self, var["key"][start_from:], "")
+                    ),
+                }
                 for var in TICKET_GLOBAL_VARIABLES
             ]
         else:
             cxt = {
-                "{0}{1}".format(prefix, var["key"]): self.datetime_clean(getattr(
-                    self, var["key"][start_from:], ""
-                ))
+                "{0}{1}".format(prefix, var["key"]): self.datetime_clean(
+                    getattr(self, var["key"][start_from:], "")
+                )
                 for var in TICKET_GLOBAL_VARIABLES
             }
 
@@ -2412,9 +2419,9 @@ class Ticket(Model, BaseTicket):
 
     def datetime_clean(self, value):
         if isinstance(value, datetime):
-            return value.strftime('%Y-%m-%d %H:%M:%S')
+            return value.strftime("%Y-%m-%d %H:%M:%S")
         return value
-    
+
     @property
     def sops_task_summary(self):
         """
