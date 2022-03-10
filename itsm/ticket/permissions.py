@@ -74,6 +74,7 @@ class TicketPermissionValidate(permissions.BasePermission):
             "send_email",
             "master_or_slave",
             "add_follower",
+            "can_exception_distribute",
         ]:
             return True
 

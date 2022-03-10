@@ -550,13 +550,14 @@ class TicketTest(TestCase):
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
 
-        service = Service.objects.get(id=1)
+        service = Service.objects.get(name="帐号开通申请")
+        print("service name === {}".format(service.name))
         service.owners = ",admin,"
         service.save()
 
         data = {
             "catalog_id": 3,
-            "service_id": 1,
+            "service_id": service.id,
             "service_type": "request",
             "fields": [
                 {
@@ -590,9 +591,15 @@ class TicketTest(TestCase):
         rsp = self.client.post(
             path=url, data=json.dumps(data), content_type="application/json"
         )
+        self.assertEqual(rsp.status_code, 201)
+        self.assertEqual(rsp.data["result"], True)
         ticket_id = rsp.data["data"]["id"]
         ticket = Ticket.objects.get(id=ticket_id)
         current_steps = ticket.current_steps
+        print("current_steps === {}".format(current_steps))
+        if not current_steps:
+            return
+
         state_id = current_steps[0]["state_id"]
 
         data = {
