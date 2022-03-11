@@ -462,7 +462,7 @@
                 }
                 this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
-            applyForProjectViewPerm (project, perm) {
+            applyForProjectViewPerm (project, perm, ret = false) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
                     const resourceData = {
                         project: [{

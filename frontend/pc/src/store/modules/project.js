@@ -96,6 +96,27 @@ export default {
         // 更改默认项目
         changeDefaultProject ({ commit }, id) {
             return ajax.post(`project/projects/${id}/update_project_record/`)
+        },
+        // 创建指定项目下的tab
+        createProjectTab ({ commit }, params) {
+            return ajax.post('project/tabs/', params).then(response => response.data)
+        },
+        // 获取指定项目下的tab
+        getProjectTab ({ commit }, params) {
+            return ajax.get('project/tabs/', { params }).then(response => response.data)
+        },
+        // 编辑指定项目下的tab
+        editProjectTab ({ commit }, params) {
+            const { id } = params
+            return ajax.patch(`project/tabs/${id}/`, params).then(response => response.data)
+        },
+        // 删除指定项目下的tab
+        deleteProjectTab ({ commit }, id) {
+            return ajax.delete(`project/tabs/${id}/`).then(response => response.data)
+        },
+        getProjectTabList({ commit }, params) {
+            const { page_size, page, ordering} = params
+            return ajax.post(`ticket/receipts/get_filter_tickets/?page_size=${ page_size }&page=${ page }&ordering=${ ordering }`, params).then(response => response.data)
         }
     }
 }
