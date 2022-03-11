@@ -528,9 +528,17 @@ class TicketTest(TestCase):
     )
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_exception_distribute(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.auth_iam.utils.IamRequest")
+    def test_exception_distribute(
+        self, patch_misc_get_bk_users, path_get_bk_users, patch_iam_request
+    ):
+
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
+        patch_iam_request.resource_multi_actions_allowed.return_value = {
+            "ticket_manage",
+            True,
+        }
 
         service = Service.objects.get(name="帐号开通申请")
         print("service name === {}".format(service.name))
