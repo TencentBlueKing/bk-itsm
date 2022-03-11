@@ -194,7 +194,20 @@
                     return {}
                 }
             },
-            panel: String
+            panel: String,
+            curServcie: Object,
+            isCustomTab: {
+                type: Boolean,
+                default () {
+                    return false
+                }
+            },
+            isEditTab: {
+                type: Boolean,
+                default () {
+                    return false
+                }
+            }
         },
         data () {
             return {
@@ -231,6 +244,9 @@
                 } else {
                     return []
                 }
+            },
+            isfilter () {
+                return this.isCustomTab
             }
         },
         watch: {
@@ -290,8 +306,26 @@
                     params.project_key = this.$route.query.project_id
                 }
                 const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
+                const result = res.data[0] ? res.data[0]['children'] : []
                 const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                formItem.list = res.data[0] ? res.data[0]['children'] : []
+                if (this.isfilter) {
+                    const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
+                    formItem.list = list
+                } else {
+                    formItem.list = res.data[0] ? res.data[0]['children'] : []
+                }
+            },
+            getTreebyId (list, id) {
+                for (let i = 0; i < list.length; i++) {
+                    const node = list[i]
+                    if (node.id === id) {
+                        return node
+                    } else {
+                        if (node.children && node.children.length > 0) {
+                            this.getTreebyId(node.children, id)
+                        }
+                    }
+                }
             },
             getParams () {
                 const params = {}
