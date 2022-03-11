@@ -33,7 +33,7 @@ from blueapps.core.celery.celery import app
 from django.test import TestCase, override_settings
 from django.core.cache import cache
 
-from itsm.service.models import CatalogService
+from itsm.service.models import CatalogService, Service
 from itsm.ticket.models import Ticket, Status, AttentionUsers
 from itsm.component.constants import APPROVAL_STATE
 
@@ -522,3 +522,99 @@ class TicketTest(TestCase):
             cache.get("approval_status_{}_{}_{}".format("admin", ticket.id, "111")),
             None,
         )
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    def test_can_exception_distribute(self):
+        ticket = Ticket.objects.create(
+            sn="123", title="test", service_id=1, service_type="change"
+        )
+        url = "/api/ticket/receipts/{}/can_exception_distribute/".format(ticket.id)
+        rsp = self.client.get(path=url, content_type="application/json")
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], True)
+        self.assertEqual(rsp.data["data"]["can_exception_distribute"], False)
+
+        service = Service.objects.get(id=1)
+
+        service.owners = ",admin,"
+        service.save()
+
+        url = "/api/ticket/receipts/{}/can_exception_distribute/".format(ticket.id)
+        rsp = self.client.get(path=url, content_type="application/json")
+        self.assertEqual(rsp.data["data"]["can_exception_distribute"], True)
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_exception_distribute(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        service = Service.objects.get(name="帐号开通申请")
+        print("service name === {}".format(service.name))
+        service.owners = ",admin,"
+        service.save()
+
+        data = {
+            "catalog_id": 3,
+            "service_id": service.id,
+            "service_type": "request",
+            "fields": [
+                {
+                    "type": "STRING",
+                    "id": 1,
+                    "key": "title",
+                    "value": "test_ticket",
+                    "choice": [],
+                },
+                {
+                    "type": "STRING",
+                    "id": 5,
+                    "key": "apply_content",
+                    "value": "111",
+                },
+                {
+                    "type": "STRING",
+                    "key": "ZHIDINGSHENPIREN",
+                    "value": "111",
+                },
+                {
+                    "type": "STRING",
+                    "key": "apply_reason",
+                    "value": "test",
+                },
+            ],
+            "creator": "admin",
+            "attention": True,
+        }
+        url = "/api/ticket/receipts/"
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(rsp.status_code, 201)
+        self.assertEqual(rsp.data["result"], True)
+        ticket_id = rsp.data["data"]["id"]
+        ticket = Ticket.objects.get(id=ticket_id)
+        current_steps = ticket.current_steps
+        print("current_steps === {}".format(current_steps))
+        if not current_steps:
+            return
+
+        state_id = current_steps[0]["state_id"]
+
+        data = {
+            "state_id": state_id,
+            "action_type": "EXCEPTION_DISTRIBUTE",
+            "processors": "admin1",
+            "processors_type": "PERSON",
+        }
+
+        url = "/api/ticket/receipts/{}/exception_distribute/".format(ticket_id)
+        rsp = self.client.post(
+            path=url, data=json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(rsp.status_code, 200)
+        self.assertEqual(rsp.data["result"], True)
+        ticket.refresh_from_db()
+
+        self.assertEqual(ticket.current_steps[0]["processors"], "admin1")

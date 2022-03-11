@@ -251,7 +251,6 @@
             // 侧边栏导航项
             sideNav () {
                 const list = []
-
                 this.sideRouters.forEach(router => {
                     if (router.id === 'sla') {
                         this.openFunction.SLA_SWITCH && list.push(router)
@@ -280,6 +279,13 @@
             '$store.state.project.id' (val) {
                 if (val) {
                     this.selectedProject = val
+                }
+            },
+            projectList (val) {
+                if (val.length !== 0) {
+                    const current = val.find(item => item.key === this.$route.query.project_id)
+                    this.applyForProjectViewPerm(current, 'project_view')
+                    this.onSelectProject('0')
                 }
             },
             isEditDialogShow (val) {

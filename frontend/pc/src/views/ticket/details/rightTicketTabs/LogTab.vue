@@ -173,7 +173,9 @@
                                 ticket_id: this.ticketInfo.id,
                                 type: 'primary'
                             }
-                            this.list.push(processor)
+                            if (item.status === 'RUNNING') {
+                                this.list.push(processor)
+                            }
                         })
                     }
                 })

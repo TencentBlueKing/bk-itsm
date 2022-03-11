@@ -749,6 +749,9 @@ class ServiceConfigSerializer(serializers.Serializer):
     can_ticket_agency = serializers.BooleanField(required=True)
     display_type = serializers.ChoiceField(required=True, choices=DISPLAY_CHOICES)
     display_role = serializers.CharField(required=False, max_length=LEN_LONG)
+    owners = serializers.CharField(
+        required=False, error_messages={"blank": _("服务负责人不能为空")}
+    )
 
     def validate(self, attrs):
         if attrs["display_type"] == OPEN:
