@@ -523,32 +523,22 @@ class TicketTest(TestCase):
             None,
         )
 
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_can_exception_distribute(self):
-        ticket = Ticket.objects.create(
-            sn="123", title="test", service_id=1, service_type="change"
-        )
-        url = "/api/ticket/receipts/{}/can_exception_distribute/".format(ticket.id)
-        rsp = self.client.get(path=url, content_type="application/json")
-        self.assertEqual(rsp.status_code, 200)
-        self.assertEqual(rsp.data["result"], True)
-        self.assertEqual(rsp.data["data"]["can_exception_distribute"], False)
-
-        service = Service.objects.get(id=1)
-
-        service.owners = ",admin,"
-        service.save()
-
-        url = "/api/ticket/receipts/{}/can_exception_distribute/".format(ticket.id)
-        rsp = self.client.get(path=url, content_type="application/json")
-        self.assertEqual(rsp.data["data"]["can_exception_distribute"], True)
-
-    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @override_settings(
+        MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",), ENVIRONMENT="dev"
+    )
     @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
     @mock.patch("itsm.component.utils.misc.get_bk_users")
-    def test_exception_distribute(self, patch_misc_get_bk_users, path_get_bk_users):
+    @mock.patch("itsm.auth_iam.utils.IamRequest")
+    def test_exception_distribute(
+        self, patch_misc_get_bk_users, path_get_bk_users, patch_iam_request
+    ):
+
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
+        patch_iam_request.resource_multi_actions_allowed.return_value = {
+            "ticket_manage",
+            True,
+        }
 
         service = Service.objects.get(name="帐号开通申请")
         print("service name === {}".format(service.name))
