@@ -2253,6 +2253,9 @@
                         },
                         {
                             "id": "sla_manage"
+                        },
+                        {
+                            "id": "ticket_manage"
                         }
                     ],
                     "sub_groups": [
@@ -2452,9 +2455,6 @@
                             {
                                 "id": "ticket_view",
                                 "required": true
-                            },
-                            {
-                                "id": "ticket_manage"
                             }
                         ]
                     },
