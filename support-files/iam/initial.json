@@ -2452,15 +2452,15 @@
                             {
                                 "id": "ticket_view",
                                 "required": true
+                            },
+                            {
+                                "id": "ticket_manage"
                             }
                         ]
                     },
                     {
                         "id": "workflow",
                         "actions": [
-                            {
-                                "id": "ticket_manage"
-                            },
                             {
                                 "id": "workflow_manage",
                                 "required": true
