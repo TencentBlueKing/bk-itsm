@@ -282,10 +282,12 @@
                 }
             },
             projectList (val) {
-                if (val.length !== 0) {
+                if (val.length !== 0 && this.$route.query.project_id) {
                     const current = val.find(item => item.key === this.$route.query.project_id)
-                    this.applyForProjectViewPerm(current, 'project_view')
-                    // this.onSelectProject('0')
+                    const result = this.applyForProjectViewPerm(current, 'project_view')
+                    if (!result) {
+                        this.onSelectProject('0')
+                    }
                 }
             },
             isEditDialogShow (val) {
@@ -468,8 +470,10 @@
                             name: project.name
                         }]
                     }
-                    this.applyForPermission([perm], project.auth_actions, resourceData, ret)
+                    this.applyForPermission([perm], project.auth_actions, resourceData)
+                    return false
                 }
+                return true
             },
             handleCreateProject () {
                 if (!this.hasPermission(['project_create'])) {
