@@ -58,6 +58,8 @@
                                         ref="advancedSearch"
                                         :forms="searchForms"
                                         :panel="panel.key"
+                                        :cur-servcie="panel"
+                                        :is-custom-tab="isCustomTab"
                                         :search-result-list="searchResultList"
                                         @search="handleSearch"
                                         @deteleSearchResult="deteleSearchResult"
@@ -326,6 +328,7 @@
                 customList: [],
                 curService: '',
                 isEditTab: false,
+                isCustomTab: false,
                 editTabId: '',
                 fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
                 customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
@@ -417,10 +420,15 @@
                         if (Object.keys(res.data).length !== 0) {
                             this.$set(this.counts, res.data.id, 0)
                             this.getProjectTabList()
-                            this.editTabId = ''
-                            this.showCustomTabEdit = false
                         }
                     })
+                }).finally(e => {
+                    if (this.isEditTab) {
+                        this.currentTab = this.customTabForm.name
+                        this.getAllTabTicketList(this.editTabId)
+                        this.editTabId = ''
+                        this.showCustomTabEdit = false
+                    }
                 })
             },
             handleCloseTabs () {
@@ -460,6 +468,8 @@
             },
             editProjectTab (panel) {
                 this.isEditTab = true
+                this.isCustomTab = false
+                this.getServiceTree(true)
                 this.editTabId = panel.id
                 this.customTabForm.name = panel.name
                 this.customTabForm.desc = panel.desc
@@ -472,6 +482,8 @@
             // 新增自定义tab
             addPanel () {
                 // this.isAddTab = true
+                this.isCustomTab = false
+                this.getServiceTree(true)
                 this.isEditTab = false
                 this.customTabForm = {
                     name: '',
@@ -485,6 +497,7 @@
                         bk_biz_id: ''
                     }
                 }
+                
                 this.showCustomTabEdit = true
             },
             // 删除自定义tab
@@ -597,28 +610,31 @@
                 })
             },
             // 查询级联数据
-            getServiceTree () {
+            getServiceTree (type) {
                 const params = {
-                    key: this.serviceType,
                     show_deleted: true
+                }
+                if (!type) {
+                    params.key = this.serviceType
                 }
                 if (this.projectId) {
                     params.project_key = this.projectId
                 }
                 this.$store.dispatch('serviceCatalog/getTreeData', params).then(res => {
                     const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                    const current = this.serviceList.find(item => item.key === this.serviceType)
-                    if (!this.fixedTabs.includes(current.name)) {
-                        const list = []
-                        this.searchForms.forEach(item => {
-                            if (item.key === 'catalog_id') {
-                                list.push(this.getTreebyId(item.list, current.conditions.catalog_id[0]))
-                            }
-                        })
-                        formItem.list = list
-                    } else {
-                        formItem.list = res.data[0] ? res.data[0]['children'] : []
-                    }
+                    formItem.list = res.data[0] ? res.data[0]['children'] : []
+                    // const current = this.serviceList.find(item => item.key === this.serviceType)
+                    // if (!this.fixedTabs.includes(current.name)) {
+                    //     const list = []
+                    //     this.searchForms.forEach(item => {
+                    //         if (item.key === 'catalog_id') {
+                    //             list.push(this.getTreebyId(item.list, current.conditions.catalog_id[0]))
+                    //         }
+                    //     })
+                    //     formItem.list = list
+                    // } else {
+                    //     formItem.list = res.data[0] ? res.data[0]['children'] : []
+                    // }
                 }).catch((res) => {
                     this.$bkMessage({
                         message: res.data.msg,
@@ -698,7 +714,12 @@
                 })
                 this.curService = this.serviceList.find(item => item.name === val)
                 this.serviceType = this.curService.key
-                this.getServiceTree()
+                if (this.fixedTabs.includes(this.curService.name)) {
+                    this.getServiceTree()
+                    this.isCustomTab = false
+                } else {
+                    this.isCustomTab = true
+                }
                 this.getAllTicketList(this.serviceType)
             },
             // 导出弹框
