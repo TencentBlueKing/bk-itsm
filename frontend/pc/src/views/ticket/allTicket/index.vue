@@ -27,6 +27,7 @@
                 <nav-title :title-name="titleName">
                     <bk-tab
                         addable
+                        closable
                         :sortable="true"
                         :sort-type="'insert'"
                         :active.sync="currentTab"
@@ -344,6 +345,7 @@
                         }
                     ]
                 },
+                customCatalog: '',
                 customTabForm: {
                     name: '',
                     desc: '',
@@ -385,6 +387,18 @@
                 this.getBusinessList()
                 this.getProjectTabList()
             },
+            getTreebyId (list, id) {
+                for (let i = 0; i < list.length; i++) {
+                    const node = list[i]
+                    if (node.id === id) {
+                        return node
+                    } else {
+                        if (node.children && node.children.length > 0) {
+                            this.getTreebyId(node.children, id)
+                        }
+                    }
+                }
+            },
             handleAddTabs () {
                 this.$refs.customFrom.validate().then(res => {
                     const params = {
@@ -402,7 +416,6 @@
                     this.$store.dispatch(url, params).then(res => {
                         if (Object.keys(res.data).length !== 0) {
                             this.$set(this.counts, res.data.id, 0)
-                            console.log(this.counts)
                             this.getProjectTabList()
                             this.editTabId = ''
                             this.showCustomTabEdit = false
@@ -454,7 +467,7 @@
                 this.showCustomTabEdit = true
             },
             sortChange (dragTabIndex, dropTabIndex) {
-                console.log(dragTabIndex, dropTabIndex)
+                // console.log(dragTabIndex, dropTabIndex)
             },
             // 新增自定义tab
             addPanel () {
@@ -518,12 +531,17 @@
                     view_type: '',
                     service_type: type
                 }
-                console.log(this.curService)
                 const excludeList = ['request', 'change', 'event', 'question']
                 let url = 'change/getList'
                 // 项目下的所有单据
                 if (this.projectId) {
                     fixParams.project_key = this.projectId
+                }
+                let searchParams
+                if (JSON.stringify(this.searchParams) === '{}') {
+                    searchParams = { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
+                } else {
+                    searchParams = this.searchParams
                 }
                 if (!excludeList.includes(type)) {
                     this.customTabLoading = true
@@ -538,14 +556,11 @@
                         'keyword': this.curService.conditions.keyword || undefined
                     }
                     fixParams.extra_conditions = {}
+                    Object.assign(fixParams.tab_conditions, searchParams)
                 } else {
                     this[`${type}Loading`] = true
+                    Object.assign(fixParams, searchParams)
                 }
-                // debugger
-                const searchParams = JSON.stringify(this.searchParams) === '{}'
-                    ? { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
-                    : this.searchParams
-                Object.assign(fixParams, searchParams)
                 return this.$store.dispatch(url, fixParams).then(res => {
                     if (!excludeList.includes(type)) {
                         // this.$set(this.counts, service.key, res.data.count)
@@ -592,7 +607,18 @@
                 }
                 this.$store.dispatch('serviceCatalog/getTreeData', params).then(res => {
                     const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                    formItem.list = res.data[0] ? res.data[0]['children'] : []
+                    const current = this.serviceList.find(item => item.key === this.serviceType)
+                    if (!this.fixedTabs.includes(current.name)) {
+                        const list = []
+                        this.searchForms.forEach(item => {
+                            if (item.key === 'catalog_id') {
+                                list.push(this.getTreebyId(item.list, current.conditions.catalog_id[0]))
+                            }
+                        })
+                        formItem.list = list
+                    } else {
+                        formItem.list = res.data[0] ? res.data[0]['children'] : []
+                    }
                 }).catch((res) => {
                     this.$bkMessage({
                         message: res.data.msg,
