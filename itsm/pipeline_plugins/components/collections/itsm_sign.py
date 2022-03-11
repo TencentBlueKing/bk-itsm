@@ -140,10 +140,11 @@ class ItsmSignService(ItsmBaseService):
 
         key_value = node_status.get_sign_key_value(ticket, code_key)
         reject_count = node_status.sign_reject_count()
-        if reject_count > 0:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "false"
-        else:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "true"
+        if NODE_APPROVE_RESULT in code_key:
+            if reject_count > 0:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "false"
+            else:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "true"
         key_value.update(approver_key_value)
         return key_value
 
