@@ -284,8 +284,10 @@
             projectList (val) {
                 if (val.length !== 0) {
                     const current = val.find(item => item.key === this.$route.query.project_id)
-                    this.applyForProjectViewPerm(current, 'project_view')
-                    this.onSelectProject('0')
+                    const result = this.applyForProjectViewPerm(current, 'project_view')
+                    if (!result) {
+                        this.onSelectProject('0')
+                    }
                 }
             },
             isEditDialogShow (val) {
@@ -469,7 +471,9 @@
                         }]
                     }
                     this.applyForPermission([perm], project.auth_actions, resourceData)
+                    return false
                 }
+                return true
             },
             handleCreateProject () {
                 if (!this.hasPermission(['project_create'])) {
