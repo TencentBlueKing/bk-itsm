@@ -128,6 +128,10 @@ class ItsmSignService(ItsmBaseService):
 
     @staticmethod
     def get_key_value(node_status, ticket, code_key):
+        if node_status.state["type"] == "SIGN":
+            key_value = node_status.get_sign_key_value(ticket, code_key)
+            return key_value
+
         approver_key_value = node_status.get_appover_key_value(code_key)
         is_multi = node_status.state["is_multi"]
         if not is_multi:
@@ -140,15 +144,20 @@ class ItsmSignService(ItsmBaseService):
 
         key_value = node_status.get_sign_key_value(ticket, code_key)
         reject_count = node_status.sign_reject_count()
-        if reject_count > 0:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "false"
-        else:
-            key_value[code_key[NODE_APPROVE_RESULT]] = "true"
+        if NODE_APPROVE_RESULT in code_key:
+            if reject_count > 0:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "false"
+            else:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "true"
         key_value.update(approver_key_value)
         return key_value
 
     @staticmethod
     def task_is_finished(node_status, finish_condition, key_value, code_key):
+        if node_status.state["type"] == "SIGN":
+            is_finished = node_status.sign_is_finished(finish_condition, key_value)
+            return is_finished
+
         is_multi = node_status.state["is_multi"]
         if not is_multi:
             if key_value.get(code_key[NODE_APPROVE_RESULT]) == "false":
