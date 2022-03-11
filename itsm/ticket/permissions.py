@@ -142,12 +142,12 @@ class TicketPermissionValidate(permissions.BasePermission):
             "resource_type": "service",
         }
 
-        apply_actions = ["ticket_manage"]
+        apply_actions = ["ticket_management"]
         auth_actions = iam_client.resource_multi_actions_allowed(
             apply_actions, [resource_info], project_key=obj.project_key
         )
 
-        if auth_actions.get("ticket_manage"):
+        if auth_actions.get("ticket_management"):
             return True
 
         bk_iam_path = "/project,{}/".format(obj.project_key)

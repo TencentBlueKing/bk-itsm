@@ -536,7 +536,7 @@ class TicketTest(TestCase):
         patch_misc_get_bk_users.return_value = {}
         path_get_bk_users.return_value = {}
         patch_iam_request.resource_multi_actions_allowed.return_value = {
-            "ticket_manage",
+            "ticket_management",
             True,
         }
 

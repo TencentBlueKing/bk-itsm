@@ -1271,7 +1271,7 @@ class Ticket(Model, BaseTicket):
     objects = managers.TicketManager()
 
     auth_resource = {"resource_type": "ticket", "resource_type_name": "单据"}
-    resource_operations = ["ticket_view", "ticket_manage"]
+    resource_operations = ["ticket_view", "ticket_management"]
 
     class Meta:
         verbose_name = _("工单")

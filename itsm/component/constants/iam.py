@@ -147,7 +147,7 @@ ACTIONS = [
         "resource_topo": ["project", "service"],
     },
     {
-        "id": "ticket_manage",
+        "id": "ticket_management",
         "name": "工单管理",
         "relate_resources": ["service"],
         "relate_actions": ["project_view"],
