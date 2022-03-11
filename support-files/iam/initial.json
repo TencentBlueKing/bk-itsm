@@ -2253,6 +2253,9 @@
                         },
                         {
                             "id": "sla_manage"
+                        },
+                        {
+                            "id": "ticket_manage"
                         }
                     ],
                     "sub_groups": [
@@ -2458,9 +2461,6 @@
                     {
                         "id": "workflow",
                         "actions": [
-                            {
-                                "id": "ticket_manage"
-                            },
                             {
                                 "id": "workflow_manage",
                                 "required": true
