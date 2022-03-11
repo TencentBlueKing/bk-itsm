@@ -700,11 +700,11 @@
                 "type": "manage",
                 "related_resource_types": [
                     {
-                        "system_id": "bk_itsm",
+                        "system_id": "itsm",
                         "id": "service",
                         "related_instance_selections": [
                             {
-                                "system_id": "bk_itsm",
+                                "system_id": "itsm",
                                 "id": "service_list"
                             }
                         ]
