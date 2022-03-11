@@ -715,6 +715,30 @@
             "operation": "upsert_action",
             "data": {
                 "id": "ticket_manage",
+                "name": "工单管理(已弃用)",
+                "name_en": "Manage Ticket Old",
+                "description": "管理某个服务资源下工单的权限",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "bk_itsm",
+                        "id": "project",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "bk_itsm",
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_management",
                 "name": "工单管理",
                 "name_en": "Manage Ticket",
                 "description": "管理某个服务资源下工单的权限",
@@ -2000,10 +2024,10 @@
                                     "id": "service_view"
                                 },
                                 {
-                                    "id": "ticket_view"
+                                    "id": "ticket_management"
                                 },
                                 {
-                                    "id": "ticket_manage"
+                                    "id": "ticket_view"
                                 },
                                 {
                                     "id": "catalog_create"
@@ -2434,6 +2458,9 @@
                     {
                         "id": "workflow",
                         "actions": [
+                            {
+                                "id": "ticket_manage"
+                            },
                             {
                                 "id": "workflow_manage",
                                 "required": true
