@@ -282,7 +282,7 @@
                 }
             },
             projectList (val) {
-                if (val.length !== 0) {
+                if (val.length !== 0 && this.$route.query.project_id) {
                     const current = val.find(item => item.key === this.$route.query.project_id)
                     const result = this.applyForProjectViewPerm(current, 'project_view')
                     if (!result) {
