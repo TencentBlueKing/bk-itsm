@@ -89,8 +89,8 @@ class TicketPermissionValidate(permissions.BasePermission):
             return True
 
         if view.action == "exception_distribute":
-            if not Service.is_service_owner(obj.service_id, request.user.username):
-                self.message = _("抱歉，您无权执行此操作，因为您不是该服务的管理员")
+            if not self.iam_ticket_manage_auth(request, obj):
+                self.message = _("抱歉，您无权执行此操作，因为您该服务没有工单管理的权限")
                 return False
             else:
                 return True
@@ -133,6 +133,45 @@ class TicketPermissionValidate(permissions.BasePermission):
             return True
 
         return obj.can_operate(username)
+
+    def iam_ticket_manage_auth(self, request, obj):
+        iam_client = IamRequest(request)
+        resource_info = {
+            "resource_id": str(obj.service_id),
+            "resource_name": obj.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_manage"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=obj.project_key
+        )
+
+        if auth_actions.get("ticket_manage"):
+            return True
+
+        bk_iam_path = "/project,{}/".format(obj.project_key)
+        resources = [
+            Resource(
+                settings.BK_IAM_SYSTEM_ID,
+                resource_info["resource_type"],
+                str(resource_info["resource_id"]),
+                {
+                    "iam_resource_owner": resource_info.get("creator", ""),
+                    "_bk_iam_path_": bk_iam_path
+                    if resource_info["resource_type"] != "project"
+                    else "",
+                    "name": resource_info.get("resource_name", ""),
+                },
+            )
+        ]
+
+        raise AuthFailedException(
+            settings.BK_IAM_SYSTEM_ID,
+            Subject("user", request.user.username),
+            Action(apply_actions[0]),
+            resources,
+        )
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)

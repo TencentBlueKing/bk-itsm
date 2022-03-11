@@ -149,9 +149,9 @@ ACTIONS = [
     {
         "id": "ticket_manage",
         "name": "工单管理",
-        "relate_resources": ["project"],
+        "relate_resources": ["service"],
         "relate_actions": ["project_view"],
-        "resource_topo": ["project"],
+        "resource_topo": ["project", "service"],
     },
     {
         "id": "operational_data_view",

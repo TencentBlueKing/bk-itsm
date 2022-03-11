@@ -1110,12 +1110,6 @@ class TicketModelViewSet(ModelViewSet):
 
         return Response()
 
-    @action(detail=True, methods=["get"])
-    def can_exception_distribute(self, request, *args, **kwargs):
-        ticket = self.get_object()
-        is_owner = Service.is_service_owner(ticket.service_id, request.user.username)
-        return Response({"can_exception_distribute": is_owner})
-
     @action(detail=True, methods=["post"])
     def exception_distribute(self, request, *args, **kwargs):
         """

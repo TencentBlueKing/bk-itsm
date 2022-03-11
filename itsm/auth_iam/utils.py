@@ -175,6 +175,10 @@ class IamRequest(object):
         """
         当个资源批量申请的权限
         """
+        if settings.ENVIRONMENT == "dev":
+            # dev 环境不走权限中心
+            actions_result = {action: True for action in actions}
+            return actions_result
 
         subject = Subject(
             "user", self.request.user.username if self.request else self.username
