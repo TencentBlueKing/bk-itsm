@@ -285,7 +285,7 @@
                 if (val.length !== 0) {
                     const current = val.find(item => item.key === this.$route.query.project_id)
                     this.applyForProjectViewPerm(current, 'project_view')
-                    this.onSelectProject('0')
+                    // this.onSelectProject('0')
                 }
             },
             isEditDialogShow (val) {
@@ -460,7 +460,7 @@
                 }
                 this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
-            applyForProjectViewPerm (project, perm) {
+            applyForProjectViewPerm (project, perm, ret = false) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
                     const resourceData = {
                         project: [{
@@ -468,7 +468,7 @@
                             name: project.name
                         }]
                     }
-                    this.applyForPermission([perm], project.auth_actions, resourceData)
+                    this.applyForPermission([perm], project.auth_actions, resourceData, ret)
                 }
             },
             handleCreateProject () {

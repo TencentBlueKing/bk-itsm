@@ -27,9 +27,8 @@
                 <nav-title :title-name="titleName">
                     <bk-tab
                         addable
-                        closable
                         :sortable="true"
-                        :sort-type="'replace'"
+                        :sort-type="'insert'"
                         :active.sync="currentTab"
                         type="unborder-card"
                         @tab-change="changeTag"
@@ -40,6 +39,7 @@
                         <bk-tab-panel
                             v-for="(panel) in serviceList"
                             v-bind="panel"
+                            :sortable="true"
                             :key="panel.key">
                             <template slot="label">
                                 <div class="list-wrapper">
@@ -323,6 +323,7 @@
                 searchToggle: true, // 点击搜索记录搜索是否添加记录
                 showCustomTabEdit: false,
                 customList: [],
+                curService: '',
                 isEditTab: false,
                 editTabId: '',
                 fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
@@ -410,7 +411,19 @@
                 })
             },
             handleCloseTabs () {
-                console.log('close')
+                this.showCustomTabEdit = false
+                this.customTabForm = {
+                    name: '',
+                    desc: '',
+                    conditions: {
+                        keyword: '',
+                        catalog_id: [],
+                        creator__in: [],
+                        current_processor: [],
+                        current_status__in: [],
+                        bk_biz_id: ''
+                    }
+                }
             },
             // 获取自定义tab列表
             getProjectTabList () {
@@ -435,10 +448,10 @@
             editProjectTab (panel) {
                 this.isEditTab = true
                 this.editTabId = panel.id
-                this.showCustomTabEdit = true
                 this.customTabForm.name = panel.name
                 this.customTabForm.desc = panel.desc
-                this.customTabForm.conditions = panel.conditions
+                this.$set(this.customTabForm, 'conditions', panel.conditions)
+                this.showCustomTabEdit = true
             },
             sortChange (dragTabIndex, dropTabIndex) {
                 console.log(dragTabIndex, dropTabIndex)
@@ -496,8 +509,7 @@
                 })
             },
             // 获取所有单据列表
-            getAllTicketList (type = this.serviceType, service) {
-                console.log(service)
+            getAllTicketList (type = this.serviceType) {
                 const fixParams = {
                     page_size: this.pagination.limit,
                     page: this.pagination.current,
@@ -506,6 +518,7 @@
                     view_type: '',
                     service_type: type
                 }
+                console.log(this.curService)
                 const excludeList = ['request', 'change', 'event', 'question']
                 let url = 'change/getList'
                 // 项目下的所有单据
@@ -516,15 +529,13 @@
                     this.customTabLoading = true
                     url = 'project/getProjectTabList'
                     fixParams.project_key = this.$route.query.project_id
-                    console.log(service.conditions.hasOwnProperty('bk_biz_id'))
-                    console.log(service.conditions.bk_biz_id)
                     fixParams.tab_conditions = {
-                        'bk_biz_id': service.conditions.bk_biz_id || undefined,
-                        'catalog_id': service.conditions.catalog_id.slice(-1).join() || undefined,
-                        'creator__in': service.conditions.creator__in,
-                        'current_processor': service.conditions.current_processor.join() || undefined,
-                        'current_status__in': service.conditions.current_status__in,
-                        'keyword': service.conditions.keyword || undefined
+                        'bk_biz_id': this.curService.conditions.bk_biz_id || undefined,
+                        'catalog_id': this.curService.conditions.catalog_id.slice(-1).join() || undefined,
+                        'creator__in': this.curService.conditions.creator__in,
+                        'current_processor': this.curService.conditions.current_processor.join() || undefined,
+                        'current_status__in': this.curService.conditions.current_status__in,
+                        'keyword': this.curService.conditions.keyword || undefined
                     }
                     fixParams.extra_conditions = {}
                 } else {
@@ -537,7 +548,7 @@
                 Object.assign(fixParams, searchParams)
                 return this.$store.dispatch(url, fixParams).then(res => {
                     if (!excludeList.includes(type)) {
-                        this.$set(this.counts, service.key, res.data.count)
+                        // this.$set(this.counts, service.key, res.data.count)
                         this.customTabList = res.data.items
                     } else {
                         this[`${type}List`] = res.data.items
@@ -659,10 +670,10 @@
                 this.searchForms.forEach(item => {
                     item.value = item.multiSelect ? [] : ''
                 })
-                const service = this.serviceList.find(item => item.name === val)
-                this.serviceType = service.key
+                this.curService = this.serviceList.find(item => item.name === val)
+                this.serviceType = this.curService.key
                 this.getServiceTree()
-                this.getAllTicketList(service.key, service)
+                this.getAllTicketList(this.serviceType)
             },
             // 导出弹框
             openExportList () {
@@ -685,8 +696,7 @@
                 this.pagination.current = 1
                 this.searchParams = params
                 this.handleSearchResult(params)
-                const service = this.serviceList.find(item => item.name === this.currentTab)
-                this.getAllTicketList(this.serviceType, service)
+                this.getAllTicketList(this.serviceType)
             },
             // 清空搜索表单
             handleClearSearch () {
