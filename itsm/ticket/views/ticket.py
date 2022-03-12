@@ -1804,6 +1804,53 @@ class TicketModelViewSet(ModelViewSet):
         }
         return Response(can_operate)
 
+    @action(detail=False, methods=["post"])
+    def get_filter_tickets(self, request, *args, **kwargs):
+        """
+        url: "/api/ticket/receipts/get_filter_tickets/?page_size=10&page=1&ordering=-create_at"
+        data: {
+            "project_key": "0",
+            "tab_conditions": {},
+            "extra_conditions": {}
+        }
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # 1.按项目key进行筛选
+        project_key = request.data.get("project_key", None)
+        if project_key:
+            queryset = queryset.filter(project_key=project_key)
+        
+        # 2.按tab自定义条件进行筛选
+        tab_filter = TicketFilterSerializer(data=request.data.get("tab_conditions"))
+        tab_filter.is_valid(raise_exception=True)
+        kwargs = tab_filter.validated_data   
+        queryset = Ticket.objects.get_tickets(
+            request.user.username, queryset, **kwargs
+        )
+        
+        # 3.在tab筛选的queryset基础上进行额外条件的筛选
+        extra_filter = TicketFilterSerializer(data=request.data.get("extra_conditions"))
+        extra_filter.is_valid(raise_exception=True)
+        queryset = queryset.filter(**extra_filter.validated_data)
+        
+        # 4.获取分页数据
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            data = TicketList(
+                page,
+                username=request.user.username,
+                token=request.query_params.get("token", ""),
+            ).to_client_representation()
+            return self.get_paginated_response(data)
+        
+        data = TicketList(
+            queryset,
+            username=request.user.username,
+            token=request.query_params.get("token", ""),
+        ).to_client_representation()
+        return Response(data)
+        
 
 class TicketStatusModelViewSet(component_viewsets.ReadOnlyModelViewSet):
     serializer_class = SimpleStatusSerializer

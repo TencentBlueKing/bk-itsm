@@ -2441,5 +2441,11 @@ export const m = {
     '当前服务协议配置未完成，确认要删除吗？': 'The current service protocol configuration is not complete. Do you want to delete it?',
     '服务名称重复，请重新输入': 'Duplicate service name, please re-enter',
     '手动节点': 'Manual Node',
-    '当前字段为自定义表单': 'The current field is a custom form'
+    '当前字段为自定义表单': 'The current field is a custom form',
+    '编辑TAB': 'Edit TAB',
+    '新建TAB': 'Create TAB',
+    '自定义tab名称': 'Custom tab name',
+    '描述信息': 'Description information',
+    '请输入描述信息': 'Please enter a description',
+    '请输入名称': 'Please enter the name'
 }

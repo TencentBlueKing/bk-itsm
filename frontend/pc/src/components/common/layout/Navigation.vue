@@ -251,7 +251,6 @@
             // 侧边栏导航项
             sideNav () {
                 const list = []
-
                 this.sideRouters.forEach(router => {
                     if (router.id === 'sla') {
                         this.openFunction.SLA_SWITCH && list.push(router)
@@ -280,6 +279,15 @@
             '$store.state.project.id' (val) {
                 if (val) {
                     this.selectedProject = val
+                }
+            },
+            projectList (val) {
+                if (val.length !== 0 && this.$route.query.project_id) {
+                    const current = val.find(item => item.key === this.$route.query.project_id)
+                    const result = this.applyForProjectViewPerm(current, 'project_view')
+                    if (!result) {
+                        this.onSelectProject('0')
+                    }
                 }
             },
             isEditDialogShow (val) {
@@ -454,7 +462,7 @@
                 }
                 this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
-            applyForProjectViewPerm (project, perm) {
+            applyForProjectViewPerm (project, perm, ret = false) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
                     const resourceData = {
                         project: [{
@@ -463,7 +471,9 @@
                         }]
                     }
                     this.applyForPermission([perm], project.auth_actions, resourceData)
+                    return false
                 }
+                return true
             },
             handleCreateProject () {
                 if (!this.hasPermission(['project_create'])) {
