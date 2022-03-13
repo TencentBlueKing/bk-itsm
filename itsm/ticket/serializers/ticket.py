@@ -35,6 +35,7 @@ from rest_framework import serializers
 from rest_framework.fields import JSONField, empty
 
 from common.log import logger
+from itsm.auth_iam.utils import IamRequest
 from itsm.component.drf.serializers import AuthModelSerializer
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -885,6 +886,26 @@ class TicketSerializer(AuthModelSerializer):
         )
 
         return self.update_auth_actions(inst, data)
+
+    def update_auth_actions(self, instance, data):
+        request = self.context["request"]
+        iam_client = IamRequest(request)
+        resource_info = {
+            "resource_id": str(instance.service_id),
+            "resource_name": instance.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_management"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=instance.project_key
+        )
+
+        data["auth_actions"] = []
+        if auth_actions.get("ticket_management"):
+            data["auth_actions"] = ["ticket_management"]
+
+        return data
 
     def run_validation(self, data):
         if self.instance is None:
