@@ -1203,6 +1203,16 @@ class TicketFilterSerializer(BaseFilterSerializer):
     overall_current_status__in = serializers.CharField(required=False)
     exclude_ticket_id__in = serializers.CharField(required=False)
     current_processor = serializers.CharField(required=False)
+    service_type = serializers.ChoiceField(
+        required=False,
+        choices=[
+            ("request", "request"),
+            ("change", "change"),
+            ("event", "event"),
+            ("question", "question"),
+        ],
+    )
+    creator__in = serializers.CharField(required=False)
 
 
 class StatisticsSerializer(BaseFilterSerializer):
