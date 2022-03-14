@@ -343,6 +343,7 @@ class TicketManager(Manager):
         filter_conditions = {
             key: value
             for key, value in dict(
+                bk_biz_id=kwargs.get("bk_biz_id"),
                 service_id=kwargs.get("service_id"),
                 flow_id=kwargs.get("flow_id"),
                 catalog_id__in=ServiceCatalog.get_descendant_ids(
