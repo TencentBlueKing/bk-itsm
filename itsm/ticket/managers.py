@@ -349,11 +349,15 @@ class TicketManager(Manager):
                     kwargs.get("catalog_id")
                 ),
                 project_key=kwargs.get("project_key"),
+                service_type=kwargs.get("service_type"),
             ).items()
             if value
         }
 
         queryset = queryset.filter(**filter_conditions)
+        
+        if kwargs.get("creator__in"):
+            queryset = queryset.filter(creator__contains=kwargs.get("creator__in"))
 
         start_time = kwargs.get("create_at__gte")
         end_time = kwargs.get("create_at__lte")

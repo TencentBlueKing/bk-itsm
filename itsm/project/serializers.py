@@ -143,10 +143,27 @@ class CostomTabSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # 1.获取当前项目key
         project_key = validated_data.get("project_key", "")
-        # 2.获取当前项目下的tab数量
-        order = CostomTab.objects.filter(
-            project_key=project_key, is_deleted=False
-        ).count()
-        # 3.当前新增的tab序号为tab数量+1
+        creator = validated_data.get("creator", "")
+        name = validated_data.get("name", "")
+        tab_list = CostomTab.objects.filter(
+            project_key=project_key, creator=creator, is_deleted=False
+        )
+        # 2.判断当前项目下该用户的tab是否已经存在
+        tab_names = list(tab_list.values_list("name", flat=True))
+        if name in tab_names:
+            raise serializers.ValidationError("当前tab名称已存在")
+        # 3.获取当前项目下该用户的tab数量
+        order = tab_list.count()
+        # 4.当前新增的tab序号为tab数量+1
         validated_data["order"] = order + FIRST_ORDER
         return super(CostomTabSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        project_key = validated_data.get("project_key", "")
+        creator = validated_data.get("updated_by", "")
+        name = validated_data.get("name", "")
+        if CostomTab.objects.filter(
+            project_key=project_key, creator=creator, name=name, is_deleted=False
+        ).exists():
+            raise serializers.ValidationError("当前tab名称已存在")
+        return super(CostomTabSerializer, self).update(instance, validated_data)

@@ -1832,7 +1832,10 @@ class TicketModelViewSet(ModelViewSet):
         # 3.在tab筛选的queryset基础上进行额外条件的筛选
         extra_filter = TicketFilterSerializer(data=request.data.get("extra_conditions"))
         extra_filter.is_valid(raise_exception=True)
-        queryset = queryset.filter(**extra_filter.validated_data)
+        extra_kwargs = extra_filter.validated_data
+        queryset = Ticket.objects.get_tickets(
+            request.user.username, queryset, **extra_kwargs
+        )
         
         # 4.获取分页数据
         page = self.paginate_queryset(queryset)
