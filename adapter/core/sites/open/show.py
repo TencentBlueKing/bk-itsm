@@ -43,12 +43,14 @@ def get_doc_url():
         )
 
 
-if settings.OPEN_VER == "enterprise":
-    TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
-    DOC_URL = get_doc_url()
-else:
-    TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
-    DOC_URL = "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
+# if settings.OPEN_VER == "enterprise":
+#     TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
+#     DOC_URL = get_doc_url()
+# else:
+
+# 企业版非企业版，统一跳到蓝鲸官网去
+TITLE = "{} | {}".format(_("流程服务"), _("腾讯蓝鲸智云"))
+DOC_URL = "https://bk.tencent.com/docs/markdown/流程服务/产品白皮书/产品简介/README.md"
 
 FOOTER = """
         <div class="copyright">
