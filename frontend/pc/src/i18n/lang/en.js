@@ -2450,5 +2450,7 @@ export const m = {
     '请输入名称': 'Please enter the name',
     '请输入备注信息': 'Please enter comments',
     '该TAB名称已存在': 'The tab name already exists',
-    '请输入自定义TAB名称': 'Please enter a custom tab name'
+    '请输入自定义TAB名称': 'Please enter a custom tab name',
+    '基本信息': 'Basic Information',
+    '筛选信息': 'Screen Information'
 }

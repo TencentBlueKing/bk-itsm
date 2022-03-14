@@ -99,7 +99,7 @@
         </template>
         <!-- 自定义tab -->
         <bk-dialog v-model="showCustomTabEdit"
-            width="600"
+            width="1000"
             :draggable="false"
             theme="primary"
             :mask-close="false"
@@ -109,16 +109,20 @@
             @cancel="handleCloseTabs">
             <bk-form
                 ref="customFrom"
+                :label-width="150"
+                class="bk-form"
                 form-type="horizontal"
                 :model="customTabForm"
                 :rules="customRules">
                 <template>
-                    <bk-form-item :label="$t(`m['自定义tab名称']`)" :required="true" :property="'name'">
+                    <p class="bk-form-title">{{ $t(`m['基本信息']`) }}</p>
+                    <bk-form-item class="bk-form-item" :label="$t(`m['自定义tab名称']`)" :required="true" :property="'name'">
                         <bk-input v-model="customTabForm.name" :placeholder="$t(`m['请输入名称']`)"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t(`m['描述信息']`)" :required="true" :property="'desc'">
                         <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
                     </bk-form-item>
+                    <p class="bk-form-title">{{ $t(`m['筛选信息']`) }}</p>
                     <template
                         v-for="(item, index) in customForm">
                         <bk-form-item :label="item.name" v-if="item.type === 'input'" :key="index">
@@ -876,6 +880,29 @@
                         margin-right: 21px;
                     }
                 }
+            }
+        }
+    }
+    .bk-form {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        .bk-form-title {
+            width: 100%;
+            margin-left: 2px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .bk-form-item {
+            width: 50%;
+            min-height: 32px;
+            /deep/ .bk-form-content {
+                width: auto;
+                min-height: 32px;
+                margin-left: 150px;
+                position: relative;
+                outline: none;
+                line-height: 0px;
             }
         }
     }
