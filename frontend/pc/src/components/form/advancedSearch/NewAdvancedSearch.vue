@@ -311,8 +311,6 @@
                 if (this.isfilter) {
                     const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
                     formItem.list = list
-                } else {
-                    formItem.list = res.data[0] ? res.data[0]['children'] : []
                 }
             },
             getTreebyId (list, id) {
