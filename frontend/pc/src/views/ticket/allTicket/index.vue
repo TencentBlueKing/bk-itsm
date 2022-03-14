@@ -41,6 +41,7 @@
                             v-for="(panel) in serviceList"
                             v-bind="panel"
                             :sortable="true"
+                            :closable="!fixedTabs.includes(panel.name)"
                             :key="panel.key">
                             <template slot="label">
                                 <div class="list-wrapper">
@@ -108,8 +109,7 @@
             @cancel="handleCloseTabs">
             <bk-form
                 ref="customFrom"
-                form-type="vertical"
-                :label-width="200"
+                form-type="horizontal"
                 :model="customTabForm"
                 :rules="customRules">
                 <template>
@@ -119,15 +119,14 @@
                     <bk-form-item :label="$t(`m['描述信息']`)" :required="true" :property="'desc'">
                         <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
                     </bk-form-item>
-                    <div
-                        v-for="(item, index) in customForm"
-                        :key="index">
-                        <bk-form-item :label="item.name" v-if="item.type === 'input'">
+                    <template
+                        v-for="(item, index) in customForm">
+                        <bk-form-item :label="item.name" v-if="item.type === 'input'" :key="index">
                             <bk-input v-model="customTabForm.conditions[item.key]"
                                 :placeholder="item.placeholder">
                             </bk-input>
                         </bk-form-item>
-                        <bk-form-item :label="item.name" v-if="item.type === 'select'">
+                        <bk-form-item :label="item.name" v-if="item.type === 'select'" :key="index">
                             <bk-select
                                 searchable
                                 :placeholder="item.placeholder"
@@ -141,7 +140,7 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item :label="item.name" v-if="item.type === 'datetime'">
+                        <bk-form-item :label="item.name" v-if="item.type === 'datetime'" :key="index">
                             <bk-date-picker
                                 style="width: 100%;"
                                 v-model="customTabForm.conditions[item.key]"
@@ -150,7 +149,7 @@
                             </bk-date-picker>
                         </bk-form-item>
                         <!-- 级联类型 -->
-                        <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
+                        <bk-form-item :label="item.name" v-if="item.type === 'cascade'" :key="index">
                             <bk-cascade
                                 style="width: 100%;"
                                 v-model="customTabForm.conditions[item.key]"
@@ -161,13 +160,13 @@
                             </bk-cascade>
                         </bk-form-item>
                         <!-- 人员 -->
-                        <bk-form-item :label="item.name" v-if="item.type === 'member'">
+                        <bk-form-item :label="item.name" v-if="item.type === 'member'" :key="index">
                             <member-select
                                 v-model="customTabForm.conditions[item.key]"
                                 :multiple="false"
                                 :placeholder="item.placeholder"></member-select>
                         </bk-form-item>
-                    </div>
+                    </template>
                 </template>
             </bk-form>
         </bk-dialog>
@@ -331,19 +330,29 @@
                 isCustomTab: false,
                 editTabId: '',
                 fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
+                checkTabNameList: [],
                 customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
                 customRules: {
                     name: [
                         {
                             required: true,
-                            message: '请输入自定义TAB名称',
+                            message: this.$t('m["请输入自定义TAB名称"]'),
+                            trigger: 'blur'
+                        },
+                        {
+                            validator: val => {
+                                const curEdit = this.serviceList.find(item => item.id === this.editTabId)
+                                const list = this.isEditTab ? this.checkTabNameList.filter(item => item !== curEdit.name) : this.checkTabNameList
+                                return !list.includes(val)
+                            },
+                            message: this.$t('m["该TAB名称已存在"]'),
                             trigger: 'blur'
                         }
                     ],
                     desc: [
                         {
                             required: true,
-                            message: '请输入备注信息',
+                            message: this.$t('m["请输入备注信息"]'),
                             trigger: 'blur'
                         }
                     ]
@@ -357,7 +366,9 @@
                         catalog_id: [],
                         creator__in: [],
                         current_processor: [],
-                        current_status__in: [],
+                        overall_current_status__in: [],
+                        create_at__gte: '',
+                        create_at__lte: '',
                         bk_biz_id: ''
                     }
                 }
@@ -427,9 +438,12 @@
                         this.currentTab = this.customTabForm.name
                         this.getAllTabTicketList(this.editTabId)
                         this.editTabId = ''
-                        this.showCustomTabEdit = false
                     }
+                    this.showCustomTabEdit = false
                 })
+            },
+            clearTabError () {
+                this.$refs.customFrom.clearError()
             },
             handleCloseTabs () {
                 this.showCustomTabEdit = false
@@ -445,6 +459,7 @@
                         bk_biz_id: ''
                     }
                 }
+                this.clearTabError()
             },
             // 获取自定义tab列表
             getProjectTabList () {
@@ -462,6 +477,7 @@
                     this.customList.forEach(ite => {
                         this.serviceList.push(ite)
                     })
+                    this.checkTabNameList = this.serviceList.map(item => item.name)
                 }).catch(e => {
                     console.log(e)
                 })
@@ -512,6 +528,10 @@
                     })
                 }
             },
+            changeTime (str) {
+                const time = new Date(str)
+                return time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds()
+            },
             // 获取所有服务类型列表
             async getServiceTypeList () {
                 this.isTabLoading = true
@@ -539,10 +559,7 @@
                 const fixParams = {
                     page_size: this.pagination.limit,
                     page: this.pagination.current,
-                    ordering: this.orderKey,
-                    is_draft: 0,
-                    view_type: '',
-                    service_type: type
+                    ordering: this.orderKey
                 }
                 const excludeList = ['request', 'change', 'event', 'question']
                 let url = 'change/getList'
@@ -561,17 +578,22 @@
                     url = 'project/getProjectTabList'
                     fixParams.project_key = this.$route.query.project_id
                     fixParams.tab_conditions = {
-                        'bk_biz_id': this.curService.conditions.bk_biz_id || undefined,
-                        'catalog_id': this.curService.conditions.catalog_id.slice(-1).join() || undefined,
-                        'creator__in': this.curService.conditions.creator__in,
+                        'keyword': this.curService.conditions.keyword || undefined,
+                        'catalog_id': Number(this.curService.conditions.catalog_id.slice(-1).join()) || undefined,
+                        'creator__in': this.curService.conditions.creator__in.join() || undefined,
                         'current_processor': this.curService.conditions.current_processor.join() || undefined,
-                        'current_status__in': this.curService.conditions.current_status__in,
-                        'keyword': this.curService.conditions.keyword || undefined
+                        'overall_current_status__in': this.curService.conditions.current_status__in.join() || undefined,
+                        'create_at__gte': this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[0]) : undefined,
+                        'create_at__lte': this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[1]) : undefined,
+                        'bk_biz_id': this.curService.conditions.bk_biz_id || undefined
                     }
                     fixParams.extra_conditions = {}
                     Object.assign(fixParams.tab_conditions, searchParams)
                 } else {
                     this[`${type}Loading`] = true
+                    fixParams.is_draft = 0
+                    fixParams.view_type = ''
+                    fixParams.service_type = type
                     Object.assign(fixParams, searchParams)
                 }
                 return this.$store.dispatch(url, fixParams).then(res => {
