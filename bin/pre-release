@@ -1,5 +1,0 @@
-#!/bin/bash
-
-echo "migrate database and cache pre-release"
-python manage.py migrate --no-input
-python manage.py createcachetable django_cache
