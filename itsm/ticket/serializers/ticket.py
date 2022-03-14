@@ -1178,6 +1178,7 @@ class BaseFilterSerializer(serializers.Serializer):
 class TicketFilterSerializer(BaseFilterSerializer):
     """单据节点操作序列化"""
 
+    bk_biz_id = serializers.IntegerField(required=False)
     catalog_id = serializers.IntegerField(required=False)
     service_id = serializers.IntegerField(required=False)
     flow_id = serializers.IntegerField(required=False)
