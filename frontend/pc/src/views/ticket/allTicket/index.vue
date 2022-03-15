@@ -533,6 +533,7 @@
                 }
             },
             changeTime (str) {
+                if (str === '') return undefined
                 const time = new Date(str)
                 return time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds()
             },
@@ -591,8 +592,11 @@
                         'create_at__lte': this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[1]) : undefined,
                         'bk_biz_id': this.curService.conditions.bk_biz_id || undefined
                     }
-                    fixParams.extra_conditions = {}
-                    Object.assign(fixParams.tab_conditions, searchParams)
+                    fixParams.extra_conditions = {
+                        'overall_current_status__in': searchParams.current_status__in
+                    }
+                    Object.assign(fixParams.extra_conditions, searchParams)
+                    fixParams.extra_conditions.current_status__in = undefined
                 } else {
                     this[`${type}Loading`] = true
                     fixParams.is_draft = 0
