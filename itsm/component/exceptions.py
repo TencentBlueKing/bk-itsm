@@ -361,3 +361,15 @@ class DeliverOperateError(ServerError):
     MESSAGE = _("转派单异常")
     ERROR_CODE = "DELIVER_OPERATE_ERROR"
     ERROR_CODE_INT = 3900046
+
+
+class RemoteSystemNotExist(ServerError):
+    MESSAGE = _("API对接系统未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900047
+
+
+class TemplateFieldNotExist(ServerError):
+    MESSAGE = _("字段未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900048

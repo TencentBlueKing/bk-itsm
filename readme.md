@@ -37,7 +37,7 @@ ITSM (IT 服务管理)是一套帮助企业对 IT 系统的规划、研发、实
 ## Usage
 - [API使用说明](docs/itsm_bkapi/apidocs/readme.md)
 - [权限说明](docs/install/permission_description.md)
-- [服务&用户组迁移指南](docs/install/service_migrate_guide.md)
+- [项目资源迁移指南](docs/install/resource_migrate_guide.md)
 - [企业微信移动端配置说明](docs/install/qy_weixin_config.md)
 - [自定义表单渲染规则说明](docs/install/custom_form_config.md)
 - [API请求沙箱使用说明](docs/install/api_sandbox_guide.md)
