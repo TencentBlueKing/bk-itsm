@@ -2,6 +2,4 @@
 
 echo "migrate database and cache pre-release"
 python manage.py migrate --no-input
-echo "collectstatic pre-release"
-python manage.py collectstatic --noinput
 python manage.py createcachetable django_cache
