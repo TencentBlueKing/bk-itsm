@@ -124,6 +124,8 @@ class ProjectMigrateSerializer(serializers.Serializer):
     CHOICES = [
         ("service", "服务"),
         ("user_group", "用户组"),
+        ("api_system", "API系统"),
+        ("template_field", "字段"),
     ]
 
     resource_type = serializers.ChoiceField(choices=CHOICES, required=True)

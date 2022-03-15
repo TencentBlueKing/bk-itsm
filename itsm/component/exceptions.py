@@ -355,3 +355,15 @@ class SlaParamError(ServerError):
     MESSAGE = _("Sla节点参数验证失败")
     ERROR_CODE = "SLA_VALIDATE_ERROR"
     ERROR_CODE_INT = 3900045
+
+
+class RemoteSystemNotExist(ServerError):
+    MESSAGE = _("API对接系统未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900046
+
+
+class TemplateFieldNotExist(ServerError):
+    MESSAGE = _("字段未找到")
+    ERROR_CODE = "REMOTE_SYSTEM_NOT_EXIST"
+    ERROR_CODE_INT = 3900047
