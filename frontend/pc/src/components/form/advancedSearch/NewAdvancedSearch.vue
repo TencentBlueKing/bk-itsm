@@ -314,6 +314,7 @@
                 }
             },
             getTreebyId (list, id) {
+                if (!id) return []
                 for (let i = 0; i < list.length; i++) {
                     const node = list[i]
                     if (node.id === id) {
