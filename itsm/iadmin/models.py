@@ -40,7 +40,6 @@ from itsm.component.constants import (
     LEN_MIDDLE,
     LEN_NORMAL,
     LEN_SHORT,
-    NOTIFY_TYPE_CHOICES,
     PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.db import managers
@@ -130,9 +129,7 @@ class CustomNotice(models.Model):
     action = models.CharField(
         _("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default"
     )
-    notify_type = models.CharField(
-        _("通知方式"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES, default="EMAIL"
-    )
+    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
     updated_by = models.CharField(_("更新人"), max_length=LEN_NORMAL, default="system")

@@ -26,6 +26,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.utils.translation import ugettext as _
 
+from common.log import logger
+from itsm.component.constants import NOTIFY_TYPE_MAPPING, NOTIFY_TYPE_CHOICES
+from itsm.component.esb.esbclient import client_backend
+
 
 def translate_constant_2(constant):
     temp_constant = []
@@ -34,3 +38,18 @@ def translate_constant_2(constant):
         temp_constant.append((item[0], _(item[1])))
     constant = temp_constant
     return constant
+
+
+def get_notify_type_choice():
+    try:
+        result = client_backend.cmsi.get_msg_type()
+        notify_type_choice = [
+            (NOTIFY_TYPE_MAPPING.get(ins["type"], ins["type"].upper()), ins["label"])
+            for ins in result
+            if ins["is_active"]
+        ]
+        return notify_type_choice
+    except Exception as e:
+        logger.error("查询消息通知类型失败，error:{}".format(e))
+
+    return NOTIFY_TYPE_CHOICES
