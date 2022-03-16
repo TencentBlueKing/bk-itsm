@@ -113,7 +113,7 @@ from itsm.workflow.permissions import (
     TemplateFieldPermissionValidate,
     TaskSchemaPermit,
 )
-from itsm.workflow.utils import translate_constant_2
+from itsm.workflow.utils import translate_constant_2, get_notify_type_choice
 from itsm.workflow.validators import (
     WorkflowPipelineValidator,
     add_fields_from_table_validate,
@@ -232,6 +232,7 @@ class WorkflowViewSet(
             "member": SelectMultipleType.get_display_operators(),
             "members": SelectMultipleType.get_display_operators(),
         }
+        notify_type_choice = get_notify_type_choice()
 
         return Response(
             {
@@ -239,7 +240,7 @@ class WorkflowViewSet(
                 "source_type": translate_constant_2(SOURCE_CHOICES),
                 "layout_type": translate_constant_2(LAYOUT_CHOICES),
                 "validate_type": translate_constant_2(VALIDATE_CHOICES),
-                "notify_type": translate_constant_2(NOTIFY_TYPE_CHOICES),
+                "notify_type": translate_constant_2(notify_type_choice),
                 "notify_rule_type": translate_constant_2(NOTIFY_RULE_CHOICES),
                 "state_type": translate_constant_2(STATE_TYPE_CHOICES),
                 "processor_type": translate_constant_2(PROCESSOR_CHOICES),

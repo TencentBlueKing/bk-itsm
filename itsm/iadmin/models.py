@@ -40,7 +40,6 @@ from itsm.component.constants import (
     LEN_MIDDLE,
     LEN_NORMAL,
     LEN_SHORT,
-    NOTIFY_TYPE_CHOICES,
 )
 from itsm.component.db import managers
 from itsm.component.fields import IOField
@@ -118,7 +117,7 @@ class CustomNotice(models.Model):
         _("内容模板"), default="", null=True, blank=True, help_text=_("工单字段的值可以作为参数写到模板中，格式如：单号:${sn}")
     )
     action = models.CharField(_("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default")
-    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES, default="EMAIL")
+    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
     updated_by = models.CharField(_("更新人"), max_length=LEN_NORMAL, default="system")

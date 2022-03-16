@@ -108,6 +108,12 @@ NOTIFY_TYPE_CHOICES = [
     (SMS, "短信"),
 ]
 
+NOTIFY_TYPE_MAPPING = {
+    "weixin": WEIXIN,
+    "mail": EMAIL,
+    "sms": SMS
+}
+
 HOLIDAY = "HOLIDAY"
 WORKDAY = "WORKDAY"
 NORMAL_DAY = "NORMAL"
