@@ -1,5 +1,5 @@
 spec_version: 2
-app_version: "2.6.1"
+app_version: "2.6.1-rc.BuildNo"
 app:
     region: default
     bk_app_code: bk_itsm
@@ -34,7 +34,7 @@ modules:
             pre_release_hook: "bash ./bin/pre-release"
         processes:
             web:
-                command: bin/start_web.sh
+                command: bash ./bin/start_web.sh
                 plan: 4C2G5R
                 replicas: 5
             beat:
