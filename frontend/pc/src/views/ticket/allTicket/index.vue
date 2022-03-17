@@ -27,7 +27,7 @@
                 <nav-title :title-name="titleName">
                     <div slot="tab">
                         <div class="nav-list">
-                            <draggable v-model="serviceList" @end="onEnd" filter=".forbid">
+                            <draggable class="drag-scroll" v-model="serviceList" @end="onEnd" filter=".forbid">
                                 <li class="drag-list" v-for="(item, index) in serviceList" :key="item.key" :class="{ 'active': item.name === currentTab, 'forbid': fixedTabs.includes(item.name) }" @click="changeTag(item.name)">
                                     <span>{{ item.name }}</span>
                                     <span v-if="counts[item.key]" class="ticket-file-count">{{ counts[item.key]}}</span>
@@ -105,7 +105,7 @@
                 <template>
                     <p class="bk-form-title">{{ $t(`m['基本信息']`) }}</p>
                     <bk-form-item class="bk-form-item" :label="$t(`m['自定义tab名称']`)" :required="true" :property="'name'">
-                        <bk-input v-model="customTabForm.name" :placeholder="$t(`m['请输入名称']`)"></bk-input>
+                        <bk-input v-model="customTabForm.name" :maxlength="20" :show-word-limit="true" :placeholder="$t(`m['请输入名称']`)"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t(`m['描述信息']`)" :required="true" :property="'desc'">
                         <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
@@ -444,13 +444,13 @@
                             this.getProjectTabList()
                         }
                     })
+                    this.showCustomTabEdit = false
                 }).finally(e => {
                     if (this.isEditTab) {
                         this.currentTab = this.customTabForm.name
                         this.getAllTabTicketList(this.editTabId)
                         this.editTabId = ''
                     }
-                    this.showCustomTabEdit = false
                 })
             },
             clearTabError () {
@@ -528,14 +528,19 @@
             closePanel (index, panel) {
                 // 固定tab
                 if (!this.fixedTabs.includes(panel.name)) {
-                    this.$store.dispatch('project/deleteProjectTab', this.serviceList[index].id).then(res => {
-                        if (res.result) {
-                            this.serviceList.splice(index, 1)
-                            if (this.currentTab === panel.name) {
-                                this.currentTab = '请求管理'
-                                this.serviceType = 'request'
-                            }
-                            this.getProjectTabList()
+                    this.$bkInfo({
+                        title: `请确认是否删除-[${panel.name}]`,
+                        confirmFn: () => {
+                            this.$store.dispatch('project/deleteProjectTab', this.serviceList[index].id).then(res => {
+                                if (res.result) {
+                                    this.serviceList.splice(index, 1)
+                                    if (this.currentTab === panel.name) {
+                                        this.currentTab = '请求管理'
+                                        this.serviceType = 'request'
+                                    }
+                                    this.getProjectTabList()
+                                }
+                            })
                         }
                     })
                 }
@@ -898,42 +903,55 @@
     .nav-list {
         display: flex;
         height: 50px;
-        .drag-list {
-            cursor: pointer;
-            display: inline-block;
-            height: 50px;
-            line-height: 50px;
-            font-size: 14px;
-            padding: 2px 20px;
-            &:hover {
-                color: #3a84ff;
-                .ticket-file-count {
-                    background: #3a84ff;
-                    color: white;
+        overflow-x: auto;
+        overflow-y: hidden;
+        z-index: 999;
+        @include scroller(#a5a5a5, 4px, 4px);
+        .drag-scroll {
+            display: flex;
+            justify-content: space-evenly;
+            .drag-list {
+                cursor: pointer;
+                display: inline-block;
+                height: 50px;
+                line-height: 50px;
+                font-size: 14px;
+                padding: 2px 20px;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+                &:hover {
+                    color: #3a84ff;
+                    .ticket-file-count {
+                        background: #3a84ff;
+                        color: white;
+                    }
+                    .icon-itsm-icon-three-one {
+                        display: inline-block;
+                    }
+                    .icon-edit-new {
+                        display: inline-block;
+                    }
                 }
                 .icon-itsm-icon-three-one {
-                    display: inline-block;
+                    width: 20px;
+                    display: none;
                 }
                 .icon-edit-new {
-                    display: inline-block;
+                    display: none;
+                    width: 20px;
+                }
+                .ticket-file-count {
+                    font-size: 12px;
+                    background: #f0f1f5;
+                    border-radius: 7px;
+                    padding: 0 2px;
                 }
             }
-            .icon-itsm-icon-three-one {
-                display: none;
+            .active {
+                color: #3a84ff;
+                border-bottom: 4px solid #3a84ff;
             }
-            .icon-edit-new {
-                display: none;
-            }
-            .ticket-file-count {
-                font-size: 12px;
-                background: #f0f1f5;
-                border-radius: 7px;
-                padding: 0 2px;
-            }
-        }
-        .active {
-            color: #3a84ff;
-            border-bottom: 4px solid #3a84ff;
         }
     }
     .bk-form {
