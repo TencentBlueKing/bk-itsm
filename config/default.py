@@ -35,7 +35,6 @@ from config import (
     PROJECT_ROOT,
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
-    RUN_VER,
 )
 from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
 
@@ -102,9 +101,6 @@ INSTALLED_APPS += (
     # 'monitors',
     "itsm.monitor",
 )
-
-if RUN_VER == "ieod":
-    INSTALLED_APPS += ("bkoauth",)
 
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
