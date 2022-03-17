@@ -35,6 +35,7 @@ from config import (
     PROJECT_ROOT,
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
+    RUN_VER,
 )
 from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
 
@@ -102,6 +103,9 @@ INSTALLED_APPS += (
     "itsm.monitor",
 )
 
+if RUN_VER == "ieod":
+    INSTALLED_APPS += ("bkoauth",)
+
 # IAM 开启开关
 USE_IAM = True if os.getenv("USE_IAM", "true").lower() == "true" else False
 if USE_IAM:
@@ -110,6 +114,7 @@ if USE_IAM:
         "iam.contrib.iam_migration",
         "itsm.auth_iam",
     )
+
 
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
