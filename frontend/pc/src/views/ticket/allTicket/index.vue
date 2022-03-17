@@ -25,76 +25,64 @@
         <template v-if="!loading">
             <div class="ticket-tab">
                 <nav-title :title-name="titleName">
-                    <bk-tab
-                        addable
-                        closable
-                        :sortable="true"
-                        :sort-type="'insert'"
-                        :active.sync="currentTab"
-                        type="unborder-card"
-                        @tab-change="changeTag"
-                        slot="tab"
-                        @sort-change="sortChange"
-                        @add-panel="addPanel"
-                        @close-panel="closePanel">
-                        <bk-tab-panel
-                            v-for="(panel) in serviceList"
-                            v-bind="panel"
-                            :sortable="true"
-                            :closable="!fixedTabs.includes(panel.name)"
-                            :key="panel.key">
-                            <template slot="label">
-                                <div class="list-wrapper">
-                                    <span>{{ panel.name }}</span>
-                                    <span v-if="counts[panel.key]" class="ticket-file-count">{{ counts[panel.key]}}</span>
-                                    <template v-if="!fixedTabs.includes(panel.name)">
-                                        <span style="font-size: 18px; margin-left: 4px;" class="bk-itsm-icon icon-edit-new" @click.stop="editProjectTab(panel)"></span>
+                    <div slot="tab">
+                        <div class="nav-list">
+                            <draggable v-model="serviceList" @end="onEnd" filter=".forbid">
+                                <li class="drag-list" v-for="(item, index) in serviceList" :key="item.key" :class="{ 'active': item.name === currentTab, 'forbid': fixedTabs.includes(item.name) }" @click="changeTag(item.name)">
+                                    <span>{{ item.name }}</span>
+                                    <span v-if="counts[item.key]" class="ticket-file-count">{{ counts[item.key]}}</span>
+                                    <template v-if="!fixedTabs.includes(item.name)">
+                                        <span style="font-size: 18px; margin-left: 4px;" class="bk-itsm-icon icon-edit-new" @click.stop="editProjectTab(item)"></span>
+                                        <i class="bk-itsm-icon icon-itsm-icon-three-one" @click.stop="closePanel(index, item)"></i>
                                     </template>
-                                </div>
-                            </template>
-                            <div class="ticket-content" v-if="serviceType === panel.key">
-                                <div class="operate-wrapper">
-                                    <advanced-search
-                                        class="advanced-search"
-                                        ref="advancedSearch"
-                                        :forms="searchForms"
-                                        :panel="panel.key"
-                                        :cur-servcie="panel"
-                                        :is-custom-tab="isCustomTab"
-                                        :search-result-list="searchResultList"
-                                        @search="handleSearch"
-                                        @deteleSearchResult="deteleSearchResult"
-                                        @onChangeHighlight="getAllTicketList()"
-                                        @formChange="handleSearchFormChange"
-                                        @clear="handleClearSearch">
-                                        <div class="slot-content">
-                                            <bk-button
-                                                data-test-id="ticket_button_export"
-                                                class="export"
-                                                :title="$t(`m.tickets['导出']`)"
-                                                @click="openExportList">
-                                                {{ $t('m.tickets["导出"]') }}
-                                            </bk-button>
-                                        </div>
-                                    </advanced-search>
-                                </div>
-                                <div class="table-wrapper">
-                                    <table-content
-                                        v-bkloading="{ isLoading: tableLoading }"
-                                        :data-list="dataList"
-                                        :pagination="pagination"
-                                        :color-hex-list="colorHexList"
-                                        :service-type="serviceType"
-                                        @submitSuccess="evaluationSubmitSuccess"
-                                        @orderingClick="orderingClick"
-                                        @handlePageLimitChange="handlePageLimitChange"
-                                        @handlePageChange="handlePageChange">
-                                    </table-content>
-                                </div>
-                            </div>
-                        </bk-tab-panel>
-                    </bk-tab>
+                                </li>
+                                <li class="drag-list forbid bk-itsm-icon icon-jia-2" @click.stop="addPanel" title="添加自定义tab"></li>
+                            </draggable>
+                        </div>
+                    </div>
                 </nav-title>
+                <template v-for="item in serviceList">
+                    <div class="ticket-content" v-if="serviceType === item.key" :key="item.key">
+                        <div class="operate-wrapper">
+                            <advanced-search
+                                class="advanced-search"
+                                ref="advancedSearch"
+                                :forms="searchForms"
+                                :panel="item.key"
+                                :cur-servcie="item"
+                                :is-custom-tab="isCustomTab"
+                                :search-result-list="searchResultList"
+                                @search="handleSearch"
+                                @deteleSearchResult="deteleSearchResult"
+                                @onChangeHighlight="getAllTicketList()"
+                                @formChange="handleSearchFormChange"
+                                @clear="handleClearSearch">
+                                <div class="slot-content">
+                                    <bk-button
+                                        data-test-id="ticket_button_export"
+                                        class="export"
+                                        :title="$t(`m.tickets['导出']`)"
+                                        @click="openExportList">
+                                        {{ $t('m.tickets["导出"]') }}
+                                    </bk-button>
+                                </div>
+                            </advanced-search>
+                        </div>
+                        <div class="table-wrapper">
+                            <table-content
+                                v-bkloading="{ isLoading: tableLoading }"
+                                :data-list="dataList"
+                                :pagination="pagination"
+                                :color-hex-list="colorHexList"
+                                :service-type="serviceType"
+                                @submitSuccess="evaluationSubmitSuccess"
+                                @orderingClick="orderingClick"
+                                @handlePageLimitChange="handlePageLimitChange"
+                                @handlePageChange="handlePageChange">
+                            </table-content>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
         <!-- 自定义tab -->
@@ -186,6 +174,7 @@
 </template>
 <!-- 自定义tab 选择服务目录是只能选择下级目录 -->
 <script>
+    import draggable from 'vuedraggable'
     import memberSelect from '../../../views/commonComponent/memberSelect'
     import NavTitle from '@/components/common/layout/NavTitle'
     import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
@@ -201,7 +190,8 @@
             AdvancedSearch,
             TableContent,
             ExportTicketDialog,
-            memberSelect
+            memberSelect,
+            draggable
         },
         mixins: [ticketListMixins],
         props: {
@@ -390,6 +380,23 @@
             this.initData()
         },
         methods: {
+            // 拖拽后变更自定义列表order
+            onEnd (e) {
+                const text = e.item.textContent.trim()
+                const curDrag = this.customList.find(item => item.name === text)
+                const params = {
+                    new_order: e.newIndex - 3,
+                    tab_id: curDrag.id
+                }
+                this.$store.dispatch('project/moveProjectTab', params).then(res => {
+
+                }).catch(res => {
+                    this.$bkMessage({
+                        message: res.data.msg,
+                        theme: 'error'
+                    })
+                })
+            },
             async initData () {
                 this.loading = true
                 // 获取所有服务类型列表
@@ -467,7 +474,6 @@
             },
             // 获取自定义tab列表
             getProjectTabList () {
-                this.customList = []
                 this.isEditTab = false
                 const params = {
                     project_key: this.$route.query.project_id
@@ -477,6 +483,7 @@
                         item.key = String(item.id)
                         this.customList.push(item)
                     })
+                    this.customList = res.data
                     this.serviceList.splice(4)
                     this.customList.forEach(ite => {
                         this.serviceList.push(ite)
@@ -495,9 +502,6 @@
                 this.customTabForm.desc = panel.desc
                 this.$set(this.customTabForm, 'conditions', panel.conditions)
                 this.showCustomTabEdit = true
-            },
-            sortChange (dragTabIndex, dropTabIndex) {
-                // console.log(dragTabIndex, dropTabIndex)
             },
             // 新增自定义tab
             addPanel () {
@@ -527,6 +531,10 @@
                     this.$store.dispatch('project/deleteProjectTab', this.serviceList[index].id).then(res => {
                         if (res.result) {
                             this.serviceList.splice(index, 1)
+                            if (this.currentTab === panel.name) {
+                                this.currentTab = '请求管理'
+                                this.serviceType = 'request'
+                            }
                             this.getProjectTabList()
                         }
                     })
@@ -734,7 +742,7 @@
             },
             // 切换不同的标签卡
             changeTag (val) {
-                // console.log('点击选项卡', val)
+                this.currentTab = val
                 this.pagination.limit = 10
                 this.pagination.current = 1
                 this.searchParams = {}
@@ -885,6 +893,47 @@
                     }
                 }
             }
+        }
+    }
+    .nav-list {
+        display: flex;
+        height: 50px;
+        .drag-list {
+            cursor: pointer;
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            font-size: 14px;
+            padding: 2px 20px;
+            &:hover {
+                color: #3a84ff;
+                .ticket-file-count {
+                    background: #3a84ff;
+                    color: white;
+                }
+                .icon-itsm-icon-three-one {
+                    display: inline-block;
+                }
+                .icon-edit-new {
+                    display: inline-block;
+                }
+            }
+            .icon-itsm-icon-three-one {
+                display: none;
+            }
+            .icon-edit-new {
+                display: none;
+            }
+            .ticket-file-count {
+                font-size: 12px;
+                background: #f0f1f5;
+                border-radius: 7px;
+                padding: 0 2px;
+            }
+        }
+        .active {
+            color: #3a84ff;
+            border-bottom: 4px solid #3a84ff;
         }
     }
     .bk-form {

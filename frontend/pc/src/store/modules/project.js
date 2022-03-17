@@ -114,6 +114,12 @@ export default {
         deleteProjectTab ({ commit }, id) {
             return ajax.delete(`project/tabs/${id}/`).then(response => response.data)
         },
+        // 拖拽排序指定项目下的tab
+        moveProjectTab({ commit }, params) {
+            const { tab_id } = params
+            return ajax.post(`project/tabs/${tab_id}/move/`, params).then(response => response.data)
+        },
+        // 获取项目tab列表
         getProjectTabList({ commit }, params) {
             const { page_size, page, ordering} = params
             return ajax.post(`ticket/receipts/get_filter_tickets/?page_size=${ page_size }&page=${ page }&ordering=${ ordering }`, params).then(response => response.data)
