@@ -27,7 +27,7 @@
                 <nav-title :title-name="titleName">
                     <div slot="tab">
                         <div class="nav-list">
-                            <draggable v-model="serviceList" @end="onEnd" filter=".forbid">
+                            <draggable class="drag-scroll" v-model="serviceList" @end="onEnd" filter=".forbid">
                                 <li class="drag-list" v-for="(item, index) in serviceList" :key="item.key" :class="{ 'active': item.name === currentTab, 'forbid': fixedTabs.includes(item.name) }" @click="changeTag(item.name)">
                                     <span>{{ item.name }}</span>
                                     <span v-if="counts[item.key]" class="ticket-file-count">{{ counts[item.key]}}</span>
@@ -898,42 +898,53 @@
     .nav-list {
         display: flex;
         height: 50px;
-        .drag-list {
-            cursor: pointer;
-            display: inline-block;
-            height: 50px;
-            line-height: 50px;
-            font-size: 14px;
-            padding: 2px 20px;
-            &:hover {
-                color: #3a84ff;
-                .ticket-file-count {
-                    background: #3a84ff;
-                    color: white;
+        overflow-x: auto;
+        overflow-y: hidden;
+        @include scroller;
+        .drag-scroll {
+            display: flex;
+            justify-content: space-evenly;
+            .drag-list {
+                width: 130px;
+                cursor: pointer;
+                display: inline-block;
+                height: 50px;
+                line-height: 50px;
+                font-size: 14px;
+                padding: 2px 20px;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+                &:hover {
+                    color: #3a84ff;
+                    .ticket-file-count {
+                        background: #3a84ff;
+                        color: white;
+                    }
+                    .icon-itsm-icon-three-one {
+                        display: inline-block;
+                    }
+                    .icon-edit-new {
+                        display: inline-block;
+                    }
                 }
                 .icon-itsm-icon-three-one {
-                    display: inline-block;
+                    display: none;
                 }
                 .icon-edit-new {
-                    display: inline-block;
+                    display: none;
+                }
+                .ticket-file-count {
+                    font-size: 12px;
+                    background: #f0f1f5;
+                    border-radius: 7px;
+                    padding: 0 2px;
                 }
             }
-            .icon-itsm-icon-three-one {
-                display: none;
+            .active {
+                color: #3a84ff;
+                border-bottom: 4px solid #3a84ff;
             }
-            .icon-edit-new {
-                display: none;
-            }
-            .ticket-file-count {
-                font-size: 12px;
-                background: #f0f1f5;
-                border-radius: 7px;
-                padding: 0 2px;
-            }
-        }
-        .active {
-            color: #3a84ff;
-            border-bottom: 4px solid #3a84ff;
         }
     }
     .bk-form {
