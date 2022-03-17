@@ -905,6 +905,7 @@
         height: 50px;
         overflow-x: auto;
         overflow-y: hidden;
+        z-index: 999;
         @include scroller(#a5a5a5, 4px, 4px);
         .drag-scroll {
             display: flex;
