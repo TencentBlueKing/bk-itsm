@@ -2477,19 +2477,10 @@ class Ticket(Model, BaseTicket):
                 transform_username(processors_list) if processors_list else "--"
             )
             logger.info(
-                "[ticket_current_processors]Success：用户名转换成中英文格式,ticket_id:{}, processors_list:{},transform_processors".format(
+                "[ticket_current_processors]Success：用户名转换成中英文格式成功,ticket_id:{}, processors_list:{}, transform_processors:{}".format(
                     self.id, processors_list, processors))
         except Exception as e:
-            if isinstance(processors_list, str):
-                processors_list = [
-                    processors
-                    for processors in processors_list.split(",")
-                    if processors
-                ]
-            user_list = []
-            for user in processors_list:
-                user_list.append("{}()".format(user))
-            processors = ",".join(user_list)
+            processors = ",".join(processors_list)
             logger.info(
                 "[ticket_current_processors]Failed：用户名转换成中英文格式失败,ticket_id:{}, processors_list:{}, error:{}".format(
                     self.id,
