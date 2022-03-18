@@ -98,7 +98,7 @@
         },
         computed: {
             isShowComment () {
-                return this.ticketInfo.is_over && this.ticketInfo.comment_id !== -1
+                return this.ticketInfo.is_over && Number(this.ticketInfo.comment_id) !== -1
             },
             token () {
                 return this.$route.query.token
@@ -159,7 +159,7 @@
                                 deal_time: '',
                                 detail_message: '',
                                 form_data: [],
-                                from_state_name: item.name,
+                                from_state_name: item.name || '',
                                 from_state_type: '',
                                 id: -1,
                                 message: '正在进行中' + '  ' + item.processors,
@@ -181,7 +181,7 @@
                 })
             },
             getTicktComment () {
-                if (!this.ticketInfo.is_over) return
+                if (!this.ticketInfo.is_over || !this.isShowComment) return
                 this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then(res => {
                     if (Object.keys(res.data).length !== 0) {
                         this.commentInfo = res.data
