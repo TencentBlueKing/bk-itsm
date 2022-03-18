@@ -281,15 +281,6 @@
                     this.selectedProject = val
                 }
             },
-            projectList (val) {
-                if (val.length !== 0 && this.$route.query.project_id && this.$route.query.from !== 'Home') {
-                    const current = val.find(item => item.key === this.$route.query.project_id)
-                    const result = this.applyForProjectViewPerm(current, 'project_view')
-                    if (!result) {
-                        this.onSelectProject('0')
-                    }
-                }
-            },
             isEditDialogShow (val) {
                 if (val) {
                     this.getProjectList()

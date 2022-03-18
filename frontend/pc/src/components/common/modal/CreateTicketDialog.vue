@@ -247,7 +247,8 @@
                     query: {
                         service_id: id,
                         key: key,
-                        project_id: this.$route.query.project_id
+                        project_id: this.$route.query.project_id,
+                        from: this.$route.name
                     }
                 })
             },

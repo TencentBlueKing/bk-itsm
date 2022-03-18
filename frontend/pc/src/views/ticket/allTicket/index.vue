@@ -92,7 +92,7 @@
             theme="primary"
             :mask-close="false"
             :auto-close="false"
-            :title="isEditTab ? $t(`m['编辑TAB']`) : $t(`m['新建TAB']`)"
+            :title="isEditTab ? $t(`m['编辑标签']`) : $t(`m['新建标签']`)"
             @confirm="handleAddTabs('add')"
             @cancel="handleCloseTabs">
             <bk-form
@@ -107,7 +107,7 @@
                     <bk-form-item class="bk-form-item" :label="$t(`m['自定义tab名称']`)" :required="true" :property="'name'">
                         <bk-input v-model="customTabForm.name" :maxlength="20" :show-word-limit="true" :placeholder="$t(`m['请输入名称']`)"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t(`m['描述信息']`)" :required="true" :property="'desc'">
+                    <bk-form-item :label="$t(`m['描述信息']`)">
                         <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
                     </bk-form-item>
                     <p class="bk-form-title">{{ $t(`m['筛选信息']`) }}</p>
@@ -340,13 +340,6 @@
                                 return !list.includes(val)
                             },
                             message: this.$t('m["该TAB名称已存在"]'),
-                            trigger: 'blur'
-                        }
-                    ],
-                    desc: [
-                        {
-                            required: true,
-                            message: this.$t('m["请输入备注信息"]'),
                             trigger: 'blur'
                         }
                     ]
@@ -920,6 +913,7 @@
                 overflow: hidden;
                 text-overflow:ellipsis;
                 white-space: nowrap;
+                color: #63656e;
                 &:hover {
                     color: #3a84ff;
                     .ticket-file-count {
