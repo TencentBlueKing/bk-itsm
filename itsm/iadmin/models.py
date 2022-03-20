@@ -41,6 +41,7 @@ from itsm.component.constants import (
     LEN_NORMAL,
     LEN_SHORT,
     NOTIFY_TYPE_CHOICES,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.db import managers
 from itsm.component.fields import IOField
@@ -98,7 +99,12 @@ class SystemSettings(Model):
     def init_default_settings(cls, *args, **kwargs):
         for setting in DEFAULT_SETTINGS:
             SystemSettings.objects.get_or_create(
-                defaults={"type": setting[1], "value": setting[2], "creator": "system", "updated_by": "system", },
+                defaults={
+                    "type": setting[1],
+                    "value": setting[2],
+                    "creator": "system",
+                    "updated_by": "system",
+                },
                 key=setting[0],
             )
 
@@ -115,15 +121,27 @@ class CustomNotice(models.Model):
         help_text=_("工单字段的值可以作为参数写到模板中，格式如：【ITSM】${service}管理单【${action}】提醒"),
     )
     content_template = models.TextField(
-        _("内容模板"), default="", null=True, blank=True, help_text=_("工单字段的值可以作为参数写到模板中，格式如：单号:${sn}")
+        _("内容模板"),
+        default="",
+        null=True,
+        blank=True,
+        help_text=_("工单字段的值可以作为参数写到模板中，格式如：单号:${sn}"),
     )
-    action = models.CharField(_("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default")
-    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES, default="EMAIL")
+    action = models.CharField(
+        _("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default"
+    )
+    notify_type = models.CharField(
+        _("通知方式"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES, default="EMAIL"
+    )
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
     updated_by = models.CharField(_("更新人"), max_length=LEN_NORMAL, default="system")
     used_by = models.CharField(_("使用者"), max_length=LEN_NORMAL, default="system")
     version = models.CharField(_("版本"), max_length=LEN_SHORT, default="V1")
+
+    project_key = models.CharField(
+        _("项目key"), max_length=LEN_SHORT, null=False, default=PUBLIC_PROJECT_PROJECT_KEY
+    )
 
     auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
     resource_operations = ["flow_element_manage"]
@@ -151,24 +169,30 @@ class CustomNotice(models.Model):
             try:
                 CustomNotice.objects.get_or_create(
                     defaults={
-                        'title_template': template[0],
-                        'content_template': template[1],
+                        "title_template": template[0],
+                        "content_template": template[1],
                         "used_by": template[4],
                         "version": "V2",
+                        "project_key": "public",
                     },
                     action=template[2],
-                    notify_type=template[3]
+                    notify_type=template[3],
                 )
             except CustomNotice.MultipleObjectsReturned:
-                CustomNotice.objects.filter(action=template[2], notify_type=template[3]).delete()
+                CustomNotice.objects.filter(
+                    action=template[2],
+                    notify_type=template[3],
+                    project_key=PUBLIC_PROJECT_PROJECT_KEY,
+                ).delete()
                 CustomNotice.objects.create(
                     **{
-                        'title_template': template[0],
-                        'content_template': template[1],
+                        "title_template": template[0],
+                        "content_template": template[1],
                         "used_by": template[4],
                         "version": "V2",
                         "action": template[2],
                         "notify_type": template[3],
+                        "project_key": "public",
                     }
                 )
 
@@ -278,7 +302,9 @@ class Data(models.Model):
     )
     key = models.CharField(_("关键字"), max_length=LEN_MIDDLE, db_index=True)
     value = IOField(verbose_name=_("值"))
-    type = models.CharField(_("类型"), choices=TYPE_CHOICES, default="string", max_length=LEN_SHORT)
+    type = models.CharField(
+        _("类型"), choices=TYPE_CHOICES, default="string", max_length=LEN_SHORT
+    )
     expire_at = models.DateTimeField(_("过期时间"), null=True, blank=True, db_index=True)
 
     objects = DataManager()
