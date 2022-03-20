@@ -167,7 +167,9 @@ class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.utils.client_backend_query.update_user_departments")
     def test_send_sms(self, update_user_departments):
-        update_user_departments.return_value = [{'id': '1', 'name': '总公司', 'family': []}]
+        update_user_departments.return_value = [
+            {"id": "1", "name": "总公司", "family": []}
+        ]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         data = {"receiver": "admin"}
@@ -182,7 +184,9 @@ class TicketViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.utils.client_backend_query.update_user_departments")
     def test_send_email(self, update_user_departments):
-        update_user_departments.return_value = [{'id': '1', 'name': '总公司', 'family': []}]
+        update_user_departments.return_value = [
+            {"id": "1", "name": "总公司", "family": []}
+        ]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         data = {"receiver": "admin"}
@@ -205,15 +209,19 @@ class TicketViewTest(TestCase):
     @mock.patch("itsm.role.models.get_user_departments")
     def test_export_group_by_service(self, get_user_departments):
         get_user_departments.return_value = ["1"]
-        url = "/api/ticket/receipts/export_group_by_service/?export_fields=sn&service_id__in=1&service_fields=eyI2IjpbInRpdGxlIl19"
+        url = "/api/ticket/receipts/export_group_by_service/?export_fields=sn&service_id__in=1&service_fields=eyI2IjpbInRpdGxlIl19"  # noqa
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
     @mock.patch("itsm.ticket.serializers.ticket.transform_single_username")
-    def test_print_ticket(self, get_user_departments, transform_single_username):
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    def test_print_ticket(
+        self, get_user_departments, transform_single_username, get_bk_users
+    ):
         get_user_departments.return_value = ["1"]
+        get_bk_users.return_value = ["1"]
         transform_single_username.return_value = "admin(管理员)"
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
@@ -382,8 +390,10 @@ class TicketViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
-    def test_tickets_processors(self, get_user_departments):
+    @mock.patch("itsm.component.utils.client_backend_query.get_bk_users")
+    def test_tickets_processors(self, get_user_departments, get_bk_users):
         get_user_departments.return_value = ["1"]
+        get_bk_users.return_value = ["1"]
         url = "/api/ticket/receipts/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
 
@@ -423,7 +433,7 @@ class TicketViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], dict)
-        
+
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.role.models.get_user_departments")
     def test_remark(self, get_user_departments):
@@ -442,7 +452,6 @@ class TicketViewTest(TestCase):
 class OperationalDataViewTest(TestCase):
     data_filter = "create_at__gte=2021-01-01&create_at__lte=2031-01-01"
     month_filter = "create_at__gte=2021-01&create_at__lte=2031-01"
-
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def setUp(self):
@@ -632,7 +641,9 @@ class OperationalDataViewTest(TestCase):
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     @mock.patch("itsm.component.utils.client_backend_query.update_user_departments")
     def test_sync_organization(self, update_user_departments):
-        update_user_departments.return_value = [{'id': '1', 'name': '总公司', 'family': []}]
+        update_user_departments.return_value = [
+            {"id": "1", "name": "总公司", "family": []}
+        ]
         url = "/api/ticket/operational/sync_organization/"
         rsp = self.client.get(path=url, data=None, content_type="application/json")
         self.assertEqual(rsp.status_code, 200)
@@ -641,10 +652,8 @@ class OperationalDataViewTest(TestCase):
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
     def test_get_tickets(self):
-        tickets_filter = (
-            "{}&title=test&creator=admin&sn=123456&is_draft=1&service_type=request".format(
-                self.data_filter
-            )
+        tickets_filter = "{}&title=test&creator=admin&sn=123456&is_draft=1&service_type=request".format(
+            self.data_filter
         )
         url = "/api/ticket/operational/get_tickets/?{}".format(tickets_filter)
         rsp = self.client.get(path=url, data=None, content_type="application/json")
@@ -708,7 +717,13 @@ class OperationalDataViewTest(TestCase):
     @mock.patch("itsm.component.tasks.adapter_api")
     def test_ticket_processor_rank(self, adapter_api):
         adapter_api.get_all_users.return_value = [
-            {'id': 'admin', 'name': 'admin(admin)', 'bk_username': 'admin', 'chname': 'admin'}]
+            {
+                "id": "admin",
+                "name": "admin(admin)",
+                "bk_username": "admin",
+                "chname": "admin",
+            }
+        ]
         url = "/api/ticket/operational/ticket_processor_rank/?{}".format(
             self.data_filter
         )
@@ -746,4 +761,3 @@ class OperationalDataViewTest(TestCase):
         self.assertEqual(rsp.status_code, 200)
         self.assertEqual(rsp.data["message"], "success")
         self.assertIsInstance(rsp.data["data"], list)
-

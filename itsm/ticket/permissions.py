@@ -88,8 +88,10 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "close" and obj.can_close(username):
             return True
 
+        iam_ticket_manage_auth = self.iam_ticket_manage_auth(request, obj)
+
         if view.action == "exception_distribute":
-            if not self.iam_ticket_manage_auth(request, obj):
+            if not iam_ticket_manage_auth:
                 self.message = _("抱歉，您无权执行此操作，因为您该服务没有工单管理的权限")
                 return False
             else:
@@ -101,8 +103,11 @@ class TicketPermissionValidate(permissions.BasePermission):
             except Exception:
                 # 异常情况直接返回
                 return False
+            state_permission = StatePermissionValidate().has_object_permission(
+                request, node
+            )
 
-            return StatePermissionValidate().has_object_permission(request, node)
+            return [state_permission, request.user.is_superuser, iam_ticket_manage_auth]
 
         if view.action == "get_ticket_output":
             return True
@@ -131,10 +136,19 @@ class TicketPermissionValidate(permissions.BasePermission):
             obj.service_id, username
         ):
             return True
-
-        return obj.can_operate(username)
+        return any(
+            [
+                obj.can_operate(username),
+                iam_ticket_manage_auth,
+                request.user.is_superuser,
+            ]
+        )
 
     def iam_ticket_manage_auth(self, request, obj):
+        # 本地开发环境，不校验单据管理权限
+        if settings.ENVIRONMENT == "dev":
+            return True
+
         iam_client = IamRequest(request)
         resource_info = {
             "resource_id": str(obj.service_id),
