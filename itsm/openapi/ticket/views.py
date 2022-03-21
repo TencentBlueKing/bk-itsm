@@ -55,6 +55,7 @@ from itsm.component.constants import (
     FIELD_PY_IMPACT,
     FIELD_TITLE,
 )
+from itsm.component.decorators import custom_apigw_required
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.drf.mixins import ApiGatewayMixin
 from itsm.component.drf.pagination import OpenApiPageNumberPagination
@@ -681,3 +682,21 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
     @catch_ticket_operate_exception
     def callback_failed_ticket(self, request):
         return Response(Cache().hkeys("callback_error_ticket"))
+
+    @action(detail=False, methods=["post"])
+    @catch_ticket_operate_exception
+    @custom_apigw_required
+    def add_follower(self, request, *args, **kwargs):
+        """关注or取关"""
+        sn = request.data.get("sn")
+        user = request.data.get("user")
+        try:
+            ticket = Ticket.objects.get(sn=sn)
+        except Ticket.DoesNotExist:
+            raise ParamError("sn[{}]对应的单据不存在！".format(sn))
+        attention = request.data.get("attention")
+        if attention:
+            ticket.add_follower(user)
+        else:
+            ticket.delete_follower(user)
+        return Response()
