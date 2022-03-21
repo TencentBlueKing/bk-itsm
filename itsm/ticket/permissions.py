@@ -107,7 +107,7 @@ class TicketPermissionValidate(permissions.BasePermission):
                 request, node
             )
 
-            return [state_permission, request.user.is_superuser, iam_ticket_manage_auth]
+            return [state_permission, iam_ticket_manage_auth]
 
         if view.action == "get_ticket_output":
             return True
@@ -136,13 +136,7 @@ class TicketPermissionValidate(permissions.BasePermission):
             obj.service_id, username
         ):
             return True
-        return any(
-            [
-                obj.can_operate(username),
-                iam_ticket_manage_auth,
-                request.user.is_superuser,
-            ]
-        )
+        return any([obj.can_operate(username), iam_ticket_manage_auth])
 
     def iam_ticket_manage_auth(self, request, obj):
         # 本地开发环境，不校验单据管理权限
