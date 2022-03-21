@@ -158,28 +158,7 @@ class TicketPermissionValidate(permissions.BasePermission):
         if auth_actions.get("ticket_management"):
             return True
 
-        bk_iam_path = "/project,{}/".format(obj.project_key)
-        resources = [
-            Resource(
-                settings.BK_IAM_SYSTEM_ID,
-                resource_info["resource_type"],
-                str(resource_info["resource_id"]),
-                {
-                    "iam_resource_owner": resource_info.get("creator", ""),
-                    "_bk_iam_path_": bk_iam_path
-                    if resource_info["resource_type"] != "project"
-                    else "",
-                    "name": resource_info.get("resource_name", ""),
-                },
-            )
-        ]
-
-        raise AuthFailedException(
-            settings.BK_IAM_SYSTEM_ID,
-            Subject("user", request.user.username),
-            Action(apply_actions[0]),
-            resources,
-        )
+        return False
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
