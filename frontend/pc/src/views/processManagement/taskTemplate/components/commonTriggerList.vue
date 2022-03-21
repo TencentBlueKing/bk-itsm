@@ -448,7 +448,10 @@
             newTrigger () {
                 this.initDialogInfo()
                 this.$router.push({
-                    name: 'PublicTrigger'
+                    name: 'projectTrigger',
+                    query: {
+                        project_id: this.$route.query.project_id
+                    }
                 })
             },
             initDialogInfo () {
