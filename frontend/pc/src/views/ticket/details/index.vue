@@ -225,8 +225,8 @@
                 this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
             })
             if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
-                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList[0].can_operate
-                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.$refs.leftTicketContent.currentStepList[0].can_operate)
+                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate)
+                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
             }
         },
         beforeDestroy () {
