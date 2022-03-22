@@ -206,7 +206,7 @@
                 })
                 this.currentStepList.forEach((item, index) => {
                     // 只有审批节点才支持异常分派
-                    if (this.ticketInfo.auth_actions.includes('ticket_management') && item.status !== 'FAILED' && item.type === 'APPROVAL') {
+                    if (this.ticketInfo.auth_actions.includes('ticket_management') && item.status === 'FAILED' && item.type === 'APPROVAL') {
                         item.operations.push({
                             can_operate: true,
                             key: 'EXCEPTION_DISTRIBUTE',
