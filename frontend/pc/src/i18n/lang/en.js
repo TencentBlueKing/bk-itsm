@@ -897,6 +897,7 @@ export const m = {
         '成功': ' Successfully',
         '请输入终止原因': 'Please input the reasons for termination',
         '请输入转单原因': 'Please input the reasons for re-assign',
+        '请输入分派原因': 'Please input the reasons for re-assign',
         '评分：': 'Rates:',
         '提单时间：': 'Reported Time:',
         '请填写你的意见': 'Please fill in your comments. ',
@@ -935,9 +936,11 @@ export const m = {
         '请输入挂起原因': 'Please input the Reason For Pending ',
         '挂起原因不能为空': 'Reason For Pending is required ',
         '转单至：': 'To: ',
+        '分派至：': 'To: ',
         '请选择处理人': 'Please select processor ',
         '转单人不能为空': 're-assign is required ',
         '转单原因': 'Reason ',
+        '分派原因': 'Reason ',
         '转单原因不能为空': 'Reasons for re-assign is required ',
         '指定处理人': 'Appointed Processor ',
         '请选择指定处理人': 'Please appoint processor ',
@@ -2452,5 +2455,6 @@ export const m = {
     '该TAB名称已存在': 'The tab name already exists',
     '请输入自定义TAB名称': 'Please enter a custom tab name',
     '基本信息': 'Basic Information',
-    '筛选信息': 'Screen Information'
+    '筛选信息': 'Screen Information',
+    '异常分派': 'Exception Distribute'
 }

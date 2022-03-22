@@ -88,6 +88,13 @@ export default {
                 return res
             })
         },
+        // 异常分派
+        exceptionDistribute({ commit, state, dispatch }, { params, id }) {
+            return ajax.post(`ticket/receipts/${id}/exception_distribute/`, params).then(response => {
+                const res = response.data
+                return res
+            })
+        },
         // 响应
         replyAssignDeliver ({ commit, state, dispatch }, { params, id }) {
             return ajax.post(`ticket/receipts/${id}/reply/`, params).then(response => {

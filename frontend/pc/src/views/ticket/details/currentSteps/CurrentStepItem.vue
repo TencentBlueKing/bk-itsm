@@ -544,6 +544,7 @@
                 }
             },
             submitFormAjax (submitFormData) {
+                console.log(submitFormData)
                 const id = this.nodeInfo.ticket_id
                 // 终止
                 if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
@@ -616,6 +617,16 @@
                         params.processors_type = submitFormData.person.type
                     }
                     this.submitAjax('newAssignDeliver', params, id)
+                }
+                console.log(this.openFormInfo.btnInfo.key)
+                if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
+                    const params = {
+                        state_id: this.nodeInfo.state_id,
+                        processors: submitFormData.person.value,
+                        processors_type: submitFormData.person.type,
+                        action_type: this.openFormInfo.btnInfo.key
+                    }
+                    this.submitAjax('exceptionDistribute', params, id)
                 }
             },
             submitAjax (type, params, id) {
