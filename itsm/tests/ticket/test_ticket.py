@@ -449,7 +449,7 @@ class TicketTest(TestCase):
         self.assertEqual(["admin", "test"], list_rsp.data["data"]["followers"])
         self.assertEqual(ticket_id, list_rsp.data["data"]["id"])
         self.assertEqual(True, list_rsp.data["data"]["can_view"])
-        self.assertEqual(False, list_rsp.data["data"]["can_operate"])
+        self.assertEqual(True, list_rsp.data["data"]["can_operate"])
 
     @mock.patch.object(Status, "approval_result")
     @mock.patch.object(Status, "get_processor_in_sign_state")

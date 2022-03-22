@@ -278,7 +278,9 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
 
         # 服务展示过滤
         conditions = Service.permission_filter(request.user.username)
-        services = services.filter(reduce(operator.or_, conditions))
+        services = services.filter(reduce(operator.or_, conditions)).order_by(
+            "-update_at"
+        )
         context = self.get_serializer_context()
         if request.query_params.get("page", "") and request.query_params.get(
             "page_size", ""

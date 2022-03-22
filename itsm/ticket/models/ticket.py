@@ -3386,6 +3386,9 @@ class Ticket(Model, BaseTicket):
             context={"dst_state": status.id, "operator": self.creator},
         )
 
+        # 全局 进入节点 触发球
+        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+
         # 提单节点给提单人发送关注通知邮件, 非提单节点给处理人发送单据待办通知邮件
         context = {}
         status.refresh_from_db()
@@ -3455,6 +3458,9 @@ class Ticket(Model, BaseTicket):
         if self.is_sla_start_state(state_id):
             self.create_sla_task(state_id=state_id)
             self.start_sla(state_id)
+
+        # 全局 进入节点 触发球
+        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
 
         # 发送进入节点的信号
         self.send_trigger_signal(
@@ -3641,6 +3647,9 @@ class Ticket(Model, BaseTicket):
 
         self.send_trigger_signal(LEAVE_STATE, state_id)
 
+        # 全局触发器
+        self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+
     def do_in_state(self, state_id, fields, operator, source):
         """节点内动作
         1. 填充表单
@@ -3677,6 +3686,8 @@ class Ticket(Model, BaseTicket):
             self.send_trigger_signal(
                 LEAVE_STATE, state_id, context={"operator": operator}
             )
+            # 全局触发器
+            self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
@@ -3798,7 +3809,9 @@ class Ticket(Model, BaseTicket):
 
         try:
             logger.info(
-                "[ticket->send_trigger_signal] 正在发送触发器事件, ticket_id={}".format(self.id)
+                "[ticket->send_trigger_signal] 正在发送触发器事件, signal={}, ticket_id={}".format(
+                    signal, self.id
+                )
             )
             trigger_signal.send(
                 signal,
