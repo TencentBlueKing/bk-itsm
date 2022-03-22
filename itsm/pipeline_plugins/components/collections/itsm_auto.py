@@ -42,6 +42,7 @@ from itsm.component.constants import (
     LEN_LONG,
     API_DICT,
     TRANSITION_OPERATE,
+    NODE_FAILED,
 )
 from itsm.component.esb.backend_component import bk
 from itsm.component.utils.basic import list_by_separator
@@ -249,6 +250,14 @@ class AutoStateService(ItsmBaseService):
             if state_status == FAILED:
                 ticket.node_status.filter(state_id=state_id).update(
                     action_type=TRANSITION_OPERATE
+                )
+                # 发送通知
+                ticket.notify(
+                    state_id=state_id,
+                    receivers=operator,
+                    message=ex_data[:LEN_LONG] if ex_data else rsp,
+                    action=NODE_FAILED,
+                    retry=False,
                 )
 
             # 发送通知

@@ -119,6 +119,9 @@ RETRY = "RETRY"
 IGNORE = "IGNORE"
 MANUAL = "MANUAL"
 
+# 流程节点失败标识
+NODE_FAILED = "NODE_FAILED"
+
 # 单据审批意见标识别
 TONGYI = "true"
 JUJUE = "false"
