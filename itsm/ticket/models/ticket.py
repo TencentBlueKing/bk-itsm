@@ -3492,6 +3492,16 @@ class Ticket(Model, BaseTicket):
 
         return variables, finish_condition, code_key
 
+    def get_fast_approval_message_params(self):
+        """获取快速审批模版所需参数"""
+        return {
+            "title": self.title,
+            "ticket_url": self.ticket_url,
+            "sn": self.sn,
+            "catalog_service_name": self.catalog_service_name,
+            "running_status": self.running_status
+        }
+
     def set_current_processors(self):
         """单据中设置当前的操作人员"""
 
