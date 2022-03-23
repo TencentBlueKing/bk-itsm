@@ -45,7 +45,7 @@
             </bk-select>
         </div>
         <!-- 二级处理人 -->
-        <div class="second-level">
+        <div class="second-level" v-if="['PERSON', 'GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE', 'ORGANIZATION'].includes(formData.levelOne)">
             <!-- 个人 -->
             <template v-if="formData.levelOne === 'PERSON' && Array.isArray(formData.levelSecond)">
                 <member-select data-test-id="dealPerson-select-personSecondHandler" :ext-cls="'bk-form-width'"
