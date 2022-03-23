@@ -60,6 +60,7 @@
                 </bk-tab-panel>
                 <!-- 全部评论 TODO -->
                 <bk-tab-panel
+                    v-if="isShowComment"
                     name="allComments"
                     :label="$t(`m.newCommon['所有评论']`)">
                     <template v-slot:label>
@@ -134,7 +135,13 @@
             commentLoading: Boolean,
             isPageOver: Boolean,
             hasNodeOptAuth: Boolean,
-            moreLoading: Boolean
+            moreLoading: Boolean,
+            isShowComment: {
+                type: Boolean,
+                default () {
+                    return true
+                }
+            }
         },
         inject: ['reloadTicket'],
         data () {
@@ -206,7 +213,7 @@
                 })
                 this.currentStepList.forEach((item, index) => {
                     // 只有审批节点才支持异常分派
-                    if (this.ticketInfo.auth_actions.includes('ticket_management') && item.status === 'FAILED' && item.type === 'APPROVAL') {
+                    if (this.ticketInfo.auth_actions.includes('ticket_management') && item.type === 'APPROVAL') {
                         item.operations.push({
                             can_operate: true,
                             key: 'EXCEPTION_DISTRIBUTE',
