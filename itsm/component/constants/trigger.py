@@ -25,10 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.utils.translation import ugettext as _
 
-ACTION_STATUS_CREATED = 'CREATED'
-ACTION_STATUS_RUNNING = 'RUNNING'
-ACTION_STATUS_SUCCEED = 'SUCCEED'
-ACTION_STATUS_FAILED = 'FAILED'
+ACTION_STATUS_CREATED = "CREATED"
+ACTION_STATUS_RUNNING = "RUNNING"
+ACTION_STATUS_SUCCEED = "SUCCEED"
+ACTION_STATUS_FAILED = "FAILED"
 
 ACTION_STATUS_CHOICE = [
     (ACTION_STATUS_CREATED, _("新建")),
@@ -53,7 +53,12 @@ TRIGGER_SOURCE_TYPE = [
     (SOURCE_TASK, _("任务")),
 ]
 
-TRIGGER_ICON_CHOICE = [("message", _("消息")), ("status", _("修改状态")), ("user", _("修改处理人")), ("api", _("API接口"))]
+TRIGGER_ICON_CHOICE = [
+    ("message", _("消息")),
+    ("status", _("修改状态")),
+    ("user", _("修改处理人")),
+    ("api", _("API接口")),
+]
 
 # 触发信息定义
 
@@ -68,6 +73,13 @@ CREATE_RELATE_TICKET = "CREATE_RELATE_TICKET"
 CREATE_PARENTChILD_TICKET = "CREATE_PARENTChILD_TICKET"
 DISSOLVE_PARENTChILD_TICKET = "DISSOLVE_PARENTChILD_TICKET"
 
+# Part2 节点和线条
+ENTER_STATE = "ENTER_STATE"
+LEAVE_STATE = "LEAVE_STATE"
+DISTRIBUTE_STATE = "DISTRIBUTE_STATE"
+CLAIM_STATE = "CLAIM_STATE"
+DELIVER_STATE = "DELIVER_STATE"
+
 FLOW_TRIGGER_SIGNAL = {
     CREATE_TICKET: _("创建单据"),
     CLOSE_TICKET: _("关闭单据"),
@@ -75,17 +87,12 @@ FLOW_TRIGGER_SIGNAL = {
     SUSPEND_TICKET: _("挂起单据"),
     RECOVERY_TICKET: _("恢复单据"),
     DELETE_TICKET: _("撤销单据"),
+    ENTER_STATE: _("进入节点"),
+    LEAVE_STATE: _("离开节点")
     # CREATE_RELATE_TICKET: _("创建关联单"),
     # CREATE_PARENTChILD_TICKET: _("创建母子单"),
     # DISSOLVE_PARENTChILD_TICKET: _("解除母子单"),
 }
-
-# Part2 节点和线条
-ENTER_STATE = "ENTER_STATE"
-LEAVE_STATE = "LEAVE_STATE"
-DISTRIBUTE_STATE = "DISTRIBUTE_STATE"
-CLAIM_STATE = "CLAIM_STATE"
-DELIVER_STATE = "DELIVER_STATE"
 
 STATE_TRIGGER_SIGNAL = {
     ENTER_STATE: _("进入节点"),
@@ -118,8 +125,8 @@ TASK_TRIGGER_SIGNAL = {
 # 所有的触发信息
 
 FLOW_SIGNAL = "FLOW"
-STATE_SIGNAL = 'STATE'
-TRANSITION_SIGNAL = 'TRANSITION'
+STATE_SIGNAL = "STATE"
+TRANSITION_SIGNAL = "TRANSITION"
 TASK_SIGNAL = "TASK"
 
 TRIGGER_SIGNAL = {
@@ -146,5 +153,7 @@ ONLY_BACKEND_SIGNALS = [
 ]
 
 TRIGGER_SIGNAL_CHOICE = [
-    (signal, name) for signal_group in TRIGGER_SIGNAL.values() for signal, name in signal_group.items()
+    (signal, name)
+    for signal_group in TRIGGER_SIGNAL.values()
+    for signal, name in signal_group.items()
 ]
