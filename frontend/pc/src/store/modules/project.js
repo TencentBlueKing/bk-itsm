@@ -123,6 +123,9 @@ export default {
         getProjectTabList({ commit }, params) {
             const { page_size, page, ordering} = params
             return ajax.post(`ticket/receipts/get_filter_tickets/?page_size=${ page_size }&page=${ page }&ordering=${ ordering }`, params).then(response => response.data)
+        },
+        getAction ({ commit }, params) {
+            return ajax.get(`iadmin/custom_notify_template/action_type/`, params).then(response => response.data)
         }
     }
 }
