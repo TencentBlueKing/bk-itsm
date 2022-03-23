@@ -230,10 +230,6 @@ def custom_regex_validate(field, field_obj):
 def regex_validate(field, field_obj):
     regex = field_obj.regex
 
-    # 自定义正则将不参与此类计算
-    if regex == "CUSTOM_REGEX":
-        return
-
     regex_list = []
     for choice in list(REGEX_CHOICES.values()):
         regex_list.extend(choice)

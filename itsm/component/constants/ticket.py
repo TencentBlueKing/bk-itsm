@@ -131,11 +131,15 @@ FIELD_PY_IMPACT = "impact"
 FIELD_PX_URGENCY = "urgency"
 FIELD_PRIORITY = "priority"
 FIELD_STATUS = "current_status"
-FIELD_APPLY_REASON = 'apply_reason'
-FIELD_APPLY_CONTENT = 'apply_content'
+FIELD_APPLY_REASON = "apply_reason"
+FIELD_APPLY_CONTENT = "apply_content"
 
 # 必选字段
-REQUIRED_FIELD = {FIELD_PX_URGENCY: _("紧急程度"), FIELD_PY_IMPACT: _("影响范围"), FIELD_PRIORITY: _("优先级")}
+REQUIRED_FIELD = {
+    FIELD_PX_URGENCY: _("紧急程度"),
+    FIELD_PY_IMPACT: _("影响范围"),
+    FIELD_PRIORITY: _("优先级"),
+}
 
 # 打回信息字段key
 FIELD_BACK_MSG = "can_back_message"
@@ -143,26 +147,32 @@ FIELD_BACK_MSG = "can_back_message"
 FIELD_TERM_MSG = "terminate_message"
 
 # 迁移旧流程自动增加的字段key
-REJECT_SELECT_KEY = 'SYSTEM__REJECT_SELECT__'
-DIAMOND_SELECT_KEY = 'SYSTEM__DIAMOND_SELECT__'
-REJECT_MESSAGE = 'SYSTEM__REJECT_MESSAGE__'
+REJECT_SELECT_KEY = "SYSTEM__REJECT_SELECT__"
+DIAMOND_SELECT_KEY = "SYSTEM__DIAMOND_SELECT__"
+REJECT_MESSAGE = "SYSTEM__REJECT_MESSAGE__"
 
 # 字段数据需要做json化/反json处理
-JSON_HANDLE_FIELDS = ["TABLE", "CUSTOMTABLE", "SOPS_TEMPLATE", "CUSTOM-FORM", "DEVOPS_TEMPLATE"]
+JSON_HANDLE_FIELDS = [
+    "TABLE",
+    "CUSTOMTABLE",
+    "SOPS_TEMPLATE",
+    "CUSTOM-FORM",
+    "DEVOPS_TEMPLATE",
+]
 
 # 导出字段表
 EXPORT_FIELDS = [
-    {'id': 'sn', 'name': _('工单编号')},
-    {'id': 'title', 'name': _('标题')},
-    {'id': 'bk_biz_id', 'name': _('关联业务')},
-    {'id': 'service_type_name', 'name': _('工单类型')},
-    {'id': 'catalog_fullname', 'name': _('服务目录')},
-    {'id': 'current_status_display', 'name': _('状态')},
-    {'id': 'current_steps', 'name': _('当前步骤')},
-    {'id': 'creator', 'name': _('创建人')},
-    {'id': 'create_at', 'name': _('创建时间')},
-    {'id': 'end_at', 'name': _('结束时间')},
-    {'id': 'service_name', 'name': _('服务')},
+    {"id": "sn", "name": _("工单编号")},
+    {"id": "title", "name": _("标题")},
+    {"id": "bk_biz_id", "name": _("关联业务")},
+    {"id": "service_type_name", "name": _("工单类型")},
+    {"id": "catalog_fullname", "name": _("服务目录")},
+    {"id": "current_status_display", "name": _("状态")},
+    {"id": "current_steps", "name": _("当前步骤")},
+    {"id": "creator", "name": _("创建人")},
+    {"id": "create_at", "name": _("创建时间")},
+    {"id": "end_at", "name": _("结束时间")},
+    {"id": "service_name", "name": _("服务")},
 ]
 
 # regex
@@ -186,7 +196,7 @@ REGEX_STRING_TEXT = [
     ("ID_CARD", _("身份证")),
     ("QQ", _("QQ号码")),
     ("IP", _("IP地址")),
-    # ("CUSTOM", u"自定义正则表达式"),
+    ("CUSTOM", u"自定义正则表达式"),
 ]
 
 REGEX_CHOICES = {
@@ -195,6 +205,7 @@ REGEX_CHOICES = {
         ("NUM", _("数字0-9")),
         ("NUMWITHOUTZERO", _("非零正整数")),
         ("ASSOCIATED_FIELD_VALIDATION", _("联合字段校验")),  # v2.4.1暂不支持
+        ("CUSTOM", u"自定义正则表达式"),
     ],
     "DATE": [
         ("EMPTY", ""),
@@ -219,6 +230,7 @@ REGEX_CHOICES = {
         ("EN_CH", _("仅能包含中英文字符")),
         ("EN_CH_NUM", _("仅能包含中英文，数字，下划线")),
         ("START_EN", _("包含中英文，数字，以英文字符开头")),
+        ("CUSTOM", u"自定义正则表达式"),
     ],
 }
 
@@ -249,9 +261,15 @@ DISTRIBUTE_TYPE_CHOICES = [
 ]
 
 DISTRIBUTE_TYPE_ACTION_DICT = {
-    "DISTRIBUTE_THEN_PROCESS": [(DISTRIBUTE_OPERATE, "DISTRIBUTING"), (TRANSITION_OPERATE, "RUNNING")],
+    "DISTRIBUTE_THEN_PROCESS": [
+        (DISTRIBUTE_OPERATE, "DISTRIBUTING"),
+        (TRANSITION_OPERATE, "RUNNING"),
+    ],
     "PROCESS": [(TRANSITION_OPERATE, "RUNNING")],
-    "CLAIM_THEN_PROCESS": [(CLAIM_OPERATE, "RECEIVING"), (TRANSITION_OPERATE, "RUNNING")],
+    "CLAIM_THEN_PROCESS": [
+        (CLAIM_OPERATE, "RECEIVING"),
+        (TRANSITION_OPERATE, "RUNNING"),
+    ],
     "DISTRIBUTE_THEN_CLAIM": [
         (DISTRIBUTE_OPERATE, "DISTRIBUTING"),
         (CLAIM_OPERATE, "RECEIVING"),
