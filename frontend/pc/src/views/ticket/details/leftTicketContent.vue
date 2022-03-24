@@ -38,7 +38,7 @@
             <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
-                    v-if="hasNodeOptAuth"
+                    v-if="hasNodeOptAuth || isShowAssgin"
                     name="currentStep"
                     :label="$t(`m.newCommon['单据处理']`)">
                     <!-- 当前节点 -->
@@ -53,6 +53,7 @@
                         :loading="loading.ticketLoading"
                         :basic-infomation="ticketInfo"
                         :node-list="nodeList"
+                        :is-show-assgin="isShowAssgin"
                         :current-step-list="currentStepList"
                         :node-trigger-list="nodeTriggerList"
                         @handlerSubmitSuccess="reloadTicket">
@@ -154,7 +155,8 @@
                 allFieldList: [],
                 currentStepLoading: false,
                 activeName: ['ticket'],
-                isShow: false
+                isShow: false,
+                isShowAssgin: false
             }
         },
         computed: {
@@ -170,7 +172,12 @@
                 if (val) {
                     this.stepActiveTab = 'currentStep'
                 } else {
-                    this.stepActiveTab = 'allComments'
+                    if (this.ticketInfo.auth_actions.includes('ticket_management')) {
+                        this.stepActiveTab = 'currentStep'
+                        this.isShowAssgin = true
+                    } else {
+                        this.stepActiveTab = 'allComments'
+                    }
                 }
             },
             isShowBasicInfo (val) {
@@ -212,14 +219,6 @@
                     this.conditionField(item, this.allFieldList)
                 })
                 this.currentStepList.forEach((item, index) => {
-                    // 只有审批节点才支持异常分派
-                    if (this.ticketInfo.auth_actions.includes('ticket_management') && item.type === 'APPROVAL') {
-                        item.operations.push({
-                            can_operate: true,
-                            key: 'EXCEPTION_DISTRIBUTE',
-                            name: this.$t(`m['异常分派']`)
-                        })
-                    }
                     if (item.fields && item.fields.length) {
                         item.fields.forEach(node => {
                             this.$set(node, 'service', this.ticketInfo.service_type)
