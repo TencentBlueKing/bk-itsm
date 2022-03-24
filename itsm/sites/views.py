@@ -114,6 +114,7 @@ def index(request):
             "DEFAULT_PROJECT": DEFAULT_PROJECT,
             "DOC_URL": DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
+            "RUN_VER": settings.RUN_VER,
         },
     )
 
