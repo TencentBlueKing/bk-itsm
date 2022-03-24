@@ -256,17 +256,12 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         if not catalog_services.exists():
             return Response([])
         service_ids = catalog_services.values_list("service_id", flat=True)
-        ordering = "FIELD(`id`, {})".format(
-            ",".join(["'{}'".format(v) for v in service_ids])
-        )
         query_params = dict(pk__in=service_ids)
         if is_valid is not None:
             query_params.update({"is_valid": is_valid})
         services = (
-            Service.objects.exclude(display_type=INVISIBLE)
-            .filter(**query_params)
-            .extra(select={"ordering": ordering}, order_by=["ordering"])
-        )
+            Service.objects.exclude(display_type=INVISIBLE).filter(**query_params)
+        ).order_by("-update_at")
 
         # 支持额外过滤选项
         if name:
@@ -275,11 +270,7 @@ class CatalogServiceViewSet(component_viewsets.ModelViewSet):
         if service_key and service_key != "globalview":
             services = services.filter(key=service_key)
 
-        # 服务展示过滤
-        conditions = Service.permission_filter(request.user.username)
-        services = services.filter(reduce(operator.or_, conditions)).order_by(
-            "-update_at"
-        )
+        services = services
         context = self.get_serializer_context()
         if request.query_params.get("page", "") and request.query_params.get(
             "page_size", ""
