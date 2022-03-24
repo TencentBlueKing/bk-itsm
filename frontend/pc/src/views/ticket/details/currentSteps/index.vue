@@ -31,6 +31,7 @@
                         :index="index"
                         :node-info="item"
                         :node-list="nodeList"
+                        :is-show-assgin="isShowAssgin"
                         :ticket-info="basicInfomation"
                         :all-groups="allGroups"
                         :read-only="readOnly"
@@ -109,7 +110,8 @@
                 default: false
             },
             isShowBasicInfo: Boolean,
-            readOnly: Boolean
+            readOnly: Boolean,
+            isShowAssgin: Boolean
         },
         data () {
             return {

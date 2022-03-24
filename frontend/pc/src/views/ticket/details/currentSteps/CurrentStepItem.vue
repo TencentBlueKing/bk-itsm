@@ -107,7 +107,7 @@
                 </p>
             </div>
             <collapse-transition v-if="!readOnly">
-                <div class="bk-node-form" v-show="unfold">
+                <div class="bk-node-form" v-show="unfold && !isShowAssgin">
                     <!-- 禁用遮罩 -->
                     <div class="bk-node-disabled" v-if="nodeInfo.status === 'SUSPEND'"></div>
                     <div class="bk-form bk-form-vertical">
@@ -221,6 +221,7 @@
                     </div>
                 </div>
             </collapse-transition>
+            <bk-button v-if="isShowAssgin" style="margin-left: 14px" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">异常分派</bk-button>
         </div>
         <!-- 处理人 tips 内容 -->
         <div id="processor-tips-content" class="bk-processor-content">
@@ -313,7 +314,8 @@
             readOnly: {
                 type: Boolean,
                 default: false
-            }
+            },
+            isShowAssgin: Boolean
         },
         data () {
             return {

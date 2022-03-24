@@ -117,7 +117,7 @@
                             value: deliverInfo.value
                         }"
                         :specify-id-list="deliverInfo.specifyIdList"
-                        :exclude-role-type-list="deliverInfo.excludeTypeList"
+                        :exclude-role-type-list="type === '转单' ? deliverInfo.excludeTypeList : excludeAssignList"
                         :show-role-type-list="deliverInfo.includeTypeList"
                         :required-msg="$t(`m.newCommon['${type}人不能为空']`)">
                     </deal-person>
@@ -195,7 +195,8 @@
                     specifyIdList: [], // 包含人员 id 列表
                     type: '',
                     value: ''
-                }
+                },
+                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API']
             }
         },
         computed: {
