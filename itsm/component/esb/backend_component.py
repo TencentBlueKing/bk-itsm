@@ -38,6 +38,7 @@ from config import APP_ID, APP_TOKEN, RUN_VER
 from blueapps.utils import get_request
 from common.log import logger
 from itsm.component.constants import ResponseCodeStatus
+from itsm.component.utils.auth import get_tapd_oauth_url
 from itsm.component.utils.sandbox import map_data
 from itsm.component.utils.bk_bunch import Bunch, bunchify, unbunchify  # noqa
 
@@ -88,9 +89,14 @@ class BaseClient(object):
             res = client.request("GET", url, params=data, **kwargs)
 
         if not res:
+            message = "empty response: {}".format(url)
+            # 获取tapd授权链接
+            if settings.ITSM_TAPD_APIGW and settings.ITSM_TAPD_APIGW in url:
+                workspace_id = data.get("workspace_id", "")
+                message = get_tapd_oauth_url(workspace_id)
             return {
                 "result": False,
-                "message": "empty response: {}".format(url),
+                "message": message,
                 "data": {},
             }
 

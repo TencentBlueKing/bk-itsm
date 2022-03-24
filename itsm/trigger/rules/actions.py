@@ -51,7 +51,18 @@ class ResponseActions(BaseActions):
         for action in rule.actions:
             action_obj = self.check_and_create(source_type, source_id, action, rule)
             if action_obj:
-                tasks.append(action_obj)
+                tasks.append(
+                    Action.objects.create(
+                        signal=self.trigger.signal,
+                        sender=self.trigger.sender,
+                        context=self.context,
+                        source_type=source_type,
+                        source_id=source_id,
+                        schema_id=action.id,
+                        rule_id=rule.id,
+                        trigger_id=self.trigger.id,
+                    )
+                )
         for task in tasks:
             if task.action_schema.operate_type == BACKEND:
                 # 当任务为自动执行的时候，直接调用执行接口

@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import datetime
+import re
 
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -53,81 +54,96 @@ from itsm.ticket.serializers import FieldSerializer
 
 def field_validate(field, state_fields, key_value, **kwargs):
     """单个字段校验"""
-    if field['key'] in [FIELD_BACK_MSG, FIELD_TERM_MSG]:
+    if field["key"] in [FIELD_BACK_MSG, FIELD_TERM_MSG]:
         return
 
-    field_obj = state_fields.get(field['key'], None)
+    field_obj = state_fields.get(field["key"], None)
 
     if field_obj is None:
-        raise serializers.ValidationError(_('【{}】字段不存在，请联系管理员').format(field['key']))
+        raise serializers.ValidationError(_("【{}】字段不存在，请联系管理员").format(field["key"]))
 
     field_obj = bunchify(field_obj)
 
     required_validate(field, field_obj, key_value, skip_readonly=True)
     # field_required_validate 已经校验是否必填
-    if not str(field['value']):
+    if not str(field["value"]):
         return
 
-    if field_obj.key == 'title' and len(key_value['params_title']) > LEN_MIDDLE:
+    if field_obj.key == "title" and len(key_value["params_title"]) > LEN_MIDDLE:
         raise serializers.ValidationError(_("标题不能超过120个字符"))
 
     choice_validate(field, field_obj, key_value, **kwargs)
     regex_validate(field, field_obj)
+    custom_regex_validate(field, field_obj)
 
 
 def required_validate(field, field_obj, key_value, skip_readonly=False):
     validate_type = field_obj.validate_type
 
     # 字段非必填且无数据时
-    if validate_type == 'OPTION' and not field['value']:
+    if validate_type == "OPTION" and not field["value"]:
         return
 
     # 是否只读校验，当字段有值后，不能被更改, 建单不做校验
     if field_obj.is_readonly and not skip_readonly:
-        if field_obj._value and field['value'] != field_obj._value:
-            raise ParamError(_('【{}】只读字段不允许修改').format(field_obj.name))
+        if field_obj._value and field["value"] != field_obj._value:
+            raise ParamError(_("【{}】只读字段不允许修改").format(field_obj.name))
 
     # 隐藏条件校验
     if field_obj.show_type == SHOW_BY_CONDITION:
         result = show_conditions_validate(field_obj.show_conditions, key_value)
         if result:
             # 隐藏条件成立且没数据，若有数据，则继续进行校验
-            if not field['value']:
+            if not field["value"]:
                 return
         else:
-            if not field['value']:
-                raise ParamError(_('【{}】为必填项').format(field_obj.name))
+            if not field["value"]:
+                raise ParamError(_("【{}】为必填项").format(field_obj.name))
 
-    if field_obj.type in ['CUSTOMTABLE', 'TABLE']:
-        if not field['value']:
-            raise serializers.ValidationError(_('【{}】为必填项').format(field_obj.name))
+    if field_obj.type in ["CUSTOMTABLE", "TABLE"]:
+        if not field["value"]:
+            raise serializers.ValidationError(_("【{}】为必填项").format(field_obj.name))
         # 表格类型字段的必填校验
 
-        field_column_schema = field_obj.choice if field_obj.type == 'TABLE' else field_obj.meta.get("columns", [])
+        field_column_schema = (
+            field_obj.choice
+            if field_obj.type == "TABLE"
+            else field_obj.meta.get("columns", [])
+        )
         required_columns = {
-            choice["key"]: choice["name"] for choice in field_column_schema if choice.get("required") is True
+            choice["key"]: choice["name"]
+            for choice in field_column_schema
+            if choice.get("required") is True
         }
         if not required_columns:
             return
 
-        for index, row in enumerate(field['value']):
+        for index, row in enumerate(field["value"]):
             for column, value in row.items():
                 if column in required_columns and not value:
                     raise serializers.ValidationError(
-                        _('表格字段【{field_name}】的第【{index}】行【{column_name}】为必填项').format(
-                            field_name=field_obj.name, index=index + 1, column_name=required_columns[column]
+                        _("表格字段【{field_name}】的第【{index}】行【{column_name}】为必填项").format(
+                            field_name=field_obj.name,
+                            index=index + 1,
+                            column_name=required_columns[column],
                         )
                     )
 
-    if isinstance(field['value'], (int, str, bool)) and not str(field['value']):
-        raise serializers.ValidationError(_('【{}】为必填项').format(field_obj.name))
+    if isinstance(field["value"], (int, str, bool)) and not str(field["value"]):
+        raise serializers.ValidationError(_("【{}】为必填项").format(field_obj.name))
 
 
 def choice_validate(field, field_obj, key_value, **kwargs):
     """
     选择类字段校验
     """
-    if field_obj.type not in ['SELECT', 'RADIO', 'CHECKBOX', 'MULTISELECT', 'TREESELECT']:
+    if field_obj.type not in [
+        "SELECT",
+        "RADIO",
+        "CHECKBOX",
+        "MULTISELECT",
+        "TREESELECT",
+    ]:
         return
 
     choice = get_choice(field_obj, key_value, **kwargs)
@@ -136,42 +152,48 @@ def choice_validate(field, field_obj, key_value, **kwargs):
         raise serializers.ValidationError(_("【%s】选项不存在，请联系管理员") % field_obj.key)
 
     # 更新choice
-    field['choice'] = choice
+    field["choice"] = choice
 
-    if field_obj.type == 'TREESELECT':
+    if field_obj.type == "TREESELECT":
         if not choice:
             raise serializers.ValidationError(_("数据字典不存在，请检查字典编码: %s") % field_obj.key)
-        key_choice = [str(item['id']) for _choice in choice for item in walk(_choice)]
+        key_choice = [str(item["id"]) for _choice in choice for item in walk(_choice)]
     else:
-        key_choice = [str(item['key']) for item in choice]
+        key_choice = [str(item["key"]) for item in choice]
 
-    if field_obj.type in ['SELECT', 'RADIO']:
-        if str(field['value']) not in key_choice:
-            raise serializers.ValidationError(_('【{}】选项不匹配，请重新选择').format(field_obj.name))
+    if field_obj.type in ["SELECT", "RADIO"]:
+        if str(field["value"]) not in key_choice:
+            raise serializers.ValidationError(
+                _("【{}】选项不匹配，请重新选择").format(field_obj.name)
+            )
 
-    if field_obj.type in ['CHECKBOX', 'MULTISELECT']:
-        if not set(field['value'].split(',')).issubset(key_choice):
-            raise serializers.ValidationError(_('【{}】选项不匹配，请重新选择').format(field_obj.name))
+    if field_obj.type in ["CHECKBOX", "MULTISELECT"]:
+        if not set(field["value"].split(",")).issubset(key_choice):
+            raise serializers.ValidationError(
+                _("【{}】选项不匹配，请重新选择").format(field_obj.name)
+            )
 
-    if field_obj.type == 'TREESELECT':
-        if str(field['value']) not in key_choice:
-            raise serializers.ValidationError(_('【{}】选项不匹配，请重新选择').format(field_obj.name))
+    if field_obj.type == "TREESELECT":
+        if str(field["value"]) not in key_choice:
+            raise serializers.ValidationError(
+                _("【{}】选项不匹配，请重新选择").format(field_obj.name)
+            )
 
 
 def get_choice(field_obj, key_value, **kwargs):
-    if field_obj.source_type == 'CUSTOM':
+    if field_obj.source_type == "CUSTOM":
         return field_obj.choice
 
-    if field_obj.source_type == 'DATADICT':
-        view_type = 'tree' if field_obj.type == 'TREESELECT' else 'list'
+    if field_obj.source_type == "DATADICT":
+        view_type = "tree" if field_obj.type == "TREESELECT" else "list"
         return SysDict.get_data_by_key(field_obj.source_uri, view_type)
 
-    if field_obj.source_type == 'API':
+    if field_obj.source_type == "API":
         return RemoteApiInstance.get_api_choice_by_instance_id(
             field_obj.api_instance_id, field_obj.kv_relation, key_value
-        )['data']
+        )["data"]
 
-    if field_obj.source_type == 'RPC':
+    if field_obj.source_type == "RPC":
         if isinstance(field_obj, Bunch):
             field_data = unbunchify(field_obj)
         else:
@@ -187,9 +209,22 @@ def get_choice(field_obj, key_value, **kwargs):
         else:
             request = CompRequest(field_data)
         request.data.update(**params)
-        component_cls = ComponentLibrary.get_component_class('rpc', request.data[RPC_CODE])
+        component_cls = ComponentLibrary.get_component_class(
+            "rpc", request.data[RPC_CODE]
+        )
         component_obj = component_cls(request)
         return component_obj.invoke()
+
+
+def custom_regex_validate(field, field_obj):
+    custom_regex = field_obj.custom_regex
+    if not custom_regex:
+        return
+    try:
+        if not re.match(r"{}".format(custom_regex), str(field["value"])):
+            raise serializers.ValidationError(_("用户输入的值不符合自定义正则规则"))
+    except Exception as e:
+        raise serializers.ValidationError(_("自定义正则出现异常， error = {}".format(e)))
 
 
 def regex_validate(field, field_obj):
@@ -200,22 +235,28 @@ def regex_validate(field, field_obj):
         regex_list.extend(choice)
 
     if regex and regex not in [reg[0] for reg in list(set(regex_list))]:
-        raise serializers.ValidationError(_('该正则规则不在可选范围内'))
+        raise serializers.ValidationError(_("该正则规则不在可选范围内"))
 
-    if regex in ['AFTER_DATE', 'BEFORE_DATE', 'AFTER_TIME', 'BEFORE_TIME']:
-        RegexValidator(field_obj.name, regex).validate(field['value'])
+    if regex in ["AFTER_DATE", "BEFORE_DATE", "AFTER_TIME", "BEFORE_TIME"]:
+        RegexValidator(field_obj.name, regex).validate(field["value"])
 
-    elif regex and regex != 'EMPTY':
+    elif regex and regex != "EMPTY":
 
-        if field_obj.type in ['INT', 'STRING']:
-            RegexValidator(field_obj.name, regex).validate(str(field['value']))
+        if field_obj.type in ["INT", "STRING"]:
+            RegexValidator(field_obj.name, regex).validate(str(field["value"]))
 
-        elif field_obj.type == 'TEXT':
-            if not isinstance(field['value'], list):
+        elif field_obj.type == "TEXT":
+            if not isinstance(field["value"], list):
                 # 这里不能全部采用转为list的方式，需要根据field的类型
-                field_value = field['value'].strip().replace('\n', ',').replace(';', ',').split(',')
+                field_value = (
+                    field["value"]
+                    .strip()
+                    .replace("\n", ",")
+                    .replace(";", ",")
+                    .split(",")
+                )
             else:
-                field_value = [field['value']]
+                field_value = [field["value"]]
 
             for value in field_value:
                 RegexValidator(field_obj.name, regex).validate(value)
@@ -226,21 +267,23 @@ class RegexValidator(Regex):
         super(RegexValidator, self).__init__(validate_type=regex.lower())
         self.field_name = field_name
         self.validate_type_action = {
-            'after_date': 'date',
-            'before_date': 'date',
-            'after_time': 'time',
-            'before_time': 'time',
+            "after_date": "date",
+            "before_date": "date",
+            "after_time": "time",
+            "before_time": "time",
         }
 
     def validate(self, value):
         action = self.validate_type_action.get(self.validate_type)
-        if action and hasattr(self, '%s_validate' % action):
-            getattr(self, '%s_validate' % action)(value)
+        if action and hasattr(self, "%s_validate" % action):
+            getattr(self, "%s_validate" % action)(value)
         else:
             try:
                 super(RegexValidator, self).validate(value)
             except ValidationError as e:
-                raise serializers.ValidationError('【{}】{}'.format(self.field_name, str(",".join(e.detail))))
+                raise serializers.ValidationError(
+                    "【{}】{}".format(self.field_name, str(",".join(e.detail)))
+                )
 
     def date_validate(self, value):
         """日期的校验"""
@@ -250,15 +293,21 @@ class RegexValidator(Regex):
             return
 
         try:
-            value = datetime.datetime.strptime(value, '%Y-%m-%d')
+            value = datetime.datetime.strptime(value, "%Y-%m-%d")
         except ValueError:
-            raise serializers.ValidationError(_('【{}】{} 不匹配日期格式{}').format(self.field_name, value, '%Y-%m-%d'))
+            raise serializers.ValidationError(
+                _("【{}】{} 不匹配日期格式{}").format(self.field_name, value, "%Y-%m-%d")
+            )
 
-        if self.validate_type == 'after_date' and value < datetime.datetime.now():
-            raise serializers.ValidationError(_('【{}】{} 不在当前日期之后').format(self.field_name, value.date()))
+        if self.validate_type == "after_date" and value < datetime.datetime.now():
+            raise serializers.ValidationError(
+                _("【{}】{} 不在当前日期之后").format(self.field_name, value.date())
+            )
 
-        if self.validate_type == 'before_date' and value > datetime.datetime.now():
-            raise serializers.ValidationError(_('【{}】{} 不在当前日期之前').format(self.field_name, value.date()))
+        if self.validate_type == "before_date" and value > datetime.datetime.now():
+            raise serializers.ValidationError(
+                _("【{}】{} 不在当前日期之前").format(self.field_name, value.date())
+            )
 
     def time_validate(self, value):
         """时间的校验"""
@@ -268,50 +317,65 @@ class RegexValidator(Regex):
             return
 
         try:
-            value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            raise serializers.ValidationError(_('【{}】{} 不匹配时间格式{}').format(self.field_name, value, '%Y-%m-%d %H:%M:%S'))
+            raise serializers.ValidationError(
+                _("【{}】{} 不匹配时间格式{}").format(
+                    self.field_name, value, "%Y-%m-%d %H:%M:%S"
+                )
+            )
 
-        if self.validate_type == 'after_time' and value < datetime.datetime.now():
-            raise serializers.ValidationError(_('【{}】{} 不在当前时间之后').format(self.field_name, value))
+        if self.validate_type == "after_time" and value < datetime.datetime.now():
+            raise serializers.ValidationError(
+                _("【{}】{} 不在当前时间之后").format(self.field_name, value)
+            )
 
-        if self.validate_type == 'before_time' and value > datetime.datetime.now():
-            raise serializers.ValidationError(_('【{}】{} 不在当前时间之前').format(self.field_name, value))
+        if self.validate_type == "before_time" and value > datetime.datetime.now():
+            raise serializers.ValidationError(
+                _("【{}】{} 不在当前时间之前").format(self.field_name, value)
+            )
 
 
 def edit_field_validate(field, **kwargs):
     """修改单个字段校验"""
 
     try:
-        field_obj = TicketField.objects.get(id=field['id'])
+        field_obj = TicketField.objects.get(id=field["id"])
     except TicketField.DoesNotExist:
-        raise ParamError(_('【{}】字段不存在，请联系管理员').format(field['key']))
+        raise ParamError(_("【{}】字段不存在，请联系管理员").format(field["key"]))
 
     if field_obj.source not in [TABLE, BASE_MODEL]:
-        raise ParamError(_('非公共字段不允许修改'))
+        raise ParamError(_("非公共字段不允许修改"))
 
     key_value = {
-        'params_%s' % field['key']: format_exp_value(field['type'], field['_value'])
-        for field in field_obj.ticket.fields.filter(_value__isnull=False).values('key', 'type', '_value')
+        "params_%s" % field["key"]: format_exp_value(field["type"], field["_value"])
+        for field in field_obj.ticket.fields.filter(_value__isnull=False).values(
+            "key", "type", "_value"
+        )
     }
 
     key_value.update(
         {
-            'params_%s' % item['key']: item['value']
-            for item in TicketGlobalVariable.objects.filter(ticket_id=field_obj.ticket_id).values('key', 'value')
+            "params_%s" % item["key"]: item["value"]
+            for item in TicketGlobalVariable.objects.filter(
+                ticket_id=field_obj.ticket_id
+            ).values("key", "value")
         }
     )
 
-    key_value.update({'params_' + field['key']: format_exp_value(field['type'], field['value'])})
+    key_value.update(
+        {"params_" + field["key"]: format_exp_value(field["type"], field["value"])}
+    )
 
     required_validate(field, field_obj, key_value, skip_readonly=True)
-    if field_obj.key == 'title' and len(key_value['params_title']) > LEN_MIDDLE:
+    if field_obj.key == "title" and len(key_value["params_title"]) > LEN_MIDDLE:
         raise serializers.ValidationError(_("标题不能超过120个字符"))
 
     # 是否必填已经校验
-    if not str(field['value']):
+    if not str(field["value"]):
         return field, field_obj
 
     choice_validate(field, field_obj, key_value, **kwargs)
     regex_validate(field, field_obj)
+    custom_regex_validate(field, field_obj)
     return field, field_obj

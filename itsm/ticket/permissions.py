@@ -35,6 +35,7 @@ from itsm.role.models import UserRole
 from itsm.service.models import Service
 
 from .models import Ticket
+from ..project.models import Project
 
 
 class SuperuserPermissionValidate(permissions.BasePermission):
@@ -162,15 +163,20 @@ class TicketPermissionValidate(permissions.BasePermission):
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
-        resource_info = {
+        project_name = Project.objects.get(key=obj.project_key).name
+        resource_info = [{
             "resource_id": str(obj.service_id),
             "resource_name": obj.service_name,
             "resource_type": "service",
-        }
+        }, {
+            "resource_id": obj.project_key,
+            "resource_name": project_name,
+            "resource_type": "project",
+        }]
 
         apply_actions = ["ticket_view"]
         auth_actions = iam_client.resource_multi_actions_allowed(
-            apply_actions, [resource_info], project_key=obj.project_key
+            apply_actions, resource_info, project_key=obj.project_key
         )
         if auth_actions.get("ticket_view"):
             return True
@@ -179,16 +185,16 @@ class TicketPermissionValidate(permissions.BasePermission):
         resources = [
             Resource(
                 settings.BK_IAM_SYSTEM_ID,
-                resource_info["resource_type"],
-                str(resource_info["resource_id"]),
+                resource["resource_type"],
+                str(resource["resource_id"]),
                 {
-                    "iam_resource_owner": resource_info.get("creator", ""),
+                    "iam_resource_owner": resource.get("creator", ""),
                     "_bk_iam_path_": bk_iam_path
-                    if resource_info["resource_type"] != "project"
+                    if resource["resource_type"] != "project"
                     else "",
-                    "name": resource_info.get("resource_name", ""),
+                    "name": resource.get("resource_name", ""),
                 },
-            )
+            ) for resource in resource_info
         ]
 
         raise AuthFailedException(

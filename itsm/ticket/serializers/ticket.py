@@ -29,6 +29,7 @@ import json
 from collections import OrderedDict
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -822,6 +823,28 @@ class TicketSerializer(AuthModelSerializer):
         node = TicketRemark.init_root_node(ticket_id=ticket_id)
         return node.id
 
+    def iam_ticket_manage_auth(self, inst):
+        # 本地开发环境，不校验单据管理权限
+        if settings.ENVIRONMENT == "dev":
+            return True
+
+        iam_client = IamRequest(self.context["request"])
+        resource_info = {
+            "resource_id": str(inst.service_id),
+            "resource_name": inst.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_management"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=inst.project_key
+        )
+
+        if auth_actions.get("ticket_management"):
+            return True
+
+        return False
+
     def to_representation(self, inst):
         """单据详情
         add extra property: can_operate, can_comment, comment_id
@@ -845,7 +868,9 @@ class TicketSerializer(AuthModelSerializer):
         )
 
         can_comment = inst.can_comment(username) or is_email_invite_token
-        can_operate = inst.can_operate(username)
+        can_operate = any(
+            [inst.can_operate(username), self.iam_ticket_manage_auth(inst)]
+        )
 
         can_view = (
             username in self.ticket_followers.get(inst.id, [])

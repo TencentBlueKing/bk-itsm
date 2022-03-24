@@ -845,3 +845,8 @@ BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = os.environ.get("BK_LOGIN_PLAIN_URL", "")
 # init APIGW public_key
 api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
+
+# itsm-tapd 网关API地址
+ITSM_TAPD_APIGW = os.environ.get("ITSM_TAPD_APIGW", "")
+# tapd 项目授权链接
+TAPD_OAUTH_URL = os.environ.get("TAPD_OAUTH_URL", "")
