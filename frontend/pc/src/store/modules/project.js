@@ -126,6 +126,19 @@ export default {
         },
         getAction ({ commit }, params) {
             return ajax.get(`iadmin/custom_notify_template/action_type/`, params).then(response => response.data)
+        },
+        getProjectNotice ({ commit }, params) {
+            return ajax.get(`iadmin/custom_notify_template/`, params).then(response => response.data)
+        },
+        addProjectNotice ({ commit }, params) {
+            return ajax.post(`iadmin/custom_notify_template/`, params).then(response => response.data)
+        },
+        updateProjectNotice ({ commit }, params) {
+            const { id } = params
+            return ajax.patch(`iadmin/custom_notify_template/${id}/`, params).then(response => response.data)
+        },
+        deleteProjectNotice ({ commit }, id) {
+            return ajax.delete(`iadmin/custom_notify_template/${id}/`).then(response => response.data)
         }
     }
 }

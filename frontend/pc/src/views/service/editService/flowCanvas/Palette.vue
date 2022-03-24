@@ -55,6 +55,7 @@
             <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
             </div>
+            <div v-if="devsopDisable" class="entry-disabled" v-bk-tooltips.right="$t(`m['暂未开放']`)"></div>
         </li>
         <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
@@ -81,12 +82,21 @@
 <script>
     export default {
         name: 'Palette',
+        data () {
+            return {
+                devsopDisable: false
+            }
+        },
         mounted () {
-            // this.$emit('registerPaletteEvent')
+            this.devsopDisable = window.RUN_VER
         }
     }
 </script>
 <style lang="scss" scoped>
+    .disable {
+        background: #e0e0e0;
+        cursor: none;
+    }
     ul {
         margin: 0;
         padding: 0;
