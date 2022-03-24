@@ -45,7 +45,6 @@ from itsm.component.constants import (
     GENERAL,
     OPEN,
     ORGANIZATION,
-    API,
     DEFAULT_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf import viewsets as component_viewsets
@@ -612,22 +611,9 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         with transaction.atomic():
             workflow = self.update_workflow_configs(workflow_id, workflow_config)
             configs["workflow_id"] = workflow.create_version().id
-            self.sync_first_state_process(workflow, configs)
             service.update_service_configs(configs)
         context = self.get_serializer_context()
         return Response(self.serializer_class(instance=service, context=context).data)
-
-    def sync_first_state_process(self, workflow, service_config):
-        display_type = service_config["display_type"]
-        display_role = service_config.get("display_role", "")
-        if display_type == API or display_type == INVISIBLE:
-            workflow.update_first_state_process_config(
-                processors_type=OPEN, processors=""
-            )
-            return
-        workflow.update_first_state_process_config(
-            processors_type=OPEN, processors=display_role
-        )
 
     def update_workflow_configs(self, workflow_id, workflow_config):
         workflow = Workflow.objects.filter(id=workflow_id).first()
