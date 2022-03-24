@@ -355,3 +355,9 @@ class SlaParamError(ServerError):
     MESSAGE = _("Sla节点参数验证失败")
     ERROR_CODE = "SLA_VALIDATE_ERROR"
     ERROR_CODE_INT = 3900045
+
+
+class DeliverOperateError(ServerError):
+    MESSAGE = _("转派单异常")
+    ERROR_CODE = "DELIVER_OPERATE_ERROR"
+    ERROR_CODE_INT = 3900046

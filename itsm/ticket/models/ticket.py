@@ -166,6 +166,7 @@ from itsm.component.exceptions import (
     CallPipelineError,
     RevokePipelineError,
     ObjectNotExist,
+    DeliverOperateError,
 )
 from itsm.component.utils.basic import dotted_name, list_by_separator
 from itsm.component.utils.bk_bunch import bunchify
@@ -464,6 +465,20 @@ class Status(Model):
                 DELIVER_OPERATE,
                 EXCEPTION_DISTRIBUTE_OPERATE,
             ]:
+
+                finished_processor_list = list(
+                    SignTask.objects.filter(
+                        status_id=self.id, status=FINISHED
+                    ).values_list("processor", flat=True)
+                )
+                new_processor_list = UserRole.get_users_by_type(
+                    self.bk_biz_id,
+                    kwargs.get("processors_type"),
+                    kwargs.get("processors"),
+                    self.ticket,
+                )
+                if set(finished_processor_list) & set(new_processor_list):
+                    raise DeliverOperateError("不允许向已经处理的人转单")
                 self.set_processors(
                     kwargs.get("processors_type", "PERSON"), kwargs.get("processors")
                 )
