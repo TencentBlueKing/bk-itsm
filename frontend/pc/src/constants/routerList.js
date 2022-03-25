@@ -164,6 +164,12 @@ const ROUTE_LIST = [
                         id: 'projectTrigger',
                         icon: 'bk-itsm-icon icon-slide',
                         path: '/project/trigger'
+                    },
+                    {
+                        name: i18n.t(`m["通知模板"]`),
+                        id: 'projectNotice',
+                        icon: 'bk-itsm-icon icon-icon-notice-new',
+                        path: '/project/notice'
                     }
                 ]
             }

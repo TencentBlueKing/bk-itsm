@@ -163,7 +163,7 @@
                 </bk-form-item>
             </template>
         </bk-form>
-        <div class="bk-add-btn">
+        <div v-if="isShowFooter" class="bk-add-btn">
             <bk-button
                 v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
                 theme="primary"
@@ -205,6 +205,10 @@
                 default () {
                     return {}
                 }
+            },
+            isShowFooter: {
+                type: Boolean,
+                default: true
             }
         },
         data () {

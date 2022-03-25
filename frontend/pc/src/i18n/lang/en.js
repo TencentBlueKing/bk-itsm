@@ -2456,5 +2456,10 @@ export const m = {
     '请输入自定义TAB名称': 'Please enter a custom tab name',
     '基本信息': 'Basic Information',
     '筛选信息': 'Screen Information',
-    '异常分派': 'Exception Distribute'
+    '异常分派': 'Exception Distribute',
+    '新增通知模板': 'Create Noitce Template',
+    '编辑通知模板': 'Edit Noitce Template',
+    '通知模板': 'Notice template',
+    '删除成功': 'success',
+    '暂未开放': 'Unopen'
 }
