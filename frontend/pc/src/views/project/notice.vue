@@ -244,7 +244,6 @@
                     params.used_by = this.formData.noticeUserBy
                     // 调取接口数据
                     this.$store.dispatch(url, params).then(res => {
-                        console.log(res)
                         this.isShowEdit = false
                         this.getNoticeList()
                     })
