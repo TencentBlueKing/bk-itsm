@@ -136,6 +136,7 @@
             commentLoading: Boolean,
             isPageOver: Boolean,
             hasNodeOptAuth: Boolean,
+            isShowAssgin: Boolean,
             moreLoading: Boolean,
             isShowComment: {
                 type: Boolean,
@@ -155,8 +156,7 @@
                 allFieldList: [],
                 currentStepLoading: false,
                 activeName: ['ticket'],
-                isShow: false,
-                isShowAssgin: false
+                isShow: false
             }
         },
         computed: {
@@ -172,12 +172,12 @@
                 if (val) {
                     this.stepActiveTab = 'currentStep'
                 } else {
-                    if (this.ticketInfo.auth_actions.includes('ticket_management')) {
-                        this.stepActiveTab = 'currentStep'
-                        this.isShowAssgin = true
-                    } else {
-                        this.stepActiveTab = 'allComments'
-                    }
+                    this.stepActiveTab = 'allComments'
+                }
+            },
+            isShowAssgin (val) {
+                if (val) {
+                    this.stepActiveTab = 'currentStep'
                 }
             },
             isShowBasicInfo (val) {

@@ -47,6 +47,7 @@
                         :ticket-id="ticketId"
                         :is-page-over="isPageOver"
                         :has-node-opt-auth="hasNodeOptAuth"
+                        :is-show-assgin="isShowAssgin"
                         :comment-loading="commentLoading"
                         :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
@@ -189,6 +190,7 @@
                 commentId: '',
                 threshold: [],
                 hasNodeOptAuth: false,
+                isShowAssgin: false,
                 basicStatus: true
             }
         },
@@ -227,6 +229,10 @@
             if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
                 this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate)
                 this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
+            }
+            if (this.ticketInfo && this.ticketInfo.auth_actions) {
+                // 当前节点有权限不显示异常分派
+                this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth
             }
         },
         beforeDestroy () {
