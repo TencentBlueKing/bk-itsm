@@ -35,7 +35,6 @@ from itsm.role.models import UserRole
 from itsm.service.models import Service
 
 from .models import Ticket
-from ..project.models import Project
 
 
 class SuperuserPermissionValidate(permissions.BasePermission):
@@ -163,16 +162,13 @@ class TicketPermissionValidate(permissions.BasePermission):
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
-        project_name = Project.objects.get(key=obj.project_key).name
-        resource_info = [{
-            "resource_id": obj.project_key,
-            "resource_name": project_name,
-            "resource_type": "project",
-        }, {
-            "resource_id": str(obj.service_id),
-            "resource_name": obj.service_name,
-            "resource_type": "service",
-        }]
+        resource_info = [
+            {
+                "resource_id": str(obj.service_id),
+                "resource_name": obj.service_name,
+                "resource_type": "service",
+            }
+        ]
 
         apply_actions = ["ticket_view"]
         auth_actions = iam_client.resource_multi_actions_allowed(
@@ -194,7 +190,8 @@ class TicketPermissionValidate(permissions.BasePermission):
                     else "",
                     "name": resource.get("resource_name", ""),
                 },
-            ) for resource in resource_info
+            )
+            for resource in resource_info
         ]
 
         raise AuthFailedException(
