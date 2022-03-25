@@ -66,7 +66,7 @@ class ProjectPipelineList(DevOps):
     method = 'GET'
 
     def handle_response(self, response_data):
-        return response_data["data"]["records"]
+        return response_data["data"]
 
 
 class ProjectsList(DevOps):
