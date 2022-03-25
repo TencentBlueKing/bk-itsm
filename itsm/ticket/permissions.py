@@ -164,22 +164,27 @@ class TicketPermissionValidate(permissions.BasePermission):
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
         project_name = Project.objects.get(key=obj.project_key).name
-        resource_info = [{
-            "resource_id": obj.project_key,
-            "resource_name": project_name,
-            "resource_type": "project",
-        }, {
+        resource_info = {
             "resource_id": str(obj.service_id),
             "resource_name": obj.service_name,
             "resource_type": "service",
-        }]
+        }
 
         apply_actions = ["ticket_view"]
         auth_actions = iam_client.resource_multi_actions_allowed(
-            apply_actions, resource_info, project_key=obj.project_key
+            apply_actions, [resource_info], project_key=obj.project_key
         )
         if auth_actions.get("ticket_view"):
             return True
+
+        resource_list = [
+            {
+                "resource_id": obj.project_key,
+                "resource_name": project_name,
+                "resource_type": "project",
+            },
+            resource_info,
+        ]
 
         bk_iam_path = "/project,{}/".format(obj.project_key)
         resources = [
@@ -194,7 +199,8 @@ class TicketPermissionValidate(permissions.BasePermission):
                     else "",
                     "name": resource.get("resource_name", ""),
                 },
-            ) for resource in resource_info
+            )
+            for resource in resource_list
         ]
 
         raise AuthFailedException(
