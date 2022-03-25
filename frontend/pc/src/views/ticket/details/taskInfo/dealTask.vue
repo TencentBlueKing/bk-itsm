@@ -85,7 +85,7 @@
         </div>
 
         <!-- 处理字段信息 -->
-        <div class="base-info" v-if="taskInfo.status !== 'NEW' && taskInfo.status === 'WAITING_FOR_OPERATE'">
+        <div class="base-info" v-if="taskInfo.status !== 'NEW' && taskInfo.status !== 'WAITING_FOR_OPERATE'">
             <h3 class="setion-title">{{ $t(`m.task['处理信息']`) }}</h3>
             <!-- 已处理 -->
             <template v-if="taskInfo.status === 'WAITING_FOR_CONFIRM' || taskInfo.status === 'FINISHED'">
