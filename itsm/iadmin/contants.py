@@ -40,6 +40,7 @@ from itsm.component.constants import (
     WAITING_FOR_OPERATE,
     WAITING_FOR_CONFIRM,
     NOTIFY_FOLLOWER_OPERATE,
+    NODE_FAILED,
 )
 from itsm.sla.constants import (
     SLA_HANDLE_WARNING_NOTIFY,
@@ -80,6 +81,7 @@ ACTION_CHOICES = [
     (SLA_HANDLE_OVERTIME_NOTIFY, _("SLA服务处理超时提醒通知")),
     (SLA_REPLY_WARNING_NOTIFY, _("SLA服务响应预警提醒通知")),
     (SLA_REPLY_OVERTIME_NOTIFY, _("SLA服务响应超时提醒")),
+    (NODE_FAILED, _("节点失败通知"))
 ]
 ACTION_CHOICES_DICT = dict(ACTION_CHOICES + [(FINISHED, _("已完成"))])
 
@@ -183,6 +185,40 @@ FOLLOW_EMAIL_TEMPLATE = """
                  <p>服务目录：${catalog_service_name}</p>
                  <p>当前环节：${running_status}</p>
                  <p>关注信息：${message}</p>
+                <p><a href="${ticket_url}">点击查看详情</a></p>
+                <br><br>
+                <p>如有任何问题，可随时联系ITSM助手。</p>
+
+                <div style="float：right;margin-right：50px">
+                    <p>ITSM流程管理服务</p>
+                    <span style="float：right">${today_date.year}年${today_date.month}月${today_date.day}日</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+"""
+FAILED_EMAIL_TEMPLATE = """
+<div style="height:650px;">
+    <div class="title">
+    </div>
+    <div class="center">
+        <div class="table">
+            <div style="font-size：20px; border-bottom：1px solid #dedede">
+                <div style="margin：10px 0 10px 20px">
+                    <span style="font-weight：bold">【ITSM通知】</span><span>${service_type_name}</span>
+                </div>
+            </div>
+            <div style="margin：30px 0 10px 30px">
+                <p>HI,您好！</p>
+                 <span>您有需要关注的单据，请关注</span>
+                 <p>当前单据节点自动执行失败</p>
+                 <p>标题：${title}</p>
+                 <p>单号：${sn}</p>
+                 <p>服务目录：${catalog_service_name}</p>
+                 <p>当前环节：${running_status}</p>
+                 <p>失败信息：${message}</p>
                 <p><a href="${ticket_url}">点击查看详情</a></p>
                 <br><br>
                 <p>如有任何问题，可随时联系ITSM助手。</p>
@@ -354,6 +390,13 @@ SMS_CONTENT_OPERATE = '''
  服务目录：${catalog_service_name}
  当前环节：${running_status}'''
 
+SMS_CONTENT_FAILED = WEIXIN_CONTENT_FAILED = ''' 
+ 节点自动执行失败
+ 标题：${title}
+ 单号：<a href="${ticket_url}">${sn}</a>
+ 当前环节：${running_status}
+ 失败信息：${message}'''
+
 WEIXIN_CONTENT_OPERATE = '''
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
@@ -458,6 +501,10 @@ NOTIFY_TEMPLATE = [
     (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_EMAIL, SLA_REPLY_OVERTIME_NOTIFY, EMAIL, "SLA"),
     (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_SMS, SLA_REPLY_OVERTIME_NOTIFY, SMS, "SLA"),
     (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_WEIXIN, SLA_REPLY_OVERTIME_NOTIFY, WEIXIN, "SLA"),
+    # 自动节点失败通知模版
+    (NOTIFY_TITLE_COMMON, SMS_CONTENT_FAILED, NODE_FAILED, SMS, "TICKET"),
+    (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_FAILED, NODE_FAILED, WEIXIN, "TICKET"),
+    (NOTIFY_TITLE_COMMON, FAILED_EMAIL_TEMPLATE + CSS_TEMPLATE, NODE_FAILED, EMAIL, "TICKET"),
 ]
 
 

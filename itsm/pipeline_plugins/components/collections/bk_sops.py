@@ -24,7 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
-from itsm.component.constants import SYSTEM_OPERATE, TRANSITION_OPERATE
+from itsm.component.constants import SYSTEM_OPERATE, TRANSITION_OPERATE, NODE_FAILED
 from itsm.component.esb.esbclient import client_backend
 from itsm.ticket.serializers import StatusSerializer
 from itsm.ticket.models import Ticket, TicketGlobalVariable
@@ -97,6 +97,14 @@ class BkOpsService(ItsmBaseService):
             current_node.set_failed_status(operator=processors, message=error_message_template,
                                            detail_message=error_message)
             ticket.node_status.filter(state_id=state_id).update(action_type=TRANSITION_OPERATE)
+            # 发送通知
+            ticket.notify(
+                state_id=state_id,
+                receivers=processors,
+                message=error_message_template,
+                action=NODE_FAILED,
+                retry=False,
+            )
 
     def execute(self, data, parent_data):
         if super(BkOpsService, self).execute(data, parent_data):

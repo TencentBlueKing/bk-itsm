@@ -27,7 +27,7 @@ import logging
 
 from django.conf import settings
 
-from itsm.component.constants import SYSTEM_OPERATE, FINISHED, TRANSITION_OPERATE
+from itsm.component.constants import SYSTEM_OPERATE, FINISHED, TRANSITION_OPERATE, NODE_FAILED
 from itsm.component.apigw import client as apigw_client
 from itsm.ticket.models import Ticket, TicketGlobalVariable
 from itsm.ticket.serializers import StatusSerializer
@@ -119,6 +119,14 @@ class BkDevOpsService(ItsmBaseService):
             current_node.set_failed_status(operator=processors, message=error_message_template,
                                            detail_message=error_message)
             ticket.node_status.filter(state_id=state_id).update(action_type=TRANSITION_OPERATE)
+            # 发送通知
+            ticket.notify(
+                state_id=state_id,
+                receivers=processors,
+                message=error_message_template,
+                action=NODE_FAILED,
+                retry=False,
+            )
 
     def execute(self, data, parent_data):
         """
