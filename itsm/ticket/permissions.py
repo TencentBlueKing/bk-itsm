@@ -165,13 +165,13 @@ class TicketPermissionValidate(permissions.BasePermission):
         iam_client = IamRequest(request)
         project_name = Project.objects.get(key=obj.project_key).name
         resource_info = [{
-            "resource_id": str(obj.service_id),
-            "resource_name": obj.service_name,
-            "resource_type": "service",
-        }, {
             "resource_id": obj.project_key,
             "resource_name": project_name,
             "resource_type": "project",
+        }, {
+            "resource_id": str(obj.service_id),
+            "resource_name": obj.service_name,
+            "resource_type": "service",
         }]
 
         apply_actions = ["ticket_view"]
