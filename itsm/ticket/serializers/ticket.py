@@ -287,9 +287,14 @@ class StatusSerializer(serializers.ModelSerializer):
                     for sign_task in sign_tasks_list
                 }
             )
+            # 获取节点上的任务处理人
+            sign_tasks_processor_list = [task["processor"] for task in sign_tasks_list]
+            # 获取当前任务的处理人列表
             user_list = UserRole.get_users_by_type(
                 inst.bk_biz_id, inst.processors_type, inst.processors, inst.ticket
             )
+            # 得到节点当前任务的已处理人
+            current_tasks_processors = list(set(sign_tasks_processor_list).intersection(set(user_list)))
             tasks = []
             for user in user_list[0:30]:
                 task_can_view = False
@@ -321,7 +326,7 @@ class StatusSerializer(serializers.ModelSerializer):
             processors = _("%s (共%d人, 已处理%d人)") % (
                 processors,
                 len(user_list),
-                len(processor_task_id_map),
+                len(current_tasks_processors),
             )
 
             # 会签节点: QUEUEING -> RUNNING
