@@ -41,6 +41,7 @@ ITSM is an upper layer SaaS application based on the Tencent Blueking product sy
 - [WeCom Configuration Instructions](docs/install/qy_weixin_config.md)
 - [Custom Form Rendering Rules Instructions](docs/install/custom_form_config.md)
 - [API_Request_Sandbox_Instructions](docs/install/api_sandbox_guide.md)
+- [ITSM Access Guidelines](docs/wiki/access.md)
 
 ## Version plan
 - [RELEASE](docs/RELEASE_EN.md)
