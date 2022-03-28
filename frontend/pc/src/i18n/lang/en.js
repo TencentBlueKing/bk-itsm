@@ -1955,6 +1955,7 @@ export const m = {
         '请输入': 'Please enter',
         '提醒内容': 'Message',
         '邮件主题': 'Email Subject',
+        '标题': 'Title',
         '邮件内容': 'Email Message',
         '短信内容': 'Message',
         '约定解决时长': 'Duration',
@@ -2461,5 +2462,7 @@ export const m = {
     '编辑通知模板': 'Edit Noitce Template',
     '通知模板': 'Notice template',
     '删除成功': 'success',
-    '暂未开放': 'Unopen'
+    '暂未开放': 'Unopen',
+    '请输入模板内容': 'Please enter the template content',
+    '确认要删除？': 'Are you sure you want to delete?'
 }
