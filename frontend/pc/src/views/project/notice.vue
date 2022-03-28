@@ -249,7 +249,7 @@
                 Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(res => {
                     const { title, message } = this.$refs.editorNotice.formInfo
                     const params = {
-                        title,
+                        title_template: title,
                         content_template: message,
                         project_key: this.$route.query.project_id
                     }
