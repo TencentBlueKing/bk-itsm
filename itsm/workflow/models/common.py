@@ -33,12 +33,12 @@ from itsm.component.constants import (
     LEN_LONG,
     LEN_NORMAL,
     LEN_SHORT,
-    NOTIFY_TYPE_CHOICES,
 )
 from itsm.component.notify import BaseNotifier
 from itsm.workflow.managers import GlobalVariableManager
 
 from .base import Model
+from ..utils import init_notify_type_choice
 
 
 class Notify(models.Model):
@@ -46,8 +46,7 @@ class Notify(models.Model):
 
     name = models.CharField(_("通知方式名称"), max_length=LEN_NORMAL, unique=True)
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
-    type = models.CharField(_("通知渠道"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES,
-                            default="EMAIL")
+    type = models.CharField(_("通知渠道"), max_length=LEN_SHORT, default="EMAIL")
     template = models.TextField(_("通知模板：可使用变量如下：xxx（TODO）"), default=EMPTY_STRING, null=True,
                                 blank=True)
 
@@ -61,8 +60,11 @@ class Notify(models.Model):
 
     @classmethod
     def init_builtin_notify(cls, *args, **kwargs):
-        for notify_type, notify_name in NOTIFY_TYPE_CHOICES:
-            if not cls.objects.filter(name="{}通知".format(notify_name), type=notify_type).exists():
+        notify_type_choice = init_notify_type_choice()
+        for notify_type, notify_name in notify_type_choice:
+            if not cls.objects.filter(
+                name="{}通知".format(notify_name), type=notify_type
+            ).exists():
                 # cls.objects.create(defaults={'name': "{}通知".format(notify_name),}, **{'type': notify_type})
                 cls.objects.create(name="{}通知".format(notify_name), type=notify_type)
 
