@@ -83,7 +83,7 @@
                             </bk-select>
                         </bk-form-item>
                         <bk-form-item label="通知场景" :required="true" :property="'noticeUserBy'">
-                            <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable>
+                            <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
                                 <bk-option v-for="option in userByList"
                                     :key="option.id"
                                     :id="option.id"
@@ -92,7 +92,7 @@
                             </bk-select>
                         </bk-form-item>
                         <bk-form-item label="通知类型" :required="true" :property="'noticeAction'">
-                            <bk-select :disabled="false" v-model="formData.noticeAction" searchable>
+                            <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
                                 <bk-option v-for="option in actionList"
                                     :key="option.id"
                                     :id="option.id"
@@ -181,7 +181,8 @@
                 formInfo: {},
                 isDataLoading: false,
                 searchNotice: '',
-                customRow: 5
+                customRow: 5,
+                actionLoading: false
             }
         },
         computed: {
@@ -199,23 +200,35 @@
         },
         mounted () {
             this.getNoticeList()
-            this.getAction()
         },
         methods: {
             changeNotice (item, index) {
                 this.acticeTab = item.id
                 this.getNoticeList()
             },
-            getAction () {
-                this.$store.dispatch('project/getAction').then(res => {
-                    const list = res.data
-                    for (const item in list) {
-                        this.actionList.push({
-                            id: item,
-                            name: list[item]
-                        })
+            async handleSelectUserBy (val) {
+                try {
+                    this.actionLoading = true
+                    this.actionList = []
+                    this.formData.noticeAction = ''
+                    const parmas = {
+                        used_by: val
                     }
-                })
+                    const res = await this.$store.dispatch('project/getAction', parmas)
+                    if (res.data && res.result) {
+                        const list = res.data
+                        for (const item in list) {
+                            this.actionList.push({
+                                id: item,
+                                name: list[item]
+                            })
+                        }
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    this.actionLoading = false
+                }
             },
             getNoticeList (isSearch) {
                 this.isDataLoading = true
@@ -283,8 +296,9 @@
             },
             editNotice (row) {
                 this.editNoticeId = row.id
-                this.formData.noticeAction = row.action
                 this.formData.noticeUserBy = row.used_by
+                this.handleSelectUserBy(row.used_by)
+                this.formData.noticeAction = row.action
                 this.$refs.editorNotice.formInfo = {
                     title: row.title_template,
                     message: row.content_template
