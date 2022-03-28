@@ -75,6 +75,23 @@ def field_validate(field, state_fields, key_value, **kwargs):
     choice_validate(field, field_obj, key_value, **kwargs)
     regex_validate(field, field_obj)
     custom_regex_validate(field, field_obj)
+    member_validate(field, field_obj)
+
+
+def member_validate(field, field_obj):
+    """人员字段校验"""
+    if field_obj.type not in ["MEMBER", "MEMBERS"]:
+        return
+    if field_obj.type == "MEMBER":
+        members = [member for member in field["value"].split(",") if member]
+        if len(members) > 1:
+            raise serializers.ValidationError(
+                _("'{}'为单选人员字段，请输入单个用户名".format(field["key"]))
+            )
+    if not re.match(r"^[A-Za-z0-9_,]+$", str(field["value"])):
+        raise serializers.ValidationError(
+            _("'{}'不满足人员正则规则(仅支持由数字，字母及下划线构成的用户名，多人时请用','分隔)".format(field["key"]))
+        )
 
 
 def required_validate(field, field_obj, key_value, skip_readonly=False):
