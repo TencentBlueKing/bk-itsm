@@ -104,7 +104,6 @@
                     <editor-notice
                         ref="editorNotice"
                         :custom-row="customRow"
-                        :key="Date.parse(new Date())"
                         :is-show-title="true"
                         :check-id="acticeTab"
                         :is-show-footer="false"
