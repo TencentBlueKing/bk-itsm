@@ -129,7 +129,7 @@ class CustomNotifyViewSet(ModelViewSet):
     @action(detail=False, methods=["get"])
     def action_type(self, request, *args, **kwargs):
         used_by = request.query_params.get("used_by")
-        data = {item[0]: item[1] for item in ACTION_CHOICES}
+        data = dict(ACTION_CHOICES)
         return Response(ACTION_CLASSIFY.get(used_by, data))
 
 

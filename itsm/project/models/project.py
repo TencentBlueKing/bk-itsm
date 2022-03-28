@@ -122,6 +122,11 @@ class Project(Model):
         self.grant_instance_permit(schedules)
         self.grant_instance_permit(sla_list)
 
+    def init_custom_notify_template(self):
+        from itsm.sla.models import CustomNotice
+
+        CustomNotice.init_project_template(self.key)
+
     def grant_instance_permit(self, instances):
         from itsm.auth_iam.utils import grant_instance_creator_related_actions
 

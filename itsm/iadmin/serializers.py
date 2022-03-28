@@ -125,6 +125,9 @@ class CustomNotifySerializer(serializers.ModelSerializer):
 
         validated_data.pop("creator", None)
 
+        # 版本号固定为v2
+        validated_data["version"] = "V2"
+
         if CustomNotice.objects.filter(
             action=action,
             notify_type=notify_type,

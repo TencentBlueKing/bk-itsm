@@ -159,30 +159,33 @@ class CustomNotice(models.Model):
         return self.get_action_display()
 
     @classmethod
-    def init_default_template(cls, *args, **kwargs):
-
-        # 升级（V1->V2）或初始化通知模板
-        if CustomNotice.objects.filter(version="V1").exists():
-            CustomNotice.objects.all().delete()
-
+    def init_project_template(cls, project_key):
         for template in NOTIFY_TEMPLATE:
             try:
-                CustomNotice.objects.get_or_create(
-                    defaults={
-                        "title_template": template[0],
-                        "content_template": template[1],
-                        "used_by": template[4],
-                        "version": "V2",
-                        "project_key": "public",
-                    },
+                CustomNotice.objects.get(
                     action=template[2],
                     notify_type=template[3],
+                    used_by=template[4],
+                    version="V2",
+                    project_key=project_key,
+                )
+            except CustomNotice.DoesNotExist:
+                CustomNotice.objects.create(
+                    **{
+                        "title_template": template[0],
+                        "content_template": template[1],
+                        "action": template[2],
+                        "used_by": template[4],
+                        "notify_type": template[3],
+                        "version": "V2",
+                        "project_key": project_key,
+                    }
                 )
             except CustomNotice.MultipleObjectsReturned:
                 CustomNotice.objects.filter(
                     action=template[2],
                     notify_type=template[3],
-                    project_key=PUBLIC_PROJECT_PROJECT_KEY,
+                    project_key=project_key,
                 ).delete()
                 CustomNotice.objects.create(
                     **{
@@ -192,9 +195,25 @@ class CustomNotice(models.Model):
                         "version": "V2",
                         "action": template[2],
                         "notify_type": template[3],
-                        "project_key": "public",
+                        "project_key": project_key,
                     }
                 )
+
+    @classmethod
+    def init_default_template(cls, *args, **kwargs):
+
+        # 升级（V1->V2）或初始化通知模板
+        if CustomNotice.objects.filter(version="V1").exists():
+            CustomNotice.objects.filter(version="V1").delete()
+
+        from itsm.project.models import Project
+
+        project_keys = Project.objects.filter(is_deleted=False).values_list(
+            "key", flat=True
+        )
+
+        for project_key in project_keys:
+            cls.init_project_template(project_key=project_key)
 
 
 class ReleaseVersionLogManager(models.Manager):
