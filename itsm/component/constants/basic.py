@@ -101,12 +101,22 @@ CACHE_1H = 1 * 60 * 60
 WEIXIN = "WEIXIN"
 EMAIL = "EMAIL"
 SMS = "SMS"
+GENERAL_NOTICE = "GENERAL"
 
 NOTIFY_TYPE_CHOICES = [
     (WEIXIN, "微信"),
     (EMAIL, "邮箱"),
     (SMS, "短信"),
 ]
+
+# 兼容已存在的通知方式
+# GENERAL_NOTICE 不作为通知方式, 不存入 Notify
+NOTIFY_TYPE_MAPPING = {"weixin": WEIXIN, "mail": EMAIL, "sms": SMS}
+
+# 内置通知方式
+# GENERAL_NOTICE 通知模版, 存入 CustomNotice
+# 在获取通知方式失败时使用通用通知模版构建通知信息
+BUILTIN_NOTIFY_TYPE = [WEIXIN, EMAIL, SMS, GENERAL_NOTICE]
 
 HOLIDAY = "HOLIDAY"
 WORKDAY = "WORKDAY"
