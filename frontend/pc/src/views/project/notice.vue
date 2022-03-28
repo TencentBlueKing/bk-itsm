@@ -104,6 +104,7 @@
                     <editor-notice
                         ref="editorNotice"
                         :custom-row="customRow"
+                        :key="Date.parse(new Date())"
                         :is-show-title="true"
                         :check-id="acticeTab"
                         :is-show-footer="false"
@@ -348,8 +349,5 @@
         padding: 4px;
         overflow-y: auto;
         @include scroller;
-    }
-    /deep/ .bk-dialog-wrapper .bk-dialog-header .bk-dialog-header-inner {
-        text-align: center;
     }
 </style>
