@@ -30,7 +30,7 @@ from rest_framework.response import Response
 from itsm.component.constants import NOTIFY_GLOBAL_VARIABLES, PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.exceptions import MigrateDataError
-from itsm.iadmin.contants import ACTION_CHOICES
+from itsm.iadmin.contants import ACTION_CHOICES, ACTION_CLASSIFY
 from itsm.iadmin.models import (
     CustomNotice,
     MigrateLogs,
@@ -128,8 +128,9 @@ class CustomNotifyViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def action_type(self, request, *args, **kwargs):
+        used_by = request.query_params.get("used_by")
         data = {item[0]: item[1] for item in ACTION_CHOICES}
-        return Response(data)
+        return Response(ACTION_CLASSIFY.get(used_by, data))
 
 
 class VersionLogsViewSet(component_viewsets.ReadOnlyModelViewSet):
