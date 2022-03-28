@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import copy
 import os
 import re
 
@@ -46,7 +46,8 @@ from itsm.component.constants import (
 from itsm.component.db import managers
 from itsm.component.fields import IOField
 from itsm.component.utils.basic import now
-from itsm.iadmin.contants import ACTION_CHOICES, DEFAULT_SETTINGS, NOTIFY_TEMPLATE
+from itsm.iadmin.contants import ACTION_CHOICES, DEFAULT_SETTINGS, NOTIFY_TEMPLATE,\
+    GENERAL_NOTIFY_TEMPLATE_LIST
 
 # 匹配版本
 VERSION_PATTERN = re.compile(r".*:(.*)].*")
@@ -130,9 +131,7 @@ class CustomNotice(models.Model):
     action = models.CharField(
         _("通知模板类型"), max_length=LEN_SHORT, choices=ACTION_CHOICES, default="default"
     )
-    notify_type = models.CharField(
-        _("通知方式"), max_length=LEN_SHORT, choices=NOTIFY_TYPE_CHOICES, default="EMAIL"
-    )
+    notify_type = models.CharField(_("通知方式"), max_length=LEN_SHORT, default="EMAIL")
     create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     update_at = models.DateTimeField(_("更新时间"), auto_now=True)
     updated_by = models.CharField(_("更新人"), max_length=LEN_NORMAL, default="system")
@@ -152,7 +151,7 @@ class CustomNotice(models.Model):
         verbose_name_plural = _("通知模板")
 
     def __unicode__(self):
-        return "%s-%s" % (self.get_action_display(), self.get_notify_type_display())
+        return "%s-%s" % (self.get_action_display(), self.notify_type)
 
     @property
     def action_name(self):
@@ -160,7 +159,18 @@ class CustomNotice(models.Model):
 
     @classmethod
     def init_project_template(cls, project_key):
-        for template in NOTIFY_TEMPLATE:
+        # 1.获取第三方通知方式
+        from itsm.workflow.utils import get_third_party_notify_type
+        third_party_notify_type_list = get_third_party_notify_type()
+        # 2.初始化第三方通知方式模版
+        third_party_notify_template_list = []
+        for notify_type in third_party_notify_type_list:
+            general_notify_template = copy.deepcopy(GENERAL_NOTIFY_TEMPLATE_LIST)
+            for template in general_notify_template:
+                template[3] = notify_type
+            third_party_notify_template_list.extend(general_notify_template)
+        
+        for template in NOTIFY_TEMPLATE+third_party_notify_template_list:
             try:
                 CustomNotice.objects.get(
                     action=template[2],
