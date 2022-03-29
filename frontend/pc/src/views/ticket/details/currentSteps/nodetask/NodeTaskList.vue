@@ -390,8 +390,9 @@
                     const loopStatusList = ['QUEUE', 'RUNNING', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'WAITING_FOR_CONFIRM']
                     if (!res.data.some(task => loopStatusList.includes(task.status)) && source === 'refreshBtn') {
                         this.reload()
-                    } else {
-                        // 轮询
+                    }
+                    // 轮询
+                    if (res.data.some(task => loopStatusList.includes(task.status))) {
                         const setTimeoutFunc = setTimeout(
                             () => {
                                 this.getTaskList(source)
