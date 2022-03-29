@@ -295,7 +295,7 @@ class ServiceManager(managers.Manager):
             workflow_tag_data = tag_data.pop("workflow")
             workflow_tag_data["is_builtin"] = False
             task_settings = []
-            if workflow_tag_data["extras"].get("task_settings"):
+            if workflow_tag_data.get("extras", {}).get("task_settings"):
                 task_settings = workflow_tag_data["extras"].pop("task_settings")
             workflow, state_map, _ = Workflow.objects.clone(workflow_tag_data, username)
             self.clone_task_settings(workflow, task_settings, state_map)
