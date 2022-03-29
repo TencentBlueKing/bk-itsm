@@ -109,6 +109,7 @@ BK_IAM_RESOURCE_API_HOST = os.getenv(
     "BKAPP_IAM_RESOURCE_API_HOST", urljoin(BK_PAAS_INNER_HOST, "/o/{}".format(APP_CODE))
 )
 
+# 如果是容器化环境，则覆盖配置
 ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
 if ENGINE_REGION == "default":
     default_settings = importlib.import_module(
