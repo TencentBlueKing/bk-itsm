@@ -25,15 +25,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # 内部版配置
 # init APIGW public_key
-import base64
 import os
 
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
-
-api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
-APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
 
 # itsm-tapd 网关API地址
 ITSM_TAPD_APIGW = os.environ.get("ITSM_TAPD_APIGW", "")
@@ -46,10 +42,6 @@ BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = os.environ.get("BK_LOGIN_PLAIN_URL", "")
 BLUEAPPS_SPECIFIC_REDIRECT_KEY = os.environ.get(
     "BLUEAPPS_SPECIFIC_REDIRECT_KEY",
 )
-
-# 蓝盾
-DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
-DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 
 # bkchat快速审批
 USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
