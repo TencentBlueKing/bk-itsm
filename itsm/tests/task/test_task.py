@@ -168,10 +168,10 @@ class SopsTaskTest(TestCase):
         self.assertEqual(rsp.data["message"], "success")
 
     @mock.patch("itsm.task.models.client_backend.sops")
-    @mock.patch.object(Task, "call_sops_create_task")
+    @mock.patch.object(Task, "call_sops_update_task")
     @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_create_sops_task_from_exist(self, mock_create_res, client_backend):
-        mock_create_res.return_value = sops_create_res, task_params
+    def test_create_sops_task_from_exist(self, mock_update_res, client_backend):
+        mock_update_res.return_value = sops_create_res, task_params
         client_backend.get_task_detail.return_value = {
             "result": True,
             "message": "",
@@ -204,9 +204,11 @@ class SopsTaskTest(TestCase):
 
     @mock.patch("itsm.task.models.client_backend.sops")
     @mock.patch.object(Task, "call_sops_create_task")
+    @mock.patch.object(Task, "update_sops_task")
     @override_settings(MIDDLEWARE=('itsm.tests.middlewares.OverrideMiddleware',))
-    def test_update_sops_task(self, mock_update_res, client_backend):
+    def test_update_sops_task(self, mock_create_res, mock_update_res, client_backend):
         # pipeline.return_value = None
+        mock_create_res.return_value = sops_create_res, task_params
         mock_update_res.return_value = sops_create_res, task_params
         client_backend.get_task_detail.return_value = {
             "result": True,
