@@ -814,20 +814,6 @@ timezone = "Asia/Shanghai"
 
 CELERY_TIMEZONE = "Asia/Shanghai"
 USE_TZ = False
-# 蓝盾
-DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
-DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
-
-# bkchat快速审批
-USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
-if USE_BKCHAT:
-    BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
-    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
-    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
-
-# show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
-BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
-BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # 通知消息模版
 CONTENT_CREATOR_WITH_TRANSLATION = (
@@ -839,14 +825,30 @@ CONTENT_CREATOR_WITH_TRANSLATION = (
 # 系统api调用账户
 SYSTEM_USE_API_ACCOUNT = "admin"
 
-BLUEAPPS_ACCOUNT_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
-BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = os.environ.get("BK_LOGIN_PLAIN_URL", "")
+# 蓝盾
+DEVOPS_CLIENT_URL = os.environ.get("DEVOPS_CLIENT_URL", "")
+DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 
-# init APIGW public_key
 api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
+
+
+# show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
+BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
+BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
 
 # itsm-tapd 网关API地址
 ITSM_TAPD_APIGW = os.environ.get("ITSM_TAPD_APIGW", "")
 # tapd 项目授权链接
 TAPD_OAUTH_URL = os.environ.get("TAPD_OAUTH_URL", "")
+
+# blueapps 相关的配置覆盖
+BLUEAPPS_ACCOUNT_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
+BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = os.environ.get("BK_LOGIN_PLAIN_URL", "")
+
+# bkchat快速审批
+USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
+if USE_BKCHAT:
+    BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
+    BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
+    BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
