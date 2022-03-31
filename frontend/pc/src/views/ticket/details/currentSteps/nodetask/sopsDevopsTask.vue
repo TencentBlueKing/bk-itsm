@@ -5,6 +5,7 @@
             v-if="nodeInfo.type === 'TASK-SOPS'"
             class="sops-form"
             ref="sopsGetParam"
+            :key="new Date().getTime()"
             :hooked-var-list="hookedVarList"
             :constants="constants"
             :context="context"
@@ -119,13 +120,12 @@
                 })
             },
             reSetSopTask () {
-                this.isHook = true
                 this.changeBtn = !this.changeBtn
+                this.isHook = this.changeBtn
                 this.isEdit = !this.isEdit
                 if (this.$refs.sopsGetParam) {
                     this.$refs.sopsGetParam.changeTicketformDisable(this.changeBtn)
                 }
-                // sops
             },
             onChangeHook (key, value) {
                 this.$emit('onChangeHook', key, value)

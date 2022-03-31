@@ -24,7 +24,7 @@
                 <div class="bk-only-search">
                     <bk-input
                         data-test-id="notice_input_search"
-                        :placeholder="$t(`m.systemConfig['请输入角色名称']`)"
+                        :placeholder="$t(`m['请输入模板内容']`)"
                         :clearable="true"
                         :right-icon="'bk-icon icon-search'"
                         v-model="searchNotice"
@@ -63,7 +63,7 @@
                 </bk-table-column>
             </bk-table>
             <bk-dialog v-model="isShowEdit"
-                width="700"
+                width="690"
                 theme="primary"
                 :mask-close="false"
                 :auto-close="false"
@@ -82,18 +82,18 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知类型" :required="true" :property="'noticeAction'">
-                            <bk-select :disabled="false" v-model="formData.noticeAction" searchable>
-                                <bk-option v-for="option in actionList"
+                        <bk-form-item label="通知场景" :required="true" :property="'noticeUserBy'">
+                            <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
+                                <bk-option v-for="option in userByList"
                                     :key="option.id"
                                     :id="option.id"
                                     :name="option.name">
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知场景" :required="true" :property="'noticeUserBy'">
-                            <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable>
-                                <bk-option v-for="option in userByList"
+                        <bk-form-item label="通知类型" :required="true" :property="'noticeAction'">
+                            <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
+                                <bk-option v-for="option in actionList"
                                     :key="option.id"
                                     :id="option.id"
                                     :name="option.name">
@@ -103,6 +103,8 @@
                     </bk-form>
                     <editor-notice
                         ref="editorNotice"
+                        :custom-row="customRow"
+                        :is-show-title="true"
                         :check-id="acticeTab"
                         :is-show-footer="false"
                         :notice-info="formInfo"
@@ -178,7 +180,9 @@
                 },
                 formInfo: {},
                 isDataLoading: false,
-                searchNotice: ''
+                searchNotice: '',
+                customRow: 5,
+                actionLoading: false
             }
         },
         computed: {
@@ -196,23 +200,35 @@
         },
         mounted () {
             this.getNoticeList()
-            this.getAction()
         },
         methods: {
             changeNotice (item, index) {
                 this.acticeTab = item.id
                 this.getNoticeList()
             },
-            getAction () {
-                this.$store.dispatch('project/getAction').then(res => {
-                    const list = res.data
-                    for (const item in list) {
-                        this.actionList.push({
-                            id: item,
-                            name: list[item]
-                        })
+            async handleSelectUserBy (val) {
+                try {
+                    this.actionLoading = true
+                    this.actionList = []
+                    this.formData.noticeAction = ''
+                    const parmas = {
+                        used_by: val
                     }
-                })
+                    const res = await this.$store.dispatch('project/getAction', parmas)
+                    if (res.data && res.result) {
+                        const list = res.data
+                        for (const item in list) {
+                            this.actionList.push({
+                                id: item,
+                                name: list[item]
+                            })
+                        }
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    this.actionLoading = false
+                }
             },
             getNoticeList (isSearch) {
                 this.isDataLoading = true
@@ -230,22 +246,32 @@
                 })
             },
             submitNotice () {
-                const { title, message } = this.$refs.editorNotice.formInfo
-                const params = {
-                    title,
-                    content_template: message,
-                    project_key: this.$route.query.project_id
-                }
-                const url = this.isEdit ? 'project/updateProjectNotice' : 'project/addProjectNotice'
-                if (this.isEdit) params.id = this.editNoticeId
-                this.$refs.basicFrom.validate().then(_ => {
+                Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(res => {
+                    const { title, message } = this.$refs.editorNotice.formInfo
+                    const params = {
+                        title_template: title,
+                        content_template: message,
+                        project_key: this.$route.query.project_id
+                    }
+                    const url = this.isEdit ? 'project/updateProjectNotice' : 'project/addProjectNotice'
+                    if (this.isEdit) params.id = this.editNoticeId
                     params.notify_type = this.formData.noticeType
                     params.action = this.formData.noticeAction
                     params.used_by = this.formData.noticeUserBy
                     // 调取接口数据
                     this.$store.dispatch(url, params).then(res => {
+                        this.$bkMessage({
+                            message: res.message,
+                            theme: 'success'
+                        })
                         this.isShowEdit = false
                         this.getNoticeList()
+                        this.clearFromData()
+                    }).catch(e => {
+                        this.$bkMessage({
+                            message: e.data.message,
+                            theme: 'error'
+                        })
                     })
                 })
             },
@@ -259,6 +285,7 @@
             },
             closeNotice () {
                 this.$refs.basicFrom.clearError()
+                this.$refs.editorNotice.$refs.wechatForm.clearError()
                 this.clearFromData()
                 this.isShowEdit = false
             },
@@ -269,10 +296,11 @@
             },
             editNotice (row) {
                 this.editNoticeId = row.id
-                this.formData.noticeAction = row.action
                 this.formData.noticeUserBy = row.used_by
+                this.handleSelectUserBy(row.used_by)
+                this.formData.noticeAction = row.action
                 this.$refs.editorNotice.formInfo = {
-                    title: row.title_template || undefined,
+                    title: row.title_template,
                     message: row.content_template
                 }
                 this.isEdit = true
@@ -280,7 +308,7 @@
             },
             deleteNotice (row) {
                 this.$bkInfo({
-                    title: '确认要删除？',
+                    title: this.$t('m["确认要删除？"]'),
                     confirmLoading: true,
                     confirmFn: () => {
                         this.$store.dispatch('project/deleteProjectNotice', row.id).then(res => {
@@ -330,7 +358,7 @@
         }
     }
     .notice-forms {
-        max-height: 500px;
+        max-height: 600px;
         padding: 4px;
         overflow-y: auto;
         @include scroller;
