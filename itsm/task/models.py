@@ -519,7 +519,7 @@ class Task(Model):
         }
 
         # 创建任务 或者重试任务
-        res = client.sops.start_task(start_task_params)
+        res = client_backend.sops.start_task(start_task_params)
 
         if not res.get("result", False):
             if sops_task:
