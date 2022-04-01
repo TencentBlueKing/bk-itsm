@@ -1,5 +1,21 @@
 # Changelog
 
+## [Version: 2.6.1] - 2022-03-31
+[New] Community edition does not open the Blue Shield node         
+[New] Popover problem fixed, development framework version updated             
+[Optimization] Abnormal statistics of approval number after order transfer            
+[New] Notification template for project latitude         
+[Optimization] Update the permission model                   
+[Repaired] Sending orders to the organization structure is abnormal          
+[Repaired] Work order view permission authentication exception repair         
+[New] Support automatic node exception notification        
+[New] Custom tabs within the project         
+[New] Global trigger within a project        
+[New] Merge service and service catalog     
+[New] Services support cloning     
+[New] Commentary on documents     
+
+
 ## [Version: 2.6.0] - 2021-09-09
  [New] Project Space, each project space manages the documents, services, elements, SLAs, and configuration management under the project.  
  [New] Platform Management, manage the basic/public configuration at platform level  
