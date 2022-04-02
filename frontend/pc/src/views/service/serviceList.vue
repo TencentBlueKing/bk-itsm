@@ -47,6 +47,12 @@
                             {{$t(`m.serviceConfig['新增']`)}}
                         </bk-button>
                         <bk-button :theme="'default'"
+                            data-test-id="service_button_batchImportService"
+                            :title="$t(`m['导入']`)"
+                            @click="importService">
+                            {{$t(`m['导入']`)}}
+                        </bk-button>
+                        <bk-button :theme="'default'"
                             data-test-id="service_button_batchDeleteService"
                             :title="$t(`m.serviceConfig['批量删除']`)"
                             :disabled="!checkList.length"
@@ -304,7 +310,7 @@
                                         theme="primary"
                                         text
                                         @click="exportService(props.row)">
-                                        {{ $t('m.managePage["导出"]') }}
+                                        {{ $t('m["导出"]') }}
                                     </bk-button>
                                 </div>
                             </bk-popover>
@@ -312,6 +318,39 @@
                     </bk-table-column>
                 </bk-table>
             </div>
+            <bk-dialog
+                width="800"
+                v-model="isImportServiceShow"
+                title="导入服务"
+                theme="primary"
+                :auto-close="false"
+                :mask-close="false"
+                @confirm="ImportConfirm">
+                <bk-form ref="importForm" id="importForm">
+                    <bk-form-item label="选择目录">
+                        <bk-select v-model="improtFormData.catalog_id" searchable multiple>
+                            <bk-option v-for="option in dirList"
+                                :key="option.id"
+                                :id="option.id"
+                                :name="option.name">
+                            </bk-option>
+                        </bk-select>
+                    </bk-form-item>
+                    <bk-form-item label="选择目录">
+                        <input type="file" :value="improtFormData.file" multiple name="bdaytime" @change="handleFile">
+                        <!-- <el-upload
+                            ref="upload"
+                            drag
+                            action="''"
+                            multiple
+                            :auto-upload="false">
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload> -->
+                    </bk-form-item>
+                </bk-form>
+            </bk-dialog>
         </div>
     </div>
 </template>
@@ -341,6 +380,10 @@
                     node: {}
                 },
                 rules: {},
+                improtFormData: {
+                    catalog_id: '',
+                    file: ''
+                },
                 formData: {
                     name: '',
                     desc: '',
@@ -407,7 +450,8 @@
                     bounded_catalogs: ''
                 },
                 editValue: '',
-                tableHoverId: ''
+                tableHoverId: '',
+                isImportServiceShow: false
             }
         },
         watch: {
@@ -436,8 +480,21 @@
             handleChangeTree (val) {
                 this.editValue = val[val.length - 1]
             },
+            handleFile (e) {
+                console.log(e)
+            },
+            ImportConfirm () {
+                const formdata = new FormData()
+                formdata.append('catalog_id', this.improtFormData.catalog_id)
+                formdata.append('file', this.improtFormData.file)
+                console.log(formdata.keys().next())
+                console.log(formdata.keys().next())
+            },
+            importService () {
+                this.isImportServiceShow = true
+                console.log('导入')
+            },
             exportService (row) {
-                console.log(row)
                 this.$store.dispatch('serviceEntry/exportService', row.id).then(res => {
                     console.log(res)
                 })
