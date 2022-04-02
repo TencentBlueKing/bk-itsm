@@ -325,30 +325,27 @@
                 theme="primary"
                 :auto-close="false"
                 :mask-close="false"
-                @confirm="ImportConfirm">
+                @confirm="importConfirm"
+                @cancel="closeImport">
                 <bk-form ref="importForm" id="importForm">
-                    <bk-form-item label="选择目录">
-                        <bk-select v-model="improtFormData.catalog_id" searchable multiple>
-                            <bk-option v-for="option in dirList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
+                    <bk-form-item label="选择目录" required>
+                        <bk-cascade
+                            v-model="importCatalogId"
+                            :list="dirList"
+                            clearable
+                            :check-any-level="true"
+                            :ext-popover-cls="'custom-cls'"
+                            @change="handleChangeTree">
+                        </bk-cascade>
                     </bk-form-item>
-                    <bk-form-item label="选择目录">
-                        <input type="file" :value="improtFormData.file" multiple name="bdaytime" @change="handleFile">
-                        <!-- <el-upload
-                            ref="upload"
-                            drag
-                            action="''"
-                            multiple
-                            :auto-upload="false">
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-                        </el-upload> -->
+                    <bk-form-item label="选择文件" required>
+                        <bk-button class="bk-btn-file" style="width: 100px">
+                            <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
+                            {{$t(`m.systemConfig['导入']`)}}
+                        </bk-button>
                     </bk-form-item>
+                    <p v-if="isHasFile" class="file-list">{{ importFileName }}</p>
+                    <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
                 </bk-form>
             </bk-dialog>
         </div>
@@ -380,10 +377,11 @@
                     node: {}
                 },
                 rules: {},
-                improtFormData: {
-                    catalog_id: '',
-                    file: ''
-                },
+                importCatalogId: [],
+                isCheckImport: false,
+                isHasFile: false,
+                importFileName: '',
+                errorName: '',
                 formData: {
                     name: '',
                     desc: '',
@@ -457,6 +455,11 @@
         watch: {
             'treeInfo.node' () {
                 this.getList(1)
+            },
+            importCatalogId (val) {
+                if (val.length !== 0) {
+                    this.isCheckImport = false
+                }
             }
         },
         created () {
@@ -481,23 +484,51 @@
                 this.editValue = val[val.length - 1]
             },
             handleFile (e) {
-                console.log(e)
+                const filename = e.target.value.split('\\').slice(-1)
+                if (filename.length !== 0) {
+                    this.importFileName = filename[0]
+                    this.isCheckImport = false
+                    this.isHasFile = true
+                } else {
+                    this.isHasFile = false
+                }
             },
-            ImportConfirm () {
+            closeImport () {
+                this.isCheckImport = false
+                this.isImportServiceShow = false
+            },
+            importConfirm () {
                 const formdata = new FormData()
-                formdata.append('catalog_id', this.improtFormData.catalog_id)
-                formdata.append('file', this.improtFormData.file)
-                console.log(formdata.keys().next())
-                console.log(formdata.keys().next())
+                formdata.append('file', this.$refs.importInput.files[0])
+                formdata.append('catalog_id', this.importCatalogId.slice(-1))
+                formdata.append('project_key', this.$route.query.project_id)
+                if (this.importCatalogId.length === 0) {
+                    this.isCheckImport = true
+                    this.errorName = this.$t(`m["目录"]`)
+                    return
+                }
+                if (formdata.get('file') === 'undefined') {
+                    this.isCheckImport = true
+                    this.errorName = this.$t(`m["文件"]`)
+                    return
+                }
+                this.isImportServiceShow = false
+                this.$store.dispatch('serviceEntry/importService', formdata).then(res => {
+                    this.$bkMessage({
+                        message: res.message,
+                        theme: 'success'
+                    })
+                    this.importCatalogId = []
+                    this.isImportServiceShow = false
+                    this.isCheckImport = false
+                    this.getList(1)
+                })
             },
             importService () {
                 this.isImportServiceShow = true
-                console.log('导入')
             },
             exportService (row) {
-                this.$store.dispatch('serviceEntry/exportService', row.id).then(res => {
-                    console.log(res)
-                })
+                window.open(window.SITE_URL + `api/service/projects/${row.id}/export/`)
             },
             handleChange (type, row) {
                 // this.editValue = row.name
@@ -969,6 +1000,37 @@
     padding: 0;
     width: 16px;
     margin: 0 auto;
+}
+.bk-btn-file {
+    float: left;
+    line-height: 30px;
+    position: relative;
+    cursor: pointer;
+
+    .bk-input-file {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 68px;
+        height: 32px;
+        overflow: hidden;
+        opacity: 0;
+        cursor: pointer;
+    }
+}
+.file-list {
+    border: 1px solid #e1ecff;
+    margin-left: 150px;
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 1px 5px;
+    color: #979ba5;
+}
+.import-error-tip {
+    font-size: 14px;
+    margin-left: 150px;
+    margin-top: 10px;
+    color: red;
 }
 
 </style>

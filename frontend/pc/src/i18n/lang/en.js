@@ -2466,5 +2466,7 @@ export const m = {
     '请输入模板内容': 'Please enter the template content',
     '确认要删除？': 'Are you sure you want to delete?',
     '导入': 'Import',
-    '导出': 'Export'
+    '导出': 'Export',
+    '文件': 'File',
+    '目录': 'Catalog'
 }
