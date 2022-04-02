@@ -298,6 +298,14 @@
                                             {{ $t('m.serviceConfig["删除"]') }}
                                         </bk-button>
                                     </template>
+                                    <bk-button
+                                        style="font-size: 12px;"
+                                        data-test-id="service_button_deleteService3"
+                                        theme="primary"
+                                        text
+                                        @click="exportService(props.row)">
+                                        {{ $t('m.managePage["导出"]') }}
+                                    </bk-button>
                                 </div>
                             </bk-popover>
                         </template>
@@ -427,6 +435,12 @@
             },
             handleChangeTree (val) {
                 this.editValue = val[val.length - 1]
+            },
+            exportService (row) {
+                console.log(row)
+                this.$store.dispatch('serviceEntry/exportService', row.id).then(res => {
+                    console.log(res)
+                })
             },
             handleChange (type, row) {
                 // this.editValue = row.name

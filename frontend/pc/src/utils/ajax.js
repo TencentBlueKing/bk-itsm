@@ -64,6 +64,7 @@ instance.interceptors.request.use(config => {
 
 instance.interceptors.response.use(response => {
     // status >= 200 && status <= 505
+    console.log(response.data)
     if (!response.data || typeof response.data === 'string') {
         const msg = window.app.$t("m.js['接口请求异常，请联系管理员']")
         console.warn(window.app.$t("m.js['接口异常，']"), window.app.$t('m.js[\'HTTP状态码：\']'), response.status)
