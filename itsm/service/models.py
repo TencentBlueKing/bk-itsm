@@ -469,7 +469,7 @@ class Service(ObjectManagerMixin, Model):
             "key": self.key,
             "name": self.name,
             "desc": self.desc,
-            "workflow": workflow.tag_data(),
+            "workflow": workflow.tag_data(need_tag_task=True),
             "owners": self.owners,
             "can_ticket_agency": self.can_ticket_agency,
             "is_valid": self.is_valid,

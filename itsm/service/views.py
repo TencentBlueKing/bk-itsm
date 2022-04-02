@@ -647,10 +647,17 @@ class ServiceViewSet(component_viewsets.AuthModelViewSet):
         )
 
     @action(detail=False, methods=["post"])
-    def import_service(self, request, *args, **kwargs):
-        data = request.data
+    def imports(self, request, *args, **kwargs):
+        data = json.loads(request.FILES.get("file").read())
+        if isinstance(data, list):
+            raise ParamError(_("2.5.9 版本之前的流程无法导入，请转换后在看，详情请看github"))
         ServiceImportSerializer(data=data).is_valid(raise_exception=True)
-        service = Service.objects.clone(data, request.user.username)
+        catalog_id = request.data.get("catalog_id")
+        project_key = request.data.get("project_key", data.get("project_key"))
+        data["project_key"] = project_key
+        service = Service.objects.clone(
+            data, request.user.username, catalog_id=catalog_id
+        )
         return Response(
             self.serializer_class(service, context=self.get_serializer_context()).data
         )
