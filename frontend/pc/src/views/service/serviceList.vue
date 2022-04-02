@@ -305,7 +305,7 @@
                                         </bk-button>
                                     </template>
                                     <bk-button
-                                        style="font-size: 12px;"
+                                        style="font-size: 12px; display: block"
                                         data-test-id="service_button_deleteService3"
                                         theme="primary"
                                         text
