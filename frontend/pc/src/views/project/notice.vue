@@ -45,16 +45,12 @@
                     <template slot-scope="props">
                         <bk-button
                             theme="primary"
-                            v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }"
-                            :disabled="!hasPermission(['notification_manage'], $store.state.project.projectAuthActions)"
                             text
                             @click="editNotice(props.row)">
                             {{ $t('m.deployPage["编辑"]') }}
                         </bk-button>
                         <bk-button
                             theme="primary"
-                            v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }"
-                            :disabled="!hasPermission(['notification_manage'], $store.state.project.projectAuthActions)"
                             text
                             @click="deleteNotice(props.row)">
                             {{ $t('m.deployPage["删除"]') }}

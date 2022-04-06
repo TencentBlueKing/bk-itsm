@@ -46,6 +46,13 @@ export default {
         },
         updateService ({ commit, state, dispatch }, params) {
             return ajax.put(`service/projects/${params.id}/`, params).then(response => response.data)
+        },
+        exportService ({ commit, state, dispatch }, id) {
+            return ajax.get(`service/projects/${id}/export/`).then(response => response.data)
+        },
+        importService ({ commit, state, dispatch }, params) {
+            return ajax.post(`service/projects/imports/`, params).then(response => response.data)
         }
+
     }
 }
