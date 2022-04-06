@@ -2468,5 +2468,7 @@ export const m = {
     '导入': 'Import',
     '导出': 'Export',
     '文件': 'File',
-    '目录': 'Catalog'
+    '目录': 'Catalog',
+    '选择文件': 'Select File',
+    '仅支持json文件！': 'Only JSON files are supported!  '
 }
