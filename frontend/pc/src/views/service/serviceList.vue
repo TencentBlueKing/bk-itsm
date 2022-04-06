@@ -47,6 +47,7 @@
                             {{$t(`m.serviceConfig['新增']`)}}
                         </bk-button>
                         <bk-button :theme="'default'"
+                            class="mr10"
                             data-test-id="service_button_batchImportService"
                             :title="$t(`m['导入']`)"
                             @click="importService">
@@ -341,10 +342,15 @@
                     <bk-form-item label="选择文件" required>
                         <bk-button class="bk-btn-file" style="width: 100px">
                             <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
-                            {{$t(`m.systemConfig['导入']`)}}
+                            {{ $t(`m['选择文件']`) }}
+                            <span class="bk-input-tip">{{ $t(`m['仅支持json文件！']`) }}</span>
                         </bk-button>
                     </bk-form-item>
-                    <p v-if="isHasFile" class="file-list">{{ importFileName }}</p>
+                    <template v-if="importFileNameList.length !== 0">
+                        <div class="file-list" v-for="(item, index) in importFileNameList" :key="index">{{ item }}
+                            <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeFile"></i>
+                        </div>
+                    </template>
                     <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
                 </bk-form>
             </bk-dialog>
@@ -380,7 +386,7 @@
                 importCatalogId: [],
                 isCheckImport: false,
                 isHasFile: false,
-                importFileName: '',
+                importFileNameList: [],
                 errorName: '',
                 formData: {
                     name: '',
@@ -460,6 +466,11 @@
                 if (val.length !== 0) {
                     this.isCheckImport = false
                 }
+            },
+            isImportServiceShow (val) {
+                if (!val) {
+                    this.importFileNameList = []
+                }
             }
         },
         created () {
@@ -483,14 +494,16 @@
             handleChangeTree (val) {
                 this.editValue = val[val.length - 1]
             },
+            closeFile () {
+                this.importFileNameList = []
+            },
             handleFile (e) {
                 const filename = e.target.value.split('\\').slice(-1)
-                if (filename.length !== 0) {
-                    this.importFileName = filename[0]
+                if (filename.length !== 0 && filename[0] !== '') {
+                    this.importFileNameList.push(filename[0])
                     this.isCheckImport = false
-                    this.isHasFile = true
                 } else {
-                    this.isHasFile = false
+                    this.importFileNameList = []
                 }
             },
             closeImport () {
@@ -507,7 +520,7 @@
                     this.errorName = this.$t(`m["目录"]`)
                     return
                 }
-                if (formdata.get('file') === 'undefined') {
+                if (this.importFileNameList.length === 0) {
                     this.isCheckImport = true
                     this.errorName = this.$t(`m["文件"]`)
                     return
@@ -1011,20 +1024,43 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 68px;
+        width: 100px;
         height: 32px;
         overflow: hidden;
         opacity: 0;
         cursor: pointer;
     }
+    .bk-input-tip {
+        position: absolute;
+        top: 0;
+        left: 110px;
+        font-size: 12px;
+        color: #979ba5;
+        cursor: auto;
+    }
 }
 .file-list {
     border: 1px solid #e1ecff;
+    position: relative;
     margin-left: 150px;
     margin-top: 10px;
     font-size: 12px;
     padding: 1px 5px;
     color: #979ba5;
+    .icon-itsm-icon-three-one {
+        display: none;
+        position: absolute;
+        right: 3px;
+        top: 4px;
+        cursor: pointer;
+    }
+    &:hover {
+        border: 1px solid #3a84ff;
+        .icon-itsm-icon-three-one {
+            display: block;
+            color: red;
+        }
+    }
 }
 .import-error-tip {
     font-size: 14px;
