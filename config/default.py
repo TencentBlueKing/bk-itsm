@@ -842,10 +842,6 @@ ITSM_TAPD_APIGW = os.environ.get("ITSM_TAPD_APIGW", "")
 # tapd 项目授权链接
 TAPD_OAUTH_URL = os.environ.get("TAPD_OAUTH_URL", "")
 
-# blueapps 相关的配置覆盖
-BLUEAPPS_ACCOUNT_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
-BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = os.environ.get("BK_LOGIN_PLAIN_URL", "")
-
 # bkchat快速审批
 USE_BKCHAT = True if os.getenv("USE_BKCHAT", "true").lower() == "true" else False
 if USE_BKCHAT:

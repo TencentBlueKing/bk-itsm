@@ -73,7 +73,7 @@
 
 <script>
     export default {
-        name: 'sopsNodeInfo',
+        name: 'devopsNodeInfo',
         props: {
             nodeInfo: {
                 type: Object,

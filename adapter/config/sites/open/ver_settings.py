@@ -29,7 +29,6 @@ import os
 
 from django.core.files.storage import FileSystemStorage
 
-from config import BK_PAAS_HOST
 from . import api as ADAPTER_API  # noqa
 
 ESB_SDK_NAME = "blueking.component.open"
@@ -49,6 +48,3 @@ STORE = FileSystemStorage(location="/")
 
 # 企业微信发送，默认weixin，可配置为企业微信rtx
 QY_WEIXIN = os.environ.get("BKAPP_WEIXIN_TYPE", "weixin")
-
-BLUEAPPS_ACCOUNT_LOGIN_URL = BK_PAAS_HOST + "/login/"
-BLUEAPPS_ACCOUNT_LOGIN_PLAIN_URL = BLUEAPPS_ACCOUNT_LOGIN_URL + "plain/"

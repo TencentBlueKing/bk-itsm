@@ -107,7 +107,7 @@
             </span>
         </div>
         <!-- 自定义表单 -->
-        <div v-else-if="item.type === 'CUSTOM-FORM'" style="width: 100%">
+        <div v-else-if="item.type === 'CUSTOM-FORM'" style="display: flex">
             <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}</span>
             <render-view
                 :form-data="customForm.formData"
@@ -378,6 +378,23 @@
                 display: inline-block;
                 line-height: 26px;
                 color: #313238;
+            }
+            .bk-li-left {
+                display: inline-block;
+                width: 120px;
+                font-weight: 400;
+                text-align: right;
+                overflow: hidden;
+                margin-right: 10px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: #979Ba5;
+                &::before {
+                    content: (':');
+                    top: 3px;
+                    left: 126px;
+                    position: absolute;
+                }
             }
         }
     }
