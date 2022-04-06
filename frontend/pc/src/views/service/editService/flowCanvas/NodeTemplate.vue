@@ -27,24 +27,19 @@
         @mousedown="moveDoneFn(node)"
         @mousemove="moveFn"
         @mouseup="onNodeClick(node, $event)"
-        @contextmenu.prevent="rightClickNode(node, $event)"
         @mouseout="hoverNode(node)"
         v-bk-clickoutside="closeNode"
-        v-bk-tooltips="{
-            placement: 'auto',
-            content: node.name,
-            theme: 'light'
-        }">
+        :title="node.name">
         <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
-            {{ $t(`m.treeinfo['开始']`) }}
+            <span :title="$t(`m.treeinfo['开始']`)" class="bk-itsm-icon icon-kaishi"></span>
         </div>
-        <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode">
-            {{ $t('m.treeinfo["结束"]') }}
+        <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode" style="padding: 8px">
+            <span :title="$t(`m.treeinfo['结束']`)" class="bk-itsm-icon icon-jieshu"></span>
         </div>
         <!-- 手动节点 -->
         <template v-for="(item, index) in typeList">
             <template v-if="node.type === item.type">
-                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)">
+                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)" @dblclick="rightClickNode(node, $event)">
                     <span class="common-auto-icon"
                         :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
                         @click.stop="openconfigu">
@@ -52,7 +47,7 @@
                         <span v-else style="font-size: 11px; font-weight: bold;">API</span>
                     </span>
                     <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
-                    <i class="bk-itsm-icon icon-edit-bold"></i>
+                    <!-- <i class="bk-itsm-icon icon-edit-bold"></i> -->
                     <span class="bk-node-delete"
                         v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
                         @click.stop="clickDelete(node)"
@@ -69,12 +64,12 @@
         </template>
         <!-- 网关节点 -->
         <div v-if="node.type === 'ROUTER-P'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-convergence"></i>
+            <i class="bk-itsm-icon icon-flow-convergence" style="color: #738abe"></i>
             <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
         </div>
         <!-- 汇聚节点 -->
         <div v-if="node.type === 'COVERAGE'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-branch"></i>
+            <i class="bk-itsm-icon icon-flow-branch" style="color: #738abe"></i>
             <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
         </div>
         <!-- 更多操作 -->
@@ -104,12 +99,13 @@
                 </ul>
             </div>
             <div class="bk-engine-word">
-                <span class="bk-canvas-span bk-engine-configur"
+                <span v-bk-tooltips.bottom="$t(`m['编辑']`)" class="bk-itsm-icon icon-edit-new"
                     :class="{ 'bk-engine-builtin': (node.type === 'ROUTER-P' || node.type === 'COVERAGE') }"
-                    @click.stop="openconfigu">{{ $t('m.treeinfo["配置"]') }}</span>
-                <span class="bk-canvas-span bk-engine-delete"
+                    @click.stop="openconfigu"></span>
+                <span v-bk-tooltips.bottom="$t(`m['复制']`)" class="bk-itsm-icon icon-itsm-icon-copy" @click="addNormal(node, copyNodeInfo)"></span>
+                <span v-bk-tooltips.bottom="$t(`m['删除']`)" class="bk-itsm-icon icon-itsm-icon-delet-fill"
                     :class="{ 'bk-engine-builtin': (node.nodeInfo && node.nodeInfo.is_builtin) }"
-                    @click.stop="clickDelete(node)">{{ $t('m.treeinfo["删除"]') }}</span>
+                    @click.stop="clickDelete(node)"></span>
             </div>
         </div>
     </div>
@@ -159,9 +155,10 @@
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
-                    { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },
-                    { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' }
+                    { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' }
+                    // { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' }
                 ],
+                copyNodeInfo: { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' },
                 currentNode: {}
             }
         },
@@ -203,15 +200,21 @@
                 this.moveFlag = false
             },
             clickNode (node, event) {
-                this.openconfigu()
-            },
-            // 右键事件
-            rightClickNode (node, event) {
+                // this.openconfigu()
                 if (!node) {
                     return
                 }
                 this.$emit('closeShow')
                 node.showMore = true
+            },
+            // 右键事件
+            rightClickNode (node, event) {
+                this.openconfigu()
+                // if (!node) {
+                //     return
+                // }
+                // this.$emit('closeShow')
+                // node.showMore = true
             },
             // 配置详情
             openconfigu () {
