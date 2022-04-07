@@ -499,6 +499,7 @@
             },
             closeFile () {
                 this.importFileNameList = []
+                this.$refs.importInput.value = ''
             },
             handleFile (e) {
                 const filename = e.target.value.split('\\').slice(-1)
@@ -509,6 +510,7 @@
                 }
             },
             closeImport () {
+                this.importCatalogId = []
                 this.isCheckImport = false
                 this.isImportServiceShow = false
             },
