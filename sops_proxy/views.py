@@ -25,18 +25,25 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
 import requests
+from django.conf import settings
 
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from revproxy.views import ProxyView
 
-from sops_proxy.settings import PREFIX_SOPS, BEFORE_PROXY_FUNC, SOPS_PROXY_URL, SOPS_SITE_URL, \
-    BK_ESB_PAAS_HOST
-from sops_proxy.utils import normalize_request_headers
+from sops_proxy.settings import (
+    PREFIX_SOPS,
+    BEFORE_PROXY_FUNC,
+    SOPS_PROXY_URL,
+    SOPS_SITE_URL,
+    BK_ESB_PAAS_HOST,
+)
+from sops_proxy.utils import normalize_request_headers, get_django_response
 
 
 def dispatch_static(request, path):
     """
-        代理sops插件的静态资源相关接口
+    代理sops插件的静态资源相关接口
     """
 
     sops_path = path.replace("/{}".format(PREFIX_SOPS), "")
@@ -45,7 +52,8 @@ def dispatch_static(request, path):
     try:
         res = requests.get(sops_url, verify=False)
         return HttpResponse(
-            content=res.content, status=res.status_code,
+            content=res.content,
+            status=res.status_code,
             content_type=res.headers._store["content-type"][1],
         )
     except Exception as e:
@@ -54,13 +62,13 @@ def dispatch_static(request, path):
 
 def dispatch_query(request, path):
     """
-        代理sops插件相关接口
-            url1: /pipeline/xxx
-            url2: /api/v3/core/xxx
-            client = get_client_by_request(request)
-            return client.sops.dispatch_plugin_query(
-                {'url': request.path, 'method': request.method, 'data': request.body}
-            )     
+    代理sops插件相关接口
+        url1: /pipeline/xxx
+        url2: /api/v3/core/xxx
+        client = get_client_by_request(request)
+        return client.sops.dispatch_plugin_query(
+            {'url': request.path, 'method': request.method, 'data': request.body}
+        )
     """
 
     try:
@@ -84,25 +92,74 @@ def dispatch_query(request, path):
         BEFORE_PROXY_FUNC(request, json_data, request_headers)
 
         try:
-            proxy_response = requests.post(url=SOPS_PROXY_URL, json=json_data,
-                                           headers=request_headers, )
+            proxy_response = requests.post(
+                url=SOPS_PROXY_URL,
+                json=json_data,
+                headers=request_headers,
+            )
 
             return JsonResponse(proxy_response.json())
 
         except Exception as e:
             return JsonResponse(
-                {"result": False,
-                 "message": "[{}]: dispatch_query post exception: {}".format(path, e), }
+                {
+                    "result": False,
+                    "message": "[{}]: dispatch_query post exception: {}".format(
+                        path, e
+                    ),
+                }
             )
 
     except Exception as e:
-        return JsonResponse({"result": False,
-                             "message": "[{}]: dispatch_query self exception: {}".format(path,
-                                                                                         e), })
+        return JsonResponse(
+            {
+                "result": False,
+                "message": "[{}]: dispatch_query self exception: {}".format(path, e),
+            }
+        )
 
 
 class SopsProxy(ProxyView):
     upstream = SOPS_SITE_URL
+
+    def build_form(self, form):
+        # 如果是域名, 则替换
+        return "{}o/bk_sops{}".format(settings.FRONTEND_URL, form.split(".com")[1])
+
+    def process(self, response):
+        try:
+            content = json.loads(response.content)
+            if "form" not in content:
+                return response
+            content["form"] = self.build_form(content["form"])
+            return JsonResponse(content)
+        except Exception:
+            return response
+
+    def dispatch(self, request, path):
+        self.request_headers = self.get_request_headers()
+
+        redirect_to = self._format_path_to_redirect(request)
+        if redirect_to:
+            return redirect(redirect_to)
+
+        proxy_response = self._created_proxy_response(request, path)
+
+        self._replace_host_on_redirect_location(request, proxy_response)
+        self._set_content_type(request, proxy_response)
+
+        response = get_django_response(
+            proxy_response, strict_cookies=self.strict_cookies
+        )
+
+        self.log.debug("RESPONSE RETURNED: %s", response)
+
+        if settings.RUN_VER == "ieod":
+            if path.startswith("api/v3/component/"):
+                response = self.process(response)
+            elif path.startswith("api/v3/variable/"):
+                response = self.process(response)
+        return response
 
 
 class UserManageProxy(ProxyView):

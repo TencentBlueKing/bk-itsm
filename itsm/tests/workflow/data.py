@@ -55,13 +55,12 @@ workflow = {
     "service": "change",
     "service_property": service_property,
     "is_biz_needed": False,
-    "creator": "itsm_admin",
+    "creator": "admin",
 }
 
 states = {
     "a": {
         "name": "填写变更",
-        "order": 0,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "dev",
@@ -70,7 +69,6 @@ states = {
     },
     "b": {
         "name": "开发leader审批",
-        "order": 1,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "dev_leader",
@@ -79,7 +77,6 @@ states = {
     },
     "c": {
         "name": "测试leader审批",
-        "order": 2,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "test_leader",
@@ -88,7 +85,6 @@ states = {
     },
     "d": {
         "name": "填写实施计划",
-        "order": 3,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "ops",
@@ -97,7 +93,6 @@ states = {
     },
     "e": {
         "name": "运维leader审批",
-        "order": 4,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "ops_leader",
@@ -106,7 +101,6 @@ states = {
     },
     "f": {
         "name": "实施变更",
-        "order": 5,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "ops",
@@ -115,7 +109,6 @@ states = {
     },
     "g": {
         "name": "验收",
-        "order": 6,
         "type": "NORMAL",
         "processors_type": "ROLE",
         "processors": "dev",
@@ -125,17 +118,17 @@ states = {
 }
 
 transitions = {
-    "t-start-a": {"direction": "FORWARD", "name": "开始", "type": "JOIN-NORMAL"},
-    "t-a-b": {"direction": "FORWARD", "name": "填单确认", "type": "JOIN-NORMAL"},
-    "t-b-a": {"direction": "BACK", "name": "驳回", "type": "JOIN-NORMAL"},
-    "t-b-c": {"direction": "FORWARD", "name": "通过", "type": "JOIN-NORMAL"},
-    "t-c-a": {"direction": "BACK", "name": "驳回", "type": "JOIN-NORMAL"},
-    "t-c-d": {"direction": "FORWARD", "name": "通过", "type": "JOIN-NORMAL"},
-    "t-d-e": {"direction": "FORWARD", "name": "填单确认", "type": "JOIN-NORMAL"},
-    "t-e-d": {"direction": "BACK", "name": "驳回", "type": "JOIN-NORMAL"},
-    "t-e-f": {"direction": "FORWARD", "name": "实施确认", "type": "JOIN-NORMAL"},
-    "t-f-g": {"direction": "FORWARD", "name": "验收确认", "type": "JOIN-NORMAL"},
-    "t-g-end": {"direction": "FORWARD", "name": "验收确认", "type": "JOIN-NORMAL"},
+    "t-start-a": {"direction": "FORWARD", "name": "开始"},
+    "t-a-b": {"direction": "FORWARD", "name": "填单确认"},
+    "t-b-a": {"direction": "BACK", "name": "驳回"},
+    "t-b-c": {"direction": "FORWARD", "name": "通过"},
+    "t-c-a": {"direction": "BACK", "name": "驳回"},
+    "t-c-d": {"direction": "FORWARD", "name": "通过"},
+    "t-d-e": {"direction": "FORWARD", "name": "填单确认"},
+    "t-e-d": {"direction": "BACK", "name": "驳回"},
+    "t-e-f": {"direction": "FORWARD", "name": "实施确认"},
+    "t-f-g": {"direction": "FORWARD", "name": "验收确认"},
+    "t-g-end": {"direction": "FORWARD", "name": "验收确认"},
 }
 
 fields = {

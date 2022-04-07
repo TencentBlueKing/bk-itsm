@@ -24,6 +24,7 @@
     <div class="ticket-detail-panel" v-bkloading="{ isLoading: loading.ticketLoading }">
         <template v-if="!ticketErrorMessage">
             <ticket-header
+                ref="ticketHeader"
                 v-if="!loading.ticketLoading"
                 :header-info="headerInfo"
                 :ticket-info="ticketInfo"
@@ -36,12 +37,22 @@
                     <!-- 基础信息/工单预览 -->
                     <left-ticket-content
                         ref="leftTicketContent"
+                        :comment-list="commentList"
+                        :comment-id="commentId"
                         :loading="loading"
                         :ticket-info="ticketInfo"
                         :node-list="nodeList"
                         :first-state-fields="firstStateFields"
                         :node-trigger-list="nodeTriggerList"
-                        :ticket-id="ticketId">
+                        :ticket-id="ticketId"
+                        :is-page-over="isPageOver"
+                        :has-node-opt-auth="hasNodeOptAuth"
+                        :is-show-assgin="isShowAssgin"
+                        :comment-loading="commentLoading"
+                        :more-loading="moreLoading"
+                        @addTargetComment="addTargetComment"
+                        @refreshComment="refreshComment"
+                        @getBacicInfoStatus="getBacicInfoStatus">
                     </left-ticket-content>
                 </div>
                 <!-- 分屏拖拽线 -->
@@ -50,10 +61,30 @@
                     <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
                 </div>
                 <div id="ticketContainerRight" class="ticket-container-right" v-show="showRightTabs">
+                    <div v-if="hasNodeOptAuth" :class="['sla-information', isShowSla ? 'hide' : '']">
+                        <div class="sla-view">
+                            <div class="sla-title" @click="handleClickShowSla">
+                                <i :class="['bk-itsm-icon', !isShowSla ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                                <span>{{ $t('m["SLA信息"]') }}</span>
+                            </div>
+                            <span class="view-sla-rule" @click="viewSlaRule">{{ $t('m["规则查看"]') }}</span>
+                        </div>
+                        <sla-record-tab
+                            v-if="!isShowSla"
+                            :threshold="threshold"
+                            :ticket-id="ticketId"
+                            :basic-infomation="ticketInfo"
+                            :node-list="nodeList">
+                        </sla-record-tab>
+                    </div>
                     <right-ticket-tabs
+                        class="right-ticket-tabs"
                         v-if="!loading.ticketLoading"
                         :ticket-info="ticketInfo"
-                        :node-list="nodeList">
+                        :has-node-opt-auth="hasNodeOptAuth"
+                        :node-list="nodeList"
+                        @ticketFinishAppraise="ticketFinishAppraise"
+                        @viewProcess="viewProcess">
                     </right-ticket-tabs>
                 </div>
             </div>
@@ -74,6 +105,7 @@
 </template>
 
 <script>
+    import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue'
     import TicketHeader from './TicketHeader.vue'
     import NoTicketContent from './components/NoTicketContent.vue'
     import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue'
@@ -91,6 +123,7 @@
             NoTicketContent,
             leftTicketContent,
             TicketHeader,
+            SlaRecordTab,
             RightTicketTabs
         },
         inject: ['reload'],
@@ -102,7 +135,19 @@
         mixins: [fieldMix, commonMix, apiFieldsWatch],
         data () {
             return {
+                moreLoading: false, // 底部加载loading
+                leftTicketDom: '',
+                isPageOver: false,
+                isThrottled: false,
+                isRequsetComment: false,
+                curCommentLength: 10, // 默认为10条
+                totalPages: 0, // 评论总页数
+                page: 1, // 评论当前页数
+                page_size: 10,
+                commentCount: 0,
+                isShowSla: true,
                 showRightTabs: true,
+                commentLoading: false,
                 ticketTimer: null, // 单据详情轮询器
                 containerLeftWidth: 0,
                 ticketId: '',
@@ -140,7 +185,13 @@
                 // 提单节点字段信息
                 firstStateFields: [],
                 // 所有字段列表
-                allFieldList: []
+                allFieldList: [],
+                commentList: [],
+                commentId: '',
+                threshold: [],
+                hasNodeOptAuth: false,
+                isShowAssgin: false,
+                basicStatus: true
             }
         },
         computed: {
@@ -151,10 +202,37 @@
                 return this.$route.query.token
             }
         },
+        watch: {
+            isShowSla (val) {
+                if (val) {
+                    const slaCount = this.ticketInfo.sla.Length
+                    const slaDom = document.querySelector('.sla-information')
+                    slaDom.style.height = (134 * slaCount) + 'px'
+                }
+            },
+            commentList (val) {
+                if (val.length > 0) {
+                    this.curCommentLength = val.length
+                }
+            }
+        },
         async mounted () {
             await this.initData()
             if (this.$route.query.cache_key) { // 通知链接进入
                 this.getTicketNoticeInfo()
+            }
+            this.getProtocolsList()
+            this.$nextTick(function () {
+                this.leftTicketDom = document.querySelector('.comment-list')
+                this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
+            })
+            if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
+                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate)
+                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
+            }
+            if (this.ticketInfo && this.ticketInfo.auth_actions) {
+                // 当前节点有权限不显示异常分派
+                this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth
             }
         },
         beforeDestroy () {
@@ -174,6 +252,126 @@
                 this.getCurrTickeStatusColor()
                 this.initCurrentStepData()
                 this.initTicketTimer()
+                this.initComments()
+            },
+            handleClickShowSla () {
+                this.isShowSla = !this.isShowSla
+            },
+            viewSlaRule () {
+                this.$router.push({
+                    name: 'slaAgreement',
+                    query: {
+                        project_id: this.$route.query.project_id || 0
+                    }
+                })
+            },
+            async initComments () {
+                try {
+                    this.commentLoading = true
+                    // 获取root id
+                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': '' })
+                    this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id
+                    this.commentList = await this.getComments(1, 10)
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    this.commentLoading = false
+                }
+            },
+            getBacicInfoStatus (val) {
+                this.basicStatus = val
+            },
+            async getComments (page, page_size) {
+                this.commentLoading = true
+                const commentList = []
+                const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
+                    'ticket_id': this.ticketId,
+                    'show_type': this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
+                    page: page,
+                    page_size: page_size
+                })
+                commmentRes.data.items.forEach((item, index) => {
+                    if (item.parent__id !== this.commentId) {
+                        this.getReplyCommet(item.parent__id, index)
+                    }
+                })
+                this.commentCount = commmentRes.data.count
+                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size) || 1
+                commentList.push(...commmentRes.data.items)
+                commentList.sort((a, b) => b.id - a.id)
+                this.commentLoading = false
+                return commentList.filter(item => item.remark_type !== 'ROOT')
+            },
+            async getReplyCommet (id, index) {
+                if (id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
+                    this.$set(this.commentList[index], 'parent_creator', res.data.creator)
+                    this.$set(this.commentList[index], 'parent_content', res.data.content)
+                }
+            },
+            async addTargetComment (curComment) {
+                if (this.commentId !== curComment.parent__id) {
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
+                    this.commentList.push(res.data)
+                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment)
+                }
+            },
+            handleTicketScroll () {
+                if (this.totalPages === 1) return
+                if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
+                    this.isThrottled = true
+                    const timer = setTimeout(async () => {
+                        this.isThrottled = false
+                        const el = this.leftTicketDom
+                        if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+                            this.moreLoading = true
+                            this.page += 1
+                            clearTimeout(timer)
+                            const result = await this.getComments(this.page, this.page_size)
+                            this.commentList.push(...result)
+                            this.isPageOver = this.page === this.totalPages
+                            this.moreLoading = false
+                        }
+                    }, 500)
+                }
+            },
+            async refreshComment () {
+                this.commentList = await this.getComments(1, this.curCommentLength + 1)
+                this.page = 1
+            },
+            getProtocolsList () {
+                const params = {
+                    project_id: this.ticketInfo.project_key
+                }
+                this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
+                    const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
+                    const slathreshold = curSlas.map(item => {
+                        const condition = item.action_policies.map(ite => {
+                            const obj = {}
+                            obj[ite.type] = ite.condition.expressions[0].value
+                            return obj
+                        })
+                        // 1 3 2 4
+                        // type 1  2 为响应
+                        // type 3  4 为处理
+                        return {
+                            sla_name: item.name,
+                            rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
+                            pWarningThreshold: condition[1][3] / 100 || 1,
+                            rTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[2][2] / 100 : 1,
+                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100
+                        }
+                    })
+                    this.threshold = [...slathreshold]
+                })
+            },
+            // 展示完整流程
+            viewProcess (val) {
+                this.$refs.leftTicketContent.changeDialogStatus(val)
+            },
+            // 单据完成评价
+            ticketFinishAppraise () {
+                this.$refs.ticketHeader.onTicketBtnClick('comment')
             },
             // 是否需要循环
             isNeedToLoop () {
@@ -362,7 +560,7 @@
                 }
                 window.requestAnimationFrame(() => {
                     this.dragLine.move = moveX
-                    el.style.width = `calc(32% - ${moveX}px)`
+                    el.style.width = `calc(320px - ${moveX}px)`
                 })
             },
             onShowRightContent () {
@@ -370,7 +568,7 @@
                 // 还原到最小宽度
                 this.$nextTick(() => {
                     const el = document.getElementById('ticketContainerRight')
-                    el.style.width = `calc(32% - ${this.dragLine.base}px)`
+                    el.style.width = `calc(320px - ${this.dragLine.base}px)`
                 })
             },
             getTicketNoticeInfo () {
@@ -410,13 +608,14 @@
 }
 .ticket-container {
     display: flex;
-    padding: 12px 20px;
+    padding: 24px;
     height: calc(100% - 50px);
     .ticket-container-left {
         flex: 1;
-        margin-right: 4px;
+        margin-right: 22px;
         height: 100%;
         overflow: auto;
+        background-color: #f5f7fa;
         @include scroller;
     }
     .drag-line {
@@ -452,11 +651,47 @@
         }
     }
     .ticket-container-right {
+        width: 320px;
         margin-left: 4px;
-        width: 32%;
         height: 100%;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        .sla-information {
+            transition: all 0.5s;
+            box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
+            background: #ffffff;
+            margin-bottom: 24px;
+            .sla-view {
+                height: 54px;
+                line-height: 20px;
+                padding: 17px 24px;
+                .sla-title {
+                    font-size: 14px;
+                    font-weight: 700;
+                    display: inline-block;
+                    color: #63656e;
+                    i {
+                        color: #c4c6cc;
+                        display: inline-block;
+                        font-size: 12px;
+                        margin-right: 8px;
+                    }
+                }
+                .view-sla-rule {
+                    cursor: pointer;
+                    float: right;
+                    color: #3a84ff;
+                    font-size: 12px;
+                }
+            }
+        }
+        .hide {
+            height: 54px;
+        }
+        .right-ticket-tabs {
+            flex: 1;
+        }
     }
 }
+
 </style>

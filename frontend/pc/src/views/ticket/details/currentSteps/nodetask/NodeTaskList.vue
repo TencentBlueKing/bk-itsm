@@ -188,10 +188,15 @@
         <bk-sideslider
             :is-show.sync="createInfo.isShow"
             :title="createInfo.isAdd ? $t(`m.task['创建任务']`) : this.$t(`m.task['编辑任务']`)"
+            :quick-close="true"
+            :before-close="() => {
+                closeSideslider('newTask')
+            }"
             :width="800">
             <div slot="content"
                 style="min-height: 300px;">
                 <new-task v-if="createInfo.isShow"
+                    ref="newTask"
                     :node-info="nodeInfo"
                     :basic-infomation="ticketInfo"
                     :item-content="createInfo.taskInfo"
@@ -202,6 +207,7 @@
         </bk-sideslider>
         <bk-sideslider
             :is-show.sync="dealTaskInfo.show"
+            :quick-close="true"
             :width="800">
             <div slot="header">
                 <task-handle-trigger
@@ -249,10 +255,15 @@
         <bk-sideslider
             :is-show.sync="taskLibrary.show"
             :title="$t(`m.tickets['从任务库创建任务']`)"
+            :before-close="() => {
+                closeSideslider('taskLibrary')
+            }"
+            :quick-close="true"
             :width="800">
             <div slot="content"
                 style="min-height: 300px;">
                 <task-library
+                    ref="taskLibrary"
                     v-if="taskLibrary.show"
                     :ticket-info="ticketInfo"
                     :node-info="nodeInfo"
@@ -347,6 +358,24 @@
             this.refreshTaskList()
         },
         methods: {
+            closeSideslider (type) {
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        this.createInfo.isShow = false
+                        this.taskLibrary.show = false
+                    },
+                    cancelFn: () => {
+                        if (type === 'newTask') {
+                            this.createInfo.isShow = true
+                        } else {
+                            this.taskLibrary.show = true
+                        }
+                    }
+                })
+            },
             // 获取任务列表
             getTaskList (source) {
                 const params = {
@@ -361,6 +390,17 @@
                     const loopStatusList = ['QUEUE', 'RUNNING', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'WAITING_FOR_CONFIRM']
                     if (!res.data.some(task => loopStatusList.includes(task.status)) && source === 'refreshBtn') {
                         this.reload()
+                    }
+                    // 轮询
+                    if (res.data.some(task => loopStatusList.includes(task.status))) {
+                        const setTimeoutFunc = setTimeout(
+                            () => {
+                                this.getTaskList(source)
+                            }, 10000
+                        )
+                        this.$once('hook:beforeDestroy', () => {
+                            clearInterval(setTimeoutFunc)
+                        })
                     }
                 }).catch((res) => {
                     errorHandler(res, this)
@@ -507,13 +547,13 @@
         color: #63656e;
         .task-title {
             position: relative;
-            &::after {
-                position: absolute;
-                right: -15px;
-                top: 3px;
-                content: '*';
-                color: #ea3636;
-            }
+            // &::after {
+            //     position: absolute;
+            //     right: -15px;
+            //     top: 3px;
+            //     content: '*';
+            //     color: #ea3636;
+            // }
         }
         .header-right-content {
             float: right;

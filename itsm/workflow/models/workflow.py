@@ -77,13 +77,19 @@ class WorkflowBase(ObjectManagerMixin, Model):
     """流程模板"""
 
     name = models.CharField(_("流程名"), max_length=LEN_MIDDLE)
-    desc = models.CharField(_("流程描述"), max_length=LEN_LONG, null=True, blank=True,
-                            default=EMPTY_STRING)
-    flow_type = models.CharField(_("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING)
+    desc = models.CharField(
+        _("流程描述"), max_length=LEN_LONG, null=True, blank=True, default=EMPTY_STRING
+    )
+    flow_type = models.CharField(
+        _("流程分类"), max_length=LEN_NORMAL, default=DEFAULT_STRING
+    )
     is_enabled = models.BooleanField(_("是否启用"), default=False, db_index=True)
     is_revocable = models.BooleanField(_("是否可撤销"), default=True)
     revoke_config = jsonfield.JSONField(
-        _("撤销配置"), default={"type": REVOKE_TYPE.FIRST, "state": 0}, null=True, blank=True
+        _("撤销配置"),
+        default={"type": REVOKE_TYPE.FIRST, "state": 0},
+        null=True,
+        blank=True,
     )
     is_draft = models.BooleanField(_("是否为草稿"), default=True)
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
@@ -91,21 +97,29 @@ class WorkflowBase(ObjectManagerMixin, Model):
     owners = models.CharField(_("负责人"), max_length=LEN_XX_LONG, default=EMPTY_STRING)
 
     notify = models.ManyToManyField("workflow.Notify", help_text=_("可关联多种通知方式"))
-    notify_rule = models.CharField(_("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES,
-                                   default="NONE")
+    notify_rule = models.CharField(
+        _("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE"
+    )
     notify_freq = models.IntegerField(_("重试间隔(s)"), default=EMPTY_INT)
 
     # 业务逻辑字段
     is_biz_needed = models.BooleanField(_("是否绑定业务"), default=False)
+    # 是否自动过单
+    is_auto_approve = models.BooleanField(_("是否自动过单"), default=False)
     is_iam_used = models.BooleanField(_("是否使用IAM角色"), default=False)
     is_supervise_needed = models.BooleanField(_("是否需要督办"), default=False)
-    supervise_type = models.CharField(_("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                      default="EMPTY")
-    supervisor = models.CharField(_("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                  blank=True)
-    engine_version = models.CharField(_("引擎版本：空/PIPELINE_VX"), max_length=LEN_NORMAL, null=True,
-                                      blank=True)
-    version_number = models.CharField(_("版本号"), max_length=LEN_NORMAL, default=DEFAULT_VERSION)
+    supervise_type = models.CharField(
+        _("督办人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    supervisor = models.CharField(
+        _("督办列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
+    engine_version = models.CharField(
+        _("引擎版本：空/PIPELINE_VX"), max_length=LEN_NORMAL, null=True, blank=True
+    )
+    version_number = models.CharField(
+        _("版本号"), max_length=LEN_NORMAL, default=DEFAULT_VERSION
+    )
 
     # deprecated fields
     master = jsonfield.JSONField(_("主分支列表"), default=EMPTY_LIST, null=True, blank=True)
@@ -131,15 +145,27 @@ class WorkflowBase(ObjectManagerMixin, Model):
 class Workflow(WorkflowBase):
     """流程模板"""
 
-    table = models.ForeignKey(Table, help_text=_("关联的基础模型"), related_name="used_workflow",
-                              null=True, blank=True, on_delete=models.CASCADE)
+    table = models.ForeignKey(
+        Table,
+        help_text=_("关联的基础模型"),
+        related_name="used_workflow",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
 
     # deprecated fields
-    service = models.CharField(_("对应的服务类型，为服务的主键"), max_length=LEN_NORMAL, null=True, blank=True,
-                               default="default")
+    service = models.CharField(
+        _("对应的服务类型，为服务的主键"),
+        max_length=LEN_NORMAL,
+        null=True,
+        blank=True,
+        default="default",
+    )
 
-    service_property = jsonfield.JSONField(_("对应服务的属性，为json字段"), default=EMPTY_DICT, null=True,
-                                           blank=True)
+    service_property = jsonfield.JSONField(
+        _("对应服务的属性，为json字段"), default=EMPTY_DICT, null=True, blank=True
+    )
 
     objects = managers.WorkflowManager()
 
@@ -161,8 +187,10 @@ class Workflow(WorkflowBase):
         # 统一key为string
         states = {str(state.pk): state.serialized_data for state in self.states.all()}
 
-        transitions = {str(transition.pk): transition.serialized_data for transition in
-                       self.transitions.all()}
+        transitions = {
+            str(transition.pk): transition.serialized_data
+            for transition in self.transitions.all()
+        }
 
         fields, be_relied = {}, {}
         valid_fields = []  # 只获取有效的字段
@@ -173,7 +201,10 @@ class Workflow(WorkflowBase):
                 field_info = field.tag_data()
             except Exception as err:
                 raise ValidationError(
-                    "节点{}字段{}存在异常,请检查字段配置,详情:{}".format(field.state.name, field.name, err))
+                    "节点{}字段{}存在异常,请检查字段配置,详情:{}".format(
+                        field.state.name, field.name, err
+                    )
+                )
             fields[str(field.id)] = field_info
 
             cur_field_key = field_info["key"]
@@ -217,7 +248,9 @@ class Workflow(WorkflowBase):
             data.update(task_schemas=task_schemas)
 
         triggers = []
-        for trigger in Trigger.objects.filter(source_type=SOURCE_WORKFLOW, source_id=self.id):
+        for trigger in Trigger.objects.filter(
+            source_type=SOURCE_WORKFLOW, source_id=self.id
+        ):
             triggers.append(trigger.tag_data())
 
         data.update(
@@ -234,6 +267,8 @@ class Workflow(WorkflowBase):
             notify=list(self.notify.values_list("id", flat=True)),
             engine_version=DEFAULT_ENGINE_VERSION,
             revoke_config=self.revoke_config,
+            is_auto_approve=self.is_auto_approve,
+            extras=self.extras,
         )
         return data
 
@@ -255,7 +290,9 @@ class Workflow(WorkflowBase):
 
         # 创建触发器的版本信息
         copy_triggers_by_source(
-            src_source_type='workflow', src_source_id=self.id, dst_source_type=SOURCE_TICKET,
+            src_source_type="workflow",
+            src_source_id=self.id,
+            dst_source_type=SOURCE_TICKET,
             dst_source_id=version.id,
         )
 
@@ -382,7 +419,7 @@ class Workflow(WorkflowBase):
             for _field in self.public_table_fields
         ]
 
-        field_keys = [item['key'] for item in field_variables]
+        field_keys = [item["key"] for item in field_variables]
 
         field_variables.extend(
             [
@@ -434,11 +471,11 @@ class Workflow(WorkflowBase):
             obj = TaskConfig(
                 workflow_id=self.id,
                 workflow_type=FLOW,
-                task_schema_id=task_info['task_schema_id'],
-                create_task_state=task_info['create_task_state'],
-                execute_task_state=task_info['execute_task_state'],
-                execute_can_create=task_info['execute_can_create'],
-                need_task_finished=task_info['need_task_finished'],
+                task_schema_id=task_info["task_schema_id"],
+                create_task_state=task_info["create_task_state"],
+                execute_task_state=task_info["execute_task_state"],
+                execute_can_create=task_info["execute_can_create"],
+                need_task_finished=task_info["need_task_finished"],
             )
             task_objs.append(obj)
         TaskConfig.objects.bulk_create(task_objs)
@@ -455,7 +492,10 @@ class Workflow(WorkflowBase):
         if missing_field:
             field_desc = [REQUIRED_FIELD[field] for field in missing_field]
             raise ValidationError(
-                _("检测到您的流程已经发生改变，现流程版本中缺少【{}】信息，请补充完整后重新配置sla").format(','.join(field_desc)))
+                _("检测到您的流程已经发生改变，现流程版本中缺少【{}】信息，请补充完整后重新配置sla").format(
+                    ",".join(field_desc)
+                )
+            )
 
     def get_notifiy_objs(self, notify_list):
         """
@@ -469,16 +509,17 @@ class Workflow(WorkflowBase):
     def update_workflow_configs(self, workflow_config):
         self.is_revocable = workflow_config["is_revocable"]
         self.revoke_config = workflow_config["revoke_config"]
-        self.notify.add(*self.get_notifiy_objs(workflow_config["notify"]))
+        self.notify.set(self.get_notifiy_objs(workflow_config["notify"]))
         self.notify_freq = workflow_config.get("notify_freq", EMPTY_INT)
         self.notify_rule = workflow_config.get("notify_rule", "NONE")
         self.is_supervise_needed = workflow_config["is_supervise_needed"]
         self.supervise_type = workflow_config["supervise_type"]
         self.supervisor = workflow_config["supervisor"]
+        self.is_auto_approve = workflow_config["is_auto_approve"]
         if "extras" in workflow_config:
             self.extras = workflow_config["extras"]
-            if 'task_settings' in workflow_config.get('extras', {}):
-                self.create_task(workflow_config['extras']['task_settings'])
+            if "task_settings" in workflow_config.get("extras", {}):
+                self.create_task(workflow_config["extras"]["task_settings"])
         self.save()
 
 
@@ -493,13 +534,22 @@ class WorkflowVersion(WorkflowBase):
 
     fields = jsonfield.JSONField(_("字段快照字典"), default=EMPTY_DICT, null=True, blank=True)
     states = jsonfield.JSONField(_("状态快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    transitions = jsonfield.JSONField(_("流转快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    triggers = jsonfield.JSONField(_("触发器快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    table = jsonfield.JSONField(_("基础模型快照字典"), default=EMPTY_DICT, null=True, blank=True)
-    version_message = models.TextField(_("版本信息"), default=EMPTY_STRING, null=True, blank=True)
+    transitions = jsonfield.JSONField(
+        _("流转快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    triggers = jsonfield.JSONField(
+        _("触发器快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    table = jsonfield.JSONField(
+        _("基础模型快照字典"), default=EMPTY_DICT, null=True, blank=True
+    )
+    version_message = models.TextField(
+        _("版本信息"), default=EMPTY_STRING, null=True, blank=True
+    )
 
-    pipeline_data = jsonfield.JSONField(_("pipeline描述数据"), default=EMPTY_DICT, null=True,
-                                        blank=True)
+    pipeline_data = jsonfield.JSONField(
+        _("pipeline描述数据"), default=EMPTY_DICT, null=True, blank=True
+    )
 
     objects = managers.WorkflowVersionManager()
 
@@ -520,9 +570,15 @@ class WorkflowVersion(WorkflowBase):
         for path in all_path:
             if from_id in path:
                 from_id_index = path.index(from_id)
-                state_id_list.extend(path[from_id_index + 1:])
+                state_id_list.extend(path[from_id_index + 1 :])
         state_list = []
-        common_type = [NORMAL_STATE, SIGN_STATE, APPROVAL_STATE, TASK_STATE, TASK_SOPS_STATE]
+        common_type = [
+            NORMAL_STATE,
+            SIGN_STATE,
+            APPROVAL_STATE,
+            TASK_STATE,
+            TASK_SOPS_STATE,
+        ]
         for state_id in set(state_id_list):
             state_info = self.states[str(state_id)]
             if state_info["type"] in common_type:
@@ -594,23 +650,25 @@ class WorkflowVersion(WorkflowBase):
 
     @transaction.atomic
     def tag_task(self):
-        task_config = TaskConfig.objects.filter(workflow_id=self.workflow_id,
-                                                workflow_type=FLOW).values()
+        task_config = TaskConfig.objects.filter(
+            workflow_id=self.workflow_id, workflow_type=FLOW
+        ).values()
         version_config = []
 
         task_schema_map = {}
         for task in task_config:
             task_schema_id = task["task_schema_id"]
             if task_schema_id not in task_schema_map:
-                task_schema_map[task_schema_id] = \
-                TaskSchema.objects.clone([task_schema_id], can_edit=False)[0]
+                task_schema_map[task_schema_id] = TaskSchema.objects.clone(
+                    [task_schema_id], can_edit=False
+                )[0]
 
         for task_info in task_config:
             task_info.pop("id")
-            task_info['workflow_id'] = self.id
-            task_info['workflow_type'] = VERSION
-            new_schema_id = task_schema_map.get(task_info['task_schema_id'])
-            task_info['task_schema_id'] = new_schema_id
+            task_info["workflow_id"] = self.id
+            task_info["workflow_type"] = VERSION
+            new_schema_id = task_schema_map.get(task_info["task_schema_id"])
+            task_info["task_schema_id"] = new_schema_id
             version_config.append(TaskConfig(**task_info))
         TaskConfig.objects.bulk_create(version_config)
 
@@ -621,19 +679,21 @@ class WorkflowVersion(WorkflowBase):
             obj = TaskConfig(
                 workflow_id=self.id,
                 workflow_type=VERSION,
-                task_schema_id=task_info['task_schema_id'],
-                create_task_state=task_info['create_task_state'],
-                execute_task_state=task_info['execute_task_state'],
-                execute_can_create=task_info['execute_can_create'],
-                need_task_finished=task_info['need_task_finished'],
+                task_schema_id=task_info["task_schema_id"],
+                create_task_state=task_info["create_task_state"],
+                execute_task_state=task_info["execute_task_state"],
+                execute_can_create=task_info["execute_can_create"],
+                need_task_finished=task_info["need_task_finished"],
             )
             task_objs.append(obj)
         TaskConfig.objects.bulk_create(task_objs)
 
     def get_execute_by_create(self, state_id, task_schema_id):
         task_config = TaskConfig.objects.filter(
-            workflow_id=self.id, workflow_type=VERSION, create_task_state=state_id,
-            task_schema_id=task_schema_id
+            workflow_id=self.id,
+            workflow_type=VERSION,
+            create_task_state=state_id,
+            task_schema_id=task_schema_id,
         )
         if task_config:
             return task_config[0].execute_task_state
@@ -642,15 +702,19 @@ class WorkflowVersion(WorkflowBase):
     def task_schema_ids(self, state_id):
         task_config = TaskConfig.objects.filter(
             Q(workflow_id=self.id, workflow_type=VERSION)
-            & Q(Q(create_task_state=state_id) | Q(execute_task_state=state_id,
-                                                  execute_can_create=True))
+            & Q(
+                Q(create_task_state=state_id)
+                | Q(execute_task_state=state_id, execute_can_create=True)
+            )
         )
-        return task_config.values_list('task_schema_id', flat=True)
+        return task_config.values_list("task_schema_id", flat=True)
 
     @property
     def transitions_hash(self):
-        return {"{from_state}_{to_state}".format(**t): tid for tid, t in
-                six.iteritems(self.transitions)}
+        return {
+            "{from_state}_{to_state}".format(**t): tid
+            for tid, t in six.iteritems(self.transitions)
+        }
 
     def graph_matrix(self, scopes=None):
         """流程图矩阵描述
@@ -674,8 +738,11 @@ class WorkflowVersion(WorkflowBase):
             if scopes:
                 if str(ssid) not in scopes:
                     continue
-                to_states = {str(t["to_state"]) for t in transitions_from if
-                             str(t["to_state"]) in scopes}
+                to_states = {
+                    str(t["to_state"])
+                    for t in transitions_from
+                    if str(t["to_state"]) in scopes
+                }
             else:
                 to_states = {str(t["to_state"]) for t in transitions_from}
 
@@ -755,19 +822,26 @@ class WorkflowVersion(WorkflowBase):
         """
         matrix = self.graph_matrix()
         # 找到图graph中start->goal中的所有路径
-        paths = dfs_paths(matrix, str(from_state_id), str(to_state_id), skip_circle=True)
+        paths = dfs_paths(
+            matrix, str(from_state_id), str(to_state_id), skip_circle=True
+        )
 
         transitions = set()
         states = set()
         for path in paths:
             for i in range(len(path) - 1):
-                trans_id = self.transitions_hash.get("{}_{}".format(path[i], path[i + 1]))
+                trans_id = self.transitions_hash.get(
+                    "{}_{}".format(path[i], path[i + 1])
+                )
                 transitions.add(trans_id)
                 states.add(path[i])
             # 补充最后一个节点id
             states.add(path[-1])
 
-        return {"states": [int(s) for s in states], "lines": [int(t) for t in transitions]}
+        return {
+            "states": [int(s) for s in states],
+            "lines": [int(t) for t in transitions],
+        }
 
         # ========================= old workflow ====================================
 
@@ -797,4 +871,6 @@ class WorkflowVersion(WorkflowBase):
         missing_field = required_field - field_keys
         if missing_field:
             field_desc = [REQUIRED_FIELD[field] for field in missing_field]
-            raise ValidationError(_("流程版本中缺少【{}】信息，请补充完整后再进行服务协议的关联").format(','.join(field_desc)))
+            raise ValidationError(
+                _("流程版本中缺少【{}】信息，请补充完整后再进行服务协议的关联").format(",".join(field_desc))
+            )

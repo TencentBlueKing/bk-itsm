@@ -32,9 +32,10 @@ import sys
 import datetime
 
 import mock
+from django.http import FileResponse
 from django.test import TestCase, override_settings
 
-from itsm.tests.service.params import CREATE_SERVICE_DATA, CONFIGS
+from itsm.tests.service.params import CREATE_SERVICE_DATA, CONFIGS, IMPORT_SERVICE_DATA
 from itsm.workflow.models import WorkflowVersion, Workflow
 from itsm.service.models import Service, FavoriteService
 
@@ -234,3 +235,45 @@ class ServiceTest(TestCase):
 
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], "OK")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_clone(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        url = "/api/service/projects/"
+        resp = self.client.post(url, CREATE_SERVICE_DATA)
+
+        service_id = resp.data["data"]["id"]
+
+        url = "/api/service/projects/{}/clone/".format(service_id)
+
+        resp = self.client.post(path=url, data=None, content_type="application/json")
+        self.assertEqual(resp.data["result"], True)
+        self.assertIsInstance(resp.data["data"], dict)
+        self.assertEqual(resp.data["data"]["key"], "request")
+
+    @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    def test_export_and_import(self, patch_misc_get_bk_users, path_get_bk_users):
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+        url = "/api/service/projects/"
+        resp = self.client.post(url, CREATE_SERVICE_DATA)
+
+        service_id = resp.data["data"]["id"]
+
+        url = "/api/service/projects/{}/export/".format(service_id)
+
+        resp = self.client.get(path=url, data=None, content_type="application/json")
+        self.assertIsInstance(resp, FileResponse)
+        #
+        # test_import
+        data = IMPORT_SERVICE_DATA
+        data["name"] = "xxxxx"
+        data["source"] = "service"
+        service = Service.objects.clone(data, "admin")
+        self.assertIsInstance(service, Service)

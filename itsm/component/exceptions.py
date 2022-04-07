@@ -346,12 +346,18 @@ class TableNotExist(ServerError):
 
 
 class AuthMigrateError(ServerError):
-    MESSAGE = _("服务模板未找到")
-    ERROR_CODE = "TABLE_NOT_EXIST"
-    ERROR_CODE_INT = 3900043
+    MESSAGE = _("权限迁移失败")
+    ERROR_CODE = "AUTH_MIGRATE_ERROR"
+    ERROR_CODE_INT = 3900044
 
 
 class SlaParamError(ServerError):
     MESSAGE = _("Sla节点参数验证失败")
     ERROR_CODE = "SLA_VALIDATE_ERROR"
-    ERROR_CODE_INT = 3900044
+    ERROR_CODE_INT = 3900045
+
+
+class DeliverOperateError(ServerError):
+    MESSAGE = _("转派单异常")
+    ERROR_CODE = "DELIVER_OPERATE_ERROR"
+    ERROR_CODE_INT = 3900046

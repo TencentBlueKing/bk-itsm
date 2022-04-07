@@ -29,10 +29,12 @@ import operator
 import time
 from functools import reduce
 from itertools import chain
+
+from django.utils.functional import partition
 from six.moves import zip
 
-from django.db import models
-from django.db.models import F, Q, QuerySet
+from django.db import models, connections, NotSupportedError
+from django.db.models import F, Q, QuerySet, AutoField
 from django.forms import model_to_dict
 from django.utils.translation import ugettext as _
 
@@ -81,7 +83,9 @@ class StatusManager(Manager):
         """查看执行中的状态"""
 
         running_status = self.filter(
-            Q(status__in=self.model.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE))
+            Q(status__in=self.model.CAN_OPERATE_STATUS)
+            | Q(status=FAILED, type=TASK_STATE)
+        )
 
         if ticket_id:
             running_status = running_status.filter(ticket_id=ticket_id)
@@ -102,7 +106,9 @@ class StatusManager(Manager):
         # GENERAL
         for role in UserRole.get_general_role_by_user(dotted_username):
             filters.append(
-                Q(processors_type=role["role_type"]) & Q(processors__contains=role["id"]))
+                Q(processors_type=role["role_type"])
+                & Q(processors__contains=role["id"])
+            )
 
         bk_user_roles = BKUserRole.get_or_update_user_roles(username)
         cmdb_roles, organization_ids = (
@@ -123,7 +129,9 @@ class StatusManager(Manager):
         # ORGANIZATION
         for organization_id in organization_ids:
             filters.append(
-                Q(processors_type="ORGANIZATION") & Q(processors__contains=organization_id))
+                Q(processors_type="ORGANIZATION")
+                & Q(processors__contains=organization_id)
+            )
 
         return reduce(operator.or_, filters)
 
@@ -146,8 +154,9 @@ class TicketManager(Manager):
         """
         con = Q()
         key_list = current_statuses.split(",")
-        ticket_statuses = TicketStatus.objects.filter(key__in=key_list).values("service_type",
-                                                                               "key")
+        ticket_statuses = TicketStatus.objects.filter(key__in=key_list).values(
+            "service_type", "key"
+        )
         for status in ticket_statuses:
             key_filter = Q()
             key_filter.connector = "AND"
@@ -173,22 +182,34 @@ class TicketManager(Manager):
             return queryset
 
         role_filter = self.build_todo_role_filter(username)
-        closed_status = set(TicketStatus.objects.filter(is_over=True).values_list("key", flat=True))
+        closed_status = set(
+            TicketStatus.objects.filter(is_over=True).values_list("key", flat=True)
+        )
         return queryset.filter(role_filter).exclude(current_status__in=closed_status)
 
     def get_approval_tickets(self, queryset, username):
         from itsm.ticket.models.ticket import Status
 
-        todo_ids = self.get_todo_tickets(queryset, username).values_list("id", flat=True)
-
-        running_node = Status.objects.filter(ticket_id__in=todo_ids, type=APPROVAL_STATE,
-                                             status=RUNNING)
-        closed_status = set(TicketStatus.objects.filter(is_over=True).values_list("key", flat=True))
-        my_approval_ticket = set(
-            [node.ticket_id for node in running_node if
-             username in node.get_processor_in_sign_state().split(",")]
+        todo_ids = self.get_todo_tickets(queryset, username).values_list(
+            "id", flat=True
         )
-        return queryset.filter(id__in=my_approval_ticket).exclude(current_status__in=closed_status)
+
+        running_node = Status.objects.filter(
+            ticket_id__in=todo_ids, type=APPROVAL_STATE, status=RUNNING
+        )
+        closed_status = set(
+            TicketStatus.objects.filter(is_over=True).values_list("key", flat=True)
+        )
+        my_approval_ticket = set(
+            [
+                node.ticket_id
+                for node in running_node
+                if username in node.get_processor_in_sign_state().split(",")
+            ]
+        )
+        return queryset.filter(id__in=my_approval_ticket).exclude(
+            current_status__in=closed_status
+        )
 
     def build_todo_role_filter(self, username):
         """current_processors的列表为混合内容，比如
@@ -222,14 +243,19 @@ class TicketManager(Manager):
                 continue
 
             filters.append(
-                Q(bk_biz_id__in=role_info["bizs"]) & Q(
-                    current_processors__contains=dotted_name(role_info["role_id"]))
+                Q(bk_biz_id__in=role_info["bizs"])
+                & Q(current_processors__contains=dotted_name(role_info["role_id"]))
             )
 
         # ORGANIZATION
         for organization_id in organization_ids:
             filters.append(
-                Q(current_processors__contains=dotted_name("O_{}".format(organization_id))))
+                Q(
+                    current_processors__contains=dotted_name(
+                        "O_{}".format(organization_id)
+                    )
+                )
+            )
 
         # 当前任务处理人
         filters.append(Q(current_task_processors__contains=dotted_username))
@@ -244,20 +270,29 @@ class TicketManager(Manager):
 
         dotted_username = dotted_name(username)
         return queryset.filter(
-            Q(updated_by__contains=dotted_username) | Q(history_task_processors=dotted_username))
+            Q(updated_by__contains=dotted_username)
+            | Q(history_task_processors=dotted_username)
+        )
 
     def get_iam_auth_tickets(self, queryset, username):
         iam_client = IamRequest(username=username)
         service_ids = set(queryset.values_list("service_id", flat=True).distinct())
 
-        resources = [{"resource_id": service_id, "resource_type": "service"} for service_id in
-                     service_ids]
+        resources = [
+            {"resource_id": service_id, "resource_type": "service"}
+            for service_id in service_ids
+        ]
 
-        apply_actions = ['ticket_view']
-        auth_actions = iam_client.batch_resource_multi_actions_allowed(apply_actions, resources)
+        apply_actions = ["ticket_view"]
+        auth_actions = iam_client.batch_resource_multi_actions_allowed(
+            apply_actions, resources
+        )
         return queryset.filter(
-            service_id__in=[service_id for service_id, perm in auth_actions.items() if
-                            perm.get('ticket_view')]
+            service_id__in=[
+                service_id
+                for service_id, perm in auth_actions.items()
+                if perm.get("ticket_view")
+            ]
         )
 
     def get_created_tickets(self, queryset, username):
@@ -268,17 +303,22 @@ class TicketManager(Manager):
         # TODO 需要确认该函数是什么意思？？
 
         operate_queryset = queryset.filter(logs__operator=username)
-        values = operate_queryset.order_by("-logs__operate_at").values("id", "logs__operate_at")
+        values = operate_queryset.order_by("-logs__operate_at").values(
+            "id", "logs__operate_at"
+        )
         ids = []
         for value in values:
             if value["id"] not in ids:
                 ids.append(value["id"])
 
-        clauses = " ".join(["WHEN id={} THEN {}".format(pk, i) for i, pk in enumerate(ids)])
+        clauses = " ".join(
+            ["WHEN id={} THEN {}".format(pk, i) for i, pk in enumerate(ids)]
+        )
         ordering = "CASE %s END" % clauses
 
-        queryset = queryset.filter(id__in=ids).extra(select={"ordering": ordering},
-                                                     order_by=("ordering",))
+        queryset = queryset.filter(id__in=ids).extra(
+            select={"ordering": ordering}, order_by=("ordering",)
+        )
 
         return queryset
 
@@ -296,20 +336,29 @@ class TicketManager(Manager):
 
         keyword = kwargs.get("keyword")
         if keyword:
-            queryset = queryset.filter(Q(sn__icontains=keyword) | Q(title__icontains=keyword))
+            queryset = queryset.filter(
+                Q(sn__icontains=keyword) | Q(title__icontains=keyword)
+            )
 
         filter_conditions = {
             key: value
             for key, value in dict(
+                bk_biz_id=kwargs.get("bk_biz_id"),
                 service_id=kwargs.get("service_id"),
                 flow_id=kwargs.get("flow_id"),
-                catalog_id__in=ServiceCatalog.get_descendant_ids(kwargs.get("catalog_id")),
-                project_key=kwargs.get("project_key")
+                catalog_id__in=ServiceCatalog.get_descendant_ids(
+                    kwargs.get("catalog_id")
+                ),
+                project_key=kwargs.get("project_key"),
+                service_type=kwargs.get("service_type"),
             ).items()
             if value
         }
 
         queryset = queryset.filter(**filter_conditions)
+        
+        if kwargs.get("creator__in"):
+            queryset = queryset.filter(creator__contains=kwargs.get("creator__in"))
 
         start_time = kwargs.get("create_at__gte")
         end_time = kwargs.get("create_at__lte")
@@ -323,16 +372,20 @@ class TicketManager(Manager):
 
         # 全局视图单据状态筛选
         if kwargs.get("overall_current_status__in"):
-            return self.get_overall_statuses_tickets(queryset,
-                                                     kwargs.get("overall_current_status__in"))
+            return self.get_overall_statuses_tickets(
+                queryset, kwargs.get("overall_current_status__in")
+            )
 
         if kwargs.get("exclude_ticket_id__in"):
-            return self.get_exclude_ticket_ids_tickets(queryset,
-                                                       kwargs.get("exclude_ticket_id__in"))
+            return self.get_exclude_ticket_ids_tickets(
+                queryset, kwargs.get("exclude_ticket_id__in")
+            )
 
         view_type = kwargs.get("view_type", "")
 
-        view_type_method = getattr(self, "get_{}_tickets".format(view_type.split("_")[-1]), None)
+        view_type_method = getattr(
+            self, "get_{}_tickets".format(view_type.split("_")[-1]), None
+        )
         if view_type_method is not None:
             return view_type_method(queryset, username)
 
@@ -342,8 +395,9 @@ class TicketManager(Manager):
 
         # 统一通过权限管理来控制是否有单据查看权限
 
-        myself_queryset = self.get_todo_tickets(queryset, username) | self.get_history_tickets(
-            queryset, username)
+        myself_queryset = self.get_todo_tickets(
+            queryset, username
+        ) | self.get_history_tickets(queryset, username)
         iam_auth_queryset = self.get_iam_auth_tickets(queryset, username)
         return myself_queryset | iam_auth_queryset
 
@@ -352,14 +406,17 @@ class TicketManager(Manager):
         from itsm.ticket.models import AttentionUsers
 
         # Follower
-        follow_tickets = AttentionUsers.objects.filter(follower=username).values_list("ticket_id",
-                                                                                      flat=True)
+        follow_tickets = AttentionUsers.objects.filter(follower=username).values_list(
+            "ticket_id", flat=True
+        )
         return list(follow_tickets)
 
     # ======================================数据迁移================================================
 
     def update_ticket_service_type(self):
-        self.model._objects.filter(service_type=DEFAULT_STRING).update(service_type=F("service"))
+        self.model._objects.filter(service_type=DEFAULT_STRING).update(
+            service_type=F("service")
+        )
 
     def update_ticket_flow_id(self):
         from itsm.workflow.models import WorkflowSnap, Workflow
@@ -369,7 +426,9 @@ class TicketManager(Manager):
             try:
                 workflow_snap = WorkflowSnap.objects.get(id=ticket.workflow_snap_id)
                 workflow = Workflow._objects.get(id=workflow_snap.workflow_id)
-                version = self.create_version_by_ticket_workflowsnap(workflow, workflow_snap)
+                version = self.create_version_by_ticket_workflowsnap(
+                    workflow, workflow_snap
+                )
                 ticket.flow_id = version.id
                 ticket.save()
                 print("%s: update flow_id for" % ticket.sn)
@@ -390,7 +449,9 @@ class TicketManager(Manager):
         ver_to_snaps = WorkflowVersion.objects.get_or_create_version_from_workflow()
         # print 'ver_for_snaps: %s' % ver_to_snaps
 
-        ver_to_catalog_service = Service.objects.get_or_create_service_and_catalog_from_version()
+        ver_to_catalog_service = (
+            Service.objects.get_or_create_service_and_catalog_from_version()
+        )
         # print 'ver_for_service: %s' % ver_for_catalog_service
 
         # 外键到ticket
@@ -402,7 +463,8 @@ class TicketManager(Manager):
                 continue
 
             self.model._objects.filter(workflow_snap_id__in=snaps).update(
-                catalog_id=service_catalog.catalog.id, service_id=service_catalog.service.id,
+                catalog_id=service_catalog.catalog.id,
+                service_id=service_catalog.service.id,
             )
 
             print("update ticket workflow: {}, cnt={}".format(ver_pk, len(snaps)))
@@ -459,11 +521,15 @@ class TicketManager(Manager):
 
         upgrade_start = datetime.datetime.now()
         logger.info(
-            "-------------------upgrade_running_tickets start: %s------------------------\n" % upgrade_start)
+            "-------------------upgrade_running_tickets start: %s------------------------\n"
+            % upgrade_start
+        )
 
         old_flows = list(
-            WorkflowVersion._objects.exclude(engine_version="PIPELINE_V1").values_list("id",
-                                                                                       flat=True))
+            WorkflowVersion._objects.exclude(engine_version="PIPELINE_V1").values_list(
+                "id", flat=True
+            )
+        )
         # old_flows = WorkflowVersion._objects.all()
         # 找到旧流程版本未结束的单据，并过滤掉草稿单、结束的单据
         running_tickets = self.filter(flow_id__in=old_flows, is_draft=False).exclude(
@@ -485,37 +551,51 @@ class TicketManager(Manager):
                 # upgrade old flow version to pipeline version
                 # logger.info('upgrade running ticket: {} version: {}'.format(ticket.id, old_flow_id))
                 # print('upgrade running ticket: {} version: {}'.format(ticket.id, old_flow_id))
-                (new_flow, states_map, transition_map,) = WorkflowVersion.objects.upgrade_version(
+                (
+                    new_flow,
+                    states_map,
+                    transition_map,
+                ) = WorkflowVersion.objects.upgrade_version(
                     old_flow_id, for_migrate=True, ticket=ticket, **kwargs
                 )
                 # 刷新单据附件目录
                 system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
 
                 for old_state_id, new_state_id in list(states_map.items()):
-                    old_path = os.path.join(system_file_path,
-                                            "{}_{}".format(ticket.id, old_state_id))
+                    old_path = os.path.join(
+                        system_file_path, "{}_{}".format(ticket.id, old_state_id)
+                    )
                     if os.path.exists(old_path):
-                        new_path = os.path.join(system_file_path,
-                                                "{}_{}".format(ticket.id, new_state_id))
+                        new_path = os.path.join(
+                            system_file_path, "{}_{}".format(ticket.id, new_state_id)
+                        )
                         copy_tree(old_path, new_path)
 
                 old_ticket_status = ticket.current_status
                 ticket.current_status = "RUNNING"
                 ticket.current_state_id = str(
-                    states_map.get(int(ticket.current_state_id), ticket.current_state_id))
+                    states_map.get(
+                        int(ticket.current_state_id), ticket.current_state_id
+                    )
+                )
                 ticket.flow_id = new_flow.id
                 ticket.save()
 
                 ticket.logs.update(workflow_id=new_flow.id)
                 for old_state_id, new_state_id in list(states_map.items()):
                     ticket.logs.filter(from_state_id=old_state_id).update(
-                        from_state_id=new_state_id)
-                    ticket.logs.filter(to_state_id=old_state_id).update(to_state_id=new_state_id)
+                        from_state_id=new_state_id
+                    )
+                    ticket.logs.filter(to_state_id=old_state_id).update(
+                        to_state_id=new_state_id
+                    )
                 for o_t, n_t in list(transition_map.items()):
                     ticket.logs.filter(transition_id=o_t).update(transition_id=n_t)
 
                 logger.info("create ticket fields")
-                exists_fields = ticket.fields.exclude(key__in=[FIELD_BACK_MSG, FIELD_TERM_MSG])
+                exists_fields = ticket.fields.exclude(
+                    key__in=[FIELD_BACK_MSG, FIELD_TERM_MSG]
+                )
                 exists_fields_values = {
                     field["key"]: {
                         "choice": json.loads(field["choice"]),
@@ -531,7 +611,10 @@ class TicketManager(Manager):
                         field = copy.deepcopy(new_flow.get_field(field_id))
                         if not field:
                             continue
-                        if field["key"] == "bk_biz_id" and ticket.bk_biz_id == DEFAULT_BK_BIZ_ID:
+                        if (
+                            field["key"] == "bk_biz_id"
+                            and ticket.bk_biz_id == DEFAULT_BK_BIZ_ID
+                        ):
                             continue
                         field.update(state_id=state_id)
                         field.update(ticket_id=ticket.id)
@@ -549,11 +632,15 @@ class TicketManager(Manager):
                 ticket.save()
 
                 # build migrate pipeline and start
-                pipeline_wrapper = PipelineWrapper(new_flow, ticket.id, for_migrate=True)
+                pipeline_wrapper = PipelineWrapper(
+                    new_flow, ticket.id, for_migrate=True
+                )
                 pipeline_data = pipeline_wrapper.create_pipeline(
                     ticket.id,
-                    root_pipeline_data={"ticket_id": ticket.id,
-                                        "old_ticket_status": old_ticket_status, },
+                    root_pipeline_data={
+                        "ticket_id": ticket.id,
+                        "old_ticket_status": old_ticket_status,
+                    },
                     need_start=True,
                     use_cache=True,
                 )
@@ -562,12 +649,19 @@ class TicketManager(Manager):
                 ticket.save()
 
                 # 自动回调
-                virtual_states = ticket.logs.all().exclude(type=REJECT_OPERATE).values_list(
-                    "from_state_id", flat=True)
+                virtual_states = (
+                    ticket.logs.all()
+                    .exclude(type=REJECT_OPERATE)
+                    .values_list("from_state_id", flat=True)
+                )
                 virtual_states = list(set(list(virtual_states)))
-                master_states = [state["id"] for state in
-                                 WorkflowVersion._objects.get(id=old_flow_id).master]
-                re_map = dict(list(zip(list(states_map.values()), list(states_map.keys()))))
+                master_states = [
+                    state["id"]
+                    for state in WorkflowVersion._objects.get(id=old_flow_id).master
+                ]
+                re_map = dict(
+                    list(zip(list(states_map.values()), list(states_map.keys())))
+                )
                 virtual_states.sort(key=lambda x: master_states.index(re_map.get(x)))
                 try:
                     virtual_states.remove(int(ticket.current_state_id))
@@ -575,7 +669,9 @@ class TicketManager(Manager):
                     pass
                 flag = True
                 for state_id in virtual_states:
-                    operator = ticket.logs.filter(from_state_id=state_id).last().operator
+                    operator = (
+                        ticket.logs.filter(from_state_id=state_id).last().operator
+                    )
                     # 当前节点是提单节点
                     if str(new_flow.first_state["id"]) == ticket.current_state_id:
                         break
@@ -583,7 +679,8 @@ class TicketManager(Manager):
                     while n > 0:
                         try:
                             ticket.activity_callback(
-                                state_id=state_id, operator=operator,
+                                state_id=state_id,
+                                operator=operator,
                             )
                             logger.info(
                                 "activity_callback : ticket_id={}, state_id={}, operator={}".format(
@@ -602,20 +699,21 @@ class TicketManager(Manager):
                 end = datetime.datetime.now()
                 if flag:
                     logger.info(
-                        "migrate old flows running ticket_id: %s success, use: %s" % (
-                        ticket.id, (end - start).seconds)
+                        "migrate old flows running ticket_id: %s success, use: %s"
+                        % (ticket.id, (end - start).seconds)
                     )
                 else:
                     logger.error(
-                        "migrate old flows running ticket_id: %s fail, use: %s" % (
-                        ticket.id, (end - start).seconds)
+                        "migrate old flows running ticket_id: %s fail, use: %s"
+                        % (ticket.id, (end - start).seconds)
                     )
 
             except Exception as e:
                 end = datetime.datetime.now()
                 logger.error(
-                    "migrate error ticket_id: {}, error: {}, use: {}".format(ticket.id, str(e),
-                                                                             (end - start).seconds)
+                    "migrate error ticket_id: {}, error: {}, use: {}".format(
+                        ticket.id, str(e), (end - start).seconds
+                    )
                 )
 
         upgrade_end = datetime.datetime.now()
@@ -682,8 +780,13 @@ class TicketLogManager(LogsManager):
         state_id = ticket.end_state["id"]
 
         # 创建结束流转日志
-        return self.create_log(ticket, state_id, end_operator, message=message,
-                               detail_message=detail_message, )
+        return self.create_log(
+            ticket,
+            state_id,
+            end_operator,
+            message=message,
+            detail_message=detail_message,
+        )
 
     def create_log(
         self,
@@ -706,8 +809,13 @@ class TicketLogManager(LogsManager):
             processors_snap = log_operator
         else:
             processors_snap = ",".join(
-                set(chain(ticket.real_current_processors, ticket.real_assignors,
-                          ticket.real_supervisors, ))
+                set(
+                    chain(
+                        ticket.real_current_processors,
+                        ticket.real_assignors,
+                        ticket.real_supervisors,
+                    )
+                )
             )
 
         status = ticket.status(state_id)
@@ -717,7 +825,9 @@ class TicketLogManager(LogsManager):
             from_state_id=state_id,
             type=operate_type,
             operator=log_operator,
-            message="%s..." % message[0:500] if len(message) > 500 else message,  # 防止消息太长
+            message="%s..." % message[0:500]
+            if len(message) > 500
+            else message,  # 防止消息太长
             workflow_id=ticket.flow.id,
             processors_type=getattr(status, "processors_type", ""),
             processors=getattr(status, "processors", ""),
@@ -736,10 +846,17 @@ class TicketLogManager(LogsManager):
 
         return log
 
-    def create_sign_state_log(self, ticket, node_status, log_operator, source, task_field_list):
+    def create_sign_state_log(
+        self, ticket, node_status, log_operator, source, task_field_list
+    ):
         processors_snap = ",".join(
-            set(chain(ticket.real_current_processors, ticket.real_assignors,
-                      ticket.real_supervisors))
+            set(
+                chain(
+                    ticket.real_current_processors,
+                    ticket.real_assignors,
+                    ticket.real_supervisors,
+                )
+            )
         )
         # 获取会签任务处理结果
         result = ""
@@ -768,13 +885,19 @@ class TicketLogManager(LogsManager):
         )
         return log
 
-    def create_trigger_action_log(self, ticket, status, log_operator, component_cls,
-                                  component_input_data):
+    def create_trigger_action_log(
+        self, ticket, status, log_operator, component_cls, component_input_data
+    ):
         """Record trigger action event log"""
         message = "{operator} {action}【{name}】."
         processors_snap = ",".join(
-            set(chain(ticket.real_current_processors, ticket.real_assignors,
-                      ticket.real_supervisors, ))
+            set(
+                chain(
+                    ticket.real_current_processors,
+                    ticket.real_assignors,
+                    ticket.real_supervisors,
+                )
+            )
         )
 
         # Component inputs -> Event log form data
@@ -810,20 +933,25 @@ class TicketLogManager(LogsManager):
         return log
 
     def get_latest_back_record(self, ticket_id, from_state_id):
-        objs = self.filter(ticket_id=ticket_id, from_state_id=from_state_id).order_by("-operate_at")
+        objs = self.filter(ticket_id=ticket_id, from_state_id=from_state_id).order_by(
+            "-operate_at"
+        )
         return objs[0] if objs.exists() else None
 
     def get_last_operator(self, ticket_id, from_state_id):
         """根据起始状态获取最近的单据操作人"""
-        objects = self.filter(ticket_id=ticket_id, from_state_id=from_state_id).order_by(
-            "-operate_at")
+        objects = self.filter(
+            ticket_id=ticket_id, from_state_id=from_state_id
+        ).order_by("-operate_at")
         if objects:
             return objects[0].operator
         return ""
 
     def is_state_operator(self, username, ticket_id, state_id):
         """是否处理过某个节点"""
-        return self.filter(ticket_id=ticket_id, from_state_id=state_id, operator=username).exists()
+        return self.filter(
+            ticket_id=ticket_id, from_state_id=state_id, operator=username
+        ).exists()
 
     def is_ticket_operator(self, username, ticket_id):
         """是否处理过某个单据"""
@@ -846,4 +974,97 @@ class TicketFieldManager(models.Manager):
     TicketField表级操作
     """
 
-    pass
+    def _batched_insert(self, objs, fields, batch_size, ignore_conflicts=False):
+        """
+        Helper method for bulk_create() to insert objs one batch at a time.
+        """
+        if (
+            ignore_conflicts
+            and not connections[self.db].features.supports_ignore_conflicts
+        ):
+            raise NotSupportedError(
+                "This database backend does not support ignoring conflicts."
+            )
+        ops = connections[self.db].ops
+        max_batch_size = max(ops.bulk_batch_size(fields, objs), 1)
+        batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
+        inserted_rows = []
+        bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
+        for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
+            if bulk_return and not ignore_conflicts:
+                inserted_rows.extend(
+                    self._insert(
+                        item,
+                        fields=fields,
+                        using=self.db,
+                        returning_fields=self.model._meta.db_returning_fields,
+                        ignore_conflicts=ignore_conflicts,
+                    )
+                )
+            else:
+                self._insert(
+                    item,
+                    fields=fields,
+                    using=self.db,
+                    ignore_conflicts=ignore_conflicts,
+                )
+        return inserted_rows
+
+    def _prepare_for_bulk_create(self, objs):
+        for obj in objs:
+            if obj.pk is None:
+                # Populate new PK values.
+                obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
+            obj._prepare_related_fields_for_save(operation_name="bulk_create")
+
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+        """
+        重写bulk_create方法，去除事务锁
+        """
+        assert batch_size is None or batch_size > 0
+        for parent in self.model._meta.get_parent_list():
+            if parent._meta.concrete_model is not self.model._meta.concrete_model:
+                raise ValueError("Can't bulk create a multi-table inherited model")
+        if not objs:
+            return objs
+        self._for_write = True
+        connection = connections[self.db]
+        opts = self.model._meta
+        fields = opts.concrete_fields
+        objs = list(objs)
+        self._prepare_for_bulk_create(objs)
+        objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+        if objs_with_pk:
+            returned_columns = self._batched_insert(
+                objs_with_pk,
+                fields,
+                batch_size,
+                ignore_conflicts=ignore_conflicts,
+            )
+            for obj_with_pk, results in zip(objs_with_pk, returned_columns):
+                for result, field in zip(results, opts.db_returning_fields):
+                    if field != opts.pk:
+                        setattr(obj_with_pk, field.attname, result)
+            for obj_with_pk in objs_with_pk:
+                obj_with_pk._state.adding = False
+                obj_with_pk._state.db = self.db
+        if objs_without_pk:
+            fields = [f for f in fields if not isinstance(f, AutoField)]
+            returned_columns = self._batched_insert(
+                objs_without_pk,
+                fields,
+                batch_size,
+                ignore_conflicts=ignore_conflicts,
+            )
+            if (
+                connection.features.can_return_rows_from_bulk_insert
+                and not ignore_conflicts
+            ):
+                assert len(returned_columns) == len(objs_without_pk)
+            for obj_without_pk, results in zip(objs_without_pk, returned_columns):
+                for result, field in zip(results, opts.db_returning_fields):
+                    setattr(obj_without_pk, field.attname, result)
+                obj_without_pk._state.adding = False
+                obj_without_pk._state.db = self.db
+
+        return objs

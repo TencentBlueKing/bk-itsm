@@ -221,6 +221,7 @@
                 })
                 const validateList = requireValidList.filter(it => {
                     let checkValue = false
+                    it.checkValue = false
                     let msg = '' // 自定义校验报错内容
                     switch (it.type) {
                         case 'TABLE':
@@ -228,9 +229,14 @@
                             it.choice.forEach(item => {
                                 if (it.value[0][item.key] !== '') {
                                     allEmpty1 = false
+                                } else {
+                                    msg += (item.name + ', ')
                                 }
                             })
                             checkValue = allEmpty1
+                            if (msg) {
+                                msg += this.$t('m.newCommon["为必填项！"]')
+                            }
                             break
                         case 'CUSTOMTABLE':
                             let allEmpty2 = false
@@ -250,10 +256,11 @@
                         default:
                             checkValue = isEmpty(it.value)
                     }
-                    it.checkValue = checkValue
                     if (msg) {
                         it.checkMessage = msg
+                        checkValue = true
                     }
+                    it.checkValue = checkValue
                     return checkValue
                 })
                 const sopStatus = this.checkBuiltInTaskTemplate()

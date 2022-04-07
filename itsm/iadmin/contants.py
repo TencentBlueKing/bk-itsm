@@ -40,6 +40,7 @@ from itsm.component.constants import (
     WAITING_FOR_OPERATE,
     WAITING_FOR_CONFIRM,
     NOTIFY_FOLLOWER_OPERATE,
+    NODE_FAILED,
 )
 from itsm.sla.constants import (
     SLA_HANDLE_WARNING_NOTIFY,
@@ -80,10 +81,42 @@ ACTION_CHOICES = [
     (SLA_HANDLE_OVERTIME_NOTIFY, _("SLA服务处理超时提醒通知")),
     (SLA_REPLY_WARNING_NOTIFY, _("SLA服务响应预警提醒通知")),
     (SLA_REPLY_OVERTIME_NOTIFY, _("SLA服务响应超时提醒")),
+    (NODE_FAILED, _("节点失败通知")),
 ]
+
+TICKET_ACTIONS = [
+    (TERMINATE_OPERATE, _("单据终止通知")),
+    (FOLLOW_OPERATE, _("邀请关注通知")),
+    (INVITE_OPERATE, _("邀请评价通知")),
+    (SUPERVISE_OPERATE, _("单据督办通知")),
+    (SUSPEND_OPERATE, _("单据挂起通知")),
+    (UNSUSPEND_OPERATE, _("单据恢复通知")),
+    (TRANSITION_OPERATE, _("单据待办通知")),
+    (FINISHED, _("单据结束通知")),
+    (NODE_FAILED, _("节点失败通知")),
+]
+
+SLA_ACTIONS = [
+    (SLA_HANDLE_WARNING_NOTIFY, _("SLA服务处理预警提醒通知")),
+    (SLA_HANDLE_OVERTIME_NOTIFY, _("SLA服务处理超时提醒通知")),
+    (SLA_REPLY_WARNING_NOTIFY, _("SLA服务响应预警提醒通知")),
+    (SLA_REPLY_OVERTIME_NOTIFY, _("SLA服务响应超时提醒")),
+]
+
+TASK_ACTIONS = [
+    (WAITING_FOR_OPERATE, _("任务待办通知")),
+    (WAITING_FOR_CONFIRM, _("任务待总结通知")),
+]
+
+ACTION_CLASSIFY = {
+    "TICKET": dict(TICKET_ACTIONS),
+    "SLA": dict(TICKET_ACTIONS),
+    "TASK": dict(TASK_ACTIONS),
+}
+
 ACTION_CHOICES_DICT = dict(ACTION_CHOICES + [(FINISHED, _("已完成"))])
 
-SUPERVISE_MESSAGE = '您的单据(${title})还没处理完成，请及时处理！'
+SUPERVISE_MESSAGE = "您的单据(${title})还没处理完成，请及时处理！"
 
 TASK_EMAIL_TEMPLATE = """
 <div style="height:650px;">
@@ -183,6 +216,40 @@ FOLLOW_EMAIL_TEMPLATE = """
                  <p>服务目录：${catalog_service_name}</p>
                  <p>当前环节：${running_status}</p>
                  <p>关注信息：${message}</p>
+                <p><a href="${ticket_url}">点击查看详情</a></p>
+                <br><br>
+                <p>如有任何问题，可随时联系ITSM助手。</p>
+
+                <div style="float：right;margin-right：50px">
+                    <p>ITSM流程管理服务</p>
+                    <span style="float：right">${today_date.year}年${today_date.month}月${today_date.day}日</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+"""
+FAILED_EMAIL_TEMPLATE = """
+<div style="height:650px;">
+    <div class="title">
+    </div>
+    <div class="center">
+        <div class="table">
+            <div style="font-size：20px; border-bottom：1px solid #dedede">
+                <div style="margin：10px 0 10px 20px">
+                    <span style="font-weight：bold">【ITSM通知】</span><span>${service_type_name}</span>
+                </div>
+            </div>
+            <div style="margin：30px 0 10px 30px">
+                <p>HI,您好！</p>
+                 <span>您有需要关注的单据，请关注</span>
+                 <p>当前单据节点自动执行失败</p>
+                 <p>标题：${title}</p>
+                 <p>单号：${sn}</p>
+                 <p>服务目录：${catalog_service_name}</p>
+                 <p>当前环节：${running_status}</p>
+                 <p>失败信息：${message}</p>
                 <p><a href="${ticket_url}">点击查看详情</a></p>
                 <br><br>
                 <p>如有任何问题，可随时联系ITSM助手。</p>
@@ -324,7 +391,7 @@ CSS_TEMPLATE = """
 </style>
 """
 
-TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = '''
+TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  任务名称：${task_name}
@@ -332,42 +399,49 @@ TASK_SMS_CONTENT_COMMON = TASK_WEIXIN_CONTENT_COMMON = '''
  任务状态：${task_status_display}
  任务创建人：${task_creator}
  任务创建时间：${task_create_at}
- ${message}'''
+ ${message}"""
 
-SMS_CONTENT_COMMON = WEIXIN_CONTENT_COMMON = '''
+SMS_CONTENT_COMMON = WEIXIN_CONTENT_COMMON = """
  标题：${title}
   单号：<a href="${ticket_url}">${sn}</a>
- ${message}'''
+ ${message}"""
 
-SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = '''您的需求(${title})已经处理完成，现邀请您为我们的服务进行评价。您的反馈对我们非常重要！感谢回复与建议，祝您工作愉快！
- ${ticket_url}'''
+SMS_CONTENT_DONE = WEIXIN_CONTENT_DONE = """您的需求(${title})已经处理完成，现邀请您为我们的服务进行评价。您的反馈对我们非常重要！感谢回复与建议，祝您工作愉快！
+ ${ticket_url}"""
 
-SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = ''' 你有一条${service_type_name}工单需要关注
+SMS_CONTENT_FOLLOW = WEIXIN_CONTENT_FOLLOW = """ 你有一条${service_type_name}工单需要关注
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
- 当前环节：${running_status}'''
+ 当前环节：${running_status}"""
 
-SMS_CONTENT_OPERATE = '''
+SMS_CONTENT_OPERATE = """
  标题：${title}
  单号：${sn}
  服务目录：${catalog_service_name}
- 当前环节：${running_status}'''
+ 当前环节：${running_status}"""
 
-WEIXIN_CONTENT_OPERATE = '''
+SMS_CONTENT_FAILED = WEIXIN_CONTENT_FAILED = """ 
+ 节点自动执行失败
+ 标题：${title}
+ 单号：<a href="${ticket_url}">${sn}</a>
+ 当前环节：${running_status}
+ 失败信息：${message}"""
+
+WEIXIN_CONTENT_OPERATE = """
  标题：${title}
  单号：<a href="${ticket_url}">${sn}</a>
  服务目录：${catalog_service_name}
  当前环节：${running_status}
- '''
+ """
 
-ATTENTION_SMS_CONTENT_COMMON = ATTENTION_WEIXIN_CONTENT_COMMON = '''
+ATTENTION_SMS_CONTENT_COMMON = ATTENTION_WEIXIN_CONTENT_COMMON = """
  标题：${title}
  单号：${sn}
  服务：${catalog_service_name}
  当前步骤：${running_status}
  当前处理人：${ticket_current_processors}
- 查看详情：${ticket_url}'''
+ 查看详情：${ticket_url}"""
 
 ATTENTION_EMAIL_TEMPLATE = """
 <div style="height:650px;">
@@ -412,7 +486,7 @@ ATTENTION_TITLE_COMMON = "『ITSM』您关注的单据动态有更新"
 
 NOTIFY_TEMPLATE = [
     # title_template content_template action notify_type used_by
-    (NOTIFY_TITLE_COMMON, ''' ${message}''', SUPERVISE_OPERATE, SMS, "TICKET"),
+    (NOTIFY_TITLE_COMMON, """ ${message}""", SUPERVISE_OPERATE, SMS, "TICKET"),
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_DONE, INVITE_OPERATE, SMS, "TICKET"),
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_DONE, FINISHED, SMS, "TICKET"),
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_COMMON, TERMINATE_OPERATE, SMS, "TICKET"),
@@ -420,10 +494,28 @@ NOTIFY_TEMPLATE = [
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_COMMON, UNSUSPEND_OPERATE, SMS, "TICKET"),
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_FOLLOW, FOLLOW_OPERATE, SMS, "TICKET"),
     (NOTIFY_TITLE_COMMON, SMS_CONTENT_OPERATE, TRANSITION_OPERATE, SMS, "TICKET"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_SMS_CONTENT_COMMON, WAITING_FOR_OPERATE, SMS, "TASK"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_SMS_CONTENT_COMMON, WAITING_FOR_CONFIRM, SMS, "TASK"),
-    (ATTENTION_TITLE_COMMON, ATTENTION_SMS_CONTENT_COMMON, NOTIFY_FOLLOWER_OPERATE, SMS, "TICKET"),
-    (NOTIFY_TITLE_COMMON, ''' ${message}''', SUPERVISE_OPERATE, WEIXIN, "TICKET"),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_SMS_CONTENT_COMMON,
+        WAITING_FOR_OPERATE,
+        SMS,
+        "TASK",
+    ),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_SMS_CONTENT_COMMON,
+        WAITING_FOR_CONFIRM,
+        SMS,
+        "TASK",
+    ),
+    (
+        ATTENTION_TITLE_COMMON,
+        ATTENTION_SMS_CONTENT_COMMON,
+        NOTIFY_FOLLOWER_OPERATE,
+        SMS,
+        "TICKET",
+    ),
+    (NOTIFY_TITLE_COMMON, """ ${message}""", SUPERVISE_OPERATE, WEIXIN, "TICKET"),
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_DONE, INVITE_OPERATE, WEIXIN, "TICKET"),
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_DONE, FINISHED, WEIXIN, "TICKET"),
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_COMMON, TERMINATE_OPERATE, WEIXIN, "TICKET"),
@@ -431,35 +523,200 @@ NOTIFY_TEMPLATE = [
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_COMMON, UNSUSPEND_OPERATE, WEIXIN, "TICKET"),
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_FOLLOW, FOLLOW_OPERATE, WEIXIN, "TICKET"),
     (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_OPERATE, TRANSITION_OPERATE, WEIXIN, "TICKET"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_WEIXIN_CONTENT_COMMON, WAITING_FOR_OPERATE, WEIXIN, "TASK"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_WEIXIN_CONTENT_COMMON, WAITING_FOR_CONFIRM, WEIXIN, "TASK"),
-    (ATTENTION_TITLE_COMMON, ATTENTION_WEIXIN_CONTENT_COMMON, NOTIFY_FOLLOWER_OPERATE, WEIXIN, "TICKET"),
-    (NOTIFY_TITLE_COMMON, INVITE_EMAIL_TEMPLATE + CSS_TEMPLATE, INVITE_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, INVITE_EMAIL_TEMPLATE + CSS_TEMPLATE, FINISHED, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, FOLLOW_EMAIL_TEMPLATE + CSS_TEMPLATE, FOLLOW_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE, TERMINATE_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE, SUSPEND_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE, UNSUSPEND_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, EMAIL_TEMPLATE + CSS_TEMPLATE, TRANSITION_OPERATE, EMAIL, "TICKET"),
-    (NOTIFY_TITLE_COMMON, SUPERVISE_EMAIL_TEMPLATE + CSS_TEMPLATE, SUPERVISE_OPERATE, EMAIL, "TICKET"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_EMAIL_TEMPLATE + CSS_TEMPLATE, WAITING_FOR_OPERATE, EMAIL, "TASK"),
-    (TASK_NOTIFY_TITLE_COMMON, TASK_EMAIL_TEMPLATE + CSS_TEMPLATE, WAITING_FOR_CONFIRM, EMAIL, "TASK"),
-    (ATTENTION_TITLE_COMMON, ATTENTION_EMAIL_TEMPLATE, NOTIFY_FOLLOWER_OPERATE, EMAIL, "TICKET"),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_WEIXIN_CONTENT_COMMON,
+        WAITING_FOR_OPERATE,
+        WEIXIN,
+        "TASK",
+    ),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_WEIXIN_CONTENT_COMMON,
+        WAITING_FOR_CONFIRM,
+        WEIXIN,
+        "TASK",
+    ),
+    (
+        ATTENTION_TITLE_COMMON,
+        ATTENTION_WEIXIN_CONTENT_COMMON,
+        NOTIFY_FOLLOWER_OPERATE,
+        WEIXIN,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        INVITE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        INVITE_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        INVITE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        FINISHED,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        FOLLOW_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        FOLLOW_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        TERMINATE_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        SUSPEND_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        OPERATE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        UNSUSPEND_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        EMAIL_TEMPLATE + CSS_TEMPLATE,
+        TRANSITION_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        NOTIFY_TITLE_COMMON,
+        SUPERVISE_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        SUPERVISE_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        WAITING_FOR_OPERATE,
+        EMAIL,
+        "TASK",
+    ),
+    (
+        TASK_NOTIFY_TITLE_COMMON,
+        TASK_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        WAITING_FOR_CONFIRM,
+        EMAIL,
+        "TASK",
+    ),
+    (
+        ATTENTION_TITLE_COMMON,
+        ATTENTION_EMAIL_TEMPLATE,
+        NOTIFY_FOLLOWER_OPERATE,
+        EMAIL,
+        "TICKET",
+    ),
     # SLA通知模板
-    (SLA_HANDLE_WARNING_NOTIFY_TITLE, SLA_HANDLE_WARNING_TEMPLATE_EMAIL, SLA_HANDLE_WARNING_NOTIFY, EMAIL, "SLA"),
-    (SLA_HANDLE_WARNING_NOTIFY_TITLE, SLA_HANDLE_WARNING_TEMPLATE_SMS, SLA_HANDLE_WARNING_NOTIFY, SMS, "SLA"),
-    (SLA_HANDLE_WARNING_NOTIFY_TITLE, SLA_HANDLE_WARNING_TEMPLATE_WEIXIN, SLA_HANDLE_WARNING_NOTIFY, WEIXIN, "SLA"),
-    (SLA_HANDLE_OVERTIME_NOTIFY_TITLE, SLA_HANDLE_OVERTIME_TEMPLATE_EMAIL, SLA_HANDLE_OVERTIME_NOTIFY, EMAIL, "SLA"),
-    (SLA_HANDLE_OVERTIME_NOTIFY_TITLE, SLA_HANDLE_OVERTIME_TEMPLATE_SMS, SLA_HANDLE_OVERTIME_NOTIFY, SMS, "SLA"),
-    (SLA_HANDLE_OVERTIME_NOTIFY_TITLE, SLA_HANDLE_OVERTIME_TEMPLATE_WEIXIN, SLA_HANDLE_OVERTIME_NOTIFY, WEIXIN, "SLA"),
-    (SLA_REPLY_WARNING_NOTIFY_TITLE, SLA_REPLY_WARNING_TEMPLATE_EMAIL, SLA_REPLY_WARNING_NOTIFY, EMAIL, "SLA"),
-    (SLA_REPLY_WARNING_NOTIFY_TITLE, SLA_REPLY_WARNING_TEMPLATE_SMS, SLA_REPLY_WARNING_NOTIFY, SMS, "SLA"),
-    (SLA_REPLY_WARNING_NOTIFY_TITLE, SLA_REPLY_WARNING_TEMPLATE_WEIXIN, SLA_REPLY_WARNING_NOTIFY, WEIXIN, "SLA"),
-    (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_EMAIL, SLA_REPLY_OVERTIME_NOTIFY, EMAIL, "SLA"),
-    (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_SMS, SLA_REPLY_OVERTIME_NOTIFY, SMS, "SLA"),
-    (SLA_REPLY_OVERTIME_NOTIFY_TITLE, SLA_REPLY_OVERTIME_TEMPLATE_WEIXIN, SLA_REPLY_OVERTIME_NOTIFY, WEIXIN, "SLA"),
+    (
+        SLA_HANDLE_WARNING_NOTIFY_TITLE,
+        SLA_HANDLE_WARNING_TEMPLATE_EMAIL,
+        SLA_HANDLE_WARNING_NOTIFY,
+        EMAIL,
+        "SLA",
+    ),
+    (
+        SLA_HANDLE_WARNING_NOTIFY_TITLE,
+        SLA_HANDLE_WARNING_TEMPLATE_SMS,
+        SLA_HANDLE_WARNING_NOTIFY,
+        SMS,
+        "SLA",
+    ),
+    (
+        SLA_HANDLE_WARNING_NOTIFY_TITLE,
+        SLA_HANDLE_WARNING_TEMPLATE_WEIXIN,
+        SLA_HANDLE_WARNING_NOTIFY,
+        WEIXIN,
+        "SLA",
+    ),
+    (
+        SLA_HANDLE_OVERTIME_NOTIFY_TITLE,
+        SLA_HANDLE_OVERTIME_TEMPLATE_EMAIL,
+        SLA_HANDLE_OVERTIME_NOTIFY,
+        EMAIL,
+        "SLA",
+    ),
+    (
+        SLA_HANDLE_OVERTIME_NOTIFY_TITLE,
+        SLA_HANDLE_OVERTIME_TEMPLATE_SMS,
+        SLA_HANDLE_OVERTIME_NOTIFY,
+        SMS,
+        "SLA",
+    ),
+    (
+        SLA_HANDLE_OVERTIME_NOTIFY_TITLE,
+        SLA_HANDLE_OVERTIME_TEMPLATE_WEIXIN,
+        SLA_HANDLE_OVERTIME_NOTIFY,
+        WEIXIN,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_WARNING_NOTIFY_TITLE,
+        SLA_REPLY_WARNING_TEMPLATE_EMAIL,
+        SLA_REPLY_WARNING_NOTIFY,
+        EMAIL,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_WARNING_NOTIFY_TITLE,
+        SLA_REPLY_WARNING_TEMPLATE_SMS,
+        SLA_REPLY_WARNING_NOTIFY,
+        SMS,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_WARNING_NOTIFY_TITLE,
+        SLA_REPLY_WARNING_TEMPLATE_WEIXIN,
+        SLA_REPLY_WARNING_NOTIFY,
+        WEIXIN,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_OVERTIME_NOTIFY_TITLE,
+        SLA_REPLY_OVERTIME_TEMPLATE_EMAIL,
+        SLA_REPLY_OVERTIME_NOTIFY,
+        EMAIL,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_OVERTIME_NOTIFY_TITLE,
+        SLA_REPLY_OVERTIME_TEMPLATE_SMS,
+        SLA_REPLY_OVERTIME_NOTIFY,
+        SMS,
+        "SLA",
+    ),
+    (
+        SLA_REPLY_OVERTIME_NOTIFY_TITLE,
+        SLA_REPLY_OVERTIME_TEMPLATE_WEIXIN,
+        SLA_REPLY_OVERTIME_NOTIFY,
+        WEIXIN,
+        "SLA",
+    ),
+    # 自动节点失败通知模版
+    (NOTIFY_TITLE_COMMON, SMS_CONTENT_FAILED, NODE_FAILED, SMS, "TICKET"),
+    (NOTIFY_TITLE_COMMON, WEIXIN_CONTENT_FAILED, NODE_FAILED, WEIXIN, "TICKET"),
+    (
+        NOTIFY_TITLE_COMMON,
+        FAILED_EMAIL_TEMPLATE + CSS_TEMPLATE,
+        NODE_FAILED,
+        EMAIL,
+        "TICKET",
+    ),
 ]
-
 
 SWITCH_ON = "on"
 SWITCH_OFF = "off"
@@ -470,11 +727,11 @@ WIKI_SWITCH = "WIKI_SWITCH"
 SLA_SWITCH = "SLA_SWITCH"
 CHILD_TICKET_SWITCH = "CHILD_TICKET_SWITCH"
 FLOW_PREVIEW = "FLOW_PREVIEW"
-TRIGGER_SWITCH = 'TRIGGER_SWITCH'
-TASK_SWITCH = 'TASK_SWITCH'
-TABLE_FIELDS_SWITCH = 'TABLE_FIELDS_SWITCH'
-FIRST_STATE_SWITCH = 'FIRST_STATE_SWITCH'
-SMS_COMMENT_SWITCH = 'SMS_COMMENT_SWITCH'
+TRIGGER_SWITCH = "TRIGGER_SWITCH"
+TASK_SWITCH = "TASK_SWITCH"
+TABLE_FIELDS_SWITCH = "TABLE_FIELDS_SWITCH"
+FIRST_STATE_SWITCH = "FIRST_STATE_SWITCH"
+SMS_COMMENT_SWITCH = "SMS_COMMENT_SWITCH"
 
 DEFAULT_SETTINGS = [
     [SYS_FILE_PATH, "PATH", ""],
@@ -490,7 +747,6 @@ DEFAULT_SETTINGS = [
     [TASK_SWITCH, "FUNCTION", SWITCH_OFF],
     [SMS_COMMENT_SWITCH, "FUNCTION", SWITCH_OFF],
 ]
-
 
 PROJECT_SETTING = [
     [TABLE_FIELDS_SWITCH, "FUNCTION", SWITCH_OFF],

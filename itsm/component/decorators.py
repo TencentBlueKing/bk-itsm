@@ -23,7 +23,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-
 import os
 import traceback
 from functools import wraps
@@ -289,6 +288,6 @@ def custom_apigw_required(view_func):
         request.jwt = JWTClient(request)
         if not request.jwt.is_valid:
             return jwt_invalid_view(request)
-        return view_func(request, *args, **kwargs)
+        return view_func(self, request, *args, **kwargs)
 
     return _wrapped_view

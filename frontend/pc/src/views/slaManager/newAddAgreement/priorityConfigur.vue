@@ -26,7 +26,7 @@
             <li style="width: 25%;"><span>{{ $t('m.slaContent["优先级"]') }}</span></li>
             <li style="width: 25%;"><span>{{ $t('m.slaContent["服务模式"]') }}</span></li>
             <li style="width: 25%;" class="tooltipsChackbox">
-                <bk-checkbox v-model="changeInfo.is_reply_need">
+                <bk-checkbox data-test-id="slaManager-checkbox-appointedTime" v-model="changeInfo.is_reply_need">
                     <span
                         v-bk-tooltips.top="$t(`m.slaContent['从进入开始节点，到完成响应操作的时间。']`)"
                         class="textDashed">
@@ -40,6 +40,7 @@
             <li style="width: 25%;">
                 <span v-for="(typeItem, typeIndex) in modelPriority"
                     :key="typeIndex"
+                    :data-test-id="`slaAgreement-span-modelPriority-${typeIndex}`"
                     style="position: relative;">
                     <template v-if="typeItem.key === item.priority">
                         <span class="in-select-icon" :style="'background-color: ' + typeColorList[item.priority]"></span>{{typeItem.name}}
@@ -54,6 +55,7 @@
                     :rules="scheduleRules"
                     ref="schedule">
                     <bk-form-item
+                        data-test-id="slaAgreement-select-modelList"
                         :property="'schedule'">
                         <bk-select v-model="item.schedule" :ext-cls="'cus-align-left'" searchable>
                             <bk-option v-for="option in modelList"
@@ -76,6 +78,7 @@
                     :rules="replyTimeRules"
                     ref="replyTime">
                     <bk-form-item
+                        data-test-id="slaAgreement-input-replyTime"
                         :property="'reply_time'"
                         :icon-offset="iconOffset">
                         <bk-input v-model.number="item.reply_time"
@@ -97,7 +100,7 @@
                                 </bk-button>
                                 <ul class="bk-dropdown-list" slot="dropdown-content">
                                     <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <a href="javascript:;" @click="timeHandler('reply_unit', time, item, index, 0)">{{ time.name }}</a>
+                                        <a href="javascript:;" data-test-id="slaAgreement-a-timeHandler" @click="timeHandler('reply_unit', time, item, index, 0)">{{ time.name }}</a>
                                     </li>
                                 </ul>
                             </bk-dropdown-menu>
@@ -115,6 +118,7 @@
                     ref="handleTime">
                     <bk-form-item
                         :property="'handle_time'"
+                        data-test-id="slaAgreement-input-handleTime"
                         :icon-offset="iconOffset">
                         <bk-input v-model.number="item.handle_time"
                             :font-size="'normal'"
@@ -297,6 +301,14 @@
                     valid = true
                 })
                 return valid
+            },
+            clearFromError () {
+                const refs = ['schedule', 'replyTime', 'handleTime']
+                refs.forEach(item => {
+                    this.$refs[item].forEach(ite => {
+                        ite.clearError()
+                    })
+                })
             }
         }
     }

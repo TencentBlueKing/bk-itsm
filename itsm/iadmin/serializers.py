@@ -30,7 +30,12 @@ from rest_framework.fields import empty
 from itsm.component.constants import LEN_NORMAL, LEN_XXX_LONG
 from itsm.component.exceptions import ParamError
 from itsm.component.drf.serializers import AuthModelSerializer
-from itsm.iadmin.models import CustomNotice, MigrateLogs, SystemSettings, ReleaseVersionLog
+from itsm.iadmin.models import (
+    CustomNotice,
+    MigrateLogs,
+    SystemSettings,
+    ReleaseVersionLog,
+)
 from itsm.iadmin.utils import version_cmp
 from itsm.iadmin.validators import PathTypeValidators
 
@@ -44,7 +49,14 @@ class MigrateLogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MigrateLogs
-        fields = ("version_from", "version_to", "operator", "create_at", "note", "exe_func")
+        fields = (
+            "version_from",
+            "version_to",
+            "operator",
+            "create_at",
+            "note",
+            "exe_func",
+        )
 
     def validate(self, data):
         """
@@ -71,12 +83,16 @@ class VersionListSerializer(serializers.ModelSerializer):
         fields = ("version",)
 
 
-class CustomNotifySerializer(AuthModelSerializer):
+class CustomNotifySerializer(serializers.ModelSerializer):
     """模板序列化"""
 
     content_template = serializers.CharField(
-        required=True, min_length=1, max_length=LEN_XXX_LONG, error_messages={"blank": _("消息模板不能为空")}
+        required=True,
+        min_length=1,
+        max_length=LEN_XXX_LONG,
+        error_messages={"blank": _("消息模板不能为空")},
     )
+    project_key = serializers.CharField(required=False)
 
     class Meta:
         model = CustomNotice
@@ -90,7 +106,37 @@ class CustomNotifySerializer(AuthModelSerializer):
             "updated_by",
             "update_at",
             "used_by",
+            "project_key",
         )
+
+    def validate(self, attrs):
+        if "project_key" in attrs:
+            project_key = attrs["project_key"]
+            if project_key == "public":
+                raise serializers.ValidationError(_("公共配置不允许新增"))
+
+        return attrs
+
+    def create(self, validated_data):
+        action = validated_data["action"]
+        notify_type = validated_data["notify_type"]
+        project_key = validated_data["project_key"]
+        used_by = validated_data["used_by"]
+
+        validated_data.pop("creator", None)
+
+        # 版本号固定为v2
+        validated_data["version"] = "V2"
+
+        if CustomNotice.objects.filter(
+            action=action,
+            notify_type=notify_type,
+            project_key=project_key,
+            used_by=used_by,
+        ).exists():
+            raise serializers.ValidationError(_("该项目下已存在相同的通知配置，不能重复添加"))
+
+        return super(CustomNotifySerializer, self).create(validated_data=validated_data)
 
 
 class SystemSettingsSerializer(AuthModelSerializer):

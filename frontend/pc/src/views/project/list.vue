@@ -187,9 +187,8 @@
                         ordering: this.ordering
                     }
                     if (this.keyword !== '') {
-                        params.keyword = this.keyword
+                        params.name__icontains = this.keyword
                     }
-
                     const res = await this.$store.dispatch('project/getProjectList', params)
                     this.pagination.count = res.data.count
                     this.list = res.data.items

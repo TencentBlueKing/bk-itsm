@@ -57,13 +57,12 @@ class MigrationHandlerBase(object):
             "resource_type_name": obj.auth_resource.get("resource_type_name"),
         }]
         iam.grant_or_revoke_instance_permission(actions, resources, operate=operate,
-                                                    project_key=obj.project_key)
-
+                                                project_key=obj.project_key)
 
     def grant_or_revoke_permit_with_project(self, request, actions, project_key, operate):
         iam = MigrateIamRequest(request)
         iam.grant_or_revoke_permit_with_project(actions, operate, project_key)
-    
+
     def iam_auth(self, request, apply_actions, obj=None, project_key=DEFAULT_PROJECT_PROJECT_KEY):
 
         resources = []
@@ -123,11 +122,6 @@ class ServiceMigrationHandler(MigrationHandlerBase):
         # 先回收权限
         self.grant_or_revoke_instance_permission(request, actions,
                                                  ready_migrate_service, REVOKE)
-
-        # 先回收权限
-        actions_without_resource = ["service_create"]
-        self.grant_or_revoke_permit_with_project(request, actions_without_resource,
-                                                 old_project_key, REVOKE)
 
         # 获取该项目获取的catalog名称
         catalog_name = ready_migrate_service.bounded_catalogs[0]
@@ -197,18 +191,10 @@ class UserGroupMigrationHandler(MigrationHandlerBase):
         if user_role is None:
             return
 
-        actions = ["role_manage"]
-        # 鉴权，用户是否有该资源的service_manage权限，有的话才可以进行迁移
-        if not self.iam_auth(request, actions, user_role, old_project_key):
-            raise NoMigratePermission(_("您当前没有权限迁移该服务，您在权限中心没有该用户组的管理权限，role_name={}".
-                                        format(user_role.name)))
-        # 先回收权限
-        actions_without_resource = ["role_create"]
-
-        # 取消项目级别的授权
-        self.grant_or_revoke_permit_with_project(request, actions_without_resource, old_project_key, REVOKE)
-        # 修改资源类型，兼容旧版
-        user_role.auth_resource = {"resource_type": "role", "resource_type_name": "角色"} 
+        if not request.user.username == user_role.creator:
+            raise NoMigratePermission("权限迁移失败，请联系该用户组创建者进行迁移")
+        actions = ["user_group_view", "user_group_edit", "user_group_delete"]
+        user_role.auth_resource = {"resource_type": "user_group", "resource_type_name": "用户组"}
         # 取消实例级别的授权
         self.grant_or_revoke_instance_permission(request, actions, user_role, REVOKE)
 

@@ -96,13 +96,13 @@ const ROUTE_LIST = [
                         icon: 'bk-itsm-icon icon-it-new-sevice',
                         path: '/project/service/list',
                         prefix: ['/project/service/']
-                    },
-                    {
-                        name: i18n.t(`m["服务目录"]`),
-                        id: 'serviceDirectory',
-                        icon: 'bk-itsm-icon icon-ticket_2',
-                        path: '/project/service_directory'
                     }
+                    // {
+                    //     name: i18n.t(`m["服务目录"]`),
+                    //     id: 'serviceDirectory',
+                    //     icon: 'bk-itsm-icon icon-ticket_2',
+                    //     path: '/project/service_directory'
+                    // }
                 ]
             },
             {
@@ -150,7 +150,7 @@ const ROUTE_LIST = [
             },
             {
                 name: i18n.t(`m["管理"]`),
-                abbrName: 'Man.',
+                abbrName: 'Man',
                 id: 'projectManage',
                 subRouters: [
                     {
@@ -164,9 +164,30 @@ const ROUTE_LIST = [
                         id: 'projectTrigger',
                         icon: 'bk-itsm-icon icon-slide',
                         path: '/project/trigger'
+                    },
+                    {
+                        name: i18n.t(`m["通知模板"]`),
+                        id: 'projectNotice',
+                        icon: 'bk-itsm-icon icon-icon-notice-new',
+                        path: '/project/notice'
                     }
                 ]
             }
+            // 2.6.0 等权限校验后显示
+            // {
+            //     name: i18n.t(`m["分析"]`),
+            //     abbrName: 'Ana',
+            //     id: 'analysis',
+            //     subRouters: [
+            //         {
+            //             name: i18n.t(`m["运营分析"]`),
+            //             id: 'projectOperationHome',
+            //             icon: 'bk-itsm-icon icon-operational-data',
+            //             path: '/project/projectOperation/home',
+            //             prefix: ['/project/projectOperation/service']
+            //         }
+            //     ]
+            // }
         ]
     },
     {

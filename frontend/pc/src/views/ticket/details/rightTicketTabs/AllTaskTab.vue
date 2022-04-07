@@ -70,6 +70,7 @@
         </bk-table>
         <bk-sideslider
             :is-show.sync="dealTaskInfo.show"
+            :quick-close="true"
             :width="800">
             <div slot="header">
                 <task-handle-trigger v-if="dealTaskInfo.show" :task-info="dealTaskInfo.itemContent" :title="dealTaskInfo.title" @close-slider="dealTaskInfo.show = false"></task-handle-trigger>

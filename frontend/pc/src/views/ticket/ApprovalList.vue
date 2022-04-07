@@ -27,6 +27,9 @@
                 class="advanced-search"
                 ref="advancedSearch"
                 :forms="searchForms"
+                :panel="type"
+                :search-result-list="searchResultList"
+                @deteleSearchResult="deteleSearchResult"
                 @search="handleSearch"
                 @clear="handleClearSearch"
                 @formChange="handleSearchFormChange">

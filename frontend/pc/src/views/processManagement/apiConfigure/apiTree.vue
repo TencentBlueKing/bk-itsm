@@ -89,15 +89,15 @@
                                         <li
                                             v-if="!item.is_builtin"
                                             data-test-id="api_li_deleteApiDirectory"
-                                            v-cursor="{ active: !projectId && !hasPermission(['public_api_manage']) }"
-                                            :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage']) }"
+                                            v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                                            :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
                                             @click.stop="openDelete(item)">
                                             <span>{{ $t('m.systemConfig["删除"]') }}</span>
                                         </li>
                                         <li
                                             data-test-id="api_li_editApiDirectory"
-                                            v-cursor="{ active: !projectId && !hasPermission(['public_api_manage']) }"
-                                            :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage']) }"
+                                            v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                                            :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
                                             @click.stop="openDictionary('CHANGE' ,item)">
                                             <span>{{ $t('m.systemConfig["编辑"]') }}</span>
                                         </li>
@@ -143,12 +143,14 @@
                     ref="dictDataForm">
                     <template v-if="dictDataTable.type === 'ADD'">
                         <bk-form-item
+                            data-test-id="api-input-systemName"
                             :label="$t(`m.systemConfig['系统名称：']`)"
                             :required="true"
                             :property="'addName'">
                             <bk-input :clearable="true" v-model="dictDataTable.formInfo.addName"></bk-input>
                         </bk-form-item>
                         <bk-form-item
+                            data-test-id="api-input-systemCode"
                             :label="$t(`m.systemConfig['系统编码：']`)"
                             :required="true"
                             :property="'addCode'">
@@ -452,7 +454,7 @@
                             }]
                         }
                     }
-                    if (!this.hasPermission(reqPerm, crtPerm)) {
+                    if (crtPerm && !this.hasPermission(reqPerm, crtPerm)) {
                         this.applyForPermission(reqPerm, crtPerm, resourceData)
                         return
                     }

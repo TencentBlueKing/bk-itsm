@@ -89,12 +89,12 @@ export default {
         },
         // 判断值是否合理
         judgeValue (value, list) {
-            return list.some(item => value.toString().indexOf(item.key) !== -1)
+            if (value) return list.some(item => value.toString().indexOf(item.key) !== -1)
         },
         // 关联数据展示的逻辑处理
         conditionField (item, list) {
             for (let i = 0; i < list.length; i++) {
-                if (list[i].show_type || (!list[i].hasOwnProperty('show_conditions') && list[i].show_result)) {
+                if (list[i].show_type || (!list[i].hasOwnProperty('show_conditions') && (!list[i].hasOwnProperty('show_result') || list[i].show_result))) {
                     list[i].showFeild = true
                     continue
                 }

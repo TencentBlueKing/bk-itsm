@@ -42,6 +42,7 @@ from itsm.component.constants import (
     LEN_LONG,
     API_DICT,
     TRANSITION_OPERATE,
+    NODE_FAILED,
 )
 from itsm.component.esb.backend_component import bk
 from itsm.component.utils.basic import list_by_separator
@@ -78,7 +79,7 @@ class AutoStateService(ItsmBaseService):
     def poll_proceed(api_config, success_conditions):
         rsp = bk.http(config=api_config)
         if success_conditions is None:
-            return rsp['result'], rsp
+            return rsp.get("result", False), rsp
         # 构造带${params_}的条件
         conditions = conditions_conversion(success_conditions)
         rsp_copy = copy.deepcopy(rsp)
@@ -90,64 +91,87 @@ class AutoStateService(ItsmBaseService):
 
     def update_variables(self, rsp, ticket_id, variables, data=None):
         for variable in variables:
-            TicketGlobalVariable.objects.filter(ticket_id=ticket_id, key=variable['key']).update(
-                value=rsp.get(variable['ref_path'], '')
-            )
+            TicketGlobalVariable.objects.filter(
+                ticket_id=ticket_id, key=variable["key"]
+            ).update(value=rsp.get(variable["ref_path"], ""))
         return variables
 
     @staticmethod
     def update_status(ticket, state_id, status, ex_data=None):
         if ex_data:
             ticket.node_status.filter(state_id=state_id).update(
-                contexts={'ex_data': ex_data}, status=status,
+                contexts={"ex_data": ex_data},
+                status=status,
             )
         else:
-            ticket.node_status.filter(state_id=state_id).update(status=status,)
+            ticket.node_status.filter(state_id=state_id).update(
+                status=status,
+            )
 
     @staticmethod
-    def build_query_params(ticket, query_params, schema, method='POST'):
+    def build_query_params(ticket, query_params, schema, method="POST"):
         # 引用变量，变量写入
         params = {
             "params_{}".format(key): value
-            for key, value in ticket.get_output_fields(return_format='dict', need_display=True).items()
+            for key, value in ticket.get_output_fields(
+                return_format="dict", need_display=True
+            ).items()
         }
 
         params_list = re.findall(r"\${(.*?)}", str(query_params))
         for name in params_list:
             if name not in params:
                 params[name] = ""
-        logger.warning('请求参数添加完成， query_params is {}, params is {}'.format(query_params, params))
+        logger.warning(
+            "请求参数添加完成， query_params is {}, params is {}".format(query_params, params)
+        )
         result, build_query_params = build_params_by_mako_template(query_params, params)
-        logger.warning('请求参数构造完成， build_query_params is {}'.format(build_query_params))
+        logger.warning("请求参数构造完成， build_query_params is {}".format(build_query_params))
         if not result:
-            logger.warning('请求参数构造异常， query_params is {}, params is {}'.format(query_params, params))
-            return False, _('请求参数构造异常，详细信息： %s') % str(build_query_params)
+            logger.warning(
+                "请求参数构造异常， query_params is {}, params is {}".format(
+                    query_params, params
+                )
+            )
+            return False, _("请求参数构造异常，详细信息： %s") % str(build_query_params)
 
         # 引用变量的类型转换及参数整体schema校验
-        if method == 'POST':
+        if method == "POST":
             try:
                 params_type_conversion(build_query_params, schema)
             except BaseException as e:
                 logger.warning(build_query_params)
-                return False, _('请求参数转换异常，详细信息： %s') % str(str(e))
+                return False, _("请求参数转换异常，详细信息： %s") % str(str(e))
 
             try:
                 jsonschema.validate(build_query_params, schema)
             except Exception as e:
                 logger.warning(build_query_params)
-                return False, _('请求参数校验异常，详细信息： %s') % str(str(e))
+                return False, _("请求参数校验异常，详细信息： %s") % str(str(e))
 
         return True, build_query_params
 
-    def get_rsp_content(self, ticket, state_id, api_config, success_conditions, operate_info=None):
+    def get_rsp_content(
+        self, ticket, state_id, api_config, success_conditions, operate_info=None
+    ):
         if operate_info and json.loads(operate_info)["action"] == "MANUAL":
             ignore_params = ticket.node_status.get(state_id=state_id).ignore_params
             logger.info("ignore_params is {}".format(ignore_params))
-            return True, {'data': ignore_params}
+            return True, {"data": ignore_params}
         else:
             return self.poll_proceed(copy.deepcopy(api_config), success_conditions)
 
-    def do_exit_plugins(self, ticket, state_id, state_status, ex_data, rsp, variables, data=None, operator_info=None):
+    def do_exit_plugins(
+        self,
+        ticket,
+        state_id,
+        state_status,
+        ex_data,
+        rsp,
+        variables,
+        data=None,
+        operator_info=None,
+    ):
         """
         退出自动节点前的清理动作
         1、结束轮询
@@ -161,15 +185,21 @@ class AutoStateService(ItsmBaseService):
 
             # self.set_outputs(data, ticket, state_id)
             for field in ticket.get_output_fields(state_id):
-                data.set_outputs("params_%s" % field['key'], field['value'])
-                logger.info('do_exit_plugins::set_output: "params_{}" = {}'.format(field['key'], field['value']))
+                data.set_outputs("params_%s" % field["key"], field["value"])
+                logger.info(
+                    'do_exit_plugins::set_output: "params_{}" = {}'.format(
+                        field["key"], field["value"]
+                    )
+                )
 
             if not operator_info:
                 operator = "system"
                 operate_type = SYSTEM_OPERATE
                 action = ACTION_DICT.get(SYSTEM_OPERATE)
                 log_message = (
-                    "自动处理单据任务【{name}】执行失败：({detail_message})." if state_status == FAILED else "自动处理单据任务【{name}】执行成功."
+                    "自动处理单据任务【{name}】执行失败：({detail_message})."
+                    if state_status == FAILED
+                    else "自动处理单据任务【{name}】执行成功."
                 )
             else:
                 detail = json.loads(operator_info)
@@ -177,21 +207,32 @@ class AutoStateService(ItsmBaseService):
                 operate_type = detail["action"].upper()
                 action = API_DICT.get(detail["action"].upper())
                 if state_status == FAILED:
-                    log_message = "{operator}{action}单据任务【{name}】执行失败：({detail_message})."
+                    log_message = (
+                        "{operator}{action}单据任务【{name}】执行失败：({detail_message})."
+                    )
                 else:
                     log_message = "{operator}{action}单据任务【{name}】执行成功."
             node_status = ticket.status(state_id)
             api_config = {}
             if node_status:
                 api_config = TaskStateApiInfoSerializer(
-                    node_status.api_instance, many=False, context={"status": node_status}
+                    node_status.api_instance,
+                    many=False,
+                    context={"status": node_status},
                 ).data
                 if node_status.query_params:
-                    if api_config["method"] == 'GET':
-                        api_config['req_params'] = node_status.query_params
+                    if api_config["method"] == "GET":
+                        api_config["req_params"] = node_status.query_params
                     else:
-                        api_config['req_body'] = node_status.query_params
-            api_log_info = [{"key": "api_info", "name": "api信息", "value": api_config, "show_result": True}]
+                        api_config["req_body"] = node_status.query_params
+            api_log_info = [
+                {
+                    "key": "api_info",
+                    "name": "api信息",
+                    "value": api_config,
+                    "show_result": True,
+                }
+            ]
             tlog = TicketEventLog.objects.create_log(
                 ticket=ticket,
                 state_id=state_id,
@@ -200,19 +241,31 @@ class AutoStateService(ItsmBaseService):
                 action=action,
                 message=log_message,
                 detail_message=ex_data[:LEN_LONG] if ex_data else rsp,
-                from_state_name=state.get('name'),
+                from_state_name=state.get("name"),
                 source=SYSTEM_OPERATE,
                 fields=api_log_info,
             )
 
             self.update_status(ticket, state_id, state_status, ex_data)
             if state_status == FAILED:
-                ticket.node_status.filter(state_id=state_id).update(action_type=TRANSITION_OPERATE)
+                ticket.node_status.filter(state_id=state_id).update(
+                    action_type=TRANSITION_OPERATE
+                )
+                # 发送通知
+                ticket.notify(
+                    state_id=state_id,
+                    receivers=operator,
+                    message=ex_data[:LEN_LONG] if ex_data else rsp,
+                    action=NODE_FAILED,
+                    retry=False,
+                )
 
             # 发送通知
             if node_status:
-                receivers = ','.join(list_by_separator(node_status.processors))
-                ticket.notify(state_id, receivers, message=tlog.translated_message, retry=False)
+                receivers = ",".join(list_by_separator(node_status.processors))
+                ticket.notify(
+                    state_id, receivers, message=tlog.translated_message, retry=False
+                )
 
         # 失败的情况也需要进入推出节点记录信息
         ticket.do_before_exit_state(state_id)
@@ -221,23 +274,31 @@ class AutoStateService(ItsmBaseService):
         if super(AutoStateService, self).execute(data, parent_data):
             return True
 
-        logger.info('AutoStateService execute: data={}, parent_data={}'.format(data.inputs, parent_data.inputs))
+        logger.info(
+            "AutoStateService execute: data={}, parent_data={}".format(
+                data.inputs, parent_data.inputs
+            )
+        )
 
         ticket_id = parent_data.inputs.ticket_id
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
         state = ticket.flow.get_state(state_id)
-        variables = state['variables'].get('outputs', [])
-        data.set_outputs('variables', variables)
+        variables = state["variables"].get("outputs", [])
+        data.set_outputs("variables", variables)
         try:
-            api_instance = RemoteApiInstance.objects.get(id=state['api_instance_id'])
+            api_instance = RemoteApiInstance.objects.get(id=state["api_instance_id"])
         except RemoteApiInstance.DoesNotExist:
-            self.do_exit_plugins(ticket, state_id, FAILED, _('对应的api配置不存在，请查询'), {}, variables, data)
+            self.do_exit_plugins(
+                ticket, state_id, FAILED, _("对应的api配置不存在，请查询"), {}, variables, data
+            )
             return True
         # 更新单据状态
-        ticket.do_before_enter_state(state_id, api_instance_id=api_instance.id, retry=False, by_flow=self.by_flow)
+        ticket.do_before_enter_state(
+            state_id, api_instance_id=api_instance.id, retry=False, by_flow=self.by_flow
+        )
 
-        all_variable_keys = [variable['key'] for variable in variables]
+        all_variable_keys = [variable["key"] for variable in variables]
         existed_variable_keys = TicketGlobalVariable.objects.filter(
             state_id=state_id, ticket_id=ticket_id, key__in=all_variable_keys
         ).values_list("key", flat=True)
@@ -245,14 +306,14 @@ class AutoStateService(ItsmBaseService):
         objs = [
             TicketGlobalVariable(
                 **{
-                    'key': variable.get('key', ''),
-                    'name': variable.get('name', ''),
-                    'state_id': state_id,
-                    'ticket_id': ticket_id,
+                    "key": variable.get("key", ""),
+                    "name": variable.get("name", ""),
+                    "state_id": state_id,
+                    "ticket_id": ticket_id,
                 }
             )
             for variable in variables
-            if variable['key'] not in existed_variable_keys
+            if variable["key"] not in existed_variable_keys
         ]
         if objs:
             TicketGlobalVariable.objects.bulk_create(objs)
@@ -260,31 +321,41 @@ class AutoStateService(ItsmBaseService):
         # 引用变量，变量写入
         api_config = api_instance.get_config()
         remote_api = api_instance.remote_api
-        schema = remote_api.req_params if remote_api.method == 'GET' else remote_api.req_body
+        schema = (
+            remote_api.req_params if remote_api.method == "GET" else remote_api.req_body
+        )
         node_status = ticket.node_status.get(state_id=state_id)
-        schedule_query_params = node_status.query_params if node_status.query_params else api_config['query_params']
-        result, query_params = self.build_query_params(ticket, schedule_query_params, schema, remote_api.method)
+        schedule_query_params = (
+            node_status.query_params
+            if node_status.query_params
+            else api_config["query_params"]
+        )
+        result, query_params = self.build_query_params(
+            ticket, schedule_query_params, schema, remote_api.method
+        )
         node_status.query_params = query_params
         node_status.save()
         if not result:
-            self.do_exit_plugins(ticket, state_id, FAILED, query_params, {}, variables, data)
+            self.do_exit_plugins(
+                ticket, state_id, FAILED, query_params, {}, variables, data
+            )
             return True
 
-        api_config['id'] = api_instance.id
+        api_config["id"] = api_instance.id
         # 设置接口执行用户为提单人
-        api_config['query_params'] = query_params
-        data.set_outputs('api_config', api_config)
-        data.set_outputs('need_poll', api_instance.need_poll)
+        api_config["query_params"] = query_params
+        data.set_outputs("api_config", api_config)
+        data.set_outputs("need_poll", api_instance.need_poll)
 
         if api_instance.need_poll:
             success_conditions = api_instance.succeed_conditions
             end_conditions = api_instance.end_conditions
-            data.set_outputs('success_conditions', success_conditions)
-            data.set_outputs('poll_time', end_conditions.get('poll_time', 1))
-            data.set_outputs('poll_interval', end_conditions.get('poll_interval', 0))
+            data.set_outputs("success_conditions", success_conditions)
+            data.set_outputs("poll_time", end_conditions.get("poll_time", 1))
+            data.set_outputs("poll_interval", end_conditions.get("poll_interval", 0))
         else:
-            data.set_outputs('poll_time', 1)
-            data.set_outputs('poll_interval', 0)
+            data.set_outputs("poll_time", 1)
+            data.set_outputs("poll_interval", 0)
 
         return True
 
@@ -297,36 +368,48 @@ class AutoStateService(ItsmBaseService):
                 # 当任务已经结束的时候，直接返回，不需要处理
                 self.finish_schedule()
                 return False
-            poll_time = data.outputs.get('poll_time', 1)
-            poll_interval = data.outputs.get('poll_interval', 0)
-            api_config = data.outputs.get('api_config')
-            success_conditions = data.outputs.get('success_conditions')
+            poll_time = data.outputs.get("poll_time", 1)
+            poll_interval = data.outputs.get("poll_interval", 0)
+            api_config = data.outputs.get("api_config")
+            success_conditions = data.outputs.get("success_conditions")
             ticket_id = parent_data.inputs.ticket_id
             state_id = data.inputs.state_id
             ticket = Ticket.objects.get(id=ticket_id)
-            variables = data.outputs.get('variables')
+            variables = data.outputs.get("variables")
             operate_info = cache.get("node_retry_{}_{}".format(ticket_id, state_id))
             logger.info("operate_info is {}".format(operate_info))
             # 补充ticket/state/api_instance_id信息
-            api_config.update(ticket_id=ticket_id, state_id=state_id, api_instance_id=api_config.get('id', 0))
+            api_config.update(
+                ticket_id=ticket_id,
+                state_id=state_id,
+                api_instance_id=api_config.get("id", 0),
+            )
 
-            latest_poll_time = data.outputs.get("latest_poll_time", datetime.now() - timedelta(seconds=poll_interval))
+            latest_poll_time = data.outputs.get(
+                "latest_poll_time", datetime.now() - timedelta(seconds=poll_interval)
+            )
 
-            if not (poll_time and latest_poll_time <= datetime.now() - timedelta(seconds=poll_interval)):
+            if not (
+                poll_time
+                and latest_poll_time
+                <= datetime.now() - timedelta(seconds=poll_interval)
+            ):
                 return True
 
             logger.info(
-                '\n-------  AutoStateService schedule  times: %s  latest_poll_time %s state_id %s ticket_id'
-                ' %s----------\n'
-                % (poll_time, latest_poll_time, state_id, ticket_id)
+                "\n-------  AutoStateService schedule  times: %s  latest_poll_time %s state_id %s ticket_id"
+                " %s----------\n" % (poll_time, latest_poll_time, state_id, ticket_id)
             )
 
             # 如果为轮询并且时间超过上一次的轮询时间
             p_result, p_rsp = self.get_rsp_content(
-                ticket, state_id, copy.deepcopy(api_config), success_conditions, operate_info
+                ticket,
+                state_id,
+                copy.deepcopy(api_config),
+                success_conditions,
+                operate_info,
             )
             poll_time -= 1
-
             if p_result:
                 # 返回为True的时候，直接结束
                 self.do_exit_plugins(
@@ -353,7 +436,7 @@ class AutoStateService(ItsmBaseService):
                 )
                 return False
 
-            data.set_outputs('poll_time', poll_time)
+            data.set_outputs("poll_time", poll_time)
             data.set_outputs("latest_poll_time", datetime.now())
             return True
         except Exception as err:
@@ -368,6 +451,6 @@ class AutoStateService(ItsmBaseService):
 
 
 class AutoStateComponent(Component):
-    name = _('自动节点')
-    code = 'itsm_auto'
+    name = _("自动节点")
+    code = "itsm_auto"
     bound_service = AutoStateService

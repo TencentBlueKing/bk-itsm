@@ -24,6 +24,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import logging
+
+from itsm.component.constants import NODE_APPROVE_RESULT
 from itsm.ticket.models import Ticket, Status, TicketGlobalVariable, SignTask
 from pipeline.component_framework.component import Component
 
@@ -42,11 +44,17 @@ class ItsmSignService(ItsmBaseService):
         if super(ItsmSignService, self).execute(data, parent_data):
             return True
 
-        logger.info("itsm_sign execute: data={}, parent_data={}".format(data.inputs, parent_data.inputs))
+        logger.info(
+            "itsm_sign execute: data={}, parent_data={}".format(
+                data.inputs, parent_data.inputs
+            )
+        )
         ticket_id = parent_data.inputs.ticket_id
         state_id = data.inputs.state_id
         ticket = Ticket.objects.get(id=ticket_id)
-        variables, finish_condition, code_key = ticket.do_before_enter_sign_state(state_id, by_flow=self.by_flow)
+        variables, finish_condition, code_key = ticket.do_before_enter_sign_state(
+            state_id, by_flow=self.by_flow
+        )
 
         # Set outputs to data
         data.set_outputs("variables", variables)
@@ -60,7 +68,9 @@ class ItsmSignService(ItsmBaseService):
         for variable in variables:
             key = variable["key"]
 
-            TicketGlobalVariable.objects.filter(ticket_id=ticket_id, key=key).update(value=key_value.get(key, ""))
+            TicketGlobalVariable.objects.filter(ticket_id=ticket_id, key=key).update(
+                value=key_value.get(key, "")
+            )
 
     def schedule(self, data, parent_data, callback_data=None):
         """
@@ -89,12 +99,20 @@ class ItsmSignService(ItsmBaseService):
                 ticket.update_ticket_fields(fields=fields)
                 # Determine if current node is finished
                 key_value = self.get_key_value(node_status, ticket, code_key)
-                if self.task_is_finished(node_status, finish_condition, key_value, code_key):
+                if self.task_is_finished(
+                    node_status, finish_condition, key_value, code_key
+                ):
                     # When node finished set output to data
-                    logger.info("\n-------  itsm_sign add table fields to pipeline data  ----------\n")
+                    logger.info(
+                        "\n-------  itsm_sign add table fields to pipeline data  ----------\n"
+                    )
                     self.update_node_variables(ticket_id, variables, key_value)
                     for field in ticket.get_output_fields(state_id):
-                        logger.info('set_output: "params_{}" = {}'.format(field["key"], field["value"]))
+                        logger.info(
+                            'set_output: "params_{}" = {}'.format(
+                                field["key"], field["value"]
+                            )
+                        )
                         data.set_outputs("params_%s" % field["key"], field["value"])
 
                     self.do_before_exit(ticket, state_id, operator)
@@ -110,11 +128,48 @@ class ItsmSignService(ItsmBaseService):
 
     @staticmethod
     def get_key_value(node_status, ticket, code_key):
+        if node_status.state["type"] == "SIGN":
+            key_value = node_status.get_sign_key_value(ticket, code_key)
+            return key_value
+
+        approver_key_value = node_status.get_appover_key_value(code_key)
+        is_multi = node_status.state["is_multi"]
+        if not is_multi:
+            key_value = {}
+            reject_count = node_status.sign_reject_count()
+            if reject_count > 0:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "false"
+            key_value.update(approver_key_value)
+            return key_value
+
         key_value = node_status.get_sign_key_value(ticket, code_key)
+        reject_count = node_status.sign_reject_count()
+        if NODE_APPROVE_RESULT in code_key:
+            if reject_count > 0:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "false"
+            else:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "true"
+        key_value.update(approver_key_value)
         return key_value
 
     @staticmethod
     def task_is_finished(node_status, finish_condition, key_value, code_key):
+        if node_status.state["type"] == "SIGN":
+            is_finished = node_status.sign_is_finished(finish_condition, key_value)
+            return is_finished
+
+        is_multi = node_status.state["is_multi"]
+        if not is_multi:
+            if key_value.get(code_key[NODE_APPROVE_RESULT]) == "false":
+                return True
+            process_count = node_status.sign_process_count()
+            is_finished = (
+                True if process_count >= int(finish_condition["value"]) else False
+            )
+            if is_finished:
+                key_value[code_key[NODE_APPROVE_RESULT]] = "true"
+            return is_finished
+
         is_finished = node_status.sign_is_finished(finish_condition, key_value)
         return is_finished
 
@@ -123,7 +178,9 @@ class ItsmSignService(ItsmBaseService):
         ticket.do_before_exit_sign_state(state_id)
 
     def final_execute(self, node_status, operator):
-        SignTask.objects.filter(status_id=node_status.id, processor=operator).update(status="FINISHED")
+        SignTask.objects.filter(status_id=node_status.id, processor=operator).update(
+            status="FINISHED"
+        )
 
     def outputs_format(self):
         return []

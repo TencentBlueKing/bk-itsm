@@ -85,44 +85,70 @@ class State(Model):
             ticket_status.key 单据状态key
     """
 
-    workflow = models.ForeignKey("workflow.Workflow", help_text=_("关联流程"), related_name="states",
-                                 on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflow.Workflow",
+        help_text=_("关联流程"),
+        related_name="states",
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(_("状态名"), max_length=LEN_NORMAL)
-    desc = models.CharField(_("状态描述"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True,
-                            blank=True)
-    type = models.CharField(_("状态类型"), max_length=LEN_SHORT, choices=STATE_TYPE_CHOICES,
-                            default=NORMAL_STATE, )
+    desc = models.CharField(
+        _("状态描述"), max_length=LEN_NORMAL, default=EMPTY_STRING, null=True, blank=True
+    )
+    type = models.CharField(
+        _("状态类型"),
+        max_length=LEN_SHORT,
+        choices=STATE_TYPE_CHOICES,
+        default=NORMAL_STATE,
+    )
     tag = models.CharField(_("节点标签"), max_length=LEN_LONG, default=DEFAULT_STRING)
 
     # 干系人，另一种设计：用一对多外键管理
-    processors_type = models.CharField(_("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                       default="OPEN")
-    processors = models.TextField(_("处理人列表"), default=EMPTY_STRING, null=True, blank=True)
-    assignors_type = models.CharField(_("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                      default="EMPTY")
-    assignors = models.TextField(_("派单人列表"), default=EMPTY_STRING, null=True, blank=True)
+    processors_type = models.CharField(
+        _("处理人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="OPEN"
+    )
+    processors = models.TextField(
+        _("处理人列表"), default=EMPTY_STRING, null=True, blank=True
+    )
+    assignors_type = models.CharField(
+        _("派单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    assignors = models.TextField(
+        _("派单人列表"), default=EMPTY_STRING, null=True, blank=True
+    )
     can_deliver = models.BooleanField(_("能否转单"), default=False)
-    delivers_type = models.CharField(_("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                     default="EMPTY")
+    delivers_type = models.CharField(
+        _("转单人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
     delivers = models.TextField(_("转单人列表"), default=EMPTY_STRING, null=True, blank=True)
 
     distribute_type = models.CharField(
-        _("分配方式"), max_length=LEN_SHORT, choices=DISTRIBUTE_TYPE_CHOICES, default="PROCESS",
+        _("分配方式"),
+        max_length=LEN_SHORT,
+        choices=DISTRIBUTE_TYPE_CHOICES,
+        default="PROCESS",
     )
 
     notify = models.ManyToManyField("workflow.Notify", help_text=_("可关联多种通知方式"))
-    notify_rule = models.CharField(_("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES,
-                                   default="NONE")
+    notify_rule = models.CharField(
+        _("通知规则"), max_length=LEN_SHORT, choices=NOTIFY_RULE_CHOICES, default="NONE"
+    )
     notify_freq = models.IntegerField(_("重试间隔(s)"), default=EMPTY_INT)
 
     # [1,3,2,4,5]
-    fields = jsonfield.JSONField(_("表单字段(ID列表，按顺序排列)"), default=EMPTY_LIST, null=True, blank=True)
-    read_only_fields = jsonfield.JSONField(_("只读表单字段(ID列表，按顺序排列)"), default=EMPTY_LIST, null=True,
-                                           blank=True)
+    fields = jsonfield.JSONField(
+        _("表单字段(ID列表，按顺序排列)"), default=EMPTY_LIST, null=True, blank=True
+    )
+    read_only_fields = jsonfield.JSONField(
+        _("只读表单字段(ID列表，按顺序排列)"), default=EMPTY_LIST, null=True, blank=True
+    )
 
     is_draft = models.BooleanField(_("是否为草稿"), default=True)
     is_terminable = models.BooleanField(_("是否可以终止"), default=False)
     is_builtin = models.BooleanField(_("是否为系统内置"), default=False)
+
+    # 是否允许在单据处理人为空时跳过
+    is_allow_skip = models.BooleanField(_("是否允许在单据处理人为空时跳过"), default=False)
 
     # 会签及任务控制
     is_sequential = models.BooleanField(_("是否是串行任务"), default=False)
@@ -130,15 +156,20 @@ class State(Model):
 
     variables = jsonfield.JSONField(_("变量"), default=EMPTY_VARIABLE, null=True)
     axis = jsonfield.JSONCharField(_("节点的坐标轴"), max_length=128, default=EMPTY_DICT)
-    api_instance_id = models.IntegerField(_("api实例主键"), default=0, null=True, blank=True)
-    extras = jsonfield.JSONCharField(_("额外信息"), max_length=LEN_XXX_LONG, default=EMPTY_DICT,
-                                     null=True, blank=True)
+    api_instance_id = models.IntegerField(
+        _("api实例主键"), default=0, null=True, blank=True
+    )
+    extras = jsonfield.JSONCharField(
+        _("额外信息"), max_length=LEN_XXX_LONG, default=EMPTY_DICT, null=True, blank=True
+    )
 
     # deprecated fields
-    followers_type = models.CharField(_("关注人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES,
-                                      default="EMPTY")
-    followers = models.CharField(_("关注人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True,
-                                 blank=True)
+    followers_type = models.CharField(
+        _("关注人类型"), max_length=LEN_SHORT, choices=PROCESSOR_CHOICES, default="EMPTY"
+    )
+    followers = models.CharField(
+        _("关注人列表"), max_length=LEN_LONG, default=EMPTY_STRING, null=True, blank=True
+    )
 
     label = models.CharField(_("标签记录"), max_length=LEN_LONG, default="EMPTY")
 
@@ -241,9 +272,15 @@ class State(Model):
         def search_forward_routers(state):
             # 找出所有的路由，打回类的直接忽略
             sub_routers = []
-            for t in Transition.objects.select_related("from_state").filter(to_state_id=state.id):
+            for t in Transition.objects.select_related("from_state").filter(
+                to_state_id=state.id
+            ):
                 sub_router = []
-                if t.from_state in searched_states and state in searched_states and not need_loop:
+                if (
+                    t.from_state in searched_states
+                    and state in searched_states
+                    and not need_loop
+                ):
                     # 起始点都在的线条，表示存在贿赂
                     post_states.append(state)
                     break
@@ -288,10 +325,13 @@ class State(Model):
             filter_type.extend([TASK_STATE, TASK_SOPS_STATE])
         allow_create_task_states = self.workflow.states.filter(type__in=filter_type)
         post_states = allow_create_task_states.exclude(id__in=exclude_states).exclude(
-            is_builtin=True)
+            is_builtin=True
+        )
         return post_states
 
-    def get_valid_inputs(self, exclude_self=False, resource_type="both", scope="transition"):
+    def get_valid_inputs(
+        self, exclude_self=False, resource_type="both", scope="transition"
+    ):
         """
         获取有效的输入参数
         :param exclude_self: 是否排除当前节点的字段变量
@@ -315,30 +355,106 @@ class State(Model):
         valid_inputs = []
         if resource_type in ["both", "field"]:
             # 会签节点的字段属于单个任务, 不允许暴露到线条上配置
-            scope_exclude_state_map = {"transition": [SIGN_STATE, APPROVAL_STATE], "state": []}
+            scope_exclude_state_map = {
+                "transition": [SIGN_STATE, APPROVAL_STATE],
+                "state": [],
+            }
             valid_fields = [
-                state.fields for state in valid_states if
-                state.type not in scope_exclude_state_map.get(scope, [])
+                state.fields
+                for state in valid_states
+                if state.type not in scope_exclude_state_map.get(scope, [])
             ]
             valid_fields = set(list(chain(*valid_fields)))
 
             field_queryset = Field.objects.filter(
                 id__in=valid_fields, type__in=SUPPORTED_TYPE, workflow=self.workflow
             ).exclude(source="TABLE")
-            valid_inputs.extend(FieldVariablesSerializer(field_queryset, many=True).data)
             valid_inputs.extend(
-                FieldVariablesSerializer(self.workflow.public_table_fields, many=True).data)
+                FieldVariablesSerializer(field_queryset, many=True).data
+            )
+            valid_inputs.extend(
+                FieldVariablesSerializer(
+                    self.workflow.public_table_fields, many=True
+                ).data
+            )
 
         if resource_type in ["both", "global"]:
             valid_state_ids = [s.id for s in valid_states]
-            global_variables_queryset = GlobalVariable.objects.filter(state_id__in=valid_state_ids,
-                                                                      is_valid=True)
-            valid_inputs.extend(GlobalVariableSerializer(global_variables_queryset, many=True).data)
+            global_variables_queryset = GlobalVariable.objects.filter(
+                state_id__in=valid_state_ids, is_valid=True
+            )
+            valid_inputs.extend(
+                GlobalVariableSerializer(global_variables_queryset, many=True).data
+            )
 
         return valid_inputs
 
-    def add_variables(self, key, show_type, source="field", in_or_out="outputs", default=None,
-                      **kwargs):
+    def get_valid_inputs_by_group(
+        self, exclude_self=False, resource_type="both", scope="transition"
+    ):
+        from itsm.workflow.serializers import (
+            GlobalVariableSerializer,
+            FieldVariablesSerializer,
+        )
+
+        exclude_states = [self.id] if exclude_self else []
+        valid_states = self.get_valid_inputs_states(exclude_states)
+
+        # 节点未设置任何连线时, 获取valid_states为空列表, 所以需要把self添加进去
+        if not exclude_self and self not in valid_states:
+            valid_states.append(self)
+
+        data = {}
+        if resource_type in ["both", "field"]:
+            # 会签节点的字段属于单个任务, 不允许暴露到线条上配置
+            scope_exclude_state_map = {
+                "transition": [SIGN_STATE, APPROVAL_STATE],
+                "state": [],
+            }
+            valid_fields = [
+                state.fields
+                for state in valid_states
+                if state.type not in scope_exclude_state_map.get(scope, [])
+            ]
+            valid_fields = set(list(chain(*valid_fields)))
+
+            field_queryset = Field.objects.filter(
+                id__in=valid_fields, type__in=SUPPORTED_TYPE, workflow=self.workflow
+            ).exclude(source="TABLE")
+
+            for field in field_queryset:
+                state_name = field.state.name if field.state.name else _("当前节点")
+                filed_data = FieldVariablesSerializer(field).data
+                filed_data["name"] = field.name
+                data.setdefault(state_name, []).append(filed_data)
+
+            for public_filed in self.workflow.public_table_fields:
+                public_filed_data = FieldVariablesSerializer(public_filed).data
+                public_filed_data["name"] = public_filed.name
+                data.setdefault("基础模型", []).append(public_filed_data)
+
+        if resource_type in ["both", "global"]:
+            valid_state_ids = [s.id for s in valid_states]
+            global_variables_queryset = GlobalVariable.objects.filter(
+                state_id__in=valid_state_ids, is_valid=True
+            )
+            for global_variable in global_variables_queryset:
+                global_variable_filed_data = GlobalVariableSerializer(
+                    global_variable
+                ).data
+                global_variable_filed_data["name"] = global_variable.name
+                data.setdefault("全局变量", []).append(global_variable_filed_data)
+        return data
+
+    def add_variables(
+        self,
+        key,
+        show_type,
+        source="field",
+        in_or_out="outputs",
+        default=None,
+        **kwargs
+    ):
         """
         添加变量到节点
             in_or_out: inputs/outputs，
@@ -350,7 +466,10 @@ class State(Model):
         if key in [v["key"] for v in new_vars]:
             return False
 
-        var = dict({"source": source, "state": self.id, "type": show_type, "key": key}, **kwargs)
+        var = dict(
+            {"source": source, "state": self.id, "type": show_type, "key": key},
+            **kwargs
+        )
 
         # 设置默认值，仅用于流程迁移时为执行过的节点保存变量值
         if default is not None:
@@ -367,9 +486,13 @@ class State(Model):
         with transaction.atomic():
             for field in fields:
                 field.pop("id", None)
-                basic_info = dict(workflow_id=self.workflow.id, source=TABLE, key=field["key"])
+                basic_info = dict(
+                    workflow_id=self.workflow.id, source=TABLE, key=field["key"]
+                )
                 field.update(basic_info)
-                obj, created = self.workflow.fields.get_or_create(key=field["key"], state=self)
+                obj, created = self.workflow.fields.get_or_create(
+                    key=field["key"], state=self
+                )
                 if not created:
                     obj.is_readonly = field["is_readonly"]
                 else:
@@ -391,15 +514,28 @@ class State(Model):
 
         version_name = create_version_number()
 
+        def build_outputs(fields):
+            outputs = []
+            for f in fields:
+                outputs.append(
+                    {"key": f.key, "type": f.type, "source": "field", "state": self.id}
+                )
+            data = {"inputs": [], "outputs": outputs}
+            return data
+
         old_fields = self.fields
         field_id_map = {}
         field_key_map = {}
+        fields_obj_list = []
         for field in Field.objects.filter(id__in=old_fields):
             # key 长度 校验128，数据库225
             old_id = field.id
             old_field_key = field.key
-            new_field_key = get_random_key("clone_{}_{}".format(old_field_key, version_name))
+            new_field_key = get_random_key(
+                "clone_{}_{}".format(old_field_key, version_name)
+            )
             obj = field.clone(new_field_key)
+            fields_obj_list.append(obj)
             field_id_map[old_id] = obj.id
             field_key_map[old_field_key] = new_field_key
         new_fields = [field_id_map.get(f, f) for f in old_fields]
@@ -407,6 +543,7 @@ class State(Model):
         self.is_draft = True
         self.is_builtin = False
         self.axis.update(x=self.axis["x"] + 250)
+        self.variables = build_outputs(fields_obj_list)
         self.save()
         Field.objects.filter(id__in=new_fields).update(state_id=self.id)
         self.update_field_show_conditions(new_fields, field_key_map)

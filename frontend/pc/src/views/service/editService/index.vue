@@ -25,8 +25,18 @@
         <nav-title :show-icon="true"
             :title-name="serviceInfo.name || $t(`m.serviceConfig['新建服务']`)"
             @goBack="onBackIconClick">
+            <div slot="step">
+                <bk-steps ext-cls="steps-icon"
+                    data-test-id="service_steps_serviceEditStep"
+                    :controllable="true"
+                    line-type="solid"
+                    :cur-step="currStep"
+                    :steps="stepList"
+                    @step-changed="onStepChange">
+                </bk-steps>
+            </div>
         </nav-title>
-        <div class="steps-container">
+        <!-- <div class="steps-container">
             <bk-steps ext-cls="steps-icon"
                 data-test-id="service_steps_serviceEditStep"
                 :controllable="true"
@@ -35,8 +45,8 @@
                 :steps="stepList"
                 @step-changed="onStepChange">
             </bk-steps>
-        </div>
-        <div class="steps-content" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
+        </div> -->
+        <div :class="['steps-content', { 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
             <template v-if="!serviceLoading && !flowInfoLoading">
                 <service-form-step v-if="currStep === 1"
                     ref="serviceFormStep"
@@ -60,7 +70,7 @@
                 </service-setting-step>
             </template>
         </div>
-        <div v-show="!isShowNodeConfig" class="submit-footer-bar">
+        <div v-show="!isShowNodeConfig || currStep !== 2" class="submit-footer-bar">
             <bk-button
                 data-test-id="service_button_prevStep"
                 ext-cls="button-item"
@@ -70,7 +80,7 @@
                 {{ prevStepBtnName }}
             </bk-button>
             <bk-button
-                data-test-id="service_button_nextStep"
+                data-test-id="service_button_nextStepAndSave"
                 ext-cls="button-item"
                 theme="primary"
                 :disabled="!serviceId && serviceId !== 0"
@@ -200,7 +210,8 @@
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
+                        project_id: this.$store.state.project.id,
+                        catalog_id: this.$route.query.catalog_id
                     }
                 })
             },
@@ -227,7 +238,8 @@
                     this.$router.push({
                         name: 'projectServiceList',
                         query: {
-                            project_id: this.$store.state.project.id
+                            project_id: this.$store.state.project.id,
+                            ...this.$route.query
                         }
                     })
                 } else {
@@ -259,6 +271,9 @@
                     // next
                     if (this.step !== 'setting') {
                         const nextStep = this.step === 'basic' ? 'process' : 'setting'
+                        if (this.step === 'basic' && !this.serviceInfo.source) {
+                            this.$refs[refName].updateServiceSource('custom')
+                        }
                         this.$router.push({
                             name: 'projectServiceEdit',
                             params: {
@@ -277,7 +292,8 @@
                         this.$router.push({
                             name: 'projectServiceList',
                             query: {
-                                project_id: this.$store.state.project.id
+                                project_id: this.$store.state.project.id,
+                                catalog_id: this.$route.query.catalog_id
                             }
                         })
                     }
@@ -308,9 +324,12 @@
     }
 }
 .steps-content {
-    height: calc(100vh - 225px);
+    height: calc(100vh - 164px);
     overflow: auto;
     @include scroller;
+}
+.steps-content-height {
+    height: calc(100vh - 165px);
 }
 .submit-footer-bar {
     position: relative;

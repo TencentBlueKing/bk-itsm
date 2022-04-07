@@ -53,6 +53,7 @@ class SlaTaskSerializer(serializers.ModelSerializer):
             "cost_time",
             "start_node_name",
             "end_node_name",
+            "reply_deadline",
         )
 
     def to_representation(self, instance):

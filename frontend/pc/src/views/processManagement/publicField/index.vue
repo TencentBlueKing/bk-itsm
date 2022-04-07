@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="projectId && !isDataLoading && pagination.count === 0"
+                v-if="projectId && !isDataLoading && pagination.count === 0 && searchToggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -37,9 +37,9 @@
                 <template slot="btns">
                     <bk-button :theme="'primary'"
                         data-test-id="field_button_createField"
-                        v-cursor="{ active: !hasPermission(createFieldPerm) }"
+                        v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
                         :class="{
-                            'btn-permission-disable': !hasPermission(createFieldPerm)
+                            'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
                         }"
                         @click="addField">
                         {{ $t('m["立即创建"]') }}
@@ -190,9 +190,12 @@
             <bk-sideslider
                 :is-show.sync="sliderInfo.show"
                 :title="sliderInfo.title"
+                :quick-close="true"
+                :before-close="closeSideslider"
                 :width="sliderInfo.width">
                 <div class="p20" slot="content" v-if="sliderInfo.show">
                     <add-field
+                        ref="addField"
                         :change-info="changeInfo"
                         :table-list="listInfo"
                         :is-edit-public="isEditPublic"
@@ -283,6 +286,7 @@
                         list: []
                     }
                 ],
+                searchToggle: false,
                 listInfo: [],
                 // 新增
                 workflow: 0,
@@ -390,6 +394,7 @@
                 this.isDataLoading = true
                 this.$store.dispatch('publicField/get_template_fields', params).then((res) => {
                     this.dataList = res.data.items
+                    this.searchToggle = res.data.items.length !== 0
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
@@ -450,14 +455,14 @@
                                 name: projectInfo.name
                             }],
                             field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
                     } else {
                         resourceData = {
                             public_field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
@@ -548,14 +553,14 @@
                                 name: projectInfo.name
                             }],
                             field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
                     } else {
                         resourceData = {
                             public_field: [{
-                                id: item.key,
+                                id: item.id,
                                 name: item.name
                             }]
                         }
@@ -567,6 +572,19 @@
                 this.changeInfo.is_tips = item.is_tips || false
                 this.sliderInfo.title = this.$t(`m.treeinfo["编辑字段"]`)
                 this.sliderInfo.show = true
+            },
+            // 关闭前验证字段表单
+            closeSideslider () {
+                this.$bkInfo({
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        this.sliderInfo.show = false
+                    },
+                    cancelFn: () => {
+                        this.sliderInfo.show = true
+                    }
+                })
             }
         }
     }

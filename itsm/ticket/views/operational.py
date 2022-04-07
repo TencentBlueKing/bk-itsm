@@ -60,6 +60,7 @@ from itsm.ticket.serializers import (
     BaseFilterSerializer,
     ServiceStatisticsFilterSerializer,
 )
+from itsm.ticket.handlers import ProjectOperationalData
 from itsm.service.models import Service, ServiceCategory
 from itsm.workflow.models import Workflow
 from itsm.workflow.serializers import OperationalDataWorkflowSerializer
@@ -88,14 +89,16 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def overview_count(self, request, *args, **kwargs):
-        service_id = request.query_params.get("service_id")
+        service_id = request.query_params.get("service_id", None)
+        scope = request.query_params.get("scope", None)
+        project_key = request.query_params.get("project_key", None)
+        project_analysis = ProjectOperationalData(service_id, scope, project_key)
         return Response(
             {
-                "count": Ticket.get_count(service_id),
-                "service_count": 1 if service_id else Service.get_count(),
-                "biz_count": Ticket.get_biz_count(service_id),
-                "user_count": Ticket.get_ticket_user_count(
-                    service_id) if service_id else user_count(),
+                "count": project_analysis.get_ticket_count(),
+                "service_count": 1 if service_id else project_analysis.get_service_count(),
+                "biz_count": project_analysis.get_biz_count(),
+                "user_count": project_analysis.get_ticket_user_count() if service_id else user_count(project_key=project_key),
             }
         )
 
@@ -113,35 +116,39 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         last_week_start = zero_now - timedelta(days=zero_now.weekday() + 7)
         last_week_end = now - timedelta(days=7)
 
-        service_id = request.query_params.get("service_id")
+        service_id = request.query_params.get("service_id", None)
+        project_key = request.query_params.get("project_key", None)
         this_scope = (this_week_start, this_week_end)
         last_scope = (last_week_start, last_week_end)
 
-        this_week_ticket_count = Ticket.get_count(service_id, this_scope)
-        last_week_ticket_count = Ticket.get_count(service_id, last_scope)
+        this_week_project_analysis = ProjectOperationalData(service_id, this_scope, project_key)
+        last_week_project_analysis = ProjectOperationalData(service_id, last_scope, project_key)
+
+        this_week_ticket_count = this_week_project_analysis.get_ticket_count()
+        last_week_ticket_count = last_week_project_analysis.get_ticket_count()
         ticket_ratio = round(
             (this_week_ticket_count - last_week_ticket_count) / (last_week_ticket_count or 1) * 100,
             2)
 
-        this_week_service_count = 1 if service_id else Service.get_count(this_scope)
-        last_week_service_count = 1 if service_id else Service.get_count(last_scope)
+        this_week_service_count = 1 if service_id else this_week_project_analysis.get_service_count()
+        last_week_service_count = 1 if service_id else last_week_project_analysis.get_service_count()
         service_ratio = round(
             (this_week_service_count - last_week_service_count) / (
                     last_week_service_count or 1) * 100, 2
         )
 
-        this_week_biz_count = Ticket.get_biz_count(service_id, this_scope)
-        last_week_biz_count = Ticket.get_biz_count(service_id, last_scope)
+        this_week_biz_count = this_week_project_analysis.get_biz_count()
+        last_week_biz_count = last_week_project_analysis.get_biz_count()
         biz_ratio = round(
             (this_week_biz_count - last_week_biz_count) / (last_week_biz_count or 1) * 100, 2)
 
         this_week_user_count = (
-            Ticket.get_ticket_user_count(service_id, this_scope) if service_id else user_count(
-                this_week=this_scope)
+            this_week_project_analysis.get_ticket_user_count() if service_id else user_count(
+                this_week=this_scope, project_key=project_key)
         )
         last_week_user_count = (
-            Ticket.get_ticket_user_count(service_id, last_scope) if service_id else user_count(
-                last_week=last_scope)
+            last_week_project_analysis.get_ticket_user_count() if service_id else user_count(
+                last_week=last_scope, project_key=project_key)
         )
         user_ratio = round(
             (this_week_user_count - last_week_user_count) / (last_week_user_count or 1) * 100, 2)
@@ -179,12 +186,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         # "group by service_id order by {} {} limit 0,10;".format(kwargs["create_at__gte"],
         #                                                         kwargs["create_at__lte"],
         #                                                         "count", "desc"))
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
 
         services = Service.objects.filter()
         service_name = kwargs.pop("service_name", "")
+        if project_key:
+            services = services.filter(project_key=project_key)
         if service_name:
             services = services.filter(name__icontains=service_name)
         services = services.values("id", "name", "key")
@@ -227,6 +237,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def biz_statistics(self, request):
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
@@ -235,6 +246,8 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
         order = kwargs.pop("order_by")
 
         queryset = self.queryset.filter(**kwargs).filter(bk_biz_id__gt=-1)
+        if project_key:
+            queryset = queryset.filter(project_key=project_key)
         if biz_id:
             queryset = queryset.filter(bk_biz_id__in=biz_id.split(","))
 
@@ -258,6 +271,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def category_statistics(self, request):
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
@@ -267,6 +281,8 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
         ticket_info = self.queryset.filter(**kwargs).values("service_type").annotate(
             count=Count("id")).order_by(order)
+        if project_key:
+            ticket_info = ticket_info.filter(project_key=project_key)
         category_info = [
             {"service_type": category_dict[ticket["service_type"]], "count": ticket["count"]} for
             ticket in ticket_info
@@ -276,6 +292,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def status_statistics(self, request):
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = BaseFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
@@ -284,6 +301,8 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             self.queryset.filter(**kwargs).values("current_status").annotate(
                 count=Count("id")).order_by("-count")
         )
+        if project_key:
+            ticket_info = ticket_info.filter(project_key=project_key)
         category_info = {}
         for ticket in ticket_info:
             if ticket["current_status"] in not_running_status:
@@ -299,11 +318,14 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def resource_count_statistics(self, request):
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = StatisticsFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
         time_delta = kwargs.pop("timedelta")
         resource_type = kwargs.pop("resource_type")
+        if project_key:
+            kwargs.update({"project_key": project_key})
         statistics = {
             "creator": Ticket.get_creator_statistics,
             "ticket": Ticket.get_ticket_statistics,
@@ -315,12 +337,15 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=["get"])
     def service_count_statistics(self, request):
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = ServiceStatisticsFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
 
         time_delta = kwargs.pop("timedelta")
         resource_type = kwargs.pop("resource_type")
+        if project_key:
+            kwargs.update({"project_query": project_key})
 
         statistics = {
             "ticket": Ticket.get_ticket_statistics,
@@ -333,6 +358,7 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
     def top_creator_statistics(self, request):
         # select username,first_level_name,family from ticket_ticket where id in
         # (select max( id ) from ticket_ticket group by username)
+        project_key = request.query_params.get("project_key", None)
         filter_serializer = ServiceStatisticsFilterSerializer(data=request.query_params)
         filter_serializer.is_valid(raise_exception=True)
         kwargs = filter_serializer.validated_data
@@ -356,9 +382,11 @@ class OperationalDataViewSet(component_viewsets.ReadOnlyModelViewSet):
             else:
                 user_info[user.username].append(
                     {"name": user.first_level_name, "family": user.family})
+                
+        project_query = Q(project_key=project_key) if project_key else Q()
 
         ticket_info = (
-            self.queryset.filter(**kwargs).values("creator").annotate(count=Count("id")).order_by(
+            self.queryset.filter(project_query).filter(**kwargs).values("creator").annotate(count=Count("id")).order_by(
                 "-count")[:10]
         )
         top_creator = [

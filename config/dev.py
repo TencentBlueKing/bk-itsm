@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import importlib
 
 from config import RUN_VER, BK_PAAS_HOST, OPEN_VER  # noqa
 
@@ -37,7 +38,7 @@ RUN_MODE = "DEVELOP"
 # APP本地静态资源目录
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "static_root/")
-BK_STATIC_URL = '/static'
+BK_STATIC_URL = "/static"
 
 # APP静态资源目录url
 # REMOTE_STATIC_URL = '%sremote/' % STATIC_URL
@@ -65,10 +66,20 @@ MEDIA_URL = "%smedia/" % SITE_URL
 # ==============================================================================
 # 加载环境差异化配置
 # ==============================================================================
-ver_settings = importlib.import_module('adapter.config.sites.%s.ver_settings' % RUN_VER)
+ver_settings = importlib.import_module("adapter.config.sites.%s.ver_settings" % RUN_VER)
 for _setting in dir(ver_settings):
     if _setting.upper() == _setting:
         locals()[_setting] = getattr(ver_settings, _setting)
+
+# 针对 paas_v3 容器化铺垫
+ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
+if ENGINE_REGION == "default":
+    default_settings = importlib.import_module(
+        "adapter.config.sites.%s.ver_settings" % "v3"
+    )
+    for _setting in dir(default_settings):
+        if _setting.upper() == _setting:
+            locals()[_setting] = getattr(default_settings, _setting)
 
 # 多人开发时，无法共享的本地配置可以放到新建的 local_settings.py 文件中
 # 并且把 local_settings.py 加入版本管理忽略文件中

@@ -32,7 +32,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.log import logger
-from itsm.component.constants import FOLLOW_OPERATE, SERVICE_CATEGORY
+from itsm.component.constants import FOLLOW_OPERATE
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.exceptions import ComponentCallError
 from itsm.component.notify import EmailNotifier
@@ -45,7 +45,10 @@ from itsm.ticket.models import (
     TicketStateDraft,
     TicketTemplate,
 )
-from itsm.ticket.permissions import CommentPermissionValidate, FollowersNotifyLogPermissionValidate
+from itsm.ticket.permissions import (
+    CommentPermissionValidate,
+    FollowersNotifyLogPermissionValidate,
+)
 from itsm.ticket.serializers import (
     CommentInviteSerializer,
     CommentSerializer,
@@ -67,7 +70,7 @@ class TemplateViewSet(component_viewsets.NormalModelViewSet):
         "name": ["exact"],
         "service": ["exact"],
     }
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
     def get_queryset(self):
         """返回个人模板"""
@@ -85,7 +88,7 @@ class StateDraftViewSet(component_viewsets.NormalModelViewSet):
         "ticket_id": ["exact"],
         "state_id": ["exact"],
     }
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
     def get_queryset(self):
         """返回个人草稿"""
@@ -104,9 +107,9 @@ class CommentViewSet(component_viewsets.NormalModelViewSet):
         "ticket": ["exact"],
         "stars": ["exact"],
     }
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_comment(self, request):
         """短信链接获取工单评论信息"""
         code = request.GET.get("code", "")
@@ -123,7 +126,7 @@ class CommentViewSet(component_viewsets.NormalModelViewSet):
         }
         return Response(data)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def post_comment(self, request):
         data = request.data
 
@@ -150,59 +153,71 @@ class CommentInviteViewSet(component_viewsets.NormalModelViewSet):
         "number": ["exact"],
         "code": ["exact"],
     }
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
 
 class FollowersNotifyLogViewSet(component_viewsets.NormalModelViewSet):
     """单据通知视图"""
 
     pagination_class = None
-    queryset = TicketFollowerNotifyLog.objects.filter(is_deleted=False, is_sys_sended=False)
+    queryset = TicketFollowerNotifyLog.objects.filter(
+        is_deleted=False, is_sys_sended=False
+    )
     serializer_class = FollowerNotifyLogSerializer
     permission_classes = (FollowersNotifyLogPermissionValidate,)
 
     filter_fields = {"ticket_id": ["exact"]}
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def notify(self, request, *args, **kwargs):
         """关注人邮件通知"""
 
         data = request.data
         ticket, receivers = notify_log_validate(data, request.user.username)
         ticket_token = TicketFollowerNotifyLog.get_unique_token()
-        data.update({'ticket_token': ticket_token, 'creator': request.user.username})
+        data.update({"ticket_token": ticket_token, "creator": request.user.username})
         notify_log = TicketFollowerNotifyLog.objects.create(**data)
 
         # 构建信息
         context = ticket.get_notify_context()
-        context.update({'message': notify_log.message, 'action': ACTION_CHOICES_DICT.get(FOLLOW_OPERATE, _('待处理'))})
-
-        follow_link = '{site_url}#/ticket/{ticket_id}/?activeNname=all&router={service}&token={token}'.format(
-            site_url=settings.TICKET_NOTIFY_HOST,
-            service=ticket.service_type,
-            ticket_id=ticket.id,
-            title=SERVICE_CATEGORY.get(ticket.service_type, ''),
-            token=ticket_token,
+        context.update(
+            {
+                "message": notify_log.message,
+                "action": ACTION_CHOICES_DICT.get(FOLLOW_OPERATE, _("待处理")),
+            }
         )
-        context['ticket_url'] = follow_link
 
-        follow_notify_template = CustomNotice.objects.get(action=FOLLOW_OPERATE, notify_type='EMAIL')
+        follow_link = "{site_url}#/ticket/detail?id={ticket_id}".format(
+            site_url=settings.FRONTEND_URL, ticket_id=ticket.id
+        )
+        context["ticket_url"] = follow_link
+        try:
+            follow_notify_template = CustomNotice.objects.get(
+                project_key=ticket.project_key,
+                action=FOLLOW_OPERATE,
+                notify_type="EMAIL",
+            )
+        except CustomNotice.DoesNotExist:
+            follow_notify_template = CustomNotice.objects.get(
+                action=FOLLOW_OPERATE, notify_type="EMAIL", project_key="public    "
+            )
+
         message = Template(follow_notify_template.content_template).render(**context)
         title = Template(follow_notify_template.title_template).render(**context)
 
-        error_message = ''
+        error_message = ""
         try:
             notify = EmailNotifier(title=title, receivers=receivers, message=message)
             notify.send()
         except ComponentCallError as error:
-            logger.warning('send notify failed, error: %s' % str(error))
+            logger.warning("send notify failed, error: %s" % str(error))
             notify_log.delete()
-            error_message = str(error).split('(')[0]
+            error_message = str(error).split("(")[0]
         except Exception as e:
-            logger.error('send email exception: %s' % e)
+            logger.error("send email exception: %s" % e)
             notify_log.delete()
-            error_message = _('组件调用异常：发送失败，请联系管理员')
+            error_message = _("组件调用异常：发送失败，请联系管理员")
 
         if error_message:
             raise serializers.ValidationError(error_message)

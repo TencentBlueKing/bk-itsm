@@ -298,7 +298,7 @@
                     name: 'CreateTicket',
                     query: {
                         service_id: id,
-                        project_id: service.project_key,
+                        // project_id: service.project_key, // 首页提单不需要项目ID
                         from: 'Home'
                     }
                 })

@@ -29,6 +29,7 @@
         <div class="first-level">
             <!-- 一级处理人 -->
             <bk-select :ext-cls="'bk-form-width mr10'"
+                data-test-id="dealPerson-select-firstHandler"
                 v-model="formData.levelOne"
                 :loading="initLoaing"
                 :clearable="false"
@@ -36,6 +37,7 @@
                 :font-size="'medium'"
                 @selected="onFirstLevelChange">
                 <bk-option v-for="option in firstLevelList"
+                    :data-test-id="`dealPerson-select-first-${option.id}`"
                     :key="option.id"
                     :id="option.id"
                     :name="option.name">
@@ -43,16 +45,17 @@
             </bk-select>
         </div>
         <!-- 二级处理人 -->
-        <div class="second-level">
+        <div class="second-level" v-if="['PERSON', 'GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE', 'ORGANIZATION'].includes(formData.levelOne)">
             <!-- 个人 -->
-            <template v-if="formData.levelOne === 'PERSON'">
-                <member-select :ext-cls="'bk-form-width'"
+            <template v-if="formData.levelOne === 'PERSON' && Array.isArray(formData.levelSecond)">
+                <member-select data-test-id="dealPerson-select-personSecondHandler" :ext-cls="'bk-form-width'"
                     v-model="formData.levelSecond" :specify-id-list="targetSpecifyIdList">
                 </member-select>
             </template>
             <!-- 通用角色表|CMDB|权限中心|第三方系统|指定节点处理人上级|引用变量 -->
             <template v-else-if="['GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE'].includes(formData.levelOne)">
                 <bk-select :ext-cls="'bk-form-width'"
+                    data-test-id="dealPerson-select-secondHandler"
                     v-model="formData.levelSecond"
                     :loading="isLoading"
                     show-select-all
@@ -60,6 +63,7 @@
                     searchable
                     :font-size="'medium'">
                     <bk-option v-for="option in secondLevelList"
+                        :data-test-id="`dealPerson-select-second-${option.id}`"
                         :key="option.id"
                         :id="option.id"
                         :name="option.name">
@@ -71,6 +75,7 @@
                 <select-tree
                     v-model="formData.levelSecond"
                     :list="organizationList"
+                    :organization-loading="organizationLoading"
                     ext-cls="bk-form-width">
                 </select-tree>
             </template>
@@ -135,6 +140,7 @@
                 showError: false,
                 initLoaing: false,
                 isLoading: false,
+                organizationLoading: false,
                 formData: {
                     levelOne: '',
                     levelSecond: []
@@ -261,6 +267,7 @@
             },
             onFirstLevelChange (type) {
                 // 清空二级数据
+                this.$set(this.formData, 'levelSecond', [])
                 this.setDeaultSecondLeve(type)
                 this.getSecondLevelList(type)
             },
@@ -316,11 +323,14 @@
             },
             // 组织架构
             getOrganization () {
+                this.organizationLoading = true
                 this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
                     // 操作角色组织架构
                     this.organizationList = res.data
                 }).catch(res => {
                     errorHandler(res, this)
+                }).finally(() => {
+                    this.organizationLoading = false
                 })
             },
             // 获取变量列表
@@ -404,6 +414,8 @@
     .first-level, .second-level {
         float: left;
         height: 32px;
+        margin-top: 10px;
+        
     }
     .person-vertical {
         .first-level, .second-level {
@@ -427,11 +439,13 @@
         }
         .first-level {
             margin-right: 8px;
+           
         }
         .first-level, .second-level {
             flex: 1;
             .bk-form-width {
                 width: 100%;
+                margin-right: 24px;
             }
         }
     }

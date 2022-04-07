@@ -155,10 +155,13 @@
         <!-- 新建母子单 -->
         <bk-sideslider
             :is-show.sync="isShowAddInheritTicket"
+            :quick-close="true"
             :title="$t(`m.newCommon['新建母子单']`)"
+            :before-close="closeSideslider"
             :width="750">
             <div class="p20" slot="content">
                 <inherit-ticket-add-dialog
+                    ref="addInheritTicket"
                     v-if="isShowAddInheritTicket"
                     :template-info="inheritStateInfo"
                     :ticket-info="ticketInfo"
@@ -233,6 +236,19 @@
             await this.getHistoryList()
         },
         methods: {
+            closeSideslider () {
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        this.isShowAddInheritTicket = false
+                    },
+                    cancelFn: () => {
+                        this.isShowAddInheritTicket = true
+                    }
+                })
+            },
             showHistory () {
                 if (!this.historyList.length) {
                     return

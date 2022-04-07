@@ -78,6 +78,7 @@
         <bk-sideslider
             :is-show.sync="viewTaskInfo.show"
             :width="800"
+            :quick-close="true"
             :title="$t(`m.task['查看任务']`)">
             <div slot="content" class="view-task-sideslider">
                 <bk-form :ext-cls="'mb10'"

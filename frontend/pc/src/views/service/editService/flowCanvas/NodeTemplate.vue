@@ -28,19 +28,23 @@
         @mousemove="moveFn"
         @mouseup="onNodeClick(node, $event)"
         @contextmenu.prevent="rightClickNode(node, $event)"
-        @click="clickNode(node, $event)"
         @mouseout="hoverNode(node)"
-        v-bk-clickoutside="closeNode">
-        <div v-if="node.type === 'START'" class="startpoint">
+        v-bk-clickoutside="closeNode"
+        v-bk-tooltips="{
+            placement: 'auto',
+            content: node.name,
+            theme: 'light'
+        }">
+        <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
             {{ $t(`m.treeinfo['开始']`) }}
         </div>
-        <div v-if="node.type === 'END'" class="endpoint">
+        <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode">
             {{ $t('m.treeinfo["结束"]') }}
         </div>
         <!-- 手动节点 -->
         <template v-for="(item, index) in typeList">
             <template v-if="node.type === item.type">
-                <div class="common-node" :key="index">
+                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)">
                     <span class="common-auto-icon"
                         :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
                         @click.stop="openconfigu">
@@ -48,6 +52,7 @@
                         <span v-else style="font-size: 11px; font-weight: bold;">API</span>
                     </span>
                     <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
+                    <i class="bk-itsm-icon icon-edit-bold"></i>
                     <span class="bk-node-delete"
                         v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
                         @click.stop="clickDelete(node)"
@@ -77,6 +82,7 @@
             <div class="bk-engine-node">
                 <ul>
                     <li v-for="(item, index) in clickList"
+                        :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }`"
                         class="tool"
                         :key="index"
                         @click.stop="addNormal(node, item)" :title="item.name">
@@ -89,7 +95,8 @@
                                     'icon-task-icon',
                                     'con-copy-new',
                                     'icon-sign-node',
-                                    'icon-approval-node'
+                                    'icon-approval-node',
+                                    'icon-devops-task-icon'
                                 ].includes(item.iconStyle) }
                             ]">
                         </i>
@@ -140,6 +147,7 @@
                     { type: 'ROUTER', iconStyle: 'icon-icon-person' },
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+                    { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
                 ],
@@ -147,6 +155,7 @@
                     { type: 'NORMAL', name: this.$t(`m.treeinfo["手动节点"]`), iconStyle: 'icon-icon-artificial' },
                     { type: 'TASK', name: this.$t(`m.treeinfo["API节点"]`), iconStyle: 'icon-api-node' },
                     { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
+                    { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
                     { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
                     { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
@@ -258,7 +267,7 @@
                             nodeInfo: res.data
                         }
                         this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
+                        this.$emit('updateNode', this.valueInfo, value.type)
                         this.addNewLine(node, res.data.id)
                     }).catch(res => {
                         this.$bkMessage({
@@ -274,15 +283,15 @@
                     this.$store.dispatch('deployCommon/copyNode', id).then((res) => {
                         this.valueInfo.node = {
                             id: 'node_' + res.data.id,
-                            x: res.data.axis.x,
-                            y: res.data.axis.y,
+                            x: res.data.axis.x - 250,
+                            y: res.data.axis.y + 100, // 复制后新节点的处于原节点下100px
                             type: res.data.type,
                             name: res.data.name,
                             showMore: false,
                             nodeInfo: res.data
                         }
                         this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
+                        this.$emit('updateNode', this.valueInfo, value.type)
                         // this.addNewLine(node, res.data.id)
                     }).catch(res => {
                         this.$bkMessage({

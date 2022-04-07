@@ -739,10 +739,13 @@
         div.bk-form-item {
             width: 32%;
             margin-top: 0px !important;
-
             .bk-label {
                 color: #424950;
                 font-weight: normal;
+            }
+            .bk-form-content {
+                width: 180px;
+                margin-left: -200px;
             }
         }
 

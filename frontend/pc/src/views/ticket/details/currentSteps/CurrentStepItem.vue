@@ -26,25 +26,38 @@
         <!-- 线条 -->
         <div class="bk-content-line" v-if="!isLastNode"></div>
         <!-- 圆圈 -->
-        <div class="bk-node-circle"></div>
+        <!-- <div class="bk-node-circle"></div> -->
         <!-- content -->
         <div :class="['bk-node-info', { 'full-screen': isFullScreen }]">
             <div class="bk-node-header">
-                <p class="bk-node-title"
-                    :class="{ 'bk-node-cursor': hasNodeOptAuth }"
-                    @click="closeUnflod($event)">
+                <!-- sla 时间 -->
+                <p class="sla-time-info" v-if="nodeInfo.sla_task_status === 2" :style="{ 'background': slaInfo.isTimeOut ? '#ffeded' : '#fafbfd' }">
+                    <span
+                        class="bk-operation-timeout"
+                        :style="'color: ' + slaInfo.color">
+                        <i :class="['bk-itsm-icon', slaInfo.isTimeOut ? 'icon-itsm-icon-mark-eight' : 'icon-clock-new']"></i>
+                        <span style="margin-left: 8px;">
+                            {{ slaInfo.isTimeOut ? $t('m.newCommon["超时："]') : $t('m.newCommon["剩余："]') }}{{ nodeInfo.sla_timeout }}
+                        </span>
+                        <span style="margin-left: 5px;">
+                            {{ $t('m.newCommon["计划完成时间："]') }}{{nodeInfo.sla_deadline || '--'}}
+                        </span>
+                    </span>
+                </p>
+                <p class="bk-node-title">
                     <!-- 折叠 icon -->
-                    <template v-if="hasNodeOptAuth">
+                    <!-- <template v-if="hasNodeOptAuth">
                         <i v-if="unfold" class="bk-icon icon-down-shape icon-default"></i>
                         <i v-else class="bk-icon icon-right-shape icon-default"></i>
-                    </template>
+                    </template> -->
                     <!-- 无权限提示 icon -->
-                    <i v-else
+                    <!-- <i v-else
                         class="bk-itsm-icon icon-icon-no-permissions"
                         style="margin-left: 5px;"
                         v-bk-tooltips.top="$t(`m.newCommon['您暂无权限处理']`)">
-                    </i>
-                    <span class="node-name">{{ nodeInfo.name }}</span>
+                    </i> -->
+                    <!-- <span class="node-name">{{ nodeInfo.name }}</span> -->
+                    <span class="node-name">{{ nodeAutoPass() ? `(${ nodeInfo.name })` + $t(`m['审批节点已自动处理']`) : nodeInfo.name }}</span>
                     <!-- 当前节点处理人 -->
                     <span
                         :ref="'processorsSpan' + index"
@@ -92,47 +105,12 @@
                     <!-- 状态 icon, API 节点和标准运维节点才显示 -->
                     <task-status :status="nodeInfo.status"></task-status>
                 </p>
-                <!-- sla 时间 -->
-                <p class="sla-time-info" v-if="nodeInfo.sla_task_status === 2">
-                    <span
-                        class="bk-operation-timeout"
-                        :style="'color: ' + slaInfo.color">
-                        <i class="bk-itsm-icon icon-clock-new"></i>
-                        <span style="margin-left: 5px;">
-                            {{ $t('m.newCommon["计划完成时间："]') }}{{nodeInfo.sla_deadline || '--'}}
-                        </span>
-                        <span style="margin-left: 15px;">
-                            {{ slaInfo.isTimeOut ? $t('m.newCommon["超时："]') : $t('m.newCommon["剩余："]') }}{{ nodeInfo.sla_timeout }}
-                        </span>
-                    </span>
-                </p>
-                
-                <!-- 全屏 icon -->
-                <span class="right-float">
-                    <!-- 响应按钮 -->
-                    <bk-button
-                        v-if="nodeInfo.is_reply_need"
-                        class="bk-sla-respons mr10"
-                        :disabled="nodeInfo.is_replied"
-                        :icon="nodeInfo.is_replied ? 'bk-icon icon-check-1' : ''"
-                        :loading="replyBtnLoading"
-                        @click="replyAssignDeliver()">
-                        响应
-                    </bk-button>
-                    <span class="full-screen-wrap">
-                        <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen(nodeInfo)"></i>
-                        <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
-                            <i class="bk-itsm-icon icon-order-close"></i>
-                            <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
-                        </span>
-                    </span>
-                </span>
             </div>
-            <collapse-transition>
+            <collapse-transition v-if="!readOnly">
                 <div class="bk-node-form" v-show="unfold">
                     <!-- 禁用遮罩 -->
-                    <div class="bk-node-disabled" v-if="!hasNodeOptAuth || nodeInfo.status === 'SUSPEND'"></div>
-                    <div class="bk-form bk-form-vertical">
+                    <div class="bk-node-disabled" v-if="nodeInfo.status === 'SUSPEND'"></div>
+                    <div class="bk-form bk-form-vertical" v-if="hasNodeOptAuth">
                         <!-- 节点任务 -->
                         <node-task-list
                             v-if="(nodeInfo.can_create_task || nodeInfo.can_execute_task)"
@@ -140,6 +118,21 @@
                             :ticket-info="ticketInfo"
                             @updateCurrentStep="successFn">
                         </node-task-list>
+                        <sops-and-devops-task
+                            v-if="nodeInfo.status === 'FAILED' && (nodeInfo.type === 'TASK-SOPS' || nodeInfo.type === 'TASK-DEVOPS')"
+                            :constants="constants"
+                            :hooked-var-list="hookedVarList"
+                            :node-info="nodeInfo"
+                            :pipeline-list="pipelineList"
+                            :constant-default-value="constantDefaultValue"
+                            :ticket-info="ticketInfo"
+                            :workflow="workflow"
+                            :pipeline-constants="pipelineConstants"
+                            :pipeline-stages="pipelineStages"
+                            :pipeline-rules="pipelineRules"
+                            @reloadTicket="reloadTicket"
+                            @onChangeHook="onChangeHook">
+                        </sops-and-devops-task>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
@@ -228,6 +221,7 @@
                     </div>
                 </div>
             </collapse-transition>
+            <bk-button v-if="isShowAssgin && nodeInfo.type === 'APPROVAL'" style="margin-left: 14px" @click="clickBtn({ can_operate: true, key: 'EXCEPTION_DISTRIBUTE' ,name: '异常分派' })">异常分派</bk-button>
         </div>
         <!-- 处理人 tips 内容 -->
         <div id="processor-tips-content" class="bk-processor-content">
@@ -260,9 +254,11 @@
     import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
     import NodeDealDialog from './NodeDealDialog.vue'
     import NodeTaskList from './nodetask/NodeTaskList.vue'
+    import sopsAndDevopsTask from './nodetask/sopsDevopsTask.vue'
     import commonMix from '@/views/commonMix/common.js'
     import { errorHandler } from '@/utils/errorHandler.js'
     import { convertTimeArrToMS, convertTimeArrToString, convertMStoString } from '@/utils/util.js'
+    import i18n from '@/i18n/index.js'
 
     export default {
         name: 'CurrentStepItem',
@@ -274,9 +270,11 @@
             apiNodeHandleBody,
             TicketTriggerDialog,
             NodeDealDialog,
-            NodeTaskList
+            NodeTaskList,
+            sopsAndDevopsTask
         },
         mixins: [commonMix],
+        inject: ['reload'],
         props: {
             ticketInfo: {
                 type: Object,
@@ -312,10 +310,22 @@
             isLastNode: {
                 type: Boolean,
                 default: false
-            }
+            },
+            readOnly: {
+                type: Boolean,
+                default: false
+            },
+            isShowAssgin: Boolean
         },
         data () {
             return {
+                constants: [],
+                hookedVarList: {},
+                pipelineList: [],
+                pipelineRules: {},
+                pipelineStages: [],
+                pipelineConstants: [],
+                constantDefaultValue: {},
                 convertTimeArrToString,
                 replyBtnLoading: false,
                 unfold: false, // 是否展开
@@ -344,7 +354,8 @@
                 slaInfo: {
                     color: '',
                     isTimeOut: false
-                }
+                },
+                workflow: ''
             }
         },
         computed: {
@@ -405,16 +416,22 @@
                 if (this.nodeInfo.sla_task_status === 2 && this.nodeInfo.is_reply_need === true) {
                     return false
                 }
+                if (this.nodeInfo.type === 'TASK-SOPS' && this.nodeInfo.status === 'RUNNING') {
+                    return false
+                }
+                if (this.nodeInfo.type === 'TASK-DEVOPS' && this.nodeInfo.status === 'RUNNING') {
+                    return false
+                }
                 return true
             }
         },
         created () {
             this.initData()
+            this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
         },
         methods: {
             initData () {
-                this.unfold = this.hasNodeOptAuth
-
+                this.unfold = !this.nodeAutoPass()
                 const item = this.nodeInfo
                 if (item.sla_task_status === 2) {
                     if (item.sla_status === 2) {
@@ -426,8 +443,76 @@
                     }
                     this.runTime()
                 }
+                this.workflow = this.ticketInfo.table_fields[0].workflow_id
+                this.getSopsPreview()
+                this.getpipelineDetail()
             },
-            
+            reloadTicket () {
+                this.reload()
+            },
+            // 获取sops Constants
+            async getSopsPreview () {
+                if (this.nodeInfo.contexts.hasOwnProperty('task_params')) {
+                    const { bk_biz_id, template_id, exclude_task_nodes_id, template_source } = this.nodeInfo.contexts.task_params
+                    const params = {
+                        bk_biz_id,
+                        template_id,
+                        exclude_task_nodes_id
+                    }
+                    const url = template_source === 'common' ? 'taskFlow/getSopsCommonPreview' : 'taskFlow/getSopsPreview'
+                    const res = await this.$store.dispatch(url, params)
+                    const constants = Object.keys(res.data.pipeline_tree.constants).map(item => {
+                        this.$set(this.hookedVarList, item, false)
+                        this.constantDefaultValue[item] = this.nodeInfo.contexts.task_params.constants[item]
+                        res.data.pipeline_tree.constants[item].value = this.nodeInfo.contexts.task_params.constants[item]
+                        return res.data.pipeline_tree.constants[item]
+                    })
+                    this.constants = constants
+                }
+            },
+            // 改变hook
+            onChangeHook (key, value) {
+                this.hookedVarList[key] = value
+            },
+            // 获取流水线
+            getpipelineDetail () {
+                if (this.nodeInfo.hasOwnProperty('api_info') && this.nodeInfo.type === 'TASK-DEVOPS') {
+                    const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
+                    const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                        this.pipelineList = res.data.properties
+                        this.pipelineConstants = res.data.properties.map(item => {
+                            const constants = {
+                                key: '',
+                                value: ''
+                            }
+                            const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id)
+                            if (findKey) {
+                                constants.key = findKey.key
+                                constants.value = findKey.value
+                            }
+                            return constants
+                        })
+                        res.data.properties.forEach(item => {
+                            this.pipelineRules[item.id] = [{
+                                required: item.required,
+                                message: i18n.t('m.treeinfo["字段必填"]'),
+                                trigger: 'blur'
+                            }]
+                        })
+                    })
+                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                        this.pipelineStages = res.data.stages
+                    })
+                }
+            },
+            // 自动通过
+            nodeAutoPass () {
+                if (this.ticketInfo.hasOwnProperty('is_auto_approve') && this.nodeInfo.type === 'APPROVAL') {
+                    return this.ticketInfo.is_auto_approve && window.username === this.ticketInfo.creator.split('(')[0] && this.nodeInfo.tasks.some(item => item.processor === this.ticketInfo.creator)
+                }
+                return false
+            },
             // 按钮操作
             clickBtn (btn) {
                 // 字段校验
@@ -461,6 +546,7 @@
                 }
             },
             submitFormAjax (submitFormData) {
+                console.log(submitFormData)
                 const id = this.nodeInfo.ticket_id
                 // 终止
                 if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
@@ -534,6 +620,16 @@
                     }
                     this.submitAjax('newAssignDeliver', params, id)
                 }
+                console.log(this.openFormInfo.btnInfo.key)
+                if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
+                    const params = {
+                        state_id: this.nodeInfo.state_id,
+                        processors: submitFormData.person.value,
+                        processors_type: submitFormData.person.type,
+                        action_type: this.openFormInfo.btnInfo.key
+                    }
+                    this.submitAjax('exceptionDistribute', params, id)
+                }
             },
             submitAjax (type, params, id) {
                 if (this.submitting) {
@@ -584,6 +680,7 @@
             // 展开收起
             closeUnflod (e) {
                 // 禁止冒泡
+                if (this.nodeAutoPass()) return
                 if (e.target.className.indexOf('bk-processor-check') === -1) {
                     if (!this.nodeInfo.can_operate && !this.currSignProcessorInfo) {
                         return
@@ -695,7 +792,6 @@
         .bk-node-info {
             position: relative;
             font-size: 14px;
-            margin-left: 27px;
             &.full-screen {
                 margin-left: 0;
                 position: fixed;
@@ -708,9 +804,9 @@
                 background: #ffffff;
             }
             .bk-node-title {
-                margin-bottom: 4px;
+                margin: 17px 10px;
                 outline: none;
-                background-color: #F0F1F5;
+                background-color: #ffffff;
                 color: #737987;
                 padding: 0;
                 width: 100%;
@@ -746,10 +842,10 @@
             }
             .bk-node-header{
                 position: relative;
-                padding: 8px 15px;
+                padding: 8px 0;
                 width: 100%;
                 color: #737987;
-                background-color: #F0F1F5;
+                background-color: #ffffff;
                 border-radius: 2px;
                 .icon-angle-down {
                     font-size: 22px;
@@ -757,8 +853,10 @@
                 
             }
             .sla-time-info {
-                padding-left: 20px;
+                height: 32px;
                 font-size: 12px;
+                border: 1px solid #ffd2d2;
+                color: #63656e;
             }
             .icon-default {
                 font-size: 12px;
@@ -905,8 +1003,9 @@
         width: calc(100% - 26px);
         margin-left: 16px;
         margin-right: 10px;
-        color: #979BA5;
-        line-height: 34px;
+        margin-bottom: 17px;
+        color: #63656e;
+        line-height: 32px;
         min-width: 265px;
         text-overflow: ellipsis;
         white-space: nowrap;

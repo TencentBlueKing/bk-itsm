@@ -1,7 +1,7 @@
 {
     "system_id": "bk_itsm",
     "operations": [
-         {
+        {
             "operation": "upsert_system",
             "data": {
                 "id": "bk_itsm",
@@ -715,8 +715,8 @@
             "operation": "upsert_action",
             "data": {
                 "id": "ticket_manage",
-                "name": "工单管理",
-                "name_en": "Manage Ticket",
+                "name": "工单管理(已弃用)",
+                "name_en": "Manage Ticket Old",
                 "description": "管理某个服务资源下工单的权限",
                 "description_en": "",
                 "type": "manage",
@@ -728,6 +728,30 @@
                             {
                                 "system_id": "bk_itsm",
                                 "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_management",
+                "name": "工单管理",
+                "name_en": "Manage Ticket",
+                "description": "管理某个服务资源下工单的权限",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "bk_itsm",
+                        "id": "service",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "bk_itsm",
+                                "id": "service_list"
                             }
                         ]
                     }
@@ -1765,7 +1789,7 @@
                 "id": "ticket_state_manage",
                 "name": "单据状态管理",
                 "name_en": "Manage Ticket State",
-                "description": "单据状态查看",
+                "description": "单据状态管理",
                 "description_en": "",
                 "type": "manage",
                 "related_resource_types": [],
@@ -2000,13 +2024,10 @@
                                     "id": "service_view"
                                 },
                                 {
+                                    "id": "ticket_management"
+                                },
+                                {
                                     "id": "ticket_view"
-                                },
-                                {
-                                    "id": "ticket_manage"
-                                },
-                                {
-                                    "id": "sla_manage"
                                 },
                                 {
                                     "id": "catalog_create"
@@ -2015,7 +2036,7 @@
                                     "id": "catalog_edit"
                                 },
                                 {
-                                     "id": "catalog_delete"
+                                    "id": "catalog_delete"
                                 }
                             ]
                         },
@@ -2028,10 +2049,10 @@
                                 },
                                 {
                                     "id": "field_view"
-                                }, 
+                                },
                                 {
                                     "id": "field_edit"
-                                }, 
+                                },
                                 {
                                     "id": "field_delete"
                                 }
@@ -2046,10 +2067,10 @@
                                 },
                                 {
                                     "id": "user_group_edit"
-                                }, 
+                                },
                                 {
                                     "id": "user_group_delete"
-                                }, 
+                                },
                                 {
                                     "id": "user_group_view"
                                 },
@@ -2058,15 +2079,9 @@
                                 },
                                 {
                                     "id": "triggers_view"
-                                }, 
-                                {
-                                    "id": "triggers_manage"
                                 },
                                 {
-                                    "id": "ticket_state_view"
-                                }, 
-                                {
-                                    "id": "ticket_state_manage"
+                                    "id": "triggers_manage"
                                 }
                             ]
                         },
@@ -2097,48 +2112,6 @@
                                 },
                                 {
                                     "id": "sla_agreement_delete"
-                                },
-                                {
-                                    "id": "sla_priority_view"
-                                },
-                                {
-                                    "id": "sla_priority_manage"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "流程",
-                            "name_en": "Flow",
-                            "actions": [
-                                {
-                                    "id": "workflow_create"
-                                },
-                                {
-                                    "id": "workflow_manage"
-                                },
-                                {
-                                    "id": "workflow_deploy"
-                                },
-                                {
-                                    "id": "flow_version_restore"
-                                },
-                                {
-                                    "id": "flow_version_manage"
-                                },
-                                {
-                                    "id": "flow_element_manage"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "角色",
-                            "name_en": "Role",
-                            "actions": [
-                                {
-                                    "id": "role_create"
-                                },
-                                {
-                                    "id": "role_manage"
                                 }
                             ]
                         },
@@ -2161,9 +2134,6 @@
                     "name_en": "Others",
                     "actions": [
                         {
-                            "id": "knowledge_manage"
-                        },
-                        {
                             "id": "operational_data_view"
                         },
                         {
@@ -2176,7 +2146,7 @@
                     "name_en": "Administration",
                     "actions": [],
                     "sub_groups": [
-                         {
+                        {
                             "name": "公共字段",
                             "name_en": "Public Fields",
                             "actions": [
@@ -2203,7 +2173,7 @@
                                 },
                                 {
                                     "id": "public_api_manage"
-                                }, 
+                                },
                                 {
                                     "id": "public_api_create"
                                 }
@@ -2247,6 +2217,83 @@
                                     "id": "task_template_manage"
                                 }
                             ]
+                        },
+                        {
+                            "name": "单据状态",
+                            "name_en": "Ticket State",
+                            "actions": [
+                                {
+                                    "id": "ticket_state_view"
+                                },
+                                {
+                                    "id": "ticket_state_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SLA 优先级",
+                            "name_en": "SLA Priority",
+                            "actions": [
+                                {
+                                    "id": "sla_priority_view"
+                                },
+                                {
+                                    "id": "sla_priority_manage"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "已经弃用的权限(无需申请)",
+                    "name_en": "Old",
+                    "actions": [
+                        {
+                            "id": "knowledge_manage"
+                        },
+                        {
+                            "id": "sla_manage"
+                        },
+                        {
+                            "id": "ticket_manage"
+                        }
+                    ],
+                    "sub_groups": [
+                        {
+                            "name": "流程",
+                            "name_en": "Flow",
+                            "actions": [
+                                {
+                                    "id": "workflow_create"
+                                },
+                                {
+                                    "id": "workflow_manage"
+                                },
+                                {
+                                    "id": "workflow_deploy"
+                                },
+                                {
+                                    "id": "flow_version_restore"
+                                },
+                                {
+                                    "id": "flow_version_manage"
+                                },
+                                {
+                                    "id": "flow_element_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "角色",
+                            "name_en": "Role",
+                            "actions": [
+                                {
+                                    "id": "role_create"
+                                },
+                                {
+                                    "id": "role_manage"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -2286,12 +2333,11 @@
                             {
                                 "id": "catalog_edit",
                                 "required": true
-                            },                            
+                            },
                             {
                                 "id": "catalog_delete",
                                 "required": true
                             },
-                            
                             {
                                 "id": "field_create",
                                 "required": true
@@ -2311,7 +2357,7 @@
                             {
                                 "id": "sla_agreement_create",
                                 "required": true
-                            },                            
+                            },
                             {
                                 "id": "settings_view",
                                 "required": true

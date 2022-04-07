@@ -109,9 +109,12 @@
         <bk-sideslider
             :is-show.sync="isShowAddAssociation"
             :title="$t(`m.manageCommon['新建关联单']`)"
+            :quick-close="true"
+            :before-close="closeSideslider"
             :width="750">
             <div class="p20" slot="content">
                 <associated-dialog
+                    ref="associated"
                     v-if="isShowAddAssociation"
                     :ticket-info="ticketInfo"
                     @close="isShowAddAssociation = false"
@@ -175,6 +178,24 @@
                     errorHandler(res, this)
                 }).finally(() => {
                     this.loading = false
+                })
+            },
+            closeSideslider () {
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
+                    confirmLoading: true,
+                    confirmFn: () => {
+                        // if (this.$refs.associated.typeSelected === 'associate') {
+                        //     this.$refs.associated.bindTicket()
+                        // } else {
+                        //     this.$refs.associated.setFields()
+                        // }
+                        this.isShowAddAssociation = false
+                    },
+                    cancelFn: () => {
+                        this.isShowAddAssociation = true
+                    }
                 })
             },
             // 获取关联历史

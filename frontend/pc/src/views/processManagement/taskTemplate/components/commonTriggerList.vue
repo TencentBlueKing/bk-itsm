@@ -24,7 +24,7 @@
     <div class="mt20 mb20">
         <div
             v-if="openFunction.TRIGGER_SWITCH && origin !== 'workflow' && origin !== 'transition'"
-            class="more-configuration" @click="showMoreConfig = !showMoreConfig">
+            class="more-configuration" data-test-id="trigger-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
             <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
             <i v-else class="bk-icon icon-up-shape"></i>
             <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
@@ -58,8 +58,8 @@
                                             <i class="bk-icon icon-plus"></i>
                                         </div>
                                         <ul class="bk-dropdown-list" slot="dropdown-content">
-                                            <li><a href="javascript:;" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
-                                            <li><a href="javascript:;" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
+                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-addTrigger" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
+                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-quoteCommonTrigger" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
                                         </ul>
                                     </bk-dropdown-menu>
                                 </ul>
@@ -117,6 +117,7 @@
                             @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
                         <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
                         <bk-button theme="primary"
+                            data-test-id="common-trigger-confirm"
                             class="mr10"
                             :title="$t(`m.taskTemplate['确定']`)"
                             @click="citeTrigger">
@@ -447,7 +448,10 @@
             newTrigger () {
                 this.initDialogInfo()
                 this.$router.push({
-                    name: 'PublicTrigger'
+                    name: 'projectTrigger',
+                    query: {
+                        project_id: this.$route.query.project_id
+                    }
                 })
             },
             initDialogInfo () {

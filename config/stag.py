@@ -22,17 +22,28 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import importlib
+from urllib.parse import urljoin
 
 from config import RUN_VER, BK_PAAS_HOST, OPEN_VER  # noqa
 
 if RUN_VER == "open":
     from blueapps.patch.settings_open_saas import *  # noqa
+
+    BK_STATIC_URL = STATIC_URL.rstrip("/")
 else:
     from blueapps.patch.settings_paas_services import *  # noqa
 
+    BK_STATIC_URL = "/static"
+
+    # 正式环境 static_url 设置为 https
+    STATIC_FRONTEND_URL = os.environ.get("BKAPP_FRONTEND_URL", None)
+    if STATIC_FRONTEND_URL is not None:
+        STATIC_URL = "%sstatic/" % STATIC_FRONTEND_URL
+
 # 预发布环境
 RUN_MODE = "STAGING"
-RIO_TOKEN = "de78a415e065444c8be829cb7eedb316"
+RIO_TOKEN = os.environ.get("RIO_TOKEN", "")
 
 # 正式环境的日志级别可以在这里配置
 # V2
@@ -68,17 +79,26 @@ if ALLOW_CSRF:
     MIDDLEWARE = ("common.middlewares.DisableCSRFCheck",) + MIDDLEWARE
 
 MEDIA_URL = "%smedia/" % SITE_URL
-BK_STATIC_URL = '/static'
+CSRF_COOKIE_NAME = "bkitsm_csrftoken"
 
 # REMOTE_STATIC_URL = "http://127.0.0.1:8000/static/"
 # STATIC_URL = "http://127.0.0.1:8000/static/"
 # ==============================================================================
 # 加载环境差异化配置
 # ==============================================================================
-ver_settings = importlib.import_module('adapter.config.sites.%s.ver_settings' % RUN_VER)
+ver_settings = importlib.import_module("adapter.config.sites.%s.ver_settings" % RUN_VER)
 for _setting in dir(ver_settings):
     if _setting.upper() == _setting:
         locals()[_setting] = getattr(ver_settings, _setting)
+
+ENGINE_REGION = os.environ.get("BKPAAS_ENGINE_REGION", "open")
+if ENGINE_REGION == "default":
+    default_settings = importlib.import_module(
+        "adapter.config.sites.%s.ver_settings" % "v3"
+    )
+    for _setting in dir(default_settings):
+        if _setting.upper() == _setting:
+            locals()[_setting] = getattr(default_settings, _setting)
 
 BK_IAM_RESOURCE_API_HOST = os.getenv(
     "BKAPP_IAM_RESOURCE_API_HOST", urljoin(BK_PAAS_INNER_HOST, "/t/{}".format(APP_CODE))

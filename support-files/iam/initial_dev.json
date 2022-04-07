@@ -669,8 +669,8 @@
             "operation": "upsert_action",
             "data": {
                 "id": "ticket_manage",
-                "name": "工单管理",
-                "name_en": "Manage Ticket",
+                "name": "工单管理(已弃用)",
+                "name_en": "Manage Ticket Old",
                 "description": "管理某个服务资源下工单的权限",
                 "description_en": "",
                 "type": "manage",
@@ -681,7 +681,31 @@
                         "related_instance_selections": [
                             {
                                 "system_id": "itsm",
-                                "id": "project_list,"
+                                "id": "project_list"
+                            }
+                        ]
+                    }
+                ],
+                "version": 1
+            }
+        },
+        {
+            "operation": "upsert_action",
+            "data": {
+                "id": "ticket_management",
+                "name": "工单管理",
+                "name_en": "Manage Ticket",
+                "description": "管理某个服务资源下工单的权限",
+                "description_en": "",
+                "type": "manage",
+                "related_resource_types": [
+                    {
+                        "system_id": "itsm",
+                        "id": "service",
+                        "related_instance_selections": [
+                            {
+                                "system_id": "itsm",
+                                "id": "service_list"
                             }
                         ]
                     }
@@ -2234,10 +2258,7 @@
                                     "id": "ticket_view"
                                 },
                                 {
-                                    "id": "ticket_manage"
-                                },
-                                {
-                                    "id": "sla_manage"
+                                    "id": "ticket_management"
                                 },
                                 {
                                     "id": "catalog_create"
@@ -2338,42 +2359,6 @@
                             ]
                         },
                         {
-                            "name": "流程",
-                            "name_en": "Flow",
-                            "actions": [
-                                {
-                                    "id": "workflow_create"
-                                },
-                                {
-                                    "id": "workflow_manage"
-                                },
-                                {
-                                    "id": "workflow_deploy"
-                                },
-                                {
-                                    "id": "flow_version_restore"
-                                },
-                                {
-                                    "id": "flow_version_manage"
-                                },
-                                {
-                                    "id": "flow_element_manage"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "角色",
-                            "name_en": "Role",
-                            "actions": [
-                                {
-                                    "id": "role_create"
-                                },
-                                {
-                                    "id": "role_manage"
-                                }
-                            ]
-                        },
-                        {
                             "name": "设置",
                             "name_en": "Setting",
                             "actions": [
@@ -2391,9 +2376,6 @@
                     "name": "其他",
                     "name_en": "Others",
                     "actions": [
-                        {
-                            "id": "knowledge_manage"
-                        },
                         {
                             "id": "operational_data_view"
                         },
@@ -2476,6 +2458,59 @@
                                 },
                                 {
                                     "id": "task_template_manage"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "已经弃用的权限(无需申请)",
+                    "name_en": "Old",
+                    "actions": [
+                        {
+                            "id": "knowledge_manage"
+                        },
+                        {
+                            "id": "sla_manage"
+                        },
+                        {
+                            "id": "ticket_manage"
+                        }
+                    ],
+                    "sub_groups": [
+                        {
+                            "name": "流程",
+                            "name_en": "Flow",
+                            "actions": [
+                                {
+                                    "id": "workflow_create"
+                                },
+                                {
+                                    "id": "workflow_manage"
+                                },
+                                {
+                                    "id": "workflow_deploy"
+                                },
+                                {
+                                    "id": "flow_version_restore"
+                                },
+                                {
+                                    "id": "flow_version_manage"
+                                },
+                                {
+                                    "id": "flow_element_manage"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "角色",
+                            "name_en": "Role",
+                            "actions": [
+                                {
+                                    "id": "role_create"
+                                },
+                                {
+                                    "id": "role_manage"
                                 }
                             ]
                         }

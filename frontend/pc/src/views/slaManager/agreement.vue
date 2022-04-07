@@ -30,7 +30,7 @@
             </div>
             <div class="itsm-page-content">
                 <empty-tip
-                    v-if="!isDataLoading && pagination.count === 0"
+                    v-if="!isDataLoading && pagination.count === 0 && searchToggle"
                     :title="emptyTip.title"
                     :sub-title="emptyTip.subTitle"
                     :desc="emptyTip.desc"
@@ -156,7 +156,7 @@
                             <template slot-scope="props">
                                 <!-- 编辑 -->
                                 <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate"
+                                    data-test-id="sla_button_agreementEditFromOperate1"
                                     v-if="!hasPermission(['sla_agreement_edit'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
                                     v-cursor
                                     text
@@ -166,7 +166,7 @@
                                     {{ $t('m.deployPage["编辑"]')}}
                                 </bk-button>
                                 <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate"
+                                    data-test-id="sla_button_agreementEditFromOperate2"
                                     v-else
                                     theme="primary"
                                     text
@@ -272,6 +272,7 @@
                         ]
                     }
                 ],
+                searchToggle: false,
                 emailNotifyEventList: [],
                 weixinNotifyEventList: [],
                 // 服务模式
@@ -344,6 +345,7 @@
                 this.isDataLoading = true
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
                     this.dataList = res.data.items
+                    this.searchToggle = res.data.items.length !== 0
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count

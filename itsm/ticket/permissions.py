@@ -35,6 +35,7 @@ from itsm.role.models import UserRole
 from itsm.service.models import Service
 
 from .models import Ticket
+from ..project.models import Project
 
 
 class SuperuserPermissionValidate(permissions.BasePermission):
@@ -74,6 +75,7 @@ class TicketPermissionValidate(permissions.BasePermission):
             "send_email",
             "master_or_slave",
             "add_follower",
+            "can_exception_distribute",
         ]:
             return True
 
@@ -87,14 +89,26 @@ class TicketPermissionValidate(permissions.BasePermission):
         if view.action == "close" and obj.can_close(username):
             return True
 
+        iam_ticket_manage_auth = self.iam_ticket_manage_auth(request, obj)
+
+        if view.action == "exception_distribute":
+            if not iam_ticket_manage_auth:
+                self.message = _("抱歉，您无权执行此操作，因为您该服务没有工单管理的权限")
+                return False
+            else:
+                return True
+
         if view.action == "operate":
             try:
                 node = obj.node_status.get(state_id=request.data.get("state_id"))
             except Exception:
                 # 异常情况直接返回
                 return False
+            state_permission = StatePermissionValidate().has_object_permission(
+                request, node
+            )
 
-            return StatePermissionValidate().has_object_permission(request, node)
+            return [state_permission, iam_ticket_manage_auth]
 
         if view.action == "get_ticket_output":
             return True
@@ -123,11 +137,33 @@ class TicketPermissionValidate(permissions.BasePermission):
             obj.service_id, username
         ):
             return True
+        return any([obj.can_operate(username), iam_ticket_manage_auth])
 
-        return obj.can_operate(username)
+    def iam_ticket_manage_auth(self, request, obj):
+        # 本地开发环境，不校验单据管理权限
+        if settings.ENVIRONMENT == "dev":
+            return True
+
+        iam_client = IamRequest(request)
+        resource_info = {
+            "resource_id": str(obj.service_id),
+            "resource_name": obj.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_management"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=obj.project_key
+        )
+
+        if auth_actions.get("ticket_management"):
+            return True
+
+        return False
 
     def iam_ticket_view_auth(self, request, obj):
         iam_client = IamRequest(request)
+        project_name = Project.objects.get(key=obj.project_key).name
         resource_info = {
             "resource_id": str(obj.service_id),
             "resource_name": obj.service_name,
@@ -141,20 +177,30 @@ class TicketPermissionValidate(permissions.BasePermission):
         if auth_actions.get("ticket_view"):
             return True
 
+        resource_list = [
+            {
+                "resource_id": obj.project_key,
+                "resource_name": project_name,
+                "resource_type": "project",
+            },
+            resource_info,
+        ]
+
         bk_iam_path = "/project,{}/".format(obj.project_key)
         resources = [
             Resource(
                 settings.BK_IAM_SYSTEM_ID,
-                resource_info["resource_type"],
-                str(resource_info["resource_id"]),
+                resource["resource_type"],
+                str(resource["resource_id"]),
                 {
-                    "iam_resource_owner": resource_info.get("creator", ""),
+                    "iam_resource_owner": resource.get("creator", ""),
                     "_bk_iam_path_": bk_iam_path
-                    if resource_info["resource_type"] != "project"
+                    if resource["resource_type"] != "project"
                     else "",
-                    "name": resource_info.get("resource_name", ""),
+                    "name": resource.get("resource_name", ""),
                 },
             )
+            for resource in resource_list
         ]
 
         raise AuthFailedException(

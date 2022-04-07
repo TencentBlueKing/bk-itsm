@@ -28,22 +28,23 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 
 from django.core.files.storage import FileSystemStorage
+
 from . import api as ADAPTER_API  # noqa
 
-ESB_SDK_NAME = 'blueking.component.open'
+ESB_SDK_NAME = "blueking.component.open"
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('BKAPP_DB_TEST'),
-        'USER': os.environ.get('BKAPP_MYSQL_USER'),
-        'PASSWORD': os.environ.get('BKAPP_MYSQL_PASS'),
-        'HOST': os.environ.get('BKAPP_MYSQL_IP'),
-        'PORT': os.environ.get('BKAPP_MYSQL_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("BKAPP_DB_TEST"),
+        "USER": os.environ.get("BKAPP_MYSQL_USER"),
+        "PASSWORD": os.environ.get("BKAPP_MYSQL_PASS"),
+        "HOST": os.environ.get("BKAPP_MYSQL_IP"),
+        "PORT": os.environ.get("BKAPP_MYSQL_PORT"),
     },
 }
 
-STORE = FileSystemStorage(location='/')
+STORE = FileSystemStorage(location="/")
 
 # 企业微信发送，默认weixin，可配置为企业微信rtx
-QY_WEIXIN = os.environ.get('BKAPP_WEIXIN_TYPE', 'weixin')
+QY_WEIXIN = os.environ.get("BKAPP_WEIXIN_TYPE", "weixin")

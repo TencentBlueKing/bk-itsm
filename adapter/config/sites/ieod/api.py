@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from common.log import logger
 
 
 def get_batch_users(users, properties, is_exact=True, page_params=None, name_type=None):
@@ -82,7 +83,16 @@ def get_all_users(users=None):
             cross_dir_users.append(user)
         else:
             normal_users.append(user)
+    logger.info(
+        "[get_all_users]正在获取全部用户,normal_users:{}, cross_dir_users:{}".format(
+            normal_users,
+            cross_dir_users))
     all_users = query_user_info(normal_users, cross_dir_users)
+    logger.info(
+        "[get_all_users]获取全部用户结束,all_users:{}, normal_users:{}, cross_dir_users:{}".format(
+            all_users,
+            normal_users,
+            cross_dir_users))
 
     all_users = [
         {

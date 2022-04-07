@@ -32,10 +32,16 @@ ITSM is an upper layer SaaS application based on the Tencent Blueking product sy
 - [Development Environment Deployment(In Chinese)](docs/install/dev_deploy.md)
 - [Production Source Code Deployment (In Chinese)](docs/install/source_code_deploy.md)
 - [Production Upload Deployment (In Chinese)](docs/install/upload_pack_deploy.md)
+- [V2.6.0 -> V2.6.1 Upgrade Guide](docs/install/V2_6_0_to_V2_6_1_upgrade_guide.md)
 
 ## Usage
 - [API Usage Instructions](docs/itsm_bkapi/apidocs/readme.md)
-
+- [Permission Description](docs/install/permission_description.md)
+- [Service & User Group Migrate Guide](docs/install/service_migrate_guide.md)
+- [WeCom Configuration Instructions](docs/install/qy_weixin_config.md)
+- [Custom Form Rendering Rules Instructions](docs/install/custom_form_config.md)
+- [API_Request_Sandbox_Instructions](docs/install/api_sandbox_guide.md)
+- [ITSM Access Guidelines](docs/wiki/access.md)
 
 ## Version plan
 - [RELEASE](docs/RELEASE_EN.md)

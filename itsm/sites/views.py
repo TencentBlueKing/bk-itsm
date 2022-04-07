@@ -42,8 +42,8 @@ from itsm.role.models import BKUserRole, UserRole
 class HttpResponseIndexRedirect(HttpResponseRedirect):
     def __init__(self, redirect_to, *args, **kwargs):
         super(HttpResponseIndexRedirect, self).__init__(redirect_to, *args, **kwargs)
-        self['Location'] = os.path.join(
-            settings.WEIXIN_APP_EXTERNAL_HOST.replace("https", "http"), redirect_to.lstrip("/")
+        self["Location"] = os.path.join(
+            settings.WEIXIN_APP_EXTERNAL_HOST, redirect_to.lstrip("/")
         )
 
 
@@ -52,18 +52,31 @@ def index(request):
     from adapter.core import TITLE, DOC_URL, LOGIN_URL
 
     # 如果发现不是woa过来的域名
-    if settings.WEIXIN_APP_EXTERNAL_HOST and settings.WEIXIN_APP_EXTERNAL_HOST.find(
-        request.get_host()) == -1:
+    if (
+        settings.WEIXIN_APP_EXTERNAL_HOST
+        and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1
+    ):
         # 如果 host的值和HTTP_REFERER一致，则跳转
         # 如果是从开发者中心中出来的，此时有HTTP_REFERER
-        if "HTTP_REFERER" not in request.META or request.get_host() in request.META.get("HTTP_REFERER", ""):
+        if "HTTP_REFERER" not in request.META or request.get_host() in request.META.get(
+            "HTTP_REFERER", ""
+        ):
+            logger.info("执行跳转: request.path = {}".format(request.path))
             return HttpResponseIndexRedirect(request.path)
 
     # 默认为当前pass host
     BK_USER_MANAGE_HOST = settings.BK_USER_MANAGE_HOST
     # 如果来源域名非微信外网域名，则使用的BK_USER_MANAGE_HOST地址
-    if settings.WEIXIN_APP_EXTERNAL_HOST and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1:
+    if (
+        settings.WEIXIN_APP_EXTERNAL_HOST
+        and settings.WEIXIN_APP_EXTERNAL_HOST.find(request.get_host()) == -1
+    ):
         BK_USER_MANAGE_HOST = FRONTEND_URL
+
+    # 非ieod环境不开启自动跳转
+    if settings.RUN_VER == "ieod":
+        if not request.is_secure():
+            return HttpResponseIndexRedirect(request.path)
 
     logger.info("HTTP_REFERER={}".format(request.META.get("HTTP_REFERER", "")))
     # 更新cmdb通用角色
@@ -71,7 +84,9 @@ def index(request):
     # 更新用户在各个系统的角色缓存
     BKUserRole.get_or_update_user_roles(request.user.username)
     try:
-        DEFAULT_PROJECT = UserProjectAccessRecord.objects.get(username=request.user.username).project_key
+        DEFAULT_PROJECT = UserProjectAccessRecord.objects.get(
+            username=request.user.username
+        ).project_key
     except Exception:
         DEFAULT_PROJECT = ""
 
@@ -86,7 +101,9 @@ def index(request):
             "all_access": UserRole.get_access_by_user(request.user.username),
             "BK_CC_HOST": settings.BK_CC_HOST,
             "BK_JOB_HOST": settings.BK_JOB_HOST,
-            "IS_ITSM_ADMIN": 1 if UserRole.is_itsm_superuser(request.user.username) else 0,
+            "IS_ITSM_ADMIN": 1
+            if UserRole.is_itsm_superuser(request.user.username)
+            else 0,
             "CUSTOM_TITLE": TITLE,
             "USE_LOG": "true",
             "LOGIN_URL": LOGIN_URL,
@@ -97,6 +114,7 @@ def index(request):
             "DEFAULT_PROJECT": DEFAULT_PROJECT,
             "DOC_URL": DOC_URL,
             "SOPS_URL": settings.SOPS_SITE_URL,
+            "RUN_VER": settings.RUN_VER,
         },
     )
 

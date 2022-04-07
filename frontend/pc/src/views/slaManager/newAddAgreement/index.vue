@@ -42,10 +42,12 @@
                     <bk-form-item
                         :label="$t(`m.slaContent['服务协议名称']`)"
                         :required="true"
+                        error-display-type="normal"
                         style="width: 540px;"
                         :property="'name'">
                         <bk-input v-model.trim="formInfo.name"
-                            maxlength="120"
+                            :maxlength="120"
+                            :show-word-limit="true"
                             :placeholder="$t(`m.slaContent['请输入服务协议名称']`)"
                             :disabled="changeInfo.info.is_builtin">
                         </bk-input>
@@ -252,6 +254,11 @@
             //     },
             //     immediate: true
             // }
+            'changeInfo.is_reply_need' (val) {
+                if (!val) {
+                    this.$refs.priorityConfigur.clearFromError()
+                }
+            }
         },
         mounted () {
             this.initData()
@@ -411,6 +418,7 @@
     .bk-add-content {
         .bk-content-group {
             width: 100% !important;
+            background: white;
             margin-bottom: 18px;
             box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
             border-radius: 2px;
@@ -469,6 +477,7 @@
         }
         .bk-priority-configur {
             display: inline-block;
+            box-shadow: 0px 2px 6px 0px rgba(6, 6, 6, 0.1);
             width: 84%;
         }
     }

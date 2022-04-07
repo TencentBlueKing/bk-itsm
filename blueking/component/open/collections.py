@@ -36,19 +36,20 @@ from .apis.job import CollectionsJOB
 from .apis.sops import CollectionsSOPS
 from .apis.usermanage import CollectionsUSERMANAGE
 from .apis.doc_center import CollectionsDOCS
-
+from .apis.esb import CollectionsEsb
 
 # Available components
 AVAILABLE_COLLECTIONS = {
-    'bk_login': CollectionsBkLogin,
-    'bk_paas': CollectionsBkPaas,
-    'cc': CollectionsCC,
-    'cmsi': CollectionsCMSI,
-    'gse': CollectionsGSE,
-    'job': CollectionsJOB,
-    'sops': CollectionsSOPS,
-    'usermanage': CollectionsUSERMANAGE,
-    'api_gateway': CollectionsApiGateway,
-    'itsm': CollectionsITSM,
-    'doc_center': CollectionsDOCS,
+    "bk_login": CollectionsBkLogin,
+    "bk_paas": CollectionsBkPaas,
+    "cc": CollectionsCC,
+    "cmsi": CollectionsCMSI,
+    "gse": CollectionsGSE,
+    "job": CollectionsJOB,
+    "sops": CollectionsSOPS,
+    "usermanage": CollectionsUSERMANAGE,
+    "api_gateway": CollectionsApiGateway,
+    "itsm": CollectionsITSM,
+    "esb": CollectionsEsb,
+    "doc_center": CollectionsDOCS,
 }

@@ -465,6 +465,20 @@ class SopsStateValidator(object):
                 raise ParamError(_("【{}】参数不能为空").format(constant.get("name")))
 
 
+class DevSopsStateValidator(object):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def __call__(self, value):
+        if not value["extras"]["devops_info"]["project_id"]:
+            raise ParamError(_("请选择蓝盾项目"))
+        if not value["extras"]["devops_info"]["pipeline_id"]:
+            raise ParamError(_("请选择蓝盾流水线"))
+        for constant in value["extras"]["devops_info"]["constants"]:
+            if not constant.get("value"):
+                raise ParamError(_("【{}】参数不能为空").format(constant.get("name")))
+
+
 class StateProcessorsValidator(object):
     def __init__(self, instance):
         self.instance = instance

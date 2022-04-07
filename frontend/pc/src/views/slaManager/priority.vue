@@ -30,11 +30,6 @@
         </div>
         <div class="itsm-page-content">
             <!-- 提示信息 -->
-            <div class="bk-itsm-version" v-if="versionStatus">
-                <i class="bk-icon icon-info-circle"></i>
-                <span>{{ $t('m.slaContent["优先级管理：通过影响范围和紧急程度两个维度来进行不同服务类型的优先级矩阵管理。"]') }}</span>
-                <i class="bk-icon icon-close" @click="closeVersion"></i>
-            </div>
             <!-- table切换栏 -->
             <ul class="bk-priority-type">
                 <li v-for="(item, index) in choiceTypeList"
@@ -44,6 +39,11 @@
                     <span>{{item.name}}</span>
                 </li>
             </ul>
+            <div class="bk-itsm-version" v-if="versionStatus">
+                <i class="bk-icon icon-info-circle"></i>
+                <span>{{ $t('m.slaContent["优先级管理：通过影响范围和紧急程度两个维度来进行不同服务类型的优先级矩阵管理。"]') }}</span>
+                <i class="bk-icon icon-close" @click="closeVersion"></i>
+            </div>
             <!-- 优先级表格 -->
             <div class="bk-priority-table" v-bkloading="{ isLoading: isDataLoading }">
                 <priority-table
@@ -271,7 +271,10 @@
 
     .bk-priority-type {
         @include clearfix;
-        border-bottom: 1px solid #DDE4EB;
+        border-bottom: 1px solid #dde4eb;
+        margin: -20px -20px 20px;
+        padding: 0 20px;
+        background-color: #ffffff;
         li {
             float: left;
             padding: 0 10px;
@@ -281,12 +284,12 @@
             cursor: pointer;
             font-size: 14px;
             &:hover {
-                color: #3A84FF;
+                color: #3a84ff;
             }
         }
         .bk-check-li {
-            border-bottom: 2px solid #3A84FF;
-            color: #3A84FF;
+            border-bottom: 2px solid #3a84ff;
+            color: #3a84ff;
         }
     }
     .bk-priority-table {

@@ -122,21 +122,27 @@ def superuser_permissions(view_func):
 
 
 class SystemSettingPermit(IamAuthWithoutResourcePermit):
-    
     def has_permission(self, request, view):
         if view.action == "list":
             apply_actions = []
         else:
             apply_actions = ["global_settings_manage", "platform_manage_access"]
-            
+
         return self.iam_auth(request, apply_actions)
 
 
 class CustomNotifyPermit(IamAuthWithoutResourcePermit):
     def has_permission(self, request, view):
-        if view.action == "list":
+        if view.action in ["variable_list", "action_type"]:
             return True
-        else:
-            apply_actions = ["notification_manage", "platform_manage_access"]
-
+        apply_actions = []
+        if view.action == "list":
+            if "project_key" not in request.query_params:
+                apply_actions = ["notification_view", "platform_manage_access"]
         return self.iam_auth(request, apply_actions)
+
+    def has_object_permission(self, request, view, obj):
+        if obj.project_key == "public":
+            apply_actions = ["notification_view", "platform_manage_access"]
+            return self.iam_auth(request, apply_actions)
+        return True

@@ -430,6 +430,23 @@ class StateViewSet(BaseWorkflowElementViewSet):
         return Response(valid_inputs)
 
     @action(detail=True, methods=["get"])
+    def group_variables(self, request, *args, **kwargs):
+        state = self.get_object()
+
+        # 默认先把field和全局的变量都获取出来
+        resource_type = request.GET.get("resource_type", "both")
+        exclude_self = request.GET.get("exclude_self", False)
+
+        valid_inputs = state.get_valid_inputs_by_group(
+            exclude_self=exclude_self, resource_type=resource_type, scope="state"
+        )
+
+        # 非提单节点可引用单据属性（提单节点提交前，尚未创建工单）
+        if not state.is_first_state:
+            valid_inputs["系统变量"] = TICKET_GLOBAL_VARIABLES
+        return Response(valid_inputs)
+
+    @action(detail=True, methods=["get"])
     def sign_variables(self, request, *args, **kwargs):
         """获取会签节点输出变量"""
         state = self.get_object()
@@ -452,12 +469,17 @@ class StateViewSet(BaseWorkflowElementViewSet):
         当前节点的后置节点
         """
         instance = self.get_object()
+        include_self = request.query_params.get("include_self", "false")
         posts = instance.get_post_states(
             contain_auto=request.query_params.get("contain_auto", "false"),
             exclude_states=[instance.id],
         )
-        serializer = self.get_serializer(posts, many=True)
-        return Response(serializer.data)
+        data = self.get_serializer(posts, many=True).data
+
+        if include_self == "true":
+            instance_data = self.get_serializer(instance).data
+            data.insert(0, instance_data)
+        return Response(data)
 
     @action(detail=True, methods=["post"])
     def add_fields_from_table(self, request, *args, **kwargs):
@@ -680,7 +702,10 @@ class FieldViewSet(BaseFieldViewSet):
         自动从State的fields中移除该字段
         """
         with transaction.atomic():
-            if instance.key == "bk_biz_id" and instance.state.name == "提单":
+            if (
+                instance.key == "bk_biz_id"
+                and instance.id == instance.workflow.first_state.id
+            ):
                 instance.workflow.is_biz_needed = False
                 instance.workflow.save()
             if instance.source != TABLE:
@@ -999,7 +1024,7 @@ class TableViewSet(component_viewsets.ModelViewSet):
     """基础模型视图"""
 
     # permission_classes = (IamAuthWithoutResourcePermit,)
-    queryset = Table.objects.all().order_by("-create_at")
+    queryset = Table.objects.filter(is_builtin=True).order_by("-create_at")
     serializer_class = TableSerializer
     filter_fields = {
         "name": ["contains", "icontains"],
@@ -1103,7 +1128,7 @@ class TaskSchemaViewSet(DynamicListModelMixin, component_viewsets.ModelViewSet):
         """
         src_instance = self.get_object()
         # 通过前端接口复制的任务模板，直接置为草稿，需要重新保存处理
-        new_ids, _ = TaskSchema.objects.clone([src_instance.id], is_draft=True)
+        new_ids = TaskSchema.objects.clone([src_instance.id], is_draft=True)
         return Response(new_ids)
 
     def perform_destroy(self, instance):

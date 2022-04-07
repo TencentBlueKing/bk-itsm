@@ -61,8 +61,9 @@ export default {
             })
         },
         // 按执行顺序获取流程节点
-        getOrderedStates ({ commit, state, dispatch }, { params, id }) {
-            return ajax.get(`workflow/states/${id}/post_states/`, { params }).then(response => {
+        getOrderedStates ({ commit, state, dispatch }, params) {
+            const { id } = params
+            return ajax.get(`workflow/states/${id}/post_states/`, { params: params }).then(response => {
                 let res = response.data
                 return res
             })

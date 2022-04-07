@@ -61,9 +61,9 @@ class TicketStatusPermit(IamAuthPermit):
     def has_permission(self, request, view):
         if view.action == "get_configs":
             apply_actions = ["ticket_state_view", "platform_manage_access"]
-        elif view.action in ["overall_ticket_statuses", "list"]:
+        elif view.action in ["overall_ticket_statuses", "list", "next_over_status"]:
             return True
         else:
             apply_actions = ["ticket_state_manage"]
-        
+
         return self.iam_auth(request, apply_actions)

@@ -40,6 +40,9 @@ class RobotForms(BaseForm):
 
     web_hook_id = StringField(name="Webhook ID", required=True)
     content = StringField(name=_("文本内容"), field_type="TEXT", required=True)
+    mentioned_list = StringField(
+        name="需要提及的人的列表", tips="英文半角逗号分割的英文名列表，不填则默认@所有成员，None不@任何人", required=False
+    )
 
 
 class AutomaticAnnouncementComponent(BaseComponent):
@@ -54,6 +57,13 @@ class AutomaticAnnouncementComponent(BaseComponent):
         """
         web_hook_ids = self.data.get_one_of_inputs("web_hook_id")
         content = self.data.get_one_of_inputs("content")
+        mentioned_list = self.data.get_one_of_inputs("mentioned_list")
+        if mentioned_list is None or len(mentioned_list) == 0:
+            mentioned_list = ["@all"]
+        elif mentioned_list == "None":
+            mentioned_list = []
+        else:
+            mentioned_list = mentioned_list.split(",")
         if not web_hook_ids:
             self.data.set_outputs("message", "企业微信机器人未添加")
             return False
@@ -63,8 +73,8 @@ class AutomaticAnnouncementComponent(BaseComponent):
             return False
 
         threads = []
-        for web_hook_id in web_hook_ids.split(','):
-            announcement = robot.Announcement(web_hook_id, content)
+        for web_hook_id in web_hook_ids.split(","):
+            announcement = robot.Announcement(web_hook_id, content, mentioned_list)
             threads.append(announcement)
 
         for thread in threads:
@@ -74,7 +84,11 @@ class AutomaticAnnouncementComponent(BaseComponent):
         for thread in threads:
             thread.join()
             if not thread.is_success():
-                output.append("发送消息到{}机器人失败，原因是{}".format(thread.web_hook_id, thread.get_error_msg()))
+                output.append(
+                    "发送消息到{}机器人失败，原因是{}".format(
+                        thread.web_hook_id, thread.get_error_msg()
+                    )
+                )
 
         if output:
             self.data.set_outputs("message", ";".join(output))

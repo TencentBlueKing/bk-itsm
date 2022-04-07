@@ -22,7 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import jsonfield
 from django.db import models, transaction
 
 from itsm.component.constants import (
@@ -32,6 +32,8 @@ from itsm.component.constants import (
     LEN_NORMAL,
     LEN_SHORT,
     PUBLIC_PROJECT_PROJECT_KEY,
+    EMPTY_DICT,
+    FIRST_ORDER,
 )
 from itsm.iadmin.contants import PROJECT_SETTING
 from itsm.project.models.base import Model
@@ -115,7 +117,23 @@ class Project(Model):
             )
 
     def init_project_sla(self):
-        Sla.init_sla(Schedule.init_schedule(project_key=self.key), project_key=self.key)
+        schedules = Schedule.init_schedule(project_key=self.key)
+        sla_list = Sla.init_sla(schedules, project_key=self.key)
+        self.grant_instance_permit(schedules)
+        self.grant_instance_permit(sla_list)
+
+    def init_custom_notify_template(self):
+        from itsm.sla.models import CustomNotice
+
+        CustomNotice.init_project_template(self.key)
+
+    def grant_instance_permit(self, instances):
+        from itsm.auth_iam.utils import grant_instance_creator_related_actions
+
+        for instance in instances:
+            instance.creator = self.creator
+            instance.save()
+            grant_instance_creator_related_actions(instance)
 
     def delete(self, using=None):
         self.is_deleted = True
@@ -162,3 +180,21 @@ class UserProjectAccessRecord(Model):
             self.project_key = project_key
             self.updated_by = self.username
             self.save()
+
+
+class CostomTab(Model):
+    name = models.CharField(_("名称"), max_length=LEN_SHORT)
+    desc = models.CharField(_("描述"), max_length=LEN_LONG, null=True, blank=True)
+    project_key = models.CharField(_("项目key"), max_length=LEN_SHORT)
+    conditions = jsonfield.JSONField(
+        _("筛选条件"), default=EMPTY_DICT, null=True, blank=True
+    )
+    order = models.IntegerField(_("排序"), default=FIRST_ORDER)
+    is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
+
+    def delete(self, using=None):
+        self.is_deleted = True
+        self.save()
+
+    def hard_delete(self, using=None):
+        super(Model, self).delete()

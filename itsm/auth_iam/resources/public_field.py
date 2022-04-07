@@ -30,14 +30,16 @@ from ...workflow.models import TemplateField
 
 
 class PublicFieldResourceProvider(ItsmResourceProvider):
-    queryset = TemplateField.objects.filter(project_key='public')
+    queryset = TemplateField.objects.filter(project_key="public")
 
     def list_instance(self, filter, page, **options):
         queryset = self.queryset
         count = queryset.count()
-        # return 
-        results = [{"id": public_field.id, "display_name": public_field.name} for public_field in
-                   queryset[page.slice_from: page.slice_to]]
+        # return
+        results = [
+            {"id": public_field.id, "display_name": public_field.name}
+            for public_field in queryset[page.slice_from : page.slice_to]
+        ]
 
         return ListResult(results=results, count=count)
 
@@ -45,7 +47,14 @@ class PublicFieldResourceProvider(ItsmResourceProvider):
         """
         public_field 没有定义属性，只处理 filter 中的 ids 字段
         """
-        queryset = self.queryset.filter(key__in=filter.ids)
+        queryset = self.queryset.filter(id__in=filter.ids)
         count = queryset.count()
-        results = [{"id": public_field.id, "display_name": public_field.name} for public_field in queryset]
+        results = [
+            {
+                "id": public_field.id,
+                "display_name": public_field.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(public_field.creator),
+            }
+            for public_field in queryset
+        ]
         return ListResult(results=results, count=count)

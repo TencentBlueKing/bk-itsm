@@ -68,7 +68,8 @@ from itsm.component.constants import (
     TRANSITION_SIGNAL,
     TASK_SIGNAL,
     SOPS_TASK,
-    FLOW, PUBLIC_PROJECT_PROJECT_KEY,
+    FLOW,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.db import managers
 from itsm.component.utils.basic import (
@@ -82,7 +83,6 @@ from itsm.component.utils.bk_bunch import bunchify
 from itsm.component.utils.misc import find_sub_string
 from itsm.role.models import UserRole
 from itsm.postman.models import RemoteApi, RemoteApiInstance
-from itsm.service.models import Service
 from itsm.trigger.api import copy_triggers_by_source, restore_trigger_data
 
 
@@ -102,7 +102,9 @@ class TransitionQuerySet(SoftDeleteQuerySet):
 
         rows = super(SoftDeleteQuerySet, self).update(is_deleted=True)
         for row in deleted_transition_info:
-            StateManager.update_state_label(row["from"], row["to"], operate_type="delete")
+            StateManager.update_state_label(
+                row["from"], row["to"], operate_type="delete"
+            )
         return rows
 
 
@@ -138,7 +140,10 @@ class ConditionManager(Manager):
         }
 
     def build_yes_or_no(self, key, field_choice, cond_type="YES"):
-        choices = [{"isDisabled": False, "id": c["key"], "name": c["name"]} for c in field_choice]
+        choices = [
+            {"isDisabled": False, "id": c["key"], "name": c["name"]}
+            for c in field_choice
+        ]
         return self.build_select_condition(key, "==", cond_type, choices)
 
 
@@ -147,8 +152,17 @@ class WorkflowManager(Manager):
     workflow表级操作
     """
 
-    def draw_workflow(self, flow, name=None, dest=None, layout="LR", width=20, height=16,
-                      save=False, view=False):
+    def draw_workflow(
+        self,
+        flow,
+        name=None,
+        dest=None,
+        layout="LR",
+        width=20,
+        height=16,
+        save=False,
+        view=False,
+    ):
         """转换为png图表，依赖graphviz"""
 
         from graphviz import Digraph
@@ -202,8 +216,12 @@ class WorkflowManager(Manager):
 
     def init_builtin_workflow(self):
 
-        file_path = os.path.join(settings.PROJECT_ROOT, "initials", "workflow",
-                                 "bk_itsm_builtin_workflow.json")
+        file_path = os.path.join(
+            settings.PROJECT_ROOT,
+            "initials",
+            "workflow",
+            "bk_itsm_builtin_workflow.json",
+        )
         with open(file_path, "r", encoding="utf-8") as f:
             data = f.read()
 
@@ -227,62 +245,107 @@ class WorkflowManager(Manager):
             desc="权限中心系统",
             role_key="BK_IAM",
             creator="admin",
-            is_builtin=True
+            is_builtin=True,
         )
 
     def init_iam_default_workflow(self):
         try:
-            iam_default = os.path.join(settings.PROJECT_ROOT, "initials/workflow/iam_default.json")
+            iam_default = os.path.join(
+                settings.PROJECT_ROOT, "initials/workflow/iam_default.json"
+            )
             with open(iam_default) as fp:
                 data = json.load(fp)
                 item = data[0]
-                for state_id, state in item['states'].items():
-                    if state['processors_type'] == 'IAM':
-                        processors = UserRole.objects.get(role_type='IAM',
-                                                          role_key='super_manager').id
-                        state['processors'] = str(processors)
+                for state_id, state in item["states"].items():
+                    if state["processors_type"] == "IAM":
+                        processors = UserRole.objects.get(
+                            role_type="IAM", role_key="super_manager"
+                        ).id
+                        state["processors"] = str(processors)
                 item.update(is_builtin=True)
                 self.restore(item)
 
-            iam_user = os.path.join(settings.PROJECT_ROOT, 'initials/workflow/iam_user.json')
+            iam_user = os.path.join(
+                settings.PROJECT_ROOT, "initials/workflow/iam_user.json"
+            )
             with open(iam_user) as fp:
                 data = json.load(fp)
                 item = data[0]
-                for state_id, state in item['states'].items():
-                    if state['processors_type'] == 'IAM':
-                        processors = UserRole.objects.get(role_type='IAM',
-                                                          role_key='rating_manager').id
-                        state['processors'] = str(processors)
+                for state_id, state in item["states"].items():
+                    if state["processors_type"] == "IAM":
+                        processors = UserRole.objects.get(
+                            role_type="IAM", role_key="rating_manager"
+                        ).id
+                        state["processors"] = str(processors)
                 item.update(is_builtin=True)
                 self.restore(item)
         except Exception as err:
-            logger.exception('init_iam_default_workflow error, msg is {}'.format(err))
+            logger.exception("init_iam_default_workflow error, msg is {}".format(err))
+
+    def init_bkbase_workflow(self):
+        bkbase_path = os.path.join(
+            settings.PROJECT_ROOT, "initials", "workflow", "bkbase"
+        )
+        bkbase_files = os.listdir(bkbase_path)
+        for file in bkbase_files:
+            file_path = os.path.join(bkbase_path, file)
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = f.read()
+
+            for flow_data in json.loads(data):
+                try:
+                    flows = self.filter(name=flow_data.get("name"))
+                    if len(flows) > 0:
+                        continue
+
+                    flow_data.update(is_builtin=True)
+                    self.restore(flow_data)
+                except BaseException as error:
+                    print(
+                        u"init workflow [{name}] error : {error}".format(
+                            name=flow_data.get("name", "none"), error=str(error)
+                        )
+                    )
 
     def create_workflow(self, content):
         # workflow
         content.update(is_draft=False)
         return self.create(**content)
 
-    @transaction.atomic
     def restore(self, data, operator="", for_migrate=False):
         """WorkflowVersion->Workflow's record"""
-
-        from django.db.models.signals import post_save
-        from itsm.workflow.signals.handlers import init_after_workflow_created
-        from itsm.workflow.models import State, Field, Transition, Table, TaskSchema, TaskConfig
-        from itsm.iadmin.models import SystemSettings
-        from distutils.dir_util import copy_tree
-
-        case_one = data.get("is_builtin") and self.filter(is_builtin=True,
-                                                          name=data.get("name")).exists()
-        case_two = data.get("is_iam_used") and self.filter(is_iam_used=True,
-                                                           name=data.get("name")).exists()
+        case_one = (
+            data.get("is_builtin")
+            and self.filter(is_builtin=True, name=data.get("name")).exists()
+        )
+        case_two = (
+            data.get("is_iam_used")
+            and self.filter(is_iam_used=True, name=data.get("name")).exists()
+        )
         if case_one or case_two:
             # 内置流程只能导入一次
-            logger.info("workflow exist, skip restore workflow {}".format(data.get("name")))
+            logger.info(
+                "workflow exist, skip restore workflow {}".format(data.get("name"))
+            )
             print("workflow exist, skip restore workflow {}".format(data.get("name")))
             return
+        return self.clone(data, operator, for_migrate)
 
+    @transaction.atomic
+    def clone(self, data, operator="", for_migrate=False):
+        from django.db.models.signals import post_save
+        from itsm.workflow.signals.handlers import init_after_workflow_created
+        from itsm.workflow.models import (
+            State,
+            Field,
+            Transition,
+            Table,
+            TaskSchema,
+            TaskConfig,
+        )
+        from itsm.iadmin.models import SystemSettings
+        from distutils.dir_util import copy_tree
+        
         states = data.pop("states")
         transitions = data.pop("transitions")
         fields = data.pop("fields")
@@ -321,8 +384,9 @@ class WorkflowManager(Manager):
             creator=operator,
             updated_by=operator,
             owners=operator,
-            name=data['name'] if data.get("is_builtin") else "{name}-{version_number}".format(
-                **data),
+            name=data["name"]
+            if data.get("is_builtin")
+            else "{name}-{version_number}".format(**data),
             version_number=create_version_number(),
         )
         old_workflow_id = data.pop("workflow_id")
@@ -335,23 +399,27 @@ class WorkflowManager(Manager):
 
         # 恢复table
         table, table_fields_map = Table.objects.restore(table_data)
-        new_task_schemas, new_old_id_map = TaskSchema.objects.restore(task_schemas=task_schemas,
-                                                                      operator=operator)
+        new_task_schemas, new_old_id_map = TaskSchema.objects.restore(
+            task_schemas=task_schemas, operator=operator
+        )
 
         new_workflow_id = workflow.id
         # 恢复state/transition/field
         _states, _state_map = State.objects.restore_states(states, new_workflow_id)
-        _, _field_map = Field.objects.restore_fields(fields, workflow, _state_map, for_migrate)
-        _, _transition_map = Transition.objects.restore_transitions(transitions, new_workflow_id,
-                                                                    _state_map)
+        _, _field_map = Field.objects.restore_fields(
+            fields, workflow, _state_map, for_migrate
+        )
+        _, _transition_map = Transition.objects.restore_transitions(
+            transitions, new_workflow_id, _state_map
+        )
         if new_task_schemas:
-            task_settings = workflow.extras['task_settings']
+            task_settings = workflow.extras["task_settings"]
             if task_settings and isinstance(task_settings, dict):
                 new_settings = []
-                task_schema_ids = task_settings.pop('task_schema_ids')
+                task_schema_ids = task_settings.pop("task_schema_ids")
                 for schema_id in task_schema_ids:
                     task_setting = copy.deepcopy(task_settings)
-                    task_setting['task_schema_id'] = schema_id
+                    task_setting["task_schema_id"] = schema_id
                     new_settings.append(task_setting)
                 task_settings = new_settings
 
@@ -360,15 +428,15 @@ class WorkflowManager(Manager):
                 obj = TaskConfig(
                     workflow_id=new_workflow_id,
                     workflow_type=FLOW,
-                    task_schema_id=setting['task_schema_id'],
-                    create_task_state=setting['create_task_state'],
-                    execute_task_state=setting['execute_task_state'],
-                    execute_can_create=setting['execute_can_create'],
-                    need_task_finished=setting['need_task_finished'],
+                    task_schema_id=setting["task_schema_id"],
+                    create_task_state=setting["create_task_state"],
+                    execute_task_state=setting["execute_task_state"],
+                    execute_can_create=setting["execute_can_create"],
+                    need_task_finished=setting["need_task_finished"],
                 )
                 task_objs.append(obj)
             TaskConfig.objects.bulk_create(task_objs)
-            workflow.extras['task_settings'] = task_settings
+            workflow.extras["task_settings"] = task_settings
         workflow.table = table
         workflow.save()
 
@@ -379,7 +447,9 @@ class WorkflowManager(Manager):
             operator=operator,
             sender_map={
                 STATE_SIGNAL: {str(key): value for key, value in _state_map.items()},
-                TRANSITION_SIGNAL: {str(key): value for key, value in _transition_map.items()},
+                TRANSITION_SIGNAL: {
+                    str(key): value for key, value in _transition_map.items()
+                },
                 FLOW_SIGNAL: {str(old_workflow_id): new_workflow_id},
             },
         )
@@ -387,13 +457,15 @@ class WorkflowManager(Manager):
         system_file_path = SystemSettings.objects.get(key="SYS_FILE_PATH").value
 
         for state_id in old_state_ids:
-            old_path = os.path.join(system_file_path,
-                                    "workflow_{}_{}".format(old_workflow_id, state_id))
+            old_path = os.path.join(
+                system_file_path, "workflow_{}_{}".format(old_workflow_id, state_id)
+            )
             if os.path.exists(old_path):
                 new_path = os.path.join(
-                    system_file_path, "workflow_{}_{}".format(new_workflow_id,
-                                                              _state_map.get(int(state_id),
-                                                                             state_id)),
+                    system_file_path,
+                    "workflow_{}_{}".format(
+                        new_workflow_id, _state_map.get(int(state_id), state_id)
+                    ),
                 )
                 copy_tree(old_path, new_path)
 
@@ -404,7 +476,12 @@ class WorkflowManager(Manager):
 
     @transaction.atomic
     def upgrade_workflow(
-        self, flow_id=None, for_migrate=False, transition_map=None, state_map=None, ticket=None,
+        self,
+        flow_id=None,
+        for_migrate=False,
+        transition_map=None,
+        state_map=None,
+        ticket=None,
         **kwargs
     ):
         """升级workflow
@@ -464,9 +541,13 @@ class WorkflowManager(Manager):
 
                 # # 路由分支历史命中
                 if state.type == "ROUTER" and ticket:
-                    last_log = ticket.logs.filter(from_state_id=new_old_state_map[state.id]).last()
+                    last_log = ticket.logs.filter(
+                        from_state_id=new_old_state_map[state.id]
+                    ).last()
                     if last_log:
-                        diamond_selected_transition_id = transition_map.get(last_log.transition_id)
+                        diamond_selected_transition_id = transition_map.get(
+                            last_log.transition_id
+                        )
 
                 can_back = extras.get("can_back", False)
                 can_distribute = extras.get("can_distribute", False)
@@ -487,8 +568,12 @@ class WorkflowManager(Manager):
                     workflow.fields.filter(state_id=state.id).update(
                         show_conditions={
                             "expressions": [
-                                {"value": "YES", "type": "SELECT", "condition": "==",
-                                 "key": state_reject_key, }
+                                {
+                                    "value": "YES",
+                                    "type": "SELECT",
+                                    "condition": "==",
+                                    "key": state_reject_key,
+                                }
                             ],
                             "type": "and",
                         },
@@ -497,7 +582,10 @@ class WorkflowManager(Manager):
 
                     # 创建字段：是否打回到【节点名】/单选下拉/是|否
                     field_name = "是否打回到【{}】".format(back_transition.to_state.name)
-                    field_choice = [{"key": "YES", "name": "是"}, {"key": "NO", "name": "否"}]
+                    field_choice = [
+                        {"key": "YES", "name": "是"},
+                        {"key": "NO", "name": "否"},
+                    ]
                     reject_field, created = workflow.fields.update_or_create(
                         state=state,
                         key=state_reject_key,
@@ -516,8 +604,9 @@ class WorkflowManager(Manager):
                     state_fields.insert(0, reject_field.id)
 
                     # 创建打回原因字段
-                    message_field = self.create_reject_message_field(state, workflow,
-                                                                     state_reject_key, "YES")
+                    message_field = self.create_reject_message_field(
+                        state, workflow, state_reject_key, "YES"
+                    )
                     state_fields.append(message_field.id)
 
                     # print 'reject: create(%s) field[%s] in state [%s]' % (created, field_name, state.name)
@@ -525,37 +614,49 @@ class WorkflowManager(Manager):
                     # print 'reject: create condition for back_transition: %s' % back_transition.name
 
                     # 构造打回连线条件
-                    yes_condition = Condition.objects.build_yes_or_no(state_reject_key,
-                                                                      field_choice, "YES")
+                    yes_condition = Condition.objects.build_yes_or_no(
+                        state_reject_key, field_choice, "YES"
+                    )
                     Condition.objects.create(workflow=workflow, data=yes_condition)
                     transitions.filter(direction="BACK").update(
-                        condition=yes_condition, condition_type="by_field",
+                        condition=yes_condition,
+                        condition_type="by_field",
                         axis={"end": "Bottom", "start": "Bottom"},
                     )
 
                     # 构造非打回连线条件
-                    no_condition = Condition.objects.build_yes_or_no(state_reject_key, field_choice,
-                                                                     "NO")
+                    no_condition = Condition.objects.build_yes_or_no(
+                        state_reject_key, field_choice, "NO"
+                    )
                     Condition.objects.create(workflow=workflow, data=no_condition)
                     forward_transitions.update(
-                        condition=no_condition, condition_type="by_field",
+                        condition=no_condition,
+                        condition_type="by_field",
                         axis={"end": "Top", "start": "Right"},
                     )
 
                 # 菱形迁移 - 合并打回字段和菱形选择字段/线条条件
                 if state.type == ROUTER_STATE and (
-                    forward_transitions.count() > 1 or back_transition):
+                    forward_transitions.count() > 1 or back_transition
+                ):
                     # 创建字段：节点名称/单选下拉/选项为出口线名称列表
                     field_name = state.name
-                    field_choice = [{"key": "OPTION-{}".format(ft.id), "name": ft.name} for ft in
-                                    forward_transitions]
+                    field_choice = [
+                        {"key": "OPTION-{}".format(ft.id), "name": ft.name}
+                        for ft in forward_transitions
+                    ]
 
                     if back_transition:
                         choice_name = "打回到【{}】".format(back_transition.to_state.name)
                         field_choice.append(
-                            {"key": "OPTION-{}".format(back_transition.id), "name": choice_name})
+                            {
+                                "key": "OPTION-{}".format(back_transition.id),
+                                "name": choice_name,
+                            }
+                        )
                         transitions.filter(direction="BACK").update(
-                            axis={"end": "Bottom", "start": "Bottom"})
+                            axis={"end": "Bottom", "start": "Bottom"}
+                        )
                         # 有打回，则更新字段展示条件
                         workflow.fields.filter(state_id=state.id).update(
                             show_conditions={
@@ -573,7 +674,9 @@ class WorkflowManager(Manager):
                         )
                         # 创建打回原因
                         message_field = self.create_reject_message_field(
-                            state, workflow, state_diamond_key,
+                            state,
+                            workflow,
+                            state_diamond_key,
                             "OPTION-{}".format(back_transition.id),
                         )
                         state_fields.append(message_field.id)
@@ -608,7 +711,9 @@ class WorkflowManager(Manager):
 
                     state_fields.insert(0, diamond_field.id)
                     state.add_variables(
-                        state_diamond_key, "SELECT", in_or_out="outputs",
+                        state_diamond_key,
+                        "SELECT",
+                        in_or_out="outputs",
                         default=diamond_selected_value,
                     )
 
@@ -624,8 +729,9 @@ class WorkflowManager(Manager):
                         fct.save()
 
                 # remove [FIELD_BACK_MSG, FIELD_TERM_MSG]
-                for field in workflow.fields.filter(state_id=state.id,
-                                                    key__in=[FIELD_BACK_MSG, FIELD_TERM_MSG]):
+                for field in workflow.fields.filter(
+                    state_id=state.id, key__in=[FIELD_BACK_MSG, FIELD_TERM_MSG]
+                ):
                     try:
                         state_fields.remove(field.id)
                     except Exception:
@@ -640,13 +746,18 @@ class WorkflowManager(Manager):
                                 api_instance_id=group_instance.id,
                                 source_type="API",
                                 type="SELECT",
-                                kv_relation={"name": "bk_inst_name", "key": "bk_inst_id"},
+                                kv_relation={
+                                    "name": "bk_inst_name",
+                                    "key": "bk_inst_id",
+                                },
                                 key=settings.BIZ_GROUP_CONF["biz_obj_id"],
                                 desc=settings.BIZ_GROUP_DESC,
                                 state=state,
                             )
                             state_fields.insert(1, group_field.id)
-                            Field._objects.filter(key=FIELD_BIZ, id__in=state.fields).update(
+                            Field._objects.filter(
+                                key=FIELD_BIZ, id__in=state.fields
+                            ).update(
                                 api_instance_id=biz_instance.id,
                                 source_type="API",
                                 type="SELECT",
@@ -655,7 +766,9 @@ class WorkflowManager(Manager):
                                 desc="请选择业务",
                             )
                         else:
-                            Field._objects.filter(key=FIELD_BIZ, id__in=state.fields).update(
+                            Field._objects.filter(
+                                key=FIELD_BIZ, id__in=state.fields
+                            ).update(
                                 api_instance_id=biz_instance.id,
                                 source_type="API",
                                 type="SELECT",
@@ -711,10 +824,12 @@ class WorkflowManager(Manager):
 
     def fix_fields(self, workflow):
         workflow.fields.all().update(related_fields={})
-        workflow.fields.filter(key="fault_level").update(source_type="DATADICT",
-                                                         source_uri="FAULT_LEVEL_INIT")
+        workflow.fields.filter(key="fault_level").update(
+            source_type="DATADICT", source_uri="FAULT_LEVEL_INIT"
+        )
         workflow.fields.filter(key="event_type").update(
-            source_type="DATADICT", source_uri="EVENT_TYPE",
+            source_type="DATADICT",
+            source_uri="EVENT_TYPE",
         )
 
     def create_reject_message_field(self, state, workflow, key, select_value):
@@ -733,7 +848,13 @@ class WorkflowManager(Manager):
                 "tips": "",
                 "show_conditions": {
                     "expressions": [
-                        {"value": select_value, "type": "SELECT", "condition": "!=", "key": key}],
+                        {
+                            "value": select_value,
+                            "type": "SELECT",
+                            "condition": "!=",
+                            "key": key,
+                        }
+                    ],
                     "type": "and",
                 },
                 "show_type": SHOW_BY_CONDITION,
@@ -772,8 +893,13 @@ class StateManager(Manager):
         """创建结束节点"""
 
         return self.create(
-            workflow_id=workflow_id, name="结束", type="END", is_draft=False, is_builtin=True,
-            axis=axis, label="G",
+            workflow_id=workflow_id,
+            name="结束",
+            type="END",
+            is_draft=False,
+            is_builtin=True,
+            axis=axis,
+            label="G",
         )
 
     def create_first_state(self, workflow, name):
@@ -791,8 +917,9 @@ class StateManager(Manager):
 
             # 初始化初始阶段的默认字段
             first_state.fields = list(
-                workflow.fields.filter(is_builtin=True).exclude(key=FIELD_STATUS).values_list("id",
-                                                                                              flat=True)
+                workflow.fields.filter(is_builtin=True)
+                .exclude(key=FIELD_STATUS)
+                .values_list("id", flat=True)
             )
             first_state.save()
 
@@ -839,13 +966,17 @@ class StateManager(Manager):
 
         # 基础模型中的字段默认所有节点可用，无需设置到某个节点
         fields = []
-        for item in Field.objects.filter(key__in=field_outputs, workflow_id=workflow_id).values(
-            "key", "type", "state", "source"
-        ):
+        for item in Field.objects.filter(
+            key__in=field_outputs, workflow_id=workflow_id
+        ).values("key", "type", "state", "source"):
             if item["source"] != "TABLE":
                 fields.append(
-                    {"key": item["key"], "type": item["type"], "source": "field",
-                     "state": item["state"], }
+                    {
+                        "key": item["key"],
+                        "type": item["type"],
+                        "source": "field",
+                        "state": item["state"],
+                    }
                 )
 
         # 插入字段变量
@@ -854,8 +985,11 @@ class StateManager(Manager):
             if not state.variables.get("outputs"):
                 state.variables["outputs"] = []
 
-            exist_field_key = [item["key"] for item in state.variables["outputs"] if
-                               item["source"] == "field"]
+            exist_field_key = [
+                item["key"]
+                for item in state.variables["outputs"]
+                if item["source"] == "field"
+            ]
 
             if field["key"] not in exist_field_key:
                 state.variables["outputs"].append(field)
@@ -864,12 +998,15 @@ class StateManager(Manager):
 
         # 插入全局变量
         global_variables = [
-            {"key": item["key"], "type": item["type"], "source": "global",
-             "state": item["state_id"], }
-            for item in
-            GlobalVariable.objects.filter(key__in=global_outputs, flow_id=workflow_id).values(
-                "key", "type", "state_id"
-            )
+            {
+                "key": item["key"],
+                "type": item["type"],
+                "source": "global",
+                "state": item["state_id"],
+            }
+            for item in GlobalVariable.objects.filter(
+                key__in=global_outputs, flow_id=workflow_id
+            ).values("key", "type", "state_id")
         ]
 
         for variable in global_variables:
@@ -877,8 +1014,11 @@ class StateManager(Manager):
             if not state.variables.get("outputs"):
                 state.variables["outputs"] = []
 
-            exist_variable_key = [item["key"] for item in state.variables["outputs"] if
-                                  item["source"] == "global"]
+            exist_variable_key = [
+                item["key"]
+                for item in state.variables["outputs"]
+                if item["source"] == "global"
+            ]
 
             if variable["key"] not in exist_variable_key:
                 state.variables["outputs"].append(variable)
@@ -926,7 +1066,7 @@ class StateManager(Manager):
                     # 用于还原
                     # 导入的时候出现的问题
                     logger.info("api_info is {}".format(api_info))
-                    remote_api_info = api_info.pop('remote_api_info')
+                    remote_api_info = api_info.pop("remote_api_info")
                     for key in [
                         "remote_system_name",
                         "remote_system_id",
@@ -938,17 +1078,18 @@ class StateManager(Manager):
                         remote_api_info.pop(key, None)
                         api_info.pop(key, None)
 
-                    remote_api_info['name'] = '{}({})'.format(remote_api_info['name'],
-                                                              create_version_number())
+                    remote_api_info["name"] = "{}({})".format(
+                        remote_api_info["name"], create_version_number()
+                    )
 
-                    api = RemoteApi.restore_api(remote_api_info, 'system')
-                    api_info['remote_api_id'] = api.id
+                    api = RemoteApi.restore_api(remote_api_info, "system")
+                    api_info["remote_api_id"] = api.id
                     api_instance = RemoteApiInstance.objects.create(**api_info)
                 except BaseException as error:
                     logger.exception("restore api state error %s" % str(error))
                     api_instance = None
 
-                state['api_instance_id'] = api_instance.id if api_instance else 0
+                state["api_instance_id"] = api_instance.id if api_instance else 0
 
             state_restored = self.create(**state)
             restored_states.append(state_restored)
@@ -956,8 +1097,9 @@ class StateManager(Manager):
 
             # 批量创建全局变量
             variables_outputs = state["variables"].get("outputs", [])
-            GlobalVariable.objects.bulk_create_global_variables(variables_outputs,
-                                                                state_restored.id, workflow_id)
+            GlobalVariable.objects.bulk_create_global_variables(
+                variables_outputs, state_restored.id, workflow_id
+            )
         return restored_states, state_map
 
     @classmethod
@@ -1028,8 +1170,9 @@ class StateManager(Manager):
                 # 如果to 为 并行网关， 分为几种情况
 
                 _prefix = (
-                    find_sub_string(from_state.label,
-                                    "|P") if from_state.type == COVERAGE_STATE else from_state.label
+                    find_sub_string(from_state.label, "|P")
+                    if from_state.type == COVERAGE_STATE
+                    else from_state.label
                 )
                 to_state_label = "{}|P{}".format(_prefix, to_state.id)
             if to_state.type == COVERAGE_STATE:
@@ -1060,7 +1203,10 @@ class StateManager(Manager):
                     set_empty(to_state)
             return
 
-        if EMPTY not in [from_state.label, to_state.label] or from_state.label == to_state.label:
+        if (
+            EMPTY not in [from_state.label, to_state.label]
+            or from_state.label == to_state.label
+        ):
             # 本来label存在并且部位空的时候，不需要修改
             # 第一种情况：不包含空位，说明工作区间已经确定
             # 第二种情况：还没有合入到主流程的时候，所有节点都为EMPTY，采用默认即可
@@ -1090,8 +1236,9 @@ class StateManager(Manager):
     @classmethod
     def update_next_states_label(cls, current_state):
         next_states = [
-            t.to_state for t in current_state.transitions_from.filter(is_deleted=False) if
-            t.to_state.label == EMPTY
+            t.to_state
+            for t in current_state.transitions_from.filter(is_deleted=False)
+            if t.to_state.label == EMPTY
         ]
         for state in next_states:
             cls.update_state_label(current_state, state)
@@ -1099,8 +1246,9 @@ class StateManager(Manager):
     @classmethod
     def update_pre_states_label(cls, current_state):
         pre_states = [
-            t.from_state for t in current_state.transitions_to.filter(is_deleted=False) if
-            t.from_state.label == EMPTY
+            t.from_state
+            for t in current_state.transitions_to.filter(is_deleted=False)
+            if t.from_state.label == EMPTY
         ]
         for state in pre_states:
             cls.update_state_label(state, current_state)
@@ -1145,7 +1293,10 @@ class TransitionManager(Manager):
             next_state_id = states[index + 1].get("id")
 
             obj, created = self.get_or_create(
-                defaults={"name": "确定", "direction": "FORWARD", },
+                defaults={
+                    "name": "确定",
+                    "direction": "FORWARD",
+                },
                 workflow_id=workflow_id,
                 from_state_id=from_state_id,
                 to_state_id=next_state_id,
@@ -1164,7 +1315,9 @@ class TransitionManager(Manager):
             _, from_key, to_key = transition_id.split("-")
 
             if from_key == "start":
-                from_state_key = State.objects.get(workflow_id=workflow_id, type="START").pk
+                from_state_key = State.objects.get(
+                    workflow_id=workflow_id, type="START"
+                ).pk
             else:
                 from_state_key = state_map.get(from_key)
 
@@ -1173,14 +1326,23 @@ class TransitionManager(Manager):
             else:
                 to_state_key = state_map.get(to_key)
 
-            transition.update(workflow_id=workflow_id, from_state_id=from_state_key,
-                              to_state_id=to_state_key)
+            transition.update(
+                workflow_id=workflow_id,
+                from_state_id=from_state_key,
+                to_state_id=to_state_key,
+            )
             obj = self.create(**transition)
             obj_map[transition_id] = obj.pk
         return obj_map
 
     def create_forward_transition(
-        self, workflow_id, from_state_id, to_state_id, is_builtin=False, name="通过", creator="system"
+        self,
+        workflow_id,
+        from_state_id,
+        to_state_id,
+        is_builtin=False,
+        name="通过",
+        creator="system",
     ):
         """正向连接两个状态 """
 
@@ -1229,7 +1391,8 @@ class TransitionManager(Manager):
                 )
 
             transition.update(
-                workflow_id=workflow_id, from_state_id=state_map[from_state_id],
+                workflow_id=workflow_id,
+                from_state_id=state_map[from_state_id],
                 to_state_id=state_map[to_state_id],
             )
 
@@ -1244,7 +1407,8 @@ class TransitionManager(Manager):
         # fix transitions of router
         for mi in list(range(0, len(workflow.master)))[:-1]:
             self.model._objects.filter(
-                from_state_id=workflow.master[mi]["id"], to_state_id=workflow.master[mi + 1]["id"],
+                from_state_id=workflow.master[mi]["id"],
+                to_state_id=workflow.master[mi + 1]["id"],
                 is_deleted=True,
             ).update(is_deleted=False, name="默认(通过)")
 
@@ -1262,8 +1426,9 @@ class FieldManager(Manager):
         w_fields = []
         field_names = get_model_fields(TemplateField, name_only=True)
         for field in fields:
-            field_values = {field_name: getattr(field, field_name, "") for field_name in
-                            field_names}
+            field_values = {
+                field_name: getattr(field, field_name, "") for field_name in field_names
+            }
             field_values.pop("id", None)
             field_values.pop("flow_type", None)
             field_values.pop("table", None)
@@ -1313,7 +1478,9 @@ class FieldManager(Manager):
                     field["related_fields"] = json.loads(field["related_fields"])
 
                 field.update(
-                    workflow_id=workflow.id, state_id=state_map.get(state_id), choice=choice,
+                    workflow_id=workflow.id,
+                    state_id=state_map.get(state_id),
+                    choice=choice,
                 )
 
                 # 旧流程迁移跳过的步骤：API字段
@@ -1322,31 +1489,37 @@ class FieldManager(Manager):
                     try:
                         # 用于还原
                         # 导入的时候出现的问题
-                        remote_api_info = api_info['remote_api_info']
-                        api_instance_info = api_info['api_instance_info']
+                        remote_api_info = api_info["remote_api_info"]
+                        api_instance_info = api_info["api_instance_info"]
 
-                        remote_api_info['name'] = '{}({})'.format(remote_api_info['name'],
-                                                                  create_version_number())
+                        remote_api_info["name"] = "{}({})".format(
+                            remote_api_info["name"], create_version_number()
+                        )
 
-                        api = RemoteApi.restore_api(remote_api_info, 'system')
-                        api_instance_info['remote_api'] = api
-                        api_instance = RemoteApiInstance.objects.create(**api_instance_info)
+                        api = RemoteApi.restore_api(remote_api_info, "system")
+                        api_instance_info["remote_api"] = api
+                        api_instance = RemoteApiInstance.objects.create(
+                            **api_instance_info
+                        )
                     except BaseException:
                         api_instance = RemoteApiInstance._objects.get(
-                            id=field.get("api_instance_id"))
+                            id=field.get("api_instance_id")
+                        )
                         api_instance.id = None
                         api_instance.is_deleted = False
                         api_instance.save()
                         api_instance.refresh_from_db()
 
-                    field['api_instance_id'] = api_instance.id
+                    field["api_instance_id"] = api_instance.id
 
                 field_restored = self.create(**field)
                 _fields.append(field_restored)
 
                 field_map[int(field_id)] = field_restored.id
             except Exception as e:
-                logger.error("import workflow fields[{}] error: {}".format(field["key"], e))
+                logger.error(
+                    "import workflow fields[{}] error: {}".format(field["key"], e)
+                )
 
         return _fields, field_map
 
@@ -1390,7 +1563,7 @@ class TemplateFieldManager(Manager):
                 "is_valid": f[11],
                 "regex": f[12],
                 "layout": "COL_12",
-                "project_key": PUBLIC_PROJECT_PROJECT_KEY
+                "project_key": PUBLIC_PROJECT_PROJECT_KEY,
             }
             self.update_or_create(key=f[4], defaults=defaults)
 
@@ -1410,7 +1583,9 @@ class TableManager(Manager):
                 # 已经存在的，直接忽略
                 continue
 
-            field_values = TemplateField.objects.filter(key__in=table[2]).values("id", "key")
+            field_values = TemplateField.objects.filter(key__in=table[2]).values(
+                "id", "key"
+            )
             field_values = sorted(field_values, key=lambda x: table[2].index(x["key"]))
             fields = [field["id"] for field in field_values]
             obj.fields.set(fields)
@@ -1443,18 +1618,24 @@ class TableManager(Manager):
         fields_map = {}
 
         table = self.create(
-            name="{}_{}".format(table_data.name, create_version_number()), desc=table_data.desc,
+            name="{}_{}".format(table_data.name, create_version_number()),
+            desc=table_data.desc,
             is_builtin=False,
         )
 
         model_attrs = get_model_fields(TemplateField)
         for field in table_data.fields:
-            template_field = {attr: field.get(attr, "") for attr in model_attrs if
-                              attr not in TemplateField.FIELDS}
+            template_field = {
+                attr: field.get(attr, "")
+                for attr in model_attrs
+                if attr not in TemplateField.FIELDS
+            }
             old_field_id = template_field.pop("id")
 
-            new_field, created = TemplateField.objects.get_or_create(defaults=template_field,
-                                                                     key=field.key, )
+            new_field, created = TemplateField.objects.get_or_create(
+                defaults=template_field,
+                key=field.key,
+            )
             fields_map[old_field_id] = new_field.id
 
         new_fields_order = [fields_map[f] for f in table_data.fields_order]
@@ -1504,9 +1685,13 @@ class WorkflowSnapManager(models.Manager):
                 item.update(processors_type="PERSON", processors=dotted_name(operator))
             states[str(item["id"])] = item
 
-        transitions = {str(item["id"]): item for item in list(workflow.transitions.values())}
-        fields = {str(item["id"]): item for item in
-                  list(workflow.fields.filter(is_valid=True).values())}
+        transitions = {
+            str(item["id"]): item for item in list(workflow.transitions.values())
+        }
+        fields = {
+            str(item["id"]): item
+            for item in list(workflow.fields.filter(is_valid=True).values())
+        }
 
         tag = self.create(
             workflow_id=workflow.id,
@@ -1530,6 +1715,8 @@ class WorkflowVersionManager(Manager):
     """
 
     def service_cnt(self, instance):
+        from itsm.service.models import Service
+
         return Service.objects.filter(workflow_id=instance["id"]).count()
 
     def get_or_create_version_from_workflow(self):
@@ -1546,27 +1733,40 @@ class WorkflowVersionManager(Manager):
         for workflow in Workflow._objects.all():
             # workflow对应的快照
             snaps = set(
-                WorkflowSnap.objects.filter(workflow_id=workflow.pk).values_list("id", flat=True))
+                WorkflowSnap.objects.filter(workflow_id=workflow.pk).values_list(
+                    "id", flat=True
+                )
+            )
             count += 1
             # 跳过已有版本的迁移（避免重复迁移）
             try:
                 version = WorkflowVersion._objects.get(workflow_id=workflow.id)
-                print("skip exist workflow version: {}({})".format(version.name,
-                                                                   version.version_number))
+                print(
+                    "skip exist workflow version: {}({})".format(
+                        version.name, version.version_number
+                    )
+                )
             except WorkflowVersion.DoesNotExist:
                 version = workflow.create_version("system")
                 print(
-                    "create workflow version: {}({})".format(version.name, version.version_number))
+                    "create workflow version: {}({})".format(
+                        version.name, version.version_number
+                    )
+                )
 
             ver_for_snaps[version.pk] = snaps
             print(
-                "update workflow: {}, cnt={}, workflow_number={}".format(workflow.name, len(snaps),
-                                                                         count))
+                "update workflow: {}, cnt={}, workflow_number={}".format(
+                    workflow.name, len(snaps), count
+                )
+            )
 
         return ver_for_snaps
 
     @transaction.atomic
-    def upgrade_version(self, version_id=None, for_migrate=False, ticket=None, **kwargs):
+    def upgrade_version(
+        self, version_id=None, for_migrate=False, ticket=None, **kwargs
+    ):
         """
         升级流程版本：version->workflow->upgrade->new version
 
@@ -1579,14 +1779,18 @@ class WorkflowVersionManager(Manager):
         data = copy.deepcopy(old_version.__dict__)
         data.update(notify=list(old_version.notify.values_list("id", flat=True)))
 
-        workflow, states_map, transition_map = Workflow.objects.restore(data, "system",
-                                                                        for_migrate=True)
-        Workflow.objects.upgrade_workflow(workflow.id, for_migrate, transition_map, states_map,
-                                          ticket, **kwargs)
+        workflow, states_map, transition_map = Workflow.objects.restore(
+            data, "system", for_migrate=True
+        )
+        Workflow.objects.upgrade_workflow(
+            workflow.id, for_migrate, transition_map, states_map, ticket, **kwargs
+        )
 
         # 部署流程
         version_name = "{}_{}".format(old_version.name, old_version.id)
-        new_version = workflow.create_version(name=version_name, operator=old_version.creator)
+        new_version = workflow.create_version(
+            name=version_name, operator=old_version.creator
+        )
 
         logger.info("create tmp version: %s" % version_name)
         # 选择性删除升级后的版本
@@ -1613,14 +1817,20 @@ class GlobalVariableManager(Manager):
             gvar.update(
                 {
                     "type": mapping.get(gvar["type"], gvar["type"]),
-                    "key": inst_data_dict.get(gvar["ref_path"], get_random_key(gvar["name"])),
+                    "key": inst_data_dict.get(
+                        gvar["ref_path"], get_random_key(gvar["name"])
+                    ),
                 }
             )
             self.update_or_create(
                 key=gvar["key"],
                 state_id=state_id,
                 flow_id=flow_id,
-                defaults={"name": gvar["name"], "type": gvar["type"], "is_valid": True, },
+                defaults={
+                    "name": gvar["name"],
+                    "type": gvar["type"],
+                    "is_valid": True,
+                },
             )
         return validate_data
 
@@ -1682,7 +1892,9 @@ class TaskSchemaManager(Manager):
                 src_schema = self.get(id=schema_id)
                 src_fields = src_schema.all_fields.all()
                 # src_schema.id = None
-                src_schema.name = '{}_{}'.format(src_schema.name, create_version_number())
+                src_schema.name = "{}_{}".format(
+                    src_schema.name, create_version_number()
+                )
                 dst_schema = copy.deepcopy(src_schema)
                 dst_schema.id = None
                 dst_schema.can_edit = can_edit
@@ -1700,8 +1912,10 @@ class TaskSchemaManager(Manager):
 
                 # 触发器的更新
                 copy_triggers_by_source(
-                    src_source_type='task', src_source_id=schema_id, dst_source_type='task',
-                    dst_source_id=dst_schema.id
+                    src_source_type="task",
+                    src_source_id=schema_id,
+                    dst_source_type="task",
+                    dst_source_id=dst_schema.id,
                 )
 
                 dst_schema_ids.append(dst_schema.id)
@@ -1722,11 +1936,11 @@ class TaskSchemaManager(Manager):
         new_ids = []
         new_old_id_map = {}
         for task_schema in task_schemas:
-            if task_schema['component_type'] == SOPS_TASK:
+            if task_schema["component_type"] == SOPS_TASK:
                 # 标准运维类型的任务直接不做导入，直接引用现有的任务模板
                 sops_task_id = self.get(component_type=SOPS_TASK, can_edit=True).id
                 new_ids.append(sops_task_id)
-                new_old_id_map[task_schema['id']] = sops_task_id
+                new_old_id_map[task_schema["id"]] = sops_task_id
                 continue
             triggers = task_schema.pop("triggers", [])
             fields = task_schema.pop("fields")
@@ -1737,7 +1951,7 @@ class TaskSchemaManager(Manager):
                 is_draft=False,
                 creator=operator,
                 updated_by=operator,
-                name="{}-{}".format(task_schema['name'], int(time.time())),
+                name="{}-{}".format(task_schema["name"], int(time.time())),
             )
             with TempDisableSignal(post_save, task_schema_created_handler, self.model):
                 new_instance = self.create(**task_schema)
@@ -1780,30 +1994,36 @@ class TaskSchemaFieldManager(Manager):
             if not isinstance(field["related_fields"], (dict, list)):
                 field["related_fields"] = json.loads(field["related_fields"])
 
-            field.update(task_schema_id=task_schema.id, creator=task_schema.creator,
-                         updated_by=task_schema.updated_by)
+            field.update(
+                task_schema_id=task_schema.id,
+                creator=task_schema.creator,
+                updated_by=task_schema.updated_by,
+            )
 
             if field["source_type"] == "API":
                 # API字段的还原
                 try:
                     # 用于还原
-                    remote_api_info = api_info['remote_api_info']
-                    api_instance_info = api_info['api_instance_info']
+                    remote_api_info = api_info["remote_api_info"]
+                    api_instance_info = api_info["api_instance_info"]
 
-                    remote_api_info['name'] = '{}({})'.format(remote_api_info['name'],
-                                                              create_version_number())
+                    remote_api_info["name"] = "{}({})".format(
+                        remote_api_info["name"], create_version_number()
+                    )
 
-                    api = RemoteApi.restore_api(remote_api_info, 'system')
-                    api_instance_info['remote_api'] = api
+                    api = RemoteApi.restore_api(remote_api_info, "system")
+                    api_instance_info["remote_api"] = api
                     api_instance = RemoteApiInstance.objects.create(**api_instance_info)
                 except BaseException:
-                    api_instance = RemoteApiInstance._objects.get(id=field.get("api_instance_id"))
+                    api_instance = RemoteApiInstance._objects.get(
+                        id=field.get("api_instance_id")
+                    )
                     api_instance.id = None
                     api_instance.is_deleted = False
                     api_instance.save()
                     api_instance.refresh_from_db()
 
-                field['api_instance_id'] = api_instance.id
+                field["api_instance_id"] = api_instance.id
 
             new_fields.append(self.model(**field))
 

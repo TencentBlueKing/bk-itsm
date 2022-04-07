@@ -22,8 +22,10 @@
 
 <template>
     <div class="bk-field-info mb20">
+        <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
         <div class="bk-node-btn">
             <bk-button
+                data-test-id="fieldConfig-button-addField"
                 v-if="configur.type !== 'APPROVAL'"
                 :theme="'default'"
                 :title="$t(`m.treeinfo['新增字段']`)"
@@ -32,6 +34,7 @@
                 {{$t(`m.treeinfo['新增字段']`)}}
             </bk-button>
             <bk-button
+                data-test-id="fieldConfig-button-addModelField"
                 v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
                 :theme="'default'"
                 :title="$t(`m.treeinfo['选择模型字段']`)"
@@ -40,10 +43,13 @@
                 {{$t(`m.treeinfo['选择模型字段']`)}}
             </bk-button>
             <bk-button :theme="'default'"
+                data-test-id="fieldConfig-button-previewField"
                 :title="$t(`m.treeinfo['字段预览']`)"
                 class="mr10"
+                style="float: right; border: 0"
                 :disabled="!showTabList.length"
                 @click="previewField">
+                <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
                 {{$t(`m.treeinfo['字段预览']`)}}
             </bk-button>
         </div>
@@ -224,6 +230,12 @@
                 type: Object,
                 default () {
                     return {}
+                }
+            },
+            isShowTitle: {
+                type: Boolean,
+                default () {
+                    return false
                 }
             }
         },
@@ -556,6 +568,12 @@
     .bk-field-info{
         color: #63656E;
         font-size: 14px;
+        .bk-field-title {
+            display: block;
+            height: 22px;
+            margin: 8px 0px;
+            color: #63656e;
+        }
     }
     .bk-node-btn{
         font-size: 0;

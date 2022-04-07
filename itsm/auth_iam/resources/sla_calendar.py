@@ -65,14 +65,17 @@ class SlaCalenderResourceProvider(ItsmResourceProvider):
 
             # queryset = self.queryset
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = Schedule.objects.filter(project_key__in=list(project_ids)).filter(
-                flow_filter)
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = Schedule.objects.filter(
+                project_key__in=list(project_ids)
+            ).filter(flow_filter)
 
         count = queryset.count()
         results = [
-            {"id": str(schedule.id), "display_name": schedule.name} for schedule in
-            queryset[page.slice_from: page.slice_to]
+            {"id": str(schedule.id), "display_name": schedule.name}
+            for schedule in queryset[page.slice_from : page.slice_to]
         ]
 
         if with_path:
@@ -80,10 +83,19 @@ class SlaCalenderResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(schedule.id),
                     "display_name": schedule.name,
-                    "path": [[{"type": "project", "id": 0,
-                               "display_name": self.get_project_name(schedule.project_key)}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": self.get_project_name(
+                                    schedule.project_key
+                                ),
+                            }
+                        ]
+                    ],
                 }
-                for schedule in queryset[page.slice_from: page.slice_to]
+                for schedule in queryset[page.slice_from : page.slice_to]
             ]
 
         return ListResult(results=results, count=count)
@@ -99,6 +111,12 @@ class SlaCalenderResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(schedule.id), "display_name": schedule.name} for schedule in
-                   Schedule.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(schedule.id),
+                "display_name": schedule.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(schedule.creator),
+            }
+            for schedule in Schedule.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

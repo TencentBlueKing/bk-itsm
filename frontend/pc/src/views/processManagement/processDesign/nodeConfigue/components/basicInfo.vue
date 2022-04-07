@@ -25,8 +25,10 @@
         <bk-form :label-width="150"
             :model="formInfo"
             :rules="rules"
+            form-type="vertical"
             ref="basicForm">
             <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)"
+                data-test-id="basicInfo-input-nodeName"
                 :ext-cls="'bk-item-width'"
                 :required="true"
                 :property="'name'">
@@ -48,7 +50,7 @@
                     </bk-option>
                 </bk-select>
             </bk-form-item>
-            <bk-form-item :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
+            <bk-form-item data-test-id="basicInfo-select-ProcessingScenarios" :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
                 <bk-select :ext-cls="'bk-form-width'"
                     v-model="formInfo.distribute_type"
                     :clearable="false"
@@ -71,7 +73,7 @@
                 </p>
             </bk-form-item>
             <template v-if="assignorsTypeList.some(assignor => assignor === formInfo.distribute_type)">
-                <bk-form-item :label="$t(`m.treeinfo['派单人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-select-assignors" :label="$t(`m.treeinfo['派单人：']`)" :required="true">
                     <div @click="checkStatus.assignors = false">
                         <deal-person
                             ref="assignors"
@@ -82,7 +84,7 @@
                 </bk-form-item>
             </template>
             <template v-if="processorsInfo.type">
-                <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-component-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
                     <div @click="checkStatus.processors = false">
                         <deal-person
                             ref="processors"
@@ -122,7 +124,7 @@
                 </template>
             </bk-form-item>
             <template v-if="!nodeInfo.is_builtin">
-                <bk-form-item :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-radio-canDeliver" :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
                     <bk-radio-group v-model="formInfo.can_deliver">
                         <bk-radio :value="trueStatus" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
                         <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
@@ -130,7 +132,7 @@
                 </bk-form-item>
             </template>
             <template v-if="formInfo.can_deliver">
-                <bk-form-item :label="$t(`m.treeinfo['转单人：']`)" :required="true">
+                <bk-form-item data-test-id="basicInfo-radio-delivers" :label="$t(`m.treeinfo['转单人：']`)" :required="true">
                     <div @click="checkStatus.delivers = false">
                         <deal-person
                             ref="delivers"
@@ -331,11 +333,11 @@
                     excludeProcessor.push('STARTER_LEADER')
                 }
                 // 是否使用权限中心角色
-                if (!this.flowInfo.is_iam_used) {
-                    excludeProcessor.push('IAM')
-                    this.assignorExclude.push('IAM')
-                    this.deliversExclude.push('IAM')
-                }
+                // if (!this.flowInfo.is_iam_used) {
+                //     excludeProcessor.push('IAM')
+                //     this.assignorExclude.push('IAM')
+                //     this.deliversExclude.push('IAM')
+                // }
                 // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
                 if (this.nodeInfo.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.nodeInfo.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
                     excludeProcessor.push('BY_ASSIGNOR')
@@ -444,10 +446,10 @@
     }
 
     .bk-item-width {
-        width: 480px;
+        width: 448px;
     }
     .bk-form-width {
-        width: 330px;
+        width: 448px;
     }
     .bk-form-display {
         float: left;
@@ -457,5 +459,8 @@
         line-height: 32px;
         color: #ff5656;
         font-size: 12px;
+    }
+    /deep/ .bk-form-width {
+        width: 448px;
     }
 </style>

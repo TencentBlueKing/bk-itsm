@@ -33,8 +33,7 @@ from django.db import models, transaction
 from django.db.models import Q, Count
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
-from mptt.managers import TreeManager
-from mptt.models import MPTTModel, TreeForeignKey
+from mptt.models import TreeForeignKey
 from multiselectfield import MultiSelectField
 
 from itsm.component.constants import (
@@ -54,6 +53,7 @@ from itsm.component.constants import (
     SERVICE_SOURCE_CHOICES,
     DEFAULT_PROJECT_PROJECT_KEY,
 )
+from itsm.component.db.models import BaseMpttModel
 from itsm.component.drf.mixins import ObjectManagerMixin
 from itsm.component.exceptions import DeleteError, ParamError, SlaParamError
 from itsm.component.utils.basic import dotted_name, fill_tree_route, get_random_key
@@ -275,7 +275,7 @@ class Service(ObjectManagerMixin, Model):
 
     need_auth_grant = True
     auth_resource = {"resource_type": "service", "resource_type_name": "服务"}
-    resource_operations = ["service_manage", "service_view"]
+    resource_operations = ["service_manage"]
 
     def __unicode__(self):
         return self.name
@@ -345,20 +345,18 @@ class Service(ObjectManagerMixin, Model):
 
     @classmethod
     def permission_filter(cls, username):
-        conditions = [Q(display_type="OPEN")]
+        conditions = [Q(display_type__in=["OPEN", "API"])]
 
         # 组织角色
         for organization in UserRole.get_user_roles(username)["organization"]:
             conditions.append(
-                Q(display_type="ORGANIZATION")
-                & Q(display_role__contains=dotted_name(organization))
+                Q(display_type="ORGANIZATION") & Q(display_role__contains=organization)
             )
 
         # 通用角色
         for role in UserRole.get_general_role_by_user(dotted_name(username)):
             conditions.append(
-                Q(display_type=role["role_type"])
-                & Q(display_role__contains=dotted_name(role["id"]))
+                Q(display_type=role["role_type"]) & Q(display_role__contains=role["id"])
             )
 
         return conditions
@@ -400,17 +398,19 @@ class Service(ObjectManagerMixin, Model):
         FavoriteService.objects.filter(service_id=self.id, user=username).delete()
 
     @classmethod
-    def get_count(cls, scope=None, project_key=DEFAULT_PROJECT_PROJECT_KEY):
-        services = Service.objects.filter(project_key=project_key)
+    def get_count(cls, scope=None, project_queryset=Q()):
+        services = Service.objects.filter(project_queryset)
         if scope:
-            services = services.filter(create_at__range=scope, project_key=project_key)
+            services = services.filter(create_at__range=scope)
         return services.count()
 
     @classmethod
-    def get_service_statistics(cls, time_delta, data):
+    def get_service_statistics(cls, time_delta, data, project_key=None):
+        project_query = Q(project_key=project_key) if project_key else Q()
         data_str = TIME_DELTA[time_delta].format(field_name="create_at")
         info = (
-            cls.objects.filter(**data)
+            cls.objects.filter(project_query)
+            .filter(**data)
             .extra(select={"date_str": data_str})
             .values("date_str")
             .annotate(count=Count("id"))
@@ -431,8 +431,10 @@ class Service(ObjectManagerMixin, Model):
     def update_service_configs(self, service_config):
         self.can_ticket_agency = service_config["can_ticket_agency"]
         self.display_type = service_config["display_type"]
-        self.display_role = service_config.get("display_role", "")
+        self.display_role = dotted_name(service_config.get("display_role", ""))
         self.workflow_id = service_config["workflow_id"]
+        if "owners" in service_config:
+            self.owners = dotted_name(service_config["owners"])
         self.is_valid = True
         self.save()
 
@@ -455,6 +457,28 @@ class Service(ObjectManagerMixin, Model):
                 sla.delete()
                 raise e
 
+    @classmethod
+    def validate_service_name(cls, service_name):
+        return cls.objects.filter(name=service_name).exists()
+
+    def tag_data(self):
+        from itsm.workflow.models import Workflow
+
+        workflow = Workflow.objects.get(id=self.workflow.workflow_id)
+        return {
+            "key": self.key,
+            "name": self.name,
+            "desc": self.desc,
+            "workflow": workflow.tag_data(need_tag_task=True),
+            "owners": self.owners,
+            "can_ticket_agency": self.can_ticket_agency,
+            "is_valid": self.is_valid,
+            "display_type": self.display_type,
+            "display_role": self.display_role,
+            "source": "custom",
+            "project_key": self.project_key,
+        }
+
 
 class ServiceSla(models.Model):
     """服务与SLA关联表"""
@@ -472,37 +496,6 @@ class ServiceSla(models.Model):
         app_label = "service"
         verbose_name = _("服务与SLA关联表")
         verbose_name_plural = _("服务与SLA关联表")
-
-
-class BaseMpttModel(MPTTModel):
-    """基础字段"""
-
-    FIELDS = ("creator", "create_at", "updated_by", "update_at", "end_at")
-
-    creator = models.CharField(
-        _("创建人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
-    )
-    create_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
-    update_at = models.DateTimeField(_("更新时间"), auto_now=True)
-    updated_by = models.CharField(
-        _("修改人"), max_length=LEN_NORMAL, null=True, blank=True, default="system"
-    )
-    end_at = models.DateTimeField(_("结束时间"), null=True, blank=True)
-    is_deleted = models.BooleanField(_("是否软删除"), default=False, db_index=True)
-
-    _objects = TreeManager()
-    objects = managers.DictDataManager()
-
-    class Meta:
-        app_label = "service"
-        abstract = True
-
-    def delete(self, using=None):
-        self.is_deleted = True
-        self.save()
-
-    def hard_delete(self, using=None):
-        super(BaseMpttModel, self).delete()
 
 
 class ServiceCatalog(BaseMpttModel):
@@ -611,7 +604,7 @@ class ServiceCatalog(BaseMpttModel):
         return [child.id for child in node.get_descendants(include_self=True)]
 
     @staticmethod
-    def subtree(node, catalogs=None, show_deleted=False):
+    def subtree(node, catalogs=None, show_deleted=False, catalog_count=None):
         """获取以node为根的子树"""
 
         # 根据catalogs列表筛选
@@ -626,7 +619,8 @@ class ServiceCatalog(BaseMpttModel):
 
         # 递归查询，sql查询次数过多 TODO
         children = [
-            node.subtree(child, catalogs, show_deleted) for child in node_children
+            node.subtree(child, catalogs, show_deleted, catalog_count)
+            for child in node_children
         ]
 
         data = {
@@ -648,7 +642,22 @@ class ServiceCatalog(BaseMpttModel):
             "icon": "icon-folder",
         }
 
+        if catalog_count:
+            data["service_count"] = catalog_count.get(data["id"], 0)
+
         return data
+
+    @classmethod
+    def annotate_catalog_count(cls, project_key):
+        """
+        计算每一节目录下的服务数量
+        """
+        catalog_count = {}
+        catalogs = ServiceCatalog.objects.filter(project_key=project_key)
+        for catalog in catalogs:
+            catalog_count[catalog.id] = catalog.included_services_count
+
+        return catalog_count
 
     @classmethod
     def tree_data(
@@ -662,6 +671,7 @@ class ServiceCatalog(BaseMpttModel):
         服务目录树
         根据服务编码过滤服务目录
         """
+        catalog_count = cls.annotate_catalog_count(project_key)
 
         def _catalog_services_filter(key, request, show_deleted):
             if key == "global":
@@ -720,7 +730,9 @@ class ServiceCatalog(BaseMpttModel):
 
         roots = roots.order_by("lft", "id")
 
-        tree = [cls.subtree(root, catalogs, show_deleted) for root in roots]
+        tree = [
+            cls.subtree(root, catalogs, show_deleted, catalog_count) for root in roots
+        ]
 
         return tree
 
@@ -831,6 +843,8 @@ class CatalogService(Model):
         "Service", help_text=_("关联服务条目"), on_delete=models.CASCADE
     )
     order = models.IntegerField("service序列", default=FIRST_ORDER)
+    auth_resource = {}
+    resource_operations = []
 
     objects = managers.CatalogServiceManager()
 
@@ -944,6 +958,19 @@ class SysDict(ObjectManagerMixin, Model):
             .order_by("order")
         )
 
+        if key == "PRIORITY":
+            return [
+                dict(
+                    [
+                        (field, getattr(dict_data, field))
+                        for field in fields
+                        if hasattr(dict_data, field)
+                    ]
+                )
+                for dict_data in dict_datas
+                if dict_data.key in ["1", "2", "3"]
+            ]
+
         return [
             dict(
                 [
@@ -969,7 +996,6 @@ class SysDict(ObjectManagerMixin, Model):
     @classmethod
     def get_data_by_key(cls, key, view_type="list"):
         """根据字典表编码获取字典数据（支持列表视图和树状视图）"""
-
         try:
             if view_type == "tree":
                 return cls.tree_data(key)

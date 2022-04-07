@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.core.cache import cache
 
+import settings
 from iam.resource.provider import ResourceProvider, ListResult
 from iam.contrib.django.dispatcher.exceptions import InvalidPageException
 from itsm.component.constants.iam import IAM_SEARCH_INSTANCE_CACHE_TIME
@@ -46,6 +47,11 @@ class ItsmResourceProvider(ResourceProvider):
             queryset = self.queryset.filter(name__icontains=filter.keyword)
 
         return queryset
+
+    def get_bk_iam_approver(self, creator):
+        if creator in ["system", None]:
+            return list(settings.INIT_SUPERUSER)
+        return creator.split(",")
 
     @staticmethod
     def pre_search_instance(filter, page, **options):

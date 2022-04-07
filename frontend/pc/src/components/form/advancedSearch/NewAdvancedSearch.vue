@@ -89,16 +89,14 @@
                             </bk-form-item>
                             <!-- 级联类型 -->
                             <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
-                                <common-cascade
+                                <bk-cascade
                                     style="width: 100%;"
                                     v-model="item.value"
-                                    :options="item.list"
-                                    :iscollect_first="false"
-                                    :iscollect_two="false"
-                                    :isshow-number="false"
-                                    :isactive="true"
-                                    @change="onFormChange($event, item)">
-                                </common-cascade>
+                                    :list="item.list"
+                                    :check-any-level="true"
+                                    clearable
+                                    :ext-popover-cls="'custom-cls'">
+                                </bk-cascade>
                             </bk-form-item>
                             <!-- 人员 -->
                             <bk-form-item :label="item.name" v-if="item.type === 'member'">
@@ -128,6 +126,21 @@
                 </div>
             </div>
         </collapse-transition>
+        <div class="search-result" v-if="searchResult.length !== 0">
+            <ul>
+                <li v-for="(result, index) in searchResult" :key="index">
+                    <bk-popover placement="bottom" theme="light">
+                        <span class="search-reult-content" @click="onSearchResult(index)">{{ result[0] }}</span>
+                        <div slot="content">
+                            <template v-for="(item, index1) in result">
+                                <p :key="index1">{{ item }}</p>
+                            </template>
+                        </div>
+                    </bk-popover>
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
+                </li>
+            </ul>
+        </div>
         <!-- 单据高亮设置 -->
         <bk-dialog
             v-model="isHighlightSetting"
@@ -157,7 +170,6 @@
 
 <script>
     import collapseTransition from '../../../utils/collapse-transition'
-    import commonCascade from '../../../views/commonComponent/commonCascade'
     import memberSelect from '../../../views/commonComponent/memberSelect'
     import commonMix from '../../../views/commonMix/common.js'
     import { isEmpty } from '@/utils/util.js'
@@ -166,7 +178,6 @@
         name: 'searchInfo',
         components: {
             collapseTransition,
-            commonCascade,
             memberSelect
         },
         mixins: [commonMix],
@@ -175,6 +186,26 @@
                 type: Array,
                 default () {
                     return []
+                }
+            },
+            searchResultList: {
+                type: Object,
+                default () {
+                    return {}
+                }
+            },
+            panel: String,
+            curServcie: Object,
+            isCustomTab: {
+                type: Boolean,
+                default () {
+                    return false
+                }
+            },
+            isEditTab: {
+                type: Boolean,
+                default () {
+                    return false
                 }
             }
         },
@@ -187,7 +218,35 @@
                 },
                 showMore: false,
                 searchWord: '',
-                searchForms: []
+                searchForms: [],
+                formField: {
+                    keyword: this.$t('m["单号/标题"]'),
+                    catalog_id: this.$t('m["服务目录"]'),
+                    creator__in: this.$t('m["提单人"]'),
+                    current_processor: this.$t('m["处理人"]'),
+                    current_status__in: this.$t('m["状态"]'),
+                    create_at__gte: this.$t('m["提单时间开始"]'),
+                    create_at__lte: this.$t('m["提单时间结束"]'),
+                    bk_biz_id: this.$t('m["业务"]')
+                }
+            }
+        },
+        computed: {
+            searchResult () {
+                if (this.searchResultList[this.panel]) {
+                    const result = this.searchResultList[this.panel].map(item => {
+                        const list = Object.keys(item).map(ite => {
+                            return `${this.formField[ite]}: ${item[ite]}`
+                        })
+                        return list
+                    })
+                    return result
+                } else {
+                    return []
+                }
+            },
+            isfilter () {
+                return this.isCustomTab
             }
         },
         watch: {
@@ -199,11 +258,74 @@
                 immediate: true
             }
         },
-        created () {
+        async created () {
+            await this.getCatalogList()
             this.getTicketHighlight()
+            const query = this.$route.query
+            const queryList = Object.keys(query)
+            const formKey = this.searchForms.map(item => item.key)
+            this.searchForms.forEach(item => {
+                if (queryList.includes(item.key)) {
+                    if (item.type === 'select') {
+                        query[item.key].split(',').map(ite => {
+                            item.value.push(ite)
+                        })
+                    } else if (item.type === 'member') {
+                        item.value.push(query[item.key])
+                    } else if (item.type === 'cascade') {
+                        item.list.map(ite => {
+                            if (ite.id === Number(query[item.key])) {
+                                item.value.push(ite.id)
+                            } else {
+                                ite.children.map(ites => {
+                                    if (ites.id === Number(query[item.key])) {
+                                        item.value.push(ite.id)
+                                        item.value.push(ites.id)
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        item.value = query[item.key]
+                    }
+                }
+            })
+            // 判断url参数有没有搜索字段
+            if (formKey.some(item => queryList.includes(item))) {
+                this.showMore = true
+                this.onSearchClick()
+            }
         },
         methods: {
             // 过滤参数
+            async getCatalogList () {
+                const params = {
+                    show_deleted: true
+                }
+                if (this.$route.query.project_id) {
+                    params.project_key = this.$route.query.project_id
+                }
+                const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
+                const result = res.data[0] ? res.data[0]['children'] : []
+                const formItem = this.searchForms.find(item => item.key === 'catalog_id')
+                if (this.isfilter) {
+                    const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
+                    formItem.list = list
+                }
+            },
+            getTreebyId (list, id) {
+                if (!id) return []
+                for (let i = 0; i < list.length; i++) {
+                    const node = list[i]
+                    if (node.id === id) {
+                        return node
+                    } else {
+                        if (node.children && node.children.length > 0) {
+                            this.getTreebyId(node.children, id)
+                        }
+                    }
+                }
+            },
             getParams () {
                 const params = {}
                 // 过滤条件
@@ -212,7 +334,7 @@
                         continue
                     }
                     if (item.type === 'cascade') { // 服务目录
-                        params[item.key] = item.value[item.value.length - 1].id
+                        params[item.key] = item.value[item.value.length - 1]
                     } else if (item.type === 'datetime') { // 时间
                         if (item.value[0] && item.value[1]) {
                             const gteTime = this.standardTime(item.value[0])
@@ -229,7 +351,11 @@
                 return params
             },
             onSearchClick () {
-                this.$emit('search', this.getParams())
+                this.$emit('search', this.getParams(), true)
+            },
+            onSearchResult (index) {
+                const params = this.searchResultList[this.panel][index]
+                this.$emit('search', params, false)
             },
             onClearClick () {
                 this.searchForms.forEach(item => {
@@ -282,7 +408,38 @@
 <style lang="scss" scoped>
     @import '../../../scss/mixins/clearfix.scss';
     @import '../../../scss/mixins/scroller.scss';
-
+    .search-result {
+        height: 30px;
+        width: 100%;
+        margin-top: 10px;
+        ul {
+            font-size: 12px;
+            li {
+                padding: 4px;
+                background-color: #f0f1f5;
+                float: left;
+                margin: 4px 4px 4px 0;
+                border-radius: 2px;
+                display: flex;
+                align-items: center;
+                max-height: 26px;
+                .search-reult-content {
+                    cursor: pointer;
+                    span {
+                        display: block;
+                        margin: 1px;
+                    }
+                }
+                i {
+                    font-size: 14px;
+                    cursor: pointer;
+                    &:hover {
+                        color: red;
+                    }
+                }
+            }
+        }
+    }
     .bk-search-info {
         position: relative;
         width: 100%;

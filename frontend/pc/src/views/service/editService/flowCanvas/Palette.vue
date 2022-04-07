@@ -51,11 +51,17 @@
                 <i class="bk-itsm-icon icon-task-icon" style="font-size: 26px;"></i>
             </div>
         </li>
-        <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
+        <li v-bk-tooltips.right="$t(`m['蓝盾节点']`)">
+            <div class="entry-item entry-gateway" data-type="TASK-DEVOPS" style="margin: 12px 0 2px;">
+                <i class="bk-itsm-icon icon-devops-task-icon" style="font-size: 26px;"></i>
+            </div>
+            <div v-if="devsopDisable === 'open'" class="entry-disabled" v-bk-tooltips.right="$t(`m['暂未开放']`)"></div>
+        </li>
+        <!-- <li v-bk-tooltips.right="$t(`m.treeinfo['会签节点']`)">
             <div class="entry-item entry-gateway" data-type="SIGN" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-sign-node" style="font-size: 26px;"></i>
             </div>
-        </li>
+        </li> -->
         <li v-bk-tooltips.right="$t(`m.treeinfo['审批节点']`)">
             <div class="entry-item entry-gateway" data-type="APPROVAL" style="margin: 12px 0 2px;">
                 <i class="bk-itsm-icon icon-approval-node" style="font-size: 26px;"></i>
@@ -76,12 +82,18 @@
 <script>
     export default {
         name: 'Palette',
-        mounted () {
-            // this.$emit('registerPaletteEvent')
+        data () {
+            return {
+                devsopDisable: window.RUN_VER
+            }
         }
     }
 </script>
 <style lang="scss" scoped>
+    .disable {
+        background: #e0e0e0;
+        cursor: none;
+    }
     ul {
         margin: 0;
         padding: 0;
@@ -90,6 +102,7 @@
             text-align: center;
             position: relative;
             &:hover {
+                background-color: #e1ecff;
                 .entry-title {
                     display: block;
                 }

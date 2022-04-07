@@ -346,6 +346,12 @@ export default {
                 return res
             })
         },
+        putDevopsInfo ({ commit, state, dispatch }, { params, stateId }) {
+            return ajax.put(`workflow/states/${stateId}/`, params).then(response => {
+                let res = response.data
+                return res
+            })
+        },
         // 上传流程文件
         getComeInList ({ commit, state, dispatch }, params) {
             return ajax.post(`postman/rpc_api/`, params).then(response => {

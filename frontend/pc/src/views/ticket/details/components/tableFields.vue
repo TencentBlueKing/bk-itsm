@@ -27,10 +27,11 @@
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
                         :key="index"
-                        :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
-                        <!-- 静态展示 -->
+                        class="bk-field-line"
+                        :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                         <fields-done
                             :item="item"
+                            :basic-info-type="basicInfoType"
                             :fields="firstStateFields"
                             :basic-infomation="basicInfomation">
                         </fields-done>
@@ -38,16 +39,18 @@
                 </template>
             </bk-form>
         </template>
-        <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div>
+        <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
         <template v-if="openFunction.TABLE_FIELDS_SWITCH">
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <div v-for="(item, index) in basicInfomation.table_fields"
+                <div v-for="(item, index) in tableFields"
                     :key="index"
-                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }"
+                    :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                     <!-- 静态展示 -->
                     <template v-if="!item.isEdit">
                         <fields-done
                             :item="item"
+                            :basic-info-type="basicInfoType"
                             :fields="basicInfomation.table_fields"
                             :basic-infomation="basicInfomation">
                         </fields-done>
@@ -96,18 +99,8 @@
             return {
                 showMore: false,
                 showInfo: true,
-                fieldList: [
-                    {
-                        isEdit: false,
-                        name: 1,
-                        content: 'qwsqw'
-                    },
-                    {
-                        isEdit: false,
-                        name: 2,
-                        content: 'qw1q1qsqw'
-                    }
-                ]
+                fieldList: [],
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER']
             }
         },
         computed: {
@@ -123,6 +116,18 @@
             },
             openFunction: function () {
                 return this.$store.state.openFunction
+            },
+            tableFields () {
+                const list = []
+                const fields = this.basicInfomation.table_fields
+                fields.forEach(ite => {
+                    if (!this.basicInfoType.includes(ite.type)) {
+                        list.push(ite)
+                    } else {
+                        list.unshift(ite)
+                    }
+                })
+                return list
             }
         },
         watch: {
@@ -172,9 +177,10 @@
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
     .bk-field-line {
-        width: 100%;
+        width: 50%;
         position: relative;
-        padding-right: 10px;
+        padding: 4px;
+        font-size: 14px;
         display: inline-block;
     }
     .bk-field-half {

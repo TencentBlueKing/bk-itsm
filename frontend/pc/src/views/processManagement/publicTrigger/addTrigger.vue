@@ -33,6 +33,7 @@
                 :rules="rules"
                 ref="triggerBasic">
                 <bk-form-item :label="$t(`m.trigger['触发器名称']`)"
+                    data-test-id="trigger-input-name"
                     :required="true"
                     :property="'name'">
                     <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)"></bk-input>
@@ -95,6 +96,7 @@
                 :rules="rules"
                 ref="triggerMade">
                 <bk-form-item :label="$t(`m.trigger['触发事件']`)"
+                    data-test-id="trigger-select-triggerEvent"
                     :required="true"
                     :property="'signal'"
                     style="width: 300px;">
@@ -111,7 +113,9 @@
                         </bk-option-group>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.trigger['触发规则']`)"
+                <bk-form-item
+                    data-test-id="trigger-div-triggerRules"
+                    :label="$t(`m.trigger['触发规则']`)"
                     :required="true">
                     <div v-bkloading="{ isLoading: contentLoading }" style="min-height: 300px;">
                         <div class="bk-trigger-rule mb10" v-for="(item, index) in rulesList" :key="index">

@@ -27,6 +27,8 @@
             ref="leftTicketContent"
             :loading="loading"
             :ticket-info="ticketInfo"
+            :has-node-opt-auth="hasNodeOptAuth"
+            :is-show-comment="isShowComment"
             :node-list="nodeList"
             :first-state-fields="firstStateFields"
             :node-trigger-list="nodeTriggerList"
@@ -86,7 +88,9 @@
                 ticketInfo: {},
                 nodeTriggerList: [],
                 firstStateFields: [],
-                nodeList: []
+                nodeList: [],
+                isShowComment: false,
+                hasNodeOptAuth: false
             }
         },
         computed: {
@@ -104,6 +108,10 @@
             await this.initData()
             if (this.$route.query.cache_key) { // 通知链接进入
                 this.getTicketNoticeInfo()
+            }
+            if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
+                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate)
+                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
             }
         },
         beforeDestroy () {

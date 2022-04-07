@@ -7,15 +7,15 @@
 Django==3.2.4
 PyMySQL==0.6.7
 mysqlclient==2.0.3
-MarkupSafe==1.0
+MarkupSafe==1.1.1
 Mako==1.0.6
-requests==2.23.0
+requests==2.22.0
 celery==4.4.5
 django-celery-beat==2.0.0
 django-celery-results==2.0.0
 # pi==3.3.1
 python-json-logger==0.1.7
-whitenoise==3.3.0
+whitenoise==5.2.0
 six==1.16.0
 httplib2==0.9.1
 djangorestframework==3.12.4
@@ -44,7 +44,7 @@ django-mptt==0.12.0
 django-mptt-admin==2.1.0
 django-nyt==1.2
 django-sekizai==2.0.0
-Markdown==2.6.11
+Markdown==3.2.1
 Pillow==5.2.0
 sorl-thumbnail==12.7.0
 django-simplemde==0.1.2
@@ -71,9 +71,18 @@ cachetools==3.1.1
 certifi==2020.4.5.1
 chardet==3.0.4
 curlify==2.2.1
-idna==2.9
+idna==2.8
 urllib3==1.25.9
 pycrypto==2.6.1
+
+#others
+raven==6.1.0
+ddtrace==0.14.1
+gunicorn==19.6.0
+bkstorages==1.0.1
+pytz==2019.3
+suds-jurko==0.6
+mock==3.0.5
 
 # excel
 xlrd==1.2.0
@@ -82,4 +91,26 @@ typing_extensions==3.6.5
 anyjson==0.3.3
 
 #bkouth
-PyJWT==2.1.0 
+PyJWT==1.6.1
+cryptography==3.3.2
+
+# prometheus
+django-prometheus==2.1.0
+
+# grpcio
+grpcio==1.27.2
+
+# opentelemetry
+opentelemetry-api==1.6.2
+opentelemetry-sdk==1.6.2
+opentelemetry-exporter-otlp==1.6.2
+opentelemetry-exporter-jaeger==1.6.2
+opentelemetry-exporter-jaeger-proto-grpc==1.6.2
+opentelemetry-exporter-jaeger-thrift==1.6.2
+opentelemetry-instrumentation==0.25b2
+opentelemetry-instrumentation-celery==0.25b2
+opentelemetry-instrumentation-django==0.25b2
+opentelemetry-instrumentation-dbapi==0.25b2
+opentelemetry-instrumentation-redis==0.25b2
+opentelemetry-instrumentation-logging==0.25b2
+opentelemetry-instrumentation-requests==0.25b2

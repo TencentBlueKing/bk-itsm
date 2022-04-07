@@ -31,8 +31,10 @@
                         :index="index"
                         :node-info="item"
                         :node-list="nodeList"
+                        :is-show-assgin="isShowAssgin"
                         :ticket-info="basicInfomation"
                         :all-groups="allGroups"
+                        :read-only="readOnly"
                         :is-last-node="index === currentStepList.length - 1"
                         :node-trigger-list="nodeTriggerList"
                         :all-field-list="allFieldList"
@@ -106,7 +108,10 @@
             loading: {
                 type: Boolean,
                 default: false
-            }
+            },
+            isShowBasicInfo: Boolean,
+            readOnly: Boolean,
+            isShowAssgin: Boolean
         },
         data () {
             return {
@@ -124,8 +129,17 @@
                     extCls: 'bk-processor-wrapper'
                 },
                 // 手动触发器下拉框状态
-                isDropdownShow: false
+                isDropdownShow: false,
+                basicInDomHeight: 54 // 基本信息初始高度
             }
+        },
+        watch: {
+            isShowBasicInfo () {
+                this.getBasicHeight()
+            }
+        },
+        mounted () {
+            this.getBasicHeight()
         },
         methods: {
             loadData () {
@@ -206,7 +220,10 @@
                     errorHandler(res, this)
                 })
             },
-            
+            getBasicHeight () {
+                const basicDom = document.querySelector('.base-info-content')
+                this.basicInDomHeight = basicDom.clientHeight
+            },
             // 成功后的回调事件
             successFn () {
                 this.$emit('handlerSubmitSuccess')
@@ -216,9 +233,12 @@
 </script>
 
 <style scoped lang='scss'>
+    @import '../../../../scss/mixins/scroller.scss';
     .bk-current-info {
+        // overflow: auto;
         position: relative;
         padding: 10px;
+        @include scroller;
     }
 
     .bk-current-padding {

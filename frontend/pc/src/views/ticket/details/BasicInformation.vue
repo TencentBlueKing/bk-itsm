@@ -25,48 +25,26 @@
         <div class="bk-basic-info" ref="basicInfo">
             <div class="bk-basic-form">
                 <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
+                <!-- <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
+                    <li v-for="item in basicInfomationList" :key="item.name" :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
+                        <span class="bk-info-title" :title="item.name">{{ item.name }} :</span>
+                        <span v-if="basicInfoType.includes(item.type)" class="bk-info-content">{{ item.display_value || '--'}}</span>
+                        <fields-done v-else class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
+                    </li>
+                </ul> -->
             </div>
-            <div class="bk-basic-form">
-                <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["工单类型："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.service_type_name || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["服务目录："]') }}</span>
-                        <span class="bk-info-content"
-                            :title="basicInfomation.catalog_fullname + '>' + basicInfomation.service_name">{{basicInfomation.catalog_fullname}}>{{basicInfomation.service_name}}</span>
-                    </li>
-                    <li>
-                        <business-card :basic-infomation="basicInfomation"></business-card>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单人："]') }}</span>
-                        <span class="bk-info-content pl5">{{basicInfomation.creator || '--'}}</span>
-                    </li>
-                    <li>
-                        <span class="bk-info-title">{{ $t('m.newCommon["提单时间："]') }}</span>
-                        <span class="bk-info-content">{{basicInfomation.create_at || '--'}}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <!-- v-if="showMore" -->
-        <div v-if="displayMoreIcon" class="more-content-btn" @click="changeShow">
-            {{ showMore ? $t('m.newCommon["收起"]') : $t('m.user["更多"]') }}
-            <i class="bk-icon icon-angle-down" v-if="!showMore"></i>
-            <i class="bk-icon icon-angle-up" v-else></i>
         </div>
     </div>
 </template>
 
 <script>
     import tableFields from './components/tableFields.vue'
-    import businessCard from '@/components/common/BusinessCard.vue'
-
+    // import fieldsDone from './components/fieldsDone.vue'
     export default {
         name: 'BasicInformation',
         components: {
-            tableFields,
-            businessCard
+            // fieldsDone,
+            tableFields
         },
         props: {
             basicInfomation: {
@@ -86,7 +64,9 @@
             return {
                 showMore: false,
                 showInfo: true,
-                displayMoreIcon: true
+                displayMoreIcon: true,
+                basicInfomationList: [],
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE']
             }
         },
         computed: {
@@ -102,6 +82,7 @@
             }
         },
         mounted () {
+            this.tableFields()
             // 这里是为了等 dom 加载完后计算真实高度
             setTimeout(() => {
                 const contentsDom = document.querySelectorAll('.basic-info-wrap > .bk-basic-info > .bk-basic-form')
@@ -126,6 +107,29 @@
             },
             changeShow () {
                 this.showMore = !this.showMore
+            },
+            // 处理基本信息字段
+            tableFields () {
+                const tlist = [] // 表单表格类型的字段
+                const { service_type_name, sn, catalog_fullname, service_name, title } = this.basicInfomation
+                const list = [
+                    { name: '标题', display_value: title, type: 'STRING' },
+                    { name: '单号', display_value: sn, type: 'STRING' },
+                    { name: '工单类型', display_value: service_type_name, type: 'STRING' },
+                    { name: '服务目录', display_value: catalog_fullname + '>' + service_name, type: 'STRING' },
+                    { name: '关联服务', display_value: service_name, type: 'STRING' }
+                ]
+                const fields = this.firstStateFields.map(item => {
+                    return item
+                })
+                fields.forEach(ite => {
+                    if (!this.basicInfoType.includes(ite.type)) {
+                        tlist.push(ite)
+                    } else {
+                        tlist.unshift(ite)
+                    }
+                })
+                this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'))
             }
         }
     }
@@ -133,13 +137,21 @@
 
 <style scoped lang='scss'>
     @import '../../../scss/mixins/clearfix.scss';
+    @import '../../../scss/mixins/scroller.scss';
+    .show {
+        width: 500px;
+        // margin-top: -10px;
+        overflow: auto;
+        @include scroller;
+    }
     .basic-info-wrap {
         position: relative;
         padding-bottom: 14px;
         &.fold {
             .bk-basic-info {
-                max-height: 300px;
-                overflow: hidden;
+                // max-height: 500px;
+                overflow: auto;
+                @include scroller;
             }
         }
         &.has-more-icon {
@@ -159,16 +171,35 @@
         }
 
         li {
-            width: 50%;
+            width: 33.33%;
             float: left;
-            font-size: 12px;
-            color: #63656E;
-            line-height: 26px;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #63656e;
+            line-height: 22px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             padding-right: 10px;
             @include clearfix;
+            .icon-basic-info {
+                display: inline-block;
+                position: relative;
+                &:hover {
+                    .show {
+                        display: block;
+                    }
+                }
+                .show {
+                    display: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background-color: blue;
+                    width: 300px;
+                    height: 200px;
+                }
+            }
         }
 
         .ul-no-border {
@@ -176,13 +207,23 @@
         }
 
         .bk-info-title {
+            width: 70px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: right;
             float: left;
-            font-weight: bold;
+            color: #979ba5;
         }
-
+        .view-content {
+            padding-left: 10px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
         .bk-info-content {
             word-wrap: break-word;
-            padding-left: 5px;
+            padding-left: 10px;
+            color: #313238;
         }
 
         .bk-basic-li {

@@ -46,14 +46,16 @@ from itsm.component.constants import (
     PROCESSOR_CHOICES,
     OPEN,
     SERVICE_SOURCE_CHOICES,
+    EMPTY_INT,
 )
 from itsm.component.drf.serializers import (
     DynamicFieldsModelSerializer,
     AuthModelSerializer,
 )
-from itsm.component.exceptions import ServiceCatalogValidateError
+from itsm.component.exceptions import ServiceCatalogValidateError, ServerError
 from itsm.component.utils.basic import dotted_name, list_by_separator, normal_name
 from itsm.component.utils.misc import transform_single_username
+from itsm.project.models import Project
 from itsm.service.models import (
     CatalogService,
     DictData,
@@ -67,7 +69,7 @@ from itsm.service.models import (
     FavoriteService,
 )
 from itsm.service.validators import key_validator, name_validator, time_validator
-from itsm.workflow.models import Workflow
+from itsm.workflow.models import Workflow, Table
 from itsm.workflow.serializers import NotifySerializer
 
 
@@ -418,6 +420,12 @@ class ServiceSerializer(AuthModelSerializer):
 
         return instance
 
+    def get_default_table_id(self):
+        try:
+            return Table.objects.get(name="默认", is_builtin=True).id
+        except Table.DoesNotExist:
+            return 1
+
     def init_work_flow(self, validated_data):
         work_flow_instance = Workflow.objects.create(
             name="{}_work_flow".format(validated_data["name"]),
@@ -428,7 +436,7 @@ class ServiceSerializer(AuthModelSerializer):
             is_iam_used=False,
             is_enabled=True,
             is_draft=False,
-            table_id=1,
+            table_id=self.get_default_table_id(),
             owners="",
             engine_version=DEFAULT_ENGINE_VERSION,
             creator=validated_data["creator"],
@@ -464,8 +472,10 @@ class ServiceSerializer(AuthModelSerializer):
 
     def to_representation(self, instance):
         data = super(ServiceSerializer, self).to_representation(instance)
-
-        workflow_instance = Workflow.objects.get(id=instance.workflow.workflow_id)
+        try:
+            workflow_instance = Workflow.objects.get(id=instance.workflow.workflow_id)
+        except Workflow.DoesNotExist:
+            raise ServerError("当前服务绑定的流程已经被删除, service_name={}".format(instance.name))
 
         username = self.context["request"].user.username
         data["creator"] = transform_single_username(data["creator"])
@@ -731,6 +741,7 @@ class WorkFlowConfigSerializer(serializers.Serializer):
     supervisor = serializers.CharField(
         required=True, max_length=LEN_LONG, allow_blank=True
     )
+    is_auto_approve = serializers.BooleanField(required=True)
 
 
 class ServiceConfigSerializer(serializers.Serializer):
@@ -738,6 +749,9 @@ class ServiceConfigSerializer(serializers.Serializer):
     can_ticket_agency = serializers.BooleanField(required=True)
     display_type = serializers.ChoiceField(required=True, choices=DISPLAY_CHOICES)
     display_role = serializers.CharField(required=False, max_length=LEN_LONG)
+    owners = serializers.CharField(
+        required=False, error_messages={"blank": _("服务负责人不能为空")}
+    )
 
     def validate(self, attrs):
         if attrs["display_type"] == OPEN:
@@ -745,4 +759,80 @@ class ServiceConfigSerializer(serializers.Serializer):
         else:
             if "display_role" not in attrs:
                 raise ValidationError(_("display_role 为必填项"))
+        return attrs
+
+
+class WorkflowImportSerializer(serializers.Serializer):
+    # 基础字段
+    name = serializers.CharField(
+        required=True,
+        max_length=LEN_MIDDLE,
+        error_messages={"blank": _("请输入流程名称!"), "max_length": _("流程名称长度不能大于120个字符")},
+    )
+    flow_type = serializers.CharField(required=True, max_length=LEN_NORMAL)
+    desc = serializers.CharField(
+        required=True, max_length=LEN_LONG, min_length=1, allow_blank=True
+    )
+    owners = serializers.CharField(
+        required=True, max_length=LEN_XX_LONG, allow_blank=True
+    )
+    # 基础模型
+    table = serializers.DictField(required=True)
+    version_number = serializers.CharField(required=True)
+    version_message = serializers.CharField(required=True, allow_blank=True)
+    states = serializers.DictField(required=True)
+    transitions = serializers.DictField(required=True)
+    triggers = serializers.ListField(required=True)
+    fields = serializers.DictField(required=True)
+
+    # 业务属性字段
+    is_biz_needed = serializers.BooleanField(required=True)
+    is_iam_used = serializers.BooleanField(required=True)
+    is_task_needed = serializers.BooleanField(required=True)
+    is_supervise_needed = serializers.BooleanField(required=True)
+    supervise_type = serializers.ChoiceField(required=True, choices=PROCESSOR_CHOICES)
+    engine_version = serializers.CharField(required=True)
+    supervisor = serializers.CharField(
+        required=True, max_length=LEN_LONG, allow_blank=True
+    )
+    is_enabled = serializers.BooleanField(required=True)
+    is_draft = serializers.BooleanField(required=True)
+    is_revocable = serializers.BooleanField(required=True)
+    revoke_config = serializers.JSONField(required=True)
+    notify = serializers.ListField(required=True)
+    notify_rule = serializers.ChoiceField(
+        required=True, allow_blank=True, choices=NOTIFY_RULE_CHOICES
+    )
+    notify_freq = serializers.IntegerField(default=EMPTY_INT)
+
+
+class ServiceImportSerializer(serializers.Serializer):
+    name = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("名称不能为空")},
+    )
+    key = serializers.CharField(
+        required=True,
+        error_messages={"blank": _("编码不能为空")},
+        max_length=LEN_LONG,
+        validators=[key_validator],
+    )
+    desc = serializers.CharField(required=False, max_length=LEN_LONG, allow_blank=True)
+    is_valid = serializers.BooleanField(required=True)
+    display_type = serializers.ChoiceField(required=True, choices=DISPLAY_CHOICES)
+    display_role = serializers.CharField(
+        required=True, max_length=LEN_LONG, allow_blank=True
+    )
+    project_key = serializers.CharField(required=True, max_length=LEN_SHORT)
+    source = serializers.ChoiceField(required=True, choices=SERVICE_SOURCE_CHOICES)
+    owners = serializers.CharField(
+        required=False, error_messages={"blank": _("服务负责人不能为空")}
+    )
+    workflow = WorkflowImportSerializer(required=True)
+
+    def validate(self, attrs):
+        project_key = attrs["project_key"]
+        if not Project.objects.filter(key=project_key).exists():
+            raise serializers.ValidationError(_("导入失败，project_key 对应的项目不存在"))
+
         return attrs

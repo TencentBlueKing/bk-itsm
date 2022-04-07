@@ -27,11 +27,21 @@ from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from itsm.component.constants import NOTIFY_GLOBAL_VARIABLES
+from itsm.component.constants import NOTIFY_GLOBAL_VARIABLES, PUBLIC_PROJECT_PROJECT_KEY
 from itsm.component.drf import viewsets as component_viewsets
 from itsm.component.exceptions import MigrateDataError
-from itsm.iadmin.models import CustomNotice, MigrateLogs, SystemSettings, ReleaseVersionLog
-from itsm.iadmin.permissions import IsMigrateSuperuser, SystemSettingPermit, CustomNotifyPermit
+from itsm.iadmin.contants import ACTION_CHOICES, ACTION_CLASSIFY
+from itsm.iadmin.models import (
+    CustomNotice,
+    MigrateLogs,
+    SystemSettings,
+    ReleaseVersionLog,
+)
+from itsm.iadmin.permissions import (
+    IsMigrateSuperuser,
+    SystemSettingPermit,
+    CustomNotifyPermit,
+)
 from itsm.iadmin.serializers import (
     CustomNotifySerializer,
     MigrateLogsSerializer,
@@ -90,13 +100,37 @@ class CustomNotifyViewSet(ModelViewSet):
     filter_fields = {
         "notify_type": ["exact"],
         "used_by": ["exact"],
+        "content_template": ["icontains", "contains"],
     }
+
+    def list(self, request, *args, **kwargs):
+        project_key = request.query_params.get(
+            "project_key", PUBLIC_PROJECT_PROJECT_KEY
+        )
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            project_key=project_key
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def variable_list(self, request, *args, **kwargs):
         """获取通知模板可用的变量列表"""
 
         return Response(NOTIFY_GLOBAL_VARIABLES)
+
+    @action(detail=False, methods=["get"])
+    def action_type(self, request, *args, **kwargs):
+        used_by = request.query_params.get("used_by")
+        data = dict(ACTION_CHOICES)
+        return Response(ACTION_CLASSIFY.get(used_by, data))
 
 
 class VersionLogsViewSet(component_viewsets.ReadOnlyModelViewSet):
@@ -157,7 +191,10 @@ class MigrateLogsViewSet(component_viewsets.ModelViewSet):
         valid_versions = []
         for item in versions:
             # 从已有版本号中过滤出属于用户选择范围的版本号列表
-            if version_cmp(version_from, item) <= 0 and version_cmp(item, version_to) <= 0:
+            if (
+                version_cmp(version_from, item) <= 0
+                and version_cmp(item, version_to) <= 0
+            ):
                 valid_versions.append(item)
 
         # 组装需要执行的函数列表

@@ -29,7 +29,8 @@ export default {
          * 我的单据列表已选字段缓存
          * todo: { size: '', fields: [] }
          */
-        settingCache: {}
+        settingCache: {},
+        hasTicketNodeOptAuth: true
     },
     mutations: {
         setSettingCache (state, { type, value }) {
@@ -37,7 +38,11 @@ export default {
         },
         clearSettingCache () {
             state.settingCache = {}
+        },
+        setHasTicketNodeOptAuth (state, value) {
+            state.hasTicketNodeOptAuth = value
         }
+        
     },
     actions: {
         // 获取单据数量（待办、审批）
@@ -117,6 +122,49 @@ export default {
         // 获取可引用变量
         getTicketOutput({ commit }, id) {
             return ajax.get(`ticket/receipts/${id}/get_ticket_output/`).then(response => response.data)
-        }
+        },
+        // 获取单据下的所有评论
+        getTicketAllComments ({ commit, state, dispatch }, params) {
+            return ajax.get('ticket/remark/', { params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 获取有回复的评论
+        getReplyComment ({ commit, state, dispatch }, params) {
+            const { id } = params
+            return ajax.get(`ticket/remark/${id}/`, { params }).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据新增评论
+        addTicketComment ({ commit, state, dispatch }, params) {
+            return ajax.post('ticket/remark/', params).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据修改评论
+        updateTicketComment ({ commit, state, dispatch }, params) {
+            const { id } = params
+            return ajax.put(`ticket/remark/${id}/`, params).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 单据删除评论
+        deleteTicketComment ({ commit, state, dispatch }, params) {
+            const id = params
+            return ajax.delete(`ticket/remark/${id}/`).then(response => {
+                let res = response.data
+                return res
+            })
+        },
+        // 获取单据评价
+        getTicktComment ({ commit, state, dispatch }, params) {
+            const id = params
+            return ajax.get(`ticket/comments/${id}/`).then(response => response.data)
+        },
     }
 }

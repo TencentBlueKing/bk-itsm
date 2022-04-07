@@ -47,7 +47,9 @@ class TriggerResourceProvider(ItsmResourceProvider):
             parent_id = filter.parent["id"]
             if parent_id:
                 # todo: add project
-                queryset = Trigger.objects.filter(project_key=parent_id, source_type="basic")
+                queryset = Trigger.objects.filter(
+                    project_key=parent_id, source_type="basic"
+                )
         elif filter.search and filter.resource_type_chain:
             # 返回结果需要带上资源拓扑路径信息
             with_path = True
@@ -66,8 +68,12 @@ class TriggerResourceProvider(ItsmResourceProvider):
 
             # queryset = queryset
             # todo: add project
-            project_ids = Project.objects.filter(project_filter).values_list("key", flat=True)
-            queryset = Trigger.objects.filter(project_key__in=list(project_ids), source_type="basic").filter(field_filter)
+            project_ids = Project.objects.filter(project_filter).values_list(
+                "key", flat=True
+            )
+            queryset = Trigger.objects.filter(
+                project_key__in=list(project_ids), source_type="basic"
+            ).filter(field_filter)
 
         count = queryset.count()
 
@@ -76,14 +82,22 @@ class TriggerResourceProvider(ItsmResourceProvider):
                 {
                     "id": str(trigger.id),
                     "display_name": trigger.name,
-                    "path": [[{"type": "project", "id": 0, "display_name": trigger.prject.name}]],
+                    "path": [
+                        [
+                            {
+                                "type": "project",
+                                "id": 0,
+                                "display_name": trigger.prject.name,
+                            }
+                        ]
+                    ],
                 }
-                for trigger in queryset[page.slice_from: page.slice_to]
+                for trigger in queryset[page.slice_from : page.slice_to]
             ]
         else:
             results = [
-                {"id": str(field.id), "display_name": field.name} for field in
-                queryset[page.slice_from: page.slice_to]
+                {"id": str(field.id), "display_name": field.name}
+                for field in queryset[page.slice_from : page.slice_to]
             ]
 
         return ListResult(results=results, count=count)
@@ -96,6 +110,12 @@ class TriggerResourceProvider(ItsmResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        results = [{"id": str(triggers.id), "display_name": triggers.name} for triggers in
-                   Trigger.objects.filter(id__in=ids)]
+        results = [
+            {
+                "id": str(triggers.id),
+                "display_name": triggers.name,
+                "_bk_iam_approver_": self.get_bk_iam_approver(triggers.creator),
+            }
+            for triggers in Trigger.objects.filter(id__in=ids)
+        ]
         return ListResult(results=results)

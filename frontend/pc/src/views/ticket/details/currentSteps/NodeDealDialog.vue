@@ -97,7 +97,7 @@
             </bk-form>
         </template>
         <!-- 转单 -->
-        <template v-if="openFormInfo.btnInfo.key === 'DELIVER'">
+        <template v-if="openFormInfo.btnInfo.key === 'DELIVER' || openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE'">
             <bk-form
                 :model="formData"
                 :rules="rules"
@@ -105,7 +105,7 @@
                 form-type="vertical"
                 ref="dialogForm">
                 <bk-form-item
-                    :label="$t(`m.newCommon['转单至：']`)"
+                    :label="$t(`m.newCommon['${type}至：']`)"
                     :required="true">
                     <deal-person
                         ref="personSelect"
@@ -117,17 +117,17 @@
                             value: deliverInfo.value
                         }"
                         :specify-id-list="deliverInfo.specifyIdList"
-                        :exclude-role-type-list="deliverInfo.excludeTypeList"
+                        :exclude-role-type-list="type === '转单' ? deliverInfo.excludeTypeList : excludeAssignList"
                         :show-role-type-list="deliverInfo.includeTypeList"
-                        :required-msg="$t(`m.newCommon['转单人不能为空']`)">
+                        :required-msg="$t(`m.newCommon['${type}人不能为空']`)">
                     </deal-person>
                 </bk-form-item>
                 <bk-form-item
-                    :label="$t(`m.newCommon['转单原因']`)"
+                    :label="$t(`m.newCommon['${type}原因']`)"
                     :required="true"
                     :property="'deliverReason'">
                     <bk-input
-                        :placeholder="$t(`m.newCommon['请输入转单原因']`)"
+                        :placeholder="$t(`m.newCommon['请输入${type}原因']`)"
                         :type="'textarea'"
                         :rows="3"
                         v-model="formData.deliverReason">
@@ -195,7 +195,14 @@
                     specifyIdList: [], // 包含人员 id 列表
                     type: '',
                     value: ''
-                }
+                },
+                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API', 'ORGANIZATION']
+            }
+        },
+        computed: {
+            //  转单 or 异常分派
+            type () {
+                return this.openFormInfo.btnInfo.key === 'DELIVER' ? '转单' : '分派'
             }
         },
         watch: {

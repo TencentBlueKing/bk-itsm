@@ -38,8 +38,9 @@ from config import APP_ID, APP_TOKEN, RUN_VER
 from blueapps.utils import get_request
 from common.log import logger
 from itsm.component.constants import ResponseCodeStatus
+from itsm.component.utils.auth import get_tapd_oauth_url
 from itsm.component.utils.sandbox import map_data
-from itsm.component.utils.bk_bunch import Bunch, bunchify, unbunchify  # noqa need in exec
+from itsm.component.utils.bk_bunch import Bunch, bunchify, unbunchify  # noqa
 
 
 class BaseClient(object):
@@ -55,7 +56,9 @@ class BaseClient(object):
 
         try:
             request_object = get_request()
-            data['__remote_user__'] = getattr(request_object.user, 'username', settings.SYSTEM_CALL_USER)
+            data["__remote_user__"] = getattr(
+                request_object.user, "username", settings.SYSTEM_CALL_USER
+            )
         except BaseException:
             pass
 
@@ -63,7 +66,7 @@ class BaseClient(object):
         url = self.build_absolute_url(path, domain)
 
         # 根据__env__强制取消测试环境
-        if data.pop('__env__', None) == 'product':
+        if data.pop("__env__", None) == "product":
             client.set_use_test_env(False)
 
         api_auth = data.pop("api_auth", None)
@@ -74,7 +77,7 @@ class BaseClient(object):
         origin_headers = kwargs.get("headers", {})
         headers = data.pop("headers", {})
         origin_headers.update(headers)
-        kwargs['headers'] = origin_headers
+        kwargs["headers"] = origin_headers
 
         if method == "POST":
             if data.get("content_type") == "text":
@@ -86,19 +89,24 @@ class BaseClient(object):
             res = client.request("GET", url, params=data, **kwargs)
 
         if not res:
+            message = "empty response: {}".format(url)
+            # 获取tapd授权链接
+            if settings.ITSM_TAPD_APIGW and settings.ITSM_TAPD_APIGW in url:
+                workspace_id = data.get("workspace_id", "")
+                message = get_tapd_oauth_url(workspace_id)
             return {
                 "result": False,
-                "message": 'empty response: {}'.format(url),
+                "message": message,
                 "data": {},
             }
 
         try:
             return res.json()
         except JSONDecodeError:
-            logger.warning('[{}]: JSONDecodeError'.format(url))
+            logger.warning("[{}]: JSONDecodeError".format(url))
             return {
                 "result": False,
-                "message": 'not support invalid json response: {}'.format(url),
+                "message": "not support invalid json response: {}".format(url),
                 "data": {},
             }
 
@@ -109,11 +117,17 @@ class BaseClient(object):
         :param url: 请求链接
         :param data: 请求数据
         :param kwargs: 其他参数
-        :return: 
+        :return:
         """
 
         return requests.request(
-            "POST", url, data=data, verify=False, timeout=20, headers=kwargs.get("headers"), **kwargs
+            "POST",
+            url,
+            data=data,
+            verify=False,
+            timeout=20,
+            headers=kwargs.get("headers"),
+            **kwargs
         )
 
 
@@ -132,7 +146,7 @@ class OpenClient(BaseClient):
     def get_client(cls, data):
         # 支持从外部指定请求所用的用户身份
         if data.get("__remote_user__"):
-            client = cls.get_client_by_user(data.pop('__remote_user__'))
+            client = cls.get_client_by_user(data.pop("__remote_user__"))
         else:
             client = cls.get_client_by_user(settings.SYSTEM_CALL_USER)
 
@@ -154,10 +168,28 @@ class IeodClient(BaseClient):
         return urllib.parse.urljoin(system_domain, path)
 
     @classmethod
+    def get_common_args(self, username):
+        try:
+            import bkoauth
+
+            # 新的access_token，会自动根据refresh_token刷新
+            access_token_obj = bkoauth.get_access_token_by_user(username)
+            access_token = access_token_obj.access_token
+            common_args = {"access_token": access_token}
+            logger.info("[IeodClient] 用户access_token获取成功")
+            return common_args
+        except Exception:
+            logger.info("根据用户获取access_token 失败, username={}".format(username))
+            return {}
+
+    @classmethod
     def get_client(cls, data):
         # 支持从外部指定请求所用的用户身份
         if data.get("__remote_user__"):
-            client = cls.get_client_by_user(data.pop('__remote_user__'))
+            user = data.pop("__remote_user__")
+            common_args = cls.get_common_args(user)
+            logger.info("[IeodClient] execute, user={}".format(user))
+            client = cls.get_client_by_user(user, **common_args)
         else:
             client = cls.get_client_by_user(settings.SYSTEM_CALL_USER)
 
@@ -175,35 +207,37 @@ class BkComponent(object):
         self.app_code = app_code
         self.app_secret = app_secret
         self._conf = ENV_MAP[ver]
-        self.client = self._conf['client']()
+        self.client = self._conf["client"]()
 
     def http(self, config):
 
         # post.body or get.query_params
-        query_params = config.get('query_params')
-        path = config.get('path')
-        method = config.get('method')
-        system_domain = config.get('system_domain')
-        map_code = config.get('map_code')
-        before_req = config.get('before_req')
-        rsp_data = config.get('rsp_data')
+        query_params = config.get("query_params")
+        path = config.get("path")
+        method = config.get("method")
+        system_domain = config.get("system_domain")
+        map_code = config.get("map_code")
+        before_req = config.get("before_req")
+        rsp_data = config.get("rsp_data")
         kwargs = {}
 
         # 请求参数预处理
         if before_req:
             try:
-                query_params = map_data(before_req, query_params, 'query_params')
+                query_params = map_data(before_req, query_params, "query_params")
             except Exception:
                 return {
                     "result": False,
-                    "message": traceback.format_exc().split('\n')[-2],
+                    "message": traceback.format_exc().split("\n")[-2],
                     "data": {},
                 }
 
         try:
-            response = self.client.request(method, path, query_params, system_domain, **kwargs)
+            response = self.client.request(
+                method, path, query_params, system_domain, **kwargs
+            )
         except Exception as e:
-            logger.error('[{}] response.Exception: {}'.format(path, e))
+            logger.error("[{}] response.Exception: {}".format(path, e))
             return {
                 "result": False,
                 "message": str(e),
@@ -213,11 +247,11 @@ class BkComponent(object):
         # 返回结果后处理
         if map_code:
             try:
-                response = map_data(map_code, response, 'response')
+                response = map_data(map_code, response, "response")
             except Exception:
                 return {
                     "result": False,
-                    "message": traceback.format_exc().split('\n')[-2],
+                    "message": traceback.format_exc().split("\n")[-2],
                     "data": {},
                 }
 
@@ -233,8 +267,8 @@ class BkComponent(object):
 
     def handle_response(self, response, rsp_data):
         """提取response中的字段值，比如
-            rsp_data = 'data.info'
-            return reponse['data']['info']
+        rsp_data = 'data.info'
+        return reponse['data']['info']
         """
         data = {}
         for attr in rsp_data.split(","):
@@ -242,11 +276,17 @@ class BkComponent(object):
                 continue
 
             try:
-                handle_code = "handle_data = unbunchify(bunchify(response).{rsp_data})".format(rsp_data=attr)
+                handle_code = (
+                    "handle_data = unbunchify(bunchify(response).{rsp_data})".format(
+                        rsp_data=attr
+                    )
+                )
                 exec(handle_code)
                 data[attr] = locals()["handle_data"]
             except AttributeError as e:
-                logger.warning("handle_response attribute_error[{}]: {}}".format(attr, e))
+                logger.warning(
+                    "handle_response attribute_error[{}]: {}".format(attr, e)
+                )
                 data[attr] = ""
 
         return data

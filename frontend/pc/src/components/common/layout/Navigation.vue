@@ -34,6 +34,7 @@
         <template slot="header">
             <div class="nav-header">
                 <bk-button
+                    data-test-id="navigation-button-createTicket"
                     theme="primary"
                     icon="plus"
                     size="small"
@@ -46,7 +47,7 @@
                         v-for="router in topNav"
                         :key="router.id"
                         :class="['nav-item', { active: router.id === activeNav }]">
-                        <router-link :to="router.path" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
+                        <router-link :to="router.path" :data-test-id="`navigation-router-navRouter-${router.id}`" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
                     </li>
                 </ul>
             </div>
@@ -71,7 +72,7 @@
                         </ul>
                     </template>
                 </bk-popover>
-                <bk-popover theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
+                <bk-popover data-test-id="navigation-popover-user" theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
                     <div class="user-name">
                         <span>{{ userName }}</span>
                         <i class="bk-icon icon-down-shape"></i>
@@ -82,7 +83,7 @@
                                 <span @click="onGoToProjectList">{{ $t(`m["项目管理"]`) }}</span>
                             </li>
                             <li class="operate-item">
-                                <span @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
+                                <span data-test-id="navigation-span-logout" @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
                             </li>
                         </ul>
                     </template>
@@ -91,6 +92,7 @@
         </template>
         <template slot="menu">
             <bk-select
+                data-test-id="navigation-select-projectList"
                 v-if="activeNav === 'project'"
                 :value="selectedProject"
                 class="project-select"
@@ -114,6 +116,7 @@
                 </bk-option>
                 <div slot="extension" class="project-select-extension">
                     <div
+                        data-test-id="navigation-div-createProject"
                         v-cursor="{ active: !hasPermission(['project_create']) }"
                         :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create']) }]"
                         @click="handleCreateProject">
@@ -121,6 +124,7 @@
                         {{ $t(`m['新建项目']`) }}
                     </div>
                     <div
+                        data-test-id="navigation-div-manageProject"
                         class="action-item"
                         @click="goToProjectManage">
                         <i class="bk-icon icon-apps"></i>
@@ -144,6 +148,7 @@
                         <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
                         <bk-navigation-menu-item
                             v-for="item in router.subRouters"
+                            :data-test-id="`navigation-menu-${item.id}`"
                             :key="item.id"
                             :id="item.id"
                             :disabled="item.disabled"
@@ -153,6 +158,7 @@
                         </bk-navigation-menu-item>
                     </div>
                     <bk-navigation-menu-item
+                        :data-test-id="`navigation-menu-platformRouter-${router.id}`"
                         v-else
                         :key="router.id"
                         :id="router.id"
@@ -245,7 +251,6 @@
             // 侧边栏导航项
             sideNav () {
                 const list = []
-
                 this.sideRouters.forEach(router => {
                     if (router.id === 'sla') {
                         this.openFunction.SLA_SWITCH && list.push(router)
@@ -310,12 +315,16 @@
             setActive () {
                 const hasMatched = this.routerList.some(nav => {
                     const navId = nav.id
+                    this.getProjectList()
                     if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
                         const matched = this.traverseSubRouter(nav.subRouters, navId)
                         if (matched.navId) {
                             this.activeNav = matched.navId
                             this.activeSideRouter = matched.sideRouterId
                             this.sideRouters = nav.subRouters
+                            if (this.$route.query.from !== 'projectTicket' && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
+                                this.sideRouters = []
+                            }
                             return true
                         } else if (this.isMatchedByPrefix(nav.prefix)) {
                             this.activeNav = nav.id
@@ -438,9 +447,13 @@
                 this.$store.commit('project/setProjectId', val)
                 this.$store.dispatch('project/changeDefaultProject', val)
                 // 申请权限页面新建项目跳到项目单据下
-                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : this.$route.name, query: { project_id: val } })
+                let path = this.$route.name
+                if (this.$route.name === 'projectServiceEdit') {
+                    path = 'projectServiceList'
+                }
+                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } })
             },
-            applyForProjectViewPerm (project, perm) {
+            applyForProjectViewPerm (project, perm, ret = false) {
                 if (!this.hasPermission([perm], project.auth_actions)) {
                     const resourceData = {
                         project: [{
@@ -449,7 +462,9 @@
                         }]
                     }
                     this.applyForPermission([perm], project.auth_actions, resourceData)
+                    return false
                 }
+                return true
             },
             handleCreateProject () {
                 if (!this.hasPermission(['project_create'])) {

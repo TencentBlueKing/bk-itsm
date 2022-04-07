@@ -34,6 +34,7 @@ PASS_RATE = "PASS_RATE"  # 通过率
 REJECT_RATE = "REJECT_RATE"  # 拒绝率
 APPROVE_RESULT = "APPROVE_RESULT"  # 审批结果
 NODE_APPROVE_RESULT = "NODE_APPROVE_RESULT"  # 审批结果
+NODE_APPROVER = "NODE_APPROVER"  # 审批人
 
 # Value unit
 PERCENT = "PERCENT"
@@ -58,7 +59,14 @@ SIGN_FIELDS = [
         "choice": [{"key": "true", "name": _("通过")}, {"key": "false", "name": _("拒绝")}],
         "meta": {"code": APPROVE_RESULT},
     },
-    {"name": _("备注"), "is_builtin": False, "display": True, "type": "TEXT", "regex": "EMPTY", "layout": "COL_12"},
+    {
+        "name": _("备注"),
+        "is_builtin": False,
+        "display": True,
+        "type": "TEXT",
+        "regex": "EMPTY",
+        "layout": "COL_12",
+    },
 ]
 
 APPROVAL_VARIABLES = [
@@ -68,8 +76,16 @@ APPROVAL_VARIABLES = [
         "meta": {
             "code": NODE_APPROVE_RESULT,
             "type": "SELECT",
-            "choice": [{"key": "false", "name": _("拒绝")}, {"key": "true", "name": _("通过")}],
+            "choice": [
+                {"key": "false", "name": _("拒绝")},
+                {"key": "true", "name": _("通过")},
+            ],
         },
+    },
+    {
+        "name": _("审批人"),
+        "type": "STRING",
+        "meta": {"code": NODE_APPROVER},
     },
 ]
 
@@ -92,7 +108,9 @@ APPROVAL_FIELDS = [
         "layout": "COL_12",
         "validate_type": "OPTION",
         "show_conditions": {
-            "expressions": [{"value": "false", "type": "RADIO", "condition": "==", "key": ""}],
+            "expressions": [
+                {"value": "false", "type": "RADIO", "condition": "==", "key": ""}
+            ],
             "type": "and",
         },
         "show_type": SHOW_BY_CONDITION,
@@ -104,7 +122,9 @@ APPROVAL_FIELDS = [
         "regex": "EMPTY",
         "layout": "COL_12",
         "show_conditions": {
-            "expressions": [{"value": "true", "type": "RADIO", "condition": "==", "key": ""}],
+            "expressions": [
+                {"value": "true", "type": "RADIO", "condition": "==", "key": ""}
+            ],
             "type": "and",
         },
         "show_type": SHOW_BY_CONDITION,

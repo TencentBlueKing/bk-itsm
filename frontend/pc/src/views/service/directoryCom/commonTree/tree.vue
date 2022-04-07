@@ -67,6 +67,7 @@
                         :class="{ 'node-selected': item.selected }"
                         style="padding-right: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: calc(100% - 50px); position: absolute; top: 0; left: 42px;"
                         @click="nodeSelected(item)">{{item.name}}</span>
+                    <span v-if="item.service_count !== undefined" class="bk-tree-count">{{ item.service_count }}</span>
                     <i class="bk-icon icon-more bk-tree-point"
                         :class="{ 'bk-point-selected': item.selected }"
                         @click.stop="iconSelected(item, $event)"></i>
@@ -758,6 +759,25 @@
 
         &:hover {
             color: #3c96ff;
+        }
+    }
+    .bk-tree-count {
+        font-size: 12px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 4px;
+        position: absolute;
+        width: 20px;
+        height: 16px;
+        top: 7px;
+        right: 20px;
+        background-color: #f0f1f5;
+        color: #979ba5;
+        cursor: pointer;
+        font-weight: 500;
+        &:hover {
+            background-color: #3c96ff;
+            color: #ffffff;
         }
     }
 

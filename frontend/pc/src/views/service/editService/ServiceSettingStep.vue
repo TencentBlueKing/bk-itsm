@@ -75,6 +75,14 @@
                             :show-role-type-list="superviseTypes">
                         </deal-person>
                     </bk-form-item>
+                    <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
+                        <bk-checkbox
+                            :true-value="true"
+                            :false-value="false"
+                            v-model="formData.is_auto_approve">
+                            当审批节点的审批人为申请人时，自动通过
+                        </bk-checkbox>
+                    </bk-form-item>
                 </bk-form>
             </div>
         </section>
@@ -95,7 +103,7 @@
                             </bk-checkbox>
                         </bk-checkbox-group>
                     </bk-form-item>
-                    <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
+                    <!-- <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
                         <bk-radio-group v-model="formData.notify_rule">
                             <bk-radio :value="'ONCE'"
                                 :ext-cls="'mr20 bk-line-radio'">
@@ -119,13 +127,13 @@
                                 </bk-select>
                             </div>
                         </bk-radio-group>
-                    </bk-form-item>
+                    </bk-form-item> -->
                 </bk-form>
             </div>
         </section>
         <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
             <div
-                class="card-title more-configuration mt20" @click="showMoreConfig = !showMoreConfig">
+                class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
                 <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
                 <i v-else class="bk-icon icon-up-shape"></i>
                 <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
@@ -144,7 +152,7 @@
                         </basic-card>
                         <basic-card class="mt20"
                             :card-label="$t(`m.taskTemplate['任务配置']`)"
-                            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)">
+                            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的流程字段配置中，将已有字段中的“关联业务” 字段添加至流程中。']`)">
                             <TaskConfigPanel ref="taskConfigPanel" :service-info="serviceInfo"></TaskConfigPanel>
                         </basic-card>
                     </div>
@@ -249,7 +257,8 @@
                     otherSettings: [],
                     notify_rule: 'ONCE',
                     notify_freq: '',
-                    notify: ['WEIXIN', 'EMAIL']
+                    notify: ['WEIXIN', 'EMAIL'],
+                    is_auto_approve: false
                 },
                 superviseTypes: ['PERSON', 'GENERAL', 'STARTER'],
                 supervisePerson: {
@@ -299,7 +308,7 @@
                 } catch (error) {
                     console.log(error)
                 }
-                
+                this.formData.is_auto_approve = this.flowInfo.is_auto_approve
                 this.formData.visibleRange = {
                     type: display_type,
                     value: display_role
@@ -358,7 +367,8 @@
                         revoke_config: {
                             type: 0, // 默认值
                             state: 0
-                        }
+                        },
+                        is_auto_approve: this.formData.is_auto_approve
                     }
                 }
                 const workflow = params.workflow_config // 之前存在流程上的参数
@@ -374,15 +384,13 @@
                     params.display_type = data.type
                     params.display_role = data.value || undefined
                 }
-
+                workflow.is_auto_approve = this.formData.is_auto_approve
                 // 撤单方式
                 const {
                     revokeWay,
                     revokeState,
                     otherSettings,
-                    notify,
-                    notify_freq: notifyFreq,
-                    notify_rule: notifyRule
+                    notify
                 } = this.formData
                 if (revokeWay === 'not_support') {
                     workflow.is_revocable = false
@@ -408,14 +416,17 @@
                 }
                 // 通知方式
                 workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
-                const canNotice = !!notify.length
-                if (canNotice) {
-                    workflow.notify_rule = notifyRule
-                    workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
-                } else {
-                    workflow.notify_rule = 'NONE'
-                    workflow.notify_freq = 0
-                }
+                workflow.notify_freq = 0
+                workflow.notify_rule = 'ONCE'
+
+                // const canNotice = !!notify.length
+                // if (canNotice) {
+                //     workflow.notify_rule = notifyRule
+                //     workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
+                // } else {
+                //     workflow.notify_rule = 'NONE'
+                //     workflow.notify_freq = 0
+                // }
 
                 // 任务配置
                 if (this.$refs.taskConfigPanel) {
@@ -423,7 +434,6 @@
                     workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams()
                 }
                 const checkResult = await this.saveAndActionService(params)
-                
                 await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
                 if (!checkResult.result) {
                     this.slaValidateMsg = checkResult.data.messages
@@ -437,6 +447,7 @@
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';
+@import '~@/scss/common-section-card.scss';
 .bk-float-radio {
     float: left;
     line-height: 30px;
@@ -505,5 +516,8 @@
     .operate-btns {
         margin-top: 20px;
     }
+}
+/deep/ .common-section-card-desc {
+    width: 100%;
 }
 </style>

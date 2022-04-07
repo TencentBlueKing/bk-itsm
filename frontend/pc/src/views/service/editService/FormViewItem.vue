@@ -21,7 +21,11 @@
   -->
 
 <template>
-    <div class="form-view-item">
+    <div :class="['form-view-item', crtForm === form.id ? 'click-status' : '']">
+        <i v-if="!addFieldStatus && crtForm === form.id" class="bk-itsm-icon icon-itsm-icon-square-one"></i>
+        <div class="drag-element">
+            <slot name="draggable"></slot>
+        </div>
         <div class="form-view-content">
             <component
                 :is="'CW-' + form.type"
@@ -29,11 +33,11 @@
                 :fields="fields">
             </component>
         </div>
-        <div class="mask"></div>
+        <div class="mask" @click="$emit('onFormEditClick', form)"></div>
         <div class="opt-btns">
-            <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four" @click="$emit('onFormEditClick', form)"></i>
+            <!-- <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four"></i> -->
             <i class="btn-item bk-itsm-icon icon-itsm-icon-copy" v-if="form.source === 'CUSTOM' " @click="$emit('onFormCloneClick', form)"></i>
-            <i class="btn-item bk-icon icon-delete" :class="deleteDisabled ? 'disabled' : ''" @click="onDeleteClick(form)"></i>
+            <i v-bk-tooltips="{ placement: 'auto-start', content: $t(`m['内置字段，不可删除']`), disabled: !deleteDisabled, theme: 'Light' }" class="btn-item bk-icon icon-delete" :class="deleteDisabled ? 'disabled' : ''" @click="onDeleteClick(form)"></i>
         </div>
     </div>
 </template>
@@ -58,7 +62,9 @@
         name: 'FormViewItem',
         props: {
             fields: Array,
-            form: Object
+            form: Object,
+            crtForm: [String, Number],
+            addFieldStatus: Boolean
         },
         computed: {
             deleteDisabled () {
@@ -82,26 +88,48 @@
     }
 </script>
 <style lang="scss" scoped>
+    .click-status {
+        background: rgba(225,236,255,0.50);
+        border: 1px solid #a3c5fd;
+    }
     .form-view-item {
+        display: flex;
         position: relative;
         padding: 10px 0;
         overflow: hidden;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
+        .icon-itsm-icon-square-one {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 14px;
+            color: red;
+        }
         &:hover {
-            background: #fcfcfc;
-            border-top: 1px solid #dde4eb;
-            border-bottom: 1px solid #dde4eb;
+            background: #f0f6ff;
+            border: 1px solid #a3c5fd;
             .mask {
                 display: block;
             }
             .opt-btns {
                 right: 0;
+                background-color: #e1ecff;
             }
         }
+        .drag-element {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 36px;
+            height: 100%;
+            text-align: center;
+            padding: 20px 0;
+            color: #c4c6cc;
+            cursor: move;
+            z-index: 2;
+        }
         .form-view-content {
-            width: 600px;
-            margin: 0 auto;
+            flex: 1;
+            margin: 0 35px 0 10px
         }
         .mask {
             position: absolute;
@@ -110,7 +138,6 @@
             width: 100%;
             height: 100%;
             display: block;
-            cursor: move;
             z-index: 1;
         }
         .opt-btns {

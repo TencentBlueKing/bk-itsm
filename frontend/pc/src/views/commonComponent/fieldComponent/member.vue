@@ -30,6 +30,7 @@
                     :disabled="item.is_readonly">
                 </member-select>
                 <business-card
+                    style="margin-top: 3px"
                     :item="item">
                 </business-card>
             </div>

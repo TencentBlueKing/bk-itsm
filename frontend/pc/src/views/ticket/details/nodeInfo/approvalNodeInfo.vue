@@ -27,7 +27,7 @@
             <fields-done
                 :key="inde"
                 :item="ite"
-                :origin="'log'">
+                :origin="'notLog'">
             </fields-done>
         </template>
     </div>

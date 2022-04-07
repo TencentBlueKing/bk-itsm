@@ -29,7 +29,7 @@
         </div>
         <div class="itsm-page-content">
             <empty-tip
-                v-if="projectId && !isLoading && triggerList.length === 0"
+                v-if="projectId && !isLoading && triggerList.length === 0 && searchToggle"
                 :title="emptyTip.title"
                 :sub-title="emptyTip.subTitle"
                 :desc="emptyTip.desc"
@@ -101,6 +101,7 @@
                             </span>
                         </li>
                     </ul>
+                    <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
                 </div>
             </template>
         </div>
@@ -144,6 +145,7 @@
             return {
                 versionStatus: true,
                 searchKey: '',
+                searchToggle: false,
                 triggerList: [],
                 iconList: [
                     { key: 'icon-icon-notice-new', name: '', typeName: 'message' },
@@ -231,7 +233,7 @@
                 if (this.projectId) {
                     params.project_key = this.projectId
                 }
-
+                this.searchToggle = !this.searchKey
                 this.isLoading = true
                 this.$store.dispatch('trigger/getTriggerTable', params).then((res) => {
                     this.triggerList = res.data.map(trigger => {
@@ -256,7 +258,7 @@
                             name: projectInfo.name
                         }],
                         trigger: [{
-                            id: item.key,
+                            id: item.id,
                             name: item.name
                         }]
                     }
@@ -272,7 +274,7 @@
             },
             // 删除触发器
             deleteTrigger (item, index) {
-                if (!this.hasPermission(['triggers_manage'], item.auth_actions)) {
+                if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const projectInfo = this.$store.state.project.projectInfo
                     const resourceData = {
                         project: [{
@@ -280,11 +282,11 @@
                             name: projectInfo.name
                         }],
                         trigger: [{
-                            id: item.key,
+                            id: item.id,
                             name: item.name
                         }]
                     }
-                    this.applyForPermission(['triggers_manage'], item.auth_actions, resourceData)
+                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                     return
                 }
                 this.$bkInfo({
@@ -313,6 +315,12 @@
 
 <style lang='scss' scoped>
     @import './triggerCss/index.scss';
+    .search-tip {
+        text-align: center;
+        font-size: 14px;
+        color: #63656e;
+        margin: 40px;
+    }
     .itsm-notify {
         padding: 6px 10px;
         padding-right: 30px;

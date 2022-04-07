@@ -10,7 +10,7 @@
 
 | 字段        | 类型     | 必选  | 描述                         |
 | --------- | ------ | --- | -------------------------- |
-| service_id | string    | 是   | 服务id |
+| service_id | string    | 是   | 服务id，从`服务列表查询`中的`data["id"]`字段获取 |
 | ticket_creator     | string    | 否   | 提单人，实例化leader和提单人本身时使用 |
 
 

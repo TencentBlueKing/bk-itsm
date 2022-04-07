@@ -27,7 +27,10 @@
                 class="advanced-search"
                 ref="advancedSearch"
                 :forms="searchForms"
+                :panel="type"
+                :search-result-list="searchResultList"
                 @search="handleSearch"
+                @deteleSearchResult="deteleSearchResult"
                 @clear="handleClearSearch"
                 @formChange="handleSearchFormChange">
                 <div class="slot-content">

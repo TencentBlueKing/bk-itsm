@@ -23,14 +23,14 @@
 <template>
     <div class="bk-basic-node">
         <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form :label-width="150" :model="formInfo">
-                <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
+            <bk-form data-test-id="service-form-autoNode" :label-width="150" :model="formInfo" form-type="vertical">
+                <bk-form-item data-test-id="autoNode-input-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
                     <bk-input :ext-cls="'bk-form-width'"
                         v-model="formInfo.name"
                         maxlength="120">
                     </bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['API接口']`)" :required="true">
+                <bk-form-item data-test-id="autoNode-select-apiInterface" :label="$t(`m.treeinfo['API接口']`)" :required="true">
                     <bk-select :ext-cls="'bk-form-width bk-form-display'"
                         v-model="formInfo.api_info.remote_system_id"
                         :clearable="false"
@@ -58,7 +58,7 @@
                         </bk-select>
                     </template>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+                <bk-form-item data-test-id="autoNode-select-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
                     <div @click="checkStatus.processors = false">
                         <deal-person
                             ref="processors"
@@ -72,7 +72,6 @@
         </basic-card>
         <template v-if="formInfo.api_info.remote_api_id">
             <basic-card
-                class="mt20"
                 v-bkloading="{ isLoading: isLoading }"
                 :card-label="$t(`m.treeinfo['输入参数']`)"
                 :card-desc="$t(`m.treeinfo['调用该API需要传递的参数信息']`)">
@@ -101,7 +100,7 @@
             </basic-card>
 
             <basic-card
-                class="mt20"
+
                 v-bkloading="{ isLoading: isLoading }"
                 :card-label="$t(`m.treeinfo['返回数据']`)"
                 :card-desc="$t(`m.treeinfo['调用成功后API将会返回的参数信息']`)">
@@ -118,7 +117,6 @@
             </basic-card>
             
             <basic-card
-                class="mt20"
                 v-bkloading="{ isLoading: isLoading }"
                 :card-label="$t(`m.treeinfo['轮询配置']`)"
                 :card-desc="$t(`m.treeinfo['当出现异常时，设置重试及结束的条件']`)">
@@ -128,44 +126,47 @@
                 </nodeCondition>
             </basic-card>
         </template>
-        
-        <bk-sideslider
-            :is-show.sync="sliderInfo.show"
-            :title="sliderInfo.title"
-            :width="sliderInfo.width">
-            <div class="p20" slot="content" v-if="sliderInfo.show">
-                <add-field
-                    @getRelatedFields="getRelatedFields"
-                    :change-info="changeInfo"
-                    :sosp-info="showTabData"
-                    :workflow="flowInfo.id"
-                    :state="configur.id"
-                    @closeShade="closeShade">
-                </add-field>
+        <basic-card>
+            <bk-sideslider
+                :is-show.sync="sliderInfo.show"
+                :title="sliderInfo.title"
+                :width="sliderInfo.width">
+                <div class="p20" slot="content" v-if="sliderInfo.show">
+                    <add-field
+                        @getRelatedFields="getRelatedFields"
+                        :change-info="changeInfo"
+                        :sosp-info="showTabData"
+                        :workflow="flowInfo.id"
+                        :state="configur.id"
+                        @closeShade="closeShade">
+                    </add-field>
+                </div>
+            </bk-sideslider>
+            <common-trigger-list
+                :origin="'state'"
+                :node-type="configur.type"
+                :source-id="flowInfo.id"
+                :sender="configur.id"
+                :table="flowInfo.table">
+            </common-trigger-list>
+            <div class="mt20" style="font-size: 0">
+                <bk-button :theme="'primary'"
+                    data-test-id="autoNode-button-submit"
+                    :title="$t(`m.treeinfo['确定']`)"
+                    :disabled="!formInfo.api_info.remote_api_id"
+                    class="mr10"
+                    @click="submitNode">
+                    {{$t(`m.treeinfo['确定']`)}}
+                </bk-button>
+                <bk-button :theme="'default'"
+                    data-test-id="autoNode-button-close"
+                    :title="$t(`m.treeinfo['取消']`)"
+                    class="mr10"
+                    @click="closeNode">
+                    {{$t(`m.treeinfo['取消']`)}}
+                </bk-button>
             </div>
-        </bk-sideslider>
-        <common-trigger-list
-            :origin="'state'"
-            :node-type="configur.type"
-            :source-id="flowInfo.id"
-            :sender="configur.id"
-            :table="flowInfo.table">
-        </common-trigger-list>
-        <div class="mt20" style="font-size: 0">
-            <bk-button :theme="'primary'"
-                :title="$t(`m.treeinfo['确定']`)"
-                :disabled="!formInfo.api_info.remote_api_id"
-                class="mr10"
-                @click="submitNode">
-                {{$t(`m.treeinfo['确定']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                :title="$t(`m.treeinfo['取消']`)"
-                class="mr10"
-                @click="closeNode">
-                {{$t(`m.treeinfo['取消']`)}}
-            </bk-button>
-        </div>
+        </basic-card>
     </div>
 </template>
 <script>
@@ -373,9 +374,9 @@
                     excludeRoleTypeList = ['OPEN']
                 }
                 // 是否使用权限中心角色
-                if (!this.flowInfo.is_iam_used) {
-                    excludeRoleTypeList.push('IAM')
-                }
+                // if (!this.flowInfo.is_iam_used) {
+                //     excludeRoleTypeList.push('IAM')
+                // }
                 // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
                 if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
                     excludeRoleTypeList.push('BY_ASSIGNOR')
@@ -810,6 +811,41 @@
         background-color: #FAFBFD;
         overflow: auto;
         @include scroller;
+        /deep/ .common-section-card-block {
+            display: flex;
+            flex-direction: column;
+        }
+        /deep/ .common-section-card-label {
+            width: 100%;
+            padding: 0 24px;
+            .common-section-card-desc {
+                width: 100%;
+            }
+        }
+        /deep/ .bk-polling {
+            margin-top: -25px;
+        }
+        /deep/ .common-section-card-body {
+            padding: 20px;
+        }
+        /deep/ .bk-form-width {
+            width: 446px;
+        }
+        /deep/ .common-section-card-block {
+            box-shadow: 0 0;
+        }
+        .api-params-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            p:nth-child(1) {
+                color: #63656e;
+                margin-bottom: 4px;
+            }
+            p:nth-child(2) {
+                font-size: 12px;
+                color: #929397;
+            }
+        }
     }
     .bk-basic-info {
         padding-bottom: 20px;
@@ -817,7 +853,7 @@
         margin-bottom: 20px;
     }
     .bk-form-width {
-        width: 330px;
+        width: 446px;
     }
     .bk-form-display {
         float: left;

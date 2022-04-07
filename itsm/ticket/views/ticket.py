@@ -142,6 +142,7 @@ from itsm.ticket.serializers import (
     UnmergeTicketsSerializer,
     RecentlyTicketFilterSerializer,
     TicketList,
+    TicketStateOperateExceptionSerializer,
 )
 from itsm.ticket.tasks import clone_pipeline, start_pipeline
 from itsm.ticket.utils import (
@@ -503,8 +504,16 @@ class TicketModelViewSet(ModelViewSet):
 
         sms_invite_validate(ticket, numbers, invitor)
 
-        # 发送逻辑
-        custom_notify = CustomNotice.objects.get(action=INVITE_OPERATE, notify_type=SMS)
+        try:
+            # 发送逻辑
+            custom_notify = CustomNotice.objects.get(
+                project_key=ticket.project_key, action=INVITE_OPERATE, notify_type=SMS
+            )
+        except CustomNotice.DoesNotExist:
+            custom_notify = CustomNotice.objects.get(
+                action=INVITE_OPERATE, notify_type=SMS, project_key="public"
+            )
+
         content_template = (
             custom_notify.title_template + "：" + custom_notify.content_template
         )
@@ -569,11 +578,15 @@ class TicketModelViewSet(ModelViewSet):
             action=ACTION_CHOICES_DICT.get(INVITE_OPERATE),
             today_date=datetime.datetime.today(),
         )
-
-        # 发送逻辑
-        custom_notify = CustomNotice.objects.get(
-            action=INVITE_OPERATE, notify_type=EMAIL
-        )
+        try:
+            # 发送逻辑
+            custom_notify = CustomNotice.objects.get(
+                action=INVITE_OPERATE, notify_type=EMAIL, project_key=ticket.project_key
+            )
+        except CustomNotice.DoesNotExist:
+            custom_notify = CustomNotice.objects.get(
+                action=INVITE_OPERATE, notify_type=EMAIL, project_key="public"
+            )
 
         ticket_url = ticket.ticket_url + "&token={token}&invite=email".format(
             token=code
@@ -1097,6 +1110,26 @@ class TicketModelViewSet(ModelViewSet):
         ticket = self.get_object()
 
         operate_serializer = TicketStateOperateSerializer(
+            request=request, ticket=ticket, operator=request.user.username
+        )
+        operate_serializer.is_valid(raise_exception=True)
+        data = operate_serializer.data
+
+        data["source"] = request.source
+        current_node = data["current_node"]
+        data["ticket"] = ticket
+        current_node.set_next_action(operator=request.user.username, **data)
+
+        return Response()
+
+    @action(detail=True, methods=["post"])
+    def exception_distribute(self, request, *args, **kwargs):
+        """
+        异常分派
+        """
+        ticket = self.get_object()
+
+        operate_serializer = TicketStateOperateExceptionSerializer(
             request=request, ticket=ticket, operator=request.user.username
         )
         operate_serializer.is_valid(raise_exception=True)
@@ -1782,6 +1815,54 @@ class TicketModelViewSet(ModelViewSet):
             for ticket in ticket_list
         }
         return Response(can_operate)
+
+    @action(detail=False, methods=["post"])
+    def get_filter_tickets(self, request, *args, **kwargs):
+        """
+        url: "/api/ticket/receipts/get_filter_tickets/?page_size=10&page=1&ordering=-create_at"
+        data: {
+            "project_key": "0",
+            "tab_conditions": {},
+            "extra_conditions": {}
+        }
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # 1.按项目key进行筛选
+        project_key = request.data.get("project_key", None)
+        if project_key:
+            queryset = queryset.filter(project_key=project_key)
+
+        # 2.按tab自定义条件进行筛选
+        tab_filter = TicketFilterSerializer(data=request.data.get("tab_conditions"))
+        tab_filter.is_valid(raise_exception=True)
+        kwargs = tab_filter.validated_data
+        queryset = Ticket.objects.get_tickets(request.user.username, queryset, **kwargs)
+
+        # 3.在tab筛选的queryset基础上进行额外条件的筛选
+        extra_filter = TicketFilterSerializer(data=request.data.get("extra_conditions"))
+        extra_filter.is_valid(raise_exception=True)
+        extra_kwargs = extra_filter.validated_data
+        queryset = Ticket.objects.get_tickets(
+            request.user.username, queryset, **extra_kwargs
+        )
+
+        # 4.获取分页数据
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            data = TicketList(
+                page,
+                username=request.user.username,
+                token=request.query_params.get("token", ""),
+            ).to_client_representation()
+            return self.get_paginated_response(data)
+
+        data = TicketList(
+            queryset,
+            username=request.user.username,
+            token=request.query_params.get("token", ""),
+        ).to_client_representation()
+        return Response(data)
 
 
 class TicketStatusModelViewSet(component_viewsets.ReadOnlyModelViewSet):

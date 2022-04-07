@@ -661,29 +661,31 @@
                     this.lineOverlay(labelValue)
                 }, 100)
             },
-            updateNode (value) {
+            updateNode (value, type) {
                 this.$refs.jsFlow.createNode(value.node)
-                // 在快速新增的时候，防止节点跌在一起
+                // 在快速新增的时候，防止节点跌在一起 ,当为copy节点时可跌在一起
                 const valueList = []
-                this.canvasData.nodes.forEach(item => {
-                    const differenceValue = {
-                        x: item.x - value.node.x,
-                        y: item.y - value.node.y
-                    }
-                    if (value.node.id !== item.id && differenceValue.y >= -40 && differenceValue.x >= -150 && differenceValue.x <= 150) {
-                        const valueInfo = {
-                            id: item.id,
-                            nodeInfo: item.nodeInfo,
-                            x: item.x,
-                            y: item.y + 100
+                if (type !== 'COPY') {
+                    this.canvasData.nodes.forEach(item => {
+                        const differenceValue = {
+                            x: item.x - value.node.x,
+                            y: item.y - value.node.y
                         }
-                        valueList.push(valueInfo)
-                        setTimeout(() => {
-                            this.$refs.jsFlow.setNodePosition(valueInfo)
-                            this.moveNode(valueInfo)
-                        }, 100)
-                    }
-                })
+                        if (value.node.id !== item.id && differenceValue.y >= -40 && differenceValue.x >= -150 && differenceValue.x <= 150) {
+                            const valueInfo = {
+                                id: item.id,
+                                nodeInfo: item.nodeInfo,
+                                x: item.x,
+                                y: item.y + 100
+                            }
+                            valueList.push(valueInfo)
+                            setTimeout(() => {
+                                this.$refs.jsFlow.setNodePosition(valueInfo)
+                                this.moveNode(valueInfo)
+                            }, 100)
+                        }
+                    })
+                }
                 // 重置原始数据内容
                 this.canvasData.nodes.forEach(item => {
                     valueList.forEach(node => {

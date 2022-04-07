@@ -24,7 +24,7 @@
     <div class="task-form">
         <div class="use-task-config">
             <span class="mr5">{{ $t(`m.trigger['是否启用']`) }}</span>
-            <bk-switcher v-model="useTask" @change="handleUseTaskChange"></bk-switcher>
+            <bk-switcher v-model="useTask" data-test-id="taskConfig-switcher-isUse" @change="handleUseTaskChange"></bk-switcher>
         </div>
         <template v-if="useTask">
             <bk-form v-for="(oneCondition, index) in taskConditionList"
@@ -35,7 +35,11 @@
                 ref="taskForms">
                 <div class="task-condition clearfix">
                     <div class="condition-item">
-                        <bk-form-item :label="$t(`m.taskTemplate['任务模板']`)" :required="true" :property="'taskId'">
+                        <bk-form-item
+                            data-test-id="taskConfig-select-taskTemplate"
+                            :label="$t(`m.taskTemplate['任务模板']`)"
+                            :required="true"
+                            :property="'taskId'">
                             <bk-select v-model="oneCondition.taskId"
                                 :placeholder="$t(`m.basicModule['请选择']`) + $t(`m.taskTemplate['任务模板']`)"
                                 :ext-cls="'bk-form-width'"
@@ -50,7 +54,11 @@
                         </bk-form-item>
                     </div>
                     <div class="condition-item">
-                        <bk-form-item :label="$t(`m.tickets['可创建任务节点']`)" :required="true" :property="'createNodeId'">
+                        <bk-form-item
+                            data-test-id="taskConfig-select-createdTaskNode"
+                            :label="$t(`m.tickets['可创建任务节点']`)"
+                            :required="true"
+                            :property="'createNodeId'">
                             <bk-select v-model="oneCondition.createNodeId"
                                 :placeholder="$t(`m.tickets['请选择可创建任务节点']`)"
                                 :ext-cls="'bk-form-width'"
@@ -68,7 +76,11 @@
                         </bk-form-item>
                     </div>
                     <div class="condition-item">
-                        <bk-form-item :label="$t(`m.tickets['可处理任务的节点']`)" :required="true" :property="'dealNodeId'">
+                        <bk-form-item
+                            data-test-id="taskConfig-select-processTaskNode"
+                            :label="$t(`m.tickets['可处理任务的节点']`)"
+                            :required="true"
+                            :property="'dealNodeId'">
                             <bk-select v-model="oneCondition.dealNodeId"
                                 :placeholder="$t(`m.tickets['请选择可处理任务的节点']`)"
                                 :ext-cls="'bk-form-width'"
@@ -234,7 +246,11 @@
                     return
                 }
                 this.$set(item, 'dealLoading', true)
-                return this.$store.dispatch('deployCommon/getOrderedStates', { id: createNodeId }).then(res => {
+                const params = {
+                    id: createNodeId,
+                    include_self: true
+                }
+                return this.$store.dispatch('deployCommon/getOrderedStates', params).then(res => {
                     item.dealList = res.data
                 }).catch(res => {
                     errorHandler(res, this)

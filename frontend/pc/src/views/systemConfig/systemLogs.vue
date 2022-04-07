@@ -120,6 +120,7 @@
             <bk-sideslider
                 :is-show.sync="customSettings.isShow"
                 :title="customSettings.title"
+                :quick-close="true"
                 :width="customSettings.width">
                 <div class="p20" slot="content" v-if="customSettings.isShow">
                     <logs-info :logs-object="customSettings.logsObject"></logs-info>

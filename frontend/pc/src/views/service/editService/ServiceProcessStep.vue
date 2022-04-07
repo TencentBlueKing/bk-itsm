@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div class="process-step" v-bkloading="{ isLoading: flowDataLoading }">
+    <div :class="[!isShowNodeConfig ? 'process-step' : 'process-step-node-conf']" v-bkloading="{ isLoading: flowDataLoading }">
         <template v-if="!flowDataLoading">
             <second-flow
                 v-if="!isShowNodeConfig"
@@ -32,6 +32,9 @@
                 @handleNodeClick="handleNodeClick">
             </second-flow>
             <div v-else>
+                <div class="node-type">{{ nodeType }}
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
+                </div>
                 <basic-node
                     v-if="configur.type === 'NORMAL'"
                     :flow-info="flowInfo"
@@ -50,6 +53,12 @@
                     :configur="configur"
                     @closeConfigur="closeConfigur">
                 </sopsNode>
+                <devopsNode
+                    v-if="configur.type === 'TASK-DEVOPS'"
+                    :flow-info="flowInfo"
+                    :configur="configur"
+                    @closeConfigur="closeConfigur">
+                </devopsNode>
                 <signNode
                     v-if="configur.type === 'SIGN'"
                     :flow-info="flowInfo"
@@ -75,6 +84,7 @@
     import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue'
     import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue'
     import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue'
+    import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
     import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
 
     export default {
@@ -85,7 +95,8 @@
             autoNode,
             sopsNode,
             signNode,
-            ApprovalNode
+            ApprovalNode,
+            devopsNode
         },
         props: {
             serviceInfo: {
@@ -109,6 +120,17 @@
         computed: {
             processId () {
                 return this.serviceInfo.workflow_id
+            },
+            nodeType () {
+                const nodoTypeList = {
+                    'TASK-DEVOPS': this.$t(`m["蓝盾节点"]`),
+                    'TASK-SOPS': this.$t(`m["标准运维节点"]`),
+                    'NORMAL': this.$t(`m["手动节点"]`),
+                    'TASK': this.$t(`m["任务节点"]`),
+                    'APPROVAL': this.$t(`m["审批节点"]`),
+                    'SIGN': this.$t(`m["会签节点"]`)
+                }
+                return nodoTypeList[this.configur.type]
             }
         },
         watch: {
@@ -197,5 +219,30 @@
 <style lang='scss' scoped>
 .process-step {
     height: 100%;
+}
+.process-step-node-conf {
+    margin: 24px auto;
+    width: 1000px;
+    /deep/ .bk-basic-node {
+        padding: 0;
+    }
+}
+.node-type {
+    background-color: #fafbfd;
+    line-height: 48px;
+    height: 48px;
+    width: 100%;
+    font-size: 14px;
+    padding: 0 24px;
+}
+.close-node-conf {
+    font-size: 20px;
+    font-weight: 500;
+    float: right;
+    line-height: 48px;
+    cursor: pointer;
+    &:hover {
+        color: red;
+    }
 }
 </style>

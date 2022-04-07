@@ -25,241 +25,335 @@
         <nav-title :title-name="$t(`m.serviceConfig['服务']`)"></nav-title>
         <div class="page-content">
             <!-- btn -->
-            <div class="bk-only-btn">
-                <div class="bk-more-search">
-                    <bk-button
-                        data-test-id="service_button_createService"
-                        v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
-                        :theme="'primary'"
-                        icon="plus"
-                        :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
-                        }]"
-                        :title="$t(`m.serviceConfig['新增']`)"
-                        @click="onServiceCreatePermissonCheck">
-                        {{$t(`m.serviceConfig['新增']`)}}
-                    </bk-button>
-                    <bk-button :theme="'default'"
-                        data-test-id="service_button_batchDeleteService"
-                        :title="$t(`m.serviceConfig['批量删除']`)"
-                        :disabled="!checkList.length"
-                        @click="deleteCheck">
-                        {{$t(`m.serviceConfig['批量删除']`)}}
-                    </bk-button>
-                    <div class="bk-search-name">
-                        <div class="bk-search-content">
-                            <bk-input
-                                :placeholder="moreSearch[0].placeholder || $t(`m.serviceConfig['请输入服务名']`)"
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                v-model="moreSearch[0].value"
-                                @enter="searchContent"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                        <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                            icon=" bk-itsm-icon icon-search-more"
-                            class="ml10 filter-btn"
-                            @click="searchMore">
-                        </bk-button>
-                    </div>
+            <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
+                <tree-info :tree-info="treeInfo" :dir-list="dirList"></tree-info>
+                <div class="hidden-tree" @click="hiddenTree">
+                    <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
                 </div>
-                <search-info
-                    ref="searchInfo"
-                    :more-search="moreSearch">
-                </search-info>
             </div>
-            <bk-table
-                ref="serviceTable"
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="dataList"
-                :size="'small'"
-                :pagination="pagination"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange"
-                @select-all="handleSelectAll"
-                @select="handleSelect">
-                <bk-table-column
-                    type="selection"
-                    width="60"
-                    align="center"
-                    :selectable="disabledFn">
-                    <template slot-scope="props">
-                        <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
-                            <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+            <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
+                <div class="bk-only-btn">
+                    <div class="bk-more-search">
+                        <bk-button
+                            data-test-id="service_button_createService"
+                            v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
+                            :theme="'primary'"
+                            icon="plus"
+                            :class="['mr10', 'plus-cus', {
+                                'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
+                            }]"
+                            :title="$t(`m.serviceConfig['新增']`)"
+                            @click="onServiceCreatePermissonCheck">
+                            {{$t(`m.serviceConfig['新增']`)}}
+                        </bk-button>
+                        <bk-button :theme="'default'"
+                            class="mr10"
+                            data-test-id="service_button_batchImportService"
+                            :title="$t(`m['导入']`)"
+                            @click="importService">
+                            {{$t(`m['导入']`)}}
+                        </bk-button>
+                        <bk-button :theme="'default'"
+                            data-test-id="service_button_batchDeleteService"
+                            :title="$t(`m.serviceConfig['批量删除']`)"
+                            :disabled="!checkList.length"
+                            @click="deleteCheck">
+                            {{$t(`m.serviceConfig['批量删除']`)}}
+                        </bk-button>
+                        <div class="bk-search-name">
+                            <div class="bk-search-content">
+                                <bk-input
+                                    :placeholder="moreSearch[0].placeholder || $t(`m.serviceConfig['请输入服务名']`)"
+                                    :clearable="true"
+                                    :right-icon="'bk-icon icon-search'"
+                                    v-model="moreSearch[0].value"
+                                    @enter="searchContent"
+                                    @clear="clearSearch">
+                                </bk-input>
+                            </div>
+                            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+                                icon=" bk-itsm-icon icon-search-more"
+                                class="ml10 filter-btn"
+                                @click="searchMore">
+                            </bk-button>
+                        </div>
+                    </div>
+                    <search-info
+                        ref="searchInfo"
+                        :more-search="moreSearch">
+                    </search-info>
+                </div>
+                <bk-table
+                    ref="serviceTable"
+                    v-bkloading="{ isLoading: isDataLoading }"
+                    :data="dataList"
+                    :size="'small'"
+                    :pagination="pagination"
+                    @cell-mouse-enter="cellMouseEnter"
+                    @cell-mouse-leave="cellMouseLeave"
+                    @page-change="handlePageChange"
+                    @page-limit-change="handlePageLimitChange"
+                    @select-all="handleSelectAll"
+                    @select="handleSelect">
+                    <bk-table-column
+                        type="selection"
+                        width="60"
+                        align="center"
+                        :selectable="disabledFn">
+                        <template slot-scope="props">
+                            <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
+                                <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                                    <span
+                                        v-cursor
+                                        class="checkbox-permission-disable"
+                                        @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                    </span>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <bk-checkbox
+                                    data-test-id="service_checkbox_checkService"
+                                    :true-value="trueStatus"
+                                    :false-value="falseStatus"
+                                    v-model="props.row.checkStatus"
+                                    @change="changeCheck(props.row)">
+                                </bk-checkbox>
+                            </template>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+                        <template slot-scope="props">
+                            <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
+                        <template slot-scope="props">
+                            <span
+                                v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                v-cursor
+                                class="bk-lable-primary text-permission-disable"
+                                ::title="props.row.name"
+                                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                {{ props.row.name }}
+                            </span>
+                            <template v-else>
                                 <span
-                                    v-cursor
-                                    class="checkbox-permission-disable"
-                                    @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                    v-if="props.row.id !== changeFrom.name"
+                                    class="bk-lable-primary"
+                                    :title="props.row.name"
+                                    @click="changeEntry(props.row, 'edit')">
+                                    {{ props.row.name }}
+                                    <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
                                 </span>
+                                <div v-else class="hover-show-icon">
+                                    <bk-input v-model="editValue"></bk-input>
+                                    <div class="operation">
+                                        <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name',props.row)"></i>
+                                        <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['类型']`)" :width="changeFrom.serviceType ? '250' : '150'">
+                        <template slot-scope="props">
+                            <template v-if="props.row.id !== changeFrom.serviceType">
+                                <template v-for="(type, typeIndex) in serviceTypesMap">
+                                    <span v-if="props.row.key === type.key"
+                                        :title="type.name"
+                                        :key="typeIndex">
+                                        {{ type.name }}
+                                        <i v-show="tableHoverId === props.row.id" @click="handleChange('key', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                                    </span>
+                                </template>
+                            </template>
+                            <div v-else class="hover-show-icon">
+                                <bk-select v-model="editValue"
+                                    :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                                    :clearable="false"
+                                    style="width: 150px"
+                                    searchable
+                                    :font-size="'medium'">
+                                    <bk-option v-for="option in serviceTypeList"
+                                        :key="option.key"
+                                        :id="option.key"
+                                        :name="option.name">
+                                    </bk-option>
+                                </bk-select>
+                                <div class="operation">
+                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key',props.row)"></i>
+                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                </div>
                             </div>
                         </template>
-                        <template v-else>
-                            <bk-checkbox
-                                data-test-id="service_checkbox_checkService"
-                                v-bk-tooltips.right="{
-                                    content: $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`),
-                                    disabled: !props.row.bounded_catalogs[0],
-                                    boundary: 'window',
-                                    always: true
-                                }"
-                                :true-value="trueStatus"
-                                :false-value="falseStatus"
-                                :disabled="!!props.row.bounded_catalogs[0]"
-                                v-model="props.row.checkStatus"
-                                @change="changeCheck(props.row)">
-                            </bk-checkbox>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.common['创建人']`)">
+                        <template slot-scope="props">
+                            <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
                         </template>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                    <template slot-scope="props">
-                        <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="150">
-                    <template slot-scope="props">
-                        <span
-                            v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
-                            v-cursor
-                            class="bk-lable-primary text-permission-disable"
-                            ::title="props.row.name"
-                            @click="onServicePermissonCheck(['service_manage'], props.row)">
-                            {{ props.row.name }}
-                        </span>
-                        <span
-                            v-else
-                            class="bk-lable-primary"
-                            :title="props.row.name"
-                            @click="changeEntry(props.row, 'edit')">
-                            {{ props.row.name }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['服务说明']`)" width="200">
-                    <template slot-scope="props">
-                        <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['类型']`)">
-                    <template slot-scope="props">
-                        <template v-for="(type, typeIndex) in serviceTypesMap">
-                            <span v-if="props.row.key === type.key"
-                                :title="type.name"
-                                :key="typeIndex">
-                                {{ type.name }}
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.common['更新人']`)">
+                        <template slot-scope="props">
+                            <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
+                        <template slot-scope="props">
+                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
+                        <template slot-scope="props">
+                            <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
+                            <div v-else class="hover-show-icon">
+                                <bk-cascade
+                                    :list="dirList"
+                                    clearable
+                                    :check-any-level="true"
+                                    style="width: 250px;"
+                                    :ext-popover-cls="'custom-cls'"
+                                    @change="handleChangeTree">
+                                </bk-cascade>
+                                <div class="operation">
+                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id',props.row)"></i>
+                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                                </div>
+                            </div>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
+                        <template slot-scope="props">
+                            <span class="bk-status-color"
+                                :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
+                            <span style="margin-left: 5px;"
+                                :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
+                                {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
                             </span>
                         </template>
-                    </template>
-                </bk-table-column>
-                <!-- <bk-table-column :label="$t(`m.serviceConfig['关联流程']`)" min-width="200">
-                    <template slot-scope="props">
-                        <span class="bk-lable-primary"
-                            @click="processShow(props.row)"
-                            :title="props.row.workflow_name + '(' + props.row.version_number + ')'">
-                            {{ props.row.workflow_name }} ({{ props.row.version_number }})
-                        </span>
-                    </template>
-                </bk-table-column> -->
-                <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}</span>
-                    </template>
-                </bk-table-column>
-
-                <bk-table-column :label="$t(`m.common['创建人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.common['更新人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-                    </template>
-                </bk-table-column>
-
-                <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" min-width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
-                    <template slot-scope="props">
-                        <span class="bk-status-color"
-                            :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
-                        <span style="margin-left: 5px;"
-                            :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
-                            {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
-                    <template slot-scope="props">
-                        <!-- sla -->
-                        <bk-button
-                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                            v-cursor
-                            text
-                            theme="primary"
-                            class="btn-permission-disable"
-                            @click="onServicePermissonCheck(['service_manage'], props.row)">
-                            SLA
-                        </bk-button>
-                        <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id } }">SLA</router-link>
-                        <!-- 编辑 -->
-                        <bk-button
-                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                            v-cursor
-                            text
-                            theme="primary"
-                            class="btn-permission-disable"
-                            @click="onServicePermissonCheck(['service_manage'], props.row)">
-                            {{ $t('m.serviceConfig["编辑"]') }}
-                        </bk-button>
-                        <bk-button
-                            v-else
-                            data-test-id="service_button_editService"
-                            theme="primary"
-                            text
-                            @click="changeEntry(props.row, 'edit')">
-                            {{ $t('m.serviceConfig["编辑"]') }}
-                        </bk-button>
-                        <!-- 删除 -->
-                        <bk-button
-                            v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                            v-cursor
-                            text
-                            theme="primary"
-                            class="btn-permission-disable"
-                            @click="onServicePermissonCheck(['service_manage'], props.row)">
-                            {{ $t('m.serviceConfig["删除"]') }}
-                        </bk-button>
-                        <template v-else-if="!!props.row.bounded_catalogs[0]">
-                            <bk-popover placement="top">
-                                <bk-button
-                                    theme="primary"
-                                    text
-                                    :disabled="!!props.row.bounded_catalogs[0]"
-                                    @click="deleteOne(props.row)">
-                                    {{ $t('m.serviceConfig["删除"]') }}
-                                </bk-button>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
+                        <template slot-scope="props">
+                            <!-- sla -->
+                            <bk-button
+                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                v-cursor
+                                text
+                                theme="primary"
+                                class="btn-permission-disable"
+                                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                SLA
+                            </bk-button>
+                            <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+                            <!-- 编辑 -->
+                            <bk-button
+                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                v-cursor
+                                text
+                                theme="primary"
+                                class="btn-permission-disable"
+                                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                {{ $t('m.serviceConfig["编辑"]') }}
+                            </bk-button>
+                            <bk-button
+                                v-else
+                                data-test-id="service_button_editService"
+                                theme="primary"
+                                text
+                                @click="changeEntry(props.row, 'edit')">
+                                {{ $t('m.serviceConfig["编辑"]') }}
+                            </bk-button>
+                            <!-- 克隆 -->
+                            <bk-button
+                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                v-cursor
+                                text
+                                theme="primary"
+                                class="btn-permission-disable"
+                                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                {{ $t('m.serviceConfig["克隆"]') }}
+                            </bk-button>
+                            <bk-button
+                                v-else
+                                data-test-id="service_button_editService"
+                                theme="primary"
+                                text
+                                @click="changeEntry(props.row, 'clone')">
+                                {{ $t('m.serviceConfig["克隆"]') }}
+                            </bk-button>
+                            <!-- 删除 -->
+                            <bk-popover placement="bottom" theme="light">
+                                <i class="bk-itsm-icon icon-move-new"></i>
                                 <div slot="content" style="white-space: normal;">
-                                    <span>{{ $t(`m.serviceConfig['服务已绑定关联目录，请先解绑后在进行删除操作']`) }}</span>
+                                    <bk-button
+                                        style="font-size: 12px;"
+                                        data-test-id="service_button_deleteService1"
+                                        v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                        v-cursor
+                                        text
+                                        theme="primary"
+                                        class="btn-permission-disable"
+                                        @click="onServicePermissonCheck(['service_manage'], props.row)">
+                                        {{ $t('m.serviceConfig["删除"]') }}
+                                    </bk-button>
+                                    <template v-else>
+                                        <bk-button
+                                            style="font-size: 12px;"
+                                            data-test-id="service_button_deleteService3"
+                                            theme="primary"
+                                            text
+                                            @click="deleteOne(props.row)">
+                                            {{ $t('m.serviceConfig["删除"]') }}
+                                        </bk-button>
+                                    </template>
+                                    <bk-button
+                                        style="font-size: 12px; display: block"
+                                        data-test-id="service_button_deleteService3"
+                                        theme="primary"
+                                        text
+                                        @click="exportService(props.row)">
+                                        {{ $t('m["导出"]') }}
+                                    </bk-button>
                                 </div>
                             </bk-popover>
                         </template>
-                        <template v-else>
-                            <bk-button
-                                data-test-id="service_button_deleteService"
-                                theme="primary"
-                                text
-                                @click="deleteOne(props.row)">
-                                {{ $t('m.serviceConfig["删除"]') }}
-                            </bk-button>
-                        </template>
+                    </bk-table-column>
+                </bk-table>
+            </div>
+            <bk-dialog
+                width="800"
+                v-model="isImportServiceShow"
+                title="导入服务"
+                theme="primary"
+                :auto-close="false"
+                :mask-close="false"
+                @confirm="importConfirm"
+                @cancel="closeImport">
+                <bk-form ref="importForm" id="importForm">
+                    <bk-form-item label="选择目录" required>
+                        <bk-cascade
+                            v-model="importCatalogId"
+                            :list="dirList"
+                            clearable
+                            :check-any-level="true"
+                            :ext-popover-cls="'custom-cls'"
+                            @change="handleChangeTree">
+                        </bk-cascade>
+                    </bk-form-item>
+                    <bk-form-item label="选择文件" required>
+                        <bk-button class="bk-btn-file" style="width: 100px">
+                            <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
+                            {{ $t(`m['选择文件']`) }}
+                            <span class="bk-input-tip">{{ $t(`m['仅支持json文件！']`) }}</span>
+                        </bk-button>
+                    </bk-form-item>
+                    <template v-if="importFileNameList.length !== 0">
+                        <div class="file-list" v-for="(item, index) in importFileNameList" :key="index">{{ item }}
+                            <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeFile"></i>
+                        </div>
                     </template>
-                </bk-table-column>
-            </bk-table>
+                    <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
+                </bk-form>
+            </bk-dialog>
         </div>
     </div>
 </template>
@@ -269,17 +363,42 @@
     import NavTitle from '@/components/common/layout/NavTitle'
     import searchInfo from '../commonComponent/searchInfo/searchInfo.vue'
     import permission from '@/mixins/permission.js'
+    import commonMix from '@/views/commonMix/common.js'
     import { errorHandler } from '../../utils/errorHandler'
+    import treeInfo from './directoryCom/treeInfo.vue'
+    // import selectTree from '@/components/form/selectTree/index.vue'
 
     export default {
         name: 'ServiceList',
         components: {
             NavTitle,
-            searchInfo
+            searchInfo,
+            treeInfo
+            // selectTree
         },
-        mixins: [permission],
+        mixins: [permission, commonMix],
         data () {
             return {
+                treeInfo: {
+                    node: {}
+                },
+                rules: {},
+                importCatalogId: [],
+                isCheckImport: false,
+                isHasFile: false,
+                importFileNameList: [],
+                errorName: '',
+                formData: {
+                    name: '',
+                    desc: '',
+                    key: '',
+                    catalog_id: ''
+                },
+                dirList: [], // 服务目录
+                serviceTypeList: [], // 服务类型
+                isBasicFormEditting: false,
+                isSubmitting: false,
+                isHiddenDirectory: false,
                 trueStatus: true,
                 falseStatus: false,
                 isDataLoading: false,
@@ -298,7 +417,7 @@
                     {
                         name: this.$t(`m.serviceConfig["服务名称"]`),
                         type: 'input',
-                        typeKey: 'name__icontains',
+                        typeKey: 'name',
                         value: '',
                         placeholder: this.$t(`m.serviceConfig["请输入服务名"]`)
                     },
@@ -328,15 +447,150 @@
                     },
                     draggable: true,
                     loading: true
+                },
+                changeFrom: {
+                    name: '',
+                    serviceType: '',
+                    bounded_catalogs: ''
+                },
+                editValue: '',
+                tableHoverId: '',
+                isImportServiceShow: false
+            }
+        },
+        watch: {
+            'treeInfo.node' () {
+                this.getList(1)
+            },
+            importCatalogId (val) {
+                if (val.length !== 0) {
+                    this.isCheckImport = false
+                }
+            },
+            isImportServiceShow (val) {
+                if (!val) {
+                    this.importFileNameList = []
                 }
             }
+        },
+        created () {
+            this.rules.name = this.checkCommonRules('name').name
+            this.rules.directory_id = this.checkCommonRules('required').required
+            this.rules.key = this.checkCommonRules('required').required
         },
         mounted () {
             this.getServiceTypes()
             this.getList()
             this.getSlaList()
+            this.getServiceDirectory()
         },
         methods: {
+            cellMouseEnter (row) {
+                this.tableHoverId = row.id
+            },
+            cellMouseLeave (row) {
+                this.tableHoverId = ''
+            },
+            handleChangeTree (val) {
+                this.editValue = val[val.length - 1]
+            },
+            closeFile () {
+                this.importFileNameList = []
+            },
+            handleFile (e) {
+                const filename = e.target.value.split('\\').slice(-1)
+                if (filename.length !== 0 && filename[0] !== '') {
+                    this.importFileNameList.push(filename[0])
+                    this.isCheckImport = false
+                } else {
+                    this.importFileNameList = []
+                }
+            },
+            closeImport () {
+                this.isCheckImport = false
+                this.isImportServiceShow = false
+            },
+            importConfirm () {
+                const formdata = new FormData()
+                formdata.append('file', this.$refs.importInput.files[0])
+                formdata.append('catalog_id', this.importCatalogId.slice(-1))
+                formdata.append('project_key', this.$route.query.project_id)
+                if (this.importCatalogId.length === 0) {
+                    this.isCheckImport = true
+                    this.errorName = this.$t(`m["目录"]`)
+                    return
+                }
+                if (this.importFileNameList.length === 0) {
+                    this.isCheckImport = true
+                    this.errorName = this.$t(`m["文件"]`)
+                    return
+                }
+                this.isImportServiceShow = false
+                this.$store.dispatch('serviceEntry/importService', formdata).then(res => {
+                    this.$bkMessage({
+                        message: res.message,
+                        theme: 'success'
+                    })
+                    this.importCatalogId = []
+                    this.isImportServiceShow = false
+                    this.isCheckImport = false
+                    this.getList(1)
+                })
+            },
+            importService () {
+                this.isImportServiceShow = true
+            },
+            exportService (row) {
+                window.open(window.SITE_URL + `api/service/projects/${row.id}/export/`)
+            },
+            handleChange (type, row) {
+                // this.editValue = row.name
+                switch (type) {
+                    case 'name':
+                        this.changeFrom.name = row.id
+                        this.changeFrom.serviceType = ''
+                        this.changeFrom.bounded_catalogs = ''
+                        this.editValue = row.name
+                        break
+                    case 'key':
+                        this.changeFrom.name = ''
+                        this.changeFrom.serviceType = row.id
+                        this.changeFrom.bounded_catalogs = ''
+                        this.editValue = row.key
+                        break
+                    case 'catalog_id':
+                        this.changeFrom.name = ''
+                        this.changeFrom.serviceType = ''
+                        this.changeFrom.bounded_catalogs = row.id
+                        break
+                }
+            },
+            closeEdit () {
+                this.changeFrom.name = ''
+                this.changeFrom.serviceType = ''
+                this.changeFrom.bounded_catalogs = ''
+            },
+            submitEditService (type, row) {
+                const curRow = row
+                curRow[type] = this.editValue
+                const params = {
+                    catalog_id: curRow.catalog_id,
+                    id: curRow.id,
+                    key: curRow.key,
+                    name: curRow.name,
+                    project_key: curRow.project_key,
+                    desc: ''
+                }
+                this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.serviceConfig["修改成功"]`),
+                        theme: 'success'
+                    })
+                    this.editValue = ''
+                    this.closeEdit()
+                    this.getList()
+                })
+            },
             // 获取数据
             getList (page) {
                 // 查询时复位页码
@@ -349,33 +603,90 @@
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                    ordering: '-update_at'
+                    ordering: '-update_at',
+                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id
                 }
-
                 this.moreSearch.forEach(item => {
                     if (item.value !== '' && item.typeKey) {
                         params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
                     }
                 })
-
+                if (!this.treeInfo.node.id) {
+                    return
+                }
                 this.isDataLoading = true
-                this.$store.dispatch('serviceEntry/getList', params).then(res => {
-                    this.dataList = res.data.items
-                    this.dataList.forEach((item, index) => {
-                        this.$set(item, 'checkStatus', false)
-                    })
-                    // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                this.$store.dispatch('catalogService/getServices', params).then(res => {
+                    if (res.data !== null) {
+                        if (Object.keys(res.data).length > 0) {
+                            this.dataList = res.data.items
+                            this.dataList.forEach((item, index) => {
+                                this.$set(item, 'checkStatus', false)
+                            })
+                            // 分页
+                            this.pagination.current = res.data.page
+                            this.pagination.count = res.data.count
+                        } else {
+                            this.dataList = []
+                        }
+                    } else {
+                        this.dataList = []
+                    }
                 }).catch(res => {
                     errorHandler(res, this)
                 }).finally(() => {
                     this.isDataLoading = false
                 })
             },
+            async getServiceDirectory () {
+                await this.$store.dispatch('serviceCatalog/getTreeData', {
+                    show_deleted: true,
+                    project_key: this.$store.state.project.id
+                }).then(res => {
+                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
+                }).catch(res => {
+                    errorHandler(res, this)
+                })
+            },
+            onBasicFormSubmit () {
+                this.$refs.basicForm.validate().then(async () => {
+                    const params = JSON.parse(JSON.stringify(this.formData))
+                    params.id = this.serviceId || undefined
+                    params.project_key = this.$store.state.project.id
+                    this.isSubmitting = true
+                    await this.createService(params)
+                    this.isSubmitting = false
+                })
+            },
+            onBasicFormCancel () {
+                this.isBasicFormEditting = false
+            },
+            createService (params) {
+                this.$store.dispatch('serviceEntry/createService', params).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.deployPage["保存成功"]`),
+                        theme: 'success'
+                    })
+                    this.$router.push({
+                        name: 'projectServiceEdit',
+                        params: {
+                            type: 'new',
+                            step: 'basic'
+                        },
+                        query: {
+                            serviceId: res.data.id,
+                            project_id: this.$store.state.project.id,
+                            fromCatalog: this.treeInfo.node.id
+                        }
+                    })
+                    this.isBasicFormEditting = false
+                }).catch(res => {
+                    errorHandler(res, this)
+                })
+            },
             // 服务类型
             getServiceTypes () {
                 this.$store.dispatch('getCustom').then((res) => {
+                    this.serviceTypeList = res.data
                     this.serviceTypesMap = res.data
                     this.moreSearch[1].list = res.data
                 }).catch(res => {
@@ -413,6 +724,7 @@
                     }
                     this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
+                    // this.isBasicFormEditting = true
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
@@ -420,24 +732,54 @@
                             step: 'basic'
                         },
                         query: {
-                            project_id: this.$store.state.project.id
+                            project_id: this.$route.query.project_id,
+                            catalog_id: this.$route.query.catalog_id
                         }
                     })
                 }
             },
             // 编辑
-            changeEntry (item, type) {
-                this.$router.push({
-                    name: 'projectServiceEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'basic'
-                    },
-                    query: {
-                        serviceId: item.id,
-                        project_id: this.$store.state.project.id
+            async changeEntry (item, type) {
+                let serviceId = item.id
+                if (type === 'clone') {
+                    // 获取克隆id
+                    try {
+                        const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
+                        serviceId = res.data.id
+                        if (res.data && res.data.id) {
+                            this.$router.push({
+                                name: 'projectServiceEdit',
+                                params: {
+                                    type: 'edit',
+                                    step: 'basic'
+                                },
+                                query: {
+                                    serviceId,
+                                    project_id: this.$store.state.project.id,
+                                    catalog_id: this.$route.query.catalog_id
+                                }
+                            })
+                        }
+                    } catch (e) {
+                        this.$bkMessage({
+                            theme: 'warning',
+                            message: e.data.message
+                        })
                     }
-                })
+                } else {
+                    this.$router.push({
+                        name: 'projectServiceEdit',
+                        params: {
+                            type: 'edit',
+                            step: 'basic'
+                        },
+                        query: {
+                            serviceId,
+                            project_id: this.$store.state.project.id,
+                            catalog_id: this.$route.query.catalog_id
+                        }
+                    })
+                }
             },
             /**
              * 单个服务操作项点击时校验
@@ -552,12 +894,12 @@
             // 全选 半选
             handleSelectAll (selection) {
                 this.dataList.forEach(item => {
-                    if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], item.auth_actions)) {
+                    if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                         item.checkStatus = !!selection.length
                     }
                 })
                 // 选中有权限数据
-                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], item.auth_actions))
+                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions]))
             },
             handleSelect (selection, row) {
                 this.checkList = selection
@@ -579,17 +921,90 @@
                 })).finally(() => {
                     this.processInfo.loading = false
                 })
+            },
+            hiddenTree () {
+                this.isHiddenDirectory = !this.isHiddenDirectory
             }
         }
     }
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';
+.icon-itsm-icon-fill-fit {
+    color: #2bcb55;
+}
+.hover-show-icon {
+    display: flex;
+    align-items: center;
+    .operation {
+        height: 100%;
+        font-size: 20px;
+        display: flex;
+        i {
+            cursor: pointer;
+        }
+    }
+}
+.icon-itsm-icon-six {
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    &:hover {
+        color: #3a84ff;
+    }
+}
 .page-content {
-    padding: 20px;
+    position: relative;
+    z-index: 100;
     height: calc(100vh - 104px);
     overflow: auto;
     @include scroller;
+    .service-left {
+        position: relative;
+        height: 100%;
+        padding-bottom: 48px;
+        width: 240px;
+        float: left;
+        background-color: #fafbfd;
+        transition: width 0.5s ease-in;
+        box-shadow: 1px 2px 4px 0px rgba(25,25,41,0.05);
+        .hidden-tree {
+            position: absolute;
+            top: calc(50% - 30px);
+            right: -14px;
+            width: 14px;
+            height: 61px;
+            line-height: 61px;
+            background-color: #dcdee5;
+            cursor: pointer;
+            color: #ffffff;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+    }
+    .service-right {
+        margin: 24px 24px 0 24px;
+        background-color: #f5f7fa;
+        float: left;
+        transition: width 0.5s ease-in;
+        width: calc(100% - 288px);
+        /deep/ .bk-table-body-wrapper {
+            background: #ffffff;
+        }
+    }
+    .bk-only-btn {
+        padding: 12px 0;
+        border: 0;
+    }
+    .hide {
+        width: 0;
+    }
+    .auto-wight {
+        width: calc(100% - 48px);
+    }
+    .bk-search-content {
+        width: 400px;
+    }
 }
 .filter-btn /deep/ .icon-search-more {
     font-size: 14px;
@@ -599,4 +1014,59 @@
     width: 16px;
     margin: 0 auto;
 }
+.bk-btn-file {
+    float: left;
+    line-height: 30px;
+    position: relative;
+    cursor: pointer;
+
+    .bk-input-file {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 32px;
+        overflow: hidden;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .bk-input-tip {
+        position: absolute;
+        top: 0;
+        left: 110px;
+        font-size: 12px;
+        color: #979ba5;
+        cursor: auto;
+    }
+}
+.file-list {
+    border: 1px solid #e1ecff;
+    position: relative;
+    margin-left: 150px;
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 1px 5px;
+    color: #979ba5;
+    .icon-itsm-icon-three-one {
+        display: none;
+        position: absolute;
+        right: 3px;
+        top: 4px;
+        cursor: pointer;
+    }
+    &:hover {
+        border: 1px solid #3a84ff;
+        .icon-itsm-icon-three-one {
+            display: block;
+            color: red;
+        }
+    }
+}
+.import-error-tip {
+    font-size: 14px;
+    margin-left: 150px;
+    margin-top: 10px;
+    color: red;
+}
+
 </style>

@@ -31,6 +31,38 @@
             :key="checkId">
             <template v-if="checkId === 'WEIXIN'">
                 <bk-form-item
+                    v-if="isShowTitle"
+                    :label="$t(`m.slaContent['标题']`)"
+                    :required="true"
+                    :property="'title'"
+                    :icon-offset="240">
+                    <bk-input
+                        type="text"
+                        :ext-cls="'bk-remindway-form'"
+                        v-model="formInfo.title">
+                    </bk-input>
+                    <div class="bk-select-btn">
+                        <bk-button
+                            theme="default"
+                            :title="$t(`m.slaContent['插入变量']`)"
+                            class="bk-form-btn plus-cus"
+                            icon="plus">
+                            {{ $t('m.slaContent["插入变量"]') }}
+                        </bk-button>
+                        <bk-select v-model="insertVariable.titleId"
+                            ext-cls="bk-select-btn-opacity"
+                            searchable
+                            :font-size="'medium'"
+                            @selected="changeInsert(...arguments,'title')">
+                            <bk-option v-for="option in variableList"
+                                :key="option.key"
+                                :id="option.key"
+                                :name="option.name">
+                            </bk-option>
+                        </bk-select>
+                    </div>
+                </bk-form-item>
+                <bk-form-item
                     :label="$t(`m.slaContent['提醒内容']`)"
                     :required="true"
                     :property="'message'"
@@ -38,7 +70,7 @@
                     <bk-input type="textarea"
                         v-cursorIndex="'editorNotice'"
                         :ext-cls="'bk-remindway-form'"
-                        :rows="5"
+                        :rows="customRow || 5"
                         v-model="formInfo.message">
                     </bk-input>
                     <div class="bk-select-btn">
@@ -65,7 +97,7 @@
             </template>
             <template v-if="checkId === 'EMAIL'">
                 <bk-form-item
-                    :label="$t(`m.slaContent['邮件主题']`)"
+                    :label="$t(`m.slaContent['标题']`)"
                     :required="true"
                     :property="'title'"
                     :icon-offset="240">
@@ -103,7 +135,7 @@
                     <bk-input type="textarea"
                         v-cursorIndex="'editorNotice'"
                         :ext-cls="'bk-remindway-form'"
-                        :rows="22"
+                        :rows="customRow || 22"
                         v-model="formInfo.message">
                     </bk-input>
                     <div class="bk-select-btn">
@@ -130,6 +162,38 @@
             </template>
             <template v-if="checkId === 'SMS'">
                 <bk-form-item
+                    v-if="isShowTitle"
+                    :label="$t(`m.slaContent['标题']`)"
+                    :required="true"
+                    :property="'title'"
+                    :icon-offset="240">
+                    <bk-input
+                        type="text"
+                        :ext-cls="'bk-remindway-form'"
+                        v-model="formInfo.title">
+                    </bk-input>
+                    <div class="bk-select-btn">
+                        <bk-button
+                            theme="default"
+                            :title="$t(`m.slaContent['插入变量']`)"
+                            class="bk-form-btn plus-cus"
+                            icon="plus">
+                            {{ $t('m.slaContent["插入变量"]') }}
+                        </bk-button>
+                        <bk-select v-model="insertVariable.titleId"
+                            ext-cls="bk-select-btn-opacity"
+                            searchable
+                            :font-size="'medium'"
+                            @selected="changeInsert(...arguments,'title')">
+                            <bk-option v-for="option in variableList"
+                                :key="option.key"
+                                :id="option.key"
+                                :name="option.name">
+                            </bk-option>
+                        </bk-select>
+                    </div>
+                </bk-form-item>
+                <bk-form-item
                     :label="$t(`m.slaContent['短信内容']`)"
                     :required="true"
                     :property="'message'"
@@ -137,7 +201,7 @@
                     <bk-input type="textarea"
                         v-cursorIndex="'editorNotice'"
                         :ext-cls="'bk-remindway-form'"
-                        :rows="15"
+                        :rows="customRow || 15"
                         v-model="formInfo.message">
                     </bk-input>
                     <div class="bk-select-btn">
@@ -163,7 +227,7 @@
                 </bk-form-item>
             </template>
         </bk-form>
-        <div class="bk-add-btn">
+        <div v-if="isShowFooter" class="bk-add-btn">
             <bk-button
                 v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
                 theme="primary"
@@ -205,7 +269,16 @@
                 default () {
                     return {}
                 }
-            }
+            },
+            isShowFooter: {
+                type: Boolean,
+                default: true
+            },
+            isShowTitle: {
+                type: Boolean,
+                default: false
+            },
+            customRow: Number
         },
         data () {
             return {

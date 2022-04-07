@@ -67,6 +67,7 @@
         <!-- 单个节点的详情信息 -->
         <div class="bk-node-content">
             <bk-sideslider
+                :show-mask="false"
                 :is-show.sync="nodeContent.isShow"
                 :title="nodeContent.title"
                 :width="nodeContent.width"
@@ -75,6 +76,7 @@
                     <node-info
                         @initInfo="initInfo"
                         :node-list="nodeInfo"
+                        :read-only="nodeContent.isShow"
                         :current-step-list="currentStepList"
                         :basic-infomation="basicInfomation"
                         :open-node-info="openNodeInfo"
@@ -281,7 +283,7 @@
 
     .bk-order-preview {
         width: 100%;
-        height: 300px;
+        height: 600px;
         position: relative;
     }
 

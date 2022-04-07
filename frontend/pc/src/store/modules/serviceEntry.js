@@ -30,42 +30,29 @@ export default {
     mutations: {},
     actions: {
         getList ({ commit, state, dispatch }, params) {
-            return ajax.get(`service/projects/`, { params: params })
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
-                .catch(error => {
-                    console.log(error)
-                })
+            return ajax.get(`service/projects/`, { params: params }).then(response => response.data).catch(error => console.log(error))
         },
         createService ({ commit, state, dispatch }, params) {
-            return ajax.post(`service/projects/`, params)
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
+            return ajax.post(`service/projects/`, params).then(response => response.data)
         },
         batchDeleteService ({ commit, state, dispatch }, params) {
-            return ajax.post(`service/projects/batch_delete/`, params)
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
+            return ajax.post(`service/projects/batch_delete/`, params).then(response => response.data)
+        },
+        cloneService ({ commit, state, dispatch }, id) {
+            return ajax.post(`service/projects/${id}/clone/`).then(response => response.data)
         },
         deleteService ({ commit, state, dispatch }, id) {
-            return ajax.delete(`service/projects/${id}/`)
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
+            return ajax.delete(`service/projects/${id}/`).then(response => response.data)
         },
         updateService ({ commit, state, dispatch }, params) {
-            return ajax.put(`service/projects/${params.id}/`, params)
-                .then(response => {
-                    let res = response.data
-                    return res
-                })
+            return ajax.put(`service/projects/${params.id}/`, params).then(response => response.data)
+        },
+        exportService ({ commit, state, dispatch }, id) {
+            return ajax.get(`service/projects/${id}/export/`).then(response => response.data)
+        },
+        importService ({ commit, state, dispatch }, params) {
+            return ajax.post(`service/projects/imports/`, params).then(response => response.data)
         }
+
     }
 }

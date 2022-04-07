@@ -62,7 +62,7 @@
 
     export default {
         name: 'fieldsRunning',
-        inject: ['partUpdate', 'initInfo'],
+        inject: ['reloadTicket'],
         components: {
             'CW-STRING': string,
             'CW-LINK': link,
@@ -182,6 +182,7 @@
                         message: this.$t(`m.systemConfig["修改成功"]`),
                         theme: 'success'
                     })
+                    this.reloadTicket()
                 }).catch((res) => {
                     errorHandler(res, this)
                 }).finally(() => {
@@ -213,7 +214,7 @@
                             confirmFn: () => {
                                 this.submitTemplate()
                                 // 仅修改单据状态后刷新整个单据
-                                this.initInfo()
+                                this.reloadTicket()
                             }
                         })
                     } else {
@@ -225,7 +226,7 @@
             },
             async toDone () {
                 await this.$set(this.item, 'isEdit', false)
-                await this.partUpdate()
+                // await this.partUpdate()
             }
         }
     }

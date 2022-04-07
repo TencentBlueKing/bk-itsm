@@ -30,8 +30,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from itsm.auth_iam.utils import IamRequest
-from itsm.component.constants import CATALOG
-from itsm.project.models import Project, ProjectSettings
+from itsm.component.constants import CATALOG, FIRST_ORDER
+from itsm.project.models import Project, ProjectSettings, CostomTab
 
 project_name_pattern = re.compile("^[0-9a-zA-Z_-]{1,}$")
 
@@ -41,7 +41,7 @@ class ProjectSerializer(ModelSerializer):
         """
         检验项目名是否符合规范
         """
-        if Project.objects.filter(name=attrs["name"]).exists():
+        if Project.objects.filter(name=attrs["name"], is_deleted=False).exists():
             raise serializers.ValidationError(
                 "创建失败: 已存在项目名称为{}的项目".format(attrs["name"])
             )
@@ -66,6 +66,7 @@ class ProjectSerializer(ModelSerializer):
         instance.init_service_catalogs(catalogs)
         instance.init_project_settings()
         instance.init_project_sla()
+        instance.init_custom_notify_template()
         return instance
 
     def to_representation(self, instance):
@@ -130,3 +131,40 @@ class ProjectMigrateSerializer(serializers.Serializer):
     resource_id = serializers.IntegerField(required=True)
     old_project_key = serializers.CharField(required=True)
     new_project_key = serializers.CharField(required=True)
+
+
+class CostomTabSerializer(serializers.ModelSerializer):
+    # 自定义单据序列化
+    conditions = serializers.JSONField(required=False)
+
+    class Meta:
+        model = CostomTab
+        fields = ("id", "name", "desc", "project_key", "conditions", "order")
+
+    def create(self, validated_data):
+        # 1.获取当前项目key
+        project_key = validated_data.get("project_key", "")
+        creator = validated_data.get("creator", "")
+        name = validated_data.get("name", "")
+        tab_list = CostomTab.objects.filter(
+            project_key=project_key, creator=creator, is_deleted=False
+        )
+        # 2.判断当前项目下该用户的tab是否已经存在
+        tab_names = list(tab_list.values_list("name", flat=True))
+        if name in tab_names:
+            raise serializers.ValidationError("当前tab名称已存在")
+        # 3.获取当前项目下该用户的tab数量
+        order = tab_list.count()
+        # 4.当前新增的tab序号为tab数量+1
+        validated_data["order"] = order + FIRST_ORDER
+        return super(CostomTabSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        project_key = validated_data.get("project_key", "")
+        creator = validated_data.get("updated_by", "")
+        name = validated_data.get("name", "")
+        if CostomTab.objects.filter(
+            project_key=project_key, creator=creator, name=name, is_deleted=False
+        ).exists():
+            raise serializers.ValidationError("当前tab名称已存在")
+        return super(CostomTabSerializer, self).update(instance, validated_data)
