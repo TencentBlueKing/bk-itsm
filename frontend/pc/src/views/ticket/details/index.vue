@@ -489,6 +489,7 @@
                     }
                 )
                 this.nodeList = copyList
+                this.$store.commit('deployOrder/setNodeList', this.nodeList)
                 this.initCurrentStepData()
             },
             // 获取当前单据状态颜色
