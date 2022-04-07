@@ -25,14 +25,16 @@
         <li v-bk-tooltips.right="$t(`m.treeinfo['开始节点']`)">
             <div class="entry-item entry-start"
                 data-type="START">
-                {{ $t('m.treeinfo["开始"]') }}
+                <i class="bk-itsm-icon icon-kaishi"></i>
+                <!-- {{ $t('m.treeinfo["开始"]') }} -->
             </div>
             <div class="entry-disabled"></div>
         </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['结束节点']`)">
-            <div class="entry-item"
+            <div class="entry-item entry-end"
                 data-type="END">
-                {{ $t('m.treeinfo["结束"]') }}
+                <i class="bk-itsm-icon icon-jieshu"></i>
+                <!-- {{ $t('m.treeinfo["结束"]') }} -->
             </div>
             <div class="entry-disabled"></div>
         </li>
@@ -117,7 +119,7 @@
                 z-index: 2;
             }
             .bk-itsm-icon {
-                color: #737987;
+                color: #738abe;
                 &:hover {
                     color: #3A84FF;
                 }
@@ -135,6 +137,15 @@
             cursor: move;
             color: #C6CFD9;
             font-size: 12px;
+        }
+        .entry-start {
+            font-size: 33px;
+            line-height: 22px;
+        }
+        .entry-end {
+            font-size: 18px;
+            line-height: 28px;
+            border: 2px solid #738abe;
         }
         .entry-gateway {
             border: none;
