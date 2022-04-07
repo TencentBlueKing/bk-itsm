@@ -391,6 +391,17 @@
                     if (!res.data.some(task => loopStatusList.includes(task.status)) && source === 'refreshBtn') {
                         this.reload()
                     }
+                    // 轮询
+                    if (res.data.some(task => loopStatusList.includes(task.status))) {
+                        const setTimeoutFunc = setTimeout(
+                            () => {
+                                this.getTaskList(source)
+                            }, 10000
+                        )
+                        this.$once('hook:beforeDestroy', () => {
+                            clearInterval(setTimeoutFunc)
+                        })
+                    }
                 }).catch((res) => {
                     errorHandler(res, this)
                 })
