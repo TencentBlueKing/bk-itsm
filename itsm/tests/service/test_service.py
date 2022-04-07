@@ -272,20 +272,8 @@ class ServiceTest(TestCase):
         self.assertIsInstance(resp, FileResponse)
         #
         # test_import
-        url = "/api/service/projects/import_service/"
         data = IMPORT_SERVICE_DATA
-        resp = self.client.post(path=url, data=data, content_type="application/json")
-        self.assertEqual(resp.data["result"], True)
-
         data["name"] = "xxxxx"
         data["source"] = "service"
-        url = "/api/service/projects/import_service/"
-        resp = self.client.post(path=url, data=data, content_type="application/json")
-        self.assertEqual(resp.data["result"], True)
-        self.assertIsInstance(resp.data["data"], dict)
-
-        data.pop("name")
-        url = "/api/service/projects/import_service/"
-        resp = self.client.post(path=url, data=None, content_type="application/json")
-        self.assertEqual(resp.data["result"], False)
-        self.assertEqual(resp.data["code"], "VALIDATE_ERROR")
+        service = Service.objects.clone(data, "admin")
+        self.assertIsInstance(service, Service)
