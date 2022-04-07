@@ -470,6 +470,9 @@
             isImportServiceShow (val) {
                 if (!val) {
                     this.importFileNameList = []
+                    this.$nextTick(_ => {
+                        this.$refs.importInput.value = ''
+                    })
                 }
             }
         },
@@ -499,11 +502,10 @@
             },
             handleFile (e) {
                 const filename = e.target.value.split('\\').slice(-1)
+                this.importFileNameList = []
                 if (filename.length !== 0 && filename[0] !== '') {
                     this.importFileNameList.push(filename[0])
                     this.isCheckImport = false
-                } else {
-                    this.importFileNameList = []
                 }
             },
             closeImport () {
