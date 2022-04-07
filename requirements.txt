@@ -114,3 +114,6 @@ opentelemetry-instrumentation-dbapi==0.25b2
 opentelemetry-instrumentation-redis==0.25b2
 opentelemetry-instrumentation-logging==0.25b2
 opentelemetry-instrumentation-requests==0.25b2
+
+Jinja2==3.0.1
+jmespath==0.10.0

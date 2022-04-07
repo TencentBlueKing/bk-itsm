@@ -26,8 +26,8 @@ import logging
 
 import jmespath
 import requests
-from bamboo_engine.utils.boolrule import BoolRule
 from jinja2 import Template
+from pipeline.utils.boolrule import BoolRule
 from pipeline.component_framework.component import Component
 from django.utils.translation import ugettext as _
 
