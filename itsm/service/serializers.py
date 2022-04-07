@@ -810,11 +810,6 @@ class ServiceImportSerializer(serializers.Serializer):
     name = serializers.CharField(
         required=True,
         error_messages={"blank": _("名称不能为空")},
-        max_length=LEN_MIDDLE,
-        validators=[
-            UniqueValidator(queryset=Service.objects.all(), message=_("服务名已存在，请重新输入")),
-            # name_validator
-        ],
     )
     key = serializers.CharField(
         required=True,
