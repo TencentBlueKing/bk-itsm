@@ -28,10 +28,10 @@
         @mousemove="moveFn"
         @mouseup="onNodeClick(node, $event)">
         <div v-if="node.type === 'START'" class="startpoint">
-            <span :title="$t(`m.treeinfo['开始']`)" class="bk-itsm-icon icon-kaishi"></span>
+            {{ $t('m.treeinfo["开始"]') }}
         </div>
-        <div v-if="node.type === 'END'" class="endpoint" style="padding: 8px">
-            <span :title="$t(`m.treeinfo['结束']`)" class="bk-itsm-icon icon-jieshu"></span>
+        <div v-if="node.type === 'END'" class="endpoint">
+            {{ $t('m.treeinfo["结束"]') }}
         </div>
         <template v-for="(item, index) in typeList" v-if="node.type === item.type">
             <div class="common-node" :class="{ 'common-auto': item.type === 'TASK' }" :key="index">
@@ -54,9 +54,9 @@
                         'bk-word-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'),
                         'bk-word-preview': node.nodeInfo.statusInfo === 'WAIT',
                         'bk-word-normal': normalColor
-                    }" :title="node.name">
+                    }">
                     {{node.name || $t(`m.treeinfo["新增节点"]`)}}</span>
-                <template v-if="previewInfo.canClick && (node.nodeInfo.statusInfo !== 'WAIT' && node.nodeInfo.statusInfo !== 'FINISHED')">
+                <template v-if="previewInfo.canClick && node.nodeInfo.statusInfo !== 'WAIT'">
                     <div class="bk-icon-status"
                         :class="{ 'bk-icon-success': node.nodeInfo.statusInfo === 'FINISHED', 'bk-icon-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED') }">
                         <i class="bk-icon icon-check-1"
@@ -74,11 +74,11 @@
         </template>
         <!-- 网关节点 -->
         <div v-if="node.type === 'ROUTER-P'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-convergence" style="color: #738abe"></i>
+            <i class="bk-itsm-icon icon-flow-convergence"></i>
         </div>
         <!-- 汇聚节点 -->
         <div v-if="node.type === 'COVERAGE'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-branch" style="color: #738abe"></i>
+            <i class="bk-itsm-icon icon-flow-branch"></i>
         </div>
     </div>
 </template>
@@ -213,29 +213,33 @@
             /* 文字 */
             .bk-more-word {
                 color: #3c96ff;
-                border-radius: 0 3px 3px 0;
+                border: 1px solid #3A84FF !important;;
+                border-radius: 0 20px 20px 0;
             }
 
             .bk-word-success {
                 color: #2DCB56;
-                border-radius: 0 3px 3px 0;
+                border: 1px solid #2DCB56 !important;
+                border-radius: 0 20px 20px 0;
             }
 
             .bk-word-error {
                 color: #FF5656;
-                border-radius: 0 3px 3px 0;
+                border: 1px solid #FF5656 !important;
+                border-radius: 0 20px 20px 0;
             }
 
             .bk-word-preview {
                 color: #c4c6cc;
-                border-radius: 0 3px 3px 0;
+                border-color: #c4c6cc !important;
+                border-radius: 0 20px 20px 0;
             }
         }
 
         .bk-icon-status {
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: 10px;
+            right: 6px;
             width: 20px;
             height: 20px;
             border-radius: 50%;
@@ -245,7 +249,7 @@
 
             .bk-icon {
                 position: absolute;
-                top: 1px;
+                top: 2px;
                 right: 1px;
                 font-size: 18px;
             }

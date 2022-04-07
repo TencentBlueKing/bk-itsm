@@ -10,40 +10,20 @@
 
 .startpoint,
 .endpoint {
-    width: 58px;
-    height: 58px;
+    width: 40px;
+    height: 40px;
     line-height: 37px;
     border-radius: 50%;
-    // border: 2px solid #C9CACB;
+    border: 2px solid #C9CACB;
     text-align: center;
     color: #63656E;
-    background-color: #fff;
+    background-color: #F0F1F5;
     font-size: 12px;
     box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
-    .icon-kaishi {
-        display: block;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        font-size: 40px;
-        line-height: 60px;
-        margin: 0 auto;
-        color: #738abe;
-    }
-    .icon-jieshu {
-        display: block;
-        width: 42px;
-        height: 42px;
-        border: 2px solid #738abe;
-        border-radius: 50%;
-        font-size: 28px;
-        line-height: 40px;
-        margin: 0 auto;
-        color: #738abe;
-    }
 }
 
 .common-branch {
+    border: 1px solid #C4C6CC;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -72,25 +52,25 @@
 .common-node {
     display: flex;
     align-items: center;
-    width: 160px;
-    height: 56px;
-    // line-height: 38px;
+    width: 150px;
+    height: 40px;
+    line-height: 38px;
     text-align: center;
     background-color: #fff;
     padding-left: 40px;
     color: #63656E;
     font-size: 14px;
     position: relative;
-    border-radius: 4px;
+    border-radius: 25px;
     box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
     border: 1px solid #DCDEE5;
     cursor: pointer;
     position: relative;
 
     &:hover {
-        border: 1px solid #3a84ff;
-        // border-radius: px;
-        color: #3a84ff;
+        border: 1px solid #3A84FF;
+        border-radius: 20px;
+        color: #3A84FF;
         .icon-edit-bold {
             display: block;
         }
@@ -101,12 +81,9 @@
         .bk-toop-info {
             color: #63656E;
         }
-        .common-auto-icon {
-            background-color: #3a84ff;
+        .bk-more-word {
+            width: 80px;
         }
-        // .bk-more-word {
-        //     width: 112px;
-        // }
     }
     .icon-edit-bold {
         display: none;
@@ -118,12 +95,12 @@
         top: 0;
         left: 0;
         font-size: 16px;
-        width: 32px;
-        height: 54px;
-        line-height: 54px;
+        width: 40px;
+        height: 38px;
+        line-height: 38px;
         color: #fff;
-        background-color: #738abe;
-        border-radius: 3px 0 0 3px;
+        background-color: #3A84FF;
+        border-radius: 25px 0 0 25px;
         box-shadow: 0px 2px 4px 0px rgba(196, 198, 204, 0.5);
 
         .bk-itsm-icon {
@@ -179,13 +156,12 @@
 .bk-more-word {
     display: inline-block;
     box-sizing: border-box;
-    width: 112px;
-    text-align: left;
-    text-overflow: ellipsis;
+    width: 80px;
+    text-align: center;
+    padding: 0 4px;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .bk-node-delete {
@@ -211,8 +187,8 @@
 
 .bk-flow-fast {
     position: absolute;
-    top: 58px;
-    right: -2px;
+    top: 30px;
+    right: -178px;
     background-color: #fff;
     border: 1px solid #DDE4EB;
     box-shadow: 0px 2px 4px 0px rgba(218, 218, 218, 0.5);
@@ -220,7 +196,7 @@
     z-index: 100;
 
     .bk-engine-node {
-        width: 160px;
+        width: 180px;
 
         ul {
             @include clearfix;
@@ -240,7 +216,7 @@
                 line-height: 42px;
                 height: 42px;
                 text-align: center;
-                color: #52699d;
+                color: #737987;
 
                 &:hover {
                     color: #3A84FF;
@@ -262,10 +238,9 @@
     }
 
     .bk-engine-word {
-        color: #52699d;
+        color: #63656E;
         line-height: 28px;
-        font-size: 14px;
-        text-align: right;
+        font-size: 12px;
         padding: 0 10px;
         border-top: 1px solid #E9EDF1;
         cursor: pointer;
