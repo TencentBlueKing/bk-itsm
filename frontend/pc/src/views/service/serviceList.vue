@@ -498,6 +498,7 @@
                 this.editValue = val[val.length - 1]
             },
             closeFile () {
+                this.$refs.importInput.value = ''
                 this.importFileNameList = []
             },
             handleFile (e) {
@@ -510,6 +511,7 @@
             },
             closeImport () {
                 this.isCheckImport = false
+                this.importCatalogId = []
                 this.isImportServiceShow = false
             },
             importConfirm () {
