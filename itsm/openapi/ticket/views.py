@@ -169,6 +169,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return queryset
 
     @action(detail=False, methods=["get"], serializer_class=TicketStatusSerializer)
+    @custom_apigw_required
     def get_ticket_status(self, request):
         """
         单据状态，支持根据单据sn查询
@@ -189,6 +190,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(self.serializer_class(ticket).data)
 
     @action(detail=False, methods=["post"], serializer_class=TicketResultSerializer)
+    @custom_apigw_required
     def ticket_approval_result(self, request):
         """
         单据状态，支持根据单据sn查询
@@ -211,6 +213,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(self.serializer_class(tickets, many=True).data)
 
     @action(detail=False, methods=["post"], serializer_class=TicketListSerializer)
+    @custom_apigw_required
     def get_tickets(self, request):
         """
         获取单据列表
@@ -355,6 +358,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response()
 
     @action(detail=False, methods=["get"], serializer_class=TicketRetrieveSerializer)
+    @custom_apigw_required
     def get_ticket_info(self, request):
         """
         获取单据详情
@@ -375,6 +379,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(self.serializer_class(ticket).data)
 
     @action(detail=False, methods=["get"], serializer_class=TicketLogsSerializer)
+    @custom_apigw_required
     def get_ticket_logs(self, request):
         """
         获取单据日志
@@ -396,6 +401,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
+    @custom_apigw_required
     def create_ticket(self, request):
         """
         创建单据
@@ -441,6 +447,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
+    @custom_apigw_required
     def operate_node(self, request):
         """
         处理单据节点（提交、认领、派单、转单、终止）
@@ -500,6 +507,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     @catch_ticket_operate_exception
+    @custom_apigw_required
     def operate_ticket(self, request):
         """
         处理单据（挂起、恢复、撤销）
@@ -642,6 +650,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     @catch_ticket_operate_exception
+    @custom_apigw_required
     def get_tickets_by_user(self, request):
         # 初始化serializer的上下文
         username = (
@@ -680,6 +689,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     @catch_ticket_operate_exception
+    @custom_apigw_required
     def callback_failed_ticket(self, request):
         return Response(Cache().hkeys("callback_error_ticket"))
 
