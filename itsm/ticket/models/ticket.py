@@ -217,6 +217,7 @@ from itsm.component.utils.client_backend_query import (
 from platform_config import BaseTicket
 
 from .basic import Model
+from ...auth_iam.utils import IamRequest
 
 
 class SignTask(Model):
@@ -2025,12 +2026,37 @@ class Ticket(Model, BaseTicket):
             ]
         )
 
+    def iam_ticket_manage_auth(self, username):
+        # 本地开发环境，不校验单据管理权限
+        if settings.ENVIRONMENT == "dev":
+            return True
+
+        iam_client = IamRequest(username=username)
+        resource_info = {
+            "resource_id": str(self.service_id),
+            "resource_name": self.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_management"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=self.project_key
+        )
+        if auth_actions.get("ticket_management"):
+            return True
+
+        return False
+
     def can_operate(self, username):
         """
         能否操作单据：任一节点的处理人
         """
         if self.is_over or self.is_slave:
             return False
+
+        if self.iam_ticket_manage_auth(username):
+            return True
+
         processors = self.current_processors + self.current_task_processors
         all_processors = set(
             [processor for processor in processors.split(",") if processor]
@@ -2166,6 +2192,10 @@ class Ticket(Model, BaseTicket):
         if username == self.creator:
             # 创建人可以直接关闭
             return True
+
+        if self.iam_ticket_manage_auth(username):
+            return True
+
         for _status in self.node_status.filter(
             Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE)
         ):
@@ -2486,21 +2516,23 @@ class Ticket(Model, BaseTicket):
     @property
     def ticket_current_processors(self):
         processors_list = self.get_current_processors()
-        
+
         try:
             processors = (
                 transform_username(processors_list) if processors_list else "--"
             )
             logger.info(
-                "[ticket_current_processors]Success：用户名转换成中英文格式成功,ticket_id:{}, processors_list:{}, transform_processors:{}".format(
-                    self.id, processors_list, processors))
+                "[ticket_current_processors]Success：用户名转换成中英文格式成功,ticket_id:{}, "
+                "processors_list:{}, "
+                "transform_processors:{}".format(self.id, processors_list, processors)
+            )
         except Exception as e:
             processors = ",".join(processors_list)
             logger.info(
                 "[ticket_current_processors]Failed：用户名转换成中英文格式失败,ticket_id:{}, processors_list:{}, error:{}".format(
-                    self.id,
-                    processors_list,
-                    str(e)))
+                    self.id, processors_list, str(e)
+                )
+            )
         return processors.strip(",")
 
     def add_follower(self, username):
@@ -2804,9 +2836,8 @@ class Ticket(Model, BaseTicket):
             except Exception as err:
                 Cache().hset("callback_error_ticket", self.sn, int(time.time()))
                 logger.exception(
-                    "[TICKET] callback error, callback_url is {},message is {}".format(
-                        callback_url, err
-                    )
+                    "[TICKET] callback_error_ticket, callback_url is {},"
+                    "message is {}, ticket_id is {}".format(callback_url, err, self.id)
                 )
 
     def prepare_all_fields(self):
