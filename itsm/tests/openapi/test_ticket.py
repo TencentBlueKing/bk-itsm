@@ -37,7 +37,7 @@ from django.test import TestCase, override_settings
 from common.cipher import AESVerification
 from common.redis import Cache
 from itsm.tests.openapi.params import CREATE_TICKET_DATA
-from itsm.ticket.models import Ticket, AttentionUsers
+from itsm.ticket.models import Ticket, AttentionUsers, TicketComment
 from itsm.service.models import Service, CatalogService
 from itsm.workflow.models import WorkflowVersion
 from itsm.role.models import UserRole
@@ -333,3 +333,67 @@ class TicketOpenTest(TestCase):
         self.assertEqual(resp.data["result"], True)
         self.assertEqual(resp.data["code"], 0)
         self.assertEqual(resp.data["data"]["current_status"], "REVOKED")
+
+    @override_settings(
+        MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",), ENVIRONMENT="dev"
+    )
+    @mock.patch("itsm.ticket.serializers.ticket.get_bk_users")
+    @mock.patch("itsm.component.utils.misc.get_bk_users")
+    @mock.patch("itsm.component.decorators.JWTClient")
+    def test_comment(
+        self, patch_jwt_client, patch_misc_get_bk_users, path_get_bk_users
+    ):
+        patch_jwt_client.is_valid.return_value = True
+        patch_misc_get_bk_users.return_value = {}
+        path_get_bk_users.return_value = {}
+
+        sn = self.create_ticket()
+
+        sn_test = "11111"
+
+        data = {
+            "sn": sn_test,
+            "stars": 4,
+            "comments": "123",
+            "source": "API",
+            "operator": "admin",
+        }
+        url = "/openapi/ticket/comment/"
+
+        resp = self.client.post(url, json.dumps(data), content_type="application/json")
+
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["message"], "params_error:sn=11111对应的单据不存在!")
+
+        data["sn"] = sn
+        resp = self.client.post(url, json.dumps(data), content_type="application/json")
+
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["message"], "params_error:单据未结束，不允许评价!")
+
+        ticket = Ticket.objects.get(sn=sn)
+        ticket.current_status = "FINISHED"
+        ticket.save()
+
+        url = "/openapi/ticket/comment/"
+
+        resp = self.client.post(url, json.dumps(data), content_type="application/json")
+
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["message"], "params_error:单据评价记录未存在，无法评价!")
+
+        TicketComment.objects.get_or_create(ticket_id=ticket.id, creator=ticket.creator)
+
+        url = "/openapi/ticket/comment/"
+
+        resp = self.client.post(url, json.dumps(data), content_type="application/json")
+
+        self.assertEqual(resp.data["result"], True)
+        self.assertEqual(resp.data["message"], "success")
+
+        url = "/openapi/ticket/comment/"
+
+        resp = self.client.post(url, json.dumps(data), content_type="application/json")
+
+        self.assertEqual(resp.data["result"], False)
+        self.assertEqual(resp.data["message"], "params_error:该单据已经被评论，请勿重复评论")
