@@ -14,8 +14,8 @@
 - [蓝鲸智云配置平台](https://github.com/Tencent/bk-cmdb)  
 
 部署方法请参考各个开源产品的相关文档，在蓝鲸智云PaaS平台部署完成后，你还需要上传部署流程服务SaaS并开通应用免登录态验证白名单。
-你可以[点击这里](https://github.com/Tencent/bk-sops/releases)下载流程服务Release版本，然后前往蓝鲸PaaS平台的"开发者中心"->"S-mart应用"上传部署新应用。
-你可以参考蓝鲸PaaS平台的"开发者中心"->"API网关"->"使用指南"->"API调用说明"页面中"用户认证"文档，添加默认流程服务APP_ID即bk_sops到应用免登录态验证白名单。
+你可以下载流程服务Release版本，然后前往蓝鲸PaaS平台的"开发者中心"->"S-mart应用"上传部署新应用。
+你可以参考蓝鲸PaaS平台的"开发者中心"->"API网关"->"使用指南"->"API调用说明"页面中"用户认证"文档，添加默认流程服务APP_ID即bk_itsm到应用免登录态验证白名单。
 
 
 ## 准备本地 rabbitmq 资源  
@@ -99,7 +99,7 @@ DATABASES = {
 
 ## 创建并初始化数据库  
 
-1) 在 mysql 中创建名为 bk_sops 的数据库
+1) 在 mysql 中创建名为 bk_itsm 的数据库
 ```sql
 CREATE DATABASE `bk_itsm` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
@@ -119,7 +119,7 @@ npm install
 ```
 
 2）本地打包
-在 frontend/desktop/ 目录下，继续执行以下命令打包前端静态资源
+在 frontend/pc/ 目录下，继续执行以下命令打包前端静态资源
 ```bash
 npm run build 
 ```

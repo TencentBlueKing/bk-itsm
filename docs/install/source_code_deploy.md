@@ -13,21 +13,21 @@
 
  在这种情况下，你依然无法直接通过源码部署的方式，取代正在运行的Smart包版本的ITSM。在这样的场景下，会出现两套ITSM同时运行的情况。一套是默认的ITSM,  权限中心依赖的是此ITSM。一个是你自己源码部署的ITSM。也就是，当普通用户需要使用你源码部署的ITSM时，需要到权限中心申请权限，然后相关的人在Smart包版本的ITSM上进行审批。除了权限中心与流程服务无法调用到你源码部署的ITSM之外，其他功能不会收到影响。
 
-如果使用这种方式部署ITSM, 需要将系统内所有的bk_itsm 替换为 你源码部署的 app_code， 比如 `bk-itsm`。同时将项目下的`support-files/iam/initial.json`文件中所有的`bk_itsm`替换为你源码部署的`app_code`。
+如果使用这种方式部署ITSM, 需要将系统内所有的bk_itsm 替换为 你源码部署的 app_code， 比如 `bk-itsm`。同时将项目下的`support-files/iam/initial.json`文件中所有的`bk_itsm`替换为你源码部署的`app_code`, 将 `"name": "流程服务"`,` "name_en": "ITSM"`分别改为对应的新信息。
 
 下面是具体的源码部署步骤:
 
 
 ## 打包并收集前端静态资源
 1）安装依赖包  
-进入 `frontend/weixin`，执行以下命令安装。如果您需要使用移动端的话，则需要在` frontend/weixin`执行相同的操作。
+进入 `frontend/pc`，执行以下命令安装。如果您需要使用移动端的话，则需要在` frontend/weixin`执行相同的操作。
 
 ```bash
 npm install
 ```
 
 2）打包前端资源
-在 frontend/目录下，继续执行以下命令打包前端静态资源
+在 frontend/ 目录下，继续执行以下命令打包前端静态资源
 
 ```bash
 npm run build
