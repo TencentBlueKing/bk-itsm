@@ -28,6 +28,9 @@ from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from config import (
     APP_CODE,
     BASE_DIR,
@@ -110,7 +113,6 @@ if USE_IAM:
         "iam.contrib.iam_migration",
         "itsm.auth_iam",
     )
-
 
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
@@ -832,7 +834,6 @@ DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
 
-
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
@@ -848,3 +849,12 @@ if USE_BKCHAT:
     BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
     BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
     BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+
+
+def redirect_func(request):
+    login_page_url = reverse("account:login_page")
+    next_url = "{}?refer_url={}".format(login_page_url, request.path)
+    return HttpResponseRedirect(next_url)
+
+
+BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
