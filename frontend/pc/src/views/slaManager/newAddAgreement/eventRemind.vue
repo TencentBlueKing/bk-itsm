@@ -23,8 +23,8 @@
 <template>
     <div class="bk-priority-configur">
         <ul class="bk-priority-head">
-            <li style="width: 140px;padding-left: 50px"><span>{{ $t('m.slaContent["提醒事件"]') }}</span></li>
-            <li style="width: calc(19% - 35px);"><span>{{ $t('m.slaContent["提醒规则"]') }}</span></li>
+            <li style="width: 140px;padding-left: 50px"><span>{{ $t('m["提醒事件"]') }}</span></li>
+            <li style="width: calc(19% - 35px);"><span>{{ $t('m["提醒规则"]') }}</span></li>
             <li style="width: calc(21% - 35px);"><span>{{ $t('m.slaContent["提醒对象"]') }}</span></li>
             <li style="width: calc(24% - 35px);"><span>{{ $t('m.slaContent["提醒方式"]') }}</span></li>
             <li style="width: calc(36% - 35px);"><span>{{ $t('m.slaContent["提醒频率"]') }}</span></li>
