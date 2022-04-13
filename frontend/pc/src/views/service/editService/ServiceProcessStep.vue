@@ -65,12 +65,18 @@
                     :configur="configur"
                     @closeConfigur="closeConfigur">
                 </signNode>
-                <approval-node
+                <!-- <approval-node
                     v-if="configur.type === 'APPROVAL'"
                     :flow-info="flowInfo"
                     :configur="configur"
                     @closeConfigur="closeConfigur">
-                </approval-node>
+                </approval-node> -->
+                <web-hook-node
+                    v-if="configur.type === 'APPROVAL'"
+                    :flow-info="flowInfo"
+                    :configur="configur"
+                    @closeConfigur="closeConfigur">
+                </web-hook-node>
             </div>
         </template>
     </div>
@@ -85,7 +91,8 @@
     import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue'
     import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue'
     import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
-    import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
+    // import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
+    import webHookNode from '@/views/processManagement/processDesign/nodeConfigue/webHookNode.vue'
 
     export default {
         name: 'ServiceProcessStep',
@@ -95,8 +102,9 @@
             autoNode,
             sopsNode,
             signNode,
-            ApprovalNode,
-            devopsNode
+            // ApprovalNode,
+            devopsNode,
+            webHookNode
         },
         props: {
             serviceInfo: {
