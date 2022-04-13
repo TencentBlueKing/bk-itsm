@@ -64,12 +64,12 @@
                 :mask-close="false"
                 :auto-close="false"
                 :header-position="'left'"
-                :title="isEdit ? '编辑' : '新建'"
+                :title="isEdit ? $t(`m['编辑']`) : $t(`m['新建']`) "
                 @confirm="submitNotice"
                 @cancel="closeNotice">
                 <div class="notice-forms">
-                    <bk-form ref="basicFrom" :model="formData" width="700" form-type="vertical" :rules="rules">
-                        <bk-form-item label="通知方式" :required="true" :property="'noticeType'">
+                    <bk-form ref="basicFrom" :model="formData" :label-width="300" width="700" form-type="vertical" :rules="rules">
+                        <bk-form-item :label="$t(`m['通知方式']`)" :required="true" :property="'noticeType'">
                             <bk-select :disabled="true" v-model="formData.noticeType" searchable>
                                 <bk-option v-for="option in noticeTypeLIST"
                                     :key="option.id"
@@ -78,7 +78,7 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知场景" :required="true" :property="'noticeUserBy'">
+                        <bk-form-item :label="$t(`m['通知场景']`)" :required="true" :property="'noticeUserBy'">
                             <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
                                 <bk-option v-for="option in userByList"
                                     :key="option.id"
@@ -87,7 +87,7 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知类型" :required="true" :property="'noticeAction'">
+                        <bk-form-item :label="$t(`m['通知类型']`)" :required="true" :property="'noticeAction'">
                             <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
                                 <bk-option v-for="option in actionList"
                                     :key="option.id"
@@ -128,16 +128,16 @@
                 isEdit: false,
                 editNoticeId: '',
                 remindWayList: [
-                    { id: 'WEIXIN', name: '企业微信' },
-                    { id: 'EMAIL', name: '邮件' },
-                    { id: 'SMS', name: '手机短信' }
+                    { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
+                    { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
                 ],
                 noticeList: [],
                 // 先写死，后续添加自定义
                 noticeTypeLIST: [
-                    { id: 'WEIXIN', name: '企业微信' },
-                    { id: 'EMAIL', name: '邮件' },
-                    { id: 'SMS', name: '手机短信' }
+                    { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
+                    { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
                 ],
                 userByList: [
                     { id: 'TICKET', name: '单据' },
@@ -211,6 +211,7 @@
                         used_by: val
                     }
                     const res = await this.$store.dispatch('project/getAction', parmas)
+                    console.log(res)
                     if (res.data && res.result) {
                         const list = res.data
                         for (const item in list) {
@@ -219,6 +220,7 @@
                                 name: list[item]
                             })
                         }
+                        console.log(this.actionList)
                     }
                 } catch (e) {
                     console.log(e)
