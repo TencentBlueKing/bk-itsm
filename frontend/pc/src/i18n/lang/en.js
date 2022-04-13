@@ -2534,5 +2534,8 @@ export const m = {
     '一个月前': 'A Mouth ago',
     '三个月前': 'Three months ago',
     '半年前': 'Half year ago',
-    '一年前': 'A year ago'
+    '一年前': 'A year ago',
+    '通知场景': 'Notification scene',
+    '通知方式': 'Notification method',
+    '通知类型': 'Notification type'
 }

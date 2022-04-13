@@ -557,7 +557,6 @@
                         console.log(res.data)
                         this.serviceList.forEach(item => {
                             item.label = item.name
-                            item.name = this.$t(`m['${item.name}']`)
                             this.$set(this.counts, item.key, 0)
                         })
                         this.serviceType = this.serviceList[0].key
