@@ -23,7 +23,7 @@
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
         <div class="ticket-process-content">
-            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  查看完整流程</i></div>
+            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  {{ $t(`m["查看完整流程"]`) }}</i></div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
@@ -162,13 +162,13 @@
                                 from_state_name: item.name || '',
                                 from_state_type: '',
                                 id: -1,
-                                message: '正在进行中' + '  ' + item.processors,
+                                message: this.$t(`m["正在进行中"]`) + '  ' + item.processors,
                                 operate_at: item.update_at,
                                 operator: item.processors,
                                 processors: '',
                                 processors_type: '',
                                 showMore: false,
-                                tag: `【${item.name}】正在进行中,` + '当前处理人' + item.processors || '--',
+                                tag: `【${item.name}】` + this.$t(`m["正在进行中"]`) + ', ' + this.$t(`m["当前处理人"]`) + item.processors || '--',
                                 ticket: this.ticketInfo.id,
                                 ticket_id: this.ticketInfo.id,
                                 type: 'primary'

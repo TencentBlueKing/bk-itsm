@@ -31,12 +31,12 @@
                                 <li class="drag-list" v-for="(item, index) in serviceList" :key="item.key" :class="{ 'active': item.name === currentTab, 'forbid': fixedTabs.includes(item.name) }" @click="changeTag(item.name)">
                                     <span>{{ item.name }}</span>
                                     <span v-if="counts[item.key]" class="ticket-file-count">{{ counts[item.key]}}</span>
-                                    <template v-if="!fixedTabs.includes(item.name)">
+                                    <template v-if="!fixedTabs.includes(item.name) && isInProject">
                                         <span style="font-size: 18px; margin-left: 4px;" class="bk-itsm-icon icon-edit-new" @click.stop="editProjectTab(item)"></span>
                                         <i class="bk-itsm-icon icon-itsm-icon-three-one" @click.stop="closePanel(index, item)"></i>
                                     </template>
                                 </li>
-                                <li class="drag-list forbid bk-itsm-icon icon-jia-2" @click.stop="addPanel" title="添加自定义tab"></li>
+                                <li v-if="isInProject" class="drag-list forbid bk-itsm-icon icon-jia-2" @click.stop="addPanel" title="添加自定义tab"></li>
                             </draggable>
                         </div>
                     </div>
@@ -367,6 +367,9 @@
             },
             dataList () {
                 return this[`${this.serviceType}List`] || this.customTabList
+            },
+            isInProject () {
+                return !!this.$route.query.project_id
             }
         },
         created () {
@@ -403,7 +406,9 @@
                 // 获取全局视图状态
                 this.getGlobalStatus()
                 this.getBusinessList()
-                this.getProjectTabList()
+                if (this.$route.query.project_id) {
+                    this.getProjectTabList()
+                }
             },
             getTreebyId (list, id) {
                 for (let i = 0; i < list.length; i++) {
@@ -549,8 +554,10 @@
                 return this.$store.dispatch('getCustom').then(res => {
                     if (res.result) {
                         this.serviceList = res.data
+                        console.log(res.data)
                         this.serviceList.forEach(item => {
                             item.label = item.name
+                            item.name = this.$t(`m['${item.name}']`)
                             this.$set(this.counts, item.key, 0)
                         })
                         this.serviceType = this.serviceList[0].key

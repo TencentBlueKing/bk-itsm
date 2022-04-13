@@ -64,16 +64,16 @@
             </li>
             <li class="page-over">
                 <div v-bkloading="{ isLoading: moreLoading }"></div>
-                <span v-if="isPageOver">评论已经加载完了</span>
+                <span v-if="isPageOver">{{ $t('m["评论已经加载完了"]') }}</span>
             </li>
         </ul>
         <div v-if="commentList.length === 0" class="no-comment">
             <img :src="imgUrl">
-            <p>当前暂无评论，快去评论吧！</p>
+            <p>{{ $t('m["当前暂无评论，快去评论吧！"]') }}</p>
         </div>
         <bk-dialog
             v-model="isEdit"
-            :title="editType === 'edit' ? '编辑评论' : '回复评论'"
+            :title="editType === 'edit' ? $t(`m['编辑评论']`) : $t(`m['回复评论']`)"
             width="800"
             theme="primary"
             :mask-close="false"
@@ -118,14 +118,14 @@
                     {
                         type: 'INSIDE',
                         icon: 'bk-itsm-icon icon-suoding common-color',
-                        name: '内部评论',
-                        docs: '仅单据相关人员可发布的评论'
+                        name: this.$t(`m['内部评论']`),
+                        docs: this.$t(`m['仅单据相关人员可发布的评论']`)
                     },
                     {
                         type: 'PUBLIC',
                         icon: 'bk-itsm-icon icon-jiesuo common-color',
-                        name: '外部评论',
-                        docs: '发布的评论所有人可见'
+                        name: this.$t(`m['外部评论']`),
+                        docs: this.$t(`m['发布的评论所有人可见']`)
                     }
                 ],
                 // commentList: [],
