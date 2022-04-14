@@ -83,7 +83,7 @@ class PipelineTest(TestCase):
             ],
             "headers": [],
             "body": {"type": "form_data", "params": []},
-            "timeout": 10,
+            "settings": {"timeout": 10},
             "success_exp": "",
         }
 
@@ -119,7 +119,7 @@ class PipelineTest(TestCase):
             ],
             "headers": [],
             "body": {"type": "form_data", "params": []},
-            "timeout": 10,
+            "settings": {"timeout": 10},
             "success_exp": "",
         }
         key_value = {

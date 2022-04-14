@@ -144,7 +144,7 @@ class WebHookService(ItsmBaseService):
 
         result = ParamsBuilder(extras=extras, variables=variables).result()
 
-        result["timeout"] = extras.get("timeout", 10)
+        result["timeout"] = extras.get("settings", {}).get("timeout", 10)
         result["success_exp"] = extras.get("success_exp", None)
 
         return result
