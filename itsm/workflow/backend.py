@@ -52,6 +52,7 @@ from itsm.component.constants import (
     TICKET_GLOBAL_VARIABLES,
     APPROVAL_STATE,
     TASK_DEVOPS_STATE,
+    WEBHOOK_STATE,
 )
 from itsm.component.exceptions import WorkFlowInvalidError
 from itsm.component.utils.basic import merge_dict_list
@@ -135,6 +136,8 @@ class PipelineWrapper(object):
             act = ServiceActivity("itsm_sign")
         elif state["type"] == TASK_DEVOPS_STATE:
             act = ServiceActivity("bk_devops")
+        elif state["type"] == WEBHOOK_STATE:
+            act = ServiceActivity("itsm_webhook")
         elif state["type"] == APPROVAL_STATE:
             act = ServiceActivity("itsm_approval_node")
         else:
@@ -601,6 +604,7 @@ class PipelineWrapper(object):
                     VIRTUAL_STATE,
                     APPROVAL_STATE,
                     TASK_DEVOPS_STATE,
+                    WEBHOOK_STATE,
                 ]:
                     # NORMAL（普通节点和分支网关节点）
                     outgoings = state["outgoing"]
