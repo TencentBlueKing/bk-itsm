@@ -65,14 +65,14 @@
                     :configur="configur"
                     @closeConfigur="closeConfigur">
                 </signNode>
-                <!-- <approval-node
+                <approval-node
                     v-if="configur.type === 'APPROVAL'"
                     :flow-info="flowInfo"
                     :configur="configur"
                     @closeConfigur="closeConfigur">
-                </approval-node> -->
+                </approval-node>
                 <web-hook-node
-                    v-if="configur.type === 'APPROVAL'"
+                    v-if="configur.type === 'WEBHOOK'"
                     :flow-info="flowInfo"
                     :configur="configur"
                     @closeConfigur="closeConfigur">
@@ -91,7 +91,7 @@
     import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue'
     import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue'
     import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue'
-    // import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
+    import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue'
     import webHookNode from '@/views/processManagement/processDesign/nodeConfigue/webHookNode.vue'
 
     export default {
@@ -102,7 +102,7 @@
             autoNode,
             sopsNode,
             signNode,
-            // ApprovalNode,
+            ApprovalNode,
             devopsNode,
             webHookNode
         },
@@ -136,7 +136,8 @@
                     'NORMAL': this.$t(`m["手动节点"]`),
                     'TASK': this.$t(`m["任务节点"]`),
                     'APPROVAL': this.$t(`m["审批节点"]`),
-                    'SIGN': this.$t(`m["会签节点"]`)
+                    'SIGN': this.$t(`m["会签节点"]`),
+                    'WEBHOOK': this.$t(`m["WEBHOOK节点"]`)
                 }
                 return nodoTypeList[this.configur.type]
             }

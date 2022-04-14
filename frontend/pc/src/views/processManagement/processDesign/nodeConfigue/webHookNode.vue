@@ -38,17 +38,31 @@
                         </bk-dropdown-menu>
                     </bk-input>
                     <div class="requset-config">
-                        <request-config ref="requestConfig" :type="curEq"></request-config>
+                        <request-config ref="requestConfig" :type="curEq" :configur="configur"></request-config>
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="'成功条件'" :ext-cls="'bk-form-display'">
-                    <bk-input v-model="formData.name"></bk-input>
+                    <bk-input v-model="formData.success_exp"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="'返回变量'" :ext-cls="'bk-form-display'">
                     <bk-table :data="returnReslut"
                         :size="'small'">
-                        <bk-table-column label="变量名称" prop="name"></bk-table-column>
-                        <bk-table-column label="来源" prop="source"></bk-table-column>
+                        <bk-table-column label="变量名称">
+                            <template slot-scope="props">
+                                <bk-input :behavior="'simplicity'" v-model="props.row.name"></bk-input>
+                            </template>
+                        </bk-table-column>
+                        <bk-table-column label="来源">
+                            <template slot-scope="props">
+                                <bk-input :behavior="'simplicity'" v-model="props.row.ref_path"></bk-input>
+                            </template>
+                        </bk-table-column>
+                        <bk-table-column label="操作" width="100">
+                            <template slot-scope="props">
+                                <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
+                                <i class="bk-itsm-icon icon-flow-other-reduc result-icon" :class="{ 'no-delete': retrunResultIsEmtry }" @click="deleteReturnReslut(props.row)"></i>
+                            </template>
+                        </bk-table-column>
                     </bk-table>
                 </bk-form-item>
             </bk-form>
@@ -118,7 +132,8 @@
                 requestOptions: ['GET', 'POST'],
                 formData: {
                     name: '',
-                    url: ''
+                    url: '',
+                    success_exp: ''
                 },
                 rules: {
                     name: [
@@ -138,12 +153,8 @@
                 },
                 returnReslut: [
                     {
-                        name: '执行结果',
-                        source: 'iefs'
-                    },
-                    {
-                        name: '宿舍地址',
-                        source: 'iefs---dz'
+                        name: '',
+                        ref_path: ''
                     }
                 ],
                 processorsInfo: {
@@ -157,40 +168,110 @@
                 excludeProcessor: []
             }
         },
+        computed: {
+            retrunResultIsEmtry () {
+                return this.returnReslut.length <= 1
+            }
+        },
+        mounted () {
+            this.getWebHookDetail()
+        },
         methods: {
+            // init () {},
+            getWebHookDetail () {
+                if (Object.keys(this.configur.extras).length !== 0) {
+                    const { url, success_exp } = this.configur.extras
+                    this.formData.name = this.configur.name
+                    this.formData.success_exp = success_exp
+                    this.formData.url = url
+
+                    this.processorsInfo.type = this.configur.processors_type
+                    this.processorsInfo.value = this.configur.processors
+
+                    this.returnReslut = this.configur.variables.outputs.length !== 0 ? this.configur.variables.outputs : [{ name: '', ref_path: '' }]
+                }
+            },
             selectRequsetOpt (item) {
                 this.curEq = item
             },
             closeNode () {
                 this.$parent.closeConfigur()
             },
+            addReturnReslut () {
+                this.returnReslut.push({
+                    name: '',
+                    source: ''
+                })
+            },
+            deleteReturnReslut (row) {
+                if (this.retrunResultIsEmtry) return
+                const index = this.returnReslut.indexOf(row)
+                if (index !== -1) {
+                    this.returnReslut.splice(index, 1)
+                }
+            },
             submit () {
                 Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(_ => {
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
-                    const { queryParams, auth, headers, body, settings, bodyValue } = this.$refs.requestConfig.config
-                    console.log(queryParams, auth, headers, body, settings, bodyValue)
-                    
+                    const { queryParams, auth, headers, body, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
+                    // params_query
+                    console.log(auth, headers, settings)
+                    const query_params = queryParams.filter(item => item.select)
+                    const outputs = this.returnReslut.filter(item => item.name !== '')
+                    outputs.forEach(item => {
+                        item.source = 'global'
+                        item.type = 'string'
+                    })
+
+                    // body
+                    const body_params = {
+                        type: bodyRadio !== 'none' ? bodyRadio : '',
+                        row_type: '',
+                        value: ''
+                    }
+                    if (bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded') {
+                        console.log('body')
+                        body_params.value = body.filter(item => item.select)
+                    }
+                    if (bodyRadio === 'raw') {
+                        body_params.row_type = rawType
+                        body_params.value = bodyValue
+                    }
                     const params = {
                         name: this.formData.name,
                         processors: processors || '',
                         processors_type: processors_type || '',
                         type: 'WEBHOOK',
-                        variables: {
+                        is_draft: false,
+                        extras: {
                             method: this.curEq,
                             url: this.formData.url,
-                            query_params: [],
+                            query_params,
                             auth: '',
                             headers: [],
-                            body: {
-                                type: '',
-                                row_type: '',
-                                value: ''
+                            body: body_params,
+                            settings: {
+                                timeout: 10
                             },
-                            settings: {},
-                            success_exp: ''
-                        }
+                            success_exp: this.formData.success_exp
+                        },
+                        variables: {
+                            outputs,
+                            inputs: []
+                        },
+                        workflow: this.configur.workflow
                     }
-                    console.log(params)
+                    const stateId = this.configur.id
+                    this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
+                        this.$bkMessage({
+                            message: this.$t(`m.treeinfo["保存成功"]`),
+                            theme: 'success'
+                        })
+                        this.$parent.closeConfigur()
+                    }, e => {
+                        console.log(e)
+                    }).finally(() => {
+                    })
                 })
             }
         }
@@ -250,5 +331,15 @@
     }
     .setion-title-icon {
         margin-top: 5px;
+    }
+    .result-icon {
+        font-size: 16px;
+        color: #c4c6cc;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    .no-delete {
+        color: #eaebf0;
+        cursor: auto;
     }
 </style>

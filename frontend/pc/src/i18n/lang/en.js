@@ -2470,5 +2470,6 @@ export const m = {
     '文件': 'File',
     '目录': 'Catalog',
     '选择文件': 'Select File',
-    '仅支持json文件！': 'Only JSON files are supported!  '
+    '仅支持json文件！': 'Only JSON files are supported!  ',
+    'WEBHOOK节点': 'WEBHOOK node'
 }

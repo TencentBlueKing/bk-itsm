@@ -3,10 +3,10 @@
         <ul class="bk-config-tab">
             <li v-for="(item, index) in panels"
                 :key="item.id"
-                :class="{ 'bk-check-config': acticeTab === item.name }"
+                :class="{ 'bk-check-config': acticeTab === item.key }"
                 @click="changeTab(item, index)">
                 <span>{{ item.label }}</span>
-                <span v-if="count[item.name]">{{ count[item.name] }}</span>
+                <span v-if="count[item.key]">{{ count[item.key] }}</span>
             </li>
         </ul>
         <template v-if="acticeTab === 'queryParams'">
@@ -18,29 +18,29 @@
         </template>
         <template v-if="acticeTab === 'auth'">
             <div class="param-config">
-                <bk-radio-group v-model="authRadio">
+                <bk-radio-group v-model="config.authRadio">
                     <bk-radio :value="'None'">无需认证</bk-radio>
                     <bk-radio :value="'Token'">Bearer Token</bk-radio>
                     <bk-radio :value="'Auth'">Basic Auth</bk-radio>
                 </bk-radio-group>
                 <div class="bk-radio-config">
-                    <div v-if="authRadio === 'None'">
+                    <div v-if="config.authRadio === 'None'">
                         <span>该请求不需要任何认证</span>
                     </div>
-                    <div v-else-if="authRadio === 'Token'">
+                    <div v-else-if="config.authRadio === 'Token'">
                         <div class="config-option" style="width: 80%">
                             <p class="mb5">TOKEN ：</p>
-                            <bk-input behavior="simplicity" :clearable="true" v-model="value"></bk-input>
+                            <bk-input behavior="simplicity" :clearable="true" v-model="config.auth_config.Token"></bk-input>
                         </div>
                     </div>
                     <div v-else style="display: flex">
                         <div class="config-option">
                             <p class="mb5">用户名 ：</p>
-                            <bk-input behavior="simplicity" :clearable="true" v-model="value"></bk-input>
+                            <bk-input behavior="simplicity" :clearable="true" v-model="config.auth_config.username"></bk-input>
                         </div>
                         <div class="config-option">
                             <p class="mb5">密码 ：</p>
-                            <bk-input behavior="simplicity" type="password" :clearable="true" v-model="value"></bk-input>
+                            <bk-input behavior="simplicity" type="password" :clearable="true" v-model="config.auth_config.password"></bk-input>
                         </div>
                     </div>
                 </div>
@@ -48,30 +48,33 @@
         </template>
         <template v-if="acticeTab === 'body'">
             <div class="param-config">
-                <bk-radio-group v-model="bodyRadio">
-                    <bk-radio :value="'none'">默认</bk-radio>
-                    <bk-radio :value="'form-data'">form-data</bk-radio>
-                    <bk-radio :value="'x-www-form-urlencoded'">x-www-form-urlencoded</bk-radio>
-                    <bk-radio :value="'raw'">raw</bk-radio>
-                </bk-radio-group>
-                <bk-select
-                    ext-cls="select-custom"
-                    :disabled="false"
-                    v-model="rawType"
-                    style="width: 100px;"
-                    behavior="simplicity">
-                    <bk-option v-for="(option, index) in rawList"
-                        :key="index"
-                        :id="option"
-                        :name="option">
-                    </bk-option>
-                </bk-select>
-                <template v-if="bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded'">
+                <div style="display: flex; align-items: center; margin-bottom: 8px">
+                    <bk-radio-group v-model="config.bodyRadio">
+                        <bk-radio :value="'none'">默认</bk-radio>
+                        <bk-radio :value="'form-data'">form-data</bk-radio>
+                        <bk-radio :value="'x-www-form-urlencoded'">x-www-form-urlencoded</bk-radio>
+                        <bk-radio :value="'raw'">raw</bk-radio>
+                    </bk-radio-group>
+                    <bk-select
+                        v-if="config.bodyRadio === 'raw'"
+                        ext-cls="select-custom"
+                        :disabled="false"
+                        v-model="config.rawType"
+                        style="width: 100px;"
+                        behavior="simplicity">
+                        <bk-option v-for="(option, index) in rawList"
+                            :key="index"
+                            :id="option"
+                            :name="option">
+                        </bk-option>
+                    </bk-select>
+                </div>
+                <template v-if="config.bodyRadio === 'form-data' || config.bodyRadio === 'x-www-form-urlencoded'">
                     <params-table :list="config.body"></params-table>
                 </template>
-                <template v-if="bodyRadio === 'raw'">
+                <template v-if="config.bodyRadio === 'raw'">
                     <div class="bk-textarea-wrapper">
-                        <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :name="config.bodyValue" placeholder="请输入"></textarea>
+                        <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :key="config.bodyValue" placeholder="请输入"></textarea>
                     </div>
                 </template>
             </div>
@@ -81,13 +84,16 @@
                 <params-table :list="config.headers"></params-table>
             </div>
         </template>
+        <template v-if="acticeTab === 'settings'">
+
+        </template>
     </div>
 </template>
 
 <script>
     import paramsTable from './paramsTable.vue'
     export default {
-        name: 'requestConfig',
+        key: 'requestConfig',
         components: {
             paramsTable
         },
@@ -95,26 +101,29 @@
             type: {
                 type: String,
                 default: () => 'GET'
+            },
+            configur: {
+                type: Object,
+                default () {
+                    return {}
+                }
             }
         },
         data () {
             return {
                 acticeTab: 'queryParams',
-                authRadio: 'None',
-                bodyRadio: 'none',
-                rawType: 'Text',
+                
                 panels: [
-                    { name: 'queryParams', label: '参数', count: 0 },
-                    { name: 'auth', label: '认证', count: 0 },
-                    { name: 'headers', label: '头信息', count: 0 },
-                    { name: 'body', label: '主体', count: 0 },
-                    { name: 'settings', label: '设置', count: 0 }
+                    { key: 'queryParams', label: '参数', count: 0 },
+                    { key: 'auth', label: '认证', count: 0 },
+                    { key: 'headers', label: '头信息', count: 0 },
+                    { key: 'body', label: '主体', count: 0 },
+                    { key: 'settings', label: '设置', count: 0 }
                 ],
                 list: [
                     {
                         check: false,
-                        id: -1,
-                        name: '',
+                        key: '',
                         value: '',
                         desc: '',
                         select: false
@@ -122,12 +131,16 @@
                 ],
                 rawList: ['JSON', 'HTML', 'XML', 'Text'],
                 config: {
-                    auth: {},
+                    auth_config: {
+                        Token: '',
+                        username: '',
+                        password: ''
+                    },
+                    authRadio: 'None',
                     queryParams: [
                         {
                             check: false,
-                            id: -1,
-                            name: '',
+                            key: '',
                             value: '',
                             desc: '',
                             select: false
@@ -136,8 +149,7 @@
                     headers: [
                         {
                             check: false,
-                            id: -1,
-                            name: '',
+                            key: '',
                             value: '',
                             desc: '',
                             select: false
@@ -146,14 +158,15 @@
                     body: [
                         {
                             check: false,
-                            id: -1,
-                            name: '',
+                            key: '',
                             value: '',
                             desc: '',
                             select: false
                         }
                     ],
+                    bodyRadio: 'none',
                     bodyValue: '',
+                    rawType: 'Text',
                     settings: {}
                 }
             }
@@ -164,9 +177,14 @@
                 return { queryParams }
             }
         },
+        mounted () {
+            if (Object.keys(this.configur.extras).length !== 0) {
+                this.config.queryParams = [...this.configur.extras.query_params, ...this.config.queryParams]
+            }
+        },
         methods: {
             changeTab (item, index) {
-                this.acticeTab = item.name
+                this.acticeTab = item.key
             },
             handleDelete (row) {
                 const index = this.list.indexOf(row)
@@ -180,15 +198,14 @@
                     val.select = true
                     this.list.push({
                         check: false,
-                        name: '',
+                        key: '',
                         value: '',
                         desc: '',
-                        select: false,
-                        id: val.id--
+                        select: false
                     })
                 } else {
-                    const { name, value, desc } = val
-                    const checkList = [name, value, desc]
+                    const { key, value, desc } = val
+                    const checkList = [key, value, desc]
                     if (checkList.every(item => item === '')) {
                         this.list.pop()
                         val.check = false
@@ -204,7 +221,7 @@
 .bk-config-tab {
     border-bottom: 1px solid #dde4eb;
     height: 40px;
-    padding: 0 20px;
+    margin: 0 10px;
     // background-color: #ffffff;
     li {
         float: left;
@@ -237,10 +254,7 @@
         }
     }
     .select-custom {
-        position: absolute;
-        top: 0;
-        left: 473px;
-        width: 78px;
+        margin-left: -380px;
     }
 }
 .icon-info-fail {
