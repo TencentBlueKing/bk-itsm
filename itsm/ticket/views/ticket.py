@@ -707,10 +707,10 @@ class TicketModelViewSet(ModelViewSet):
             if not service_fields:
                 return []
 
-            started_states = [
-                service_inst.first_state_id
-                for service_inst in Service.objects.filter(id__in=service_fields.keys())
-            ]
+            # started_states = [
+            #     service_inst.first_state_id
+            #     for service_inst in Service.objects.filter(id__in=service_fields.keys())
+            # ]
 
             # 获取导出的所有字段内容 -- 当前的id如果较多，这里大量拉取，估计有点问题
             all_service_field_keys.append("bk_biz_id")
@@ -720,7 +720,7 @@ class TicketModelViewSet(ModelViewSet):
                         service_id__in=service_fields.keys()
                     ).values_list("id", flat=True),
                     type__in=EXPORT_SUPPORTED_TYPE,
-                    state_id__in=started_states,
+                    # state_id__in=started_states,
                     key__in=all_service_field_keys,
                 ),
                 many=True,
