@@ -328,6 +328,6 @@ class WebHookService(ItsmBaseService):
 
 
 class WebHookComponent(Component):
-    name = _("自动节点")
+    name = _("WEBHOOK 节点")
     code = "itsm_webhook"
     bound_service = WebHookService
