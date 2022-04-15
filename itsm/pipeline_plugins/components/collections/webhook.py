@@ -203,13 +203,13 @@ class WebHookService(ItsmBaseService):
 
         state = ticket.flow.get_state(state_id)
         variables = state["variables"].get("outputs", [])
-        extras = state["extras"]
+        webhook_info = state["extras"].get("webhook_info")
         processors = ticket.current_processors[1:-1]
         current_node = ticket.node_status.get(state_id=state_id)
 
         error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
         try:
-            extras = self.build_params(extras, ticket)
+            extras = self.build_params(webhook_info, ticket)
         except Exception as e:
             err_message = "Webhook节点解析失败, error={}".format(e)
             self.do_exit_plugins(
@@ -328,6 +328,6 @@ class WebHookService(ItsmBaseService):
 
 
 class WebHookComponent(Component):
-    name = _("自动节点")
+    name = _("WEBHOOK 节点")
     code = "itsm_webhook"
     bound_service = WebHookService
