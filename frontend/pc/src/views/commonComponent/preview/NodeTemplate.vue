@@ -113,6 +113,7 @@
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
+                    { type: 'WEBHOOK', iconStyle: 'icon-request-config' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' }
                 ]
             }

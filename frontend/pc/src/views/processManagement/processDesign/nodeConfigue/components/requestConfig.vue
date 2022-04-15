@@ -73,9 +73,7 @@
                     <params-table :list="config.body"></params-table>
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
-                    <div class="bk-textarea-wrapper">
-                        <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :key="config.bodyValue" placeholder="请输入"></textarea>
-                    </div>
+                    <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" placeholder="请输入"></textarea>
                 </template>
             </div>
         </template>
@@ -85,7 +83,15 @@
             </div>
         </template>
         <template v-if="acticeTab === 'settings'">
-
+            <div class="param-config">
+                <div class="setting-option">
+                    <p class="mb5">请求超时</p>
+                    <div class="setting-content">
+                        <bk-input behavior="simplicity" :clearable="true" v-model="config.settings.timeout"></bk-input>
+                        <span style="margin-left: 5px">S</span>
+                    </div>
+                </div>
+            </div>
         </template>
     </div>
 </template>
@@ -167,7 +173,9 @@
                     bodyRadio: 'none',
                     bodyValue: '',
                     rawType: 'Text',
-                    settings: {}
+                    settings: {
+                        timeout: 10
+                    }
                 }
             }
         },
@@ -180,6 +188,15 @@
         mounted () {
             if (Object.keys(this.configur.extras).length !== 0) {
                 this.config.queryParams = [...this.configur.extras.query_params, ...this.config.queryParams]
+                this.config.settings.timeout = this.configur.extras.settings.timeout
+
+                this.config.bodyRadio = this.configur.extras.body.type || 'none'
+                if (this.configur.extras.body.type === 'form-data' || this.configur.extras.body.type === 'x-www-form-urlencoded') {
+                    this.config.body = [...this.configur.extras.body.value, ...this.config.body]
+                } else if (this.configur.extras.body.type === 'raw') {
+                    this.config.rawType = this.configur.extras.body.row_type
+                    this.config.bodyValue = this.configur.extras.body.value
+                }
             }
         },
         methods: {
@@ -255,6 +272,13 @@
     }
     .select-custom {
         margin-left: -380px;
+    }
+    .setting-option {
+        font-size: 14px;
+        width: 25%;
+        .setting-content {
+            display: flex;
+        }
     }
 }
 .icon-info-fail {

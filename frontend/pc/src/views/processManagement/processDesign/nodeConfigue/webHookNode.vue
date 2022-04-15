@@ -148,6 +148,11 @@
                             required: true,
                             message: '必填项',
                             trigger: 'blur'
+                        },
+                        {
+                            pattern: /(http|https):\/\/\S*/,
+                            message: '必填项',
+                            trigger: 'blur'
                         }
                     ]
                 },
@@ -237,6 +242,10 @@
                         body_params.row_type = rawType
                         body_params.value = bodyValue
                     }
+                    // settings
+                    const settings_parmas = {
+                        timeout: settings.timeout
+                    }
                     const params = {
                         name: this.formData.name,
                         processors: processors || '',
@@ -250,9 +259,7 @@
                             auth: '',
                             headers: [],
                             body: body_params,
-                            settings: {
-                                timeout: 10
-                            },
+                            settings: settings_parmas,
                             success_exp: this.formData.success_exp
                         },
                         variables: {
