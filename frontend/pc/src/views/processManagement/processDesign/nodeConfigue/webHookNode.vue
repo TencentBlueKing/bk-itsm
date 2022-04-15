@@ -24,7 +24,7 @@
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="'URL'" :ext-cls="'bk-form-display'" required property="url" error-display-type="normal">
-                    <bk-input v-model="formData.url" :clearable="true" :font-size="'medium'">
+                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" @change="handleUrlChange">
                         <bk-dropdown-menu class="group-text" @show="isDropdownShow = true" @hide="isDropdownShow = false" ref="dropdown" slot="prepend" :font-size="'medium'">
                             <bk-button type="primary" slot="dropdown-trigger">
                                 <template v-for="(item, index) in requestOptions">
@@ -37,6 +37,13 @@
                             </ul>
                         </bk-dropdown-menu>
                     </bk-input>
+                    <div v-show="isShowUrlVariable && filterVariableList.length !== 0" class="select-variables">
+                        <ul>
+                            <li v-for="(item, index) in filterVariableList" :key="index" @click="handleSelectContent(item)">{{item.name}}</li>
+                        </ul>
+                    </div>
+                </bk-form-item>
+                <bk-form-item :ext-cls="'bk-form-display'">
                     <div class="requset-config">
                         <request-config ref="requestConfig" :type="curEq" :configur="configur"></request-config>
                     </div>
@@ -150,8 +157,8 @@
                             trigger: 'blur'
                         },
                         {
-                            pattern: /(http|https):\/\/\S*/,
-                            message: '必填项',
+                            regex: /(http|https):\/\/\S*/,
+                            message: '必需以http://或https://开头',
                             trigger: 'blur'
                         }
                     ]
@@ -170,16 +177,30 @@
                     delivers: false,
                     processors: false
                 },
-                excludeProcessor: []
+                excludeProcessor: [],
+                isShowUrlVariable: false,
+                stateList: [],
+                urlField: ''
             }
         },
         computed: {
             retrunResultIsEmtry () {
                 return this.returnReslut.length <= 1
+            },
+            filterVariableList () {
+                if (!this.formData.url) return []
+                const list = this.stateList.filter(item => {
+                    return item.name.indexOf(this.formData.url.charAt(this.formData.url.length - 1)) !== -1
+                })
+                if (list.length !== 0) {
+                    this.$refs.urlInput.focus()
+                }
+                return list
             }
         },
         mounted () {
             this.getWebHookDetail()
+            this.getRelatedFields()
         },
         methods: {
             // init () {},
@@ -195,6 +216,28 @@
 
                     this.returnReslut = this.configur.variables.outputs.length !== 0 ? this.configur.variables.outputs : [{ name: '', ref_path: '' }]
                 }
+            },
+            getRelatedFields () {
+                const params = {
+                    workflow: this.flowInfo.id,
+                    state: this.configur.id,
+                    field: ''
+                }
+                this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
+                    this.stateList = res.data
+                })
+            },
+            handleSelectContent (item) {
+                console.log(item)
+                this.formData.url = this.formData.url.slice(0, -1) + `{{ ${item.key}}}`
+                this.$refs.urlInput.focus()
+            },
+            handleUrlChange (value, event) {
+                // console.log(value, event)
+                this.isShowUrlVariable = true
+                // if (value.endsWith('{{')) {
+                //     this.isShowUrlVariable = true
+                // }
             },
             selectRequsetOpt (item) {
                 this.curEq = item
@@ -319,7 +362,7 @@
         }
     }
     .requset-config {
-        min-height: 188px;
+        min-height: 120px;
         margin: 10px 0;
         padding: 0 16px;
         background-color: #f5f7fa;
@@ -333,8 +376,34 @@
         width: 448px;
     }
     .bk-form-display {
+        position: relative;
         float: left;
         margin-right: 10px;
+        .select-variables {
+            width: 492px;
+            height: 230px;
+            position: absolute;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 14px;
+            border: 1px solid #c4c6cc;
+            top: 35px;
+            left: 71px;
+            z-index: 100;
+            overflow-y: auto;
+            @include scroller;
+            ul {
+                padding: 5px;
+                li {
+                    height: 30px;
+                    cursor: pointer;
+                    &:hover {
+                        background-color: #e1ecff;
+                        color: #3a84ff;
+                    }
+                }
+            }
+        }
     }
     .setion-title-icon {
         margin-top: 5px;
