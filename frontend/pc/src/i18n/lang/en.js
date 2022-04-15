@@ -1974,7 +1974,10 @@ export const m = {
         '确定删除该服务协议？': 'Are you sure to delete the service protocol?',
         '请至少勾选一个': 'Please check at least one',
         '工作时间不能为空！': 'Working time can\'t be empty!',
-        '最多只能添加三个时段': 'A maximum of three time slots can be added'
+        '最多只能添加三个时段': 'A maximum of three time slots can be added',
+        '对特殊单据，如预警单和超时单设置颜色高亮提醒。': 'Set color highlight reminders for special documents, such as early warning and overtime.',
+        '预警单据背景颜色': 'Warning document background color',
+        '超时单据背景颜色': 'Timeout document background color'
     },
     basicModule: {
         '基础模型': 'Basic Model',
