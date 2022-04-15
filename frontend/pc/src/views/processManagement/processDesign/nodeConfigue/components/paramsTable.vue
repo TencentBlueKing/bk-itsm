@@ -6,17 +6,17 @@
                     <bk-checkbox v-model="props.row.select"></bk-checkbox>
                 </template>
             </bk-table-column>
-            <bk-table-column label="字段名">
+            <bk-table-column :label="$t(`m['字段名']`)">
                 <template slot-scope="props">
                     <bk-input :behavior="'simplicity'" v-model="props.row.key" @change="changeInput(props.row)"></bk-input>
                 </template>
             </bk-table-column>
-            <bk-table-column label="值">
+            <bk-table-column :label="$t(`m['值']`)">
                 <template slot-scope="props">
                     <bk-input :behavior="'simplicity'" v-model="props.row.value" @change="changeInput(props.row)"></bk-input>
                 </template>
             </bk-table-column>
-            <bk-table-column label="描述">
+            <bk-table-column :label="$t(`m['描述']`)">
                 <template slot-scope="props">
                     <bk-input :behavior="'simplicity'" v-model="props.row.desc" @change="changeInput(props.row)"></bk-input>
                 </template>

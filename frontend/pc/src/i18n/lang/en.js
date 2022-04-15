@@ -2471,5 +2471,22 @@ export const m = {
     '目录': 'Catalog',
     '选择文件': 'Select File',
     '仅支持json文件！': 'Only JSON files are supported!  ',
-    'WEBHOOK节点': 'WEBHOOK node'
+    'WEBHOOK节点': 'WEBHOOK node',
+    '节点名称': 'Node name',
+    '成功条件': 'Success condition',
+    '返回变量': 'Return Variable',
+    '变量名称': 'variable Name',
+    '来源': 'Source',
+    '参数说明': 'Parameter Description',
+    '无需认证': 'No certification required',
+    '该请求不需要任何认证': 'This request does not require any authentication',
+    '默认': 'default',
+    '请求超时': 'Request timed out',
+    '参数': 'Query',
+    '认证': 'Auth',
+    '头信息': 'Headers',
+    '主体': 'Body',
+    '字段名': 'field name',
+    '值': 'value',
+    '描述': 'describe'
 }

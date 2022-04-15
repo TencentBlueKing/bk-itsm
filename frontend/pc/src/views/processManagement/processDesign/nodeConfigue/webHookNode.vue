@@ -7,7 +7,7 @@
                 :model="formData"
                 :rules="rules"
                 form-type="vertical">
-                <bk-form-item :label="'节点名称'" :ext-cls="'bk-form-width bk-form-display'" property="name" error-display-type="normal" required>
+                <bk-form-item :label="$t(`m['节点名称']`)" :ext-cls="'bk-form-width bk-form-display'" property="name" error-display-type="normal" required>
                     <bk-input v-model="formData.name"></bk-input>
                 </bk-form-item>
                 <bk-form-item
@@ -48,23 +48,23 @@
                         <request-config ref="requestConfig" :type="curEq" :configur="configur"></request-config>
                     </div>
                 </bk-form-item>
-                <bk-form-item :label="'成功条件'" :ext-cls="'bk-form-display'">
+                <bk-form-item :label="$t(`m['成功条件']`)" :ext-cls="'bk-form-display'">
                     <bk-input v-model="formData.success_exp"></bk-input>
                 </bk-form-item>
-                <bk-form-item :label="'返回变量'" :ext-cls="'bk-form-display'">
+                <bk-form-item :label="$t(`m['返回变量']`)" :ext-cls="'bk-form-display'">
                     <bk-table :data="returnReslut"
                         :size="'small'">
-                        <bk-table-column label="变量名称">
+                        <bk-table-column :label="$t(`m['变量名称']`)">
                             <template slot-scope="props">
                                 <bk-input :behavior="'simplicity'" v-model="props.row.name"></bk-input>
                             </template>
                         </bk-table-column>
-                        <bk-table-column label="来源">
+                        <bk-table-column :label="$t(`m['来源']`)">
                             <template slot-scope="props">
                                 <bk-input :behavior="'simplicity'" v-model="props.row.ref_path"></bk-input>
                             </template>
                         </bk-table-column>
-                        <bk-table-column label="操作" width="100">
+                        <bk-table-column :label="$t(`m['操作']`)" width="100">
                             <template slot-scope="props">
                                 <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
                                 <i class="bk-itsm-icon icon-flow-other-reduc result-icon" :class="{ 'no-delete': retrunResultIsEmtry }" @click="deleteReturnReslut(props.row)"></i>
@@ -203,10 +203,9 @@
             this.getRelatedFields()
         },
         methods: {
-            // init () {},
             getWebHookDetail () {
                 if (Object.keys(this.configur.extras).length !== 0) {
-                    const { url, success_exp } = this.configur.extras
+                    const { url, success_exp } = this.configur.extras.webhook_info
                     this.formData.name = this.configur.name
                     this.formData.success_exp = success_exp
                     this.formData.url = url
@@ -233,11 +232,7 @@
                 this.$refs.urlInput.focus()
             },
             handleUrlChange (value, event) {
-                // console.log(value, event)
                 this.isShowUrlVariable = true
-                // if (value.endsWith('{{')) {
-                //     this.isShowUrlVariable = true
-                // }
             },
             selectRequsetOpt (item) {
                 this.curEq = item
@@ -296,14 +291,16 @@
                         type: 'WEBHOOK',
                         is_draft: false,
                         extras: {
-                            method: this.curEq,
-                            url: this.formData.url,
-                            query_params,
-                            auth: '',
-                            headers: [],
-                            body: body_params,
-                            settings: settings_parmas,
-                            success_exp: this.formData.success_exp
+                            webhook_info: {
+                                method: this.curEq,
+                                url: this.formData.url,
+                                query_params,
+                                auth: '',
+                                headers: [],
+                                body: body_params,
+                                settings: settings_parmas,
+                                success_exp: this.formData.success_exp
+                            }
                         },
                         variables: {
                             outputs,
@@ -397,6 +394,7 @@
                 li {
                     height: 30px;
                     cursor: pointer;
+                    color: #75777f;
                     &:hover {
                         background-color: #e1ecff;
                         color: #3a84ff;

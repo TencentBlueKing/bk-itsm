@@ -48,7 +48,7 @@
         </li>
         <li v-bk-tooltips.right="$t(`m['WEBHOOK节点']`)">
             <div class="entry-item entry-gateway" data-type="WEBHOOK" style="margin: 12px 0 2px;">
-                <i class="bk-itsm-icon icon-request-config" style="font-size: 26px;"></i>
+                <i class="bk-itsm-icon icon-webhook-2" style="font-size: 33px;"></i>
             </div>
         </li>
         <li v-bk-tooltips.right="$t(`m.treeinfo['标准运维节点']`)">

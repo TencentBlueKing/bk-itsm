@@ -12,20 +12,20 @@
         <template v-if="acticeTab === 'queryParams'">
             <div class="param-config">
                 <i class="bk-itsm-icon icon-info-fail"></i>
-                <span style="font-size: 12px;color: #63656e">参数说明</span>
+                <span style="font-size: 12px;color: #63656e">{{ $t(`m['参数说明']`) }}</span>
                 <params-table :list="config.queryParams"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'auth'">
             <div class="param-config">
                 <bk-radio-group v-model="config.authRadio">
-                    <bk-radio :value="'None'">无需认证</bk-radio>
+                    <bk-radio :value="'None'">{{ $t(`m['无需认证']`) }}</bk-radio>
                     <bk-radio :value="'Token'">Bearer Token</bk-radio>
                     <bk-radio :value="'Auth'">Basic Auth</bk-radio>
                 </bk-radio-group>
                 <div class="bk-radio-config">
                     <div v-if="config.authRadio === 'None'">
-                        <span>该请求不需要任何认证</span>
+                        <span>{{ $t(`m['该请求不需要任何认证']`) }}</span>
                     </div>
                     <div v-else-if="config.authRadio === 'Token'">
                         <div class="config-option" style="width: 80%">
@@ -35,11 +35,11 @@
                     </div>
                     <div v-else style="display: flex">
                         <div class="config-option">
-                            <p class="mb5">用户名 ：</p>
+                            <p class="mb5">{{ $t(`m['用户名']`) }}：</p>
                             <bk-input behavior="simplicity" :clearable="true" v-model="config.auth_config.username"></bk-input>
                         </div>
                         <div class="config-option">
-                            <p class="mb5">密码 ：</p>
+                            <p class="mb5">{{ $t(`m['密码']`) }}：</p>
                             <bk-input behavior="simplicity" type="password" :clearable="true" v-model="config.auth_config.password"></bk-input>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
             <div class="param-config">
                 <div style="display: flex; align-items: center; margin-bottom: 8px">
                     <bk-radio-group v-model="config.bodyRadio">
-                        <bk-radio :value="'none'">默认</bk-radio>
+                        <bk-radio :value="'none'">{{ $t(`m['默认']`) }}</bk-radio>
                         <bk-radio :value="'form-data'">form-data</bk-radio>
                         <bk-radio :value="'x-www-form-urlencoded'">x-www-form-urlencoded</bk-radio>
                         <bk-radio :value="'raw'">raw</bk-radio>
@@ -73,7 +73,7 @@
                     <params-table :list="config.body"></params-table>
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
-                    <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" placeholder="请输入"></textarea>
+                    <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :placeholder="$t(`m['请输入']`)"></textarea>
                 </template>
             </div>
         </template>
@@ -85,7 +85,7 @@
         <template v-if="acticeTab === 'settings'">
             <div class="param-config">
                 <div class="setting-option">
-                    <p class="mb5">请求超时</p>
+                    <p class="mb5">{{ $t(`m['请求超时']`) }}</p>
                     <div class="setting-content">
                         <bk-input behavior="simplicity" :clearable="true" v-model="config.settings.timeout"></bk-input>
                         <span style="margin-left: 5px">S</span>
@@ -120,11 +120,11 @@
                 acticeTab: 'queryParams',
                 
                 panels: [
-                    { key: 'queryParams', label: '参数', count: 0 },
-                    { key: 'auth', label: '认证', count: 0 },
-                    { key: 'headers', label: '头信息', count: 0 },
-                    { key: 'body', label: '主体', count: 0 },
-                    { key: 'settings', label: '设置', count: 0 }
+                    { key: 'queryParams', label: this.$t(`m['参数']`), count: 0 },
+                    { key: 'auth', label: this.$t(`m['认证']`), count: 0 },
+                    { key: 'headers', label: this.$t(`m['头信息']`), count: 0 },
+                    { key: 'body', label: this.$t(`m['主体']`), count: 0 },
+                    { key: 'settings', label: this.$t(`m['设置']`), count: 0 }
                 ],
                 list: [
                     {
@@ -187,15 +187,15 @@
         },
         mounted () {
             if (Object.keys(this.configur.extras).length !== 0) {
-                this.config.queryParams = [...this.configur.extras.query_params, ...this.config.queryParams]
-                this.config.settings.timeout = this.configur.extras.settings.timeout
+                this.config.queryParams = [...this.configur.extras.webhook_info.query_params, ...this.config.queryParams]
+                this.config.settings.timeout = this.configur.extras.webhook_info.settings.timeout
 
-                this.config.bodyRadio = this.configur.extras.body.type || 'none'
-                if (this.configur.extras.body.type === 'form-data' || this.configur.extras.body.type === 'x-www-form-urlencoded') {
-                    this.config.body = [...this.configur.extras.body.value, ...this.config.body]
-                } else if (this.configur.extras.body.type === 'raw') {
-                    this.config.rawType = this.configur.extras.body.row_type
-                    this.config.bodyValue = this.configur.extras.body.value
+                this.config.bodyRadio = this.configur.extras.webhook_info.body.type || 'none'
+                if (this.configur.extras.webhook_info.body.type === 'form-data' || this.configur.extras.webhook_info.body.type === 'x-www-form-urlencoded') {
+                    this.config.body = [...this.configur.extras.webhook_info.body.value, ...this.config.body]
+                } else if (this.configur.extras.webhook_info.body.type === 'raw') {
+                    this.config.rawType = this.configur.extras.webhook_info.body.row_type
+                    this.config.bodyValue = this.configur.extras.webhook_info.body.value
                 }
             }
         },
