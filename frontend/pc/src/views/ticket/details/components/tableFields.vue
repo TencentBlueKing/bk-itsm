@@ -23,6 +23,7 @@
 <template>
     <div class="bk-table-fields">
         <template v-if="openFunction.FIRST_STATE_SWITCH">
+            <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
@@ -40,6 +41,7 @@
         </template>
         <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
         <template v-if="openFunction.TABLE_FIELDS_SWITCH">
+            <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <div v-for="(item, index) in tableFields"
                     :key="index"
@@ -174,6 +176,10 @@
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
+    .bk-field-tip {
+        color: #c4c6cc;
+        margin-left: 27px;
+    }
     .bk-field-line {
         width: 50%;
         position: relative;
