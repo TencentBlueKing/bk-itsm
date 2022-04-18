@@ -1024,11 +1024,15 @@ class Status(Model):
         )
         ordering = "CASE %s END" % clauses
 
+        filter_experssion = Q(state_id=self.state_id) | Q(
+            workflow_field_id__in=workflow_field_order
+        )
+
+        if self.is_first_status:
+            filter_experssion = filter_experssion | Q(workflow_field_id=0)
+
         return (
-            self.ticket.fields.filter(
-                Q(state_id=self.state_id)
-                | Q(workflow_field_id__in=workflow_field_order)
-            )
+            self.ticket.fields.filter(filter_experssion)
             .exclude(source=BASE_MODEL)
             .extra(
                 select={"ordering": ordering},
@@ -4608,6 +4612,37 @@ class Ticket(Model, BaseTicket):
         resume_at = datetime.now()
         for task in self._sla_tasks.filter(task_status=SLA_PAUSED):
             task.resume(resume_at)
+
+    def create_dynamic_fields(self, dynamic_fields):
+        """
+        dynamic_fields: list:[{
+            "type": "INT",
+            "name": "年龄",
+            "value": 1
+        }]
+        """
+        if not dynamic_fields:
+            return
+
+        fields = []
+        for field in dynamic_fields:
+            ticket_field = copy.deepcopy(field)
+            ticket_field.pop("workflow_id", None)
+            ticket_field.pop("flow_type", None)
+
+            # 填充默认值
+            default = ticket_field.pop("default", "")
+            if default:
+                ticket_field.update(_value=default)
+
+            ticket_field["ticket_id"] = self.id
+
+            ticket_field.pop("api_info", None)
+            ticket_field.pop("project_key", None)
+            ticket_field["workflow_field_id"] = 0
+            fields.append(TicketField(**ticket_field))
+
+        TicketField.objects.bulk_create(fields)
 
 
 class TicketOrganization(Model):

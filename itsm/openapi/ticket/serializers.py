@@ -22,7 +22,6 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
@@ -34,6 +33,7 @@ from itsm.component.constants import (
     LEN_NORMAL,
 )
 from itsm.component.exceptions import ParamError
+from itsm.component.utils.basic import get_pinyin_key
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
 from itsm.ticket.validators import ticket_fields_validate
 
@@ -311,6 +311,19 @@ class TicketCreateSerializer(TicketSerializer):
     """
 
     creator = serializers.CharField(required=True)
+
+
+class DynamicFieldSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=32)
+    type = serializers.ChoiceField(
+        choices=[("STRING", "字符串"), ("INT", "数字")], required=True
+    )
+    value = serializers.CharField(required=True, max_length=32)
+    key = serializers.CharField(required=False, read_only=True)
+
+    def validate(self, attrs):
+        attrs["key"] = get_pinyin_key(attrs["name"])
+        return attrs
 
 
 class TicketNodeOperateSerializer(TicketStateOperateSerializer):
