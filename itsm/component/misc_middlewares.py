@@ -257,6 +257,12 @@ class HttpResponseIndexRedirect(HttpResponseRedirect):
 
 class HttpsMiddleware(MiddlewareMixin):
     def process_request(self, request):
+
+        if settings.RUN_VER == "ieod":
+            # 对于openapi 跳转豁免
+            if request.path.startswith("/openapi/"):
+                return None
+
         # 如果发现不是woa过来的域名
         if (
             settings.WEIXIN_APP_EXTERNAL_HOST

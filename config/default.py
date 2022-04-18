@@ -116,7 +116,7 @@ if USE_IAM:
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
 MIDDLEWARE = (
     # 手动关闭服务中间件，需要到admin里设置key='SERVICE_SWITCH'这条数据的value
-    # "itsm.component.misc_middlewares.HttpsMiddleware",
+    "itsm.component.misc_middlewares.HttpsMiddleware",
     "itsm.component.misc_middlewares.ServiceSwitchCheck",
     # api网关接口豁免
     "itsm.component.misc_middlewares.ApiIgnoreCheck",
