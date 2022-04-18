@@ -139,7 +139,7 @@
     width: 100%;
 }
 .view-item-wrap > .view-item {
-    margin-top: 2px;
+    margin-top: 10px;
     word-break: break-all;
 
 }
