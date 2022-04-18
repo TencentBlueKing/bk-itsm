@@ -37,15 +37,17 @@ WEB_HOOK_URL = "http://in.qyapi.weixin.qq.com/cgi-bin/webhook/send?key={}"
 
 
 class Announcement(Thread):
-    def __init__(self, web_hook_id, content, mentioned_list):
+    def __init__(self, web_hook_id, content, mentioned_list, chat_ids):
         super(Announcement, self).__init__()
         self.web_hook_id = web_hook_id
         self.content = content
         self.mentioned_list = mentioned_list
         self.status_code = 200
         self.result = None
+        self.chat_ids = chat_ids
 
     def run(self):
+
         try:
             logger.info("[ROBOT] call robot begin")
             session = requests.session()
@@ -59,6 +61,8 @@ class Announcement(Thread):
                         "mentioned_list": self.mentioned_list,
                     },
                 }
+                if self.chat_ids is not None:
+                    data["chatid"] = self.chat_ids
                 resp = session.post(
                     url=WEB_HOOK_URL.format(self.web_hook_id),
                     data=json.dumps(data),
