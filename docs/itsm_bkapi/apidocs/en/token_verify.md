@@ -49,6 +49,6 @@ token verification
 
 ### data
 
-| 字段     | 类型     | 描述       |
+| Field     | Type     | Description       |
 | -------------| ------ | -------- |
 | is_passed  | bool | is validate     |
