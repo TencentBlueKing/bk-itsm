@@ -27,8 +27,7 @@
                 <template v-for="(item, index) in firstStateFields">
                     <div v-if="item.showFeild"
                         :key="index"
-                        class="bk-field-line"
-                        :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
+                        class="bk-field-line">
                         <fields-done
                             :item="item"
                             :basic-info-type="basicInfoType"
@@ -44,8 +43,7 @@
             <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
                 <div v-for="(item, index) in tableFields"
                     :key="index"
-                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }"
-                    :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
+                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
                     <!-- 静态展示 -->
                     <template v-if="!item.isEdit">
                         <fields-done
