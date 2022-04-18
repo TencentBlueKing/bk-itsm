@@ -97,7 +97,7 @@
             theme="primary"
             :mask-close="false"
             header-position="left"
-            title="提示"
+            :title="$t(`m.newCommon('提示')`)"
             @confirm="onNoticeConfirm">
             {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ noticeInfo.processed_user }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
         </bk-dialog>
