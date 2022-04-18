@@ -3082,7 +3082,7 @@ class Ticket(Model, BaseTicket):
                 f_processors if state.type == TASK_STATE else last_operator
             )
             defaults.update(
-                processors_type=PERSON,
+                processors_type=status.processors_type,
                 processors=current_processors,
                 distribute_type="PROCESS",
                 action_type="TRANSITION",
