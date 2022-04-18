@@ -37,7 +37,7 @@
                             </ul>
                         </bk-dropdown-menu>
                     </bk-input>
-                    <div v-show="isShowUrlVariable && filterVariableList.length !== 0" class="select-variables">
+                    <div v-show="!isShowUrlVariable && filterVariableList.length !== 0" class="select-variables">
                         <ul>
                             <li v-for="(item, index) in filterVariableList" :key="index" @click="handleSelectContent(item)">{{item.name}}</li>
                         </ul>
@@ -179,6 +179,7 @@
                 },
                 excludeProcessor: [],
                 isShowUrlVariable: false,
+                filterParams: '',
                 stateList: [],
                 urlField: ''
             }
@@ -189,13 +190,21 @@
             },
             filterVariableList () {
                 if (!this.formData.url) return []
-                const list = this.stateList.filter(item => {
-                    return item.name.indexOf(this.formData.url.charAt(this.formData.url.length - 1)) !== -1
-                })
-                if (list.length !== 0) {
-                    this.$refs.urlInput.focus()
+                // if (this.formData.url)
+                const index = this.formData.url.lastIndexOf('\{')
+                if (index !== -1) {
+                    const params = this.formData.url.substring(index + 1, this.formData.url.length)
+                    if (params === '') return []
+                    this.filterParams = params
+                    const list = this.stateList.filter(item => {
+                        return item.name.indexOf(params) !== -1
+                    })
+                    if (list.length !== 0) {
+                        this.$refs.urlInput.focus()
+                    }
+                    return list
                 }
-                return list
+                return []
             }
         },
         mounted () {
@@ -205,10 +214,11 @@
         methods: {
             getWebHookDetail () {
                 if (Object.keys(this.configur.extras).length !== 0) {
-                    const { url, success_exp } = this.configur.extras.webhook_info
+                    const { url, success_exp, method } = this.configur.extras.webhook_info
                     this.formData.name = this.configur.name
                     this.formData.success_exp = success_exp
                     this.formData.url = url
+                    this.curEq = method
 
                     this.processorsInfo.type = this.configur.processors_type
                     this.processorsInfo.value = this.configur.processors
@@ -227,12 +237,15 @@
                 })
             },
             handleSelectContent (item) {
-                console.log(item)
-                this.formData.url = this.formData.url.slice(0, -1) + `{{ ${item.key}}}`
+                this.formData.url = this.formData.url.slice(0, -(this.filterParams.length + 2)) + `{{ ${item.key}}}`
                 this.$refs.urlInput.focus()
             },
             handleUrlChange (value, event) {
-                this.isShowUrlVariable = true
+                if (value.endsWith('{{')) {
+                    this.isShowUrlVariable = true
+                } else {
+                    this.isShowUrlVariable = false
+                }
             },
             selectRequsetOpt (item) {
                 this.curEq = item
