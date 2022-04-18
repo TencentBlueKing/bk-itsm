@@ -38,7 +38,7 @@
             <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
-                    v-if="hasNodeOptAuth || isShowAssgin"
+                    v-if="hasNodeOptAuth || isShowAssgin || currSetpIsIframe"
                     name="currentStep"
                     :label="$t(`m['单据处理']`)">
                     <!-- 当前节点 -->
@@ -165,6 +165,9 @@
                     return 0
                 }
                 return this.currentStepList.length
+            },
+            currSetpIsIframe () {
+                return this.$route.name === 'TicketDetailIframe'
             }
         },
         watch: {
