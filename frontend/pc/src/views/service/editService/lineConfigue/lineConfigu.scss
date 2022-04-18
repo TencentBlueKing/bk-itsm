@@ -17,7 +17,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 540px;
+        width: 560px;
         &.bk-line-small {
             width: 320px;
         }
@@ -31,7 +31,7 @@
         width: 230px;
         position: relative;
         margin-right: 7px;
-        height: 40px;
+        height: 56px;
 
         .bk-line-word {
             position: absolute;
@@ -54,7 +54,7 @@
             height: 10px;
             width: 100%;
             background-color: #F0F1F5;
-            top: 16px;
+            top: 24px;
             left: 0;
             z-index: 1;
 
@@ -70,7 +70,7 @@
 
         .bk-line-squrea {
             position: absolute;
-            top: 17px;
+            top: 25px;
             right: -4px;
             width: 8px;
             height: 8px;

@@ -32,7 +32,7 @@
                 @handleNodeClick="handleNodeClick">
             </second-flow>
             <div v-else>
-                <div class="node-type">{{ nodeType }}
+                <div class="node-type">{{ nodeType }}(#{{ configur.id }})
                     <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
                 </div>
                 <basic-node
