@@ -12,6 +12,18 @@
         <div class="bk-page bk-auto-node-basic">
             <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
             <div class="bk-param">
+                <p class="bk-partition">
+                    <b class="bk-base-label">Url:</b>
+                    <span>{{nodeInfo.url || '--'}}</span>
+                </p>
+                <p class="bk-partition">
+                    <b class="bk-base-label">Method:</b>
+                    <span>{{nodeInfo.url || '--'}}</span>
+                </p>
+                <!-- params -->
+                <p class="bk-partition">
+                    <b class="bk-base-label">Query:</b>
+                </p>
                 <bk-table
                     v-if="true"
                     :data="[]"
@@ -23,6 +35,51 @@
                         </template>
                     </bk-table-column>
                 </bk-table>
+                <!-- body -->
+                <p class="bk-partition">
+                    <b class="bk-base-label">Body:</b>
+                </p>
+                <bk-table
+                    v-if="true"
+                    :data="[]"
+                    :ext-cls="'bk-editor-table'">
+                    <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="key"></bk-table-column>
+                    <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+                        <template slot-scope="props">
+                            <span>{{props.row.value || '--'}}</span>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
+                <textarea v-else class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :placeholder="$t(`m['请输入']`)"></textarea>
+                <!-- settings -->
+            </div>
+        </div>
+        <div class="bk-page bk-auto-node-basic">
+            <p class="bk-header-bold">{{ $t('m.taskTemplate["执行详情"]') }}</p>
+            <div>
+                <p class="bk-partition">
+                    <b class="bk-base-label">{{ $t('m.taskTemplate["执行状态："]') }}</b>
+                    <span
+                        :class="{
+                            'statusShow': true,
+                            'statusSuccess': status === '执行成功',
+                            'statusRunning': status === '执行中',
+                            'statusFailed': status === '执行失败' }">
+                        {{status || '--'}}</span>
+                </p>
+                <p class="bk-partition">
+                    <b class="bk-base-label">{{ $t('m.common["开始时间："]') }}</b>
+                    <span>{{nodeInfo.create_at}}</span>
+                </p>
+                <p class="bk-partition">
+                    <b class="bk-base-label">{{ $t('m.common["结束时间："]') }}</b>
+                    <span>{{ nodeInfo.end_at || $t('m.taskTemplate["尚未结束"]') }}
+                    </span>
+                </p>
+                <div class="bk-partition errorDiv">
+                    <b class="bk-base-label">{{ $t('m.taskTemplate["错误信息："]') }}</b>
+                </div>
+                <!-- <div class="langError">{{nodeInfo.api_info.error_message || '--'}}</div> -->
             </div>
         </div>
     </div>
@@ -39,8 +96,14 @@
                 }
             }
         },
+        data () {
+            return {
+                status: ''
+            }
+        },
         mounted () {
-            if (this.nodeInfo.query_params) {
+            this.status = '执行中'
+            if (this.nodeInfo.webhook_api) {
                 console.log('555')
             }
         }
