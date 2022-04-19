@@ -136,6 +136,17 @@ class WebHookService(ItsmBaseService):
     __need_schedule__ = False
     interval = StaticIntervalGenerator(1)
 
+    def update_info(self, current_node, **kwargs):
+        """
+        更新任务上下文
+        @param current_node: 当前节点状态 Type: object
+        @param devops_result: 节点全局变量 Type: object
+        @param kwargs: 流水线构建参数 Type: dict
+        """
+
+        current_node.contexts.update(**kwargs)
+        current_node.save()
+
     def build_params(self, extras, ticket):
         """
         整体渲染 extras 所有的变量
@@ -150,14 +161,15 @@ class WebHookService(ItsmBaseService):
         return result
 
     def update_variables(self, resp, ticket_id, variables):
-
         resp = {"resp": resp}
         for variable in variables:
+            value = jmespath.search(variable["ref_path"], resp)
             TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).update(
-                value=jmespath.search(variable["ref_path"], resp)
+                value=value
             )  # 这个地方要改
+            variable["value"] = value
         return variables
 
     def do_exit_plugins(
@@ -221,6 +233,8 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
+
+        self.update_info(current_node, build_params=extras)
 
         # 基本信息
         method = extras.get("method", "GET")
@@ -306,8 +320,10 @@ class WebHookService(ItsmBaseService):
                 return False
 
         # 更新全局变量
-        self.update_variables(resp, ticket_id, variables)
+        variable_output = self.update_variables(resp, ticket_id, variables)
         # 设置状态
+        self.update_info(current_node, variables=variable_output)
+
         current_node.set_status(status=FINISHED)
         # 创建任务
         current_node.create_action_log(
