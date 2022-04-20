@@ -22,7 +22,9 @@ class EncodeWebhook(object):
         if not body:
             return b""
         data_type = body["type"]
-        encode_method = getattr(self, "encode_{}_body".format(data_type), None)
+        encode_method = getattr(
+            self, "encode_{}_body".format(data_type.replace("-", "_")), None
+        )
         if encode_method is None:
             return b""
 
@@ -41,7 +43,7 @@ class EncodeWebhook(object):
         return json.dumps(content)
 
     def encode_form_data_body(self, body):
-        params = body.get("params", [])
+        params = body.get("content", [])
         fields = {}
         for item in params:
             template = Template(item["value"])
@@ -54,10 +56,10 @@ class EncodeWebhook(object):
         """
         x-www-form-urlencoded数据格式组装
         """
-        params = body.get("params", [])
+        params = body.get("content", [])
         fields = {}
         for item in params:
             template = Template(item["value"])
-            fields[item["key"]] = template.render(self.variables)
+            fields[item["key"]] = template.render(self.kv)
         data = parse.urlencode(fields)
         return data.encode("utf-8")

@@ -82,7 +82,7 @@ class ParamsBuilder:
             data.update(
                 {
                     "Content-Type": content_type_headers.get(
-                        body.get("content_type"), "text/plain"
+                        body.get("row_type", "json").lower(), "text/plain"
                     )
                 }
             )
@@ -157,18 +157,28 @@ class WebHookService(ItsmBaseService):
 
         result["timeout"] = extras.get("settings", {}).get("timeout", 10)
         result["success_exp"] = extras.get("success_exp", None)
+        result["method"] = extras.get("method", "GET").upper()
 
         return result
 
-    def update_variables(self, resp, ticket_id, variables):
+    def update_variables(self, resp, ticket_id, state_id, variables):
         resp = {"resp": resp}
         for variable in variables:
             value = jmespath.search(variable["ref_path"], resp)
-            TicketGlobalVariable.objects.filter(
+            if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
-            ).update(
-                value=value
-            )  # 这个地方要改
+            ).exists():
+                TicketGlobalVariable.objects.filter(
+                    ticket_id=ticket_id, key=variable["key"]
+                ).update(value=value)
+            else:
+                TicketGlobalVariable.objects.create(
+                    name=variable.get("name", ""),
+                    ticket_id=ticket_id,
+                    key=variable["key"],
+                    value=value,
+                    state_id=state_id,
+                )
             variable["value"] = value
         return variables
 
@@ -320,7 +330,7 @@ class WebHookService(ItsmBaseService):
                 return False
 
         # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, variables)
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
         # 设置状态
         self.update_info(current_node, variables=variable_output)
 
