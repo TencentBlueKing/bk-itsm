@@ -86,7 +86,7 @@ class ParamsBuilder:
                     )
                 }
             )
-        elif body.get("type") == "raw":
+        elif body.get("type") == "form-data":
             data.update({"Content-Type": "multipart/form-data"})
         else:
             data.update({"Content-Type": "application/x-www-form-urlencoded"})
