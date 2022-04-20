@@ -74,6 +74,7 @@
     import ticketLogDetail from './logInfo/ticketLogDetail'
     import { errorHandler } from '@/utils/errorHandler'
     import fieldMix from '@/views/commonMix/field.js'
+    import { mapState } from 'vuex'
 
     export default {
         name: 'LogTab',
@@ -100,14 +101,23 @@
             isShowComment () {
                 return this.ticketInfo.is_over && Number(this.ticketInfo.comment_id) !== -1
             },
+            ...mapState({
+                nodeList: state => state.deployOrder.nodeList
+            }),
             token () {
                 return this.$route.query.token
+            }
+        },
+        watch: {
+            nodeList (val) {
+                if (val.length !== 0) {
+                    this.getCurrentProcess()
+                }
             }
         },
         created () {
             this.getOperationLogList()
             this.getTicktComment()
-            this.getCurrentProcess()
         },
         // 方法集合
         methods: {
@@ -146,37 +156,29 @@
                 })
             },
             getCurrentProcess () {
-                const params = {
-                    id: this.$route.query.id,
-                    token: this.token || undefined
-                }
-                this.$store.dispatch('deployOrder/getNodeList', params).then(res => {
-                    if (res.data.length !== 0 && this.ticketInfo.current_status === 'RUNNING') {
-                        res.data.slice(0, -1).forEach(item => {
-                            const processor = {
-                                action: '',
-                                // content: this.ticketInfo.current_processors || '--',
-                                deal_time: '',
-                                detail_message: '',
-                                form_data: [],
-                                from_state_name: item.name || '',
-                                from_state_type: '',
-                                id: -1,
-                                message: this.$t(`m["正在进行中"]`) + '  ' + item.processors,
-                                operate_at: item.update_at,
-                                operator: item.processors,
-                                processors: '',
-                                processors_type: '',
-                                showMore: false,
-                                tag: `【${item.name}】` + this.$t(`m["正在进行中"]`) + ', ' + this.$t(`m["当前处理人"]`) + item.processors || '--',
-                                ticket: this.ticketInfo.id,
-                                ticket_id: this.ticketInfo.id,
-                                type: 'primary'
-                            }
-                            if (item.status === 'RUNNING') {
-                                this.list.push(processor)
-                            }
-                        })
+                this.nodeList.forEach(item => {
+                    const processor = {
+                        action: '',
+                        // content: this.ticketInfo.current_processors || '--',
+                        deal_time: '',
+                        detail_message: '',
+                        form_data: [],
+                        from_state_name: item.name || '',
+                        from_state_type: '',
+                        id: -1,
+                        message: this.$t(`m["正在进行中"]`) + '  ' + item.processors,
+                        operate_at: item.update_at,
+                        operator: item.processors,
+                        processors: '',
+                        processors_type: '',
+                        showMore: false,
+                        tag: `【${item.name}】` + this.$t(`m["正在进行中"]`) + ', ' + this.$t(`m["当前处理人"]`) + item.processors || '--',
+                        ticket: this.ticketInfo.id,
+                        ticket_id: this.ticketInfo.id,
+                        type: 'primary'
+                    }
+                    if (item.status === 'RUNNING') {
+                        this.list.push(processor)
                     }
                 })
             },

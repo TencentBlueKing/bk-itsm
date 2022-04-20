@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey" :style="{ 'width': fieldType ? '' : '50%' }">
+    <div :class="{ 'bk-fields-done': true, 'bk-fields-log': origin === 'log' }" :key="routerKey">
         <!-- table -->
         <div v-if="item.type === 'TABLE'" class="bk-fields-done-item" style="width: 100%; max-width: 100%;">
             <span class="bk-li-left" :title="item.name">{{item.name}}</span>
@@ -107,9 +107,10 @@
             </span>
         </div>
         <!-- 自定义表单 -->
-        <div v-else-if="item.type === 'CUSTOM-FORM'" style="display: flex">
+        <div v-else-if="item.type === 'CUSTOM-FORM'" class="bk-fields-done-item">
             <span v-if="isShowName" class="bk-li-left" style="float: initial;" :title="item.name">{{item.name}}</span>
             <render-view
+                style="width: calc(100% - 140px)"
                 :form-data="customForm.formData"
                 :context="customForm.context">
             </render-view>
@@ -300,9 +301,6 @@
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
     .bk-fields-done {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
         width: 100%;
         color: #737987;
 
