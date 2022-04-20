@@ -1355,6 +1355,9 @@ export const m = {
         '选取公共字段': 'Select the public fields '
     },
     'treeinfo': {
+        '请求超时': 'Request timed out',
+        '返回变量': 'return variable',
+        '路径': 'path',
         '自动处理': 'Auto-processing',
         '提前结束条件': 'Early termination condition',
         '顺序会签': 'Sequential sign',
@@ -2488,5 +2491,6 @@ export const m = {
     '主体': 'Body',
     '字段名': 'field name',
     '值': 'value',
-    '描述': 'describe'
+    '描述': 'describe',
+    '必需以http://或https://开头': 'Must start with http:// or https://'
 }

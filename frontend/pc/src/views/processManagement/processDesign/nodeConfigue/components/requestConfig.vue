@@ -51,9 +51,9 @@
                 <div style="display: flex; align-items: center; margin-bottom: 8px">
                     <bk-radio-group v-model="config.bodyRadio">
                         <bk-radio :value="'none'">{{ $t(`m['默认']`) }}</bk-radio>
-                        <bk-radio :value="'form-data'">form-data</bk-radio>
-                        <bk-radio :value="'x-www-form-urlencoded'">x-www-form-urlencoded</bk-radio>
-                        <bk-radio :value="'raw'">raw</bk-radio>
+                        <bk-radio :value="'form-data'" :disabled="radioDisabled">form-data</bk-radio>
+                        <bk-radio :value="'x-www-form-urlencoded'" :disabled="radioDisabled">x-www-form-urlencoded</bk-radio>
+                        <bk-radio :value="'raw'" :disabled="radioDisabled">raw</bk-radio>
                     </bk-radio-group>
                     <bk-select
                         v-if="config.bodyRadio === 'raw'"
@@ -118,7 +118,6 @@
         data () {
             return {
                 acticeTab: 'queryParams',
-                
                 panels: [
                     { key: 'queryParams', label: this.$t(`m['参数']`), count: 0 },
                     { key: 'auth', label: this.$t(`m['认证']`), count: 0 },
@@ -183,6 +182,16 @@
             count () {
                 const queryParams = this.config.queryParams.filter(item => item.select).length
                 return { queryParams }
+            },
+            radioDisabled () {
+                return this.type === 'GET'
+            }
+        },
+        watch: {
+            type (val) {
+                if (val === 'GET') {
+                    this.config.bodyRadio = 'none'
+                }
             }
         },
         mounted () {
@@ -192,10 +201,10 @@
 
                 this.config.bodyRadio = this.configur.extras.webhook_info.body.type || 'none'
                 if (this.configur.extras.webhook_info.body.type === 'form-data' || this.configur.extras.webhook_info.body.type === 'x-www-form-urlencoded') {
-                    this.config.body = [...this.configur.extras.webhook_info.body.value, ...this.config.body]
+                    this.config.body = [...this.configur.extras.webhook_info.body.content, ...this.config.body]
                 } else if (this.configur.extras.webhook_info.body.type === 'raw') {
                     this.config.rawType = this.configur.extras.webhook_info.body.row_type
-                    this.config.bodyValue = this.configur.extras.webhook_info.body.value
+                    this.config.bodyValue = this.configur.extras.webhook_info.body.content
                 }
             }
         },

@@ -14,7 +14,7 @@
             <div class="bk-param">
                 <p class="bk-partition">
                     <b class="bk-base-label">Url:</b>
-                    <span>{{nodeInfo.url || '--'}}</span>
+                    <span>{{nodeInfo.api_info.webhook_info.url || '--'}}</span>
                 </p>
                 <p class="bk-partition">
                     <b class="bk-base-label">Method:</b>
@@ -23,10 +23,11 @@
                 <!-- params -->
                 <p class="bk-partition">
                     <b class="bk-base-label">Query:</b>
+                    <span v-if="queryList.length === 0">--</span>
                 </p>
                 <bk-table
-                    v-if="true"
-                    :data="[]"
+                    v-if="queryList.length !== 0"
+                    :data="queryList"
                     :ext-cls="'bk-editor-table'">
                     <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="key"></bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
@@ -38,10 +39,11 @@
                 <!-- body -->
                 <p class="bk-partition">
                     <b class="bk-base-label">Body:</b>
+                    <span>{{ bodyParams.raw || '--' }}</span>
                 </p>
                 <bk-table
-                    v-if="true"
-                    :data="[]"
+                    v-if="bodyParams.form.length !== 0"
+                    :data="bodyParams.form"
                     :ext-cls="'bk-editor-table'">
                     <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="key"></bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
@@ -50,8 +52,30 @@
                         </template>
                     </bk-table-column>
                 </bk-table>
-                <textarea v-else class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :placeholder="$t(`m['请输入']`)"></textarea>
                 <!-- settings -->
+                <p class="bk-partition">
+                    <b class="bk-base-label">Settings:</b>
+                </p>
+                <p class="bk-partition">
+                    <b class="bk-base-label">{{$t(`m.treeinfo['请求超时']`)}}:</b>
+                    <span>{{nodeInfo.api_info.webhook_info.timeout || '--'}}</span>
+                </p>
+                <p class="bk-partition">
+                    <b class="bk-base-label">{{$t(`m.treeinfo['返回变量']`)}}:</b>
+                    <span v-if="variableList.length === 0">--</span>
+                </p>
+                <bk-table
+                    v-if="variableList.length !== 0"
+                    :data="variableList"
+                    :ext-cls="'bk-editor-table'">
+                    <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="key"></bk-table-column>
+                    <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+                        <template slot-scope="props">
+                            <span>{{props.row.value || '--'}}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.treeinfo['路径']`)" prop="key"></bk-table-column>
+                </bk-table>
             </div>
         </div>
         <div class="bk-page bk-auto-node-basic">
@@ -62,9 +86,9 @@
                     <span
                         :class="{
                             'statusShow': true,
-                            'statusSuccess': status === '执行成功',
-                            'statusRunning': status === '执行中',
-                            'statusFailed': status === '执行失败' }">
+                            'statusSuccess': status === 'FINISHED',
+                            'statusRunning': status === 'RUNNING',
+                            'statusFailed': status === 'FAILED' }">
                         {{status || '--'}}</span>
                 </p>
                 <p class="bk-partition">
@@ -98,14 +122,48 @@
         },
         data () {
             return {
-                status: ''
+                status: '',
+                isFormData: false
+            }
+        },
+        computed: {
+            queryList () {
+                if ('query_params' in this.nodeInfo.api_info.webhook_info) {
+                    const list = this.nodeInfo.api_info.webhook_info.query_params
+                    const result = []
+                    for (const key in list) {
+                        result.push({
+                            key,
+                            value: list[key]
+                        })
+                    }
+                    return result
+                }
+                return []
+            },
+            bodyParams () {
+                const params = {
+                    raw: '',
+                    form: []
+                }
+                if ('body' in this.nodeInfo.api_info.webhook_info) {
+                    const { body } = this.nodeInfo.api_info.webhook_info
+                    if (typeof body === 'string') {
+                        params.raw = body
+                    }
+                }
+                return { ...params }
+            },
+            variableList () {
+                if ('variables' in this.nodeInfo.api_info.webhook_info) {
+                    const { outputs } = this.nodeInfo.api_info.webhook_info.variables
+                    return outputs || []
+                }
+                return []
             }
         },
         mounted () {
-            this.status = '执行中'
-            if (this.nodeInfo.webhook_api) {
-                console.log('555')
-            }
+            this.status = this.nodeInfo.status
         }
     }
 </script>

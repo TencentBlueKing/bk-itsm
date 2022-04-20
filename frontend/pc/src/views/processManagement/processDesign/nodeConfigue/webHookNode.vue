@@ -146,19 +146,19 @@
                     name: [
                         {
                             required: true,
-                            message: '必填项',
+                            message: this.$t(`m['必填项']`),
                             trigger: 'blur'
                         }
                     ],
                     url: [
                         {
                             required: true,
-                            message: '必填项',
+                            message: this.$t(`m['必填项']`),
                             trigger: 'blur'
                         },
                         {
                             regex: /(http|https):\/\/\S*/,
-                            message: '必需以http://或https://开头',
+                            message: this.$t(`m['必需以http://或https://开头']`),
                             trigger: 'blur'
                         }
                     ]
@@ -269,9 +269,9 @@
             submit () {
                 Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(_ => {
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
-                    const { queryParams, auth, headers, body, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
+                    const { queryParams, body, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
                     // params_query
-                    console.log(auth, headers, settings)
+                    // console.log(auth, headers, settings)
                     const query_params = queryParams.filter(item => item.select)
                     const outputs = this.returnReslut.filter(item => item.name !== '')
                     outputs.forEach(item => {
@@ -283,15 +283,14 @@
                     const body_params = {
                         type: bodyRadio !== 'none' ? bodyRadio : '',
                         row_type: '',
-                        value: ''
+                        content: ''
                     }
                     if (bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded') {
-                        console.log('body')
-                        body_params.value = body.filter(item => item.select)
+                        body_params.content = body.filter(item => item.select)
                     }
                     if (bodyRadio === 'raw') {
                         body_params.row_type = rawType
-                        body_params.value = bodyValue
+                        body_params.content = bodyValue
                     }
                     // settings
                     const settings_parmas = {
