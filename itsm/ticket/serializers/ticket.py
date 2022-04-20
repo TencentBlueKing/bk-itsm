@@ -270,7 +270,7 @@ class StatusSerializer(serializers.ModelSerializer):
             }
             data["api_info"] = remote_info
         elif inst.state["type"] == WEBHOOK_STATE:
-            data["api_info"] = (data["contexts"].get("build_params", {}),)
+            data["api_info"] = data["contexts"].get("build_params", {})
         elif inst.state["type"] in [SIGN_STATE, APPROVAL_STATE]:
             # Get sign task progress
             sign_tasks = SignTask.objects.filter(status_id=inst.id)
