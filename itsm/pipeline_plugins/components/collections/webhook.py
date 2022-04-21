@@ -232,6 +232,7 @@ class WebHookService(ItsmBaseService):
         error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
         try:
             extras = self.build_params(webhook_info, ticket)
+            self.update_info(current_node, build_params=extras)
         except Exception as e:
             err_message = "Webhook节点解析失败, error={}".format(e)
             self.do_exit_plugins(
@@ -243,8 +244,6 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
-
-        self.update_info(current_node, build_params=extras)
 
         # 基本信息
         method = extras.get("method", "GET")
@@ -276,10 +275,21 @@ class WebHookService(ItsmBaseService):
             )
             logger.exception("[webhook]节点请求失败，失败原因 error = {}".format(e))
             return False
-
-        # 返回code 非 200
-        if response.status_code not in [200, 201]:
-            err_message = "返回状态码非200"
+        try:
+            # 返回code 非 200
+            if response.status_code not in [200, 201]:
+                err_message = "返回状态码非200"
+                self.do_exit_plugins(
+                    ticket,
+                    state_id,
+                    current_node,
+                    err_message,
+                    error_message_template,
+                    processors,
+                )
+                return False
+        except Exception as e:
+            err_message = "状态码解析失败， error={}".format(e)
             self.do_exit_plugins(
                 ticket,
                 state_id,
