@@ -99,19 +99,29 @@ class ParamsBuilder:
         return encode_webhook.encode_body(body=body)
 
     def result(self):
-        return {
+
+        data = {
             "url": self.build_url(),
-            "body": self.build_body(),
+            "method": self.extras.get("method", "GET").upper(),
+            "body": {
+                "type": self.extras.get("body")["type"],
+                "row_type": self.extras.get("body")["row_type"],
+                "content": self.build_body(),
+            },
             "headers": self.build_headers(),
             "query_params": self.build_query_params(),
+            "settings": self.extras.get("settings", {}),
+            "success_exp": self.extras.get("success_exp", None),
+            "auth": self.extras["auth"],
         }
+        return data
 
 
 class WebHookService(ItsmBaseService):
     """
     {
             "method": "method",
-            "url": {"key":"", value:""},
+            "url": "",
             "query_params": [{key:"", value:""}],
             "auth": "",
             "headers": {},
@@ -154,10 +164,6 @@ class WebHookService(ItsmBaseService):
         variables = ticket.get_output_fields(return_format="dict", need_display=True)
 
         result = ParamsBuilder(extras=extras, variables=variables).result()
-
-        result["timeout"] = extras.get("settings", {}).get("timeout", 10)
-        result["success_exp"] = extras.get("success_exp", None)
-        result["method"] = extras.get("method", "GET").upper()
 
         return result
 
@@ -225,11 +231,29 @@ class WebHookService(ItsmBaseService):
 
         state = ticket.flow.get_state(state_id)
         variables = state["variables"].get("outputs", [])
-        webhook_info = state["extras"].get("webhook_info")
+        error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
+
         processors = ticket.current_processors[1:-1]
         current_node = ticket.node_status.get(state_id=state_id)
 
-        error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
+        try:
+            webhook_info = (
+                current_node.query_params
+                if current_node.query_params
+                else state["extras"].get("webhook_info")
+            )
+        except Exception as e:
+            err_message = "webhook info节点解析失败, error={}".format(e)
+            self.do_exit_plugins(
+                ticket,
+                state_id,
+                current_node,
+                err_message,
+                error_message_template,
+                processors,
+            )
+            return False
+
         try:
             extras = self.build_params(webhook_info, ticket)
             self.update_info(current_node, build_params=extras)
@@ -250,9 +274,10 @@ class WebHookService(ItsmBaseService):
         url = extras.get("url")
         query_params = extras.get("query_params")
         headers = extras.get("headers")
-        body = extras.get("body", {})
-        timeout = extras.get("timeout", 10)
+        body = extras.get("body", {})["content"]
+        timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
+        auth = EncodeWebhook.encode_authorization(extras.get("auth"))
 
         try:
             response = requests.request(
@@ -261,7 +286,8 @@ class WebHookService(ItsmBaseService):
                 data=body,
                 params=query_params,
                 headers=headers,
-                timeout=timeout,
+                timeout=int(timeout),
+                auth=auth,
                 verify=False,
             )
         except Exception as e:
