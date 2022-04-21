@@ -117,7 +117,7 @@
             width="800"
             :value="isCreateService"
             :mask-close="false"
-            :title="'创建服务'"
+            :title="$t(`m['创建服务']`)"
             :auto-close="false"
             @confirm="onBasicFormSubmit"
             @cancel="onBasicFormCancel">

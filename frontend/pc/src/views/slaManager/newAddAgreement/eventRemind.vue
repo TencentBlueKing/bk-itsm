@@ -244,7 +244,7 @@
                 receiversRules: {
                     receivers: [
                         {
-                            message: '字段必填',
+                            message: this.$t('m.slaContent["字段必填"]'),
                             required: true,
                             type: 'string',
                             trigger: 'blur',
@@ -257,7 +257,7 @@
                 notifyTypeRules: {
                     email_notify: [
                         {
-                            message: '字段必填',
+                            message: this.$t('m.slaContent["字段必填"]'),
                             required: true,
                             type: 'string',
                             trigger: 'blur',
@@ -268,7 +268,7 @@
                     ],
                     weixin_notify: [
                         {
-                            message: '字段必填',
+                            message: this.$t('m.slaContent["字段必填"]'),
                             required: true,
                             type: 'string',
                             trigger: 'blur',
