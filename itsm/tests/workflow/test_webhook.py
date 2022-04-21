@@ -76,17 +76,15 @@ class PipelineTest(TestCase):
     @mock.patch("itsm.pipeline_plugins.components.collections.webhook.requests.request")
     def test_excute(self, request, do_before_enter_state, build_params):
         extras = {
-            "webhook_info": {
-                "method": "GET",
-                "url": "http://127.0.0.1/",
-                "query_params": [
-                    {"key": "bk_app_code", "value": "itsm"},
-                ],
-                "headers": [],
-                "body": {"type": "form_data", "params": []},
-                "settings": {"timeout": 10},
-                "success_exp": "",
-            }
+            "method": "GET",
+            "url": "http://127.0.0.1/",
+            "query_params": [
+                {"key": "bk_app_code", "value": "itsm"},
+            ],
+            "headers": [],
+            "body": {"type": "form_data", "params": [], "row_type": "", "content": ""},
+            "settings": {"timeout": 10},
+            "success_exp": "",
         }
 
         build_params.return_value = extras
@@ -120,7 +118,7 @@ class PipelineTest(TestCase):
                 {"key": "bk_username", "value": "admin"},
             ],
             "headers": [],
-            "body": {"type": "form_data", "params": []},
+            "body": {"type": "form_data", "params": [], "row_type": "", "content": ""},
             "settings": {"timeout": 10},
             "success_exp": "",
         }
