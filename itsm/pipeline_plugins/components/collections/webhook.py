@@ -112,7 +112,7 @@ class ParamsBuilder:
             "query_params": self.build_query_params(),
             "settings": self.extras.get("settings", {}),
             "success_exp": self.extras.get("success_exp", None),
-            "auth": self.extras["auth"],
+            "auth": self.extras.get("auth", {}),
         }
         return data
 
@@ -277,7 +277,7 @@ class WebHookService(ItsmBaseService):
         body = extras.get("body", {})["content"]
         timeout = extras.get("settings", {}).get("timeout", 10)
         success_exp = extras.get("success_exp")
-        auth = EncodeWebhook.encode_authorization(extras.get("auth"))
+        auth = EncodeWebhook.encode_authorization(extras.get("auth", {}))
 
         try:
             response = requests.request(
