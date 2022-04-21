@@ -82,7 +82,7 @@ class ParamsBuilder:
             data.update(
                 {
                     "Content-Type": content_type_headers.get(
-                        body.get("content_type"), "text/plain"
+                        body.get("row_type", "json").lower(), "text/plain"
                     )
                 }
             )
@@ -157,18 +157,28 @@ class WebHookService(ItsmBaseService):
 
         result["timeout"] = extras.get("settings", {}).get("timeout", 10)
         result["success_exp"] = extras.get("success_exp", None)
+        result["method"] = extras.get("method", "GET").upper()
 
         return result
 
-    def update_variables(self, resp, ticket_id, variables):
+    def update_variables(self, resp, ticket_id, state_id, variables):
         resp = {"resp": resp}
         for variable in variables:
             value = jmespath.search(variable["ref_path"], resp)
-            TicketGlobalVariable.objects.filter(
+            if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
-            ).update(
-                value=value
-            )  # 这个地方要改
+            ).exists():
+                TicketGlobalVariable.objects.filter(
+                    ticket_id=ticket_id, key=variable["key"]
+                ).update(value=value)
+            else:
+                TicketGlobalVariable.objects.create(
+                    name=variable.get("name", ""),
+                    ticket_id=ticket_id,
+                    key=variable["key"],
+                    value=value,
+                    state_id=state_id,
+                )
             variable["value"] = value
         return variables
 
@@ -222,6 +232,7 @@ class WebHookService(ItsmBaseService):
         error_message_template = "WebHook任务【{name}】执行失败，失败信息 {detail_message}"
         try:
             extras = self.build_params(webhook_info, ticket)
+            self.update_info(current_node, build_params=extras)
         except Exception as e:
             err_message = "Webhook节点解析失败, error={}".format(e)
             self.do_exit_plugins(
@@ -233,8 +244,6 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
-
-        self.update_info(current_node, build_params=extras)
 
         # 基本信息
         method = extras.get("method", "GET")
@@ -266,10 +275,21 @@ class WebHookService(ItsmBaseService):
             )
             logger.exception("[webhook]节点请求失败，失败原因 error = {}".format(e))
             return False
-
-        # 返回code 非 200
-        if response.status_code not in [200, 201]:
-            err_message = "返回状态码非200"
+        try:
+            # 返回code 非 200
+            if response.status_code not in [200, 201]:
+                err_message = "返回状态码非200"
+                self.do_exit_plugins(
+                    ticket,
+                    state_id,
+                    current_node,
+                    err_message,
+                    error_message_template,
+                    processors,
+                )
+                return False
+        except Exception as e:
+            err_message = "状态码解析失败， error={}".format(e)
             self.do_exit_plugins(
                 ticket,
                 state_id,
@@ -320,7 +340,7 @@ class WebHookService(ItsmBaseService):
                 return False
 
         # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, variables)
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
         # 设置状态
         self.update_info(current_node, variables=variable_output)
 
