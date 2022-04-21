@@ -1801,6 +1801,14 @@ export const m = {
     },
     // SLA content
     'slaContent': {
+        '对特殊单据，如预警单和超时单设置颜色高亮提醒。': 'Set color highlight reminders for special documents, such as early warning and overtime.',
+        '预警单据背景颜色': 'Warning document background color',
+        '超时单据背景颜色': 'Timeout document background color',
+        '跳转新建': 'click to add',
+        '从进入开始节点，到完成响应操作的时间。': 'The time from entering the start node to completing the response operation.',
+        '从进入开始节点，到离开结束节点的时间。': 'The time from entering the start node to leaving the end node.',
+        '请选择通知事件': 'Please select a notification event',
+        '字段必填': 'Field required',
         '约定响应时长': 'Agreed response time',
         '约定处理时长': 'Agreed processing time',
         '单次提醒': 'one-time reminder',

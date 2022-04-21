@@ -554,7 +554,6 @@
                 return this.$store.dispatch('getCustom').then(res => {
                     if (res.result) {
                         this.serviceList = res.data
-                        console.log(res.data)
                         this.serviceList.forEach(item => {
                             item.label = item.name
                             this.$set(this.counts, item.key, 0)
