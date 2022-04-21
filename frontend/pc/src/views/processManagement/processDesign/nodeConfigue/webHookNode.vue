@@ -7,10 +7,11 @@
                 :model="formData"
                 :rules="rules"
                 form-type="vertical">
-                <bk-form-item :label="$t(`m['节点名称']`)" :ext-cls="'bk-form-width bk-form-display'" property="name" error-display-type="normal" required>
+                <bk-form-item v-if="isStatus" :label="$t(`m['节点名称']`)" :ext-cls="'bk-form-width bk-form-display'" property="name" error-display-type="normal" required>
                     <bk-input v-model="formData.name"></bk-input>
                 </bk-form-item>
                 <bk-form-item
+                    v-if="isStatus"
                     data-test-id="devops-component-processor"
                     :label="$t(`m.treeinfo['处理人：']`)"
                     :required="true">
@@ -74,6 +75,7 @@
                 </bk-form-item>
             </bk-form>
             <common-trigger-list
+                v-if="isStatus"
                 ref="commonTriggerList"
                 :origin="'state'"
                 :node-type="configur.type"
@@ -82,7 +84,7 @@
                 :table="flowInfo.table">
             </common-trigger-list>
 
-            <div class="mt20" style="font-size: 0">
+            <div v-if="isStatus" class="mt20" style="font-size: 0">
                 <bk-button :theme="'primary'"
                     data-test-id="devops-button-submit"
                     :title="$t(`m.treeinfo['确定']`)"
@@ -128,6 +130,12 @@
                 type: Object,
                 default () {
                     return {}
+                }
+            },
+            isStatus: {
+                type: Boolean,
+                default () {
+                    return true
                 }
             }
         },

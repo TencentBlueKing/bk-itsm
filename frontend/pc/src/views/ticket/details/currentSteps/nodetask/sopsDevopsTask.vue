@@ -42,6 +42,9 @@
             v-if="nodeInfo.type === 'TASK-DEVOPS'"
             :stages="pipelineStages">
         </devops-preview>
+        <div v-if="nodeInfo.type === 'WEBHOOK'">
+            <web-hook :configur="nodeInfo" :is-status="false"></web-hook>
+        </div>
         <div class="submit-btn">
             <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
             <bk-button :theme="'primary'" @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
@@ -52,12 +55,14 @@
 
 <script>
     import DevopsPreview from '@/components/task/DevopsPreview.vue'
+    import webHook from '../../../../processManagement/processDesign/nodeConfigue/webHookNode.vue'
     import sopsGetParam from '../../../../processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue'
     export default {
         name: 'sopsTask',
         components: {
             sopsGetParam,
-            DevopsPreview
+            DevopsPreview,
+            webHook
         },
         props: {
             ticketInfo: Object,
@@ -219,5 +224,11 @@
     }
     .submit-btn {
         margin-top: 60px;
+    }
+    .bk-basic-node {
+        padding: 0;
+        .common-section-card-block {
+            display: inline-block;
+        }
     }
 </style>

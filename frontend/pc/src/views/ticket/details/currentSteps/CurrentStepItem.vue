@@ -119,7 +119,7 @@
                             @updateCurrentStep="successFn">
                         </node-task-list>
                         <sops-and-devops-task
-                            v-if="nodeInfo.status === 'FAILED' && (nodeInfo.type === 'TASK-SOPS' || nodeInfo.type === 'TASK-DEVOPS')"
+                            v-if="nodeInfo.status === 'FAILED' && (nodeInfo.type === 'TASK-SOPS' || nodeInfo.type === 'TASK-DEVOPS' || nodeInfo.type === 'WEBHOOK')"
                             :constants="constants"
                             :hooked-var-list="hookedVarList"
                             :node-info="nodeInfo"
