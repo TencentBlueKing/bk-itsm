@@ -3,8 +3,18 @@ import json
 from urllib import parse
 
 from jinja2 import Template
-from requests.auth import HTTPBasicAuth
 from requests_toolbelt import MultipartEncoder
+from requests.auth import HTTPBasicAuth, AuthBase
+
+
+class HTTPBearerToken(AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, r):
+        authstr = "Bearer " + self.token
+        r.headers["Authorization"] = authstr
+        return r
 
 
 class EncodeWebhook(object):
@@ -17,6 +27,8 @@ class EncodeWebhook(object):
         auth_config = authorize.get("auth_config")
         if auth_type == "basic_auth":
             return HTTPBasicAuth(auth_config["username"], auth_config["password"])
+        if auth_type == "bearer_token":
+            return HTTPBearerToken(auth_config["token"])
 
     def encode_body(self, body):
         if not body:
