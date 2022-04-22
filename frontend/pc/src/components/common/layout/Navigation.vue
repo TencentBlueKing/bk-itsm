@@ -273,7 +273,7 @@
             }
         },
         watch: {
-            '$route.fullPath' (val) {
+            '$route.fullPath' () {
                 this.setActive()
             },
             '$store.state.project.id' (val) {

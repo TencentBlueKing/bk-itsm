@@ -225,9 +225,7 @@
                     this.$refs.webhook.validate().then(res => {
                         const method = this.$refs.webhook.curEq
                         const { success_exp, url } = this.$refs.webhook.formData
-                        console.log(this.$refs.webhook.$refs.requestConfig.config)
                         const { queryParams, body, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.webhook.$refs.requestConfig.config
-                        // const { authRadio, auth_config} = this.$refs.webhook.$refs.requestConfig.config
                         const query_params = queryParams.filter(item => item.select)
                         // const outputs = this.returnReslut.filter(item => item.name !== '')
                         // outputs.forEach(item => {
