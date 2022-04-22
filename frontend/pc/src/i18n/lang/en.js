@@ -2492,5 +2492,7 @@ export const m = {
     '字段名': 'field name',
     '值': 'value',
     '描述': 'describe',
-    '必需以http://或https://开头': 'Must start with http:// or https://'
+    '必需以http://或https://开头': 'Must start with http:// or https://',
+    '请输入': 'Please enter'
+
 }

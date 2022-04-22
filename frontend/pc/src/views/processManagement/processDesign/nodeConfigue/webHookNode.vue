@@ -25,7 +25,7 @@
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="'URL'" :ext-cls="'bk-form-display'" required property="url" error-display-type="normal">
-                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" @change="handleUrlChange">
+                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" :disabled="disable" @change="handleUrlChange">
                         <bk-dropdown-menu class="group-text" @show="isDropdownShow = true" @hide="isDropdownShow = false" ref="dropdown" slot="prepend" :font-size="'medium'">
                             <bk-button type="primary" slot="dropdown-trigger">
                                 <template v-for="(item, index) in requestOptions">
@@ -46,27 +46,27 @@
                 </bk-form-item>
                 <bk-form-item :ext-cls="'bk-form-display'">
                     <div class="requset-config">
-                        <request-config ref="requestConfig" :type="curEq" :configur="configur"></request-config>
+                        <request-config ref="requestConfig" :type="curEq" :configur="configur" :is-status="isStatus" :disable="disable"></request-config>
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m['成功条件']`)" :ext-cls="'bk-form-display'">
-                    <bk-input v-model="formData.success_exp"></bk-input>
+                    <bk-input v-model="formData.success_exp" :disabled="disable"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m['返回变量']`)" :ext-cls="'bk-form-display'">
                     <bk-table :data="returnReslut"
                         :size="'small'">
                         <bk-table-column :label="$t(`m['变量名称']`)">
                             <template slot-scope="props">
-                                <bk-input :behavior="'simplicity'" v-model="props.row.name"></bk-input>
+                                <bk-input :behavior="'simplicity'" v-model="props.row.name" :disabled="disable"></bk-input>
                             </template>
                         </bk-table-column>
                         <bk-table-column :label="$t(`m['来源']`)">
                             <template slot-scope="props">
-                                <bk-input :behavior="'simplicity'" v-model="props.row.ref_path"></bk-input>
+                                <bk-input :behavior="'simplicity'" v-model="props.row.ref_path" :disabled="disable"></bk-input>
                             </template>
                         </bk-table-column>
                         <bk-table-column :label="$t(`m['操作']`)" width="100">
-                            <template slot-scope="props">
+                            <template slot-scope="props" v-if="!disable">
                                 <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
                                 <i class="bk-itsm-icon icon-flow-other-reduc result-icon" :class="{ 'no-delete': retrunResultIsEmtry }" @click="deleteReturnReslut(props.row)"></i>
                             </template>
@@ -137,7 +137,14 @@
                 default () {
                     return true
                 }
+            },
+            disable: {
+                type: Boolean,
+                default () {
+                    return false
+                }
             }
+            
         },
         data () {
             return {
@@ -221,20 +228,29 @@
         },
         methods: {
             getWebHookDetail () {
-                if (Object.keys(this.configur.extras).length !== 0) {
-                    const { url, success_exp, method } = this.configur.extras.webhook_info
+                if (this.isStatus) {
+                    if (Object.keys(this.configur.extras).length !== 0) {
+                        const { url, success_exp, method } = this.configur.extras.webhook_info
+                        this.formData.name = this.configur.name
+                        this.formData.success_exp = success_exp
+                        this.formData.url = url
+                        this.curEq = method
+    
+                        this.processorsInfo.type = this.configur.processors_type
+                        this.processorsInfo.value = this.configur.processors
+    
+                        this.returnReslut = this.configur.variables.outputs.length !== 0 ? this.configur.variables.outputs : [{ name: '', ref_path: '' }]
+                    }
+                } else {
+                    const { url, success_exp, method } = this.configur.api_info.webhook_info
                     this.formData.name = this.configur.name
                     this.formData.success_exp = success_exp
                     this.formData.url = url
                     this.curEq = method
-
-                    this.processorsInfo.type = this.configur.processors_type
-                    this.processorsInfo.value = this.configur.processors
-
-                    this.returnReslut = this.configur.variables.outputs.length !== 0 ? this.configur.variables.outputs : [{ name: '', ref_path: '' }]
                 }
             },
             getRelatedFields () {
+                if (!this.isStatus) return
                 const params = {
                     workflow: this.flowInfo.id,
                     state: this.configur.id,
@@ -267,6 +283,9 @@
                     source: ''
                 })
             },
+            validate () {
+                return this.$refs.webForm.validate()
+            },
             deleteReturnReslut (row) {
                 if (this.retrunResultIsEmtry) return
                 const index = this.returnReslut.indexOf(row)
@@ -277,7 +296,7 @@
             submit () {
                 Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(_ => {
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
-                    const { queryParams, body, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
+                    const { queryParams, body, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
                     // params_query
                     // console.log(auth, headers, settings)
                     const query_params = queryParams.filter(item => item.select)
@@ -286,7 +305,18 @@
                         item.source = 'global'
                         item.type = 'string'
                     })
-
+                    // auth
+                    const auth_params = {
+                        auth_type: authRadio !== 'None' ? authRadio : '',
+                        auth_config: {}
+                    }
+                    const { username, password, Token } = auth_config
+                    if (authRadio === 'basic_auth') {
+                        auth_params.auth_config.username = username
+                        auth_params.auth_config.password = password
+                    } else if (authRadio === 'bearer_token') {
+                        auth_params.auth_config.token = Token
+                    }
                     // body
                     const body_params = {
                         type: bodyRadio !== 'none' ? bodyRadio : '',
@@ -302,7 +332,7 @@
                     }
                     // settings
                     const settings_parmas = {
-                        timeout: settings.timeout
+                        timeout: Number(settings.timeout)
                     }
                     const params = {
                         name: this.formData.name,
@@ -315,7 +345,7 @@
                                 method: this.curEq,
                                 url: this.formData.url,
                                 query_params,
-                                auth: '',
+                                auth: auth_params,
                                 headers: [],
                                 body: body_params,
                                 settings: settings_parmas,

@@ -43,7 +43,12 @@
             :stages="pipelineStages">
         </devops-preview>
         <div v-if="nodeInfo.type === 'WEBHOOK'">
-            <web-hook :configur="nodeInfo" :is-status="false"></web-hook>
+            <web-hook
+                ref="webhook"
+                :configur="nodeInfo"
+                :disable="disable"
+                :is-status="false">
+            </web-hook>
         </div>
         <div class="submit-btn">
             <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
@@ -96,6 +101,7 @@
                 isHook: false,
                 isEdit: false,
                 stateList: [],
+                disable: true,
                 pipelineFormList: [],
                 pipelineData: {} // 流水线参数
             }
@@ -126,6 +132,8 @@
             },
             reSetSopTask () {
                 this.changeBtn = !this.changeBtn
+                // console.log(this.changeBtn)
+                this.disable = !this.changeBtn
                 this.isHook = this.changeBtn
                 this.isEdit = !this.isEdit
                 if (this.$refs.sopsGetParam) {
@@ -192,7 +200,7 @@
                         template_source
                     }
                     this.retry(params)
-                } else {
+                } else if (this.nodeInfo.type === 'TASK-DEVOPS') {
                     this.$refs.devopsVariable.validate().then(res => {
                         const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
                             return {
@@ -208,6 +216,61 @@
                             project_id,
                             pipeline_id,
                             constants
+                        }
+                        this.retry(params)
+                    })
+                } else {
+                    console.log(this.$refs.webhook)
+                    // console.log(this.$refs.webhook.validates())
+                    this.$refs.webhook.validate().then(res => {
+                        const method = this.$refs.webhook.curEq
+                        const { success_exp, url } = this.$refs.webhook.formData
+                        console.log(this.$refs.webhook.$refs.requestConfig.config)
+                        const { queryParams, body, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.webhook.$refs.requestConfig.config
+                        // const { authRadio, auth_config} = this.$refs.webhook.$refs.requestConfig.config
+                        const query_params = queryParams.filter(item => item.select)
+                        // const outputs = this.returnReslut.filter(item => item.name !== '')
+                        // outputs.forEach(item => {
+                        //     item.source = 'global'
+                        //     item.type = 'string'
+                        // })
+                        // auth
+                        const auth_params = {
+                            auth_type: authRadio !== 'None' ? authRadio : '',
+                            auth_config: {}
+                        }
+                        const { username, password, Token } = auth_config
+                        if (authRadio === 'basic_auth') {
+                            auth_params.auth_config.username = username
+                            auth_params.auth_config.password = password
+                        } else if (authRadio === 'bearer_token') {
+                            auth_params.auth_config.token = Token
+                        }
+                        // body
+                        const body_params = {
+                            type: bodyRadio !== 'none' ? bodyRadio : '',
+                            row_type: '',
+                            content: ''
+                        }
+                        if (bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded') {
+                            body_params.content = body.filter(item => item.select)
+                        }
+                        if (bodyRadio === 'raw') {
+                            body_params.row_type = rawType
+                            body_params.content = bodyValue
+                        }
+                        const settings_parmas = {
+                            timeout: Number(settings.timeout)
+                        }
+                        params.inputs = {
+                            method,
+                            url,
+                            success_exp,
+                            query_params,
+                            auth: auth_params,
+                            headers: [],
+                            body: body_params,
+                            settings: settings_parmas
                         }
                         this.retry(params)
                     })
@@ -227,8 +290,11 @@
     }
     .bk-basic-node {
         padding: 0;
-        .common-section-card-block {
-            display: inline-block;
+        /deep/ .common-section-card-block {
+            display: block;
+        }
+        /deep/ .common-section-card-body {
+            padding: 0;
         }
     }
 </style>

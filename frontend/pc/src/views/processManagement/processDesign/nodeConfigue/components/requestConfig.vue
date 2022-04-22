@@ -13,34 +13,34 @@
             <div class="param-config">
                 <i class="bk-itsm-icon icon-info-fail"></i>
                 <span style="font-size: 12px;color: #63656e">{{ $t(`m['参数说明']`) }}</span>
-                <params-table :list="config.queryParams"></params-table>
+                <params-table :list="config.queryParams" :disable="disable"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'auth'">
             <div class="param-config">
                 <bk-radio-group v-model="config.authRadio">
                     <bk-radio :value="'None'">{{ $t(`m['无需认证']`) }}</bk-radio>
-                    <bk-radio :value="'Token'">Bearer Token</bk-radio>
-                    <bk-radio :value="'Auth'">Basic Auth</bk-radio>
+                    <bk-radio :value="'bearer_token'">Bearer Token</bk-radio>
+                    <bk-radio :value="'basic_auth'">Basic Auth</bk-radio>
                 </bk-radio-group>
                 <div class="bk-radio-config">
                     <div v-if="config.authRadio === 'None'">
                         <span>{{ $t(`m['该请求不需要任何认证']`) }}</span>
                     </div>
-                    <div v-else-if="config.authRadio === 'Token'">
+                    <div v-else-if="config.authRadio === 'bearer_token'">
                         <div class="config-option" style="width: 80%">
                             <p class="mb5">TOKEN ：</p>
-                            <bk-input behavior="simplicity" :clearable="true" v-model="config.auth_config.Token"></bk-input>
+                            <bk-input behavior="simplicity" :disabled="disable" :clearable="true" v-model="config.auth_config.Token"></bk-input>
                         </div>
                     </div>
                     <div v-else style="display: flex">
                         <div class="config-option">
                             <p class="mb5">{{ $t(`m['用户名']`) }}：</p>
-                            <bk-input behavior="simplicity" :clearable="true" v-model="config.auth_config.username"></bk-input>
+                            <bk-input behavior="simplicity" :disabled="disable" :clearable="true" v-model="config.auth_config.username"></bk-input>
                         </div>
                         <div class="config-option">
                             <p class="mb5">{{ $t(`m['密码']`) }}：</p>
-                            <bk-input behavior="simplicity" type="password" :clearable="true" v-model="config.auth_config.password"></bk-input>
+                            <bk-input behavior="simplicity" :disabled="disable" type="password" :clearable="true" v-model="config.auth_config.password"></bk-input>
                         </div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@
                     </bk-select>
                 </div>
                 <template v-if="config.bodyRadio === 'form-data' || config.bodyRadio === 'x-www-form-urlencoded'">
-                    <params-table :list="config.body"></params-table>
+                    <params-table :list="config.body" :disable="disable"></params-table>
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
                     <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :placeholder="$t(`m['请输入']`)"></textarea>
@@ -79,7 +79,7 @@
         </template>
         <template v-if="acticeTab === 'headers'">
             <div class="param-config">
-                <params-table :list="config.headers"></params-table>
+                <params-table :list="config.headers" :disable="disable"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'settings'">
@@ -87,8 +87,8 @@
                 <div class="setting-option">
                     <p class="mb5">{{ $t(`m['请求超时']`) }}</p>
                     <div class="setting-content">
-                        <bk-input behavior="simplicity" :clearable="true" v-model="config.settings.timeout"></bk-input>
-                        <span style="margin-left: 5px">S</span>
+                        <bk-input behavior="simplicity" :disabled="disable" :clearable="true" v-model="config.settings.timeout"></bk-input>
+                        <span style="margin-left: 5px">s</span>
                     </div>
                 </div>
             </div>
@@ -112,6 +112,18 @@
                 type: Object,
                 default () {
                     return {}
+                }
+            },
+            isStatus: {
+                type: Boolean,
+                default () {
+                    return true
+                }
+            },
+            disable: {
+                type: Boolean,
+                default () {
+                    return false
                 }
             }
         },
@@ -195,16 +207,71 @@
             }
         },
         mounted () {
-            if (Object.keys(this.configur.extras).length !== 0) {
-                this.config.queryParams = [...this.configur.extras.webhook_info.query_params, ...this.config.queryParams]
-                this.config.settings.timeout = this.configur.extras.webhook_info.settings.timeout
-
-                this.config.bodyRadio = this.configur.extras.webhook_info.body.type || 'none'
-                if (this.configur.extras.webhook_info.body.type === 'form-data' || this.configur.extras.webhook_info.body.type === 'x-www-form-urlencoded') {
-                    this.config.body = [...this.configur.extras.webhook_info.body.content, ...this.config.body]
-                } else if (this.configur.extras.webhook_info.body.type === 'raw') {
-                    this.config.rawType = this.configur.extras.webhook_info.body.row_type
-                    this.config.bodyValue = this.configur.extras.webhook_info.body.content
+            if (this.isStatus) {
+                if (Object.keys(this.configur.extras).length !== 0) {
+                    const { auth, settings, query_params, body } = this.configur.extras.webhook_info
+                    this.config.queryParams = [...query_params, ...this.config.queryParams]
+                    this.config.settings.timeout = settings.timeout
+                    this.config.authRadio = auth.auth_type
+                    // const { username, password, Token } = auth_config
+                    if (auth.auth_type === 'bearer_token') {
+                        this.config.auth_config.Token = auth.auth_config.token
+                    } else if (auth.auth_type === 'basic_auth') {
+                        this.config.auth_config.username = auth.auth_config.username
+                        this.config.auth_config.password = auth.auth_config.password
+                    }
+                    this.config.bodyRadio = body.type || 'none'
+                    if (body.type === 'form-data' || body.type === 'x-www-form-urlencoded') {
+                        this.config.body = [...body.content, ...this.config.body]
+                    } else if (body.type === 'raw') {
+                        this.config.rawType = body.row_type
+                        this.config.bodyValue = body.content
+                    }
+                }
+            } else {
+                if (Object.keys(this.configur.api_info).length !== 0) {
+                    const { body, settings, auth, query_params } = this.configur.api_info.webhook_info
+                    this.config.settings.timeout = settings.timeout
+                    // query_params auth
+                    const result = []
+                    for (const key in query_params) {
+                        result.push({
+                            key,
+                            value: query_params[key],
+                            select: true
+                        })
+                    }
+                    this.config.queryParams = [...result, ...this.config.queryParams]
+                    this.config.bodyRadio = body.type || 'none'
+                    if (body.type === 'x-www-form-urlencoded') {
+                        const list = []
+                        body.content.split('&').map(item => {
+                            const cl = item.split('=')
+                            list.push({
+                                key: cl[0],
+                                value: cl[1],
+                                select: true
+                            })
+                        })
+                        this.config.body = [...list, ...this.config.body]
+                    } else if (body.type === 'form-data') {
+                        // this.config.body =
+                    } else if (body.type === 'raw') {
+                        this.config.rawType = body.row_type
+                        this.config.bodyValue = body.value
+                    }
+                    if ('auth_type' in auth) {
+                        this.config.authRadio = auth.auth_type
+                        if (auth.auth_type === 'bearer_token') {
+                            this.config.auth_config.Token = auth.auth_config.token
+                        } else if (auth.auth_type === 'basic_auth') {
+                            console.log(auth.auth_config.username)
+                            this.config.auth_config.username = auth.auth_config.username
+                            this.config.auth_config.password = auth.auth_config.password
+                        }
+                    } else {
+                        this.config.authRadio = 'None'
+                    }
                 }
             }
         },
