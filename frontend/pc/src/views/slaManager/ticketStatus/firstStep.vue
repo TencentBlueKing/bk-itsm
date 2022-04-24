@@ -445,6 +445,7 @@
                         }).finally(() => {
                             this.statusTable[this.isEdit.index].name = temp.name
                             this.statusTable[this.isEdit.index].desc = temp.desc
+                            this.statusTable[this.isEdit.index].color_hex = temp.color_hex
                             this.secondClick = false
                             this.showColorPicker = false
                             this.initAddTemp()
