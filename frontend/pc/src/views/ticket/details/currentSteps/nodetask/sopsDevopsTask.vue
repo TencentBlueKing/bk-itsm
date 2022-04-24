@@ -134,7 +134,6 @@
             },
             reSetSopTask () {
                 this.changeBtn = !this.changeBtn
-                // console.log(this.changeBtn)
                 this.disable = !this.changeBtn
                 this.isHook = this.changeBtn
                 this.isEdit = !this.isEdit
@@ -222,8 +221,6 @@
                         this.retry(params)
                     })
                 } else {
-                    console.log(this.$refs.webhook)
-                    // console.log(this.$refs.webhook.validates())
                     this.$refs.webhook.validate().then(res => {
                         const method = this.$refs.webhook.curEq
                         const { success_exp, url } = this.$refs.webhook.formData
@@ -273,7 +270,6 @@
                             this.errorTip = ![body_params.content, query_params].every(item => item.every(ite => ite.key !== '' && ite.value !== ''))
                         }
                         if (this.errorTip) return
-                        debugger
                         this.retry(params)
                     })
                 }

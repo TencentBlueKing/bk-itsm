@@ -56,7 +56,6 @@
             },
             handleDelete (row) {
                 const index = this.list.indexOf(row)
-                console.log(index)
                 if (index !== -1) {
                     this.list.splice(index, 1)
                 }

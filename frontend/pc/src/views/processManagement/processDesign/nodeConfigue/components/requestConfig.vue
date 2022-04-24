@@ -296,7 +296,6 @@
                         if (auth.auth_type === 'bearer_token') {
                             this.config.auth_config.Token = auth.auth_config.token
                         } else if (auth.auth_type === 'basic_auth') {
-                            console.log(auth.auth_config.username)
                             this.config.auth_config.username = auth.auth_config.username
                             this.config.auth_config.password = auth.auth_config.password
                         }

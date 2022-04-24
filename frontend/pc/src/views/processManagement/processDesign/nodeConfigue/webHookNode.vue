@@ -342,8 +342,6 @@
                 Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(_ => {
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                     const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
-                    // params_query
-                    // console.log(auth, headers, settings)
                     const query_params = queryParams.filter(item => item.select)
                     const outputs = this.returnReslut.filter(item => item.name !== '')
                     outputs.forEach(item => {
