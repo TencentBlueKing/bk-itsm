@@ -52,7 +52,7 @@
                 <bk-form-item :label="$t(`m['成功条件']`)" :ext-cls="'bk-form-display'">
                     <bk-input v-model="formData.success_exp" :disabled="disable"></bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t(`m['返回变量']`)" :ext-cls="'bk-form-display'">
+                <bk-form-item v-if="isStatus" :label="$t(`m['返回变量']`)" :ext-cls="'bk-form-display'">
                     <bk-table :data="returnReslut"
                         :size="'small'">
                         <bk-table-column :label="$t(`m['变量名称']`)">
