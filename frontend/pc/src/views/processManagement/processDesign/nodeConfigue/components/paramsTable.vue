@@ -1,29 +1,29 @@
 <template>
     <div>
-        <bk-table :data="list">
+        <bk-table :data="list" :disabled="true">
             <bk-table-column width="40">
                 <template slot-scope="props">
-                    <bk-checkbox v-model="props.row.select"></bk-checkbox>
+                    <bk-checkbox v-model="props.row.select" :disabled="disable"></bk-checkbox>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m['字段名']`)">
                 <template slot-scope="props">
-                    <bk-input :behavior="'simplicity'" v-model="props.row.key" @change="changeInput(props.row)"></bk-input>
+                    <bk-input :behavior="'simplicity'" :disabled="disable" v-model="props.row.key" @change="changeInput(props.row)"></bk-input>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m['值']`)">
                 <template slot-scope="props">
-                    <bk-input :behavior="'simplicity'" v-model="props.row.value" @change="changeInput(props.row)"></bk-input>
+                    <bk-input :behavior="'simplicity'" :disabled="disable" v-model="props.row.value" @change="changeInput(props.row)"></bk-input>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m['描述']`)">
                 <template slot-scope="props">
-                    <bk-input :behavior="'simplicity'" v-model="props.row.desc" @change="changeInput(props.row)"></bk-input>
+                    <bk-input :behavior="'simplicity'" :disabled="disable" v-model="props.row.desc" @change="changeInput(props.row)"></bk-input>
                 </template>
             </bk-table-column>
             <bk-table-column width="40">
                 <template slot-scope="props" v-if="isShowDelete !== list.indexOf(props.row)">
-                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="handleDelete(props.row)"></i>
+                    <i v-if="!disable" class="bk-itsm-icon icon-itsm-icon-three-one" @click="handleDelete(props.row)"></i>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -37,6 +37,12 @@
             list: {
                 type: Array,
                 defalut: () => []
+            },
+            disable: {
+                type: Boolean,
+                default () {
+                    return false
+                }
             }
         },
         computed: {

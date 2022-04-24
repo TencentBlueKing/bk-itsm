@@ -18,7 +18,7 @@
                 </p>
                 <p class="bk-partition">
                     <b class="bk-base-label">Method:</b>
-                    <span>{{nodeInfo.url || '--'}}</span>
+                    <span>{{nodeInfo.api_info.webhook_info.method || '--'}}</span>
                 </p>
                 <!-- params -->
                 <p class="bk-partition">
@@ -68,13 +68,13 @@
                     v-if="variableList.length !== 0"
                     :data="variableList"
                     :ext-cls="'bk-editor-table'">
-                    <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="key"></bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+                    <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
+                    <bk-table-column :label="$t(`m.treeinfo['参数值']`)">
                         <template slot-scope="props">
                             <span>{{props.row.value || '--'}}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['路径']`)" prop="key"></bk-table-column>
+                    <bk-table-column :label="$t(`m.treeinfo['路径']`)" prop="ref_path"></bk-table-column>
                 </bk-table>
             </div>
         </div>
@@ -103,7 +103,7 @@
                 <div class="bk-partition errorDiv">
                     <b class="bk-base-label">{{ $t('m.taskTemplate["错误信息："]') }}</b>
                 </div>
-                <!-- <div class="langError">{{nodeInfo.api_info.error_message || '--'}}</div> -->
+                <div class="langError">{{nodeInfo.api_info.error_message || '--'}}</div>
             </div>
         </div>
     </div>
@@ -155,9 +155,12 @@
                 return { ...params }
             },
             variableList () {
-                if ('variables' in this.nodeInfo.api_info.webhook_info) {
-                    const { outputs } = this.nodeInfo.api_info.webhook_info.variables
-                    return outputs || []
+                if ('variables' in this.nodeInfo.api_info) {
+                    if (Object.keys(this.nodeInfo.api_info.variables).length !== 0) {
+                        return this.nodeInfo.api_info.variables
+                    }
+                    // const { outputs } = this.nodeInfo.api_info.webhook_info.variables
+                    return []
                 }
                 return []
             }
