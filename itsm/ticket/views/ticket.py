@@ -81,6 +81,7 @@ from itsm.component.constants import (
     OPEN,
     GENERAL,
     ORGANIZATION,
+    FAST_APPROVAL_MESSAGE,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -1081,7 +1082,15 @@ class TicketModelViewSet(ModelViewSet):
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
             **{"title": ticket.title}
         )
+        # 构造快速审批通知信息
+        fast_approval_message = FAST_APPROVAL_MESSAGE.format(
+            **ticket.get_fast_approval_message_params())
         for step in ticket.current_steps:
+            # 快速审批通知
+            ticket.notify_fast_approval(
+                step["state_id"], step["processors"], fast_approval_message,
+                action=SUPERVISE_OPERATE, kwargs=kwargs
+            )
             ticket.notify(
                 state_id=step["state_id"],
                 receivers=step["processors"],

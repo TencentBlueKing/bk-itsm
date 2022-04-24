@@ -130,3 +130,11 @@ APPROVAL_FIELDS = [
         "show_type": SHOW_BY_CONDITION,
     },
 ]
+
+# 快速审批通知信息模版
+FAST_APPROVAL_MESSAGE = """
+ 标题：{title}
+ 单号：<a href="{ticket_url}">{sn}</a>
+ 服务目录：{catalog_service_name}
+ 当前环节：{running_status}
+ """
