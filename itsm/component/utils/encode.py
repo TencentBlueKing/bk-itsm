@@ -18,8 +18,9 @@ class HTTPBearerToken(AuthBase):
 
 
 class EncodeWebhook(object):
-    def __init__(self, kv=None):
+    def __init__(self, kv=None, headers=None):
         self.kv = kv or {}
+        self.headers = headers or {}
 
     @staticmethod
     def encode_authorization(authorize):
@@ -62,6 +63,7 @@ class EncodeWebhook(object):
             fields[item["key"]] = template.render(self.kv)
 
         multipart_data = MultipartEncoder(fields=fields)
+        self.headers.update({"Content-Type": multipart_data.content_type})
         return multipart_data.to_string()
 
     def encode_x_www_form_urlencoded_body(self, body):
