@@ -63,11 +63,10 @@ class ParamsBuilder:
         return data
 
     def build_headers(self):
-        headers = self.extras.get("headers")
-        data = {}
-        for item in headers:
+        headers = {}
+        for item in self.extras.get("headers"):
             template = Template(item["value"])
-            data[item["key"]] = template.render(self.variables)
+            headers[item["key"]] = template.render(self.variables)
 
         content_type_headers = {
             "json": "application/json",
@@ -79,7 +78,7 @@ class ParamsBuilder:
 
         body = self.extras.get("body")
         if body.get("type") == "raw":
-            data.update(
+            headers.update(
                 {
                     "Content-Type": content_type_headers.get(
                         body.get("row_type", "json").lower(), "text/plain"
@@ -87,28 +86,29 @@ class ParamsBuilder:
                 }
             )
         elif body.get("type") == "form-data":
-            data.update({"Content-Type": "multipart/form-data"})
+            headers.update({"Content-Type": "multipart/form-data"})
         else:
-            data.update({"Content-Type": "application/x-www-form-urlencoded"})
+            headers.update({"Content-Type": "application/x-www-form-urlencoded"})
 
-        return data
+        return headers
 
-    def build_body(self):
+    def build_body(self, headers):
         body = self.extras.get("body")
-        encode_webhook = EncodeWebhook(self.variables)
+        encode_webhook = EncodeWebhook(self.variables, headers=headers)
         return encode_webhook.encode_body(body=body)
 
     def result(self):
 
+        headers = self.build_headers()
         data = {
             "url": self.build_url(),
             "method": self.extras.get("method", "GET").upper(),
+            "headers": headers,
             "body": {
                 "type": self.extras.get("body")["type"],
                 "row_type": self.extras.get("body")["row_type"],
-                "content": self.build_body(),
+                "content": self.build_body(headers),
             },
-            "headers": self.build_headers(),
             "query_params": self.build_query_params(),
             "settings": self.extras.get("settings", {}),
             "success_exp": self.extras.get("success_exp", None),
