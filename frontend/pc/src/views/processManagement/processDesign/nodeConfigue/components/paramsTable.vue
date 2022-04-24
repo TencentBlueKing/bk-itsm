@@ -56,12 +56,13 @@
             },
             handleDelete (row) {
                 const index = this.list.indexOf(row)
-                console.log(index)
                 if (index !== -1) {
                     this.list.splice(index, 1)
                 }
             },
             changeInput (val) {
+                // 输入清除error
+                this.$emit('changeFormStatus', false)
                 if (!val.check) {
                     val.check = true
                     val.select = true

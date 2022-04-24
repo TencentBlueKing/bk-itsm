@@ -2493,6 +2493,7 @@ export const m = {
     '值': 'value',
     '描述': 'describe',
     '必需以http://或https://开头': 'Must start with http:// or https://',
-    '请输入': 'Please enter'
+    '请输入': 'Please enter',
+    '已选参数的字段名和值不能为空': 'The field name and value of the selected parameter cannot be empty'
 
 }

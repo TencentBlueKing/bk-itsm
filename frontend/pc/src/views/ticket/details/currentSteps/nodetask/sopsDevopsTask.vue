@@ -46,6 +46,7 @@
             <web-hook
                 ref="webhook"
                 :configur="nodeInfo"
+                :task-error-tip="errorTip"
                 :disable="disable"
                 :is-status="false">
             </web-hook>
@@ -102,6 +103,7 @@
                 isEdit: false,
                 stateList: [],
                 disable: true,
+                errorTip: false,
                 pipelineFormList: [],
                 pipelineData: {} // 流水线参数
             }
@@ -132,7 +134,6 @@
             },
             reSetSopTask () {
                 this.changeBtn = !this.changeBtn
-                // console.log(this.changeBtn)
                 this.disable = !this.changeBtn
                 this.isHook = this.changeBtn
                 this.isEdit = !this.isEdit
@@ -220,19 +221,11 @@
                         this.retry(params)
                     })
                 } else {
-                    console.log(this.$refs.webhook)
-                    // console.log(this.$refs.webhook.validates())
                     this.$refs.webhook.validate().then(res => {
                         const method = this.$refs.webhook.curEq
                         const { success_exp, url } = this.$refs.webhook.formData
-                        const { queryParams, body, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.webhook.$refs.requestConfig.config
+                        const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.webhook.$refs.requestConfig.config
                         const query_params = queryParams.filter(item => item.select)
-                        // const outputs = this.returnReslut.filter(item => item.name !== '')
-                        // outputs.forEach(item => {
-                        //     item.source = 'global'
-                        //     item.type = 'string'
-                        // })
-                        // auth
                         const auth_params = {
                             auth_type: authRadio !== 'None' ? authRadio : '',
                             auth_config: {}
@@ -250,10 +243,11 @@
                             row_type: '',
                             content: ''
                         }
-                        if (bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded') {
-                            body_params.content = body.filter(item => item.select)
-                        }
-                        if (bodyRadio === 'raw') {
+                        if (bodyRadio === 'form-data') {
+                            body_params.content = bodyFormData.filter(item => item.select)
+                        } else if (bodyRadio === 'x-www-form-urlencoded') {
+                            body_params.content = bodyWwwForm.filter(item => item.select)
+                        } else if (bodyRadio === 'raw') {
                             body_params.row_type = rawType
                             body_params.content = bodyValue
                         }
@@ -270,6 +264,12 @@
                             body: body_params,
                             settings: settings_parmas
                         }
+                        if (params.inputs.method === 'GET') {
+                            this.errorTip = !query_params.every(item => item.key !== '' && item.value !== '')
+                        } else if (typeof body_params.content !== 'string') {
+                            this.errorTip = ![body_params.content, query_params].every(item => item.every(ite => ite.key !== '' && ite.value !== ''))
+                        }
+                        if (this.errorTip) return
                         this.retry(params)
                     })
                 }
