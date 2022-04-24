@@ -62,6 +62,8 @@
                 }
             },
             changeInput (val) {
+                // 输入清除error
+                this.$emit('changeFormStatus', false)
                 if (!val.check) {
                     val.check = true
                     val.select = true

@@ -6,14 +6,18 @@
                 :class="{ 'bk-check-config': acticeTab === item.key }"
                 @click="changeTab(item, index)">
                 <span>{{ item.label }}</span>
-                <span v-if="count[item.key]">{{ count[item.key] }}</span>
+                <!-- <span v-if="count[item.key]">{{ count[item.key] }}</span> -->
             </li>
         </ul>
         <template v-if="acticeTab === 'queryParams'">
             <div class="param-config">
                 <i class="bk-itsm-icon icon-info-fail"></i>
                 <span style="font-size: 12px;color: #63656e">{{ $t(`m['参数说明']`) }}</span>
-                <params-table :list="config.queryParams" :disable="disable"></params-table>
+                <params-table
+                    :list="config.queryParams"
+                    :disable="disable"
+                    @changeFormStatus="changeFormStatus">
+                </params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'auth'">
@@ -49,7 +53,7 @@
         <template v-if="acticeTab === 'body'">
             <div class="param-config">
                 <div style="display: flex; align-items: center; margin-bottom: 8px">
-                    <bk-radio-group v-model="config.bodyRadio">
+                    <bk-radio-group v-model="config.bodyRadio" style="width: 500px">
                         <bk-radio :value="'none'">{{ $t(`m['默认']`) }}</bk-radio>
                         <bk-radio :value="'form-data'" :disabled="radioDisabled">form-data</bk-radio>
                         <bk-radio :value="'x-www-form-urlencoded'" :disabled="radioDisabled">x-www-form-urlencoded</bk-radio>
@@ -69,11 +73,27 @@
                         </bk-option>
                     </bk-select>
                 </div>
-                <template v-if="config.bodyRadio === 'form-data' || config.bodyRadio === 'x-www-form-urlencoded'">
-                    <params-table :list="config.body" :disable="disable"></params-table>
+                <template v-if="config.bodyRadio === 'form-data'">
+                    <params-table
+                        :list="config.bodyFormData"
+                        :disable="disable"
+                        @changeFormStatus="changeFormStatus">
+                    </params-table>
+                </template>
+                <template v-if="config.bodyRadio === 'x-www-form-urlencoded'">
+                    <params-table
+                        :list="config.bodyWwwForm"
+                        :disable="disable"
+                        @changeFormStatus="changeFormStatus">
+                    </params-table>
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
-                    <textarea class="bk-form-textarea" style="resize: vertical" v-model="config.bodyValue" :placeholder="$t(`m['请输入']`)"></textarea>
+                    <textarea
+                        class="bk-form-textarea"
+                        style="resize: vertical"
+                        v-model="config.bodyValue"
+                        :placeholder="$t(`m['请输入']`)">
+                    </textarea>
                 </template>
             </div>
         </template>
@@ -172,7 +192,16 @@
                             select: false
                         }
                     ],
-                    body: [
+                    bodyWwwForm: [
+                        {
+                            check: false,
+                            key: '',
+                            value: '',
+                            desc: '',
+                            select: false
+                        }
+                    ],
+                    bodyFormData: [
                         {
                             check: false,
                             key: '',
@@ -221,8 +250,10 @@
                         this.config.auth_config.password = auth.auth_config.password
                     }
                     this.config.bodyRadio = body.type || 'none'
-                    if (body.type === 'form-data' || body.type === 'x-www-form-urlencoded') {
-                        this.config.body = [...body.content, ...this.config.body]
+                    if (body.type === 'form-data') {
+                        this.config.bodyFormData = [...body.content, ...this.config.bodyFormData]
+                    } else if (body.type === 'x-www-form-urlencoded') {
+                        this.config.bodyWwwForm = [...body.content, ...this.config.bodyWwwForm]
                     } else if (body.type === 'raw') {
                         this.config.rawType = body.row_type
                         this.config.bodyValue = body.content
@@ -253,7 +284,7 @@
                                 select: true
                             })
                         })
-                        this.config.body = [...list, ...this.config.body]
+                        this.config.bodyWwwForm = [...list, ...this.config.bodyWwwForm]
                     } else if (body.type === 'form-data') {
                         // this.config.body =
                     } else if (body.type === 'raw') {
@@ -284,6 +315,9 @@
                 if (index !== -1) {
                     this.list.splice(index, 1)
                 }
+            },
+            changeFormStatus (val) {
+                this.$emit('changeFormStatus', val)
             },
             changeInput (val) {
                 if (!val.check) {
@@ -339,6 +373,7 @@
     padding: 10px;
     position: relative;
     .bk-radio-config {
+        width: 500px;
         font-size: 12px;
         color: #63656e;
         .config-option {
@@ -347,7 +382,8 @@
         }
     }
     .select-custom {
-        margin-left: -380px;
+        width: 80px;
+        margin-left: -30px;
     }
     .setting-option {
         font-size: 14px;

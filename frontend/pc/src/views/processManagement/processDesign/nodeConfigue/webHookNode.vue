@@ -26,7 +26,13 @@
                 </bk-form-item>
                 <bk-form-item :label="'URL'" :ext-cls="'bk-form-display'" required property="url" error-display-type="normal">
                     <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" :disabled="disable" @change="handleUrlChange">
-                        <bk-dropdown-menu class="group-text" @show="isDropdownShow = true" @hide="isDropdownShow = false" ref="dropdown" slot="prepend" :font-size="'medium'">
+                        <bk-dropdown-menu
+                            ref="dropdown"
+                            class="group-text"
+                            slot="prepend"
+                            :font-size="'medium'"
+                            @show="isDropdownShow = true"
+                            @hide="isDropdownShow = false">
                             <bk-button type="primary" slot="dropdown-trigger">
                                 <template v-for="(item, index) in requestOptions">
                                     <span v-if="curEq === item" :key="index">{{item}}</span>
@@ -34,19 +40,34 @@
                                 <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                             </bk-button>
                             <ul class="bk-dropdown-list" slot="dropdown-content">
-                                <li v-for="(item, index) in requestOptions" :key="index"><a href="javascript:;" @click="selectRequsetOpt(item)">{{ item }}</a></li>
+                                <li v-for="(item, index) in requestOptions"
+                                    :key="index">
+                                    <a href="javascript:;" @click="selectRequsetOpt(item)">{{ item }}</a>
+                                </li>
                             </ul>
                         </bk-dropdown-menu>
                     </bk-input>
                     <div v-show="!isShowUrlVariable && filterVariableList.length !== 0" class="select-variables">
                         <ul>
-                            <li v-for="(item, index) in filterVariableList" :key="index" @click="handleSelectContent(item)">{{item.name}}</li>
+                            <li v-for="(item, index) in filterVariableList"
+                                :key="index"
+                                @click="handleSelectContent(item)">
+                                {{item.name}}
+                            </li>
                         </ul>
                     </div>
                 </bk-form-item>
                 <bk-form-item :ext-cls="'bk-form-display'">
                     <div class="requset-config">
-                        <request-config ref="requestConfig" :type="curEq" :configur="configur" :is-status="isStatus" :disable="disable"></request-config>
+                        <request-config
+                            ref="requestConfig"
+                            :type="curEq"
+                            :configur="configur"
+                            :is-status="isStatus"
+                            :disable="disable"
+                            @changeFormStatus="changeFormStatus">
+                        </request-config>
+                        <p v-if="errorTip" class="error-tip">{{ $t(`m['已选参数的字段名和值不能为空']`) }}</p>
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="$t(`m['成功条件']`)" :ext-cls="'bk-form-display'">
@@ -68,7 +89,10 @@
                         <bk-table-column :label="$t(`m['操作']`)" width="100">
                             <template slot-scope="props" v-if="!disable">
                                 <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
-                                <i class="bk-itsm-icon icon-flow-other-reduc result-icon" :class="{ 'no-delete': retrunResultIsEmtry }" @click="deleteReturnReslut(props.row)"></i>
+                                <i class="bk-itsm-icon icon-flow-other-reduc result-icon"
+                                    :class="{ 'no-delete': retrunResultIsEmtry }"
+                                    @click="deleteReturnReslut(props.row)">
+                                </i>
                             </template>
                         </bk-table-column>
                     </bk-table>
@@ -143,8 +167,13 @@
                 default () {
                     return false
                 }
+            },
+            taskErrorTip: {
+                type: Boolean,
+                default () {
+                    return false
+                }
             }
-            
         },
         data () {
             return {
@@ -172,7 +201,14 @@
                             trigger: 'blur'
                         },
                         {
-                            regex: /(http|https):\/\/\S*/,
+                            validator: (val) => {
+                                if (val.indexOf('{{') !== -1) {
+                                    return true
+                                } else {
+                                    const reg = /(http|https):\/\/\S*/
+                                    return reg.test(val)
+                                }
+                            },
                             message: this.$t(`m['必需以http://或https://开头']`),
                             trigger: 'blur'
                         }
@@ -196,6 +232,7 @@
                 isShowUrlVariable: false,
                 filterParams: '',
                 stateList: [],
+                errorTip: false,
                 urlField: ''
             }
         },
@@ -220,6 +257,11 @@
                     return list
                 }
                 return []
+            }
+        },
+        watch: {
+            taskErrorTip (val) {
+                this.errorTip = val
             }
         },
         mounted () {
@@ -283,6 +325,9 @@
                     source: ''
                 })
             },
+            changeFormStatus (val) {
+                this.errorTip = val
+            },
             validate () {
                 return this.$refs.webForm.validate()
             },
@@ -296,7 +341,7 @@
             submit () {
                 Promise.all([this.$refs.processors.verifyValue(), this.$refs.webForm.validate()]).then(_ => {
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
-                    const { queryParams, body, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
+                    const { queryParams, bodyFormData, bodyWwwForm, authRadio, auth_config, settings, bodyValue, bodyRadio, rawType } = this.$refs.requestConfig.config
                     // params_query
                     // console.log(auth, headers, settings)
                     const query_params = queryParams.filter(item => item.select)
@@ -323,10 +368,11 @@
                         row_type: '',
                         content: ''
                     }
-                    if (bodyRadio === 'form-data' || bodyRadio === 'x-www-form-urlencoded') {
-                        body_params.content = body.filter(item => item.select)
-                    }
-                    if (bodyRadio === 'raw') {
+                    if (bodyRadio === 'form-data') {
+                        body_params.content = bodyFormData.filter(item => item.select)
+                    } else if (bodyRadio === 'x-www-form-urlencoded') {
+                        body_params.content = bodyWwwForm.filter(item => item.select)
+                    } else if (bodyRadio === 'raw') {
                         body_params.row_type = rawType
                         body_params.content = bodyValue
                     }
@@ -358,6 +404,13 @@
                         },
                         workflow: this.configur.workflow
                     }
+                    // 校验 勾选参数的key value
+                    if (this.curEq === 'GET') {
+                        this.errorTip = !query_params.every(item => item.key !== '' && item.value !== '')
+                    } else if (typeof body_params.content !== 'string') {
+                        this.errorTip = ![body_params.content, query_params].every(item => item.every(ite => ite.key !== '' && ite.value !== ''))
+                    }
+                    if (this.errorTip) return
                     const stateId = this.configur.id
                     this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
                         this.$bkMessage({
@@ -413,6 +466,11 @@
         margin: 10px 0;
         padding: 0 16px;
         background-color: #f5f7fa;
+        .error-tip {
+            font-size: 12px;
+            color: red;
+            margin-left: 10px;
+        }
     }
     .bk-basic-info {
         padding-bottom: 20px;
