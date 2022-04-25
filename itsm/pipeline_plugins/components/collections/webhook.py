@@ -138,9 +138,14 @@ class WebHookService(ItsmBaseService):
         """
         整体渲染 extras 所有的变量
         """
-        variables = ticket.get_output_fields(return_format="dict", need_display=True)
+        fields = ticket.fields.values_list("key", "_value")
+        variables = TicketGlobalVariable.objects.filter(
+            ticket_id=ticket.id
+        ).values_list("key", "value")
 
-        result = ParamsBuilder(extras=extras, variables=variables).result()
+        values = dict(list(fields) + list(variables))
+
+        result = ParamsBuilder(extras=extras, variables=values).result()
 
         return result
 
