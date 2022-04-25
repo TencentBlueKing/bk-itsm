@@ -22,6 +22,7 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import copy
 import logging
 
 import jmespath
@@ -47,73 +48,49 @@ class ParamsBuilder:
         self.extras = extras
         self.variables = variables
 
-    def build_url(self):
-        url_config = self.extras.get("url")
-        template = Template(url_config)
-        value = template.render(self.variables)
-        return value
+    def jinja_render(self, template_value):
+        """
+        做jinja渲染
+        :param template_value:
+        :return:
+        """
+        if isinstance(template_value, str):
+            return Template(template_value).render(self.variables)
+        if isinstance(template_value, dict):
+            render_value = {}
+            for key, value in template_value.items():
+                render_value[key] = self.jinja_render(value)
+            return render_value
+        if isinstance(template_value, list):
+            return [self.jinja_render(value) for value in template_value]
+        return template_value
 
-    def build_query_params(self):
-        query_params = self.extras.get("query_params")
-        data = {}
+    def build_query_params(self, query_params):
+        params = {}
         for item in query_params:
-            template = Template(item["value"])
-            data[item["key"]] = template.render(self.variables)
-
-        return data
-
-    def build_headers(self):
-        headers = {}
-        for item in self.extras.get("headers"):
-            template = Template(item["value"])
-            headers[item["key"]] = template.render(self.variables)
-
-        content_type_headers = {
-            "json": "application/json",
-            "text": "text/plain",
-            "javascript": "application/javascript",
-            "html": "text/html",
-            "xml": "application/xml",
-        }
-
-        body = self.extras.get("body")
-        if body.get("type") == "raw":
-            headers.update(
-                {
-                    "Content-Type": content_type_headers.get(
-                        body.get("row_type", "json").lower(), "text/plain"
-                    )
-                }
-            )
-        elif body.get("type") == "form-data":
-            headers.update({"Content-Type": "multipart/form-data"})
-        else:
-            headers.update({"Content-Type": "application/x-www-form-urlencoded"})
-
-        return headers
-
-    def build_body(self, headers):
-        body = self.extras.get("body")
-        encode_webhook = EncodeWebhook(self.variables, headers=headers)
-        return encode_webhook.encode_body(body=body)
+            params[item["key"]] = item["value"]
+        return params
 
     def result(self):
+        extras_copy = copy.deepcopy(self.extras)
+        data = self.jinja_render(extras_copy)
+        headers = data.get("headers", {})
+        encode_webhook = EncodeWebhook(headers=headers)
+        content = encode_webhook.encode_body(data.get("body", {}))
 
-        headers = self.build_headers()
-        data = {
-            "url": self.build_url(),
-            "method": self.extras.get("method", "GET").upper(),
-            "headers": headers,
-            "body": {
-                "type": self.extras.get("body")["type"],
-                "row_type": self.extras.get("body")["row_type"],
-                "content": self.build_body(headers),
-            },
-            "query_params": self.build_query_params(),
-            "settings": self.extras.get("settings", {}),
-            "success_exp": self.extras.get("success_exp", None),
-            "auth": self.extras.get("auth", {}),
+        body = {
+            "type": self.extras.get("body")["type"],
+            "row_type": self.extras.get("body")["row_type"],
+            "content": content,
         }
+        data.update(
+            {
+                "headers": encode_webhook.headers,
+                "body": body,
+                "query_params": self.build_query_params(data.get("query_params", {})),
+            }
+        )
+
         return data
 
 
@@ -161,9 +138,14 @@ class WebHookService(ItsmBaseService):
         """
         整体渲染 extras 所有的变量
         """
-        variables = ticket.get_output_fields(return_format="dict", need_display=True)
+        fields = ticket.fields.values_list("key", "_value")
+        variables = TicketGlobalVariable.objects.filter(
+            ticket_id=ticket.id
+        ).values_list("key", "value")
 
-        result = ParamsBuilder(extras=extras, variables=variables).result()
+        values = dict(list(fields) + list(variables))
+
+        result = ParamsBuilder(extras=extras, variables=values).result()
 
         return result
 
