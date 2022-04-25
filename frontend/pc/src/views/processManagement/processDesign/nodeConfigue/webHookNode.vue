@@ -25,7 +25,7 @@
                     </div>
                 </bk-form-item>
                 <bk-form-item :label="'URL'" :ext-cls="'bk-form-display'" required property="url" error-display-type="normal">
-                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" :disabled="disable" @change="handleUrlChange">
+                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" :placeholder="$t(`m['以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量']`)" :disabled="disable" @change="handleUrlChange">
                         <bk-dropdown-menu
                             ref="dropdown"
                             class="group-text"
@@ -53,6 +53,7 @@
                                 :key="index"
                                 @click="handleSelectContent(item)">
                                 {{item.name}}
+                                <span class="variable-key">({{item.key}})</span>
                             </li>
                         </ul>
                     </div>
@@ -249,7 +250,7 @@
                     if (params === '') return []
                     this.filterParams = params
                     const list = this.stateList.filter(item => {
-                        return item.name.indexOf(params) !== -1
+                        return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
                     })
                     if (list.length !== 0) {
                         this.$refs.urlInput.focus()
@@ -521,5 +522,10 @@
     .no-delete {
         color: #eaebf0;
         cursor: auto;
+    }
+    .variable-key {
+        font-size: 12px;
+        color: #c4c6cc;
+        margin-left: 10px;
     }
 </style>
