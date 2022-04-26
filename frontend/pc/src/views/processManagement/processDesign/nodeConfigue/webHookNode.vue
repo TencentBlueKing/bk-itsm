@@ -47,7 +47,7 @@
                             </ul>
                         </bk-dropdown-menu>
                     </bk-input>
-                    <div v-show="!isShowUrlVariable && filterVariableList.length !== 0" class="select-variables">
+                    <div v-show="filterVariableList.length !== 0" class="select-variables">
                         <ul>
                             <li v-for="(item, index) in filterVariableList"
                                 :key="index"
@@ -244,14 +244,16 @@
             filterVariableList () {
                 if (!this.formData.url) return []
                 // if (this.formData.url)
-                const index = this.formData.url.lastIndexOf('\{')
+                const index = this.formData.url.lastIndexOf('\{\{')
+                console.log()
                 if (index !== -1) {
-                    const params = this.formData.url.substring(index + 1, this.formData.url.length)
-                    if (params === '') return []
-                    this.filterParams = params
+                    const params = this.formData.url.substring(index + 2, this.formData.url.length) || ''
+                    console.log(params)
+                    this.filterParams = params || ''
                     const list = this.stateList.filter(item => {
                         return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
                     })
+                    console.log(list)
                     if (list.length !== 0) {
                         this.$refs.urlInput.focus()
                     }

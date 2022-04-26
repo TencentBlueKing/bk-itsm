@@ -8,7 +8,7 @@
             </bk-table-column>
             <bk-table-column :label="$t(`m['字段名']`)">
                 <template slot-scope="props">
-                    <bk-input :behavior="'simplicity'" :disabled="disable" v-model="props.row.key" @change="changeInput(props.row)"></bk-input>
+                    <bk-input :behavior="'simplicity'" :disabled="disable" v-model="props.row.key" @change="changeInput(props.row)">dqw</bk-input>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m['值']`)">

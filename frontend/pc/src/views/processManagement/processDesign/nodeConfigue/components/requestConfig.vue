@@ -89,6 +89,7 @@
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
                     <textarea
+                        ref="textarea"
                         class="bk-form-textarea"
                         style="resize: vertical"
                         v-model="config.bodyValue"
@@ -117,6 +118,7 @@
 </template>
 
 <script>
+    import { position, offset } from 'caret-pos'
     import paramsTable from './paramsTable.vue'
     export default {
         key: 'requestConfig',
@@ -149,6 +151,8 @@
         },
         data () {
             return {
+                left: '0px',
+                top: '0px',
                 acticeTab: 'queryParams',
                 panels: [
                     { key: 'queryParams', label: this.$t(`m['参数']`), count: 0 },
@@ -233,6 +237,12 @@
                 if (val === 'GET') {
                     this.config.bodyRadio = 'none'
                 }
+            },
+            'config.bodyRadio' (val) {
+                // console.log(val)
+                if (val === 'raw') {
+                    this.calculateLocation()
+                }
             }
         },
         mounted () {
@@ -306,6 +316,16 @@
             }
         },
         methods: {
+            calculateLocation () {
+                this.$nextTick(_ => {
+                    // console.dir(this.$refs.textarea)
+                    const textDom = this.$refs.textarea
+                    const pos = position(textDom) // { left: 15, top: 30, height: 20, pos: 15 }
+                    const off = offset(textDom)
+                    console.log('pos', pos, 'off', off)
+                    console.dir(textDom)
+                })
+            },
             changeTab (item, index) {
                 this.acticeTab = item.key
             },
