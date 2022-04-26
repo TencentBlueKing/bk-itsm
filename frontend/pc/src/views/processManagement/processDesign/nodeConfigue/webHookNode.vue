@@ -65,6 +65,7 @@
                             :type="curEq"
                             :configur="configur"
                             :is-status="isStatus"
+                            :state-list="stateList"
                             :disable="disable"
                             @changeFormStatus="changeFormStatus">
                         </request-config>
@@ -248,12 +249,10 @@
                 console.log()
                 if (index !== -1) {
                     const params = this.formData.url.substring(index + 2, this.formData.url.length) || ''
-                    console.log(params)
                     this.filterParams = params || ''
                     const list = this.stateList.filter(item => {
                         return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
                     })
-                    console.log(list)
                     if (list.length !== 0) {
                         this.$refs.urlInput.focus()
                     }

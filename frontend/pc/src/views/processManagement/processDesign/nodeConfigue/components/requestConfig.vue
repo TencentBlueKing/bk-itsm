@@ -15,6 +15,7 @@
                 <span style="font-size: 12px;color: #63656e">{{ $t(`m['参数说明']`) }}</span>
                 <params-table
                     :list="config.queryParams"
+                    :state-list="stateList"
                     :disable="disable"
                     @changeFormStatus="changeFormStatus">
                 </params-table>
@@ -77,6 +78,7 @@
                     <params-table
                         :list="config.bodyFormData"
                         :disable="disable"
+                        :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
                     </params-table>
                 </template>
@@ -95,6 +97,14 @@
                         v-model="config.bodyValue"
                         :placeholder="$t(`m['请输入']`)">
                     </textarea>
+                    <ul class="raw-select" v-show="rawVarList.length !== 0" :style="{ left: left + 'px', top: top + 'px' }">
+                        <li v-for="(item, index) in rawVarList"
+                            :key="index"
+                            @click="handleSelectContent(item)">
+                            {{item.name}}
+                            <span class="variable-key">({{item.key}})</span>
+                        </li>
+                    </ul>
                 </template>
             </div>
         </template>
@@ -147,12 +157,13 @@
                 default () {
                     return false
                 }
-            }
+            },
+            stateList: Array
         },
         data () {
             return {
-                left: '0px',
-                top: '0px',
+                left: 20,
+                top: 72,
                 acticeTab: 'queryParams',
                 panels: [
                     { key: 'queryParams', label: this.$t(`m['参数']`), count: 0 },
@@ -171,6 +182,8 @@
                     }
                 ],
                 rawList: ['JSON', 'HTML', 'XML', 'Text'],
+                rawVarList: [],
+                filterParams: '',
                 config: {
                     auth_config: {
                         Token: '',
@@ -238,12 +251,33 @@
                     this.config.bodyRadio = 'none'
                 }
             },
-            'config.bodyRadio' (val) {
-                // console.log(val)
-                if (val === 'raw') {
-                    this.calculateLocation()
+            'config.bodyValue' (val) {
+                // 定位变量位置
+                const textDom = this.$refs.textarea
+                console.log(textDom.scrollTop, '滚动条高度')
+                const pos = position(textDom)
+                // const off = offset(textDom)
+                this.left = pos.left + 10
+                this.top = pos.top + 40 + 24 + 2 - textDom.scrollTop
+                if (!val) return this.rawVarList
+                const index = val.lastIndexOf('\{\{')
+                if (index !== -1) {
+                    const params = val.substring(index + 2, val.length) || ''
+                    // console.log(params)
+                    this.filterParams = params
+                    this.rawVarList = this.stateList.filter(item => {
+                        return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
+                    })
+                    if (this.rawVarList.length !== 0) {
+                        this.$refs.textarea.focus()
+                    }
                 }
             }
+        },
+        created () {
+            // document.onkeydown = (e) => {
+            //     console.log(e)
+            // }
         },
         mounted () {
             if (this.isStatus) {
@@ -316,6 +350,10 @@
             }
         },
         methods: {
+            handleSelectContent (item) {
+                this.config.bodyValue = this.config.bodyValue.slice(0, -(this.filterParams.length + 2)) + `{{ ${item.key}}}`
+                this.$refs.textarea.focus()
+            },
             calculateLocation () {
                 this.$nextTick(_ => {
                     // console.dir(this.$refs.textarea)
@@ -410,6 +448,17 @@
         .setting-content {
             display: flex;
         }
+    }
+    .raw-select {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #c4c6cc;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 100;
+        width: 300px;
+        height: 200px;
+        overflow: auto;
     }
 }
 .icon-info-fail {
