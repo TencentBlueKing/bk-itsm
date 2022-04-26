@@ -23,15 +23,14 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import logging
 import json
 from threading import Thread
 
 import requests
 
+from common.log import logger
 from common.sub_string import sub_string
 
-logger = logging.getLogger(__name__)
 
 WEB_HOOK_URL = "http://in.qyapi.weixin.qq.com/cgi-bin/webhook/send?key={}"
 
