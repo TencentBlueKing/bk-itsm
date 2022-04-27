@@ -15,6 +15,8 @@
                 <span style="font-size: 12px;color: #63656e">{{ $t(`m['参数说明']`) }}</span>
                 <params-table
                     :list="config.queryParams"
+                    :state-list="stateList"
+                    :is-status="isStatus"
                     :disable="disable"
                     @changeFormStatus="changeFormStatus">
                 </params-table>
@@ -76,7 +78,9 @@
                 <template v-if="config.bodyRadio === 'form-data'">
                     <params-table
                         :list="config.bodyFormData"
+                        :is-status="isStatus"
                         :disable="disable"
+                        :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
                     </params-table>
                 </template>
@@ -84,22 +88,33 @@
                     <params-table
                         :list="config.bodyWwwForm"
                         :disable="disable"
+                        :is-status="isStatus"
+                        :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
                     </params-table>
                 </template>
                 <template v-if="config.bodyRadio === 'raw'">
                     <textarea
+                        ref="textarea"
                         class="bk-form-textarea"
                         style="resize: vertical"
                         v-model="config.bodyValue"
                         :placeholder="$t(`m['请输入']`)">
                     </textarea>
+                    <ul class="raw-select" v-show="rawVarList.length !== 0" :style="{ left: left + 'px', top: top + 'px' }">
+                        <li v-for="(item, index) in rawVarList"
+                            :key="index"
+                            @click="handleSelectContent(item)">
+                            {{item.name}}
+                            <span class="variable-key">({{item.key}})</span>
+                        </li>
+                    </ul>
                 </template>
             </div>
         </template>
         <template v-if="acticeTab === 'headers'">
             <div class="param-config">
-                <params-table :list="config.headers" :disable="disable"></params-table>
+                <params-table :list="config.headers" :disable="disable" :state-list="stateList" :is-status="isStatus"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'settings'">
@@ -117,6 +132,7 @@
 </template>
 
 <script>
+    import { position } from 'caret-pos'
     import paramsTable from './paramsTable.vue'
     export default {
         key: 'requestConfig',
@@ -145,10 +161,13 @@
                 default () {
                     return false
                 }
-            }
+            },
+            stateList: Array
         },
         data () {
             return {
+                left: 20,
+                top: 72,
                 acticeTab: 'queryParams',
                 panels: [
                     { key: 'queryParams', label: this.$t(`m['参数']`), count: 0 },
@@ -167,6 +186,8 @@
                     }
                 ],
                 rawList: ['JSON', 'HTML', 'XML', 'Text'],
+                rawVarList: [],
+                filterParams: '',
                 config: {
                     auth_config: {
                         Token: '',
@@ -233,7 +254,37 @@
                 if (val === 'GET') {
                     this.config.bodyRadio = 'none'
                 }
+            },
+            'config.bodyValue' (val) {
+                // 定位变量位置
+                const textDom = this.$refs.textarea
+                console.log(textDom.scrollTop, '滚动条高度')
+                const pos = position(textDom)
+                // const off = offset(textDom)
+                this.left = pos.left + 10
+                this.top = pos.top + 40 + 24 + 2 - textDom.scrollTop
+                if (!val) {
+                    this.rawVarList = []
+                    return
+                }
+                const index = val.lastIndexOf('\{\{')
+                if (index !== -1) {
+                    const params = val.substring(index + 2, val.length) || ''
+                    // console.log(params)
+                    this.filterParams = params
+                    this.rawVarList = this.stateList.filter(item => {
+                        return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
+                    })
+                    if (this.rawVarList.length !== 0) {
+                        this.$refs.textarea.focus()
+                    }
+                }
             }
+        },
+        created () {
+            // document.onkeydown = (e) => {
+            //     console.log(e)
+            // }
         },
         mounted () {
             if (this.isStatus) {
@@ -306,6 +357,10 @@
             }
         },
         methods: {
+            handleSelectContent (item) {
+                this.config.bodyValue = this.config.bodyValue.slice(0, -(this.filterParams.length + 2)) + `{{ ${item.key}}}`
+                this.$refs.textarea.focus()
+            },
             changeTab (item, index) {
                 this.acticeTab = item.key
             },
@@ -344,6 +399,7 @@
 </script>
 
 <style lang='scss' scoped>
+@import '../../../../../scss/mixins/scroller.scss';
 .bk-config-tab {
     border-bottom: 1px solid #dde4eb;
     height: 40px;
@@ -389,6 +445,35 @@
         width: 25%;
         .setting-content {
             display: flex;
+        }
+    }
+    .raw-select {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #c4c6cc;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 100;
+        width: 300px;
+        height: 200px;
+        padding: 5px;
+        overflow: auto;
+        @include scroller;
+        li {
+            height: 30px;
+            line-height: 30px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            color: #75777f;
+            &:hover {
+                background-color: #e1ecff;
+                color: #3a84ff;
+            }
+            span {
+                font-size: 12px;
+            }
         }
     }
 }
