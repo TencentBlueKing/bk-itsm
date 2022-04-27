@@ -7,7 +7,13 @@
                 :model="formData"
                 :rules="rules"
                 form-type="vertical">
-                <bk-form-item v-if="isStatus" :label="$t(`m['节点名称']`)" :ext-cls="'bk-form-width bk-form-display'" property="name" error-display-type="normal" required>
+                <bk-form-item
+                    v-if="isStatus"
+                    :label="$t(`m['节点名称']`)"
+                    :ext-cls="'bk-form-width bk-form-display'"
+                    property="name"
+                    error-display-type="normal"
+                    required>
                     <bk-input v-model="formData.name"></bk-input>
                 </bk-form-item>
                 <bk-form-item
@@ -24,8 +30,19 @@
                         </deal-person>
                     </div>
                 </bk-form-item>
-                <bk-form-item :label="'URL'" :ext-cls="'bk-form-display'" required property="url" error-display-type="normal">
-                    <bk-input v-model="formData.url" ref="urlInput" :clearable="true" :font-size="'medium'" :placeholder="$t(`m['以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量']`)" :disabled="disable" @change="handleUrlChange">
+                <bk-form-item
+                    :label="'URL'"
+                    :ext-cls="'bk-form-display'"
+                    required
+                    property="url"
+                    error-display-type="normal">
+                    <bk-input v-model="formData.url"
+                        ref="urlInput"
+                        :clearable="true"
+                        :font-size="'medium'"
+                        :placeholder="isStatus ? $t(`m['以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量']`) : $t(`m['请输入']`)"
+                        :disabled="disable"
+                        @change="handleUrlChange">
                         <bk-dropdown-menu
                             ref="dropdown"
                             class="group-text"

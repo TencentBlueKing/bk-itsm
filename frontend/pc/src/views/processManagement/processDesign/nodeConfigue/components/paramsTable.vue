@@ -20,9 +20,10 @@
                         v-model="props.row.value"
                         :behavior="'simplicity'"
                         :disabled="disable"
-                        :placeholder="$t(`m['输入“{{”可选择引用变量']`)"
+                        :placeholder="isStatus ? $t(`m['输入“{{”可选择引用变量']`) : $t(`m['请输入']`)"
                         @change="changeInput(props.row, props.$index)"></bk-input>
                     <bk-popover
+                        v-if="isStatus"
                         :ref="`inputParam${props.$index}`"
                         placement="bottom"
                         theme="light"
@@ -75,7 +76,13 @@
                     return false
                 }
             },
-            stateList: Array
+            stateList: Array,
+            isStatus: {
+                type: Boolean,
+                default () {
+                    return true
+                }
+            }
         },
         data () {
             return {
@@ -97,20 +104,22 @@
         watch: {
             list: {
                 handler (val) {
-                    val.forEach((item, index) => {
-                        if (item.value === '') {
-                            this.$nextTick(_ => {
-                                this.$refs['inputParam' + index].hideHandler()
-                            })
-                        }
-                    })
+                    if (this.isStatus) {
+                        val.forEach((item, index) => {
+                            if (item.value === '') {
+                                this.$nextTick(_ => {
+                                    this.$refs['inputParam' + index].hideHandler()
+                                })
+                            }
+                        })
+                    }
                 },
                 immediate: true,
                 deep: true
             },
             wwwFormData: {
                 handler (val) {
-                    if (val.length === 0) {
+                    if (val.length === 0 && this.isStatus) {
                         for (let index = 0; index < this.list.length; index++) {
                             this.$nextTick(_ => {
                                 this.$refs['inputParam' + index].hideHandler()
@@ -122,7 +131,7 @@
             }
         },
         mounted () {
-            if (this.list.length !== 0) {
+            if (this.list.length !== 0 && this.isStatus) {
                 for (let index = 0; index < this.list.length; index++) {
                     this.$nextTick(_ => {
                         this.$refs['inputParam' + index].hideHandler()
@@ -147,20 +156,22 @@
                 this.wwwFormData = []
             },
             changeInput (item, rowIndex) {
-                const index = item.value.lastIndexOf('\{\{')
-                this.curIndex = ''
-                if (index !== -1) {
-                    this.$refs['inputParam' + rowIndex].showHandler()
-                    const params = item.value.substring(index + 2, item.value.length) || ''
-                    this.filterParams = !params ? '' : params
-                    this.wwwFormData = this.stateList.filter(ite => {
-                        return ite.name.indexOf(this.filterParams) !== -1 || ite.key.indexOf(this.filterParams) !== -1
-                    })
-                    this.curIndex = rowIndex
-                } else {
-                    this.$refs['inputParam' + rowIndex].hideHandler()
+                if (this.isStatus) {
+                    const index = item.value.lastIndexOf('\{\{')
+                    this.curIndex = ''
+                    if (index !== -1) {
+                        this.$refs['inputParam' + rowIndex].showHandler()
+                        const params = item.value.substring(index + 2, item.value.length) || ''
+                        this.filterParams = !params ? '' : params
+                        this.wwwFormData = this.stateList.filter(ite => {
+                            return ite.name.indexOf(this.filterParams) !== -1 || ite.key.indexOf(this.filterParams) !== -1
+                        })
+                        this.curIndex = rowIndex
+                    } else {
+                        this.$refs['inputParam' + rowIndex].hideHandler()
+                    }
+                    this.curCulum = item
                 }
-                this.curCulum = item
                 // 输入清除error
                 this.$emit('changeFormStatus', false)
                 if (!item.check) {

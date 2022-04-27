@@ -16,6 +16,7 @@
                 <params-table
                     :list="config.queryParams"
                     :state-list="stateList"
+                    :is-status="isStatus"
                     :disable="disable"
                     @changeFormStatus="changeFormStatus">
                 </params-table>
@@ -77,6 +78,7 @@
                 <template v-if="config.bodyRadio === 'form-data'">
                     <params-table
                         :list="config.bodyFormData"
+                        :is-status="isStatus"
                         :disable="disable"
                         :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
@@ -86,6 +88,7 @@
                     <params-table
                         :list="config.bodyWwwForm"
                         :disable="disable"
+                        :is-status="isStatus"
                         :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
                     </params-table>
@@ -111,7 +114,7 @@
         </template>
         <template v-if="acticeTab === 'headers'">
             <div class="param-config">
-                <params-table :list="config.headers" :disable="disable" :state-list="stateList"></params-table>
+                <params-table :list="config.headers" :disable="disable" :state-list="stateList" :is-status="isStatus"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'settings'">
