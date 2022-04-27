@@ -86,6 +86,7 @@
                     <params-table
                         :list="config.bodyWwwForm"
                         :disable="disable"
+                        :state-list="stateList"
                         @changeFormStatus="changeFormStatus">
                     </params-table>
                 </template>
@@ -110,7 +111,7 @@
         </template>
         <template v-if="acticeTab === 'headers'">
             <div class="param-config">
-                <params-table :list="config.headers" :disable="disable"></params-table>
+                <params-table :list="config.headers" :disable="disable" :state-list="stateList"></params-table>
             </div>
         </template>
         <template v-if="acticeTab === 'settings'">
@@ -128,7 +129,7 @@
 </template>
 
 <script>
-    import { position, offset } from 'caret-pos'
+    import { position } from 'caret-pos'
     import paramsTable from './paramsTable.vue'
     export default {
         key: 'requestConfig',
@@ -259,7 +260,10 @@
                 // const off = offset(textDom)
                 this.left = pos.left + 10
                 this.top = pos.top + 40 + 24 + 2 - textDom.scrollTop
-                if (!val) return this.rawVarList
+                if (!val) {
+                    this.rawVarList = []
+                    return
+                }
                 const index = val.lastIndexOf('\{\{')
                 if (index !== -1) {
                     const params = val.substring(index + 2, val.length) || ''
@@ -354,16 +358,6 @@
                 this.config.bodyValue = this.config.bodyValue.slice(0, -(this.filterParams.length + 2)) + `{{ ${item.key}}}`
                 this.$refs.textarea.focus()
             },
-            calculateLocation () {
-                this.$nextTick(_ => {
-                    // console.dir(this.$refs.textarea)
-                    const textDom = this.$refs.textarea
-                    const pos = position(textDom) // { left: 15, top: 30, height: 20, pos: 15 }
-                    const off = offset(textDom)
-                    console.log('pos', pos, 'off', off)
-                    console.dir(textDom)
-                })
-            },
             changeTab (item, index) {
                 this.acticeTab = item.key
             },
@@ -402,6 +396,7 @@
 </script>
 
 <style lang='scss' scoped>
+@import '../../../../../scss/mixins/scroller.scss';
 .bk-config-tab {
     border-bottom: 1px solid #dde4eb;
     height: 40px;
@@ -458,7 +453,25 @@
         z-index: 100;
         width: 300px;
         height: 200px;
+        padding: 5px;
         overflow: auto;
+        @include scroller;
+        li {
+            height: 30px;
+            line-height: 30px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            color: #75777f;
+            &:hover {
+                background-color: #e1ecff;
+                color: #3a84ff;
+            }
+            span {
+                font-size: 12px;
+            }
+        }
     }
 }
 .icon-info-fail {

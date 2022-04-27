@@ -244,9 +244,7 @@
             },
             filterVariableList () {
                 if (!this.formData.url) return []
-                // if (this.formData.url)
                 const index = this.formData.url.lastIndexOf('\{\{')
-                console.log()
                 if (index !== -1) {
                     const params = this.formData.url.substring(index + 2, this.formData.url.length) || ''
                     this.filterParams = params || ''
@@ -494,7 +492,7 @@
             border: 1px solid #c4c6cc;
             top: 35px;
             left: 71px;
-            z-index: 100;
+            z-index: 2000;
             overflow-y: auto;
             @include scroller;
             ul {
