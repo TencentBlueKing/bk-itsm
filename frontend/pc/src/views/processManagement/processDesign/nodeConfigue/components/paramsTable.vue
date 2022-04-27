@@ -28,8 +28,9 @@
                         placement="bottom"
                         theme="light"
                         :arrow="false"
-                        :always="!!props.row.value"
-                        :ext-cls="!props.row.value ? 'show-tippy' : ''"
+                        :always="!props.row.value"
+                        :disabled="!props.row.value"
+                        :ext-cls="props.row.value ? 'show-tippy' : ''"
                         :transfer="true">
                         <div slot="content" class="params-select-value">
                             <ul class="params-select">
