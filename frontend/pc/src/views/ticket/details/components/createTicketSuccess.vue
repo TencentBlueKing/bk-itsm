@@ -42,6 +42,7 @@
         data () {
             return {
                 time: 30,
+                timer: '',
                 isStart: true
             }
         },
@@ -61,10 +62,12 @@
                 }
             },
             jumpPage () {
+                clearInterval(this.timer)
                 this.isStart = false
                 this.$router.push(this.routerInfo)
             },
             onBackClick () {
+                clearInterval(this.timer)
                 this.isStart = false
                 this.$emit('onBackIconClick')
             }
