@@ -929,11 +929,20 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = (
-                TicketStatus.objects.filter(service_type=service_type)
-                .filter(key=setting.get("name"))
-                .first()
-            )
+
+            if setting.get("name") in TICKET_STATUS_DICT.keys():
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(key=setting.get("name"))
+                    .first()
+                )
+            else:
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(name=setting.get("name"))
+                    .first()
+                )
+
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
@@ -3551,7 +3560,7 @@ class Ticket(Model, BaseTicket):
             "ticket_url": self.ticket_url,
             "sn": self.sn,
             "catalog_service_name": self.catalog_service_name,
-            "running_status": self.running_status
+            "running_status": self.running_status,
         }
 
     def set_current_processors(self):
