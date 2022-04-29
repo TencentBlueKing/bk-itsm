@@ -23,10 +23,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from itsm.component.constants import LEN_NORMAL, NOTIFY_TYPE_CHOICES
+from itsm.component.constants import LEN_NORMAL, LEN_SHORT
 from itsm.workflow.models import Notify
 
 
@@ -34,10 +33,7 @@ class NotifySerializer(serializers.ModelSerializer):
     """通知方式序列化"""
 
     name = serializers.CharField(required=False, max_length=LEN_NORMAL)
-    type = serializers.ChoiceField(
-        required=True, choices=NOTIFY_TYPE_CHOICES,
-        error_messages={'invalid_choice': _('指定的通知方式不存在'), }
-    )
+    type = serializers.CharField(required=True, max_length=LEN_SHORT)
 
     class Meta:
         model = Notify

@@ -104,7 +104,7 @@ class BaseForm:
                 raise FieldRequiredError("字段【{}】缺失".format(field['name']))
 
 
-class MessageForms(BaseForm):
+class SMSMessageForms(BaseForm):
     """
     发送通知的输入数据格式
     """
@@ -131,3 +131,13 @@ class EmailMessageForms(BaseForm):
     title = StringField(name="邮件标题")
     receivers = MemberField(name="收件人", field_type="MULTI_MEMBERS")
     content = StringField(name="内容", field_type="TEXT", is_tips=True, tips="文本格式支持html，如果需要换行，请在行尾加 &lt;br/&gt;")
+
+
+class BaseMessageForms(BaseForm):
+    """
+    发送通用通知的输入数据格式
+    """
+
+    title = StringField(name="标题")
+    receivers = MemberField(name="收件人", field_type="MULTI_MEMBERS")
+    content = StringField(name="内容", field_type="TEXT")

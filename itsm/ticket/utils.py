@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
 from mako.template import Template
 
 from common.log import logger
+from itsm.component.constants import GENERAL_NOTICE
 from itsm.component.utils.misc import transform_single_username
 from itsm.iadmin.contants import ACTION_CHOICES_DICT
 from itsm.iadmin.models import CustomNotice
@@ -69,6 +70,8 @@ def compute_list_difference(current, new):
 
 
 def get_custom_notify(ticket, action, notify_type, used_by=None):
+    if not notify_type:
+        notify_type = GENERAL_NOTICE
     query_params = {
         "action": action,
         "notify_type": notify_type,
