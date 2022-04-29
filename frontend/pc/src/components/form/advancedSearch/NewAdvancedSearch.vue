@@ -95,6 +95,7 @@
                                     :list="item.list"
                                     :check-any-level="true"
                                     clearable
+                                    @change="onFormChange($event, item)"
                                     :ext-popover-cls="'custom-cls'">
                                 </bk-cascade>
                             </bk-form-item>

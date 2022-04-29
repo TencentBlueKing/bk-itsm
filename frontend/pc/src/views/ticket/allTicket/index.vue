@@ -325,7 +325,7 @@
                 editTabId: '',
                 fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
                 checkTabNameList: [],
-                customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
+                customForm: SEARCH_FORM.slice(0),
                 customRules: {
                     name: [
                         {
@@ -797,6 +797,7 @@
             },
             // 展开高级搜索
             handleSearchFormChange (key, val) {
+                console.log(key, val)
                 if (key === 'catalog_id') {
                     const formItem = this.searchForms.find(item => item.key === 'service_id__in')
                     formItem.display = val.length
