@@ -30,10 +30,16 @@ import django
 
 from itsm.workflow.models import *  # noqa
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 django.setup()
 
-category_parent = {"level": 1, "key": "zi_kai_fa_ye_wu_lei", "name": "自开发业务类", "desc": "描述1", "parent_key": ""}
+category_parent = {
+    "level": 1,
+    "key": "zi_kai_fa_ye_wu_lei",
+    "name": "自开发业务类",
+    "desc": "描述1",
+    "parent_key": "",
+}
 
 category_child = {
     "level": 2,
@@ -45,7 +51,10 @@ category_child = {
 
 change_type = {"key": "normal", "name": "常规", "desc": "常规变更"}
 
-service_property = {"change": {"change_type": "test_plat_type"}, "public": {"service_category": "yi_ji_mu_lu"}}
+service_property = {
+    "change": {"change_type": "test_plat_type"},
+    "public": {"service_category": "yi_ji_mu_lu"},
+}
 
 workflow = {
     "name": "自研业务类变更流程{}",
@@ -433,16 +442,17 @@ def init_workflow_data():
     obj = Workflow.objects.create_workflow(workflow)
     obj_map = State.objects.create_states(obj.id, states)
     Transition.objects.create_transitions(obj.id, transitions, obj_map)
-    Notify.init_builtin_notify()
     Field.objects.create_fields(obj.id, fields)
 
     import random
 
     for id, state in obj_map.items():
         state_obj = State.objects.get(id=state)
-        state_obj.fields = Field.objects.filter(id__lte=random.randint(1, 6)).values_list("id", flat=True)
+        state_obj.fields = Field.objects.filter(
+            id__lte=random.randint(1, 6)
+        ).values_list("id", flat=True)
         state_obj.save()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     init_workflow_data()
