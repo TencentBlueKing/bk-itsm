@@ -380,7 +380,7 @@
                     // body
                     const body_params = {
                         type: bodyRadio !== 'none' ? bodyRadio : '',
-                        row_type: '',
+                        raw_type: '',
                         content: ''
                     }
                     if (bodyRadio === 'form-data') {
@@ -388,7 +388,7 @@
                     } else if (bodyRadio === 'x-www-form-urlencoded') {
                         body_params.content = bodyWwwForm.filter(item => item.select)
                     } else if (bodyRadio === 'raw') {
-                        body_params.row_type = rawType
+                        body_params.raw_type = rawType
                         body_params.content = bodyValue
                     }
                     // settings

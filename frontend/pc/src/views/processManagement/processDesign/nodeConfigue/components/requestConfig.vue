@@ -306,7 +306,7 @@
                     } else if (body.type === 'x-www-form-urlencoded') {
                         this.config.bodyWwwForm = [...body.content, ...this.config.bodyWwwForm]
                     } else if (body.type === 'raw') {
-                        this.config.rawType = body.row_type
+                        this.config.rawType = body.raw_type
                         this.config.bodyValue = body.content
                     }
                 }
@@ -339,8 +339,8 @@
                     } else if (body.type === 'form-data') {
                         // this.config.body =
                     } else if (body.type === 'raw') {
-                        this.config.rawType = body.row_type
-                        this.config.bodyValue = body.value
+                        this.config.rawType = body.raw_type
+                        this.config.bodyValue = body.content
                     }
                     if ('auth_type' in auth) {
                         this.config.authRadio = auth.auth_type
