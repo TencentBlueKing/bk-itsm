@@ -37,27 +37,27 @@
                     <i class="bk-icon" :class="[panel.icon]"></i>
                     <span class="panel-name">{{panel.label}}</span>
                 </template>
-                <div v-for="(subPanel, subIndex) in itemInfo.sub_components"
+                <!-- <div v-for="(subPanel, subIndex) in itemInfo.sub_components"
                     :key="subIndex"
-                    v-if="activeName === subPanel.name">
-                    <div v-for="(field, fieldIndex) in subPanel.field_schema"
-                        :key="fieldIndex"
-                        class="mb20"
-                        :test-posi-id="field.key">
-                        <bk-form-item
-                            :label="field.name"
-                            :required="field.required"
-                            :key="index"
-                            :desc="field.tips">
-                            <change-conductor
-                                :index="index"
-                                :item-info="field"
-                                :origin="'message'"
-                                @change-panel-status="changePanelStatus(subPanel, subIndex)">
-                            </change-conductor>
-                        </bk-form-item>
-                    </div>
+                    v-if="activeName === subPanel.name"> -->
+                <div v-for="(field, fieldIndex) in panel.field_schema"
+                    :key="field.key"
+                    class="mb20"
+                    :test-posi-id="field.key">
+                    <bk-form-item
+                        :label="field.name"
+                        :required="field.required"
+                        :key="index"
+                        :desc="field.tips">
+                        <change-conductor
+                            :index="index"
+                            :item-info="field"
+                            :origin="'message'"
+                            @change-panel-status="changePanelStatus(panel, fieldIndex)">
+                        </change-conductor>
+                    </bk-form-item>
                 </div>
+                <!-- </div> -->
             </bk-tab-panel>
         </bk-tab>
     </div>
