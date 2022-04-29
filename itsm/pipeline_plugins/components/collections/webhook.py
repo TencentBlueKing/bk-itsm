@@ -80,7 +80,7 @@ class ParamsBuilder:
 
         body = {
             "type": self.extras.get("body")["type"],
-            "row_type": self.extras.get("body")["row_type"],
+            "raw_type": self.extras.get("body")["raw_type"],
             "content": content,
         }
         data.update(
@@ -104,7 +104,7 @@ class WebHookService(ItsmBaseService):
             "headers": {},
             "body": {
                 "type": "row, json",
-                "row_type": "json, "
+                "raw_type": "json, "
                 "value": ""
             },
             "timeout": "",

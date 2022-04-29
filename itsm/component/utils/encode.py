@@ -53,9 +53,9 @@ class EncodeWebhook(object):
             "xml": "application/xml",
         }
 
-        row_type = body["row_type"]
+        raw_type = body["raw_type"]
         self.headers.update(
-            {"Content-Type": content_type_headers.get(row_type.lower(), "text/plain")}
+            {"Content-Type": content_type_headers.get(raw_type.lower(), "text/plain")}
         )
         if isinstance(body["content"], str):
             return body["content"].encode("utf-8")
