@@ -388,7 +388,7 @@
                     } else if (bodyRadio === 'x-www-form-urlencoded') {
                         body_params.content = bodyWwwForm.filter(item => item.select)
                     } else if (bodyRadio === 'raw') {
-                        body_params.raw_type = rawType
+                        body_params.raw_type = rawType || 'Text'
                         body_params.content = bodyValue
                     }
                     // settings
