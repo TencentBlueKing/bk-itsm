@@ -82,7 +82,7 @@ class PipelineTest(TestCase):
                 {"key": "bk_app_code", "value": "itsm"},
             ],
             "headers": [],
-            "body": {"type": "form_data", "params": [], "row_type": "", "content": ""},
+            "body": {"type": "form_data", "params": [], "raw_type": "", "content": ""},
             "settings": {"timeout": 10},
             "success_exp": "",
         }
@@ -118,7 +118,7 @@ class PipelineTest(TestCase):
                 {"key": "bk_username", "value": "admin"},
             ],
             "headers": [],
-            "body": {"type": "form_data", "params": [], "row_type": "", "content": ""},
+            "body": {"type": "form_data", "params": [], "raw_type": "", "content": ""},
             "settings": {"timeout": 10},
             "success_exp": "",
         }
