@@ -24,12 +24,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import copy
-import traceback
-from functools import wraps
-
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -62,11 +58,10 @@ from itsm.component.drf.pagination import OpenApiPageNumberPagination
 from itsm.component.exceptions import (
     OperateTicketError,
     ParamError,
-    ServerError,
     TicketNotFoundError,
     CreateTicketError,
 )
-from itsm.component.utils.drf import format_validation_message
+from itsm.openapi.decorators import catch_openapi_exception
 from itsm.openapi.ticket.serializers import (
     TicketCreateSerializer,
     TicketListSerializer,
@@ -95,57 +90,6 @@ from itsm.ticket.validators import (
     FieldSerializer,
     edit_field_validate,
 )
-
-
-def catch_ticket_operate_exception(view_func):
-    """单据处理接口的公共异常捕捉"""
-
-    # @wraps(view_func, assigned=available_attrs(view_func))
-    @wraps(view_func)
-    def __wrapper(self, request, *args, **kwargs):
-        try:
-            return view_func(self, request, *args, **kwargs)
-        except Ticket.DoesNotExist:
-            return Response(
-                {
-                    "result": False,
-                    "code": TicketNotFoundError.ERROR_CODE_INT,
-                    "data": None,
-                    "message": TicketNotFoundError.MESSAGE,
-                }
-            )
-        except ServerError as e:
-            # 捕捉drf序列化检验的自定义错误
-            return Response(
-                {
-                    "result": False,
-                    "code": e.code_int,
-                    "data": None,
-                    "message": e.message,
-                }
-            )
-        except ValidationError as e:
-            # 捕捉drf序列化检验原始错误
-            return Response(
-                {
-                    "result": False,
-                    "code": ParamError.ERROR_CODE_INT,
-                    "data": None,
-                    "message": format_validation_message(e),
-                }
-            )
-        except Exception as e:
-            logger.error(traceback.format_exc())
-            return Response(
-                {
-                    "result": False,
-                    "code": OperateTicketError.ERROR_CODE_INT,
-                    "data": None,
-                    "message": _("接口异常，请检查请求参数: {}").format(e),
-                }
-            )
-
-    return __wrapper
 
 
 @method_decorator(login_exempt, name="dispatch")
@@ -400,7 +344,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(self.serializer_class(ticket).data)
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def create_ticket(self, request):
         """
@@ -446,7 +390,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         )
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def operate_node(self, request):
         """
@@ -506,7 +450,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response()
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def operate_ticket(self, request):
         """
@@ -565,7 +509,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response()
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     def proceed_approval(self, request):
         # 审批节点的处理
         serializer = ProceedApprovalSerializer(
@@ -637,7 +581,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response()
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     def proceed_fast_approval(self, request):
         """
         处理快速审批请求
@@ -649,7 +593,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return proceed_fast_approval(request)
 
     @action(detail=False, methods=["get"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def get_tickets_by_user(self, request):
         # 初始化serializer的上下文
@@ -675,7 +619,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         return Response(data)
 
     @action(detail=False, methods=["post"], url_path="token/verify")
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     def verify(self, request):
         token = request.data.get("token", "")
         message = settings.APP_CODE + "_" + settings.SECRET_KEY
@@ -688,13 +632,13 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
         )
 
     @action(detail=False, methods=["get"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def callback_failed_ticket(self, request):
         return Response(Cache().hkeys("callback_error_ticket"))
 
     @action(detail=False, methods=["post"])
-    @catch_ticket_operate_exception
+    @catch_openapi_exception
     @custom_apigw_required
     def add_follower(self, request, *args, **kwargs):
         """关注or取关"""
