@@ -1056,7 +1056,6 @@
             async getResponseList () {
                 await this.$store.dispatch('trigger/getResponseList').then(async (res) => {
                     this.responseWayList = res.data
-                    console.log(res.data)
                     // todo:任务模板和公共触发器中不允许修改字段值
                     if (!this.originInfoToTrigger.id || this.originInfoToTrigger.source === 'task') {
                         this.responseWayList = this.responseWayList.filter(way => way.key !== 'modify_field' && way.key !== 'modify_specified_state_processor')
