@@ -7,11 +7,11 @@
         </div>
         <div :id="editorId">
         </div>
-        <!-- <ul class="bullet-box" :style="{ left: left + 'px', top: top + 'px', display: showFlag }">
+        <ul class="bullet-box" :style="{ left: left + 'px', top: top + 'px', display: showFlag }">
             <li v-for="item in list" :key="item.key" @click="selectLine(item)">
                 {{item.name}}
             </li>
-        </ul> -->
+        </ul>
     </div>
 </template>
 
@@ -32,7 +32,11 @@
                 left: '0px',
                 top: '0px',
                 showFlag: 'none',
-                list: [],
+                list: [
+                    { key: 1, name: '1' },
+                    { key: 5, name: '2' },
+                    { key: 2, name: '3' }
+                ],
                 isInsideComment: false
             }
         },
@@ -51,8 +55,8 @@
                     const menuH = wangED.offsetHeight - textDom.offsetHeight
                     this.left = pos.left
                     this.top = menuH + pos.height + pos.top
-                    // const childEle = document.getElementsByClassName('bullet-box')[0]
-                    // console.log(childEle)
+                    const childEle = document.getElementsByClassName('bullet-box')[0]
+                    console.log(childEle)
                 } else {
                     this.showFlag = 'none'
                 }

@@ -73,6 +73,7 @@ from itsm.component.constants import (
     STARTER,
     LEN_XXX_LONG,
     EXCEPTION_DISTRIBUTE_OPERATE,
+    WEBHOOK_STATE,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.exceptions import TriggerValidateError
@@ -268,6 +269,11 @@ class StatusSerializer(serializers.ModelSerializer):
                 "error_message": inst.error_message,
             }
             data["api_info"] = remote_info
+        elif inst.state["type"] == WEBHOOK_STATE:
+            data["api_info"] = {
+                "webhook_info": data["contexts"].get("build_params", {}),
+                "variables": data["contexts"].get("variables", {}),
+            }
         elif inst.state["type"] in [SIGN_STATE, APPROVAL_STATE]:
             # Get sign task progress
             sign_tasks = SignTask.objects.filter(status_id=inst.id)
@@ -294,7 +300,9 @@ class StatusSerializer(serializers.ModelSerializer):
                 inst.bk_biz_id, inst.processors_type, inst.processors, inst.ticket
             )
             # 得到节点当前任务的已处理人
-            current_tasks_processors = list(set(sign_tasks_processor_list).intersection(set(user_list)))
+            current_tasks_processors = list(
+                set(sign_tasks_processor_list).intersection(set(user_list))
+            )
             tasks = []
             for user in user_list[0:30]:
                 task_can_view = False

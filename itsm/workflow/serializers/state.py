@@ -150,6 +150,15 @@ class StateSerializer(serializers.ModelSerializer):
                     validated_data["variables"]["outputs"],
                 )
                 validated_data["variables"].update(outputs=outputs)
+
+            if validated_data.get("type", "") == "WEBHOOK":
+                outputs = GlobalVariable.objects.create_global_variable(
+                    instance.id,
+                    instance.workflow_id,
+                    instance.variables["outputs"],
+                    validated_data["variables"]["outputs"],
+                )
+                validated_data["variables"].update(outputs=outputs)
             if validated_data.get("type", "") == "TASK-SOPS":
                 GlobalVariable.objects.get_or_create(
                     key="sops_result_%s" % instance.id,
