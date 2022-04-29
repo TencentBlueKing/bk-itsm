@@ -257,26 +257,27 @@
             },
             'config.bodyValue' (val) {
                 // 定位变量位置
-                const textDom = this.$refs.textarea
-                console.log(textDom.scrollTop, '滚动条高度')
-                const pos = position(textDom)
-                // const off = offset(textDom)
-                this.left = pos.left + 10
-                this.top = pos.top + 40 + 24 + 2 - textDom.scrollTop
-                if (!val) {
-                    this.rawVarList = []
-                    return
-                }
-                const index = val.lastIndexOf('\{\{')
-                if (index !== -1) {
-                    const params = val.substring(index + 2, val.length) || ''
-                    // console.log(params)
-                    this.filterParams = params
-                    this.rawVarList = this.stateList.filter(item => {
-                        return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
-                    })
-                    if (this.rawVarList.length !== 0) {
-                        this.$refs.textarea.focus()
+                if (this.$refs.textarea) {
+                    const textDom = this.$refs.textarea
+                    const pos = position(textDom)
+                    // const off = offset(textDom)
+                    this.left = pos.left + 10
+                    this.top = pos.top + 40 + 24 + 2 - textDom.scrollTop
+                    if (!val) {
+                        this.rawVarList = []
+                        return
+                    }
+                    const index = val.lastIndexOf('\{\{')
+                    if (index !== -1) {
+                        const params = val.substring(index + 2, val.length) || ''
+                        // console.log(params)
+                        this.filterParams = params
+                        this.rawVarList = this.stateList.filter(item => {
+                            return item.name.indexOf(params) !== -1 || item.key.indexOf(params) !== -1
+                        })
+                        if (this.rawVarList.length !== 0) {
+                            this.$refs.textarea.focus()
+                        }
                     }
                 }
             }
