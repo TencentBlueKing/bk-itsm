@@ -31,18 +31,24 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.conf import settings
 
-from itsm.component.constants import INNER_API_INSTANCE_ID, INNER_STATE_ID, INNER_TICKET_ID
+from itsm.component.constants import (
+    INNER_API_INSTANCE_ID,
+    INNER_STATE_ID,
+    INNER_TICKET_ID,
+)
 from requests_tracker.filtering import filters
 from requests_tracker.models import Record
-from requests_tracker.utils.http_message import render_request_message, render_response_message
-
+from requests_tracker.utils.http_message import (
+    render_request_message,
+    render_response_message,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def get_url(prep):
     _ = urlsplit(prep.url)
-    return urlunsplit((_.scheme, _.netloc, _.path, '', ''))
+    return urlunsplit((_.scheme, _.netloc, _.path, "", ""))
 
 
 def response_handler(sender, uid, prep, resp, duration, **kwargs):
@@ -51,12 +57,13 @@ def response_handler(sender, uid, prep, resp, duration, **kwargs):
     if not filters.rt_filter(prep, **kwargs):
         return
 
+    request_host = (resp.raw._original_response.peer or "")[0:128]
     try:
         Record.objects.create(
             uid=uid,
-            url=get_url(prep),
-            api_uid=kwargs.get('api_uid', ''),
-            operator=kwargs.get('operator', ''),
+            url=get_url(prep)[0:255],
+            api_uid=kwargs.get("api_uid", ""),
+            operator=kwargs.get("operator", ""),
             state_id=kwargs.get(INNER_STATE_ID, 0),
             ticket_id=kwargs.get(INNER_TICKET_ID, 0),
             api_instance_id=kwargs.get(INNER_API_INSTANCE_ID, 0),
@@ -66,7 +73,7 @@ def response_handler(sender, uid, prep, resp, duration, **kwargs):
             response_message=render_response_message(resp)[0 : 2048 * 8],
             remark=resp.reason,
             duration=duration,
-            request_host=resp.raw._original_response.peer,
+            request_host=request_host,
         )
     except Exception as e:
         logger.warning("save response record error: %s" % str(e))
@@ -82,9 +89,9 @@ def request_failed_handler(sender, uid, prep, exception, duration, **kwargs):
     try:
         Record.objects.create(
             uid=uid,
-            url=get_url(prep),
-            api_uid=kwargs.get('api_uid', ''),
-            operator=kwargs.get('operator', ''),
+            url=get_url(prep)[0:255],
+            api_uid=kwargs.get("api_uid", ""),
+            operator=kwargs.get("operator", ""),
             state_id=kwargs.get(INNER_STATE_ID, 0),
             ticket_id=kwargs.get(INNER_TICKET_ID, 0),
             api_instance_id=kwargs.get(INNER_API_INSTANCE_ID, 0),
