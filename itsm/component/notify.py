@@ -46,14 +46,24 @@ class BaseNotifier(object):
     def get_notify_class(self, notify_type, **kwargs):
         """获取通知类"""
 
-        if notify_type == 'weixin':
-            return WeixinNotifier(self.title, self.receivers, self.message, ticket_id=kwargs.get('ticket_id'))
+        if notify_type == "weixin":
+            return WeixinNotifier(
+                self.title,
+                self.receivers,
+                self.message,
+                ticket_id=kwargs.get("ticket_id"),
+            )
 
-        if notify_type == 'email':
+        if notify_type == "email":
             return EmailNotifier(self.title, self.receivers, self.message)
 
-        if notify_type == 'sms':
-            return SmsNotifier(self.title, self.receivers, self.message, receiver_nums=kwargs.get('receiver_nums'))
+        if notify_type == "sms":
+            return SmsNotifier(
+                self.title,
+                self.receivers,
+                self.message,
+                receiver_nums=kwargs.get("receiver_nums"),
+            )
 
         return BaseNotifier(self.title, self.receivers, self.message, notify_type)
 
@@ -64,7 +74,9 @@ class BaseNotifier(object):
         # 1.获取消息通知类型
         try:
             result = client_backend.cmsi.get_msg_type()
-            notify_type_list = [ins["type"] for ins in result if ins["is_active"]]
+            notify_type_list = [
+                ins["type"].upper() for ins in result if ins["is_active"]
+            ]
         except ComponentCallError as e:
             logger.error("查询消息通知类型失败，error:{}".format(e))
             raise e
@@ -74,7 +86,9 @@ class BaseNotifier(object):
             logger.info("不支持当前通知类型，notify_type:{}".format(self.notify_type))
             return
         # 3.构建通用消息发送接口参数
-        params = merge_dict_list([self.params, kwargs, {"msg_type": self.notify_type}])
+        params = merge_dict_list(
+            [self.params, kwargs, {"msg_type": self.notify_type.lower()}]
+        )
         # 4.通用消息发送
         try:
             return client_backend.cmsi.send_msg(params)
@@ -106,7 +120,7 @@ class WeixinNotifier(BaseNotifier):
         message,
         wx_qy_agentid=settings.WX_QY_AGENTID,
         wx_qy_corpsecret=settings.WX_QY_CORPSECRET,
-        ticket_id='',
+        ticket_id="",
     ):
         """支持指定通道发送企业微信消息"""
 
@@ -117,11 +131,13 @@ class WeixinNotifier(BaseNotifier):
         super(WeixinNotifier, self).__init__(title, receivers, message)
 
     def send(self, **kwargs):
-        params = merge_dict_list([self.params, kwargs, {'msg_type': settings.QY_WEIXIN}])
+        params = merge_dict_list(
+            [self.params, kwargs, {"msg_type": settings.QY_WEIXIN}]
+        )
         try:
             client_backend.cmsi.send_msg(params)
         except ComponentCallError as e:
-            if e.esb_message.startswith('Some users failed'):
+            if e.esb_message.startswith("Some users failed"):
                 return
             raise e
 
@@ -132,9 +148,9 @@ class WeixinNotifier(BaseNotifier):
             "title": self.title,
             "content": self.message,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "remark": _('<a href="https://{site_url}weixin/#/detail/{ticket_id}/">点击查看详情</a>').format(
-                site_url=WEIXIN_SHARE_URL, ticket_id=self.ticket_id
-            ),
+            "remark": _(
+                '<a href="https://{site_url}weixin/#/detail/{ticket_id}/">点击查看详情</a>'
+            ).format(site_url=WEIXIN_SHARE_URL, ticket_id=self.ticket_id),
             "wx_qy_agentid": self.wx_qy_agentid,
             "wx_qy_corpsecret": self.wx_qy_corpsecret,
         }
@@ -166,10 +182,10 @@ class SmsNotifier(BaseNotifier):
 
     def send(self, **kwargs):
         try:
-            params = merge_dict_list([self.params, kwargs, kwargs, {'msg_type': 'sms'}])
+            params = merge_dict_list([self.params, kwargs, kwargs, {"msg_type": "sms"}])
             return client_backend.cmsi.send_sms(params)
         except ComponentCallError as e:
-            if e.esb_message.startswith('Some users failed'):
+            if e.esb_message.startswith("Some users failed"):
                 return
             raise e
 
