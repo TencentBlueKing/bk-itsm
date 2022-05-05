@@ -27,7 +27,7 @@
             :style="{ backgroundColor: headerInfo.statusColor }"
             :title="ticketInfo.current_status_display"
             class="ticket-status">
-            {{ localeCookie ? ticketInfo.current_status_display : ticketInfo.current_status }}
+            {{ localeCookie ? ticketInfo.current_status : ticketInfo.current_status_display}}
         </span>
         <span class="ticket-status comments-info"
             v-if="ticketInfo.is_commented || ticketInfo.can_commen">
