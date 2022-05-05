@@ -797,7 +797,6 @@
             },
             // 展开高级搜索
             handleSearchFormChange (key, val) {
-                console.log(key, val)
                 if (key === 'catalog_id') {
                     const formItem = this.searchForms.find(item => item.key === 'service_id__in')
                     formItem.display = val.length
