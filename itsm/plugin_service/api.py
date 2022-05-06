@@ -18,12 +18,12 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from plugin_service import env
-from plugin_service.conf import PLUGIN_LOGGER
-from plugin_service.api_decorators import inject_plugin_client, validate_params
-from plugin_service.exceptions import PluginServiceException
-from plugin_service.plugin_client import PluginServiceApiClient
-from plugin_service.serializers import (
+from itsm.plugin_service import env
+from itsm.plugin_service.conf import PLUGIN_LOGGER
+from itsm.plugin_service.api_decorators import inject_plugin_client, validate_params
+from itsm.plugin_service.exceptions import PluginServiceException
+from itsm.plugin_service.plugin_client import PluginServiceApiClient
+from itsm.plugin_service.serializers import (
     PluginListResponseSerializer,
     DetailResponseSerializer,
     MetaResponseSerializer,

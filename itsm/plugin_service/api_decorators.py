@@ -17,8 +17,8 @@ from django.http import JsonResponse
 from rest_framework.request import Request
 
 from .conf import PLUGIN_CLIENT_LOGGER
-from plugin_service.exceptions import PluginServiceException
-from plugin_service.plugin_client import PluginServiceApiClient
+from itsm.plugin_service.exceptions import PluginServiceException
+from itsm.plugin_service.plugin_client import PluginServiceApiClient
 
 logger = logging.getLogger(PLUGIN_CLIENT_LOGGER)
 

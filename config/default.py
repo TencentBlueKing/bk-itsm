@@ -103,6 +103,7 @@ INSTALLED_APPS += (
     # 'flower',
     # 'monitors',
     "itsm.monitor",
+    "itsm.plugin_service",
 )
 
 # IAM 开启开关

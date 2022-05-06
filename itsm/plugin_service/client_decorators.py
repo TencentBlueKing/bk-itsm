@@ -2,7 +2,7 @@ import functools
 import logging
 
 from . import env
-from plugin_service.conf import PLUGIN_CLIENT_LOGGER
+from itsm.plugin_service.conf import PLUGIN_CLIENT_LOGGER
 
 
 logger = logging.getLogger(PLUGIN_CLIENT_LOGGER)
