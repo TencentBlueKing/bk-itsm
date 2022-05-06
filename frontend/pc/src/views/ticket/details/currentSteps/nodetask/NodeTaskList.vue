@@ -386,7 +386,6 @@
                     this.taskList.forEach(item => {
                         this.$set(item, 'editOrder', item.order)
                     })
-                    this.$store.commit('taskFlow/setTaskList', res.data)
                     // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询,否则为处理完成状态,需刷新单据
                     const loopStatusList = ['QUEUE', 'RUNNING', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'WAITING_FOR_CONFIRM']
                     if (!res.data.some(task => loopStatusList.includes(task.status)) && source === 'refreshBtn') {
