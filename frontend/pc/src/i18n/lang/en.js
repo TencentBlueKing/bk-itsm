@@ -2542,5 +2542,6 @@ export const m = {
     '通知方式': 'Notification method',
     '通知类型': 'Notification type',
     '提单节点字段信息：': 'Bill of lading node field information:',
-    '基础字段信息：': 'Basic field information:'
+    '基础字段信息：': 'Basic field information:',
+    '节点任务': 'Node Task'
 }

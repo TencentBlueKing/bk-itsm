@@ -105,7 +105,7 @@
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['任务类型']`)">
                     <template slot-scope="props">
-                        <span v-bk-tooltips.top="props.row.processor_users">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
+                        <span v-bk-tooltips.top="props.row.component_type">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
@@ -386,6 +386,7 @@
                     this.taskList.forEach(item => {
                         this.$set(item, 'editOrder', item.order)
                     })
+                    this.$store.commit('taskFlow/setTaskList', res.data)
                     // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询,否则为处理完成状态,需刷新单据
                     const loopStatusList = ['QUEUE', 'RUNNING', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'WAITING_FOR_CONFIRM']
                     if (!res.data.some(task => loopStatusList.includes(task.status)) && source === 'refreshBtn') {

@@ -125,6 +125,26 @@
                     </div>
                 </template>
             </div>
+            <template v-if="filterList.length !== 0">
+                <h3 class="bk-basic-h3">{{ $t('m["节点任务"]') }}</h3>
+                <bk-table
+                    :data="filterList"
+                    :size="'small'">
+                    <bk-table-column :label="$t(`m.task['顺序']`)" prop="order" :width="60"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['任务名称']`)" prop="name"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['处理人']`)" prop="processor_users"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['任务类型']`)">
+                        <template slot-scope="props">
+                            <span v-bk-tooltips.top="props.row.component_type">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.task['状态']`)">
+                        <template slot-scope="props">
+                            <task-status :status="props.row.status"></task-status>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
+            </template>
         </div>
     </div>
 </template>
@@ -138,6 +158,8 @@
     import signNodeInfo from './signNodeInfo'
     import approvalNodeInfo from './approvalNodeInfo'
     import { errorHandler } from '@/utils/errorHandler'
+    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue'
+    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js'
 
     export default {
         name: 'nodeContent',
@@ -148,7 +170,8 @@
             sopsNodeInfo,
             signNodeInfo,
             approvalNodeInfo,
-            devopsNodeInfo
+            devopsNodeInfo,
+            taskStatus
         },
         props: {
             readOnly: Boolean,
@@ -187,10 +210,18 @@
                     { name: this.$t(`m.newCommon["处理人"]`), value: '', key: 'processors' },
                     { name: this.$t(`m.newCommon["处理时间"]`), value: '', key: 'update_at' }
                 ],
-                openStatus: true
+                openStatus: true,
+                taskTemplateTypes: TASK_TEMPLATE_TYPES,
+                taskList: []
             }
         },
         computed: {
+            filterList () {
+                if (this.nodeList && this.nodeList[0]) {
+                    return this.taskList.filter(item => item.execute_state_id === this.nodeList[0].state_id)
+                }
+                return []
+            },
             nodeListCurren () {
                 const nodeListCurren = this.nodeList.filter(
                     item => {
@@ -215,10 +246,23 @@
                     }
                 }, 10000
             )
+            this.getTaskList()
         },
         methods: {
             initInfo () {
                 this.$emit('initInfo')
+            },
+            getTaskList () {
+                const params = {
+                    ticket_id: this.basicInfomation.id
+                }
+                this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
+                    this.taskList = res.data
+                })
+            },
+            getTaskTypeName (type) {
+                const target = this.taskTemplateTypes.find(m => m.type === type)
+                return target ? target.name : type
             },
             getTicketNodeInfo (openNodeInfo) {
                 const id = this.basicInfomation.id
