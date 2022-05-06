@@ -29,7 +29,7 @@
                 :key="index"
                 :test-posi-id="panel.key">
                 <template slot="label">
-                    <bk-checkbox style="float: left; margin: 12px 8px 0 0;"
+                    <bk-checkbox style="float: left; margin: 0px 8px 0 0;"
                         :true-value="trueStatus"
                         :false-value="falseStatus"
                         v-model="panel.checked">
@@ -87,11 +87,13 @@
             }
         },
         computed: {
-
         },
         created () {
             this.itemInfo.sub_components.forEach(item => {
                 this.$set(item, 'checked', (item.checked || false))
+                if (item.checked) {
+                    this.activeName = item.name
+                }
                 this.$set(item, 'label', item.name)
                 this.$set(item, 'icon', '')
                 switch (item.key) {
@@ -105,11 +107,10 @@
                         item.icon = 'icon-weixin'
                         break
                 }
-                item.name = item.key
+                // item.name = item.key
             })
         },
         mounted () {
-
         },
         methods: {
             changPanel (name) {
@@ -133,6 +134,12 @@
     .bk-send-message {
         /deep/ .bk-tab-label-item{
             min-width: 200px;
+            .bk-tab-label {
+                padding: 0 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
     }
 </style>
