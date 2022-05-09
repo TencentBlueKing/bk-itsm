@@ -21,10 +21,10 @@
   -->
 
 <template>
-    <div class="bk-node-content" v-bkloading="{ isLoading: !nodeListCurren[0] }">
+    <div class="bk-node-content" v-bkloading="{ isLoading: !nodeListCurrent[0] }">
         <template
-            v-if="nodeListCurren[0] && (nodeListCurren[0].can_operate || nodeListCurren[0].can_view) && nodeListCurren[0].type !== 'TASK-SOPS'">
-            <div class="bk-logs-basic" v-if="nodeListCurren[0] && nodeListCurren[0].action_type === 'TRANSITION'">
+            v-if="nodeListCurrent[0] && (nodeListCurrent[0].can_operate || nodeListCurrent[0].can_view) && nodeListCurrent[0].type !== 'TASK-SOPS'">
+            <div class="bk-logs-basic" v-if="nodeListCurrent[0] && nodeListCurrent[0].action_type === 'TRANSITION'">
                 <h3 class="bk-basic-h3">{{ $t('m.newCommon["基本信息"]') }}</h3>
                 <ul>
                     <li v-for="(item, index) in basicList" :key="index">
@@ -36,12 +36,12 @@
         </template>
         <div class="bk-logs-basic">
             <template
-                v-if="nodeListCurren[0] && (nodeListCurren[0].can_operate || nodeListCurren[0].can_view) &&
-                    (nodeListCurren[0].type === 'NORMAL' || nodeListCurren[0].type === 'SIGN')">
+                v-if="nodeListCurrent[0] && (nodeListCurrent[0].can_operate || nodeListCurrent[0].can_view) &&
+                    (nodeListCurrent[0].type === 'NORMAL' || nodeListCurrent[0].type === 'SIGN')">
                 <h3 class="bk-basic-h3">
-                    {{nodeListCurren[0].type === 'SIGN' ? $t(`m.newCommon['会签进度']`) : $t('m.newCommon["节点信息"]')}}</h3>
+                    {{nodeListCurrent[0].type === 'SIGN' ? $t(`m.newCommon['会签进度']`) : $t('m.newCommon["节点信息"]')}}</h3>
             </template>
-            <div v-for="(item, index) in nodeListCurren" :key="index" style="position: relative;">
+            <div v-for="(item, index) in nodeListCurrent" :key="index" style="position: relative;">
                 <!-- 有操作权限/有查看权限 -->
                 <template v-if="(item.can_operate || item.can_view)">
                     <div class="bk-node-form-disabled" v-if="!item.can_operate"></div>
@@ -68,7 +68,7 @@
                             :read-only="readOnly"
                             :basic-infomation="basicInfomation"
                             :current-step-list="currentStepList"
-                            :node-list="nodeListCurren"
+                            :node-list="nodeListCurrent"
                             :open-status="openStatus"
                             @closeSlider="closeSlider">
                         </current-steps>
@@ -125,6 +125,26 @@
                     </div>
                 </template>
             </div>
+            <template v-if="filterList.length !== 0">
+                <h3 class="bk-basic-h3">{{ $t('m["节点任务"]') }}</h3>
+                <bk-table
+                    :data="filterList"
+                    :size="'small'">
+                    <bk-table-column :label="$t(`m.task['顺序']`)" prop="order" :width="60"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['任务名称']`)" prop="name"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['处理人']`)" prop="processor_users"></bk-table-column>
+                    <bk-table-column :label="$t(`m.task['任务类型']`)">
+                        <template slot-scope="props">
+                            <span v-bk-tooltips.top="props.row.component_type">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column :label="$t(`m.task['状态']`)">
+                        <template slot-scope="props">
+                            <task-status :status="props.row.status"></task-status>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
+            </template>
         </div>
     </div>
 </template>
@@ -138,6 +158,8 @@
     import signNodeInfo from './signNodeInfo'
     import approvalNodeInfo from './approvalNodeInfo'
     import { errorHandler } from '@/utils/errorHandler'
+    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue'
+    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js'
 
     export default {
         name: 'nodeContent',
@@ -148,7 +170,8 @@
             sopsNodeInfo,
             signNodeInfo,
             approvalNodeInfo,
-            devopsNodeInfo
+            devopsNodeInfo,
+            taskStatus
         },
         props: {
             readOnly: Boolean,
@@ -187,23 +210,31 @@
                     { name: this.$t(`m.newCommon["处理人"]`), value: '', key: 'processors' },
                     { name: this.$t(`m.newCommon["处理时间"]`), value: '', key: 'update_at' }
                 ],
-                openStatus: true
+                openStatus: true,
+                taskTemplateTypes: TASK_TEMPLATE_TYPES,
+                taskList: []
             }
         },
         computed: {
-            nodeListCurren () {
-                const nodeListCurren = this.nodeList.filter(
+            filterList () {
+                if (this.nodeList && this.nodeList[0]) {
+                    return this.taskList.filter(item => item.execute_state_id === this.nodeList[0].state_id)
+                }
+                return []
+            },
+            nodeListCurrent () {
+                const nodeListCurrent = this.nodeList.filter(
                     item => {
                         return item.state_id === this.openNodeInfo.id
                     }
                 )
-                if (nodeListCurren[0]) {
+                if (nodeListCurrent[0]) {
                     for (let i = 0; i < this.basicList.length; i++) {
                         const property = this.basicList[i]
-                        property.value = JSON.parse(JSON.stringify((nodeListCurren[0][property.key] || '')))
+                        property.value = JSON.parse(JSON.stringify((nodeListCurrent[0][property.key] || '')))
                     }
                 }
-                return nodeListCurren
+                return nodeListCurrent
             }
         },
         mounted () {
@@ -215,10 +246,23 @@
                     }
                 }, 10000
             )
+            this.getTaskList()
         },
         methods: {
             initInfo () {
                 this.$emit('initInfo')
+            },
+            getTaskList () {
+                const params = {
+                    ticket_id: this.basicInfomation.id
+                }
+                this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
+                    this.taskList = res.data || []
+                })
+            },
+            getTaskTypeName (type) {
+                const target = this.taskTemplateTypes.find(m => m.type === type)
+                return target ? target.name : type
             },
             getTicketNodeInfo (openNodeInfo) {
                 const id = this.basicInfomation.id

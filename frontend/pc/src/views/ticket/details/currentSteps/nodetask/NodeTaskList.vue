@@ -105,7 +105,7 @@
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['任务类型']`)">
                     <template slot-scope="props">
-                        <span v-bk-tooltips.top="props.row.processor_users">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
+                        <span v-bk-tooltips.top="props.row.component_type">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
