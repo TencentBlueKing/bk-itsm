@@ -27,10 +27,12 @@ import copy
 import re
 
 from rest_framework import serializers
+from rest_framework.fields import empty
 from rest_framework.serializers import ModelSerializer
 
 from itsm.auth_iam.utils import IamRequest
 from itsm.component.constants import CATALOG, FIRST_ORDER
+from itsm.iadmin.validators import ProjectPathTypeValidators
 from itsm.project.models import Project, ProjectSettings, CostomTab
 
 project_name_pattern = re.compile("^[0-9a-zA-Z_-]{1,}$")
@@ -113,7 +115,10 @@ class ProjectSettingSerializer(serializers.ModelSerializer):
     project_key = serializers.CharField(
         required=True, max_length=32, source="project_id"
     )
-    project = ProjectSerializer(required=False)
+
+    def run_validation(self, data=empty):
+        self.validators = (ProjectPathTypeValidators(self.instance),)
+        return super(ProjectSettingSerializer, self).run_validation(data)
 
     class Meta:
         model = ProjectSettings
