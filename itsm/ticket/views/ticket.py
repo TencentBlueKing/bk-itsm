@@ -875,25 +875,28 @@ class TicketModelViewSet(ModelViewSet):
             request=request,
         )
         node_status = ticket.node_status.get(state_id=state_id)
-        if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
-            SignTask.objects.update_or_create(
-                status_id=node_status.id,
-                processor=request.user.username,
-                defaults={"status": "RUNNING"},
-            )
-        else:
-            node_status.status = QUEUEING
-            node_status.save()
 
-        res = ticket.activity_callback(
-            state_id, request.user.username, fields, request.source
-        )
-        if not res.result:
-            logger.warning(
-                "callback error， current state id %s, error message: %s"
-                % (state_id, res.message)
+        with transaction.atomic():
+            # 单据审批新增事务控制
+            if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
+                SignTask.objects.update_or_create(
+                    status_id=node_status.id,
+                    processor=request.user.username,
+                    defaults={"status": "RUNNING"},
+                )
+            else:
+                node_status.status = QUEUEING
+                node_status.save()
+
+            res = ticket.activity_callback(
+                state_id, request.user.username, fields, request.source
             )
-            ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+            if not res.result:
+                logger.warning(
+                    "callback error， current state id %s, error message: %s"
+                    % (state_id, res.message)
+                )
+                ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
         return Response(
             {
                 "code": ResponseCodeStatus.OK
@@ -1084,12 +1087,16 @@ class TicketModelViewSet(ModelViewSet):
         )
         # 构造快速审批通知信息
         fast_approval_message = FAST_APPROVAL_MESSAGE.format(
-            **ticket.get_fast_approval_message_params())
+            **ticket.get_fast_approval_message_params()
+        )
         for step in ticket.current_steps:
             # 快速审批通知
             ticket.notify_fast_approval(
-                step["state_id"], step["processors"], fast_approval_message,
-                action=SUPERVISE_OPERATE, kwargs=kwargs
+                step["state_id"],
+                step["processors"],
+                fast_approval_message,
+                action=SUPERVISE_OPERATE,
+                kwargs=kwargs,
             )
             ticket.notify(
                 state_id=step["state_id"],
