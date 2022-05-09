@@ -28,7 +28,13 @@ from django.utils.translation import ugettext as _
 from itsm.component.notify import EmailNotifier, WeixinNotifier, SmsNotifier
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.component.exceptions import ComponentCallError
-from itsm.trigger.action.core import BaseForm, EmailMessageForms, MessageForms, WechatMessageForms, SubComponentField
+from itsm.trigger.action.core import (
+    BaseForm,
+    EmailMessageForms,
+    MessageForms,
+    WechatMessageForms,
+    SubComponentField,
+)
 
 from itsm.ticket.models import Ticket
 from itsm.task.models import Task
@@ -46,8 +52,10 @@ class SendEmailComponent(BaseComponent):
 
     def _execute(self):
         inputs = self.data.inputs
-        receivers = ",".join(inputs['receivers'])
-        notifier = EmailNotifier(title=inputs['title'], receivers=receivers, message=inputs['content'])
+        receivers = ",".join(inputs["receivers"])
+        notifier = EmailNotifier(
+            title=inputs["title"], receivers=receivers, message=inputs["content"]
+        )
         try:
             notifier.send()
         except ComponentCallError:
@@ -64,8 +72,12 @@ class SendSMSComponent(BaseComponent):
     need_refresh = False
 
     def _execute(self):
-        receivers = ",".join(self.data.inputs['receivers'])
-        notifier = SmsNotifier(title="sms-title needless", receivers=receivers, message=self.data.inputs['content'])
+        receivers = ",".join(self.data.inputs["receivers"])
+        notifier = SmsNotifier(
+            title="sms-title needless",
+            receivers=receivers,
+            message=self.data.inputs["content"],
+        )
         try:
             notifier.send()
         except ComponentCallError:
@@ -82,9 +94,11 @@ class SendWechatComponent(BaseComponent):
     need_refresh = False
 
     def _execute(self):
-        receivers = ",".join(self.data.inputs['receivers'])
+        receivers = ",".join(self.data.inputs["receivers"])
         notifier = WeixinNotifier(
-            title=self.data.inputs['title'], receivers=receivers, message=self.data.inputs['content']
+            title=self.data.inputs["title"],
+            receivers=receivers,
+            message=self.data.inputs["content"],
         )
         try:
             notifier.send()
@@ -99,7 +113,8 @@ class MultiMessageForms(BaseForm):
     """
 
     sub_message_component = SubComponentField(
-        sub_components=[SendEmailComponent, SendSMSComponent, SendWechatComponent], name="对应的所有消息配置信息"
+        sub_components=[SendEmailComponent, SendSMSComponent, SendWechatComponent],
+        name="对应的所有消息配置信息",
     )
 
     def get_cleaned_data_or_error(self):
@@ -110,8 +125,8 @@ class MultiMessageForms(BaseForm):
 class SendMessage(BaseComponent):
     """
     发送通知组合条件
-    :param : 
-    :return: 
+    :param :
+    :return:
     """
 
     name = _("发送通知给用户")
@@ -125,9 +140,9 @@ class SendMessage(BaseComponent):
         #  根据输入参数进行解析子动作的初始化， 根据参数类型
 
         """
-        :param context: 
-        :param params_schema: 
-        :param action_id: 
+        :param context:
+        :param params_schema:
+        :param action_id:
         """
         super(SendMessage, self).__init__(context, params_schema, action_id, countdown)
 
@@ -143,23 +158,24 @@ class SendMessage(BaseComponent):
     def get_sub_action(self, sub_component):
         """
         获取对应的子类对象
-        :param sub_component: 
-        :return: 
+        :param sub_component:
+        :return:
         """
 
         for action_class in self.sub_action_classes:
-            if sub_component['key'] == action_class.code:
-                return action_class(self.context, sub_component['params'])
+            if sub_component["key"] == action_class.code:
+                return action_class(self.context, sub_component["params"])
 
     def _execute(self):
+        result = [True]
         for sub_action in self.sub_actions:
-            sub_action.execute()
-        return True
+            result.append(sub_action.execute())
+        return all(result)
 
     def to_representation_data(self, flat=False):
         """
         获取字段的展示值
-        :return: 
+        :return:
         """
         return self.form.to_representation_data(sub_actions=self.sub_actions, flat=flat)
 
@@ -169,7 +185,7 @@ class SendMessage(BaseComponent):
         """
         try:
             ticket = Ticket.objects.get(sn=self.context.get("ticket_sn"))
-            self.context.update(ticket.get_output_fields(return_format='dict'))
+            self.context.update(ticket.get_output_fields(return_format="dict"))
         except Ticket.DoesNotExist:
             pass
 
