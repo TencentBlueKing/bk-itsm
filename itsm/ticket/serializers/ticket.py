@@ -72,6 +72,7 @@ from itsm.component.constants import (
     STARTER,
     LEN_XXX_LONG,
     EXCEPTION_DISTRIBUTE_OPERATE,
+    WEBHOOK_STATE,
 )
 from itsm.component.dlls.component import ComponentLibrary
 from itsm.component.exceptions import TriggerValidateError
@@ -267,6 +268,11 @@ class StatusSerializer(serializers.ModelSerializer):
                 "error_message": inst.error_message,
             }
             data["api_info"] = remote_info
+        elif inst.state["type"] == WEBHOOK_STATE:
+            data["api_info"] = {
+                "webhook_info": data["contexts"].get("build_params", {}),
+                "variables": data["contexts"].get("variables", {}),
+            }
         elif inst.state["type"] in [SIGN_STATE, APPROVAL_STATE]:
             # Get sign task progress
             sign_tasks = SignTask.objects.filter(status_id=inst.id)
