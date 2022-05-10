@@ -91,7 +91,7 @@
                         <span :title="props.row.current_status_display"
                             class="bk-status-color-info"
                             :style="getstatusColor(props.row)">
-                            {{props.row.current_status_display || '--'}}
+                            {{localeCookie ? props.row.current_status_display : props.row.current_status }}
                         </span>
                     </template>
                 </bk-table-column>
@@ -119,6 +119,7 @@
 
 <script>
     import { errorHandler } from '../../../../utils/errorHandler'
+    import cookie from 'cookie'
 
     export default {
         name: 'InheritTicketAddDialog',
@@ -167,7 +168,8 @@
                     limit: 10
                 },
                 checkList: [],
-                colorHexList: []
+                colorHexList: [],
+                localeCookie: false
             }
         },
         computed: {
@@ -193,6 +195,7 @@
             }
             await this.getTypeStatus()
             await this.getList()
+            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
         },
         methods: {
             getFlag (flag, info) {

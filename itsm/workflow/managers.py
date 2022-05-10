@@ -345,7 +345,7 @@ class WorkflowManager(Manager):
         )
         from itsm.iadmin.models import SystemSettings
         from distutils.dir_util import copy_tree
-        
+
         states = data.pop("states")
         transitions = data.pop("transitions")
         fields = data.pop("fields")
@@ -413,7 +413,7 @@ class WorkflowManager(Manager):
             transitions, new_workflow_id, _state_map
         )
         if new_task_schemas:
-            task_settings = workflow.extras["task_settings"]
+            task_settings = workflow.extras.get("task_settings", [])
             if task_settings and isinstance(task_settings, dict):
                 new_settings = []
                 task_schema_ids = task_settings.pop("task_schema_ids")

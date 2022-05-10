@@ -27,7 +27,7 @@
             :style="{ backgroundColor: headerInfo.statusColor }"
             :title="ticketInfo.current_status_display"
             class="ticket-status">
-            {{ ticketInfo.current_status_display }}
+            {{ localeCookie ? ticketInfo.current_status : ticketInfo.current_status_display}}
         </span>
         <span class="ticket-status comments-info"
             v-if="ticketInfo.is_commented || ticketInfo.can_commen">
@@ -209,6 +209,7 @@
     import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue'
     import StepSubmitDialog from './StepSubmitDialog.vue'
     import { errorHandler } from '@/utils/errorHandler'
+    import cookie from 'cookie'
 
     export default {
         name: 'TicketHeader',
@@ -238,11 +239,13 @@
                 rotate: false,
                 isDropdownShow: false,
                 disabledText: this.$t(`m.newCommon["暂无权限或单据已结束"]`),
-                ticketOperateType: ''
+                ticketOperateType: '',
+                localeCookie: false
             }
         },
         mounted () {
             this.initData()
+            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
         },
         methods: {
             initData () {

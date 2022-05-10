@@ -3,6 +3,7 @@ import copy
 import json
 from datetime import datetime
 
+import mock
 from django.test import TestCase, override_settings
 from blueapps.core.celery.celery import app
 
@@ -21,7 +22,9 @@ class TestUtils(TestCase):
         self.assertEqual(seconds_format(seconds), "455576:13:09")
 
     @override_settings(MIDDLEWARE=("itsm.tests.middlewares.OverrideMiddleware",))
-    def test_sla(self):
+    @mock.patch("itsm.component.decorators.JWTClient")
+    def test_sla(self, patch_jwt_client):
+        patch_jwt_client.is_valid.return_value = True
         workflow_data = copy.deepcopy(DATA)
         workflow, _, _ = Workflow.objects.restore(workflow_data)
         version = workflow.create_version()
