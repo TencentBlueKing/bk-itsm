@@ -203,6 +203,9 @@
             },
             currTabSettingCache () {
                 return this.$store.state.ticket.settingCache['all_' + this.serviceType]
+            },
+            projectSwitch: function () {
+                return this.$store.state.project.projectSwitch
             }
         },
         watch: {
