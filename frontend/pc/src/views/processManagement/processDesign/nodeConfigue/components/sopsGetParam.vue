@@ -212,7 +212,8 @@
                 default () {
                     return true
                 }
-            }
+            },
+            initFormDate: Object
         },
         data () {
             return {
@@ -287,8 +288,11 @@
         },
         computed: {},
         watch: {
-            constants () {
-                this.renderKey = new Date().getTime()
+            constants: {
+                handler () {
+                    this.renderKey = new Date().getTime()
+                },
+                deep: true
             },
             isEdit () {
                 this.renderKey = new Date().getTime()
@@ -314,7 +318,7 @@
                 if (val) {
                     this.formData[scheme.tag_code] = ''
                 } else {
-                    this.formData[scheme.tag_code] = constantItem ? deepClone(this.constantDefaultValue[scheme.tag_code]) : ''
+                    this.formData[scheme.tag_code] = constantItem ? deepClone(this.constantDefaultValue[scheme.tag_code]) : this.initFormDate[scheme.tag_code].value
                     const index = this.quoteErrors.findIndex(item => item === scheme.tag_code)
                     if (index > -1) {
                         this.quoteErrors.splice(index, 1)
