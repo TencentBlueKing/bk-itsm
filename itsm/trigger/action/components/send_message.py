@@ -220,9 +220,10 @@ class SendMessage(BaseComponent):
                 return action_class(self.context, sub_component["params"])
 
     def _execute(self):
+        result = [True]
         for sub_action in self.sub_actions:
-            sub_action.execute()
-        return True
+            result.append(sub_action.execute())
+        return all(result)
 
     def to_representation_data(self, flat=False):
         """
