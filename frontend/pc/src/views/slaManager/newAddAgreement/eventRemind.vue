@@ -93,6 +93,9 @@
                         <bk-checkbox :value="'email'" style="margin-bottom: 12px">
                             {{$t('m.treeinfo["邮件"]')}}
                         </bk-checkbox>
+                        <!-- <bk-checkbox v-for="notice in noticeType" :key="notice.id" :value="notice.typeName.toLowerCase()" style="margin-bottom: 12px">
+                            {{ notice.name }}
+                        </bk-checkbox> -->
                         <bk-checkbox :value="'weixin'">{{$t('m.treeinfo["企业微信"]')}}</bk-checkbox>
                         <bk-form-item
                             data-test-id="slaAgreement-select-emailNotifyEventList"
@@ -106,7 +109,7 @@
                                 size="small"
                                 :popover-width="150"
                                 searchable>
-                                <bk-option v-for="option in emailNotifyEventList"
+                                <bk-option v-for="option in notifyEventList['email']"
                                     :key="option.id"
                                     :id="option.id"
                                     :name="option.name">
@@ -119,7 +122,7 @@
                             v-if="item.notify_type_list.indexOf('weixin') !== -1"
                             :property="'weixin_notify'">
                             <bk-select :clearable="false" :placeholder="$t(`m.slaContent['请选择通知事件']`)" size="small" v-model="item.weixin_notify" searchable>
-                                <bk-option v-for="option in weixinNotifyEventList"
+                                <bk-option v-for="option in notifyEventList['weixin']"
                                     :key="option.id"
                                     :id="option.id"
                                     :name="option.name">
@@ -169,6 +172,8 @@
 
 <script>
     import commonMix from '../../commonMix/common.js'
+    import { mapState } from 'vuex'
+
     export default {
         name: 'priorityConfigur',
         mixins: [commonMix],
@@ -179,16 +184,10 @@
                     return []
                 }
             },
-            emailNotifyEventList: {
-                type: Array,
+            notifyEventList: {
+                type: Object,
                 default () {
-                    return []
-                }
-            },
-            weixinNotifyEventList: {
-                type: Array,
-                default () {
-                    return []
+                    return {}
                 }
             },
             modelPriority: {
@@ -280,6 +279,11 @@
                 },
                 iconOffset: 75
             }
+        },
+        computed: {
+            ...mapState({
+                noticeType: state => state.common.configurInfo.notify_type
+            })
         },
         watch: {
             modelPriority () {

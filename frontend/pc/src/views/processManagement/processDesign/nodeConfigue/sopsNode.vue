@@ -60,6 +60,7 @@
                             :key="project.bk_biz_id"
                             :id="project.bk_biz_id"
                             :name="project.name">
+                            {{ project.name }}<span style="font-size: 12px; color: #ded6d7">&nbsp;&nbsp;{{ '(' + project.bk_biz_id + ')' }}</span>
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
@@ -113,8 +114,6 @@
                     </div>
                 </bk-form-item>
             </bk-form>
-        </basic-card>
-        <basic-card>
             <div class="sops-params-title">
                 <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
                 <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
@@ -160,6 +159,8 @@
                 </div>
             </div>
         </basic-card>
+        <!-- <basic-card>
+        </basic-card> -->
     </div>
 </template>
 <script>
@@ -662,6 +663,7 @@
             width: 448px;
         }
         .sops-params-title {
+            margin-top: 20px;
             font-size: 14px;
             p:nth-child(1) {
                 color: #63656e;

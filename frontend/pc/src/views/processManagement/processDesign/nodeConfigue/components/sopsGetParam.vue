@@ -109,6 +109,7 @@
                             <bk-select
                                 :disabled="disabled || disabledRenderForm"
                                 :clearable="false"
+                                searchable
                                 :value="formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
                                 @selected="onSelectVar($event, scheme)">
                                 <bk-option

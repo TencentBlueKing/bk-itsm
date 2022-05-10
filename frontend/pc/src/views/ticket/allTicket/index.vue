@@ -325,7 +325,7 @@
                 editTabId: '',
                 fixedTabs: ['请求管理', '变更管理', '事件管理', '问题管理'],
                 checkTabNameList: [],
-                customForm: SEARCH_FORM.filter(item => item.key !== 'service_id__in'),
+                customForm: SEARCH_FORM.slice(0),
                 customRules: {
                     name: [
                         {

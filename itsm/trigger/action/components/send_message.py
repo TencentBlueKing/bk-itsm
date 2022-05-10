@@ -25,21 +25,51 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.utils.translation import ugettext as _
 
-from itsm.component.notify import EmailNotifier, WeixinNotifier, SmsNotifier
+from itsm.component.constants import WEIXIN, EMAIL, SMS
+from itsm.component.notify import (
+    EmailNotifier,
+    WeixinNotifier,
+    SmsNotifier,
+    BaseNotifier,
+)
 from itsm.trigger.action.core.component import BaseComponent
 from itsm.component.exceptions import ComponentCallError
 from itsm.trigger.action.core import (
     BaseForm,
     EmailMessageForms,
-    MessageForms,
+    SMSMessageForms,
     WechatMessageForms,
     SubComponentField,
+    BaseMessageForms,
 )
 
 from itsm.ticket.models import Ticket
 from itsm.task.models import Task
 
 __register_ignore__ = False
+
+from itsm.workflow.utils import get_notify_type_choice
+
+
+def get_sub_components():
+    sub_components = []
+    notify_list = get_notify_type_choice()
+    for notify in notify_list:
+        if notify[0] in [WEIXIN, EMAIL, SMS]:
+            sub_components.append(
+                {
+                    WEIXIN: SendWechatComponent,
+                    EMAIL: SendEmailComponent,
+                    SMS: SendSMSComponent,
+                }.get(notify[0])
+            )
+        else:
+            base_component = SendBaseComponent
+            base_component.name = _(notify[1])
+            base_component.notify_type = notify[0]
+            base_component.code = "send_{}_message".format(notify[0].lower())
+            sub_components.append(base_component)
+    return sub_components
 
 
 class SendEmailComponent(BaseComponent):
@@ -67,7 +97,7 @@ class SendSMSComponent(BaseComponent):
     name = _("短信")
     code = "send_sms_message"
     is_async = False
-    form_class = MessageForms
+    form_class = SMSMessageForms
     is_sub_class = True
     need_refresh = False
 
@@ -107,14 +137,37 @@ class SendWechatComponent(BaseComponent):
         return True
 
 
+class SendBaseComponent(BaseComponent):
+    name = ""
+    code = ""
+    notify_type = None
+    is_async = False
+    form_class = BaseMessageForms
+    is_sub_class = True
+    need_refresh = False
+
+    def _execute(self):
+        receivers = ",".join(self.data.inputs["receivers"])
+        notifier = BaseNotifier(
+            title=self.data.inputs["title"],
+            receivers=receivers,
+            message=self.data.inputs["content"],
+            notify_type=self.notify_type,
+        )
+        try:
+            notifier.send()
+        except ComponentCallError:
+            raise
+        return True
+
+
 class MultiMessageForms(BaseForm):
     """
     发送通知的输入数据格式
     """
 
     sub_message_component = SubComponentField(
-        sub_components=[SendEmailComponent, SendSMSComponent, SendWechatComponent],
-        name="对应的所有消息配置信息",
+        sub_components=get_sub_components(), name="对应的所有消息配置信息"
     )
 
     def get_cleaned_data_or_error(self):
@@ -134,7 +187,7 @@ class SendMessage(BaseComponent):
     is_async = False
     need_refresh = False
     form_class = MultiMessageForms
-    sub_action_classes = [SendEmailComponent, SendWechatComponent, SendSMSComponent]
+    sub_action_classes = get_sub_components()
 
     def __init__(self, context, params_schema, action_id=None, countdown=0):
         #  根据输入参数进行解析子动作的初始化， 根据参数类型
