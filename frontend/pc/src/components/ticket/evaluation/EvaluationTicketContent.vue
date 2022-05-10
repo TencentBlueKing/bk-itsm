@@ -199,7 +199,7 @@
             },
             // 是否展示短信评论
             isShowSMSComment () {
-                return this.$store.state.openFunction.SMS_COMMENT_SWITCH && window.run_site !== 'bmw'
+                return (this.$store.state.project.projectSwitch.SMS_COMMENT_SWITCH || this.$store.state.openFunction.SMS_COMMENT_SWITCH) && window.run_site !== 'bmw'
             }
         },
         methods: {
