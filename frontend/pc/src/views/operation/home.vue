@@ -191,6 +191,7 @@
     import LineChart from './components/lineChart.vue'
     import BarChart from './components/barChart.vue'
     import PieChart from './components/pieChart.vue'
+    import i18n from '@/i18n/index.js'
 
     const FORMAT = 'YYYY-MM-DD'
 
@@ -203,7 +204,7 @@
         },
         {
             key: 'service_name',
-            name: '服务名称',
+            name: i18n.t(`m['服务名称']`),
             link: true,
             handler (data) {
                 this.$router.push({ name: this.$route.query.project_id ? 'projectOperationService' : 'OperationService', params: { id: data.service_id }, query: { project_id: this.$route.query.project_id } })
@@ -211,11 +212,11 @@
         },
         {
             key: 'category',
-            name: '服务类型'
+            name: i18n.t(`m['服务类型']`)
         },
         {
             key: 'count',
-            name: '单量（占比）',
+            name: i18n.t(`m['单量（占比）']`),
             sort: true,
             align: 'right',
             format (data) {
@@ -224,14 +225,14 @@
         },
         {
             key: 'creator_count',
-            name: '用户数',
+            name: i18n.t(`m['用户数']`),
             sort: true,
             align: 'right',
             width: 100
         },
         {
             key: 'biz_count',
-            name: '业务使用数',
+            name: i18n.t(`m['业务使用数']`),
             sort: true,
             align: 'right',
             width: 110
@@ -246,17 +247,17 @@
         },
         {
             key: 'bk_biz_name',
-            name: '业务名'
+            name: i18n.t(`m['业务名']`)
         },
         {
             key: 'service_count',
-            name: '使用服务数量',
+            name: i18n.t(`m['使用服务数量']`),
             sort: true,
             align: 'right'
         },
         {
             key: 'count',
-            name: '单量',
+            name: i18n.t(`m['单量']`),
             sort: true,
             align: 'right',
             width: 120
@@ -271,16 +272,16 @@
         },
         {
             key: 'creator',
-            name: '用户ID',
+            name: i18n.t(`m['用户ID']`),
             width: 120
         },
         {
             key: 'organization',
-            name: '所在组织'
+            name: i18n.t(`m['所在组织']`)
         },
         {
             key: 'count',
-            name: '提单量',
+            name: i18n.t(`m['提单量']`),
             colorMark: true,
             align: 'right',
             width: 120
@@ -376,7 +377,7 @@
                 },
                 shortcuts: [
                     {
-                        text: '今天',
+                        text: this.$t(`m['今天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().format(FORMAT)
@@ -384,7 +385,7 @@
                         }
                     },
                     {
-                        text: '昨天',
+                        text: this.$t(`m['昨天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'day').format(FORMAT)
@@ -392,7 +393,7 @@
                         }
                     },
                     {
-                        text: '前天',
+                        text: this.$t(`m['前天']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(2, 'day').format(FORMAT)
@@ -400,7 +401,7 @@
                         }
                     },
                     {
-                        text: '一周前',
+                        text: this.$t(`m['一周前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'week').format(FORMAT)
@@ -408,7 +409,7 @@
                         }
                     },
                     {
-                        text: '一个月前',
+                        text: this.$t(`m['一个月前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'month').format(FORMAT)
@@ -416,7 +417,7 @@
                         }
                     },
                     {
-                        text: '三个月前',
+                        text: this.$t(`m['三个月前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(3, 'month').format(FORMAT)
@@ -424,7 +425,7 @@
                         }
                     },
                     {
-                        text: '半年前',
+                        text: this.$t(`m['半年前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(6, 'month').format(FORMAT)
@@ -432,7 +433,7 @@
                         }
                     },
                     {
-                        text: '一年前',
+                        text: this.$t(`m['一年前']`),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().subtract(1, 'year').format(FORMAT)

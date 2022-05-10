@@ -60,6 +60,7 @@
                             :key="project.bk_biz_id"
                             :id="project.bk_biz_id"
                             :name="project.name">
+                            {{ project.name }}<span style="font-size: 12px; color: #ded6d7">&nbsp;&nbsp;{{ '(' + project.bk_biz_id + ')' }}</span>
                         </bk-option>
                     </bk-select>
                 </bk-form-item>

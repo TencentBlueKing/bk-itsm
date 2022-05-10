@@ -62,7 +62,7 @@
                 </span>
             </p>
             <div class="other-choice" v-if="priorityConten.editorStatus">
-                <span>应用到其它类型: </span>
+                <span>{{ $t('m["应用到其它类型"]') }}: </span>
                 <bk-checkbox-group class="choice-checkbox-group" v-model="serviceTypeList">
                     <bk-checkbox class="choice-checkbox" v-for="choice in serviceTypeOptions" :key="choice.key" :value="choice.key">{{choice.name}}</bk-checkbox>
                 </bk-checkbox-group>

@@ -72,8 +72,8 @@ class Model(models.Model):
     updated_by = models.CharField(_("修改人"), max_length=LEN_NORMAL)
     is_deleted = models.BooleanField(_("是否软删除"), default=False)
 
-    _objects = models.Manager()
     objects = managers.Manager()
+    _objects = models.Manager()
 
     auth_resource = {"resource_type": "flow_element", "resource_type_name": "流程元素"}
     resource_operations = ["flow_element_manage"]

@@ -4,9 +4,9 @@
             <div class="ticket-base-info">
                 <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
                     <i :class="['bk-itsm-icon', isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
-                    <span class="ticket-title">提单信息</span>
-                    <span>提单人: {{ ticketInfo.creator}}</span>
-                    <span>提单时间: {{ ticketInfo.create_at}}</span>
+                    <span class="ticket-title">{{ $t(`m['提单信息']`) }}</span>
+                    <span>{{ $t(`m['提单人']`) }}: {{ ticketInfo.creator}}</span>
+                    <span>{{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at}}</span>
                 </div>
                 <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
                     <basic-information
@@ -38,12 +38,12 @@
             <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
-                    v-if="hasNodeOptAuth || isShowAssgin"
+                    v-if="hasNodeOptAuth || isShowAssgin || currSetpIsIframe"
                     name="currentStep"
-                    :label="$t(`m.newCommon['单据处理']`)">
+                    :label="$t(`m['单据处理']`)">
                     <!-- 当前节点 -->
                     <template slot="label">
-                        <span class="panel-name">{{ $t(`m.newCommon['单据处理']`) }}</span>
+                        <span class="panel-name">{{ $t(`m['单据处理']`) }}</span>
                         <i class="panel-count">{{ currStepNodeNum }}</i>
                     </template>
                     <current-steps
@@ -93,7 +93,7 @@
             :close-icon="true"
             :show-footer="false"
             v-model="isShow"
-            title="完整流程预览">
+            :title="$t(`m['查看完整流程']`)">
             <order-preview
                 v-if="isShow"
                 :basic-infomation="ticketInfo"
@@ -165,6 +165,9 @@
                     return 0
                 }
                 return this.currentStepList.length
+            },
+            currSetpIsIframe () {
+                return this.$route.name === 'TicketDetailIframe'
             }
         },
         watch: {

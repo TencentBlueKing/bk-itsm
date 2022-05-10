@@ -68,29 +68,48 @@ class Action(TriggerBaseModel):
         "need_refresh",
         "component_name",
         "end_time",
+        "ex_data",
     )
 
-    signal = models.CharField(_("触发事件信号"), choices=TRIGGER_SIGNAL_CHOICE, max_length=LEN_MIDDLE)
-    sender = models.CharField(_("触发对象"), help_text=_("一般为触发该信号的元素id"), max_length=LEN_NORMAL)
+    signal = models.CharField(
+        _("触发事件信号"), choices=TRIGGER_SIGNAL_CHOICE, max_length=LEN_MIDDLE
+    )
+    sender = models.CharField(
+        _("触发对象"), help_text=_("一般为触发该信号的元素id"), max_length=LEN_NORMAL
+    )
     rule_id = models.IntegerField(_("事件关联的触发器规则信息"), default=EMPTY_INT)
     trigger_id = models.IntegerField(_("事件关联的触发器信息"), default=EMPTY_INT)
     schema_id = models.IntegerField(_("事件关联的配置信息"))
 
     # 真正处罚对象的来源, 可以根据用户的需要来定义
     source_type = models.CharField(
-        _("响应事件来源类型"), help_text=_("记录响应事件的来源类型, 由用户自定义，方便使用方后期管理"), max_length=LEN_NORMAL, default=EMPTY_STRING,
+        _("响应事件来源类型"),
+        help_text=_("记录响应事件的来源类型, 由用户自定义，方便使用方后期管理"),
+        max_length=LEN_NORMAL,
+        default=EMPTY_STRING,
     )
     source_id = models.IntegerField(_("对应的来源PK值"), null=True, blank=True)
 
     context = jsonfield.JSONField(_("触发事件的上下文参数"), default=EMPTY_DICT)
-    inputs = jsonfield.JSONField(_("用户的输入参数"), help_text=_("输入参数引用的参数变量"), default=EMPTY_DICT)
-    outputs = jsonfield.JSONField(_("动作的输出参数"), help_text=_("动作的输出参数字典"), default=EMPTY_DICT)
+    inputs = jsonfield.JSONField(
+        _("用户的输入参数"), help_text=_("输入参数引用的参数变量"), default=EMPTY_DICT
+    )
+    outputs = jsonfield.JSONField(
+        _("动作的输出参数"), help_text=_("动作的输出参数字典"), default=EMPTY_DICT
+    )
 
     # 事件的执行状态
-    status = models.CharField(_("响应事件状态"), choices=ACTION_STATUS_CHOICE, default="CREATED", max_length=LEN_NORMAL)
+    status = models.CharField(
+        _("响应事件状态"),
+        choices=ACTION_STATUS_CHOICE,
+        default="CREATED",
+        max_length=LEN_NORMAL,
+    )
     end_time = models.DateTimeField(_("任务结束事件"), null=True)
     operator = models.CharField(_("执行人"), max_length=LEN_NORMAL, default=SYS)
-    ex_data = jsonfield.JSONField(_("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT)
+    ex_data = jsonfield.JSONField(
+        _("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT
+    )
 
     objects = ActionManagers()
 
@@ -111,7 +130,7 @@ class Action(TriggerBaseModel):
         if self.action_schema.can_repeat:
             self.id = None
         self.save()
-        self.refresh_from_db(fields=['id'])
+        self.refresh_from_db(fields=["id"])
 
         if need_update_context:
             self.update_context()
@@ -150,7 +169,9 @@ class Action(TriggerBaseModel):
     @property
     def component_obj(self):
         self.context.update(self.outputs if self.outputs else EMPTY_DICT)
-        return self.action_schema.component_class(self.context, self.action_schema.params, self.id, self.count_down)
+        return self.action_schema.component_class(
+            self.context, self.action_schema.params, self.id, self.count_down
+        )
 
     @property
     def count_down(self):
@@ -200,7 +221,7 @@ class Action(TriggerBaseModel):
         for _type, signals in TRIGGER_SIGNAL.items():
             if self.signal in signals:
                 return _type
-        return 'Undefined'
+        return "Undefined"
 
     @property
     def signal_name(self):
@@ -220,5 +241,5 @@ class Action(TriggerBaseModel):
             return EMPTY_DISPLAY_STRING
         if self.operator == SYS:
             return _("系统")
-        bk_users = get_bk_users(format='dict', users=[self.operator])
+        bk_users = get_bk_users(format="dict", users=[self.operator])
         return bk_users.get(self.operator, EMPTY_DISPLAY_STRING)

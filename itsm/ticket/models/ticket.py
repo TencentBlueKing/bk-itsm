@@ -218,6 +218,7 @@ from itsm.component.utils.client_backend_query import (
 from platform_config import BaseTicket
 
 from .basic import Model
+from ...auth_iam.utils import IamRequest
 
 
 class SignTask(Model):
@@ -929,11 +930,20 @@ class Status(Model):
             from_ticket_status = TicketStatus.objects.get(
                 service_type=service_type, key=self.ticket.current_status
             )
-            to_ticket_status = (
-                TicketStatus.objects.filter(service_type=service_type)
-                .filter(key=setting.get("name"))
-                .first()
-            )
+
+            if setting.get("name") in TICKET_STATUS_DICT.keys():
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(key=setting.get("name"))
+                    .first()
+                )
+            else:
+                to_ticket_status = (
+                    TicketStatus.objects.filter(service_type=service_type)
+                    .filter(name=setting.get("name"))
+                    .first()
+                )
+
             # 是否满足单据状态流转设置
             if (
                 to_ticket_status
@@ -2026,12 +2036,37 @@ class Ticket(Model, BaseTicket):
             ]
         )
 
+    def iam_ticket_manage_auth(self, username):
+        # 本地开发环境，不校验单据管理权限
+        if settings.ENVIRONMENT == "dev":
+            return True
+
+        iam_client = IamRequest(username=username)
+        resource_info = {
+            "resource_id": str(self.service_id),
+            "resource_name": self.service_name,
+            "resource_type": "service",
+        }
+
+        apply_actions = ["ticket_management"]
+        auth_actions = iam_client.resource_multi_actions_allowed(
+            apply_actions, [resource_info], project_key=self.project_key
+        )
+        if auth_actions.get("ticket_management"):
+            return True
+
+        return False
+
     def can_operate(self, username):
         """
         能否操作单据：任一节点的处理人
         """
         if self.is_over or self.is_slave:
             return False
+
+        if self.iam_ticket_manage_auth(username):
+            return True
+
         processors = self.current_processors + self.current_task_processors
         all_processors = set(
             [processor for processor in processors.split(",") if processor]
@@ -2167,6 +2202,10 @@ class Ticket(Model, BaseTicket):
         if username == self.creator:
             # 创建人可以直接关闭
             return True
+
+        if self.iam_ticket_manage_auth(username):
+            return True
+
         for _status in self.node_status.filter(
             Q(status__in=Status.CAN_OPERATE_STATUS) | Q(status=FAILED, type=TASK_STATE)
         ):
@@ -2493,8 +2532,7 @@ class Ticket(Model, BaseTicket):
                 transform_username(processors_list) if processors_list else "--"
             )
             logger.info(
-                "[ticket_current_processors]Success：用户名转换成中英文格式成功,"
-                "ticket_id:{}, "
+                "[ticket_current_processors]Success：用户名转换成中英文格式成功,ticket_id:{}, "
                 "processors_list:{}, "
                 "transform_processors:{}".format(self.id, processors_list, processors)
             )
@@ -2808,9 +2846,8 @@ class Ticket(Model, BaseTicket):
             except Exception as err:
                 Cache().hset("callback_error_ticket", self.sn, int(time.time()))
                 logger.exception(
-                    "[TICKET] callback error, callback_url is {},message is {}".format(
-                        callback_url, err
-                    )
+                    "[TICKET] callback_error_ticket, callback_url is {},"
+                    "message is {}, ticket_id is {}".format(callback_url, err, self.id)
                 )
 
     def prepare_all_fields(self):
@@ -3056,7 +3093,7 @@ class Ticket(Model, BaseTicket):
                 f_processors if state.type == TASK_STATE else last_operator
             )
             defaults.update(
-                processors_type=PERSON,
+                processors_type=status.processors_type,
                 processors=current_processors,
                 distribute_type="PROCESS",
                 action_type="TRANSITION",
@@ -3517,6 +3554,16 @@ class Ticket(Model, BaseTicket):
         )
 
         return variables, finish_condition, code_key
+
+    def get_fast_approval_message_params(self):
+        """获取快速审批模版所需参数"""
+        return {
+            "title": self.title,
+            "ticket_url": self.ticket_url,
+            "sn": self.sn,
+            "catalog_service_name": self.catalog_service_name,
+            "running_status": self.running_status,
+        }
 
     def set_current_processors(self):
         """单据中设置当前的操作人员"""

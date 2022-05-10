@@ -69,10 +69,6 @@ class JWTClient(object):
             self.headers = jwt.get_unverified_header(self.raw_content)
 
             public_key = self._get_jwt_public_key()
-            logger.info("self.raw_content ==== {}".format(self.raw_content))
-            logger.info(
-                "self.APIGW_PUBLIC_KEY ==== {}".format(settings.APIGW_PUBLIC_KEY)
-            )
             self.payload = jwt.decode(
                 self.raw_content, public_key, algorithms=["RS512"], issuer="APIGW"
             )
