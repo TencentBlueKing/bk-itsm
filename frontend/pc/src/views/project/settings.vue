@@ -39,29 +39,17 @@
                 versionStatus: true,
                 // 开关功能对照表
                 switchKeyMap: {
+                    SYS_FILE_PATH: 'systemPath',
                     FLOW_PREVIEW: 'preview',
+                    WIKI_SWITCH: 'wiki',
+                    CHILD_TICKET_SWITCH: 'inherit',
                     SLA_SWITCH: 'sla',
                     TRIGGER_SWITCH: 'trigger',
+                    TASK_SWITCH: 'task',
                     FIRST_STATE_SWITCH: 'basic',
                     TABLE_FIELDS_SWITCH: 'module',
                     SMS_COMMENT_SWITCH: 'smsComment'
                 },
-                switchData: [
-                    {
-                        id: 12,
-                        type: 'FUNCTION',
-                        key: 'TABLE_FIELDS_SWITCH',
-                        value: 'off',
-                        project: '0'
-                    },
-                    {
-                        id: 13,
-                        type: 'FUNCTION',
-                        key: 'FIRST_STATE_SWITCH',
-                        value: 'off',
-                        project: '0'
-                    }
-                ],
                 moduleInfo: {
                     basic: {
                         id: '',
@@ -116,26 +104,32 @@
                 this.getSettingsDate()
             },
             async getSettingsDate () {
-                // const res = await this.$store.dispatch('project/getProjectSettings', { project_key: this.$route.query.project_id })
-                // console.log(res)
+                const res = await this.$store.dispatch('project/getProjectSettings', { project_key: this.$route.query.project_id })
                 const tempObj = {}
-                this.switchData.forEach(item => {
-                    this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key] = item.value === 'on'
-                    this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || ''
+                const skipList = ['IS_ORGANIZATION', 'WIKI_SWITCH', 'TASK_SWITCH']
+                const result = res.data.filter(item => !skipList.includes(item.key))
+                result.forEach(item => {
+                    if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {
+                        this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key] = item.value === 'on'
+                        this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || ''
+                    }
                 })
-                console.log(tempObj)
                 this.$store.commit('project/setprojectSwitch', tempObj)
-                console.log(this.$store.state.project)
             },
             allSwitchChange (status, type) {
-                console.log(status, type)
+                const id = this.moduleInfo[type].id
                 const params = {
-                    type: '',
-                    key: '',
-                    value: ''
+                    type: 'FUNCTION',
+                    key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
+                    value: status ? 'on' : 'off'
                 }
-                this.$store.dispatch('project/updateProjectSettings', params).then(res => {
-                    console.log(res)
+                console.log(params)
+                this.$store.dispatch('project/updateProjectSettings', { params, id }).then(res => {
+                    this.$bkMessage({
+                        message: this.$t(`m.home["更新成功"]`),
+                        theme: 'success'
+                    })
+                    this.getSettingsDate()
                 })
             },
             closeVersion () {
