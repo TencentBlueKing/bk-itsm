@@ -138,6 +138,7 @@ from itsm.component.constants import (
     LEN_XX_LONG,
     TASK_DEVOPS_STATE,
     WEBHOOK_STATE,
+    FIELD_BIZ,
 )
 from itsm.component.constants.trigger import (
     CREATE_TICKET,
@@ -2889,6 +2890,10 @@ class Ticket(Model, BaseTicket):
             # 更新优先级由update_priority统一处理
             if field["key"] == FIELD_PRIORITY:
                 continue
+
+            if field["key"] == FIELD_BIZ:
+                self.bk_biz_id = field["value"]
+                self.save()
             filter_fields.append(field)
 
         fields_map = {filed["key"]: filed for filed in filter_fields}

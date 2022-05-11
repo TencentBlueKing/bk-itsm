@@ -1579,9 +1579,9 @@ class TableManager(Manager):
 
         for table in tables:
             obj, created = self.get_or_create(is_builtin=True, name=table[0])
-            if not created:
-                # 已经存在的，直接忽略
-                continue
+            # if not created:
+            #     # 已经存在的，直接忽略
+            #     continue
 
             field_values = TemplateField.objects.filter(key__in=table[2]).values(
                 "id", "key"

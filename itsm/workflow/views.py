@@ -371,7 +371,7 @@ class WorkflowViewSet(
             )
         return Response(
             TableRetrieveSerializer(
-                workflow.table, context={"is_biz_needed": workflow.is_biz_needed}
+                workflow.table, context={"is_biz_needed": True}
             ).data
         )
 
@@ -909,6 +909,11 @@ class WorkflowVersionViewSet(
             if state["type"] == "ROUTER":
                 state.update(type="NORMAL")
         return Response(states)
+
+    @action(detail=True, methods=["get"])
+    def biz_states(self, request, *args, **kwargs):
+        flow = self.get_object_include_deleted(kwargs.get("pk"))
+        return Response(list(flow.states.values()))
 
     @action(detail=True, methods=["get"])
     def transitions(self, request, *args, **kwargs):
