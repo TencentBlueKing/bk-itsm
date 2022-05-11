@@ -155,9 +155,8 @@ export default {
         getProjectSettings ({ commit }, params) {
             return ajax.get(`/project/project_settings/`, { params }).then(response => response.data)
         },
-        updateProjectSettings ({ commit }, params) {
-            const { id } = params
-            return ajax.patch(`/project/project_settings/${id}`, { params }).then(response => response.data)
+        updateProjectSettings ({ commit }, { params, id }) {
+            return ajax.patch(`/project/project_settings/${id}/`, { params }).then(response => response.data)
         }
     }
 }
