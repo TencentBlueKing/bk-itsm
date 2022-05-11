@@ -28,16 +28,20 @@ from itsm.helper.tasks import _db_fix_from_1_1_22_to_2_1_x, _db_fix_from_2_1_x_t
 
 from .models import SystemSettings
 from .contants import TRIGGER_SWITCH, SWITCH_OFF
+from ..project.models import ProjectSettings
 
-MIGRATE_VERSIONS = {"2.2.1": [_db_fix_from_2_1_x_to_2_2_1], "2.1.17": [_db_fix_from_1_1_22_to_2_1_x]}
+MIGRATE_VERSIONS = {
+    "2.2.1": [_db_fix_from_2_1_x_to_2_2_1],
+    "2.1.17": [_db_fix_from_1_1_22_to_2_1_x],
+}
 
 
 def version_cmp(version1, version2):
     """
     比较版本号大小
     """
-    parts1 = [int(x) for x in version1.split('.')]
-    parts2 = [int(x) for x in version2.split('.')]
+    parts1 = [int(x) for x in version1.split(".")]
+    parts2 = [int(x) for x in version2.split(".")]
 
     lendiff = len(parts1) - len(parts2)
     if lendiff > 0:
@@ -54,3 +58,9 @@ def version_cmp(version1, version2):
 
 def is_trigger_switch_off():
     return SystemSettings.objects.filter(key=TRIGGER_SWITCH, value=SWITCH_OFF).exists()
+
+
+def is_trigger_switch_off_project(project_id):
+    return ProjectSettings.objects.filter(
+        key=TRIGGER_SWITCH, value=SWITCH_OFF, project_id=project_id
+    ).exists()
