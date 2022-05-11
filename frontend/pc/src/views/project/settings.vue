@@ -119,12 +119,14 @@
             allSwitchChange (status, type) {
                 const id = this.moduleInfo[type].id
                 const params = {
+                    id,
+                    project: this.$route.query.project_id,
+                    project_key: this.$route.query.project_id,
                     type: 'FUNCTION',
                     key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
                     value: status ? 'on' : 'off'
                 }
-                console.log(params)
-                this.$store.dispatch('project/updateProjectSettings', { params, id }).then(res => {
+                this.$store.dispatch('project/updateProjectSettings', params).then(res => {
                     this.$bkMessage({
                         message: this.$t(`m.home["更新成功"]`),
                         theme: 'success'
