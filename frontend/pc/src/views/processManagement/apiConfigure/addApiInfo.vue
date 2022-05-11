@@ -151,9 +151,9 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js'
-    import memberSelect from '../../commonComponent/memberSelect'
-    import { errorHandler } from '../../../utils/errorHandler.js'
+    import commonMix from '../../commonMix/common.js';
+    import memberSelect from '../../commonComponent/memberSelect';
+    import { errorHandler } from '../../../utils/errorHandler.js';
 
     export default {
         name: 'addApiInfo',
@@ -162,30 +162,30 @@
         props: {
             treeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             pathList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             firstLevelInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             typeInfo: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 is_builtin: true,
@@ -220,44 +220,44 @@
                 isDropdownShow: false,
                 // 校验
                 rules: {},
-            }
+            };
         },
         computed: {
-            isAll () {
+            isAll() {
                 if (this.firstLevelInfo.code) {
-                    this.directory.formInfo.key = this.firstLevelInfo.id
-                    this.$parent.$parent.$parent.getChannelPathList(this.firstLevelInfo.code)
-                    return false
+                    this.directory.formInfo.key = this.firstLevelInfo.id;
+                    this.$parent.$parent.$parent.getChannelPathList(this.firstLevelInfo.code);
+                    return false;
                 }
-                return true
+                return true;
             },
         },
-        mounted () {
+        mounted() {
             // 校验
-            this.rules.key = this.checkCommonRules('select').select
-            this.rules.road = this.checkCommonRules('select').select
-            this.rules.name = this.checkCommonRules('name').name
+            this.rules.key = this.checkCommonRules('select').select;
+            this.rules.road = this.checkCommonRules('select').select;
+            this.rules.name = this.checkCommonRules('name').name;
         },
         methods: {
             // 取消
-            closeAdd () {
-                this.$parent.$parent.openShade()
+            closeAdd() {
+                this.$parent.$parent.openShade();
             },
             // 添加
-            submitAdd () {
-                this.$refs.addApiForm.validate().then(validator => {
-                    this.addHandel()
-                }, validator => {
-                    console.warn(validator)
-                })
+            submitAdd() {
+                this.$refs.addApiForm.validate().then((validator) => {
+                    this.addHandel();
+                }, (validator) => {
+                    console.warn(validator);
+                });
             },
-            getRemoteSystemData () {
-                this.$parent.$parent.getRemoteSystemData()
+            getRemoteSystemData() {
+                this.$parent.$parent.getRemoteSystemData();
             },
             // 新增api
-            addHandel () {
+            addHandel() {
                 if (this.secondClick) {
-                    return
+                    return;
                 }
                 const params = {
                     remote_system: this.directory.formInfo.key,
@@ -274,35 +274,35 @@
                     req_headers: [],
                     rsp_data: {},
                     req_body: {},
-                }
-                this.secondClick = true
-                this.$store.dispatch('apiRemote/post_remote_api', params).then(res => {
+                };
+                this.secondClick = true;
+                this.$store.dispatch('apiRemote/post_remote_api', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["添加成功"]'),
                         theme: 'success',
-                    })
-                    this.getRemoteSystemData()
-                    this.closeAdd()
+                    });
+                    this.getRemoteSystemData();
+                    this.closeAdd();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
-            switchChange (isActivated) {
-                this.directory.formInfo.is_activated = isActivated
+            switchChange(isActivated) {
+                this.directory.formInfo.is_activated = isActivated;
             },
-            changeMethod (path, option) {
-                const dataItem = this.pathList.filter(item => item.path === path)[0]
-                this.directory.formInfo.type = dataItem.method
-                this.directory.formInfo.func_name = dataItem.func_name
-                this.directory.formInfo.name = dataItem.label
-                this.directory.formInfo.version = dataItem.version || 'v1'
-                this.directory.formInfo.category = dataItem.category
+            changeMethod(path, option) {
+                const dataItem = this.pathList.filter(item => item.path === path)[0];
+                this.directory.formInfo.type = dataItem.method;
+                this.directory.formInfo.func_name = dataItem.func_name;
+                this.directory.formInfo.name = dataItem.label;
+                this.directory.formInfo.version = dataItem.version || 'v1';
+                this.directory.formInfo.category = dataItem.category;
             },
-            changeCode (id, ption) {
+            changeCode(id, ption) {
                 // 切换 清空
                 this.directory.formInfo = {
                     name: '',
@@ -315,22 +315,22 @@
                     category: 'component',
                     ownersInputValue: [],
                     desc: '',
-                }
-                const dataItem = this.treeList.slice(1).filter(item => item.id === id)[0]
-                this.$parent.$parent.$parent.getChannelPathList(dataItem.code)
+                };
+                const dataItem = this.treeList.slice(1).filter(item => item.id === id)[0];
+                this.$parent.$parent.$parent.getChannelPathList(dataItem.code);
             },
-            dropdownShow () {
-                this.isDropdownShow = true
+            dropdownShow() {
+                this.isDropdownShow = true;
             },
-            dropdownHide () {
-                this.isDropdownShow = false
+            dropdownHide() {
+                this.isDropdownShow = false;
             },
-            requestHandler (requestway, requestwayIndex) {
-                this.directory.formInfo.type = requestway.name
-                this.$refs.requestwayDrop.hide()
+            requestHandler(requestway, requestwayIndex) {
+                this.directory.formInfo.type = requestway.name;
+                this.$refs.requestwayDrop.hide();
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

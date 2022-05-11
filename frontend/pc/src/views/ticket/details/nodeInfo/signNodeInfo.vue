@@ -66,9 +66,9 @@
 </template>
 
 <script>
-    import timeLine from '../components/timeLine'
-    import fieldsDone from '../components/fieldsDone'
-    import { errorHandler } from '@/utils/errorHandler'
+    import timeLine from '../components/timeLine';
+    import fieldsDone from '../components/fieldsDone';
+    import { errorHandler } from '@/utils/errorHandler';
     export default {
         name: 'signNodeInfo',
         components: {
@@ -78,73 +78,73 @@
         props: {
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 logs: {},
                 getLogFlag: false,
-            }
+            };
         },
-        async mounted () {
-            await this.nodeInfo
-            await this.initData()
+        async mounted() {
+            await this.nodeInfo;
+            await this.initData();
         },
         methods: {
-            async initData () {
-                this.getLogFlag = true
-                await this.getLogs()
-                const waitProcessors = []
-                this.nodeInfo.tasks.forEach(processor => {
+            async initData() {
+                this.getLogFlag = true;
+                await this.getLogs();
+                const waitProcessors = [];
+                this.nodeInfo.tasks.forEach((processor) => {
                     if (processor.status === 'WAIT') {
-                        waitProcessors.push(processor.processor)
+                        waitProcessors.push(processor.processor);
                     }
-                })
+                });
                 const tempLog = {
                     message: waitProcessors.length + this.$t('m.newCommon[\'人待处理\']'),
                     operate_at: this.getFormatDate(),
                     tag: 'processors',
-                }
-                tempLog.message += waitProcessors.length ? this.$t('m.newCommon[\'：\']') + waitProcessors.join(',') : ''
-                this.logs.unshift(tempLog)
-                this.getLogFlag = false
+                };
+                tempLog.message += waitProcessors.length ? this.$t('m.newCommon[\'：\']') + waitProcessors.join(',') : '';
+                this.logs.unshift(tempLog);
+                this.getLogFlag = false;
             },
-            getFormatDate () {
-                const date = new Date()
-                let month = date.getMonth() + 1
-                let strDate = date.getDate()
+            getFormatDate() {
+                const date = new Date();
+                let month = date.getMonth() + 1;
+                let strDate = date.getDate();
                 if (month >= 1 && month <= 9) {
-                    month = `0${month}`
+                    month = `0${month}`;
                 }
                 if (strDate >= 0 && strDate <= 9) {
-                    strDate = `0${strDate}`
+                    strDate = `0${strDate}`;
                 }
                 const currentDate = `${date.getFullYear()}-${month}-${strDate
-                } ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-                return currentDate
+                } ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                return currentDate;
             },
-            async getLogs () {
+            async getLogs() {
                 const params = {
                     ticket: this.nodeInfo.ticket_id,
                     status: this.nodeInfo.id,
                     type: 'SIGN',
-                }
-                await this.$store.dispatch('apiRemote/get_sign_logs', params).then(res => {
-                    res.data.forEach(item => {
-                        this.$set(item, 'showMore', false)
-                    })
-                    this.logs = res.data
-                    this.logs.reverse()
+                };
+                await this.$store.dispatch('apiRemote/get_sign_logs', params).then((res) => {
+                    res.data.forEach((item) => {
+                        this.$set(item, 'showMore', false);
+                    });
+                    this.logs = res.data;
+                    this.logs.reverse();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

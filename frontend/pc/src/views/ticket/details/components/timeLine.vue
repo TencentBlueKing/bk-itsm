@@ -52,8 +52,8 @@
         props: {
             lineList: {
                 type: [Array, Object],
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             parent: {
@@ -61,12 +61,12 @@
                 default: 'normal',
             },
         },
-        data () {
+        data() {
             return {
 
-            }
+            };
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
     .bk-timeline-contain {

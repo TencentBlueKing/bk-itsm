@@ -41,12 +41,12 @@ export const COMMON_ATTRS = {
         type: String,
         required: false,
     },
-}
-export function getFormMixins (attrs) {
-    const privateProps = {} // 继承属性
+};
+export function getFormMixins(attrs) {
+    const privateProps = {}; // 继承属性
     for (const key in attrs) {
         if (key !== 'value') {
-            privateProps[key] = attrs[key]
+            privateProps[key] = attrs[key];
         }
     }
     return {
@@ -55,27 +55,27 @@ export function getFormMixins (attrs) {
             ...privateProps,
         },
         inject: ['getContext'],
-        data () {
+        data() {
             return {
                 value: this.$attrs.value ? this.$attrs.value : attrs.value.default,
-            }
+            };
         },
         methods: {
             /**
              * 获取最顶层 ViewItem 组件实例
              */
-            getTopViewItem () {
-                let vueTag = this
-                let isTop = false
+            getTopViewItem() {
+                let vueTag = this;
+                let isTop = false;
                 while (!isTop) {
                     if (vueTag.$parent && vueTag.$parent.isRootRenderView) {
-                        isTop = true
+                        isTop = true;
                     } else {
-                        vueTag = vueTag.$parent
+                        vueTag = vueTag.$parent;
                     }
                 }
-                return vueTag
+                return vueTag;
             },
         },
-    }
+    };
 }

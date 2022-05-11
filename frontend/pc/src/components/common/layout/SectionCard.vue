@@ -52,15 +52,15 @@
             },
         },
         computed: {
-            applyLabelWidth () {
-                const w = this.labelWidth
+            applyLabelWidth() {
+                const w = this.labelWidth;
                 if (typeof w === 'number') {
-                    return `${w}px`
+                    return `${w}px`;
                 }
-                return w
+                return w;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .common-card-block {

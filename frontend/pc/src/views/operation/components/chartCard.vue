@@ -48,7 +48,7 @@
     </div>
 </template>
 <script>
-    import debounce from 'lodash/debounce'
+    import debounce from 'lodash/debounce';
 
     export default {
         name: 'ChartCard',
@@ -74,20 +74,20 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 searchStr: '',
-            }
+            };
         },
-        created () {
-            this.onSearch = debounce(this.searchHandler, 500)
+        created() {
+            this.onSearch = debounce(this.searchHandler, 500);
         },
         methods: {
-            searchHandler (val) {
-                this.$emit('search', val)
+            searchHandler(val) {
+                this.$emit('search', val);
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .chart-card {

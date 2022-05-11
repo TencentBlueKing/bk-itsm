@@ -126,9 +126,9 @@
 </template>
 
 <script>
-    import apiRequestBody from './apiRequestBody.vue'
-    import ace from '../../../commonComponent/aceEditor/index.js'
-    import mixins from '../../../commonMix/mixins_api.js'
+    import apiRequestBody from './apiRequestBody.vue';
+    import ace from '../../../commonComponent/aceEditor/index.js';
+    import mixins from '../../../commonMix/mixins_api.js';
 
     export default {
         components: {
@@ -139,12 +139,12 @@
         props: {
             detailInfoOri: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 responseDetailConfig: {
@@ -186,98 +186,98 @@
                 bodyInfo: {
                     checkInfo: {},
                 },
-            }
+            };
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get () {
-                    return this.detailInfoOri
+                get() {
+                    return this.detailInfoOri;
                 },
                 // setter
-                set (newVal) {
-                    this.$parent.DetailInfo = newVal
+                set(newVal) {
+                    this.$parent.DetailInfo = newVal;
                 },
             },
             treeDataList: {
                 // getter
-                get () {
-                    const treeDataList = this.basicInfo.treeDataList ? [...this.basicInfo.treeDataList] : []
-                    treeDataList.forEach(item => {
-                        this.recordParent(item, '')
-                    })
-                    return treeDataList
+                get() {
+                    const treeDataList = this.basicInfo.treeDataList ? [...this.basicInfo.treeDataList] : [];
+                    treeDataList.forEach((item) => {
+                        this.recordParent(item, '');
+                    });
+                    return treeDataList;
                 },
                 // setter
-                set (newVal) {
-                    this.$set(this.$parent.DetailInfo, 'treeDataList', newVal)
+                set(newVal) {
+                    this.$set(this.$parent.DetailInfo, 'treeDataList', newVal);
                 },
             },
         },
-        created () {
+        created() {
             if (this.basicInfo.req_params && this.basicInfo.req_params.length) {
-                this.basicInfo.req_params.forEach(item => {
-                    item.is_necessary = item.is_necessary ? 1 : 0
-                })
+                this.basicInfo.req_params.forEach((item) => {
+                    item.is_necessary = item.is_necessary ? 1 : 0;
+                });
             }
         },
         methods: {
-            initDate () {
-                this.treeDataList.forEach(item => {
-                    this.recordParent(item, '')
-                })
+            initDate() {
+                this.treeDataList.forEach((item) => {
+                    this.recordParent(item, '');
+                });
             },
-            recordParent (tree, parentInfo) {
-                tree.parentInfo = parentInfo
+            recordParent(tree, parentInfo) {
+                tree.parentInfo = parentInfo;
                 if (tree.children == null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.recordParent(item, tree)
-                })
+                tree.children.forEach((item) => {
+                    this.recordParent(item, tree);
+                });
             },
-            changTitle (item, index) {
-                this.checkIndex = index
+            changTitle(item, index) {
+                this.checkIndex = index;
             },
             // 新增Headers
-            addLine (oriData, index) {
+            addLine(oriData, index) {
                 const value = {
                     name: '',
                     value: '',
                     sample: '',
                     desc: '',
-                }
-                oriData.splice(index + 1, 0, value)
+                };
+                oriData.splice(index + 1, 0, value);
             },
-            deleteLine (oriData, index) {
+            deleteLine(oriData, index) {
                 if (oriData.length === 1) {
-                    return
+                    return;
                 }
-                oriData.splice(index, 1)
+                oriData.splice(index, 1);
             },
             // 新增Query
-            addQuery (oriData, index) {
+            addQuery(oriData, index) {
                 const value = {
                     name: '',
                     is_necessary: 0,
                     sample: '',
                     desc: '',
                     value: '',
-                }
-                oriData.splice(index + 1, 0, value)
+                };
+                oriData.splice(index + 1, 0, value);
             },
-            deleteQuery (oriData, index) {
+            deleteQuery(oriData, index) {
                 if (oriData.length === 1) {
-                    return
+                    return;
                 }
-                oriData.splice(index, 1)
+                oriData.splice(index, 1);
             },
             // 新增Body
-            addBodyLine (node) {
-                this.bodyInfo.checkInfo = node
+            addBodyLine(node) {
+                this.bodyInfo.checkInfo = node;
                 if (!node.parentInfo) {
-                    return
+                    return;
                 }
                 const addnode = {
                     has_children: false,
@@ -289,11 +289,11 @@
                     type: 'string',
                     desc: '',
                     parentInfo: node.parentInfo,
-                }
-                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node) + 1, 0, addnode)
+                };
+                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node) + 1, 0, addnode);
             },
-            addBodyChild (node) {
-                this.bodyInfo.checkInfo = node
+            addBodyChild(node) {
+                this.bodyInfo.checkInfo = node;
                 const addnode = {
                     has_children: false,
                     showChildren: false,
@@ -304,24 +304,24 @@
                     type: 'string',
                     desc: '',
                     parentInfo: this.bodyInfo.checkInfo,
-                }
+                };
                 if (!node.children || !node.children.length) {
-                    this.$set(node, 'children', [])
-                    node.children = node.children.splice(0, node.children.length)
-                    node.has_children = true
-                    node.showChildren = true
+                    this.$set(node, 'children', []);
+                    node.children = node.children.splice(0, node.children.length);
+                    node.has_children = true;
+                    node.showChildren = true;
                 }
-                node.children.push(addnode)
+                node.children.push(addnode);
             },
             // 删除
-            deleteBodyLine (node) {
-                this.bodyInfo.checkInfo = node
+            deleteBodyLine(node) {
+                this.bodyInfo.checkInfo = node;
                 if (!node.parentInfo) {
-                    return
+                    return;
                 }
-                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node), 1)
+                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node), 1);
             },
-            closeDictionary (e, id) {
+            closeDictionary(e, id) {
                 this.dictDataTable = Object.assign({}, {
                     showDialog: !this.dictDataTable.showDialog,
                     formInfo: {
@@ -337,30 +337,30 @@
                     headerPosition: 'left',
                     autoClose: false,
                     precision: 0,
-                })
+                });
             },
             // 导入JSON
-            async submitDictionary () {
-                let rootJsonschemaData = {}
+            async submitDictionary() {
+                let rootJsonschemaData = {};
                 try {
-                    rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value))
-                    this.basicInfo.treeDataList = this.jsonschemaToList(rootJsonschemaData)
-                    this.closeDictionary()
+                    rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value));
+                    this.basicInfo.treeDataList = this.jsonschemaToList(rootJsonschemaData);
+                    this.closeDictionary();
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
                         theme: 'error',
-                    })
+                    });
                 }
             },
-            importEditorInitAfter (val) {
+            importEditorInitAfter(val) {
                 // ...
             },
-            blur (content, $editor, $fn) {
-                this.responseDetailConfig.value = content
+            blur(content, $editor, $fn) {
+                this.responseDetailConfig.value = content;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

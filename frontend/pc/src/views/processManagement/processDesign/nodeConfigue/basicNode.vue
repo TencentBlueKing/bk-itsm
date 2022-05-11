@@ -69,13 +69,13 @@
     </div>
 </template>
 <script>
-    import basicInfo from './components/basicInfo.vue'
-    import fieldConfig from './components/fieldConfig.vue'
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
-    import BasicCard from '@/components/common/layout/BasicCard.vue'
-    import { deepClone } from '@/utils/util.js'
-    import { errorHandler } from '../../../../utils/errorHandler'
-    
+    import basicInfo from './components/basicInfo.vue';
+    import fieldConfig from './components/fieldConfig.vue';
+    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+    import BasicCard from '@/components/common/layout/BasicCard.vue';
+    import { deepClone } from '@/utils/util.js';
+    import { errorHandler } from '../../../../utils/errorHandler';
+
     export default {
         name: 'basicNode',
         components: {
@@ -88,19 +88,19 @@
             // 流程信息
             flowInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 节点信息
             configur: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isLoading: false,
                 secondClick: false,
@@ -110,98 +110,98 @@
                 nodeTagList: [],
                 // 基础信息 form
                 baseFormData: {},
-            }
+            };
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            initData () {
-                this.getNodeTagList()
+            initData() {
+                this.getNodeTagList();
             },
             // 获取节点标签数据
-            getNodeTagList () {
+            getNodeTagList() {
                 const params = {
                     key: 'STATE_TAG_TYPE',
-                }
+                };
                 this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
-                    this.nodeTagList = res.data
+                    this.nodeTagList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
 
-                    })
+                    });
             },
-            checkStringValue (value) {
-                const temp = this.stringValueList.findIndex(item => item === value)
-                return temp === -1
+            checkStringValue(value) {
+                const temp = this.stringValueList.findIndex(item => item === value);
+                return temp === -1;
             },
             // 确认
-            async submitNode () {
+            async submitNode() {
                 // 校验阻止
-                const basicInfo = this.$refs.basic.backBasicInfo()
-                const checkBasic = this.$refs.basic.checkStatus
+                const basicInfo = this.$refs.basic.backBasicInfo();
+                const checkBasic = this.$refs.basic.checkStatus;
                 if (checkBasic.name || checkBasic.assignors || checkBasic.delivers || checkBasic.processors) {
-                    return
+                    return;
                 }
-                const params = {}
+                const params = {};
                 // 固定值
-                params.is_draft = false
-                params.workflow = this.flowInfo.id
-                params.type = this.configur.type
-                params.is_terminable = false
+                params.is_draft = false;
+                params.workflow = this.flowInfo.id;
+                params.type = this.configur.type;
+                params.is_terminable = false;
                 // 基本信息
-                params.name = basicInfo.name
-                params.tag = basicInfo.tag
-                params.distribute_type = basicInfo.distribute_type
-                params.assignors_type = basicInfo.assignors_type
-                params.assignors = basicInfo.assignors
-                params.processors_type = basicInfo.processors_type
-                params.processors = basicInfo.processors
+                params.name = basicInfo.name;
+                params.tag = basicInfo.tag;
+                params.distribute_type = basicInfo.distribute_type;
+                params.assignors_type = basicInfo.assignors_type;
+                params.assignors = basicInfo.assignors;
+                params.processors_type = basicInfo.processors_type;
+                params.processors = basicInfo.processors;
                 params.extras = {
                     ticket_status: {
                         name: basicInfo.ticket_key,
                         type: basicInfo.ticket_type,
                     },
-                }
-                params.can_deliver = basicInfo.can_deliver
-                params.delivers_type = basicInfo.delivers_type
-                params.delivers = basicInfo.delivers
+                };
+                params.can_deliver = basicInfo.can_deliver;
+                params.delivers_type = basicInfo.delivers_type;
+                params.delivers = basicInfo.delivers;
                 // 字段配置
-                const fieldInfo = this.$refs.field.showTabList
-                params.fields = fieldInfo.map(item => item.id)
-                const { id } = this.configur
+                const fieldInfo = this.$refs.field.showTabList;
+                params.fields = fieldInfo.map(item => item.id);
+                const { id } = this.configur;
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',
-                    })
-                    this.$emit('closeConfigur', true)
+                    });
+                    this.$emit('closeConfigur', true);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 取消
-            closeNode () {
-                this.$emit('closeConfigur', false)
+            closeNode() {
+                this.$emit('closeConfigur', false);
             },
             // 基础信息数据改变
-            baseFormInfoChange (form) {
-                const { distribute_type: distributeType, can_deliver: canDeliver } = form
+            baseFormInfoChange(form) {
+                const { distribute_type: distributeType, can_deliver: canDeliver } = form;
                 if (distributeType === this.baseFormData.distribute_type && canDeliver === this.baseFormData.can_deliver) {
-                    return
+                    return;
                 }
-                this.baseFormData = deepClone(form)
+                this.baseFormData = deepClone(form);
                 // 根据处理场景不同，剔除不必要触发事件
                 const filterMap = {
                     // 直接处理
@@ -212,29 +212,29 @@
                     CLAIM_THEN_PROCESS: ['DISTRIBUTE_STATE', 'DELIVER_STATE'],
                     // 先派单，后认领
                     DISTRIBUTE_THEN_CLAIM: [],
-                }
-                let filterList = filterMap[distributeType] || []
+                };
+                let filterList = filterMap[distributeType] || [];
                 // 是否可转单 选项存在时
                 if (!this.configur.is_builtin) {
                     if (canDeliver) {
-                        filterList = filterList.filter(key => key !== 'DELIVER_STATE')
+                        filterList = filterList.filter(key => key !== 'DELIVER_STATE');
                     } else if (filterList.indexOf('DELIVER_STATE') === -1) {
-                        filterList.push('DELIVER_STATE')
+                        filterList.push('DELIVER_STATE');
                     }
                 }
-                
+
                 if (this.$refs.commonTriggerList) {
-                    this.$refs.commonTriggerList.setFilterSignal(filterList)
-                    this.$refs.commonTriggerList.getBoundTriggerList()
+                    this.$refs.commonTriggerList.setFilterSignal(filterList);
+                    this.$refs.commonTriggerList.getBoundTriggerList();
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/scroller.scss';
-    
+
     .bk-basic-node {
         padding: 20px;
         height: 100%;

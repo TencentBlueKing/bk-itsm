@@ -67,8 +67,8 @@
     </div>
 </template>
 <script>
-    import { errorHandler } from '../../../../utils/errorHandler'
-    import inputParams from '../apiContent/inputParams.vue'
+    import { errorHandler } from '../../../../utils/errorHandler';
+    import inputParams from '../apiContent/inputParams.vue';
 
     export default {
         name: 'apiCall',
@@ -78,107 +78,107 @@
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 apiSysList: [],
                 apiList: [],
                 apiId: '',
                 isLoading: false,
-            }
+            };
         },
-        mounted () {
-            this.getRemoteSystemData()
-            this.initData()
+        mounted() {
+            this.getRemoteSystemData();
+            this.initData();
         },
         methods: {
-            initData () {
-                this.item.wayInfo.field_schema.forEach(schema => {
+            initData() {
+                this.item.wayInfo.field_schema.forEach((schema) => {
                     if (schema.key === 'api_source' && schema.value) {
-                        this.getApiContent(schema.value)
+                        this.getApiContent(schema.value);
                     }
-                })
+                });
             },
-            getRemoteSystemData () {
+            getRemoteSystemData() {
                 const params = {
                     project_key: this.$route.query.project_id,
-                }
-                this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
-                    this.apiSysList = res.data.filter(item => item.is_activated)
+                };
+                this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
+                    this.apiSysList = res.data.filter(item => item.is_activated);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
+                    });
             },
-            changeCode () {
-                this.getApiTableList(arguments[2].systemId)
-                arguments[2].apiId = ''
-                this.apiId = ''
+            changeCode() {
+                this.getApiTableList(arguments[2].systemId);
+                arguments[2].apiId = '';
+                this.apiId = '';
             },
-            getApiTableList (id) {
+            getApiTableList(id) {
                 const params = {
                     remote_system: id || '',
-                }
-                this.$store.dispatch('apiRemote/get_remote_api', params).then(res => {
-                    this.apiList = res.data.filter(ite => ite.is_activated)
+                };
+                this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
+                    this.apiList = res.data.filter(ite => ite.is_activated);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
 
-                    })
+                    });
             },
-            changeApi (value) {
-                this.isLoading = true
-                const apiContent = this.apiList.filter(item => item.id === arguments[0])[0]
-                this.item.wayInfo.field_schema.forEach(item => {
-                    item.apiContent = apiContent
-                    this.$set(item.apiContent, 'bodyTableData', [])
-                })
-                this.apiId = value
+            changeApi(value) {
+                this.isLoading = true;
+                const apiContent = this.apiList.filter(item => item.id === arguments[0])[0];
+                this.item.wayInfo.field_schema.forEach((item) => {
+                    item.apiContent = apiContent;
+                    this.$set(item.apiContent, 'bodyTableData', []);
+                });
+                this.apiId = value;
                 setTimeout(() => {
-                    this.isLoading = false
-                }, 1000)
+                    this.isLoading = false;
+                }, 1000);
             },
-            getApiContent (id) {
-                this.isLoading = true
+            getApiContent(id) {
+                this.isLoading = true;
                 const params = {
                     id,
-                }
-                this.$store.dispatch('apiRemote/get_remote_api_detail', params).then(res => {
-                    const backValue = res.data
+                };
+                this.$store.dispatch('apiRemote/get_remote_api_detail', params).then((res) => {
+                    const backValue = res.data;
                     // 二次赋值渲染操作
-                    this.item.wayInfo.field_schema.forEach(schema => {
+                    this.item.wayInfo.field_schema.forEach((schema) => {
                         if (schema.key === 'api_source' && schema.value) {
-                            schema.apiId = id
-                            schema.systemId = backValue.remote_system
+                            schema.apiId = id;
+                            schema.systemId = backValue.remote_system;
                         } else {
-                            schema.apiContent = backValue
-                            this.$set(schema.apiContent, 'bodyTableData', [])
+                            schema.apiContent = backValue;
+                            this.$set(schema.apiContent, 'bodyTableData', []);
                         }
-                    })
-                    this.getApiTableList(backValue.remote_system)
-                    this.apiId = id
+                    });
+                    this.getApiTableList(backValue.remote_system);
+                    this.apiId = id;
                     setTimeout(() => {
-                        this.isLoading = false
-                    }, 1000)
+                        this.isLoading = false;
+                    }, 1000);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
 
-                    })
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

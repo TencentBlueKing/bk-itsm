@@ -105,12 +105,12 @@
 </template>
 
 <script>
-    import dayjs from 'dayjs'
-    import i18n from '@/i18n/index.js'
-    import taskStatus from './TaskStatus.vue'
-    import BuildDetailInfo from './BuildDetailInfo.vue'
-    import { errorHandler } from '../../../../../utils/errorHandler'
-    import { convertMStoString, convertByteToSize } from '@/utils/util'
+    import dayjs from 'dayjs';
+    import i18n from '@/i18n/index.js';
+    import taskStatus from './TaskStatus.vue';
+    import BuildDetailInfo from './BuildDetailInfo.vue';
+    import { errorHandler } from '../../../../../utils/errorHandler';
+    import { convertMStoString, convertByteToSize } from '@/utils/util';
 
     // 任务基础信息
     const baseTaskInfoList = [
@@ -120,8 +120,8 @@
         { key: 'sub_pipeline_id', name: i18n.t('m.tickets[\'流水线\']'), value: '' },
         { key: 'processor_users', name: i18n.t('m.task[\'处理人\']'), value: '' },
         { key: 'status', name: i18n.t('m.task[\'状态\']'), value: '' },
-    ]
-    
+    ];
+
     const executInfoList = [
         { key: 'buildNum', name: i18n.t('m.tickets[\'构建号\']'), value: '' },
         { key: 'buildNum', name: i18n.t('m.tickets[\'源材料\']'), value: '' },
@@ -130,7 +130,7 @@
         { key: 'endTime', name: i18n.t('m.tickets[\'完成于\']'), value: '' },
         { key: 'executeTime', name: i18n.t('m.systemConfig[\'耗时\']'), value: '' },
         { key: 'pipelineVersion', name: i18n.t('m.tickets[\'编排版本号\']'), value: '' },
-    ]
+    ];
 
     export default {
         name: 'DevopsExecutInfo',
@@ -144,7 +144,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 baseTaskInfoList,
                 executInfoList,
@@ -157,99 +157,99 @@
                 buildList: [],
                 outputVariableList: [], // 输出变量
                 openBuildInfo: {}, // 打开的构建信息
-            }
+            };
         },
         computed: {
-            status () {
-                return this.taskInfo.status
+            status() {
+                return this.taskInfo.status;
             },
-            taskInfoList () {
-                const { taskStatusInfo } = this
-                const list = this.baseTaskInfoList.map(item => {
+            taskInfoList() {
+                const { taskStatusInfo } = this;
+                const list = this.baseTaskInfoList.map((item) => {
                     if (item.key === 'component_type') {
-                        return item
+                        return item;
                     }
                     if (item.key === 'task_schema_id' || item.key === 'sub_pipeline_id') {
-                        item.value = taskStatusInfo[item.key]
-                        return item
+                        item.value = taskStatusInfo[item.key];
+                        return item;
                     }
-                    item.value = this.taskInfo[item.key]
-                    return item
-                })
-                return list
+                    item.value = this.taskInfo[item.key];
+                    return item;
+                });
+                return list;
             },
-            displayExecutInfoList () {
-                const { buildStatusInfo } = this
-                this.executInfoList.forEach(item => {
+            displayExecutInfoList() {
+                const { buildStatusInfo } = this;
+                this.executInfoList.forEach((item) => {
                     switch (item.key) {
                         case 'startTime':
                         case 'endTime':
-                            item.value = dayjs(buildStatusInfo[item.key]).format('YYYY-MM-DD hh:mm:ss')
-                            break
+                            item.value = dayjs(buildStatusInfo[item.key]).format('YYYY-MM-DD hh:mm:ss');
+                            break;
                         case 'executeTime':
-                            item.value = convertMStoString(buildStatusInfo.executeTime * 1000)
-                            break
+                            item.value = convertMStoString(buildStatusInfo.executeTime * 1000);
+                            break;
                         default:
-                            item.value = buildStatusInfo[item.key]
+                            item.value = buildStatusInfo[item.key];
                     }
-                })
-                return this.executInfoList
+                });
+                return this.executInfoList;
             },
         },
-        created () {
+        created() {
         },
-        async mounted () {
-            await this.getTaskStatusInfo()
-            this.getDevopsBuildStatus()
+        async mounted() {
+            await this.getTaskStatusInfo();
+            this.getDevopsBuildStatus();
         },
         methods: {
             // 获取任务状态信息
-            getTaskStatusInfo () {
-                this.taskStatusInfoLoading = true
-                const { id } = this.taskInfo
+            getTaskStatusInfo() {
+                this.taskStatusInfoLoading = true;
+                const { id } = this.taskInfo;
                 return this.$store.dispatch('taskFlow/getTaskStatusInfo', id).then((res) => {
-                    this.taskStatusInfo = res.data
+                    this.taskStatusInfo = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.taskStatusInfoLoading = false
-                    })
+                        this.taskStatusInfoLoading = false;
+                    });
             },
             // 构建状态信息
-            getDevopsBuildStatus () {
-                this.buildStatusLoading = true
-                const { project_id: projectId, sub_pipeline_id: pipelineId, sub_task_id: buildId } = this.taskStatusInfo
+            getDevopsBuildStatus() {
+                this.buildStatusLoading = true;
+                const { project_id: projectId, sub_pipeline_id: pipelineId, sub_task_id: buildId } = this.taskStatusInfo;
                 const params = {
                     project_id: projectId,
                     pipeline_id: pipelineId,
                     build_id: buildId,
-                }
+                };
                 this.$store.dispatch('ticket/getDevopsBuildStatus', params).then((res) => {
-                    this.buildStatusInfo = res.data
-                    this.buildList = (res.data.artifactList || []).map(item => {
-                        item.size = convertByteToSize(item.size)
-                        return item
-                    })
+                    this.buildStatusInfo = res.data;
+                    this.buildList = (res.data.artifactList || []).map((item) => {
+                        item.size = convertByteToSize(item.size);
+                        return item;
+                    });
                     this.outputVariableList = Object.keys(res.data.variables).map(key => ({
                         key,
                         value: res.data.variables[key],
-                    }))
+                    }));
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.buildStatusLoading = false
-                    })
+                        this.buildStatusLoading = false;
+                    });
             },
-            openBuildDetail (row) {
-                this.isShowBuildDetailDialog = true
-                this.openBuildInfo = row
+            openBuildDetail(row) {
+                this.isShowBuildDetailDialog = true;
+                this.openBuildInfo = row;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/animation/rotation.scss';

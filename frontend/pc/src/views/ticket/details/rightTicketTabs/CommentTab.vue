@@ -93,9 +93,9 @@
 </template>
 
 <script>
-    import EvaluationTicketContent from '@/components/ticket/evaluation/EvaluationTicketContent.vue'
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import { SCORE_LIST } from '@/constants/ticket'
+    import EvaluationTicketContent from '@/components/ticket/evaluation/EvaluationTicketContent.vue';
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import { SCORE_LIST } from '@/constants/ticket';
 
     export default {
         name: 'CommentTab',
@@ -108,39 +108,39 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 loading: false,
                 picked: 'One',
                 satisfactInfo: {},
                 scoreList: SCORE_LIST,
-            }
+            };
         },
-        mounted () {
-            this.getEvaluation()
+        mounted() {
+            this.getEvaluation();
         },
         methods: {
             // 获取评论
-            async getEvaluation () {
-                this.loading = true
+            async getEvaluation() {
+                this.loading = true;
                 const params = {
                     id: this.ticketInfo.comment_id,
-                }
+                };
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
                 await this.$store.dispatch('evaluation/getEvaluation', params).then((res) => {
-                    this.satisfactInfo = res.data
+                    this.satisfactInfo = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 /* 满意度 */

@@ -98,10 +98,10 @@
 </template>
 
 <script>
-    import apiRunConfig from './apiRunConfig.vue'
-    import ace from '../../../commonComponent/aceEditor/index.js'
-    import mixins from '../../../commonMix/mixins_api.js'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import apiRunConfig from './apiRunConfig.vue';
+    import ace from '../../../commonComponent/aceEditor/index.js';
+    import mixins from '../../../commonMix/mixins_api.js';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         components: {
@@ -112,12 +112,12 @@
         props: {
             apiDetailInfoCommon: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 alarmDetailConfig: {
                     value: '',
@@ -143,72 +143,72 @@
                 },
                 // 是否执行成功
                 isSuccess: true,
-            }
+            };
         },
         computed: {},
         watch: {},
-        mounted () {
+        mounted() {
             // this.initDate()
         },
         methods: {
-            getRemoteApiDetail (id) {
-                this.$parent.$parent.getRemoteApiDetail(id)
+            getRemoteApiDetail(id) {
+                this.$parent.$parent.getRemoteApiDetail(id);
             },
-            changBlur (val) {
-                this.dataProcess.value = val
+            changBlur(val) {
+                this.dataProcess.value = val;
             },
-            reqChangBlur (val) {
-                this.reqDataProcess.value = val
+            reqChangBlur(val) {
+                this.reqDataProcess.value = val;
             },
-            editorInitAfter (val) {
+            editorInitAfter(val) {
             },
-            async updateApi () {
+            async updateApi() {
                 if (this.secondClick || !this.apiDetailInfoCommon.treeDataList || !this.apiDetailInfoCommon.responseTreeDataList) {
-                    return
+                    return;
                 }
                 try {
                     // 2.重置数据 参数和返回数据统一
-                    const resData = JSON.parse(this.alarmDetailConfig.value)
-                    this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value))
-                    this.apiDetailInfoCommon.resJsonschemaData = this.jsonToJsonschema(resData || {})
+                    const resData = JSON.parse(this.alarmDetailConfig.value);
+                    this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value));
+                    this.apiDetailInfoCommon.resJsonschemaData = this.jsonToJsonschema(resData || {});
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
                         theme: 'error',
-                    })
-                    return
+                    });
+                    return;
                 }
                 // body Jsonschema数据结构
-                this.apiDetailInfoCommon.req_body = this.apiDetailInfoCommon.bodyJsonschemaData.root // root初始 Jsonschema数据结构
+                this.apiDetailInfoCommon.req_body = this.apiDetailInfoCommon.bodyJsonschemaData.root; // root初始 Jsonschema数据结构
                 // response Jsonschema数据结构
-                this.apiDetailInfoCommon.rsp_data = this.apiDetailInfoCommon.resJsonschemaData.root // root初始 Jsonschema数据结构
+                this.apiDetailInfoCommon.rsp_data = this.apiDetailInfoCommon.resJsonschemaData.root; // root初始 Jsonschema数据结构
                 // 删除多重数据
-                await delete this.apiDetailInfoCommon.treeDataList
-                await delete this.apiDetailInfoCommon.responseTreeDataList
+                await delete this.apiDetailInfoCommon.treeDataList;
+                await delete this.apiDetailInfoCommon.responseTreeDataList;
 
-                const params = this.apiDetailInfoCommon
+                const params = this.apiDetailInfoCommon;
                 if (params.req_body.required.length === 0) {
-                    delete params.req_body.required
+                    delete params.req_body.required;
                 }
-                params.map_code = this.dataProcess.value
-                params.before_req = this.reqDataProcess.value
-                this.secondClick = true
-                await this.$store.dispatch('apiRemote/put_remote_api', params).then(res => {
+                params.map_code = this.dataProcess.value;
+                params.before_req = this.reqDataProcess.value;
+                this.secondClick = true;
+                await this.$store.dispatch('apiRemote/put_remote_api', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["更新成功"]'),
                         theme: 'success',
-                    })
-                    this.getRemoteApiDetail(this.apiDetailInfoCommon.id)
+                    });
+                    this.getRemoteApiDetail(this.apiDetailInfoCommon.id);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -38,9 +38,9 @@
 </template>
 
 <script>
-    import BkUserSelector from '@blueking/user-selector'
-    import jsonp from 'jsonp'
-    import i18n from '@/i18n/index.js'
+    import BkUserSelector from '@blueking/user-selector';
+    import jsonp from 'jsonp';
+    import i18n from '@/i18n/index.js';
 
     export default {
         name: 'MemberSelector',
@@ -58,8 +58,8 @@
              */
             specifyIdList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             placeholder: {
@@ -77,8 +77,8 @@
             },
             value: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 外部设置的 class name
@@ -87,60 +87,60 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 customUserList: [],
                 users: [],
-            }
+            };
         },
         computed: {
-            api () {
-                const host = window.BK_USER_MANAGE_HOST || location.origin
-                return `${host}/api/c/compapi/v2/usermanage/fs_list_users/`
+            api() {
+                const host = window.BK_USER_MANAGE_HOST || location.origin;
+                return `${host}/api/c/compapi/v2/usermanage/fs_list_users/`;
             },
         },
-        created () {
+        created() {
             if (this.specifyIdList.length) {
-                this.getCustomUserListByspecifyIdList()
+                this.getCustomUserListByspecifyIdList();
             }
         },
         methods: {
             // 查询指定 id 用户信息
-            getUserInfo (userIds) {
+            getUserInfo(userIds) {
                 return new Promise((resolve, reject) => {
                     jsonp(`${this.api}?app_code=bk-magicbox&exact_lookups=${userIds.join(',')}&page_size=100&page=1`, null, (err, res) => {
                         if (err) {
-                            reject(err)
+                            reject(err);
                         } else {
-                            resolve(res.data.results)
+                            resolve(res.data.results);
                         }
-                    })
-                })
+                    });
+                });
             },
             // 通过指定用户 id 获取自定义备选列表数据
-            getCustomUserListByspecifyIdList () {
+            getCustomUserListByspecifyIdList() {
                 const ids = this.specifyIdList.map(id =>  // 去除人员id中的（）
-                    id.replace(/\(.*\)$/, ''))
-                this.getUserInfo(ids).then(results => {
-                    this.customUserList = results
-                })
+                    id.replace(/\(.*\)$/, ''));
+                this.getUserInfo(ids).then((results) => {
+                    this.customUserList = results;
+                });
             },
             // 模糊搜索匹配值，有 dataList 时生效
-            fuzzySearchMethod (keyword, next) {
-                const results = this.customUserList.filter(item => {
-                    const names = item.username + item.display_name
-                    return names.indexOf(keyword) > -1
-                })
+            fuzzySearchMethod(keyword, next) {
+                const results = this.customUserList.filter((item) => {
+                    const names = item.username + item.display_name;
+                    return names.indexOf(keyword) > -1;
+                });
                 return Promise.resolve({
                     next: true,
                     results,
-                })
+                });
             },
-            onChange (value) {
-                this.$emit('change', value)
+            onChange(value) {
+                this.$emit('change', value);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -39,19 +39,40 @@
                     ref="dynamicForm">
                     <div class="bk-sla-content">
                         <span>{{$t(`m.serviceConfig['是否启用']`)}}</span>
-                        <bk-switcher size="small" theme="primary" v-model="isSlaActive" :pre-check="handleUseSlaPreCheck"></bk-switcher>
+                        <bk-switcher
+                            size="small"
+                            theme="primary"
+                            v-model="isSlaActive"
+                            :pre-check="handleUseSlaPreCheck"></bk-switcher>
                         {{$t(`m.serviceConfig['可以通过点击添加“+”或点击流程节点添加']`)}}
                     </div>
                     <div class="bk-sla-content" v-if="isSlaActive">
                         <div class="bk-service-agreement">
-                            <span class="bk-service-label">{{$t(`m.serviceConfig['服务协议']`)}}<span class="red-star">*</span></span>
+                            <span class="bk-service-label">
+                                {{$t(`m.serviceConfig['服务协议']`)}}
+                                <span class="red-star">*</span>
+                            </span>
                             <div class="bk-service-agreement-list">
-                                <div class="bk-agreement-content" v-for="(agree, index) in serviceData.sla" :key="index">
-                                    <span class="bk-agreement-color" :style="'background-color: ' + agree.color"></span>
-                                    <span class="bk-agreement-text" @click="agreementTextClick(agree, 'edit')">{{ getProtocolName(agree.sla_id) || $t(`m.tickets["未设置"]`) }}</span>
-                                    <span class="bk-icon icon-delete" @click="agreementCloseClick(agree, index)"></span>
+                                <div class="bk-agreement-content"
+                                    v-for="(agree, index) in serviceData.sla"
+                                    :key="index">
+                                    <span class="bk-agreement-color"
+                                        :style="'background-color: ' + agree.color">
+                                    </span>
+                                    <span class="bk-agreement-text" @click="agreementTextClick(agree, 'edit')">
+                                        {{ getProtocolName(agree.sla_id) || $t(`m.tickets["未设置"]`) }}
+                                    </span>
+                                    <span class="bk-icon icon-delete"
+                                        @click="agreementCloseClick(agree, index)">
+                                    </span>
                                 </div>
-                                <bk-button @click="agreementTextClick({})" size="small" theme="default" icon="plus" class="bk-sla-add"></bk-button>
+                                <bk-button
+                                    class="bk-sla-add"
+                                    size="small"
+                                    theme="default"
+                                    icon="plus"
+                                    @click="agreementTextClick({})">
+                                </bk-button>
                             </div>
                         </div>
                         <div style="height: 420px;margin-top:10px" v-bkloading="{ isLoading: canvasDataLoading }">
@@ -93,7 +114,9 @@
             :width="695">
             <div slot="header" class="sideslider-header">
                 {{$t(`m.serviceConfig['绑定服务协议']`)}}
-                <div @click="viewAgreementIsShow = true" class="view-agreement-text">{{$t(`m.serviceConfig['查看协议计时说明']`)}}</div>
+                <div @click="viewAgreementIsShow = true" class="view-agreement-text">
+                    {{$t(`m.serviceConfig['查看协议计时说明']`)}}
+                </div>
             </div>
             <div slot="content" class="sideslider-content">
                 <bk-form
@@ -150,7 +173,10 @@
                                 :id="option.id"
                                 :name="option.name">
                                 <span>{{option.name}}</span>
-                                <i v-bk-tooltips="{ content: '跳转查看协议', placements: ['top'] }" class="bk-icon icon-edit" @click.stop="handleEditAgreement(option)"></i>
+                                <i v-bk-tooltips="{ content: '跳转查看协议', placements: ['top'] }"
+                                    class="bk-icon icon-edit"
+                                    @click.stop="handleEditAgreement(option)">
+                                </i>
                             </bk-option>
                             <div slot="extension" @click="handleCreateAgreement" style="cursor: pointer;">
                                 <i class="bk-icon icon-plus-circle"></i>{{$t(`m.serviceConfig['跳转新建协议']`)}}
@@ -163,8 +189,12 @@
                     </bk-form-item>
                 </bk-form>
                 <div style="margin-top: 20px;">
-                    <bk-button style="margin-right: 10px;width:86px" theme="primary" @click="handleSetAgreement()">确定</bk-button>
-                    <bk-button style="width:86px" theme="default" @click="handleCancelAgreement()">取消</bk-button>
+                    <bk-button style="margin-right: 10px;width:86px" theme="primary" @click="handleSetAgreement()">
+                        确定
+                    </bk-button>
+                    <bk-button style="width:86px" theme="default" @click="handleCancelAgreement()">
+                        取消
+                    </bk-button>
                 </div>
             </div>
         </bk-sideslider>
@@ -178,16 +208,16 @@
             :title="$t(`m.serviceConfig['协议计时说明']`)">
             <div class="agree-img"></div>
         </bk-dialog>
-        
+
     </div>
 </template>
 
 <script>
-    import axios from 'axios'
-    import secondFlow from './slaJsflowCanvas/secondFlow.vue'
-    import commonMix from '../../commonMix/common.js'
-    import { ProcessTools } from '@/utils/process.js'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import axios from 'axios';
+    import secondFlow from './slaJsflowCanvas/secondFlow.vue';
+    import commonMix from '../../commonMix/common.js';
+    import { ProcessTools } from '@/utils/process.js';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'ProjectServiceSla',
@@ -198,12 +228,12 @@
         props: {
             modelPriority: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 serviceLoading: true,
                 serviceData: {},
@@ -231,7 +261,7 @@
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                     end_node_id: [
@@ -239,7 +269,7 @@
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                     sla_id: [
@@ -247,213 +277,213 @@
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                 },
                 agreeType: 'add',
                 isStartSla: true,
                 processTools: null,
-            }
+            };
         },
         computed: {
-            getTransitionLines () {
+            getTransitionLines() {
                 return {
                     from_state: this.agreementEditData.start_node_id,
                     to_state: this.agreementEditData.end_node_id,
-                }
+                };
             },
         },
         watch: {
-            getTransitionLines (states) {
+            getTransitionLines(states) {
                 if (states.from_state && states.to_state) {
                     const params = {
                         id: this.serviceData.workflow,
                         from_state_id: states.from_state,
                         to_state_id: states.to_state,
-                    }
-                    this.$store.dispatch('workflowVersion/getTransitionLines', params).then(res => {
-                        this.agreementEditData.lines = res.data.lines
-                        this.agreementEditData.states = res.data.states
+                    };
+                    this.$store.dispatch('workflowVersion/getTransitionLines', params).then((res) => {
+                        this.agreementEditData.lines = res.data.lines;
+                        this.agreementEditData.states = res.data.states;
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
-                        })
+                        .catch((res) => {
+                            errorHandler(res, this);
+                        });
                 }
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
             // 初始化数据
-            async initData () {
-                this.getSlaList()
-                await this.getServiceDetail()
-                this.getWorkflowCanvasData()
+            async initData() {
+                this.getSlaList();
+                await this.getServiceDetail();
+                this.getWorkflowCanvasData();
             },
             // 获取服务详情
-            getServiceDetail () {
-                this.serviceLoading = true
+            getServiceDetail() {
+                this.serviceLoading = true;
                 return this.$store.dispatch('service/getServiceDetail', this.$route.params.id).then((res) => {
-                    this.serviceData = res.data
+                    this.serviceData = res.data;
                     if (res.data.sla.length > 0) {
-                        this.isSlaActive = true
+                        this.isSlaActive = true;
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.serviceLoading = false
-                    })
+                        this.serviceLoading = false;
+                    });
             },
             // 服务级别列表
-            getSlaList () {
-                this.slaListLoading = true
+            getSlaList() {
+                this.slaListLoading = true;
                 const params = {
                     is_enabled: true,
                     project_key: this.$store.state.project.id,
-                }
-                this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
-                    this.slaList = res.data
+                };
+                this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
+                    this.slaList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.slaListLoading = false
-                    })
+                        this.slaListLoading = false;
+                    });
             },
-            getWorkflowCanvasData () {
-                this.canvasDataLoading = true
+            getWorkflowCanvasData() {
+                this.canvasDataLoading = true;
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id: this.serviceData.workflow }),
                     this.$store.dispatch('deployCommon/getLineVersion', { id: this.serviceData.workflow }),
                 ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data
+                    this.addList = userResp.data;
                     for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i
+                        this.addList[i].indexInfo = i;
                     }
-                    this.$store.commit('cdeploy/getChart', this.addList)
+                    this.$store.commit('cdeploy/getChart', this.addList);
 
-                    this.lineList = reposResp.data.items
-                    this.nodeOption = userResp.data.filter(node => node.name !== '' && node.type !== 'START' && node.type !== 'END')
+                    this.lineList = reposResp.data.items;
+                    this.nodeOption = userResp.data.filter(node => node.name !== '' && node.type !== 'START' && node.type !== 'END');
 
-                    this.processTools = new ProcessTools(this.addList, this.lineList)
+                    this.processTools = new ProcessTools(this.addList, this.lineList);
                 }))
                     .finally(() => {
-                        this.canvasDataLoading = false
-                    })
+                        this.canvasDataLoading = false;
+                    });
             },
-            getPostNodes (startId) {
-                const afterNodes = this.processTools.getSlaAfterNodes(startId)
-                this.endNodeOption = afterNodes
+            getPostNodes(startId) {
+                const afterNodes = this.processTools.getSlaAfterNodes(startId);
+                this.endNodeOption = afterNodes;
             },
-            getProtocolName (protocol) {
-                const slaname = this.slaList.find(sla => sla.id === protocol)
+            getProtocolName(protocol) {
+                const slaname = this.slaList.find(sla => sla.id === protocol);
                 if (slaname && slaname.name) {
-                    return protocol && slaname.name
+                    return protocol && slaname.name;
                 }
             },
-            handleSetAgreement () {
-                this.$refs.agreementForm.validate().then(validator => {
+            handleSetAgreement() {
+                this.$refs.agreementForm.validate().then(_ => {
                     if (!this.isNodeClick && this.agreeType === 'add') {
-                        this.serviceData.sla.push(this.agreementEditData)
+                        this.serviceData.sla.push(this.agreementEditData);
                     }
-                    this.isNodeClick = false
-                    this.serviceAgreementIsShow = false
-                })
+                    this.isNodeClick = false;
+                    this.serviceAgreementIsShow = false;
+                });
             },
-            agreementTextClick (agree, type) {
-                this.agreeType = type || 'add'
-                this.agreementEditData = agree
-                this.serviceAgreementIsShow = true
-                this.endNodeOption = []
+            agreementTextClick(agree, type) {
+                this.agreeType = type || 'add';
+                this.agreementEditData = agree;
+                this.serviceAgreementIsShow = true;
+                this.endNodeOption = [];
                 if (!agree.color) {
-                    this.$set(this.agreementEditData, 'color', this.getRendomColor())
+                    this.$set(this.agreementEditData, 'color', this.getRendomColor());
                 }
                 if (this.agreementEditData.start_node_id) {
-                    this.getPostNodes(this.agreementEditData.start_node_id)
+                    this.getPostNodes(this.agreementEditData.start_node_id);
                 }
-                this.isNodeClick = false
+                this.isNodeClick = false;
             },
             // 节点校验
-            nodeCheck (agree) {
-                const isError = agree.start_node_id === agree.end_node_id
+            nodeCheck(agree) {
+                const isError = agree.start_node_id === agree.end_node_id;
                 if (isError) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig[\'添加协议失败，请重新选择正确结束节点！\']'),
                         theme: 'error',
                         ellipsisLine: 0,
-                    })
+                    });
                 }
-                return isError
+                return isError;
             },
-            agreementCloseClick (agree, agreeIndex) {
+            agreementCloseClick(agree, agreeIndex) {
                 this.$bkInfo({
                     extCls: 'agreement-close',
                     type: 'warning',
                     title: this.getProtocolName(agree.sla_id) ? `${this.$t('m.serviceConfig["确认删除服务协议"]')}<${this.getProtocolName(agree.sla_id)}>` : this.$t('m["当前服务协议配置未完成，确认要删除吗？"]'),
                     confirmFn: () => {
-                        const lastIndex = this.serviceData.sla.length - 1
+                        const lastIndex = this.serviceData.sla.length - 1;
                         if (lastIndex === agreeIndex && !this.serviceData.sla[lastIndex].end_node_id) {
-                            this.isStartSla = true
-                            this.isNodeClick = false
+                            this.isStartSla = true;
+                            this.isNodeClick = false;
                         }
-                        this.serviceData.sla.splice(agreeIndex, 1)
+                        this.serviceData.sla.splice(agreeIndex, 1);
                     },
-                })
+                });
             },
-            configuNode (value) {
-                const { sla } = this.serviceData
+            configuNode(value) {
+                const { sla } = this.serviceData;
                 if (this.isStartSla) {
                     sla.push({
                         start_node_id: value.id,
                         color: this.getRendomColor(),
-                    })
+                    });
                 } else {
-                    const len = sla.length - 1
-                    const lastSlaItem = sla[len]
-                    const endOptions = this.processTools.getSlaAfterNodes(lastSlaItem.start_node_id)
+                    const len = sla.length - 1;
+                    const lastSlaItem = sla[len];
+                    const endOptions = this.processTools.getSlaAfterNodes(lastSlaItem.start_node_id);
                     if (!endOptions.find(n => n.id === value.id)) {
                         this.$bkMessage({
                             message: '该节点不能作为 SLA 结束节点',
                             theme: 'error',
                             ellipsisLine: 0,
-                        })
-                        return false
+                        });
+                        return false;
                     }
 
-                    lastSlaItem.end_node_id = value.id
-                    this.$set(sla, len, sla[len])
+                    lastSlaItem.end_node_id = value.id;
+                    this.$set(sla, len, sla[len]);
                     if (this.nodeCheck(sla[len])) {
-                        sla[len].end_node_id = ''
-                        return
+                        sla[len].end_node_id = '';
+                        return;
                     }
-                    this.agreementTextClick(sla[len])
-                    this.isNodeClick = true
+                    this.agreementTextClick(sla[len]);
+                    this.isNodeClick = true;
                 }
-                this.isStartSla = !this.isStartSla
+                this.isStartSla = !this.isStartSla;
             },
-            getRendomColor () {
-                let i = 0
-                let colorStr = '#'
-                let random = 0
-                const aryNum = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+            getRendomColor() {
+                let i = 0;
+                let colorStr = '#';
+                let random = 0;
+                const aryNum = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
                 for (i = 0; i < 6; i++) {
-                    random = parseInt(Math.random() * 16)
-                    colorStr += aryNum[random]
+                    random = parseInt(Math.random() * 16);
+                    colorStr += aryNum[random];
                 }
-                if (colorStr === '#FFFFFF')colorStr = '#87cb12'
-                return colorStr
+                if (colorStr === '#FFFFFF')colorStr = '#87cb12';
+                return colorStr;
             },
             // 提交 取消
-            submitFn () {
+            submitFn() {
                 const {
                     can_ticket_agency, catalog_id, desc, display_type, id, is_valid, key,
                     name, owners, sla, workflow,
-                } = this.serviceData
+                } = this.serviceData;
                 const params = {
                     can_ticket_agency,
                     catalog_id,
@@ -468,97 +498,97 @@
                     workflow,
                     admin: owners.split(','),
                     project_key: this.$store.state.project.id,
-                }
+                };
                 // SLA开关
                 if (this.isSlaActive) {
                     if (!params.sla.length) {
                         this.$bkMessage({
                             message: this.$t('m.deployPage["请添加SLA协议！"]'),
                             theme: 'error',
-                        })
-                        return
+                        });
+                        return;
                     }
-                    params.sla = params.sla.map(sla => {
-                        sla.name = this.getProtocolName(sla.sla_id)
-                        return sla
-                    })
+                    params.sla = params.sla.map((sla) => {
+                        sla.name = this.getProtocolName(sla.sla_id);
+                        return sla;
+                    });
                 } else {
-                    params.sla = []
+                    params.sla = [];
                 }
                 // 请求方法
                 if (this.submitPending) {
-                    return
+                    return;
                 }
-                this.submitPending = true
-                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
+                this.submitPending = true;
+                this.$store.dispatch('serviceEntry/updateService', params).then(_ => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
-                    })
-                    this.goToServiceList()
+                    });
+                    this.goToServiceList();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.submitPending = false
-                    })
+                        this.submitPending = false;
+                    });
             },
-            goToServiceList () {
-                this.$router.push({ name: 'projectServiceList', query: { project_id: this.$route.query.project_id, catalog_id: this.$route.query.catalog_id } })
+            goToServiceList() {
+                this.$router.push({ name: 'projectServiceList', query: { project_id: this.$route.query.project_id, catalog_id: this.$route.query.catalog_id } });
             },
             // 跳转到新建服务协议
-            handleCreateAgreement () {
-                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id } })
-                window.open(routeData.href, '_blank')
+            handleCreateAgreement() {
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id } });
+                window.open(routeData.href, '_blank');
             },
-            handleEditAgreement (option) {
-                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id, item: JSON.stringify(option) } })
-                window.open(routeData.href, '_blank')
+            handleEditAgreement(option) {
+                const routeData = this.$router.resolve({ path: '/project/sla_agreement', query: { project_id: this.$store.state.project.id, item: JSON.stringify(option) } });
+                window.open(routeData.href, '_blank');
             },
             // 校验
-            async submitInfo () {
-                this.$refs.dynamicForm.validate().then(validator => {
+            async submitInfo() {
+                this.$refs.dynamicForm.validate().then((_) => {
 
-                }, validator => {
-                    this.$parent.$refs.agreement.scrollTop = 0
-                })
+                }, (_) => {
+                    this.$parent.$refs.agreement.scrollTop = 0;
+                });
             },
-            handleCancelAgreement () {
-                this.serviceAgreementIsShow = false
-                this.clearLastNode()
+            handleCancelAgreement() {
+                this.serviceAgreementIsShow = false;
+                this.clearLastNode();
             },
-            clearLastNode () {
+            clearLastNode() {
                 if (this.isNodeClick && this.agreeType === 'add') {
-                    this.serviceData.sla.pop()
+                    this.serviceData.sla.pop();
                 }
-                return true
+                return true;
             },
             // 校验流程是否可以启用 sla 协议
-            handleUseSlaPreCheck (val) {
+            handleUseSlaPreCheck(val) {
                 if (!val) {
-                    return true
+                    return true;
                 }
                 if (!this.serviceData.workflow) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig[\'请选择流程版本\']'),
                         theme: 'error',
-                    })
-                    return false
+                    });
+                    return false;
                 }
                 const result = new Promise((resolve, reject) => {
                     this.$store.dispatch('sla/checkProcessCanUseSla', this.serviceData.workflow).then((res) => {
-                        resolve(res.result)
+                        resolve(res.result);
                     })
-                        .catch(err => {
-                            errorHandler(err, this)
-                            reject(err)
-                        })
-                })
-                return result
+                        .catch((err) => {
+                            errorHandler(err, this);
+                            reject(err);
+                        });
+                });
+                return result;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

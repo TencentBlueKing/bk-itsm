@@ -39,35 +39,35 @@
         props: {
             detailInfoOri: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
-                
-            }
+
+            };
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get () {
-                    return this.detailInfoOri
+                get() {
+                    return this.detailInfoOri;
                 },
                 // setter
-                set (newVal) {
-                    this.$parent.DetailInfo = newVal
+                set(newVal) {
+                    this.$parent.DetailInfo = newVal;
                 },
             },
         },
         methods: {
-            
+
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
-    
+
 </style>

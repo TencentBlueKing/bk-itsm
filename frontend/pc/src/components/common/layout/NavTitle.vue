@@ -49,11 +49,11 @@
             },
         },
         methods: {
-            goBack () {
-                this.$emit('goBack')
+            goBack() {
+                this.$emit('goBack');
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
@@ -91,5 +91,5 @@
             margin: 0 auto;
         }
     }
-    
+
 </style>

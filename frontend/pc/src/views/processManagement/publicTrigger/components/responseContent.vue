@@ -93,10 +93,10 @@
     </div>
 </template>
 <script>
-    import changeConductor from './changeConductor.vue'
-    import sendMessage from './sendMessage.vue'
-    import apiCall from './apiCall.vue'
-    import modifyField from './modifyField'
+    import changeConductor from './changeConductor.vue';
+    import sendMessage from './sendMessage.vue';
+    import apiCall from './apiCall.vue';
+    import modifyField from './modifyField';
 
     export default {
         name: 'responseContent',
@@ -109,101 +109,101 @@
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             signal: String,
         },
-        data () {
+        data() {
             return {
-            }
+            };
         },
         computed: {
             // 只允许后台自动执行的触发事件列表
-            onlyBackendSignals () {
-                return this.$store.state.common.configurInfo.only_backend_signals || []
+            onlyBackendSignals() {
+                return this.$store.state.common.configurInfo.only_backend_signals || [];
             },
             // 是否显示前台触发 radio
-            isShowFrontendTrigger () {
-                return !this.onlyBackendSignals.includes(this.signal)
+            isShowFrontendTrigger() {
+                return !this.onlyBackendSignals.includes(this.signal);
             },
         },
         watch: {
             isShowFrontendTrigger: {
-                handler (val) {
+                handler(val) {
                     if (!val) {
-                        this.item.performData.runMode = 'BACKEND'
+                        this.item.performData.runMode = 'BACKEND';
                     }
                 },
                 immediate: true,
             },
         },
-        created () {
-            this.initData()
+        created() {
+            this.initData();
         },
         methods: {
-            initData () {
-                this.$set(this.item, 'contentStatus', false)
+            initData() {
+                this.$set(this.item, 'contentStatus', false);
                 // 对于API字段需要做特定的数据处理
                 if (this.item.wayInfo.key === 'api') {
-                    this.item.wayInfo.field_schema.forEach(schema => {
+                    this.item.wayInfo.field_schema.forEach((schema) => {
                         if (schema.key === 'api_source') {
-                            this.$set(schema, 'systemId', '')
-                            this.$set(schema, 'apiId', '')
+                            this.$set(schema, 'systemId', '');
+                            this.$set(schema, 'apiId', '');
                         } else {
-                            this.$set(schema, 'apiContent', {})
+                            this.$set(schema, 'apiContent', {});
                         }
-                    })
+                    });
                 } else {
                     // 内置content内容
-                    this.item.wayInfo.field_schema.forEach(schema => {
-                        let valueInfo = schema.value || ''
+                    this.item.wayInfo.field_schema.forEach((schema) => {
+                        let valueInfo = schema.value || '';
                         if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
-                            valueInfo = []
+                            valueInfo = [];
                             if (schema.value) {
-                                schema.value.forEach(schemaValue => {
+                                schema.value.forEach((schemaValue) => {
                                     if (schemaValue.value) {
                                         const itemValue = {
                                             key: schemaValue.value.member_type,
                                             value: schemaValue.value.members,
                                             secondLevelList: [],
                                             isLoading: false,
-                                        }
-                                        valueInfo.push(itemValue)
+                                        };
+                                        valueInfo.push(itemValue);
                                     }
-                                })
+                                });
                             } else {
                                 const itemValue = {
                                     key: '',
                                     value: '',
                                     secondLevelList: [],
                                     isLoading: false,
-                                }
-                                valueInfo.push(itemValue)
+                                };
+                                valueInfo.push(itemValue);
                             }
                         }
-                        this.$set(schema, 'value', valueInfo)
+                        this.$set(schema, 'value', valueInfo);
                         // 对于发通知的数据格式
                         if (schema.type === 'SUBCOMPONENT' && schema.sub_components && schema.sub_components.length) {
-                            schema.sub_components.forEach(subComponent => {
+                            schema.sub_components.forEach((subComponent) => {
                                 if (subComponent.field_schema.length) {
-                                    subComponent.field_schema.forEach(subField => {
-                                        let subFieldValue = subField.value || ''
+                                    subComponent.field_schema.forEach((subField) => {
+                                        let subFieldValue = subField.value || '';
                                         if (subField.type === 'MEMBERS' || subField.type === 'MULTI_MEMBERS') {
-                                            subFieldValue = []
+                                            subFieldValue = [];
                                             if (Array.isArray(subField.value)) {
-                                                subField.value.forEach(schemaValue => {
+                                                subField.value.forEach((schemaValue) => {
                                                     if (schemaValue.value) {
                                                         const itemValue = {
                                                             key: schemaValue.value.member_type,
                                                             value: schemaValue.value.members,
                                                             secondLevelList: [],
                                                             isLoading: false,
-                                                        }
-                                                        subFieldValue.push(itemValue)
+                                                        };
+                                                        subFieldValue.push(itemValue);
                                                     }
-                                                })
+                                                });
                                             } else {
                                                 subFieldValue = [
                                                     {
@@ -212,19 +212,19 @@
                                                         secondLevelList: [],
                                                         isLoading: false,
                                                     },
-                                                ]
+                                                ];
                                             }
                                         }
-                                        this.$set(subField, 'value', subFieldValue)
-                                    })
+                                        this.$set(subField, 'value', subFieldValue);
+                                    });
                                 }
-                            })
+                            });
                         }
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

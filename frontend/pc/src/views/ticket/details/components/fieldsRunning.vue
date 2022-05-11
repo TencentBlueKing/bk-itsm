@@ -38,27 +38,27 @@
     </div>
 </template>
 <script>
-    import commonMix from '../../../commonMix/common.js'
-    import string from '../../../commonComponent/fieldComponent/string.vue'
-    import link from '../../../commonComponent/fieldComponent/link'
-    import int from '../../../commonComponent/fieldComponent/int.vue'
-    import text from '../../../commonComponent/fieldComponent/text.vue'
-    import checkbox from '../../../commonComponent/fieldComponent/checkbox.vue'
-    import radio from '../../../commonComponent/fieldComponent/radio.vue'
-    import select from '../../../commonComponent/fieldComponent/select.vue'
-    import inputSelect from '../../../commonComponent/fieldComponent/inputSelect'
-    import multiselect from '../../../commonComponent/fieldComponent/multiselect.vue'
-    import date from '../../../commonComponent/fieldComponent/date.vue'
-    import datetime from '../../../commonComponent/fieldComponent/datetime.vue'
-    import member from '../../../commonComponent/fieldComponent/member.vue'
-    import members from '../../../commonComponent/fieldComponent/members.vue'
-    import table from '../../../commonComponent/fieldComponent/table.vue'
-    import customtable from '../../../commonComponent/fieldComponent/customtable.vue'
-    import editor from '../../../commonComponent/fieldComponent/editor.vue'
-    import tree from '../../../commonComponent/fieldComponent/tree.vue'
-    import file from '../../../commonComponent/fieldComponent/file.vue'
-    import cascade from '../../../commonComponent/fieldComponent/cascade.vue'
-    import { errorHandler } from '@/utils/errorHandler.js'
+    import commonMix from '../../../commonMix/common.js';
+    import string from '../../../commonComponent/fieldComponent/string.vue';
+    import link from '../../../commonComponent/fieldComponent/link';
+    import int from '../../../commonComponent/fieldComponent/int.vue';
+    import text from '../../../commonComponent/fieldComponent/text.vue';
+    import checkbox from '../../../commonComponent/fieldComponent/checkbox.vue';
+    import radio from '../../../commonComponent/fieldComponent/radio.vue';
+    import select from '../../../commonComponent/fieldComponent/select.vue';
+    import inputSelect from '../../../commonComponent/fieldComponent/inputSelect';
+    import multiselect from '../../../commonComponent/fieldComponent/multiselect.vue';
+    import date from '../../../commonComponent/fieldComponent/date.vue';
+    import datetime from '../../../commonComponent/fieldComponent/datetime.vue';
+    import member from '../../../commonComponent/fieldComponent/member.vue';
+    import members from '../../../commonComponent/fieldComponent/members.vue';
+    import table from '../../../commonComponent/fieldComponent/table.vue';
+    import customtable from '../../../commonComponent/fieldComponent/customtable.vue';
+    import editor from '../../../commonComponent/fieldComponent/editor.vue';
+    import tree from '../../../commonComponent/fieldComponent/tree.vue';
+    import file from '../../../commonComponent/fieldComponent/file.vue';
+    import cascade from '../../../commonComponent/fieldComponent/cascade.vue';
+    import { errorHandler } from '@/utils/errorHandler.js';
 
     export default {
         name: 'fieldsRunning',
@@ -88,24 +88,24 @@
         props: {
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 showMore: false,
                 showInfo: true,
@@ -125,45 +125,45 @@
                 secondClick: false,
                 rotate: false,
                 marginTypeList: ['TABLE', 'CUSTOMTABLE', 'FILE', 'RICHTEXT'],
-            }
+            };
         },
         computed: {
-            profile () {
+            profile() {
                 if (!this.basicInfomation) {
-                    return
+                    return;
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
                     department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
-                }
+                };
             },
         },
-        mounted () {
-            this.$set(this.item, 'isEdit', true)
+        mounted() {
+            this.$set(this.item, 'isEdit', true);
             this.$nextTick(() => {
-                this.reloadCurPage()
-            })
-            this.$forceUpdate()
+                this.reloadCurPage();
+            });
+            this.$forceUpdate();
         },
         methods: {
-            freshBtn (item, changeFields) {
-                this.rotate = !this.rotate
-                this.freshApi(item, changeFields, 'field')
+            freshBtn(item, changeFields) {
+                this.rotate = !this.rotate;
+                this.freshApi(item, changeFields, 'field');
             },
-            freshRpc (item) {
-                this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
-                    item.choice = res.data
-                    item.val = ''
+            freshRpc(item) {
+                this.$store.dispatch('apiRemote/getRpcData', item).then((res) => {
+                    item.choice = res.data;
+                    item.val = '';
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 修改至结束状态弹窗事件
-            submitTemplate () {
-                const { id } = this.basicInfomation
-                this.fieldFormatting([this.item])
+            submitTemplate() {
+                const { id } = this.basicInfomation;
+                this.fieldFormatting([this.item]);
                 const params = {
                     field: {
                         id: this.item.id,
@@ -171,62 +171,62 @@
                         value: this.item.value,
                         type: this.item.type,
                     },
-                }
+                };
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch('basicModule/edit_field', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["修改成功"]'),
                         theme: 'success',
-                    })
-                    this.reloadTicket()
+                    });
+                    this.reloadTicket();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                        this.toDone()
-                    })
+                        this.secondClick = false;
+                        this.toDone();
+                    });
             },
-            reloadCurPage () {
-                this.routerKey = +new Date()
+            reloadCurPage() {
+                this.routerKey = +new Date();
             },
-            cancel () {
-                this.fields.forEach(ite => {
-                    ite.isEdit = false
-                })
-                this.$set(this.item, 'isEdit', false)
+            cancel() {
+                this.fields.forEach((ite) => {
+                    ite.isEdit = false;
+                });
+                this.$set(this.item, 'isEdit', false);
             },
-            async save () {
+            async save() {
                 if (this.item.key === 'current_status') {
-                    const temp = this.item.choice.filter(ite => ite.key === this.item.val)[0]
+                    const temp = this.item.choice.filter(ite => ite.key === this.item.val)[0];
                     if (temp.is_over === 'True') {
                         this.$bkInfo({
                             type: 'warning',
                             title: this.$t('m.systemConfig["确认保存？"]'),
                             subTitle: this.$t('m.systemConfig["状态修改为【"]') + temp.name + this.$t('m.systemConfig["】将导致整个单据结束"]'),
                             confirmFn: () => {
-                                this.submitTemplate()
+                                this.submitTemplate();
                                 // 仅修改单据状态后刷新整个单据
-                                this.reloadTicket()
+                                this.reloadTicket();
                             },
-                        })
+                        });
                     } else {
-                        this.submitTemplate()
+                        this.submitTemplate();
                     }
                 } else {
-                    this.submitTemplate()
+                    this.submitTemplate();
                 }
             },
-            async toDone () {
-                await this.$set(this.item, 'isEdit', false)
+            async toDone() {
+                await this.$set(this.item, 'isEdit', false);
                 // await this.partUpdate()
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';

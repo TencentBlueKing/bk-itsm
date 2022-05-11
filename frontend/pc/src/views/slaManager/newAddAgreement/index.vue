@@ -116,9 +116,9 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js'
-    import priorityConfigur from './priorityConfigur.vue'
-    import eventRemind from './eventRemind.vue'
+    import commonMix from '../../commonMix/common.js';
+    import priorityConfigur from './priorityConfigur.vue';
+    import eventRemind from './eventRemind.vue';
     export default {
         name: 'addAgreement',
         components: {
@@ -129,36 +129,36 @@
         props: {
             modelList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             emailNotifyEventList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             weixinNotifyEventList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             modelPriority: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 testPriority1: [
                     {
@@ -232,11 +232,11 @@
                 },
                 // 校验规则
                 nameRules: {},
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
         watch: {
@@ -254,38 +254,38 @@
             //     },
             //     immediate: true
             // }
-            'changeInfo.is_reply_need' (val) {
+            'changeInfo.is_reply_need'(val) {
                 if (!val) {
-                    this.$refs.priorityConfigur.clearFromError()
+                    this.$refs.priorityConfigur.clearFromError();
                 }
             },
         },
-        mounted () {
-            this.initData()
-            this.nameRules = this.checkCommonRules('name')
+        mounted() {
+            this.initData();
+            this.nameRules = this.checkCommonRules('name');
         },
         methods: {
             // 初始化数据
-            initData () {
-                const parentInfo = this.changeInfo.info
+            initData() {
+                const parentInfo = this.changeInfo.info;
                 this.formInfo = {
                     name: parentInfo.name || '',
                     agreementStatus: parentInfo.is_enabled || true,
                     id: parentInfo.id,
-                }
+                };
             },
-            wacthEventList (listKey, watchType, eventList) {
-                this[listKey] = this[listKey].map(item => {
+            wacthEventList(listKey, watchType, eventList) {
+                this[listKey] = this[listKey].map((item) => {
                     if (!this.changeInfo.info.id || !item[`${watchType}_notify`]) {
-                        item[`${watchType}_notify`] = eventList[0].id
+                        item[`${watchType}_notify`] = eventList[0].id;
                     }
-                    return item
-                })
+                    return item;
+                });
             },
-            
-            getReminderInfo (id) {
-                const priorList = []
-                let priorObj = {}
+
+            getReminderInfo(id) {
+                const priorList = [];
+                let priorObj = {};
                 this.$refs[`eventRemind${id}`].priorityList.map((prior, index) => {
                     priorObj = {
                         type: prior.type,
@@ -315,16 +315,16 @@
                                 },
                             },
                         ],
-                    }
+                    };
                     if (!prior.hasCheckBox || (this.changeInfo.is_reply_need && prior.isCheck)) {
-                        priorList.push(priorObj)
+                        priorList.push(priorObj);
                     }
-                })
-                return priorList
+                });
+                return priorList;
             },
             // 提交 取消
-            submitFn () {
-                const policies = this.$refs.priorityConfigur.priorityList
+            submitFn() {
+                const policies = this.$refs.priorityConfigur.priorityList;
                 const params = {
                     name: this.formInfo.name,
                     is_enabled: this.formInfo.agreementStatus,
@@ -332,63 +332,63 @@
                     action_policies: [...this.getReminderInfo(1), ...this.getReminderInfo(3)],
                     project_key: this.$store.state.project.id,
                     policies,
-                }
+                };
                 // 修改和新建
-                const urlValue = this.changeInfo.info.id ? 'putProtocol' : 'addProtocol'
+                const urlValue = this.changeInfo.info.id ? 'putProtocol' : 'addProtocol';
                 const paramsValue = {
                     params,
-                }
+                };
                 if (this.changeInfo.info.id) {
-                    paramsValue.id = this.changeInfo.info.id
+                    paramsValue.id = this.changeInfo.info.id;
                 }
                 // 请求方法
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch(`slaManagement/${urlValue}`, paramsValue).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
-                    })
-                    this.closeAgreement(true)
+                    });
+                    this.closeAgreement(true);
                 })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
+                        });
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
-            closeAgreement (type) {
+            closeAgreement(type) {
                 if (!type && this.checkDataChange()) {
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t('m.slaContent["确认返回？"]'),
                         // subTitle: this.$t(`m.slaContent["数据发生更改，确认后将不保存修改的数据！"]`),
                         confirmFn: () => {
-                            this.$parent.getList(1)
-                            this.$parent.closeAgreement()
+                            this.$parent.getList(1);
+                            this.$parent.closeAgreement();
                         },
-                    })
+                    });
                 } else {
-                    this.$parent.getList(1)
-                    this.$parent.closeAgreement()
+                    this.$parent.getList(1);
+                    this.$parent.closeAgreement();
                 }
             },
             // 数据对比
-            checkDataChange () {
-                return true
+            checkDataChange() {
+                return true;
             },
             // 校验
-            async submitInfo () {
-                const priorityConfigurCheck = await this.$refs.priorityConfigur.checkData()
-                const warningEventRemindCheck = await this.$refs.eventRemind1.checkData()
-                const timeOutEventRemindCheck = await this.$refs.eventRemind3.checkData()
-                this.$refs.dynamicForm.validate().then(validator => {
+            async submitInfo() {
+                const priorityConfigurCheck = await this.$refs.priorityConfigur.checkData();
+                const warningEventRemindCheck = await this.$refs.eventRemind1.checkData();
+                const timeOutEventRemindCheck = await this.$refs.eventRemind3.checkData();
+                this.$refs.dynamicForm.validate().then((validator) => {
                     if (!priorityConfigurCheck && !warningEventRemindCheck && !timeOutEventRemindCheck) {
                         if (this.changeInfo.info.id) {
                             this.$bkInfo({
@@ -396,17 +396,17 @@
                                 title: this.$t('m.slaContent["确认更新服务协议？"]'),
                                 // subTitle: this.$t(`m.slaContent["更新的内容将会实时应用在关联的服务中，请谨慎修改！"]`),
                                 confirmFn: () => {
-                                    this.submitFn()
+                                    this.submitFn();
                                 },
-                            })
+                            });
                         } else {
-                            this.submitFn()
+                            this.submitFn();
                         }
                     }
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

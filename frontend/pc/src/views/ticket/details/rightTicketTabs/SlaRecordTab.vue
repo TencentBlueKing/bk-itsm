@@ -64,21 +64,21 @@
 </template>
 
 <script>
-    import { convertTimeArrToMS, convertTimeArrToString } from '@/utils/util.js'
-    import { errorHandler } from '../../../../utils/errorHandler'
-    
+    import { convertTimeArrToMS, convertTimeArrToString } from '@/utils/util.js';
+    import { errorHandler } from '../../../../utils/errorHandler';
+
     export default {
         name: 'slaRecord',
         props: {
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             threshold: Array,
         },
-        data () {
+        data() {
             return {
                 convertTimeArrToString,
                 loading: false,
@@ -111,64 +111,64 @@
                 taskStatusList: ['', this.$t('m.newCommon["未开启"]'), this.$t('m.newCommon["计时中"]'), this.$t('m.newCommon["暂停中"]'), this.$t('m.newCommon["已结束"]'), this.$t('m.newCommon["已超时"]')],
                 responseCost: '',
                 processCost: '',
-            }
+            };
         },
         watch: {
         },
-        mounted () {
-            this.getReceiptsSlaTask()
+        mounted() {
+            this.getReceiptsSlaTask();
         },
         methods: {
-            getReceiptsSlaTask () {
+            getReceiptsSlaTask() {
                 if (this.basicInfomation.hasOwnProperty('id')) {
-                    this.loading = true
+                    this.loading = true;
                     const params = {
                         id: this.basicInfomation.id,
-                    }
-                    this.$store.dispatch('change/getReceiptsSlaTask', params).then(res => {
-                        this.slaList = res.data
-                        this.slaList.forEach(item => {
-                            this.$set(item, 'sla_responseTime', [0, 0, 0, 0, 0, 0])
-                            this.$set(item, 'sla_processTime', [0, 0, 0, 0, 0, 0])
-                        })
+                    };
+                    this.$store.dispatch('change/getReceiptsSlaTask', params).then((res) => {
+                        this.slaList = res.data;
+                        this.slaList.forEach((item) => {
+                            this.$set(item, 'sla_responseTime', [0, 0, 0, 0, 0, 0]);
+                            this.$set(item, 'sla_processTime', [0, 0, 0, 0, 0, 0]);
+                        });
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.loading = false
-                            this.changeTimeoutStatus()
-                        })
+                            this.loading = false;
+                            this.changeTimeoutStatus();
+                        });
                 }
             },
-            changeTimeoutStatus () {
+            changeTimeoutStatus() {
                 this.slaList.forEach((item, index) => {
                     if (item.task_status === 2) {
                         // 当前时间
                         const curTime = convertTimeArrToMS(new Date().toLocaleDateString()
                             .split('/')
                             .concat(new Date().toTimeString()
-                                .split(' ')[0].split(':')))
+                                .split(' ')[0].split(':')));
                         // 响应倒计时
-                        const Rtime = convertTimeArrToMS(item.reply_deadline.split(' ')[0].split('-').concat(item.reply_deadline.split(' ')[1].split(':')))
+                        const Rtime = convertTimeArrToMS(item.reply_deadline.split(' ')[0].split('-').concat(item.reply_deadline.split(' ')[1].split(':')));
                         // 处理倒计时
-                        const Ptime = convertTimeArrToMS(item.deadline.split(' ')[0].split('-').concat(item.deadline.split(' ')[1].split(':')))
-                        const responseCost = Rtime - curTime
-                        const processCost = Ptime - curTime
-                        this.runTime(responseCost, processCost, index, item.name)
+                        const Ptime = convertTimeArrToMS(item.deadline.split(' ')[0].split('-').concat(item.deadline.split(' ')[1].split(':')));
+                        const responseCost = Rtime - curTime;
+                        const processCost = Ptime - curTime;
+                        this.runTime(responseCost, processCost, index, item.name);
                     }
-                    item.reply_cost = convertTimeArrToString(item.reply_cost)
-                })
+                    item.reply_cost = convertTimeArrToString(item.reply_cost);
+                });
             },
-            changeTime (currentSec) {
-                const absCurrentSec = Math.abs(currentSec)
-                const day = absCurrentSec / (24 * 60 * 60)
-                const hour = (absCurrentSec % (24 * 60 * 60)) / (60 * 60)
-                const minute = absCurrentSec % (24 * 60 * 60) % (60 * 60) / 60
-                const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60
-                return { day, hour, minute, sec }
+            changeTime(currentSec) {
+                const absCurrentSec = Math.abs(currentSec);
+                const day = absCurrentSec / (24 * 60 * 60);
+                const hour = (absCurrentSec % (24 * 60 * 60)) / (60 * 60);
+                const minute = absCurrentSec % (24 * 60 * 60) % (60 * 60) / 60;
+                const sec = absCurrentSec % (24 * 60 * 60) % (60 * 60) % 60;
+                return { day, hour, minute, sec };
             },
-            goToSla () {
+            goToSla() {
                 this.$router.push({
                     name: 'projectServiceSla',
                     params: {
@@ -177,63 +177,63 @@
                     query: {
                         project_id: this.$route.query.project_id,
                     },
-                })
+                });
             },
-            runTime (responseCost, processCost, index, name) {
-                let isResponseTimeout = false
-                let isProcessTimeout = false
-                let isResponseNormal = true
-                let isProcessNormal = true
+            runTime(responseCost, processCost, index, name) {
+                let isResponseTimeout = false;
+                let isProcessTimeout = false;
+                let isResponseNormal = true;
+                let isProcessNormal = true;
                 // sla的超时预警的阈值
-                const threshold = this.threshold.find(item => item.sla_name === name)
-                const curResponseCost = JSON.parse(JSON.stringify(responseCost)) // 当前响应时间
-                const curProcessCost = JSON.parse(JSON.stringify(processCost)) // 当前处理时间
+                const threshold = this.threshold.find(item => item.sla_name === name);
+                const curResponseCost = JSON.parse(JSON.stringify(responseCost)); // 当前响应时间
+                const curProcessCost = JSON.parse(JSON.stringify(processCost)); // 当前处理时间
                 // 启动计时器
                 this.myInterval(() => {
-                    responseCost--
-                    processCost--
+                    responseCost--;
+                    processCost--;
                     if (responseCost < curResponseCost - (threshold.rTimeOutThreshold * curResponseCost) || responseCost < 0) {
-                        isResponseTimeout = true
-                        isResponseNormal = false
+                        isResponseTimeout = true;
+                        isResponseNormal = false;
                     } else if (responseCost < threshold.rWarningThreshold * curResponseCost) {
-                        isResponseNormal = false
+                        isResponseNormal = false;
                     }
                     if (processCost < curProcessCost - (threshold.pTimeOutThreshold * curProcessCost) || processCost < 0) {
-                        isProcessTimeout = true
-                        isProcessNormal = false
+                        isProcessTimeout = true;
+                        isProcessNormal = false;
                     } else if (processCost < threshold.pWarningThreshold * curProcessCost) { // 预警time
-                        isProcessNormal = false
+                        isProcessNormal = false;
                     }
-                    const responseTime = [0, 0] // 响应时间
-                    const processTime = [0, 0] // 处理时间
-                    const rTime = this.changeTime(responseCost)
-                    const pTime = this.changeTime(processCost)
-                    responseTime.push(parseInt(rTime.day), parseInt(rTime.hour), parseInt(rTime.minute), rTime.sec)
-                    processTime.push(parseInt(pTime.day), parseInt(pTime.hour), parseInt(pTime.minute), pTime.sec)
-                    this.slaList[index].sla_responseTime = responseTime
-                    this.slaList[index].sla_processTime = processTime
-                    this.slaList[index].isResponseTimeout = isResponseTimeout
-                    this.slaList[index].isProcessTimeout = isProcessTimeout
-                    this.slaList[index].isResponseNormal = isResponseNormal
-                    this.slaList[index].isProcessNormal = isProcessNormal
-                    this.$set(this.slaList, index, this.slaList[index])
-                }, 1000)
+                    const responseTime = [0, 0]; // 响应时间
+                    const processTime = [0, 0]; // 处理时间
+                    const rTime = this.changeTime(responseCost);
+                    const pTime = this.changeTime(processCost);
+                    responseTime.push(parseInt(rTime.day), parseInt(rTime.hour), parseInt(rTime.minute), rTime.sec);
+                    processTime.push(parseInt(pTime.day), parseInt(pTime.hour), parseInt(pTime.minute), pTime.sec);
+                    this.slaList[index].sla_responseTime = responseTime;
+                    this.slaList[index].sla_processTime = processTime;
+                    this.slaList[index].isResponseTimeout = isResponseTimeout;
+                    this.slaList[index].isProcessTimeout = isProcessTimeout;
+                    this.slaList[index].isResponseNormal = isResponseNormal;
+                    this.slaList[index].isProcessNormal = isProcessNormal;
+                    this.$set(this.slaList, index, this.slaList[index]);
+                }, 1000);
             },
-            myInterval (fn, time) {
-                if (this._isDestroyed === true) return false
+            myInterval(fn, time) {
+                if (this._isDestroyed === true) return false;
                 const outTimeKey = setTimeout(() => {
-                    fn()
-                    clearTimeout(outTimeKey)
-                    this.myInterval(fn, time)
-                }, time)
+                    fn();
+                    clearTimeout(outTimeKey);
+                    this.myInterval(fn, time);
+                }, time);
             },
-            getCurrentCost (beginTime) {
-                const beginTimestamp = new Date(beginTime)
-                const nowTimestamp = new Date()
-                return Math.round((nowTimestamp - beginTimestamp) / 1000)
+            getCurrentCost(beginTime) {
+                const beginTimestamp = new Date(beginTime);
+                const nowTimestamp = new Date();
+                return Math.round((nowTimestamp - beginTimestamp) / 1000);
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>
@@ -272,7 +272,7 @@
                     color: #767880;
                     margin-right: 20px;
                 }
-                
+
             }
         }
         .bk-no-content {

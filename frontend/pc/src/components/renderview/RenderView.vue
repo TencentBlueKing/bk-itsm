@@ -36,8 +36,8 @@
     </div>
 </template>
 <script>
-    import ViewItem from './ViewItem'
-    
+    import ViewItem from './ViewItem';
+
     export default {
         name: 'RenderView',
         components: {
@@ -53,41 +53,41 @@
                 default: () => ({}),
             },
         },
-        provide () {
+        provide() {
             return {
                 getContext: () => this.context,
-            }
+            };
         },
-        data () {
+        data() {
             return {
                 isRootRenderView: null,
                 value: {},
-            }
+            };
         },
-        created () {
-            this.initRenderView()
+        created() {
+            this.initRenderView();
         },
         methods: {
-            getScheme (form) {
+            getScheme(form) {
                 if (this.context.schemes[form.scheme]) {
-                    return this.context.schemes[form.scheme]
+                    return this.context.schemes[form.scheme];
                 }
-                return {}
+                return {};
             },
-            initRenderView () {
-                let vueTag = this
-                let findParent = false
+            initRenderView() {
+                let vueTag = this;
+                let findParent = false;
                 while (!findParent && vueTag.$parent) {
                     if (vueTag.$parent.$options._componentTag === 'render-view') {
-                        findParent = true
+                        findParent = true;
                     } else {
-                        vueTag = vueTag.$parent
+                        vueTag = vueTag.$parent;
                     }
                 }
-                this.isRootRenderView = !findParent
+                this.isRootRenderView = !findParent;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

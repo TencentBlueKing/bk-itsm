@@ -46,9 +46,9 @@
 </template>
 
 <script>
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
-    import { errorHandler } from '@/utils/errorHandler'
-    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue'
+    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+    import { errorHandler } from '@/utils/errorHandler';
+    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue';
 
     export default {
         name: 'taskHandleTrigger',
@@ -60,8 +60,8 @@
         props: {
             taskInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             title: {
@@ -73,42 +73,42 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 dropdownShow: false,
                 gettingTriggers: true,
                 triggerList: [],
-            }
+            };
         },
-        mounted () {
-            this.getHandleList()
+        mounted() {
+            this.getHandleList();
         },
         methods: {
-            getHandleList () {
+            getHandleList() {
                 const params = {
                     source_id: this.taskInfo.id,
                     source_type: 'task',
                     operate_type: 'MANUAL',
-                }
-                this.$store.dispatch('trigger/getTaskHandleTriggers', params).then(res => {
-                    this.triggerList = res.data
+                };
+                this.$store.dispatch('trigger/getTaskHandleTriggers', params).then((res) => {
+                    this.triggerList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.gettingTriggers = false
-                    })
+                        this.gettingTriggers = false;
+                    });
             },
-            openTriggerDialog (trigger) {
-                this.$refs.triggerDialog.openDialog(trigger)
+            openTriggerDialog(trigger) {
+                this.$refs.triggerDialog.openDialog(trigger);
             },
-            refreshTicket () {
-                this.$emit('close-slider')
-                this.reloadTicket()
+            refreshTicket() {
+                this.$emit('close-slider');
+                this.reloadTicket();
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

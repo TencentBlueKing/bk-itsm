@@ -131,4 +131,4 @@ export const CUSTOM_FORM_TEMPLATE = {
             value: '',
         },
     ],
-}
+};

@@ -34,7 +34,8 @@
                         <li>
                             <a href="javascript:;"
                                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                                :class="{ 'text-permission-disable': !projectId
+                                    && !hasPermission(['public_api_create']) }"
                                 :title="$t(`m.systemConfig['接入']`)"
                                 data-test-id="api_a_apiTableAccessApi"
                                 @click="openShade('JOIN')">
@@ -45,7 +46,8 @@
                             <a href="javascript:;"
                                 data-test-id="api_a_apiTableCreateApi"
                                 v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                                :class="{ 'text-permission-disable': !projectId
+                                    && !hasPermission(['public_api_create']) }"
                                 :title="$t(`m.systemConfig['新增']`)"
                                 @click="openShade('ADD')">
                                 {{$t(`m.systemConfig['新增']`)}}
@@ -59,7 +61,13 @@
                     :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                     :title="$t(`m.systemConfig['点击上传']`)"
                     class="mr10 bk-btn-file">
-                    <input :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'" :value="fileVal" class="bk-input-file" @change="handleFile" @click="hasImportPermission">
+                    <input :type="!projectId
+                        && !hasPermission(['public_api_create'])
+                            ? 'button' : 'file'"
+                        :value="fileVal"
+                        class="bk-input-file"
+                        @change="handleFile"
+                        @click="hasImportPermission">
                     {{$t(`m.systemConfig['导入']`)}}
                 </bk-button>
                 <bk-button :theme="'default'"
@@ -106,8 +114,10 @@
                     <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
                     <span class="bk-lable-primary"
                         data-test-id="api_span_apiTableViewDetail"
-                        v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        v-cursor="{ active: !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        :class="{ 'text-permission-disable': !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="props.row.name"
                         @click="entryOne(props.row)">
                         {{props.row.name || '--'}}
@@ -158,17 +168,22 @@
                     </bk-button>
                     <bk-button theme="primary" text
                         data-test-id="api_button_apiTableEditApi"
-                        v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        v-cursor="{ active: !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        :class="{ 'text-permission-disable': !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="$t(`m.systemConfig['编辑']`)"
-                        :disabled="(projectId || hasPermission(['public_api_manage'], props.row.auth_actions)) && (props.row.is_builtin || !!props.row.count)"
+                        :disabled="(projectId || hasPermission(['public_api_manage'], props.row.auth_actions))
+                            && (props.row.is_builtin || !!props.row.count)"
                         @click="entryOne(props.row)">
                         {{ $t('m.systemConfig["编辑"]') }}
                     </bk-button>
                     <bk-button theme="primary" text
                         data-test-id="api_button_apiTableDeleteApi"
-                        v-cursor="{ active: !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        v-cursor="{ active: !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+                        :class="{ 'text-permission-disable': !projectId
+                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
                         :title="$t(`m.systemConfig['移除']`)"
                         :disabled="props.row.is_builtin"
                         @click="openDelete(props.row)">
@@ -194,9 +209,9 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    import addApiInfo from './addApiInfo.vue'
-    import permission from '@/mixins/permission.js'
+    import { errorHandler } from '../../../utils/errorHandler';
+    import addApiInfo from './addApiInfo.vue';
+    import permission from '@/mixins/permission.js';
 
     export default {
         components: {
@@ -206,37 +221,37 @@
         props: {
             treeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             listInfoOri: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             pathList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             projectId: String,
             firstLevelInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             customPaging: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 isDropdownShow: false,
@@ -269,26 +284,26 @@
                 },
                 fileVal: '',
                 typeInfo: '',
-            }
+            };
         },
         computed: {
             listInfo: {
                 // getter
-                get () {
-                    return this.listInfoOri
+                get() {
+                    return this.listInfoOri;
                 },
                 // setter
-                set (newVal) {
-                    this.$parent.listInfo = newVal
+                set(newVal) {
+                    this.$parent.listInfo = newVal;
                 },
             },
         },
         watch: {},
-        mounted () {
+        mounted() {
 
         },
         methods: {
-            async entryOne (item) {
+            async entryOne(item) {
                 // 公共api
                 if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
                     const resourceData = {
@@ -296,95 +311,96 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
+                    return;
                 }
-                this.$parent.displayInfo.level_1 = item
+                this.$parent.displayInfo.level_1 = item;
                 // 展示 单个api
-                await this.$parent.getRemoteApiDetail(item.id)
+                await this.$parent.getRemoteApiDetail(item.id);
             },
-            getRemoteSystemData () {
-                this.$parent.getRemoteSystemData()
+            getRemoteSystemData() {
+                this.$parent.getRemoteSystemData();
                 const customPaging = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
+                };
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
             },
-            systemName (id) {
-                const system = this.treeList.filter(item => item.id === id)
+            systemName(id) {
+                const system = this.treeList.filter(item => item.id === id);
                 if (system.length) {
-                    return system[0].name
+                    return system[0].name;
                 }
-                return '--'
+                return '--';
             },
-            changTitle (item, index) {
-                this.checkIndex = index
+            changTitle(item, index) {
+                this.checkIndex = index;
             },
             // 新增
-            openShade (type) {
+            openShade(type) {
                 if (!this.projectId) {
                     if (!this.hasPermission(['public_api_create'])) {
-                        this.applyForPermission(['public_api_create'], [], {})
-                        return
+                        this.applyForPermission(['public_api_create'], [], {});
+                        return;
                     }
                 }
-                this.typeInfo = type
-                this.entryInfo.title = type === 'ADD' ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]')
-                this.$refs.apiDropdown.hide()
-                this.entryInfo.show = !this.entryInfo.show
+                this.typeInfo = type;
+                this.entryInfo.title = type === 'ADD'
+                    ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
+                this.$refs.apiDropdown.hide();
+                this.entryInfo.show = !this.entryInfo.show;
             },
-            dropdownShow () {
-                this.isDropdownShow = true
+            dropdownShow() {
+                this.isDropdownShow = true;
             },
-            dropdownHide () {
-                this.isDropdownShow = false
+            dropdownHide() {
+                this.isDropdownShow = false;
             },
             // 查询
-            serchEntry () {
+            serchEntry() {
                 const customPaging = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
+                };
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
             },
-            clearInfo () {
-                this.searchInfo.key = ''
-                this.serchEntry()
+            clearInfo() {
+                this.searchInfo.key = '';
+                this.serchEntry();
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
                 const customPaging = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
+                };
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
             },
-            handlePageChange (page) {
-                this.pagination.current = page
+            handlePageChange(page) {
+                this.pagination.current = page;
                 const customPaging = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
+                };
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection) {
+                this.checkList = selection;
             },
-            disabledFn (item, index) {
+            disabledFn(item) {
                 if (!this.projectId) {
-                    return this.hasPermission(['public_api_manage'], item.auth_actions) && !item.is_builtin
+                    return this.hasPermission(['public_api_manage'], item.auth_actions) && !item.is_builtin;
                 }
-                return !item.is_builtin
+                return !item.is_builtin;
             },
             // 二次弹窗确认
-            openDelete (item) {
+            openDelete(item) {
                 if (!this.projectId) {
                     if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
                         const resourceData = {
@@ -392,9 +408,9 @@
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
-                        this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
-                        return
+                        };
+                        this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
+                        return;
                     }
                 }
                 this.$bkInfo({
@@ -402,94 +418,99 @@
                     title: this.$t('m.systemConfig["确认移除服务？"]'),
                     subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('apiRemote/delete_api', id).then(res => {
+                        this.secondClick = true;
+                        this.$store.dispatch('apiRemote/delete_api', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getRemoteSystemData()
+                            });
+                            this.getRemoteSystemData();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
-            deleteCheck () {
+            deleteCheck() {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.systemConfig["确认移除服务？"]'),
                     subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
                     confirmFn: () => {
-                        const id = this.checkList.map(item => item.id).join(',')
+                        const id = this.checkList.map(item => item.id).join(',');
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('apiRemote/batch_delete_apis', { id }).then(res => {
+                        this.secondClick = true;
+                        this.$store.dispatch('apiRemote/batch_delete_apis', { id }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["批量删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getRemoteSystemData()
+                            });
+                            this.getRemoteSystemData();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
             //
-            hasImportPermission () {
+            hasImportPermission() {
                 if (!this.projectId) {
                     if (!this.hasPermission(['public_api_create'])) {
-                        this.applyForPermission(['public_api_create'], [], {})
+                        this.applyForPermission(['public_api_create'], [], {});
                     }
                 }
             },
             // 上传文件模板
-            handleFile (e) {
-                const fileInfo = e.target.files[0]
+            handleFile(e) {
+                const fileInfo = e.target.files[0];
                 if (fileInfo.size <= 10 * 1024 * 1024) {
-                    const data = new FormData()
-                    data.append('file', fileInfo)
-                    const fileType = 'json'
+                    const data = new FormData();
+                    data.append('file', fileInfo);
+                    const fileType = 'json';
                     this.$store.dispatch('apiRemote/get_api_import', { fileType, data }).then((res) => {
                         this.$bkMessage({
-                            message: `${this.$t('m.systemConfig["成功导入"]')}${res.data.success}${this.$t('m.systemConfig["个API接口，"]')}${this.$t('m.systemConfig["失败"]')}${res.data.failed}${this.$t('m.systemConfig["个"]')}`,
+                            message: `${this.$t('m.systemConfig["成功导入"]')}
+                                ${res.data.success}
+                                ${this.$t('m.systemConfig["个API接口，"]')}
+                                ${this.$t('m.systemConfig["失败"]')}
+                                ${res.data.failed}
+                                ${this.$t('m.systemConfig["个"]')}`,
                             theme: 'success',
-                        })
-                        this.getRemoteSystemData()
+                        });
+                        this.getRemoteSystemData();
                     }, (res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                         .finally(() => {
-                            this.fileVal = ''
-                        })
+                            this.fileVal = '';
+                        });
                 } else {
-                    this.fileVal = ''
+                    this.fileVal = '';
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["文件大小不能超过10MB！"]'),
                         theme: 'error',
-                    })
+                    });
                 }
             },
-            exportFlow (item, index) {
-                window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`)
+            exportFlow(item) {
+                window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -49,27 +49,27 @@
             },
         },
         watch: {
-            isFull (val) {
+            isFull(val) {
                 if (val) {
                     this.$bkMessage({
                         message: this.$t('m.common["按 ESC 键退出全屏"]'),
-                    })
-                    document.addEventListener('keydown', this.handlerKeyDown)
+                    });
+                    document.addEventListener('keydown', this.handlerKeyDown);
                 }
             },
         },
         methods: {
-            onClose () {
-                this.$emit('onClose')
+            onClose() {
+                this.$emit('onClose');
             },
-            handlerKeyDown (event) {
+            handlerKeyDown(event) {
                 if (event.keyCode === 27) {
-                    this.onClose()
-                    document.removeEventListener('keydown', this.handlerKeyDown)
+                    this.onClose();
+                    document.removeEventListener('keydown', this.handlerKeyDown);
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

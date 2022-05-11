@@ -58,7 +58,7 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 // 状态列表
                 statusMap: {
@@ -80,21 +80,21 @@
                     failed: ['FAILED', 'DELETED', 'REVOKED', 'SUSPENDED'],
                     default: [],
                 },
-            }
+            };
         },
         computed: {
-            statusIcon () {
-                const keys = Object.keys(this.statusIconMap)
+            statusIcon() {
+                const keys = Object.keys(this.statusIconMap);
                 for (let i = 0; i < keys.length; i++) {
-                    const val = this.statusIconMap[keys[i]]
+                    const val = this.statusIconMap[keys[i]];
                     if (val.includes(this.status)) {
-                        return keys[i]
+                        return keys[i];
                     }
                 }
-                return ''
+                return '';
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -104,7 +104,7 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
+    import { errorHandler } from '../../../utils/errorHandler';
     export default {
         name: 'ColumnSn',
         props: {
@@ -117,7 +117,7 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 fromRouter: this.from || this.$route.name,
                 parent: {},
@@ -125,59 +125,59 @@
                 associates: [], // 关联单
                 inheritLoading: false,
                 associateLoading: false,
-            }
+            };
         },
         computed: {
-            openFunction () {
-                return this.$store.state.openFunction
+            openFunction() {
+                return this.$store.state.openFunction;
             },
         },
         methods: {
             // 获取母子单
-            getInheritTicket () {
+            getInheritTicket() {
                 if (this.parent.id || this.children.length) {
-                    return
+                    return;
                 }
-                this.inheritLoading = true
+                this.inheritLoading = true;
                 const params = {
                     id: this.row.id,
-                }
-                this.$store.dispatch('change/getInheritState', params).then(res => {
+                };
+                this.$store.dispatch('change/getInheritState', params).then((res) => {
                     if (res.data.related_type === 'slave') {
-                        this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]))
+                        this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]));
                     } else {
-                        this.children = res.data.master_slave_tickets
+                        this.children = res.data.master_slave_tickets;
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res)
+                    .catch((res) => {
+                        errorHandler(res);
                     })
                     .finally(() => {
-                        this.inheritLoading = false
-                    })
+                        this.inheritLoading = false;
+                    });
             },
             // 获取关联单
-            getAssociatedTickets () {
+            getAssociatedTickets() {
                 if (this.associates.length) {
-                    return
+                    return;
                 }
-                this.associateLoading = true
+                this.associateLoading = true;
                 const params = {
                     id: this.row.id,
-                }
+                };
                 this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
-                    this.associates = res.data
+                    this.associates = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.associateLoading = false
-                    })
+                        this.associateLoading = false;
+                    });
             },
 
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .table-link {

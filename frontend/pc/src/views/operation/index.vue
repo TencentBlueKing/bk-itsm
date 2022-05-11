@@ -28,7 +28,7 @@
 <script>
     export default {
         name: 'OperationData',
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .operation-data-page {

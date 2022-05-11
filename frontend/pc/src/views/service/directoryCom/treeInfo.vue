@@ -59,32 +59,38 @@
                     <ul>
                         <li
                             data-test-id="directoty-li-addCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_create'], $store.state.project.projectAuthActions), zIndex: 3001 }"
+                            v-cursor="{ active: !hasPermission(['catalog_create'], 
+                                $store.state.project.projectAuthActions), zIndex: 3001 }"
                             :title="$t(`m.serviceConfig['新增']`)"
                             :class="{
                                 'bk-disabled-add': String(treeInfo.node.level) === '3',
-                                'text-permission-disable': !hasPermission(['catalog_create'], $store.state.project.projectAuthActions)
-                            }"
+                                'text-permission-disable': !hasPermission(['catalog_create'],
+                                    $store.state.project.projectAuthActions)
+                                }"
                             @click="openAdd">
                             <span>{{ $t('m.serviceConfig["新增"]') }}</span>
                         </li>
                         <li
                             data-test-id="directoty-li-editCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions) }"
+                            v-cursor="{ active: !hasPermission(['catalog_edit'],
+                                $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['编辑']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_edit'], $store.state.project.projectAuthActions)
-                            }"
+                                'text-permission-disable': !hasPermission(['catalog_edit'],
+                                    $store.state.project.projectAuthActions)
+                                }"
                             @click="openUpdate">
                             <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
                         </li>
                         <li
                             data-test-id="directoty-li-delCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions) }"
+                            v-cursor="{ active: !hasPermission(['catalog_delete'],
+                                $store.state.project.projectAuthActions) }"
                             :title="$t(`m.serviceConfig['删除']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_delete'], $store.state.project.projectAuthActions)
-                            }"
+                                'text-permission-disable': !hasPermission(['catalog_delete'],
+                                    $store.state.project.projectAuthActions)
+                                }"
                             @click="openDelete">
                             <span>{{ $t('m.serviceConfig["删除"]') }}</span>
                         </li>
@@ -140,10 +146,10 @@
     </div>
 </template>
 <script>
-    import tree from './commonTree/tree.vue'
-    import commonMix from '../../commonMix/common.js'
-    import { errorHandler } from '../../../utils/errorHandler'
-    import permission from '@/mixins/permission.js'
+    import tree from './commonTree/tree.vue';
+    import commonMix from '../../commonMix/common.js';
+    import { errorHandler } from '../../../utils/errorHandler';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'treeInfo',
@@ -154,12 +160,12 @@
         props: {
             treeInfo: {
                 type: Object,
-                default () {
-                    return { node: {} }
+                default() {
+                    return { node: {} };
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isTreeLoading: false,
                 firstStatus: false,
@@ -185,300 +191,305 @@
                 // 校验规则
                 rules: {},
                 parentIds: [],
-            }
+            };
         },
         computed: {
-            showMore () {
-                return this.$store.state.serviceCatalog.treeMore
+            showMore() {
+                return this.$store.state.serviceCatalog.treeMore;
             },
         },
-        mounted () {
-            this.getTreeList()
-            this.rules.name = this.checkCommonRules('name').name
+        mounted() {
+            this.getTreeList();
+            this.rules.name = this.checkCommonRules('name').name;
         },
         methods: {
             // 获取树信息
-            getTreeList () {
-                this.isTreeLoading = true
+            getTreeList() {
+                this.isTreeLoading = true;
                 this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
                     project_key: this.$store.state.project.id,
-                }).then(res => {
-                    this.treeList = res.data
-                    this.getTreeParentId(res.data, this.$route.query.catalog_id)
+                }).then((res) => {
+                    this.treeList = res.data;
+                    this.getTreeParentId(res.data, this.$route.query.catalog_id);
                     if (!this.firstStatus) {
-                        this.treeInfo.node = this.treeList[0]
+                        this.treeInfo.node = this.treeList[0];
                     }
-                    this.treeList.forEach(item => {
-                        this.recordCheckFn(item)
+                    this.treeList.forEach((item) => {
+                        this.recordCheckFn(item);
                         if (!this.firstStatus) {
-                            this.$set(item, 'selected', true)
+                            this.$set(item, 'selected', true);
                         }
-                    })
-                    this.firstStatus = true
+                    });
+                    this.firstStatus = true;
                     if (this.treeInfo.node.id) {
-                        this.treeList.forEach(item => {
-                            this.getNodeTree(item)
-                        })
+                        this.treeList.forEach((item) => {
+                            this.getNodeTree(item);
+                        });
                     }
                     if (this.$route.query.catalog_id !== 1) {
-                        this.treeList[0].selected = false
+                        this.treeList[0].selected = false;
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isTreeLoading = false
-                    })
+                        this.isTreeLoading = false;
+                    });
             },
             // 获取当前目录id 和parents id
-            getTreeParentId (list, id) {
+            getTreeParentId(list, id) {
                 for (let i = 0; i < list.length; i++) {
-                    const node = list[i]
+                    const node = list[i];
                     if (node.id === id) {
-                        node.route.forEach(item => {
-                            this.parentIds.push(item.id)
-                        })
+                        node.route.forEach((item) => {
+                            this.parentIds.push(item.id);
+                        });
                     } else {
                         if (node.children && node.children.length > 0) {
-                            this.getTreeParentId(node.children, id)
+                            this.getTreeParentId(node.children, id);
                         }
                     }
                 }
             },
             // 点击节点方法
-            nodeClick (node) {
-                this.treeInfo.node = node
-                this.$route.query.catalog_id = node.id
-                this.$store.commit('serviceCatalog/changeTreeOperat', false)
+            nodeClick(node) {
+                this.treeInfo.node = node;
+                this.$route.query.catalog_id = node.id;
+                this.$store.commit('serviceCatalog/changeTreeOperat', false);
             },
-            iconNode (node) {
-                this.treeInfo.node = node.node
-                this.$store.commit('serviceCatalog/changeTreeOperat', true)
-                const { treeOperat } = this.$refs
+            iconNode(node) {
+                this.treeInfo.node = node.node;
+                this.$store.commit('serviceCatalog/changeTreeOperat', true);
+                const { treeOperat } = this.$refs;
                 if (window.innerHeight - 108 <= node.event.pageY) {
-                    treeOperat.style.top = `${node.event.pageY - 240}px`
+                    treeOperat.style.top = `${node.event.pageY - 240}px`;
                 } else {
-                    treeOperat.style.top = `${node.event.pageY - 144}px`
+                    treeOperat.style.top = `${node.event.pageY - 144}px`;
                 }
             },
-            hidden (event) {
-                const treePanel = this.$refs.treeTree
+            hidden(event) {
+                const treePanel = this.$refs.treeTree;
                 if (treePanel && !treePanel.contains(event.target)) {
-                    this.$store.commit('serviceCatalog/changeTreeOperat', false)
+                    this.$store.commit('serviceCatalog/changeTreeOperat', false);
                 }
             },
             // 节点展开收起
-            nodeExpand (node, expanded) {
-                let expendIndex = -1
+            nodeExpand(node, expanded) {
+                let expendIndex = -1;
                 for (let i = 0; i < this.expandIdList.length; i++) {
                     if (node.id === this.expandIdList[i]) {
-                        expendIndex = i
+                        expendIndex = i;
                     }
                 }
                 if (expanded) {
                     if (expendIndex === -1) {
-                        this.expandIdList.push(node.id)
+                        this.expandIdList.push(node.id);
                     }
                 } else {
                     if (expendIndex !== -1) {
-                        this.expandIdList.splice(expendIndex, 1)
+                        this.expandIdList.splice(expendIndex, 1);
                     }
                 }
             },
-            recordCheckFn (tree) {
-                this.expandIdList.forEach(selectItem => {
+            recordCheckFn(tree) {
+                this.expandIdList.forEach((selectItem) => {
                     if (selectItem === tree.id) {
-                        tree.expanded = true
+                        tree.expanded = true;
                     }
-                })
+                });
                 if (this.treeInfo.node.id === tree.id) {
-                    this.$set(tree, 'selected', true)
+                    this.$set(tree, 'selected', true);
                 }
                 if (tree.children === null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.recordCheckFn(item)
-                })
+                tree.children.forEach((item) => {
+                    this.recordCheckFn(item);
+                });
             },
-            getNodeTree (tree) {
+            getNodeTree(tree) {
                 if (this.parentIds.includes(tree.id)) {
-                    this.$set(tree, 'expanded', true)
+                    this.$set(tree, 'expanded', true);
                 }
                 if (this.$route.query.catalog_id === tree.id && tree.id !== 1) {
-                    this.$set(tree, 'expanded', true)
-                    this.$set(tree, 'selected', true)
+                    this.$set(tree, 'expanded', true);
+                    this.$set(tree, 'selected', true);
                 }
                 if (tree.children === null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
+                tree.children.forEach((item) => {
                     if (item.parent_id === tree.id && this.$route.query.catalog_id === item.id) {
-                        this.$set(tree, 'expanded', true)
+                        this.$set(tree, 'expanded', true);
                     }
-                    this.getNodeTree(item)
-                })
+                    this.getNodeTree(item);
+                });
             },
             // 搜索
-            searchInfo () {
-                this.$refs.tree5.searchNode(this.searchWord)
+            searchInfo() {
+                this.$refs.tree5.searchNode(this.searchWord);
             },
-            clearInfo () {
-                this.searchWord = ''
-                this.$refs.tree5.searchNode(this.searchWord)
+            clearInfo() {
+                this.searchWord = '';
+                this.$refs.tree5.searchNode(this.searchWord);
             },
             // 新增目录
-            openAdd (catalog) {
+            openAdd(catalog) {
                 if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['catalog_create'], this.$store.state.project.projectAuthActions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['catalog_create'],
+                        this.$store.state.project.projectAuthActions,
+                        resourceData);
+                    return;
                 }
                 if (String(this.treeInfo.node.level) === '3') {
-                    return
+                    return;
                 }
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择父级目录再进行新增"]'),
                         theme: 'warning',
-                    })
-                    return
+                    });
+                    return;
                 }
-                this.toggleDialog('add')
-                this.addDirectory.optType = 'add'
+                this.toggleDialog('add');
+                this.addDirectory.optType = 'add';
                 this.addDirectory.formInfo = {
                     parent__id: catalog === 'root' ? 1 : this.treeInfo.node.id,
                     parent___name: this.treeInfo.node.name,
                     name: '',
                     desc: '',
-                }
+                };
             },
-            toggleDialog (optType) {
+            toggleDialog(optType) {
                 if (optType === 'add') {
-                    this.addDirectory.title = this.$t('m.serviceConfig["新增服务目录"]')
+                    this.addDirectory.title = this.$t('m.serviceConfig["新增服务目录"]');
                 } else if (optType === 'update') {
-                    this.addDirectory.title = this.$t('m.serviceConfig["编辑服务目录"]')
+                    this.addDirectory.title = this.$t('m.serviceConfig["编辑服务目录"]');
                 }
-                this.addDirectory.show = !this.addDirectory.show
-                this.$refs.dynamicForm.clearError()
+                this.addDirectory.show = !this.addDirectory.show;
+                this.$refs.dynamicForm.clearError();
             },
-            submitAdd () {
-                this.$refs.dynamicForm.validate().then(validator => {
-                    const params = this.addDirectory.formInfo
-                    params.project_key = this.$store.state.project.id
+            submitAdd() {
+                this.$refs.dynamicForm.validate().then(() => {
+                    const params = this.addDirectory.formInfo;
+                    params.project_key = this.$store.state.project.id;
                     if (this.clickSecond) {
-                        return
+                        return;
                     }
-                    this.clickSecond = true
+                    this.clickSecond = true;
                     if (this.addDirectory.optType === 'add') {
-                        this.$store.dispatch('serviceCatalog/create', params).then(res => {
+                        this.$store.dispatch('serviceCatalog/create', params).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["新增目录成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             // TODO 局部刷新
-                            this.getTreeList()
-                            this.toggleDialog()
+                            this.getTreeList();
+                            this.toggleDialog();
                             // 确认保存后清空节点数据
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.clickSecond = false
-                            })
+                                this.clickSecond = false;
+                            });
                     } else if (this.addDirectory.optType === 'update') {
                         if (this.addDirectory.formInfo.parent__id === '') {
-                            delete this.addDirectory.formInfo.parent__id
+                            delete this.addDirectory.formInfo.parent__id;
                         }
 
-                        this.$store.dispatch('serviceCatalog/update', params).then(res => {
+                        this.$store.dispatch('serviceCatalog/update', params).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["更新目录成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             // TODO 局部刷新
-                            this.getTreeList()
-                            this.toggleDialog()
+                            this.getTreeList();
+                            this.toggleDialog();
                             // 确认保存后清空节点数据
                             // this.treeInfo.node = {}
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.clickSecond = false
-                            })
+                                this.clickSecond = false;
+                            });
                     }
-                }, validator => {
+                }, () => {
 
-                })
+                });
             },
             // 编辑目录
-            openUpdate () {
+            openUpdate() {
                 if (!this.hasPermission(['catalog_edit'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['catalog_edit'], this.$store.state.project.projectAuthActions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['catalog_edit'],
+                        this.$store.state.project.projectAuthActions,
+                        resourceData);
+                    return;
                 }
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择需要编辑的目录"]'),
                         theme: 'warning',
-                    })
-                    return
+                    });
+                    return;
                 }
-                this.addDirectory.optType = 'update'
+                this.addDirectory.optType = 'update';
                 this.addDirectory.formInfo = {
                     parent__id: this.treeInfo.node.parent_id,
                     parent___name: this.treeInfo.node.parent_name,
                     id: this.treeInfo.node.id,
                     name: this.treeInfo.node.name,
                     desc: this.treeInfo.node.desc,
-                }
+                };
 
-                this.toggleDialog('update')
+                this.toggleDialog('update');
             },
             // 删除
-            openDelete () {
+            openDelete() {
                 if (!this.hasPermission(['catalog_delete'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['catalog_delete'], this.$store.state.project.projectAuthActions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['catalog_delete'],
+                        this.$store.state.project.projectAuthActions, resourceData);
+                    return;
                 }
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择要删除的目录"]'),
                         theme: 'warning',
-                    })
-                    return
+                    });
+                    return;
                 }
                 if (this.treeInfo.node.children && this.treeInfo.node.children.length) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请先删除子目录"]'),
                         theme: 'warning',
-                    })
-                    return
+                    });
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
@@ -486,50 +497,50 @@
                     subTitle: this.$t('m.serviceConfig["服务目录一旦删除，此服务目录将不可用，请谨慎操作。"]'),
                     confirmFn: () => {
                         if (this.clickSecond) {
-                            return
+                            return;
                         }
-                        this.clickSecond = true
-                        this.$store.dispatch('serviceCatalog/delete', this.treeInfo.node.id).then(res => {
+                        this.clickSecond = true;
+                        this.$store.dispatch('serviceCatalog/delete', this.treeInfo.node.id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除目录成功"]'),
                                 theme: 'success',
-                            })
-                            this.getTreeList()
-                            this.firstStatus = false
+                            });
+                            this.getTreeList();
+                            this.firstStatus = false;
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.clickSecond = false
-                            })
+                                this.clickSecond = false;
+                            });
                     },
-                })
+                });
             },
-            onDragNode () {
+            onDragNode() {
                 if (arguments[0].currentParent.children.length <= 1) {
-                    return
+                    return;
                 }
                 if (this.clickSecond) {
-                    return
+                    return;
                 }
-                this.clickSecond = true
+                this.clickSecond = true;
                 const params = {
                     new_order: arguments[0].currentParent.children.map(item => item.id),
-                }
-                const { id } = arguments[0].dragNode
-                this.$store.dispatch('serviceCatalog/moveNode', { params, id }).then(res => {
+                };
+                const { id } = arguments[0].dragNode;
+                this.$store.dispatch('serviceCatalog/moveNode', { params, id }).then(() => {
                     // ...
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.clickSecond = false
-                    })
+                        this.clickSecond = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -46,15 +46,15 @@
 </template>
 
 <script>
-    import dayjs from 'dayjs'
-    
+    import dayjs from 'dayjs';
+
     const infoList = [
         { name: 'Name', key: 'name', value: '' },
         { name: 'Path', key: 'path', value: '' },
         { name: 'Size', key: 'size', value: '' },
         { name: 'Created', key: 'createTime', value: '--' },
         { name: 'Last Modified', key: 'modifiedTime', value: '' },
-    ]
+    ];
     export default {
         name: 'BuildDetailInfo',
         props: {
@@ -63,27 +63,27 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 infoList: [],
-            }
+            };
         },
-        mounted () {
-            this.infoList = infoList.map(item => {
+        mounted() {
+            this.infoList = infoList.map((item) => {
                 switch (item.key) {
                     case 'modifiedTime':
-                        item.value = dayjs(this.buildItem.modifiedTime * 1000).format('YYYY-MM-DD hh:mm:ss')
-                        break
+                        item.value = dayjs(this.buildItem.modifiedTime * 1000).format('YYYY-MM-DD hh:mm:ss');
+                        break;
                     default:
-                        item.value = this.buildItem[item.key] || '--'
+                        item.value = this.buildItem[item.key] || '--';
                 }
-                return item
-            })
+                return item;
+            });
         },
         methods: {
 
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/form.scss';

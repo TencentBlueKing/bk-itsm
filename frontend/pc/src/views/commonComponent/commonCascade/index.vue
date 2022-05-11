@@ -223,56 +223,56 @@
             // },
             positions: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         top: '',
                         left: '',
                         bottom: '',
                         right: '',
-                    }
+                    };
                 },
             },
             disabled: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             // 每级目录
             options: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 收藏样式二
             iscollectTwo: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             // 收藏项
             optionsFavorites: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isshowNumber: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             isactive: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 数据结构实例
                 options_eg: [{
@@ -331,379 +331,379 @@
                 searchList: [],
                 searchContent: '',
                 searchItem: {},
-            }
+            };
         },
         computed: {
-            currentTextinfo () {
-                return this.textinfoOri
+            currentTextinfo() {
+                return this.textinfoOri;
             },
             // 初始化 每级目录
-            options1 () {
-                const options = (this.iscollectTwo && !this.iscollect_first) ? [this.favoritesItem, ...this.options] : [...this.options]
+            options1() {
+                const options = (this.iscollectTwo && !this.iscollect_first) ? [this.favoritesItem, ...this.options] : [...this.options];
                 if (options) {
                     options.forEach((item) => {
-                        item.isselect = false
-                    })
+                        item.isselect = false;
+                    });
                 }
                 if (this.level1 !== null) {
                     if (this.level1 === 0) {
-                        this.options2 = options[this.level1].children
+                        this.options2 = options[this.level1].children;
                     }
                     if (options[this.level1]) {
-                        options[this.level1].isselect = true
+                        options[this.level1].isselect = true;
                     }
                 }
-                return options
+                return options;
             },
             // 初始化 收藏项
-            options_favorites_sign () {
-                return this.optionsFavorites.map((item) => item.key)
+            options_favorites_sign() {
+                return this.optionsFavorites.map(item => item.key);
             },
-            favoritesItem () {
+            favoritesItem() {
                 const favoritesItem = {
                     key: 'favorites',
                     name: this.$t('m.common["我的收藏"]'),
                     children: [...this.optionsFavorites].map((item) => {
-                        item.favorites = true
-                        return item
+                        item.favorites = true;
+                        return item;
                     }),
-                }
-                return favoritesItem
+                };
+                return favoritesItem;
             },
             /* eslint-disable vue/no-async-in-computed-properties */
-            async isTextinfoChange () {
+            async isTextinfoChange() {
                 if (!this.textinfoOri || !this.textinfoOri.length) {
                     // 清空
                     if (this.selectedOptionsvalue && this.selectedOptionsvalue.length) {
-                        await this.reduction()
-                        return this.$t('m.common["清空"]')
+                        await this.reduction();
+                        return this.$t('m.common["清空"]');
                     }
-                    return '==1'
+                    return '==1';
                 } if (this.textinfoOri.length !== this.selectedOptionsvalue.length) {
                     // 赋值
-                    await this.assignment(this.textinfoOri)
-                    return this.$t('m.common["赋值1"]')
+                    await this.assignment(this.textinfoOri);
+                    return this.$t('m.common["赋值1"]');
                 } if (this.textinfoOri.length === this.selectedOptionsvalue.length) {
-                    let isChange = false
+                    let isChange = false;
                     for (let i = 0; i < this.textinfoOri.length; i++) {
                         if (this.selectedOptionsvalue[i].id !== this.textinfoOri[i].id) {
-                            isChange = true
+                            isChange = true;
                         }
                     }
                     if (isChange) {
-                        await this.assignment(this.textinfoOri)
-                        return this.$t('m.common["赋值2"]')
+                        await this.assignment(this.textinfoOri);
+                        return this.$t('m.common["赋值2"]');
                     }
-                    return '==2'
+                    return '==2';
                 }
-                return '==3'
+                return '==3';
             },
             /* eslint-enable */
         },
         watch: {
-            searchContent (val) {
+            searchContent(val) {
                 if (val) {
-                    this.getSearchList()
+                    this.getSearchList();
                 }
             },
-            'selector.open' (val) {
+            'selector.open'(val) {
                 if (val) {
                     // 当弹开下拉框时，清空搜索数据
-                    this.searchContent = ''
+                    this.searchContent = '';
                 }
             },
             // 后期赋值响应
-            async options1 (newvalue, oldvalue) {
-                if (this.currentTextinfo && this.currentTextinfo.length && (this.textinfo !== await this.currentTextinfo.map((item) => item.name).join('/'))) {
-                    this.assignment(this.currentTextinfo)
+            async options1(newvalue, oldvalue) {
+                if (this.currentTextinfo && this.currentTextinfo.length && (this.textinfo !== await this.currentTextinfo.map(item => item.name).join('/'))) {
+                    this.assignment(this.currentTextinfo);
                 }
             },
-            async currentTextinfo (newvalue, oldvalue) {
+            async currentTextinfo(newvalue, oldvalue) {
                 if (!newvalue || !newvalue.length) {
-                    this.reduction()
+                    this.reduction();
                 } else {
                     if (this.level1 === null) {
-                        if (this.textinfo !== await newvalue.map((item) => item.name).join('/')) {
+                        if (this.textinfo !== await newvalue.map(item => item.name).join('/')) {
                             // 我要赋值---后期赋值响应'
-                            this.assignment(newvalue)
+                            this.assignment(newvalue);
                         }
                     }
                 }
             },
             deep: true,
         },
-        async mounted () {
+        async mounted() {
             // 初始赋值响应
             if (this.textinfoOri && this.textinfoOri.length && this.level1 === null) {
-                if (this.textinfo !== await this.selectedOptionsvalue.map((item) => item.name).join('/')) {
+                if (this.textinfo !== await this.selectedOptionsvalue.map(item => item.name).join('/')) {
                     // 我要赋值---初始赋值响应'
-                    this.assignment(this.textinfoOri)
+                    this.assignment(this.textinfoOri);
                 }
             }
         },
         methods: {
             // 搜索功能
-            getSearchList () {
-                const selections = this.changeList()
-                this.searchList = selections.filter(item => item.name && item.name.indexOf(this.searchContent) > -1)
+            getSearchList() {
+                const selections = this.changeList();
+                this.searchList = selections.filter(item => item.name && item.name.indexOf(this.searchContent) > -1);
                 // 将搜索的数据选中
             },
-            changeList () {
-                const listInfo = JSON.parse(JSON.stringify(this.options))
-                const selections = []
+            changeList() {
+                const listInfo = JSON.parse(JSON.stringify(this.options));
+                const selections = [];
                 const getSelections = (arr, id, name) => {
-                    arr.forEach(item => {
-                        item.id = id ? `${id} / ${item.id}` : String(item.id)
-                        item.name = name ? `${name} / ${item.name}` : String(item.name)
+                    arr.forEach((item) => {
+                        item.id = id ? `${id} / ${item.id}` : String(item.id);
+                        item.name = name ? `${name} / ${item.name}` : String(item.name);
                         selections.push({
                             id: item.id.split(' / '),
                             name: item.name,
                             disabled: !!item.disabled,
                             isSelected: !!item.isSelected,
-                        })
+                        });
                         if (item.children && item.children.length) {
-                            getSelections(item.children, item.id, item.name)
+                            getSelections(item.children, item.id, item.name);
                         }
-                    })
-                }
-                getSelections(listInfo)
-                return selections
+                    });
+                };
+                getSelections(listInfo);
+                return selections;
             },
-            handleSelectItem (item, index) {
+            handleSelectItem(item, index) {
                 if (item.disabled) {
-                    return
+                    return;
                 }
-                this.searchList.forEach(node => {
-                    node.isSelected = false
-                })
-                item.isSelected = true
+                this.searchList.forEach((node) => {
+                    node.isSelected = false;
+                });
+                item.isSelected = true;
                 // 抛出最外层并且执行事件
                 if (item.id.length === 1) {
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[0])
-                    })
-                    this.performFn(this.options1, 1, String(item.id[0]))
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[0]);
+                    });
+                    this.performFn(this.options1, 1, String(item.id[0]));
                 } else if (item.id.length === 2) {
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[0])
-                    })
-                    this.performFn(this.options1, 1, String(item.id[0]))
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[1])
-                    })
-                    this.performFn(this.options2, 2, String(item.id[1]))
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[0]);
+                    });
+                    this.performFn(this.options1, 1, String(item.id[0]));
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[1]);
+                    });
+                    this.performFn(this.options2, 2, String(item.id[1]));
                 } else {
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[0])
-                    })
-                    this.performFn(this.options1, 1, String(item.id[0]))
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[1])
-                    })
-                    this.performFn(this.options2, 2, String(item.id[1]))
-                    this.options.forEach(node => {
-                        this.treeData(node, item.id[2])
-                    })
-                    this.performFn(this.options3, 3, String(item.id[2]))
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[0]);
+                    });
+                    this.performFn(this.options1, 1, String(item.id[0]));
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[1]);
+                    });
+                    this.performFn(this.options2, 2, String(item.id[1]));
+                    this.options.forEach((node) => {
+                        this.treeData(node, item.id[2]);
+                    });
+                    this.performFn(this.options3, 3, String(item.id[2]));
                 }
                 // 关闭下拉框并清空数据
-                this.selector.open = false
-                this.searchContent = ''
+                this.selector.open = false;
+                this.searchContent = '';
             },
             // 通过ID来获取当前的item项
-            treeData (tree, id) {
+            treeData(tree, id) {
                 if (String(id) === String(tree.id)) {
-                    this.searchItem = tree
+                    this.searchItem = tree;
                 }
                 if (tree.children == null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(tree => {
-                    this.treeData(tree, id)
-                })
+                tree.children.forEach((tree) => {
+                    this.treeData(tree, id);
+                });
             },
             // 执行方法体
-            performFn (optionsList, level, id) {
-                const itemIndex = optionsList.findIndex((node, index) => String(node.id) === String(id))
-                const optionsItem = optionsList.find((node, index) => String(node.id) === String(id))
-                this.selectLevel(level, itemIndex, optionsItem)
+            performFn(optionsList, level, id) {
+                const itemIndex = optionsList.findIndex((node, index) => String(node.id) === String(id));
+                const optionsItem = optionsList.find((node, index) => String(node.id) === String(id));
+                this.selectLevel(level, itemIndex, optionsItem);
             },
             // 从外向里赋值
-            async assignment (textinfoOri) {
-                await this.options1
+            async assignment(textinfoOri) {
+                await this.options1;
                 for (let i = 0; i < textinfoOri.length; i++) {
-                    let indexPosition = -1
+                    let indexPosition = -1;
                     this[`options${i + 1}`].map((it, ind) => {
                         if (textinfoOri[i].id === it.id) {
-                            indexPosition = ind
+                            indexPosition = ind;
                         }
-                    })
+                    });
                     if (indexPosition !== -1) {
-                        await this.selectLevel(i + 1, indexPosition, textinfoOri[i])
+                        await this.selectLevel(i + 1, indexPosition, textinfoOri[i]);
                     }
                 }
-                this.selector.open = false
+                this.selector.open = false;
             },
-            closeHidden () {
-                this.selector.open = false
+            closeHidden() {
+                this.selector.open = false;
             },
             // 改变父model
-            async fnTextinfo () {
-                await this.$emit('change', this.selectedOptionsvalue)
+            async fnTextinfo() {
+                await this.$emit('change', this.selectedOptionsvalue);
             },
-            scrollEvent ($event) {
-                this.styletranslateY.transform = `translate(-26px,${-$event.target.scrollTop - 32}px)`
+            scrollEvent($event) {
+                this.styletranslateY.transform = `translate(-26px,${-$event.target.scrollTop - 32}px)`;
             },
             // 展开/关闭 级联选择器
-            async showcascader () {
+            async showcascader() {
                 if (this.disabled) {
-                    return
+                    return;
                 }
                 if (!this.textinfo) {
-                    this.reduction()
+                    this.reduction();
                 }
-                this.selector.open = !this.selector.open
-                const el = this.$refs.cascader
-                const vm = this
+                this.selector.open = !this.selector.open;
+                const el = this.$refs.cascader;
+                const vm = this;
                 const documentHandler = function (e) {
                     if (!el.contains(e.target)) {
-                        vm.selector.open = false
-                        vm.$root.cascaderFunction = undefined
-                        document.removeEventListener('click', documentHandler)
+                        vm.selector.open = false;
+                        vm.$root.cascaderFunction = undefined;
+                        document.removeEventListener('click', documentHandler);
                     }
-                }
+                };
                 // 可以解除事件监听
                 if (!this.selector.open) {
-                    await document.removeEventListener('click', this.$root.cascaderFunction)
-                    this.$root.cascaderFunction = undefined
-                    return
+                    await document.removeEventListener('click', this.$root.cascaderFunction);
+                    this.$root.cascaderFunction = undefined;
+                    return;
                 }
                 if (this.selector.open && !this.$root.cascaderFunction) {
-                    this.$root.cascaderFunction = documentHandler
-                    document.addEventListener('click', documentHandler)
+                    this.$root.cascaderFunction = documentHandler;
+                    document.addEventListener('click', documentHandler);
                 }
             },
             // 设置选择项
-            async settextinfo (item, type = 'own') {
+            async settextinfo(item, type = 'own') {
                 if (type === 'give_default') {
                     if (item[0] && item[0].id) {
-                        await this.$emit('change', item)
-                        this.textinfo = item[0].name
+                        await this.$emit('change', item);
+                        this.textinfo = item[0].name;
                     }
-                    return
+                    return;
                 }
                 if (!item.children || !item.children.length) {
-                    this.selector.open = false
+                    this.selector.open = false;
                 }
-                this.textinfo = await this.selectedOptionsvalue.map((item) => item.name).join('/')
-                await this.$emit('change', this.selectedOptionsvalue)
-                await this.fnTextinfo()
+                this.textinfo = await this.selectedOptionsvalue.map(item => item.name).join('/');
+                await this.$emit('change', this.selectedOptionsvalue);
+                await this.fnTextinfo();
             },
             // 选中每级目录
-            async selectLevel (level, index, item) {
+            async selectLevel(level, index, item) {
                 if (level === 1) {
-                    this.level3 = null
-                    this.level2 = null
-                    this.level1 = index
+                    this.level3 = null;
+                    this.level2 = null;
+                    this.level1 = index;
                     this.options1.forEach((ite) => {
-                        ite.isselect = false
-                    })
+                        ite.isselect = false;
+                    });
                     this.options2.forEach((ite) => {
-                        ite.isselect = false
-                    })
+                        ite.isselect = false;
+                    });
                     this.options3.forEach((ite) => {
-                        ite.isselect = false
-                    })
-                    this.options1[index].isselect = true
-                    this.options3 = []
-                    this.options2 = []
-                    this.selectedOptionsvalue = []
-                    this.options2 = item.children || []
+                        ite.isselect = false;
+                    });
+                    this.options1[index].isselect = true;
+                    this.options3 = [];
+                    this.options2 = [];
+                    this.selectedOptionsvalue = [];
+                    this.options2 = item.children || [];
                 } else if (level === 2) {
-                    this.level3 = null
-                    this.level2 = index
+                    this.level3 = null;
+                    this.level2 = index;
                     this.options2.forEach((ite) => {
-                        ite.isselect = false
-                    })
+                        ite.isselect = false;
+                    });
                     this.options3.forEach((ite) => {
-                        ite.isselect = false
-                    })
-                    this.options2[index].isselect = true
-                    this.options3 = []
-                    this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 1)
-                    this.options3 = item.children || []
+                        ite.isselect = false;
+                    });
+                    this.options2[index].isselect = true;
+                    this.options3 = [];
+                    this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 1);
+                    this.options3 = item.children || [];
                 } else {
-                    this.level3 = index
+                    this.level3 = index;
                     this.options3.forEach((ite) => {
-                        ite.isselect = false
-                    })
-                    this.options3[index].isselect = true
-                    this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 2)
+                        ite.isselect = false;
+                    });
+                    this.options3[index].isselect = true;
+                    this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 2);
                 }
-                this.selectedOptionsvalue.push(item)
+                this.selectedOptionsvalue.push(item);
                 // 每一级选不关闭
                 if (item.key !== 'favorites') {
-                    this.settextinfo(item)
+                    this.settextinfo(item);
                 }
             },
             // 收藏
-            async collect_s (item) {
-                const objdata = Object.assign({}, item)
+            async collect_s(item) {
+                const objdata = Object.assign({}, item);
                 // 数据还原
                 if (objdata.isselect) {
-                    delete objdata.isselect
+                    delete objdata.isselect;
                 }
                 if (objdata.favorites) {
-                    delete objdata.favorites
+                    delete objdata.favorites;
                 }
-                const index = this.options_favorites_sign.indexOf(objdata.key)
+                const index = this.options_favorites_sign.indexOf(objdata.key);
                 if (index !== -1) {
-                    await this.cancelcollect_s(item, index)
-                    return
+                    await this.cancelcollect_s(item, index);
+                    return;
                 }
                 // 收藏
-                await this.$emit('collect', [...this.optionsFavorites, objdata])
+                await this.$emit('collect', [...this.optionsFavorites, objdata]);
             },
             // 取消收藏
-            async cancelcollect_s (item, index) {
+            async cancelcollect_s(item, index) {
                 if (item.isselect) {
-                    this.textinfo = ''
+                    this.textinfo = '';
                 }
-                const objdata = Object.assign({}, item)
+                const objdata = Object.assign({}, item);
                 if (objdata.isselect) {
-                    delete objdata.isselect
+                    delete objdata.isselect;
                 }
                 if (objdata.favorites) {
-                    delete objdata.favorites
+                    delete objdata.favorites;
                 }
-                const favoriteslist = [...this.optionsFavorites]
-                favoriteslist.splice(index, 1)
+                const favoriteslist = [...this.optionsFavorites];
+                favoriteslist.splice(index, 1);
                 // 取消收藏
-                await this.$emit('cancelcollect', favoriteslist)
+                await this.$emit('cancelcollect', favoriteslist);
             },
-            async reduction () {
-                this.textinfo = ''
-                this.isCollectOpen = true
-                this.level3 = null
-                this.level2 = null
-                this.level1 = null
+            async reduction() {
+                this.textinfo = '';
+                this.isCollectOpen = true;
+                this.level3 = null;
+                this.level2 = null;
+                this.level1 = null;
                 this.options1.forEach((ite) => {
-                    ite.isselect = false
-                })
+                    ite.isselect = false;
+                });
                 this.options2.forEach((ite) => {
-                    ite.isselect = false
-                })
+                    ite.isselect = false;
+                });
                 this.options3.forEach((ite) => {
-                    ite.isselect = false
-                })
-                this.options3 = []
-                this.options2 = []
-                this.selectedOptionsvalue = []
+                    ite.isselect = false;
+                });
+                this.options3 = [];
+                this.options2 = [];
+                this.selectedOptionsvalue = [];
             },
         },
-        create () {
+        create() {
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

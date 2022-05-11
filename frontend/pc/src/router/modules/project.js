@@ -20,26 +20,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-const ProjectHome = () => import('../../views/project/index.vue')
-const ProjectList = () => import('../../views/project/list.vue')
-const ProjectGuide = () => import('../../views/project/guide.vue')
-const ProjectTicket = () => import('../../views/project/ticket.vue')
-const ProjectService = () => import('../../views/service/index.vue')
-const ProjectServiceList = () => import('../../views/service/serviceList.vue')
-const ProjectServiceEdit = () => import('../../views/service/editService/index.vue')
-const ProjectServiceSla = () => import('../../views/service/sla/index.vue')
-const ServiceDirectory = () => import('../../views/service/directory.vue')
-const Field = () => import('../../views/project/fields.vue')
-const Role = () => import('../../views/project/role.vue')
-const Trigger = () => import('../../views/project/trigger.vue')
-const Notice = () => import('../../views/project/notice.vue')
-const API = () => import('../../views/project/api.vue')
-const SlaManage = () => import('../../views/slaManager/slaManager.vue')
-const SlaAgreement = () => import('../../views/slaManager/agreement.vue')
+const ProjectHome = () => import('../../views/project/index.vue');
+const ProjectList = () => import('../../views/project/list.vue');
+const ProjectGuide = () => import('../../views/project/guide.vue');
+const ProjectTicket = () => import('../../views/project/ticket.vue');
+const ProjectService = () => import('../../views/service/index.vue');
+const ProjectServiceList = () => import('../../views/service/serviceList.vue');
+const ProjectServiceEdit = () => import('../../views/service/editService/index.vue');
+const ProjectServiceSla = () => import('../../views/service/sla/index.vue');
+const ServiceDirectory = () => import('../../views/service/directory.vue');
+const Field = () => import('../../views/project/fields.vue');
+const Role = () => import('../../views/project/role.vue');
+const Trigger = () => import('../../views/project/trigger.vue');
+const Notice = () => import('../../views/project/notice.vue');
+const API = () => import('../../views/project/api.vue');
+const SlaManage = () => import('../../views/slaManager/slaManager.vue');
+const SlaAgreement = () => import('../../views/slaManager/agreement.vue');
 
-const ProjectOperationData = () => import('../../views/operation/index.vue')
-const ProjectOperationHome = () => import('../../views/operation/home.vue')
-const ProjectOperationService = () => import('../../views/operation/service.vue')
+const ProjectOperationData = () => import('../../views/operation/index.vue');
+const ProjectOperationHome = () => import('../../views/operation/home.vue');
+const ProjectOperationService = () => import('../../views/operation/service.vue');
 
 export default [
     {
@@ -47,7 +47,7 @@ export default [
         name: 'ProjectList',
         component: ProjectList,
     },
-    
+
     {
         path: '/project_guide',
         name: 'ProjectGuide',
@@ -87,7 +87,7 @@ export default [
                         path: ':type(new|edit)/:step(basic|process|setting)',
                         name: 'projectServiceEdit',
                         component: ProjectServiceEdit,
-                        props: (route) => ({
+                        props: route => ({
                             serviceId: route.query.serviceId,
                             type: route.params.type,
                             step: route.params.step,
@@ -159,4 +159,4 @@ export default [
             },
         ],
     },
-]
+];

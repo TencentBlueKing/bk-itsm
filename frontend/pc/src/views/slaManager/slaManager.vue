@@ -114,10 +114,10 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    import permission from '@/mixins/permission.js'
-    import addModel from './addModel.vue'
-    import EmptyTip from '../project/components/emptyTip.vue'
+    import { errorHandler } from '../../utils/errorHandler';
+    import permission from '@/mixins/permission.js';
+    import addModel from './addModel.vue';
+    import EmptyTip from '../project/components/emptyTip.vue';
 
     export default {
         name: 'slaManager',
@@ -126,7 +126,7 @@
             EmptyTip,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 secondClick: false,
@@ -169,55 +169,55 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
         watch: {},
-        mounted () {
-            this.getModelList()
-            if (this.$route.query.key === 'create') this.addModelInfo()
+        mounted() {
+            this.getModelList();
+            if (this.$route.query.key === 'create') this.addModelInfo();
         },
         methods: {
-            async getModelList () {
-                this.isDataLoading = true
-                await this.$store.dispatch('sla/getScheduleList', { project_key: this.$store.state.project.id }).then(res => {
-                    this.modelList = res.data
+            async getModelList() {
+                this.isDataLoading = true;
+                await this.$store.dispatch('sla/getScheduleList', { project_key: this.$store.state.project.id }).then((res) => {
+                    this.modelList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
             // 新增
-            addModelInfo () {
+            addModelInfo() {
                 if (!this.hasPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData)
+                    };
+                    this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData);
                 } else {
-                    this.isEdit = false
-                    this.changeInfo.isShow = true
-                    this.changeInfo.info.is_builtin = false
+                    this.isEdit = false;
+                    this.changeInfo.isShow = true;
+                    this.changeInfo.info.is_builtin = false;
                 }
             },
             // 修改信息/查看详情
-            changeLineInfo (item, index) {
+            changeLineInfo(item, index) {
                 if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -227,18 +227,18 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return false;
                 }
-                this.changeInfo.info = item
-                this.isEdit = true
-                this.changeInfo.isShow = true
+                this.changeInfo.info = item;
+                this.isEdit = true;
+                this.changeInfo.isShow = true;
             },
             // 删除
-            deleteModel (item, index) {
+            deleteModel(item, index) {
                 if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -248,68 +248,68 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return false;
                 }
                 if (item.is_builtin) {
-                    return
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.slaContent["确定删除该服务模式？"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
+                        this.secondClick = true;
                         this.$store.dispatch('sla/deleteSchedule', id).then((res) => {
-                            this.getModelList()
+                            this.getModelList();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
-            splitItem (item) {
-                return item.days[0].day_of_week.split(',')
+            splitItem(item) {
+                return item.days[0].day_of_week.split(',');
             },
-            numToDay (val) {
-                let temp = ''
+            numToDay(val) {
+                let temp = '';
                 switch (val) {
                     case '0':
-                        temp = this.$t('m.slaContent["周一"]')
-                        break
+                        temp = this.$t('m.slaContent["周一"]');
+                        break;
                     case '1':
-                        temp = this.$t('m.slaContent["周二"]')
-                        break
+                        temp = this.$t('m.slaContent["周二"]');
+                        break;
                     case '2':
-                        temp = this.$t('m.slaContent["周三"]')
-                        break
+                        temp = this.$t('m.slaContent["周三"]');
+                        break;
                     case '3':
-                        temp = this.$t('m.slaContent["周四"]')
-                        break
+                        temp = this.$t('m.slaContent["周四"]');
+                        break;
                     case '4':
-                        temp = this.$t('m.slaContent["周五"]')
-                        break
+                        temp = this.$t('m.slaContent["周五"]');
+                        break;
                     case '5':
-                        temp = this.$t('m.slaContent["周六"]')
-                        break
+                        temp = this.$t('m.slaContent["周六"]');
+                        break;
                     case '6':
-                        temp = this.$t('m.slaContent["周日"]')
-                        break
+                        temp = this.$t('m.slaContent["周日"]');
+                        break;
                     default:
-                        temp = ''
+                        temp = '';
                 }
-                return temp
+                return temp;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

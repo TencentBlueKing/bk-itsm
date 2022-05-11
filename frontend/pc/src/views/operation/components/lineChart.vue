@@ -39,8 +39,8 @@
     </div>
 </template>
 <script>
-    import Chart from '@blueking/bkcharts'
-    import i18n from '@/i18n/index.js'
+    import Chart from '@blueking/bkcharts';
+    import i18n from '@/i18n/index.js';
 
     export default {
         name: 'LineChart',
@@ -59,7 +59,7 @@
             },
             timeDimensions: {
                 type: Array,
-                default () {
+                default() {
                     return [
                         {
                             key: 'days',
@@ -77,7 +77,7 @@
                             key: 'years',
                             name: i18n.t('m[\'年\']'),
                         },
-                    ]
+                    ];
                 },
             },
             dimension: {
@@ -110,11 +110,11 @@
             },
             chartData: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         x: [],
                         y: [],
-                    }
+                    };
                 },
             },
             loading: {
@@ -122,33 +122,33 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 chartInstance: null,
-            }
+            };
         },
         watch: {
-            loading (val) {
+            loading(val) {
                 if (!val) {
-                    this.updateChart()
+                    this.updateChart();
                 }
             },
         },
-        mounted () {
-            this.init()
+        mounted() {
+            this.init();
         },
         methods: {
-            init () {
-                const ctx = this.$refs.lineChartWrap.querySelector('.line-chart').getContext('2d')
-                const { x, y } = this.chartData
-                let bgColor
+            init() {
+                const ctx = this.$refs.lineChartWrap.querySelector('.line-chart').getContext('2d');
+                const { x, y } = this.chartData;
+                let bgColor;
                 if (this.gradientColor.length === 2) {
-                    const gradient = ctx.createLinearGradient(0, 320, 0, 0)
-                    gradient.addColorStop(0, this.gradientColor[0])
-                    gradient.addColorStop(1, this.gradientColor[1])
-                    bgColor = gradient
+                    const gradient = ctx.createLinearGradient(0, 320, 0, 0);
+                    gradient.addColorStop(0, this.gradientColor[0]);
+                    gradient.addColorStop(1, this.gradientColor[1]);
+                    bgColor = gradient;
                 } else {
-                    bgColor = this.bgColor
+                    bgColor = this.bgColor;
                 }
 
                 this.chartInstance = new Chart(ctx, {
@@ -190,18 +190,18 @@
                             enabled: true,
                         },
                     },
-                })
+                });
             },
-            updateChart () {
-                this.chartInstance.data.datasets[0].data = this.chartData.y
-                this.chartInstance.data.labels = this.chartData.x
-                this.chartInstance.update()
+            updateChart() {
+                this.chartInstance.data.datasets[0].data = this.chartData.y;
+                this.chartInstance.data.labels = this.chartData.x;
+                this.chartInstance.update();
             },
-            onSelectDimension (val) {
-                this.$emit('onDimensionChange', val)
+            onSelectDimension(val) {
+                this.$emit('onDimensionChange', val);
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .line-chart {

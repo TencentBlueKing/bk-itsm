@@ -54,15 +54,15 @@
 </template>
 
 <script>
-    import dayjs from 'dayjs'
-    import relativeTime from 'dayjs/plugin/relativeTime'
+    import dayjs from 'dayjs';
+    import relativeTime from 'dayjs/plugin/relativeTime';
     export default {
         name: 'commentItem',
         props: {
             curComment: Object,
             commentList: Array,
         },
-        data () {
+        data() {
             return {
                 isEditComment: false,
                 deleteCommentDialog: false,
@@ -80,7 +80,7 @@
                     'years ago': this.$t('m[\'年前\']'),
                     'year ago': this.$t('m[\'年前\']'),
                 },
-            }
+            };
         },
         computed: {
             // parentComment () {
@@ -90,54 +90,54 @@
             //     }
             //     return parentComment
             // },
-            createTime () {
-                dayjs.extend(relativeTime)
-                const timestamp = dayjs(this.curComment.create_at).unix() * 1000
-                const time = dayjs(timestamp).fromNow()
+            createTime() {
+                dayjs.extend(relativeTime);
+                const timestamp = dayjs(this.curComment.create_at).unix() * 1000;
+                const time = dayjs(timestamp).fromNow();
                 // 0 to 44 seconds
-                const timeStr = time.split(' ')[1]
+                const timeStr = time.split(' ')[1];
                 const timeType = time.split(' ').slice(1, 3)
-                    .join(' ')
+                    .join(' ');
                 if (timeStr === 'few') {
-                    return this.$t('m[\'刚刚\']')
+                    return this.$t('m[\'刚刚\']');
                 }
                 if (time.split(' ')[0] === 'an' || time.split(' '[0] === 'a')) {
-                    return `${1} ${this.timeFormat[timeType]}`
+                    return `${1} ${this.timeFormat[timeType]}`;
                 }
-                return `${time.split(' ')[0]} ${this.timeFormat[timeType]}`
+                return `${time.split(' ')[0]} ${this.timeFormat[timeType]}`;
             },
         },
         methods: {
-            randomHex () {
-                let authorbgc
+            randomHex() {
+                let authorbgc;
                 do {
                     authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16)
-                        .padEnd(6, '0')}`
+                        .padEnd(6, '0')}`;
                 }
-                while (authorbgc === '#ffffff')
-                return authorbgc
+                while (authorbgc === '#ffffff');
+                return authorbgc;
             },
-            avatar (str) {
-                return str.substr(0, 1).toLocaleUpperCase()
+            avatar(str) {
+                return str.substr(0, 1).toLocaleUpperCase();
             },
-            deleteComment (id) {
-                this.$store.dispatch('ticket/deleteTicketComment', id).then(res => {
-                    this.$emit('refreshComment')
-                    this.deleteCommentDialog = false
-                })
+            deleteComment(id) {
+                this.$store.dispatch('ticket/deleteTicketComment', id).then((res) => {
+                    this.$emit('refreshComment');
+                    this.deleteCommentDialog = false;
+                });
             },
-            endorse () {
-                this.isAgree = !this.isAgree
-                console.log('agree', '暂不支持')
+            endorse() {
+                this.isAgree = !this.isAgree;
+                console.log('agree', '暂不支持');
             },
-            handleDeleteDialogShow (val) {
-                this.deleteCommentDialog = val
+            handleDeleteDialogShow(val) {
+                this.deleteCommentDialog = val;
             },
-            jumpTargetComment (curComment) {
-                this.$emit('jumpTargetComment', curComment)
+            jumpTargetComment(curComment) {
+                this.$emit('jumpTargetComment', curComment);
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

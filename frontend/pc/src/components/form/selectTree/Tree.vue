@@ -55,7 +55,7 @@
     </ul>
 </template>
 <script>
-    import collapseTransition from '../../../utils/collapse-transition'
+    import collapseTransition from '../../../utils/collapse-transition';
     export default {
         name: 'Tree',
         components: {
@@ -71,22 +71,22 @@
                 default: 0,
             },
         },
-        data () {
+        data() {
             return {
                 pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`,
-            }
+            };
         },
         methods: {
             // 展开子级
-            toggleChildren (item) {
-                this.$emit('toggleChildren', item)
+            toggleChildren(item) {
+                this.$emit('toggleChildren', item);
             },
             // 选中
-            toggle (item) {
-                this.$emit('toggle', item)
+            toggle(item) {
+                this.$emit('toggle', item);
             },
         },
-    }
+    };
 </script>
 
 <style  lang="scss" scoped>

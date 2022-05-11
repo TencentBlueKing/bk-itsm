@@ -145,11 +145,11 @@
     </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue'
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue'
-    import i18n from '@/i18n/index.js'
-    import ticketListMixins from './ticketListMixins.js'
+    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+    import i18n from '@/i18n/index.js';
+    import ticketListMixins from './ticketListMixins.js';
 
     const COLUMN_LIST = [
         {
@@ -208,7 +208,7 @@
             id: 'operate',
             label: i18n.t('m.manageCommon[\'操作\']'),
             minWidth: '80' },
-    ]
+    ];
 
     export default {
         name: 'AttentionList',
@@ -221,24 +221,24 @@
         props: {
             from: String,
         },
-        data () {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
+        data() {
+            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
             return {
                 columnList,
                 type: 'attention',
                 isExportDialogShow: false,
                 // 评价
                 evaluationTicketInfo: {},
-            }
+            };
         },
         methods: {
             // 打开满意度评价
-            onOpenEvaluationTicketModal (row) {
-                this.$refs.evaluationModal.show()
-                this.evaluationTicketInfo = row
+            onOpenEvaluationTicketModal(row) {
+                this.$refs.evaluationModal.show();
+                this.evaluationTicketInfo = row;
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

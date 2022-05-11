@@ -151,11 +151,11 @@
     </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue'
-    import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue'
-    import i18n from '@/i18n/index.js'
-    import ticketListMixins from './ticketListMixins.js'
+    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+    import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
+    import i18n from '@/i18n/index.js';
+    import ticketListMixins from './ticketListMixins.js';
 
     const COLUMN_LIST = [
         {
@@ -214,7 +214,7 @@
             id: 'operate',
             label: i18n.t('m.manageCommon[\'操作\']'),
             minWidth: '80' },
-    ]
+    ];
 
     export default {
         name: 'ApprovalList',
@@ -224,8 +224,8 @@
             ApprovalDialog,
         },
         mixins: [ticketListMixins],
-        data () {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
+        data() {
+            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
             return {
                 columnList,
                 type: 'approval',
@@ -238,61 +238,61 @@
                 isApprovalDialogShow: false,
                 // 批量审批选中单
                 selectedList: [],
-            }
+            };
         },
         methods: {
             // 批量审批
-            onBatchApprovalClick () {
-                this.isApprovalDialogShow = true
+            onBatchApprovalClick() {
+                this.isApprovalDialogShow = true;
                 this.approvalInfo = {
                     result: true,
                     showAllOption: true,
                     approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
-                }
+                };
             },
             // 可以选中
-            canSelected (row, index) {
-                return row.waiting_approve
+            canSelected(row, index) {
+                return row.waiting_approve;
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.ticketList.forEach(item => {
-                    item.checkStatus = !!selection.length
-                })
-                this.selectedList = selection
+            handleSelectAll(selection) {
+                this.ticketList.forEach((item) => {
+                    item.checkStatus = !!selection.length;
+                });
+                this.selectedList = selection;
             },
             // 批量审批-单个选中
             // 改变中选态，与表头选择相呼应
-            changeSelection (value) {
-                this.$refs.ticketList.toggleRowSelection(value, value.checkStatus)
+            changeSelection(value) {
+                this.$refs.ticketList.toggleRowSelection(value, value.checkStatus);
                 if (value.checkStatus) {
                     if (!this.selectedList.some(item => item.id === value.id)) {
-                        this.selectedList.push(value)
+                        this.selectedList.push(value);
                     }
                 } else {
-                    this.selectedList = this.selectedList.filter(item => item.id !== value.id)
+                    this.selectedList = this.selectedList.filter(item => item.id !== value.id);
                 }
             },
-            onOpenApprovalDialog (id, result) {
-                this.isApprovalDialogShow = true
+            onOpenApprovalDialog(id, result) {
+                this.isApprovalDialogShow = true;
                 this.approvalInfo = {
                     result,
                     approvalList: [{ ticket_id: id }],
-                }
+                };
             },
-            onApprovalDialogHidden (result) {
-                this.isApprovalDialogShow = false
+            onApprovalDialogHidden(result) {
+                this.isApprovalDialogShow = false;
                 this.approvalInfo = {
                     result: true,
                     showAllOption: false,
                     approvalList: [],
-                }
+                };
                 if (result) {
-                    this.initData()
+                    this.initData();
                 }
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

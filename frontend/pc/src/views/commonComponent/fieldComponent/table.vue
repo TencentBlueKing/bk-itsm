@@ -70,62 +70,62 @@
                 default: false,
             },
         },
-        data () {
-            return {}
+        data() {
+            return {};
         },
         watch: {
-            'item.val' () {
+            'item.val'() {
                 if (this.item.val === '') {
-                    this.item.val = []
-                    const obj = {}
+                    this.item.val = [];
+                    const obj = {};
                     for (let i = 0; i < this.item.choice.length; i++) {
-                        const { key } = this.item.choice[i]
-                        obj[key] = ''
+                        const { key } = this.item.choice[i];
+                        obj[key] = '';
                     }
-                    this.item.val.push(obj)
+                    this.item.val.push(obj);
                 }
                 if (typeof this.$parent.refresh === 'function') {
-                    this.$parent.refresh()
+                    this.$parent.refresh();
                 }
             },
         },
-        created () {
+        created() {
             if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
-                this.item.val = []
-                const obj = {}
+                this.item.val = [];
+                const obj = {};
                 for (let i = 0; i < this.item.choice.length; i++) {
-                    const { key } = this.item.choice[i]
-                    obj[key] = ''
+                    const { key } = this.item.choice[i];
+                    obj[key] = '';
                 }
-                this.item.val.push(obj)
+                this.item.val.push(obj);
             }
         },
         methods: {
-            addOne () {
-                const obj = {}
+            addOne() {
+                const obj = {};
                 for (let i = 0; i < this.item.choice.length; i++) {
-                    const { key } = this.item.choice[i]
-                    obj[key] = ''
+                    const { key } = this.item.choice[i];
+                    obj[key] = '';
                 }
-                this.item.val.push(obj)
+                this.item.val.push(obj);
             },
-            deleteOne (props) {
+            deleteOne(props) {
                 if (this.item.val.length === 1) {
                     this.$bkMessage({
                         message: '默认行不能删除',
                         theme: 'warning',
-                    })
+                    });
                 } else {
                     this.$bkInfo({
                         title: '确认要删除此条数据？',
                         confirmFn: () => {
-                            this.item.val.splice(props.$index, 1)
+                            this.item.val.splice(props.$index, 1);
                         },
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -54,7 +54,7 @@
                 default: () => ({}),
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .current-steps-wrap /deep/ {

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
     export default {
         name: 'RADIO',
         mixins: [mixins],
@@ -53,8 +53,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -66,27 +66,27 @@
                 default: false,
             },
         },
-        data () {
-            return {}
+        data() {
+            return {};
         },
         watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
+            'item.val'() {
+                this.conditionField(this.item, this.fields);
             },
         },
-        async mounted () {
+        async mounted() {
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
-            this.item.choice = await this.getFieldOptions(this.item)
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.conditionField(this.item, this.fields)
+            this.item.choice = await this.getFieldOptions(this.item);
+            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+            this.item.val = valueStatus ? this.item.val : '';
+            this.conditionField(this.item, this.fields);
         },
         methods: {
 
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -43,9 +43,9 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    import memberSelect from '../memberSelect'
-    import businessCard from '@/components/common/BusinessCard.vue'
+    import mixins from '../../commonMix/field.js';
+    import memberSelect from '../memberSelect';
+    import businessCard from '@/components/common/BusinessCard.vue';
 
     export default {
         name: 'MEMBERS',
@@ -63,8 +63,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -76,26 +76,26 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 selectedItems: [],
-            }
+            };
         },
         watch: {
-            'item.val' (val) {
-                this.selectedItems = val ? val.split(',') : []
+            'item.val'(val) {
+                this.selectedItems = val ? val.split(',') : [];
             },
         },
-        async mounted () {
-            this.selectedItems = this.item.val ? this.item.val.split(',') : []
-            this.conditionField(this.item, this.fields)
+        async mounted() {
+            this.selectedItems = this.item.val ? this.item.val.split(',') : [];
+            this.conditionField(this.item, this.fields);
         },
         methods: {
-            onMemberSelectChange (data) {
-                this.item.val = data.join(',')
+            onMemberSelectChange(data) {
+                this.item.val = data.join(',');
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -117,78 +117,78 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 multiSelect: true,
-            }
+            };
         },
         watch: {
-            'item.val' () {
+            'item.val'() {
                 if (this.item.val === '') {
-                    this.item.val = []
-                    const obj = {}
+                    this.item.val = [];
+                    const obj = {};
                     for (let i = 0; i < this.item.meta.columns.length; i++) {
-                        const { key } = this.item.meta.columns[i]
-                        obj[key] = ''
+                        const { key } = this.item.meta.columns[i];
+                        obj[key] = '';
                     }
-                    this.item.val.push(obj)
+                    this.item.val.push(obj);
                 }
                 if (typeof this.$parent.refresh === 'function') {
-                    this.$parent.refresh()
+                    this.$parent.refresh();
                 }
             },
         },
-        created () {
+        created() {
             if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
-                this.item.val = []
-                const obj = {}
+                this.item.val = [];
+                const obj = {};
                 for (let i = 0; i < this.item.meta.columns.length; i++) {
-                    const { key } = this.item.meta.columns[i]
-                    obj[key] = ''
+                    const { key } = this.item.meta.columns[i];
+                    obj[key] = '';
                 }
-                this.item.val.push(obj)
+                this.item.val.push(obj);
             }
             // 脏数据处理：如果自定义表格中有下拉框，且选中的 key 在 choice.key 中找不到
             // 尝试把 key 在 choice.name 中找,找到，则把 key 替换成 choice.key
             // 上诉条件都不满足！则把该项的 value 赋值为空，结合必填校验让用户去重新选择！
-            this.item.val.forEach(row => {
-                this.item.meta.columns.forEach(column => {
+            this.item.val.forEach((row) => {
+                this.item.meta.columns.forEach((column) => {
                     if ((column.display === 'multiselect' || column.display === 'select')) {
-                        const vals = typeof row[column.key] === 'string' ? [row[column.key]] : row[column.key]
+                        const vals = typeof row[column.key] === 'string' ? [row[column.key]] : row[column.key];
                         if (!vals.every(key => column.choice.find(c => c.key === key))) {
-                            const option = column.choice.find(c => c.name === row[column.key])
-                            row[column.key] = option ? option.key : ''
+                            const option = column.choice.find(c => c.name === row[column.key]);
+                            row[column.key] = option ? option.key : '';
                         }
                     }
-                })
-            })
+                });
+            });
         },
         methods: {
-            addOne () {
-                const obj = {}
+            addOne() {
+                const obj = {};
                 for (let i = 0; i < this.item.meta.columns.length; i++) {
-                    const { key } = this.item.meta.columns[i]
-                    obj[key] = ''
+                    const { key } = this.item.meta.columns[i];
+                    obj[key] = '';
                 }
-                this.item.val.push(obj)
+                this.item.val.push(obj);
             },
-            deleteOne (index) {
+            deleteOne(index) {
                 if (this.item.val.length === 1) {
                     this.$bkMessage({
                         message: '默认行不能删除',
                         theme: 'warning',
-                    })
+                    });
                 } else {
                     this.$bkInfo({
                         title: '确认要删除此条数据？',
                         confirmFn: () => {
-                            this.item.val.splice(index, 1)
+                            this.item.val.splice(index, 1);
                         },
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

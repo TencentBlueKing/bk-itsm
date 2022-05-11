@@ -61,9 +61,9 @@
 </template>
 
 <script>
-    import apiBasic from './components/apiBasic.vue'
-    import apiEditor from './components/apiEditor.vue'
-    import apiRun from './components/apiRun.vue'
+    import apiBasic from './components/apiBasic.vue';
+    import apiEditor from './components/apiEditor.vue';
+    import apiRun from './components/apiRun.vue';
 
     export default {
         name: 'apiContent',
@@ -75,36 +75,36 @@
         props: {
             apiDetailInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             treeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             pathList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isBuiltinIdList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             secondLevelInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 apiDetailInfoCommon: this.apiDetailInfo,
                 // tag
@@ -114,30 +114,30 @@
                     { name: this.$t('m.systemConfig["运行"]') },
                 ],
                 checkIndex: 1,
-            }
+            };
         },
         computed: {
-            backName () {
-                return this.secondLevelInfo.name
+            backName() {
+                return this.secondLevelInfo.name;
             },
         },
         watch: {
-            apiDetailInfo (newVal, oldVal) {
-                this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal))
-                this.initData()
+            apiDetailInfo(newVal, oldVal) {
+                this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal));
+                this.initData();
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            backTab () {
-                this.$parent.displayInfo.level_1 = {}
+            backTab() {
+                this.$parent.displayInfo.level_1 = {};
             },
-            changTitle (item, index) {
-                this.checkIndex = index
+            changTitle(item, index) {
+                this.checkIndex = index;
             },
-            initData () {
+            initData() {
                 if (this.apiDetailInfoCommon.req_headers) {
                     if (!this.apiDetailInfoCommon.req_headers.length) {
                         this.apiDetailInfoCommon.req_headers = [
@@ -147,7 +147,7 @@
                                 sample: '',
                                 desc: '',
                             },
-                        ]
+                        ];
                     }
                     if (!this.apiDetailInfoCommon.req_params.length) {
                         this.apiDetailInfoCommon.req_params = [
@@ -158,12 +158,12 @@
                                 desc: '',
                                 value: '',
                             },
-                        ]
+                        ];
                     }
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

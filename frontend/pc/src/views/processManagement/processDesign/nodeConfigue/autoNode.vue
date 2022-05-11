@@ -115,7 +115,7 @@
                     </response-data-node>
                 </div>
             </basic-card>
-            
+
             <basic-card
                 v-bkloading="{ isLoading: isLoading }"
                 :card-label="$t(`m.treeinfo['轮询配置']`)"
@@ -170,16 +170,16 @@
     </div>
 </template>
 <script>
-    import getParam from './addField/getParam.vue'
-    import postParam from './addField/postParam.vue'
-    import responseDataNode from './autoComponents/responseDataNode.vue'
-    import nodeCondition from './autoComponents/nodeCondition.vue'
-    import addField from './addField/index.vue'
-    import mixins from '../../../commonMix/mixins_api.js'
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
-    import dealPerson from './components/dealPerson.vue'
-    import BasicCard from '@/components/common/layout/BasicCard.vue'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import getParam from './addField/getParam.vue';
+    import postParam from './addField/postParam.vue';
+    import responseDataNode from './autoComponents/responseDataNode.vue';
+    import nodeCondition from './autoComponents/nodeCondition.vue';
+    import addField from './addField/index.vue';
+    import mixins from '../../../commonMix/mixins_api.js';
+    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+    import dealPerson from './components/dealPerson.vue';
+    import BasicCard from '@/components/common/layout/BasicCard.vue';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         name: 'autoNode',
@@ -198,25 +198,25 @@
             // 流程信息
             flowInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 节点信息
             configur: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             state: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isLoading: true,
                 lineInfo: {
@@ -328,50 +328,50 @@
                     is_tips: false,
                     tips: '',
                 },
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            async initData () {
-                await this.configur
-                await this.flowInfo
+            async initData() {
+                await this.configur;
+                await this.flowInfo;
                 // 节点名称
-                this.formInfo.name = this.configur.name
-                this.getRelatedFields()
-                this.getExcludeRoleTypeList()
+                this.formInfo.name = this.configur.name;
+                this.getRelatedFields();
+                this.getExcludeRoleTypeList();
                 // 处理人
                 if (this.configur.processors_type) {
-                    this.formInfo.processors_type = this.configur.processors_type
-                    this.formInfo.processors = this.formInfo.processors_type === 'PERSON' ? this.configur.processors.split(',') : this.configur.processors
+                    this.formInfo.processors_type = this.configur.processors_type;
+                    this.formInfo.processors = this.formInfo.processors_type === 'PERSON' ? this.configur.processors.split(',') : this.configur.processors;
                 }
                 // 处理人
                 this.processorsInfo = {
                     type: this.configur.processors_type,
                     value: this.configur.processors,
-                }
+                };
                 // API接口
                 if (this.configur.api_info) {
-                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info))
+                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
                 }
-                await this.getRemoteSystemData()
-                await this.getApiTableList(this.formInfo.api_info.remote_system_id)
+                await this.getRemoteSystemData();
+                await this.getApiTableList(this.formInfo.api_info.remote_system_id);
             },
             // 计算处理人类型需要排除的类型
-            getExcludeRoleTypeList () {
+            getExcludeRoleTypeList() {
                 // 不显示的人员类型
-                let excludeRoleTypeList = []
+                let excludeRoleTypeList = [];
                 // 内置节点
                 if (this.configur.is_builtin) {
-                    excludeRoleTypeList = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE']
+                    excludeRoleTypeList = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
                 } else {
-                    excludeRoleTypeList = ['OPEN']
+                    excludeRoleTypeList = ['OPEN'];
                 }
                 // 是否使用权限中心角色
                 // if (!this.flowInfo.is_iam_used) {
@@ -379,110 +379,110 @@
                 // }
                 // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
                 if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
-                    excludeRoleTypeList.push('BY_ASSIGNOR')
+                    excludeRoleTypeList.push('BY_ASSIGNOR');
                 }
                 if (!this.flowInfo.is_biz_needed) {
-                    excludeRoleTypeList.push('CMDB')
+                    excludeRoleTypeList.push('CMDB');
                 }
-                this.excludeRoleTypeList = [...['EMPTY', 'API'], ...excludeRoleTypeList]
+                this.excludeRoleTypeList = [...['EMPTY', 'API'], ...excludeRoleTypeList];
             },
             // 确认
-            async submitNode () {
+            async submitNode() {
                 // api参数校验
-                const isre = await this.apiFz()
+                const isre = await this.apiFz();
                 if (!isre) {
-                    return
+                    return;
                 }
                 if (!this.checkLineInfo()) {
-                    return
+                    return;
                 }
-                this.formInfo.workflow = this.flowInfo.id
-                const params = JSON.parse(JSON.stringify(this.formInfo))
-                params.is_draft = false
-                params.processors_type = ''
-                params.processors = ''
+                this.formInfo.workflow = this.flowInfo.id;
+                const params = JSON.parse(JSON.stringify(this.formInfo));
+                params.is_draft = false;
+                params.processors_type = '';
+                params.processors = '';
                 // 处理人为空校验
                 if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
-                    this.checkStatus.processors = true
-                    return
+                    this.checkStatus.processors = true;
+                    return;
                 }
                 if (this.$refs.processors) {
-                    const data = this.$refs.processors.getValue()
-                    params.processors_type = data.type
-                    params.processors = data.value
+                    const data = this.$refs.processors.getValue();
+                    params.processors_type = data.type;
+                    params.processors = data.value;
                 }
-                const { id } = this.configur
+                const { id } = this.configur;
                 if (this.clickSecond) {
-                    return
+                    return;
                 }
-                this.clickSecond = true
+                this.clickSecond = true;
                 this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',
-                    })
-                    this.$emit('closeConfigur', true)
+                    });
+                    this.$emit('closeConfigur', true);
                 }, (res) => {
-                    errorHandler(res, this)
+                    errorHandler(res, this);
                 })
                     .finally(() => {
-                        this.clickSecond = false
-                    })
+                        this.clickSecond = false;
+                    });
             },
             // 获取以前的字段/引用变量
-            async getRelatedFields () {
+            async getRelatedFields() {
                 const params = {
                     workflow: this.flowInfo.id,
                     state: this.configur.id,
                     field: '',
-                }
-                await this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
-                    this.stateList = res.data
+                };
+                await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
+                    this.stateList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 取消
-            closeNode () {
-                this.$emit('closeConfigur', false)
+            closeNode() {
+                this.$emit('closeConfigur', false);
             },
-            closeShade () {
-                this.sliderInfo.show = false
+            closeShade() {
+                this.sliderInfo.show = false;
             },
             // 获取Api系统列表
-            async getRemoteSystemData () {
+            async getRemoteSystemData() {
                 const params = {
                     project_key: this.$store.state.project.id,
-                }
-                await this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
-                    this.apiSysList = res.data.filter(item => item.is_activated)
+                };
+                await this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
+                    this.apiSysList = res.data.filter(item => item.is_activated);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 获取Api接口列表数据
-            async getApiTableList (id) {
+            async getApiTableList(id) {
                 const params = {
                     remote_system: id || '',
-                }
-                this.isLoading = true
-                await this.$store.dispatch('apiRemote/get_remote_api', params).then(res => {
-                    this.apiList = res.data.filter(ite => ite.is_activated)
+                };
+                this.isLoading = true;
+                await this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
+                    this.apiList = res.data.filter(ite => ite.is_activated);
                     if (this.configur.api_info) {
-                        this.apiDetail = Object.assign({}, this.apiList.filter(ite => ite.id === this.configur.api_info.remote_api_id)[0])
+                        this.apiDetail = Object.assign({}, this.apiList.filter(ite => ite.id === this.configur.api_info.remote_api_id)[0]);
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isLoading = false
-                    })
+                        this.isLoading = false;
+                    });
             },
             // 选择api接口
-            async changeMethod (valueId, option) {
+            async changeMethod(valueId, option) {
                 this.lineInfo = {
                     // 关系模板
                     template: '',
@@ -517,64 +517,64 @@
                             ],
                         },
                     ],
-                }
+                };
                 this.formInfo.variables = {
                     inputs: [],
                     outputs: [],
-                }
-                this.formInfo.api_info.need_poll = false
+                };
+                this.formInfo.api_info.need_poll = false;
                 this.formInfo.api_info.succeed_conditions = {
                     expressions: [],
                     type: 'and',
-                }
+                };
                 this.formInfo.api_info.end_conditions = {
                     poll_interval: 1,
                     poll_time: 3,
-                }
+                };
                 if (this.configur.api_info && (this.configur.api_info.remote_api_id === valueId)) {
-                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info))
+                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
                 }
-                const valueOption = this.apiList.filter(item => item.id === valueId)[0]
-                this.apiDetail = await Object.assign({}, valueOption)
+                const valueOption = this.apiList.filter(item => item.id === valueId)[0];
+                this.apiDetail = await Object.assign({}, valueOption);
             },
             // 选择接口系统
-            changeCode (value, option) {
-                this.formInfo.api_info.remote_api_id = ''
-                this.formInfo.api_info.req_params = {}
-                this.formInfo.api_info.req_body = {}
-                this.formInfo.api_info.rsp_data = ''
-                this.getApiTableList(value)
+            changeCode(value, option) {
+                this.formInfo.api_info.remote_api_id = '';
+                this.formInfo.api_info.req_params = {};
+                this.formInfo.api_info.req_body = {};
+                this.formInfo.api_info.rsp_data = '';
+                this.getApiTableList(value);
             },
             // 检验轮询配置条件是否填充完整
-            checkLineInfo () {
+            checkLineInfo() {
                 if (!this.formInfo.api_info.need_poll) {
-                    return true
+                    return true;
                 }
-                this.lineInfo.expressions.forEach(item => {
-                    item.checkInfo = item.expressions.some(node => (!node.condition.toString() || !node.key.toString() || !node.value.toString()))
-                })
-                const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo)
+                this.lineInfo.expressions.forEach((item) => {
+                    item.checkInfo = item.expressions.some(node => (!node.condition.toString() || !node.key.toString() || !node.value.toString()));
+                });
+                const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo);
                 if (checkStatus) {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["请完善轮询配置！"]'),
                         theme: 'warning',
-                    })
-                    return false
+                    });
+                    return false;
                 }
                 this.formInfo.api_info.succeed_conditions = {
                     expressions: [],
                     type: this.lineInfo.between,
-                }
-                this.formInfo.api_info.succeed_conditions.expressions = this.lineInfo.expressions.map(item => {
+                };
+                this.formInfo.api_info.succeed_conditions.expressions = this.lineInfo.expressions.map((item) => {
                     const objz = {
                         type: item.type,
                         expressions: [],
-                    }
-                    objz.expressions = item.expressions.map(ite => {
+                    };
+                    objz.expressions = item.expressions.map((ite) => {
                         const obj = {
-                            key: ite.key.split(',').map(it => {
-                                it = it.replace(/^\d+\_/, '')
-                                return it
+                            key: ite.key.split(',').map((it) => {
+                                it = it.replace(/^\d+\_/, '');
+                                return it;
                             })
                                 .join('.'),
                             condition: ite.condition,
@@ -582,119 +582,119 @@
                             type: ite.type,
                             source: 'global',
                             choiceList: [],
-                        }
-                        return obj
-                    })
-                    return objz
-                })
+                        };
+                        return obj;
+                    });
+                    return objz;
+                });
                 if (!this.formInfo.api_info.end_conditions.poll_interval.toString()
                     || !this.formInfo.api_info.end_conditions.poll_time.toString()) {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["请完善轮询间隔、次数！"]'),
                         theme: 'warning',
-                    })
-                    return false
+                    });
+                    return false;
                 }
-                this.formInfo.api_info.end_conditions.poll_interval = Number(this.formInfo.api_info.end_conditions.poll_interval)
-                this.formInfo.api_info.end_conditions.poll_time = Number(this.formInfo.api_info.end_conditions.poll_time)
-                return true
+                this.formInfo.api_info.end_conditions.poll_interval = Number(this.formInfo.api_info.end_conditions.poll_interval);
+                this.formInfo.api_info.end_conditions.poll_time = Number(this.formInfo.api_info.end_conditions.poll_time);
+                return true;
             },
             // api参数校验
-            async apiFz () {
+            async apiFz() {
                 if (!this.formInfo.name) {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["请填写节点名称！"]'),
                         theme: 'warning',
-                    })
-                    return false
+                    });
+                    return false;
                 }
                 if (!this.formInfo.api_info.remote_system_id || !this.formInfo.api_info.remote_api_id) {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["请选取接口！"]'),
                         theme: 'warning',
-                    })
-                    return false
+                    });
+                    return false;
                 }
                 // 是否可 滚动
                 // let isNow = false
                 // 1.query参数检验
                 if (this.$refs.getParam) {
                     // 过滤
-                    const necessaryVariableQuery = this.$refs.getParam.paramTableData.filter(ite => ite.is_necessary)
+                    const necessaryVariableQuery = this.$refs.getParam.paramTableData.filter(ite => ite.is_necessary);
                     // 提示 标红
                     necessaryVariableQuery.forEach((item, index) => {
-                        item.isCheck = true
-                        item.isSatisfied = item.source_type === 'CUSTOM' ? !!item.value : !!item.value_key
-                    })
+                        item.isCheck = true;
+                        item.isSatisfied = item.source_type === 'CUSTOM' ? !!item.value : !!item.value_key;
+                    });
                     // 校验
-                    const firstNotSatisfiedQuery = necessaryVariableQuery.filter(ite => !ite.isSatisfied)[0]
+                    const firstNotSatisfiedQuery = necessaryVariableQuery.filter(ite => !ite.isSatisfied)[0];
                     if (firstNotSatisfiedQuery) {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["请输入GET参数！"]'),
                             theme: 'warning',
-                        })
+                        });
                         // if (!isNow) {
                         //     // 滚动
                         //     firstNotSatisfiedQuery.el.scrollIntoView(true)
                         //     isNow = true
                         // }
-                        return false
+                        return false;
                     }
                 }
                 // 2.body参数检验
                 if (this.$refs.postParam) {
                     // 过滤
-                    const necessaryVariableBody = this.$refs.postParam.bodyTableData.filter(ite => ite.is_necessary && (ite.type !== 'object' && ite.type !== 'array'))
+                    const necessaryVariableBody = this.$refs.postParam.bodyTableData.filter(ite => ite.is_necessary && (ite.type !== 'object' && ite.type !== 'array'));
                     // 提示 标红 验证
                     necessaryVariableBody.forEach((item, index) => {
-                        item.isCheck = true
-                        item.isSatisfied = item.source_type === 'CUSTOM' ? item.value.toString() : !!item.value_key
-                    })
-                    const firstNotSatisfied = necessaryVariableBody.filter(ite => !ite.isSatisfied)[0]
+                        item.isCheck = true;
+                        item.isSatisfied = item.source_type === 'CUSTOM' ? item.value.toString() : !!item.value_key;
+                    });
+                    const firstNotSatisfied = necessaryVariableBody.filter(ite => !ite.isSatisfied)[0];
                     if (firstNotSatisfied) {
                         // 展开参数
-                        this.$refs.postParam.bodyTableData.forEach(item => {
-                            item.showChildren = true
-                            item.isShow = true
-                        })
+                        this.$refs.postParam.bodyTableData.forEach((item) => {
+                            item.showChildren = true;
+                            item.isShow = true;
+                        });
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["请输入POST参数！"]'),
                             theme: 'warning',
-                        })
+                        });
                         // 滚动 跳转
                         // if (!isNow) {
                         //     firstNotSatisfied.el.scrollIntoView(true)
                         //     isNow = true
                         // }
-                        return false
+                        return false;
                     }
                 }
                 // 提交参数赋值
-                this.formInfo.api_info.req_params = !this.$refs.getParam ? {} : await this.listTojson(this.$refs.getParam.paramTableData)
-                this.formInfo.api_info.req_body = !this.$refs.postParam ? {} : await this.treeToJson(this.$refs.postParam.bodyTableData.filter(item => (!item.level)))
+                this.formInfo.api_info.req_params = !this.$refs.getParam ? {} : await this.listTojson(this.$refs.getParam.paramTableData);
+                this.formInfo.api_info.req_body = !this.$refs.postParam ? {} : await this.treeToJson(this.$refs.postParam.bodyTableData.filter(item => (!item.level)));
                 // 3.返回参数校验
                 const selectKeyList = this.$refs.responseDataNode
                     ? this.$refs.responseDataNode.responseTableData.filter(item => (item.isSelectedKey))
-                    : []
+                    : [];
                 // 未选全局变量
                 if (!selectKeyList.length) {
-                    return true
+                    return true;
                 }
                 if (!selectKeyList.every(item => !!item.isSelectedValue)) {
                     // 展开参数
-                    this.$refs.responseDataNode && this.$refs.responseDataNode.responseTableData.forEach(item => {
-                        item.showChildren = true
-                        item.isShow = true
-                    })
+                    this.$refs.responseDataNode && this.$refs.responseDataNode.responseTableData.forEach((item) => {
+                        item.showChildren = true;
+                        item.isShow = true;
+                    });
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["勾选全局变量后，请提供变量名"]'),
                         theme: 'warning',
-                    })
+                    });
                     // 标红
                     selectKeyList.forEach((item, index) => {
-                        item.isCheck = true
-                        item.isSatisfied = item.isSelectedValue
-                    })
+                        item.isCheck = true;
+                        item.isSatisfied = item.isSelectedValue;
+                    });
                     // const firstNotSatisfiedRes = selectKeyList.filter(
                     //     ite => {
                     //         return !ite['isSatisfied']
@@ -703,45 +703,45 @@
                     // 滚动 跳转
                     // firstNotSatisfiedRes.el.scrollIntoView(true)
                     // isNow = true
-                    return false
+                    return false;
                 }
-                this.formInfo.variables.outputs = selectKeyList.map(item => {
+                this.formInfo.variables.outputs = selectKeyList.map((item) => {
                     const objdata = {
                         // "key": "",
                         name: '',
                         ref_path: '',
                         type: item.type,
                         source: 'global',
-                    }
+                    };
                     // objdata.key = JSON.parse(JSON.stringify(item.isSelectedValue))
-                    objdata.name = JSON.parse(JSON.stringify(item.isSelectedValue))
-                    objdata.ref_path = item.ancestorsList_str.split(',').map(ite => {
-                        ite = ite.replace(/^\d+\_/, '')
-                        return ite
+                    objdata.name = JSON.parse(JSON.stringify(item.isSelectedValue));
+                    objdata.ref_path = item.ancestorsList_str.split(',').map((ite) => {
+                        ite = ite.replace(/^\d+\_/, '');
+                        return ite;
                     })
-                        .join('.')
-                    return objdata
-                })
-                this.formInfo.api_info.rsp_data = this.formInfo.variables.outputs.map(item => item.ref_path).join(',')
-                return true
+                        .join('.');
+                    return objdata;
+                });
+                this.formInfo.api_info.rsp_data = this.formInfo.variables.outputs.map(item => item.ref_path).join(',');
+                return true;
             },
             // 多级列表数据转换为JSON数据
-            listTojson (listdata) {
-                const jsondata = {}
+            listTojson(listdata) {
+                const jsondata = {};
                 if (listdata.length) {
-                    listdata.forEach(item => {
+                    listdata.forEach((item) => {
                         jsondata[item.name] = item.source_type === 'CUSTOM' ? item.value
-                            : `\$\{params\_${item.value_key}\}`
-                    })
+                            : `\$\{params\_${item.value_key}\}`;
+                    });
                 }
-                return jsondata
+                return jsondata;
             },
-            addNewItem (data) {
-                this.showTabData = data
-                this.sliderInfo.show = true
+            addNewItem(data) {
+                this.showTabData = data;
+                this.sliderInfo.show = true;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

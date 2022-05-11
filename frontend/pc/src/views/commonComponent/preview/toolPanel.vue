@@ -39,26 +39,26 @@
         props: {
             fullStatus: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
         },
-        data () {
-            return {}
+        data() {
+            return {};
         },
         methods: {
-            onZoomIn () {
-                this.$emit('onZoomIn')
+            onZoomIn() {
+                this.$emit('onZoomIn');
             },
-            onZoomOut () {
-                this.$emit('onZoomOut')
+            onZoomOut() {
+                this.$emit('onZoomOut');
             },
-            onResetPosition () {
-                this.$emit('onResetPosition')
+            onResetPosition() {
+                this.$emit('onResetPosition');
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .tools-wrapper {

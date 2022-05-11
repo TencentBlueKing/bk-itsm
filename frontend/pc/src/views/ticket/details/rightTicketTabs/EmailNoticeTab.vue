@@ -70,8 +70,8 @@
 </template>
 
 <script>
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson'
-    import { errorHandler } from '@/utils/errorHandler.js'
+    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+    import { errorHandler } from '@/utils/errorHandler.js';
 
     export default {
         name: 'EmailNoticeTab',
@@ -81,12 +81,12 @@
         props: {
             ticketInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 flowStartText: this.$t('m.newCommon["流程开始"]'),
                 flowList: [],
@@ -100,103 +100,103 @@
                     type: 'PERSON',
                     value: '',
                 },
-            }
+            };
         },
-        created () {
-            const includeTypes = ['GENERAL', 'PERSON']
+        created() {
+            const includeTypes = ['GENERAL', 'PERSON'];
             if (this.ticketInfo.is_biz_need) {
-                includeTypes.push('CMDB')
+                includeTypes.push('CMDB');
             }
-            this.includeTypes = includeTypes
+            this.includeTypes = includeTypes;
         },
-        mounted () {
-            this.getflowList()
+        mounted() {
+            this.getflowList();
         },
         methods: {
             // 获取流转日志-关注人日志
-            getflowList () {
+            getflowList() {
                 if (!this.id) {
-                    return
+                    return;
                 }
                 const params = {
                     ticket_id: this.id,
-                }
+                };
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
                 this.$store.dispatch('cdeploy/getfllowLog', params).then((res) => {
-                    this.flowList = []
+                    this.flowList = [];
                     if (res.data.length) {
-                        res.data.forEach(item => {
-                            const line = {}
+                        res.data.forEach((item) => {
+                            const line = {};
                             // XXX 通知关注人 。。。
                             line.content = `<div title="${item.group}" style="word-break: break-all;
                             display: -webkit-box;
                             -webkit-line-clamp: 2;
                             -webkit-box-orient: vertical;
-                            overflow: hidden;">${item.creator_zh}${this.$t('m.newCommon["邮件通知："]')} ${item.group}</div>`
-                            line.tag = item.create_at
+                            overflow: hidden;">${item.creator_zh}${this.$t('m.newCommon["邮件通知："]')} ${item.group}</div>`;
+                            line.tag = item.create_at;
                             if (item.message !== this.flowStartText) {
-                                this.flowList.push(line)
+                                this.flowList.push(line);
                             }
-                        })
+                        });
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
             // 发送关注到人
-            postFollowlogs () {
+            postFollowlogs() {
                 if (this.followers.clickSecond || !this.$refs.personSelect.verifyValue()) {
-                    return
+                    return;
                 }
                 if (this.followers.comments.length > 200 || !this.followers.comments) {
                     this.$bkMessage({
                         message: this.$t('m.memberSelect["必填项且字数不能超过200"]'),
                         theme: 'error',
-                    })
-                    return
+                    });
+                    return;
                 }
 
-                this.followers.clickSecond = true
-                const personSelectValue = this.$refs.personSelect.getValue()
+                this.followers.clickSecond = true;
+                const personSelectValue = this.$refs.personSelect.getValue();
                 const params = {
                     ticket_id: this.ticketInfo.id,
                     state_name: this.ticketInfo.current_state_name,
                     followers: personSelectValue.value,
                     followers_type: personSelectValue.type,
                     message: this.followers.comments,
-                }
+                };
                 this.$store.dispatch('cdeploy/postFollowlogs', { params }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["发送成功"]'),
                         theme: 'success',
-                    })
-                    this.clearFollowlogs()
-                    this.getflowList()
+                    });
+                    this.clearFollowlogs();
+                    this.getflowList();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.followers.clickSecond = false
-                    })
+                        this.followers.clickSecond = false;
+                    });
             },
             // 清空关注信息
-            clearFollowlogs () {
+            clearFollowlogs() {
                 // 关注
                 this.followers = {
                     comments: '',
                     clickSecond: false,
-                }
+                };
                 this.personSelectCheckValue = {
                     type: 'PERSON',
                     value: '',
-                }
+                };
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .recipient-person {

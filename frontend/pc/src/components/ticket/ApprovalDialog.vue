@@ -43,7 +43,7 @@
                     {{ approvalInfo.result ? $t(`m.managePage['通过']`) : $t(`m.manageCommon['拒绝']`) }}
                 </span>
             </bk-form-item>
-            
+
             <bk-form-item :label="$t(`m.home['备注']`)" :label-width="140" :required="!approvalInfo.result" property="approvalNotice">
                 <bk-input type="textarea" :row="4" :maxlength="200" v-model="formData.approvalNotice"></bk-input>
             </bk-form-item>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
+    import { errorHandler } from '../../utils/errorHandler';
 
     export default {
         name: 'ApprovalDialog',
@@ -70,7 +70,7 @@
                 }),
             },
         },
-        data () {
+        data() {
             return {
                 approvalConfirmBtnLoading: false,
                 formData: { approvalNotice: '' },
@@ -82,46 +82,46 @@
 
                     }],
                 },
-            }
+            };
         },
         methods: {
-            onApprovalConfirm () {
-                this.approvalConfirmBtnLoading = true
-                this.$refs.approvalForm.validate().then(async val => {
+            onApprovalConfirm() {
+                this.approvalConfirmBtnLoading = true;
+                this.$refs.approvalForm.validate().then(async (val) => {
                     if (val) {
                         const data = {
                             result: this.approvalInfo.result.toString(),
                             opinion: this.formData.approvalNotice,
                             approval_list: this.approvalInfo.approvalList,
-                        }
+                        };
                         await this.$store.dispatch('workbench/batchApproval', data).then((res) => {
-                            this.$emit('cancel', true)
+                            this.$emit('cancel', true);
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.formData.approvalNotice = ''
-                            })
+                                this.formData.approvalNotice = '';
+                            });
                     }
                 })
                     .finally(() => {
-                        this.approvalConfirmBtnLoading = false
-                    })
+                        this.approvalConfirmBtnLoading = false;
+                    });
             },
-            onApprovalCancel () {
-                this.formData.approvalNotice = ''
-                this.approvalConfirmBtnLoading = false
-                this.$emit('cancel')
+            onApprovalCancel() {
+                this.formData.approvalNotice = '';
+                this.approvalConfirmBtnLoading = false;
+                this.$emit('cancel');
             },
-            checkApprovalNotice (val) {
+            checkApprovalNotice(val) {
                 if (!this.approvalInfo.result) {
-                    return val !== ''
+                    return val !== '';
                 }
-                return true
+                return true;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .result-tag {

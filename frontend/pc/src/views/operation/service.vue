@@ -117,14 +117,14 @@
     </div>
 </template>
 <script>
-    import dayjs from 'dayjs'
-    import throttle from 'lodash/throttle'
-    import SummaryCard from './components/summaryCard.vue'
-    import ChartCard from './components/chartCard.vue'
-    import TableChart from './components/tableChart.vue'
-    import LineChart from './components/lineChart.vue'
+    import dayjs from 'dayjs';
+    import throttle from 'lodash/throttle';
+    import SummaryCard from './components/summaryCard.vue';
+    import ChartCard from './components/chartCard.vue';
+    import TableChart from './components/tableChart.vue';
+    import LineChart from './components/lineChart.vue';
 
-    const FORMAT = 'YYYY-MM-DD'
+    const FORMAT = 'YYYY-MM-DD';
 
     const CREATOR_TABLE_COLUMNS = [
         {
@@ -148,7 +148,7 @@
             align: 'right',
             width: 120,
         },
-    ]
+    ];
 
     export default {
         name: 'OperationService',
@@ -158,11 +158,11 @@
             TableChart,
             LineChart,
         },
-        data () {
-            const end = dayjs().format('YYYY-MM-DD')
+        data() {
+            const end = dayjs().format('YYYY-MM-DD');
             const start = dayjs().subtract(1, 'month')
-                .format('YYYY-MM-DD')
-            const serviceId = Number(this.$route.params.id)
+                .format('YYYY-MM-DD');
+            const serviceId = Number(this.$route.params.id);
             return {
                 serviceId,
                 serviceList: [],
@@ -200,80 +200,80 @@
                 addedTicketChartDismension: 'days',
                 bizChartDismension: 'days',
                 datePickerOptions: {
-                    disabledDate (val) {
-                        return dayjs(val).isAfter(dayjs(), 'day')
+                    disabledDate(val) {
+                        return dayjs(val).isAfter(dayjs(), 'day');
                     },
                 },
                 shortcuts: [
                     {
                         text: '今天',
-                        value () {
-                            const end = dayjs().format(FORMAT)
-                            const start = dayjs().format(FORMAT)
-                            return [start, end]
+                        value() {
+                            const end = dayjs().format(FORMAT);
+                            const start = dayjs().format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '昨天',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'day')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '前天',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(2, 'day')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '一周前',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'week')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '一个月前',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '三个月前',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(3, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '半年前',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(6, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: '一年前',
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'year')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                 ],
@@ -284,64 +284,64 @@
                     top10CreateTicketUser: false,
                     biz: false,
                 },
-            }
+            };
         },
         computed: {
-            serviceName () {
-                const service = this.serviceList.find(item => item.id === this.serviceId)
-                return service ? service.name : '--'
+            serviceName() {
+                const service = this.serviceList.find(item => item.id === this.serviceId);
+                return service ? service.name : '--';
             },
         },
-        created () {
-            this.getServiceList()
-            this.getSummaryData()
-            this.getDetailData()
-            this.handleDateSelectorPosition = throttle(this.scrollHandler, 300)
+        created() {
+            this.getServiceList();
+            this.getSummaryData();
+            this.getDetailData();
+            this.handleDateSelectorPosition = throttle(this.scrollHandler, 300);
         },
-        mounted () {
-            document.querySelector('.section-content').addEventListener('scroll', this.handleDateSelectorPosition, false)
+        mounted() {
+            document.querySelector('.section-content').addEventListener('scroll', this.handleDateSelectorPosition, false);
         },
-        beforeDestroy () {
-            document.querySelector('.section-content').removeEventListener('scroll', this.handleDateSelectorPosition, false)
+        beforeDestroy() {
+            document.querySelector('.section-content').removeEventListener('scroll', this.handleDateSelectorPosition, false);
         },
         methods: {
-            async getServiceList () {
-                this.loading.serviceList = true
+            async getServiceList() {
+                this.loading.serviceList = true;
                 try {
-                    const resp = await this.$store.dispatch('service/getServiceList')
-                    this.serviceList = resp.data
+                    const resp = await this.$store.dispatch('service/getServiceList');
+                    this.serviceList = resp.data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.serviceList = false
+                    this.loading.serviceList = false;
                 }
             },
-            getDetailData () {
-                this.getTop10CreateTicketUserData()
-                this.getAddedTicketData()
-                this.getBizData()
+            getDetailData() {
+                this.getTop10CreateTicketUserData();
+                this.getAddedTicketData();
+                this.getBizData();
             },
             // 概览数据
-            async getSummaryData () {
-                this.loading.summary = true
+            async getSummaryData() {
+                this.loading.summary = true;
                 try {
                     const resp = await Promise.all([
                         this.$store.dispatch('operation/getSummaryTotalData', { service_id: this.serviceId }),
                         this.$store.dispatch('operation/getSummaryWeekData', { service_id: this.serviceId }),
-                    ])
+                    ]);
                     this.summaryData = {
                         total: resp[0].data,
                         week: resp[1].data,
-                    }
+                    };
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.summary = false
+                    this.loading.summary = false;
                 }
             },
             // 新增单量
-            async getAddedTicketData () {
-                this.loading.addedTicket = true
+            async getAddedTicketData() {
+                this.loading.addedTicket = true;
                 try {
                     const params = {
                         create_at__gte: this.dateRange[0],
@@ -349,54 +349,54 @@
                         timedelta: this.addedTicketChartDismension,
                         resource_type: 'ticket',
                         service_id: this.serviceId,
-                    }
-                    const resp = await this.$store.dispatch('operation/getResourceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getResourceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.addedTicketData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.addedTicketData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.addedTicket = false
+                    this.loading.addedTicket = false;
                 }
             },
             // top 10 提单用户
-            async getTop10CreateTicketUserData () {
-                this.loading.top10CreateTicketUser = true
+            async getTop10CreateTicketUserData() {
+                this.loading.top10CreateTicketUser = true;
                 try {
                     const params = {
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
                         service_id: this.serviceId,
-                    }
-                    const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params)
-                    const data = resp.data.map(item => {
+                    };
+                    const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params);
+                    const data = resp.data.map((item) => {
                         if (item.organization.length > 0) {
-                            const fullOrganization = this.getFullOrganization(item.organization)
-                            item.organization_full = fullOrganization.reverse().join('/')
-                            item.organization = item.organization[0].name
+                            const fullOrganization = this.getFullOrganization(item.organization);
+                            item.organization_full = fullOrganization.reverse().join('/');
+                            item.organization = item.organization[0].name;
                         } else {
-                            item.organization = '--'
+                            item.organization = '--';
                         }
-                        return item
-                    })
-                    this.top10CreateTicketUserData = data
+                        return item;
+                    });
+                    this.top10CreateTicketUserData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.top10CreateTicketUser = false
+                    this.loading.top10CreateTicketUser = false;
                 }
             },
             // 业务数量
-            async getBizData () {
-                this.loading.biz = true
+            async getBizData() {
+                this.loading.biz = true;
                 try {
                     const params = {
                         create_at__gte: this.dateRange[0],
@@ -404,58 +404,58 @@
                         timedelta: this.bizChartDismension,
                         resource_type: 'biz',
                         service_id: this.serviceId,
-                    }
-                    const resp = await this.$store.dispatch('operation/getServiceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getServiceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.bizData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.bizData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.biz = false
+                    this.loading.biz = false;
                 }
             },
-            getFullOrganization (organization) {
-                const target = organization[0]
-                let fullOrganization = [target.name]
+            getFullOrganization(organization) {
+                const target = organization[0];
+                let fullOrganization = [target.name];
                 if (target.family && target.family.length > 0) {
-                    const nextName = this.getFullOrganization(target.family)
-                    fullOrganization = fullOrganization.concat(nextName)
+                    const nextName = this.getFullOrganization(target.family);
+                    fullOrganization = fullOrganization.concat(nextName);
                 }
-                return fullOrganization
+                return fullOrganization;
             },
-            onServicePanelToggle (isShow) {
-                this.isServicePanelShow = isShow
+            onServicePanelToggle(isShow) {
+                this.isServicePanelShow = isShow;
             },
-            onServiceChange (id) {
-                this.serviceId = id
-                this.getDetailData()
-                this.$router.push({ name: 'OperationService', params: { id } })
+            onServiceChange(id) {
+                this.serviceId = id;
+                this.getDetailData();
+                this.$router.push({ name: 'OperationService', params: { id } });
             },
-            onSelectDate (value) {
-                this.dateRange = value
-                this.getDetailData()
+            onSelectDate(value) {
+                this.dateRange = value;
+                this.getDetailData();
             },
-            scrollHandler (e) {
-                this.isDateSelectorFixed = e.target.scrollTop > 150
+            scrollHandler(e) {
+                this.isDateSelectorFixed = e.target.scrollTop > 150;
             },
-            onAddedTicketDimensionChange (val) {
-                this.addedTicketChartDismension = val
-                this.getAddedTicketData()
+            onAddedTicketDimensionChange(val) {
+                this.addedTicketChartDismension = val;
+                this.getAddedTicketData();
             },
-            onAddedServiceDimensionChange (val) {
-                this.bizChartDismension = val
-                this.getBizData()
+            onAddedServiceDimensionChange(val) {
+                this.bizChartDismension = val;
+                this.getBizData();
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .section-nav {

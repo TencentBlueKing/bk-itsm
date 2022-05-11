@@ -70,8 +70,8 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    import pinyin from 'pinyin'
+    import mixins from '../../commonMix/field.js';
+    import pinyin from 'pinyin';
 
     export default {
         name: 'INPUTSELECT',
@@ -79,14 +79,14 @@
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -98,7 +98,7 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 options: [],
                 addStatus: false,
@@ -106,80 +106,80 @@
                     name: '',
                     key: '',
                 },
-            }
+            };
         },
         watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
+            'item.val'() {
+                this.conditionField(this.item, this.fields);
             },
-            'item.choice' (newVal, oldVal) {
+            'item.choice'(newVal, oldVal) {
                 if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
-                    this.getOption()
+                    this.getOption();
                 }
             },
         },
-        async mounted () {
+        async mounted() {
             if (!this.item.val && this.item.value) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
-            await this.getOption()
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.conditionField(this.item, this.fields)
+            await this.getOption();
+            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+            this.item.val = valueStatus ? this.item.val : '';
+            this.conditionField(this.item, this.fields);
         },
         methods: {
-            async getOption () {
-                this.options = this.item.choice = await this.getFieldOptions(this.item)
+            async getOption() {
+                this.options = this.item.choice = await this.getFieldOptions(this.item);
             },
-            selected () {
+            selected() {
                 if (this.item.related_fields && this.item.related_fields.be_relied) {
-                    this.item.related_fields.be_relied.forEach(ite => {
-                        this.fields.forEach(it => {
+                    this.item.related_fields.be_relied.forEach((ite) => {
+                        this.fields.forEach((it) => {
                             if (ite === it.key) {
-                                it.val = it.value = ''
+                                it.val = it.value = '';
                             }
-                        })
-                    })
+                        });
+                    });
                 }
             },
-            giveDefaultKey () {
+            giveDefaultKey() {
                 if (!this.tempChoice.name || this.tempChoice.key) {
-                    return
+                    return;
                 }
-                this.tempChoice.key = ''
+                this.tempChoice.key = '';
                 const transfer = pinyin(this.tempChoice.name, {
                     style: pinyin.STYLE_NORMAL,
                     heteronym: false,
-                })
-                transfer.forEach(item => {
-                    this.tempChoice.key += `${item}`
-                })
-                this.tempChoice.key = this.tempChoice.key.toUpperCase().replace(/\ /g, '_')
+                });
+                transfer.forEach((item) => {
+                    this.tempChoice.key += `${item}`;
+                });
+                this.tempChoice.key = this.tempChoice.key.toUpperCase().replace(/\ /g, '_');
                 if (this.tempChoice.key.length >= 32) {
-                    this.tempChoice.key = this.tempChoice.key.substr(0, 32)
+                    this.tempChoice.key = this.tempChoice.key.substr(0, 32);
                 }
             },
-            confirmAdd () {
+            confirmAdd() {
                 if (!this.tempChoice.name) {
-                    return
+                    return;
                 }
-                this.addStatus = false
-                this.options.push({ ...this.tempChoice, can_delete: true })
-                this.item.val = this.tempChoice.key
-                this.tempChoice.name = this.tempChoice.key = ''
+                this.addStatus = false;
+                this.options.push({ ...this.tempChoice, can_delete: true });
+                this.item.val = this.tempChoice.key;
+                this.tempChoice.name = this.tempChoice.key = '';
             },
-            cancelAdd () {
-                this.addStatus = false
-                this.tempChoice.name = this.tempChoice.key = ''
+            cancelAdd() {
+                this.addStatus = false;
+                this.tempChoice.name = this.tempChoice.key = '';
             },
-            handleDeleteOption (deleteOption) {
+            handleDeleteOption(deleteOption) {
                 if (deleteOption === this.item.val) {
-                    this.item.val = ''
+                    this.item.val = '';
                 }
-                this.options = this.options.filter(option => option.key !== deleteOption)
+                this.options = this.options.filter(option => option.key !== deleteOption);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

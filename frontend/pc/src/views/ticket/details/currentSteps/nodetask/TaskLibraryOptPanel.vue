@@ -64,7 +64,7 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler'
+    import { errorHandler } from '../../../../../utils/errorHandler';
 
     export default {
         name: 'TaskLibraryOptPanel',
@@ -78,7 +78,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 templateListLoading: false,
                 type: 'new',
@@ -93,89 +93,89 @@
                     },
                 ] },
                 templateList: [],
-            }
+            };
         },
         methods: {
-            getLibraryList () {
-                this.templateListLoading = true
+            getLibraryList() {
+                this.templateListLoading = true;
                 this.$store.dispatch('taskFlow/getLibraryList', {
                     service_id: this.ticketInfo.service_id,
                 }).then((res) => {
-                    this.templateList = res.data
+                    this.templateList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.templateListLoading = false
-                    })
+                        this.templateListLoading = false;
+                    });
             },
-            onSwitchType (type) {
-                this.type = type
-                this.formData.name = ''
+            onSwitchType(type) {
+                this.type = type;
+                this.formData.name = '';
                 if (type === 'update') {
-                    this.getLibraryList()
+                    this.getLibraryList();
                 }
             },
-            async onSbumit () {
-                const result = await this.$refs.taskForm.validate()
+            async onSbumit() {
+                const result = await this.$refs.taskForm.validate();
                 if (!result) {
-                    return
+                    return;
                 }
                 if (!this.taskList.length) {
                     this.$bkMessage({
                         message: this.$t('m.tickets[\'没有任务可以存入任务库\']'),
                         theme: 'error',
-                    })
-                    return false
+                    });
+                    return false;
                 }
                 if (this.type === 'new') {
-                    this.newTaskLibrary()
+                    this.newTaskLibrary();
                 } else {
-                    this.updataLibrary()
+                    this.updataLibrary();
                 }
             },
-            newTaskLibrary () {
+            newTaskLibrary() {
                 const params = {
                     name: this.formData.name,
                     service_id: this.ticketInfo.service_id,
                     tasks: this.taskList.map(item => item.id),
-                }
+                };
                 this.$store.dispatch('taskFlow/creatLibrary', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'任务库创建成功\']'),
                         theme: 'success',
-                    })
-                    this.$emit('close')
-                    this.resetForm()
+                    });
+                    this.$emit('close');
+                    this.resetForm();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            updataLibrary () {
+            updataLibrary() {
                 const params = {
                     tasks: this.taskList.map(item => item.id),
-                }
-                const id = this.formData.name
+                };
+                const id = this.formData.name;
                 this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'更新成功\']'),
                         theme: 'success',
-                    })
-                    this.$emit('close')
-                    this.resetForm()
+                    });
+                    this.$emit('close');
+                    this.resetForm();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            resetForm () {
-                this.formData.name = ''
-                this.type = 'new'
+            resetForm() {
+                this.formData.name = '';
+                this.type = 'new';
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .task-library-opt-panel {

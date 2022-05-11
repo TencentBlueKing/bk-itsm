@@ -82,7 +82,7 @@
                 // }]
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .empty-page-tip {

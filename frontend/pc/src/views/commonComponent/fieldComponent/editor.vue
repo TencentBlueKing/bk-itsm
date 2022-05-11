@@ -38,7 +38,7 @@
 </template>
 
 <script>
-    import RichTextEditor from '../../../components/form/richTextEditor/richTextEditor.vue'
+    import RichTextEditor from '../../../components/form/richTextEditor/richTextEditor.vue';
     export default {
         name: 'RICHTEXT',
         components: {
@@ -59,12 +59,12 @@
                 default: false,
             },
         },
-        mounted () {
+        mounted() {
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

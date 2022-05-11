@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env webpack-dev-server --progress --config ./build/webpack.dev.conf.js",
     "build": "cross-env npm run build:production",
-    "lint": "eslint --fix --ext .js,.vue src",
+    "lint": "eslint --fix .js,.vue src",
     "build:production": "cross-env webpack --progress --config ./build/webpack.prod.conf.js",
     "build:production:sourcemap": "cross-env SOURCE_MAP=true webpack --progress --config ./build/webpack.prod.conf.js"
   },

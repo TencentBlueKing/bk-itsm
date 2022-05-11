@@ -46,7 +46,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
 
     export default {
         name: 'SELECT',
@@ -54,14 +54,14 @@
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -73,47 +73,47 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 options: [],
-            }
+            };
         },
         watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
+            'item.val'() {
+                this.conditionField(this.item, this.fields);
             },
-            'item.choice' (newVal, oldVal) {
+            'item.choice'(newVal, oldVal) {
                 if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
-                    this.getOption()
+                    this.getOption();
                 }
             },
         },
-        async mounted () {
+        async mounted() {
             if (!this.item.val && this.item.value) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
-            await this.getOption()
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.conditionField(this.item, this.fields)
+            await this.getOption();
+            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+            this.item.val = valueStatus ? this.item.val : '';
+            this.conditionField(this.item, this.fields);
         },
         methods: {
-            async getOption () {
-                this.options = this.item.choice = await this.getFieldOptions(this.item)
+            async getOption() {
+                this.options = this.item.choice = await this.getFieldOptions(this.item);
             },
-            selected () {
+            selected() {
                 if (this.item.related_fields && this.item.related_fields.be_relied) {
-                    this.item.related_fields.be_relied.forEach(ite => {
-                        this.fields.forEach(it => {
+                    this.item.related_fields.be_relied.forEach((ite) => {
+                        this.fields.forEach((it) => {
                             if (ite === it.key) {
-                                it.val = it.value = ''
+                                it.val = it.value = '';
                             }
-                        })
-                    })
+                        });
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

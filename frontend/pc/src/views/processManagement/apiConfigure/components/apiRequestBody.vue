@@ -188,7 +188,7 @@
 </template>
 
 <script>
-    import collapseTransition from '../../../../utils/collapse-transition'
+    import collapseTransition from '../../../../utils/collapse-transition';
 
     export default {
         name: 'exportTree',
@@ -198,14 +198,14 @@
         props: {
             isBuiltin: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             isBody: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             treeDataList: {
@@ -217,7 +217,7 @@
                 default: () => 0,
             },
         },
-        data () {
+        data() {
             return {
                 pLeft: `padding-left:${15 * (this.treeIndex)}px; padding-right: 5px;`,
                 treeTypeList: [
@@ -229,7 +229,7 @@
                 ],
                 trueStatus: true,
                 falseStatus: false,
-            }
+            };
         },
         watch: {
             // treeDataList: {
@@ -239,38 +239,38 @@
             //     deep: true
             // }
         },
-        mounted () {
+        mounted() {
         },
         methods: {
             // 展开子级
-            toggleChildren (item) {
-                this.$emit('toggleChildren', item)
+            toggleChildren(item) {
+                this.$emit('toggleChildren', item);
             },
-            toggle (item) {
-                this.$emit('toggle', item)
+            toggle(item) {
+                this.$emit('toggle', item);
             },
             // 组件内调用组件，需要抛出数据两次
-            selectItem (item) {
-                this.$emit('selectItem', item)
+            selectItem(item) {
+                this.$emit('selectItem', item);
             },
             // 新增数据
-            addBrotherLine (item) {
-                this.$emit('addBrotherLine', item)
+            addBrotherLine(item) {
+                this.$emit('addBrotherLine', item);
             },
-            addChildLine (item) {
-                this.$emit('addChildLine', item)
+            addChildLine(item) {
+                this.$emit('addChildLine', item);
             },
-            deleteLine (item) {
-                this.$emit('deleteLine', item)
+            deleteLine(item) {
+                this.$emit('deleteLine', item);
             },
-            changeType (item) {
-                this.$set(item, 'children', [])
+            changeType(item) {
+                this.$set(item, 'children', []);
                 if (item.type === 'array') {
-                    this.addChildLine(item)
+                    this.addChildLine(item);
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

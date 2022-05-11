@@ -153,11 +153,11 @@
 </template>
 
 <script>
-    import SelectService from './SelectService.vue'
-    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue'
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch'
-    import axios from 'axios'
-    import { errorHandler } from '../../../../../utils/errorHandler'
+    import SelectService from './SelectService.vue';
+    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+    import apiFieldsWatch from '@/views/commonMix/api_fields_watch';
+    import axios from 'axios';
+    import { errorHandler } from '../../../../../utils/errorHandler';
 
     export default {
         name: 'AssociatedDialog',
@@ -172,7 +172,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 typeSelectRadio: [
                     {
@@ -208,24 +208,24 @@
                     serviceType: [],
                     keyword: '',
                 },
-            }
+            };
         },
         computed: {
-            serviceTypeList () {
-                return this.$store.state.choice_type_list
+            serviceTypeList() {
+                return this.$store.state.choice_type_list;
             },
         },
-        mounted () {
-            this.getList()
-            this.getTypeStatus()
+        mounted() {
+            this.getList();
+            this.getTypeStatus();
         },
         methods: {
             // 切换关联方式时清空fieldList
-            clearFieldList () {
-                this.fieldList = []
+            clearFieldList() {
+                this.fieldList = [];
             },
-            checkOne (rowData) {
-                const { id } = rowData
+            checkOne(rowData) {
+                const { id } = rowData;
                 const { href } = this.$router.resolve({
                     name: 'commonInfo',
                     params: {
@@ -234,11 +234,11 @@
                     query: {
                         id: `${id}`,
                     },
-                })
-                window.open(href, '_blank')
+                });
+                window.open(href, '_blank');
             },
             // 获取已有单据列表
-            getList () {
+            getList() {
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
@@ -249,184 +249,184 @@
                     access: 'true',
                     exclude_ticket_id__in: this.ticketInfo.id,
                     project_key: this.ticketInfo.project_key,
-                }
-                let resUrl = ''
-                this.getUrlInfo = ''
+                };
+                let resUrl = '';
+                this.getUrlInfo = '';
                 for (const key in params) {
-                    this.getUrlInfo += `${key}=${params[key]}`
-                    resUrl += `${key}=${params[key]}`
+                    this.getUrlInfo += `${key}=${params[key]}`;
+                    resUrl += `${key}=${params[key]}`;
                 }
-                this.isTableLoading = true
+                this.isTableLoading = true;
                 this.$store.dispatch('change/getList', params).then((res) => {
                     if (resUrl !== this.getUrlInfo) {
-                        return
+                        return;
                     }
-                    this.tabShowList = res.data.items
+                    this.tabShowList = res.data.items;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isTableLoading = false
-                    })
+                        this.isTableLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection, row) {
+                this.checkList = selection;
             },
-            disabledFn (item) {
-                return !item.has_relationships
+            disabledFn(item) {
+                return !item.has_relationships;
             },
-            getstatusColor (row) {
-                const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status)
+            getstatusColor(row) {
+                const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status);
                 return statusColor.length ? {
                     color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
-                } : { color: '#3c96ff', border: '1px solid #3c96ff' }
+                } : { color: '#3c96ff', border: '1px solid #3c96ff' };
             },
-            getTypeStatus () {
-                const params = {}
-                const type = ''
+            getTypeStatus() {
+                const params = {};
+                const type = '';
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
-                    this.colorHexList = res.data
+                    this.colorHexList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 搜索
-            serviceSearch (val) {
+            serviceSearch(val) {
                 if (!val && this.searchInfo.serviceType.length) {
-                    this.getList()
+                    this.getList();
                 }
             },
-            clearSearch () {
-                this.searchInfo.serviceType = []
-                this.getList()
+            clearSearch() {
+                this.searchInfo.serviceType = [];
+                this.getList();
             },
-            clearInfo () {
-                this.searchInfo.keyword = ''
-                this.getList()
+            clearInfo() {
+                this.searchInfo.keyword = '';
+                this.getList();
             },
             // 获取服务字段并自动填写
-            getFieldList () {
-                this.showField = true
+            getFieldList() {
+                this.showField = true;
                 if (!this.$refs.SelectService.formData.service_id) {
-                    this.fieldList = []
-                    return
+                    this.fieldList = [];
+                    return;
                 }
                 const params = {
                     service_id: this.$refs.SelectService.formData.service_id,
-                }
+                };
                 axios.all([
                     this.$store.dispatch('change/getSubmitFields', params),
                     this.$store.dispatch('change/getAllFields', this.ticketInfo.id),
                 ]).then(axios.spread((firstResp, allResp) => {
-                    firstResp.data.forEach(item => {
-                        this.$set(item, 'val', '')
-                        item.type = item.type === 'CASCADE' ? 'SELECT' : item.type
-                        this.$set(item, 'showFeild', true)
-                        this.$set(item, 'service', this.$refs.SelectService.formData.key)
-                        allResp.data.forEach(tempResItem => {
+                    firstResp.data.forEach((item) => {
+                        this.$set(item, 'val', '');
+                        item.type = item.type === 'CASCADE' ? 'SELECT' : item.type;
+                        this.$set(item, 'showFeild', true);
+                        this.$set(item, 'service', this.$refs.SelectService.formData.key);
+                        allResp.data.forEach((tempResItem) => {
                             if (item.key === tempResItem.key) {
-                                item.val = tempResItem.value || ''
+                                item.val = tempResItem.value || '';
                             }
-                        })
-                    })
-                    this.fieldList = firstResp.data
-                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit')
+                        });
+                    });
+                    this.fieldList = firstResp.data;
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit');
                 }))
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.showField = false
-                    })
+                        this.showField = false;
+                    });
             },
             // 提交函数
-            setFields () {
+            setFields() {
                 if (this.disabled) {
-                    return
+                    return;
                 }
                 const SelectServiceForm = {
                     catalog_id: this.$refs.SelectService.formData.cascadeId,
                     service_id: this.$refs.SelectService.formData.service_id,
                     service_type: this.$refs.SelectService.formData.key,
-                }
-                const formData = {}
-                formData.from_ticket_id = this.ticketInfo.id * 1
-                formData.catalog_id = SelectServiceForm.catalog_id
-                formData.service_id = SelectServiceForm.service_id
-                formData.service_type = SelectServiceForm.service_type
+                };
+                const formData = {};
+                formData.from_ticket_id = this.ticketInfo.id * 1;
+                formData.catalog_id = SelectServiceForm.catalog_id;
+                formData.service_id = SelectServiceForm.service_id;
+                formData.service_type = SelectServiceForm.service_type;
                 // 将字段中的时间转换一遍
-                formData.fields = []
-                this.$refs.fieldInfo.fieldChange()
-                this.fieldList.forEach(item => {
+                formData.fields = [];
+                this.$refs.fieldInfo.fieldChange();
+                this.fieldList.forEach((item) => {
                     formData.fields.push({
                         type: item.type,
                         id: item.id,
                         key: item.key,
                         value: item.showFeild ? item.value : '',
                         choice: item.choice,
-                    })
-                })
-                this.buttonDisabled = true
+                    });
+                });
+                this.buttonDisabled = true;
                 this.$store.dispatch('change/submit', formData).then((res) => {
                     if (res.code === 'OK') {
                         this.$bkMessage({
                             message: this.$t('m.common["提交成功！"]'),
                             theme: 'success',
-                        })
-                        this.$emit('submitSuccess')
+                        });
+                        this.$emit('submitSuccess');
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.buttonDisabled = false
-                    })
+                        this.buttonDisabled = false;
+                    });
             },
             // 关闭测弹窗
-            closeOpen () {
-                this.$emit('close')
+            closeOpen() {
+                this.$emit('close');
             },
-            bindTicket () {
-                const tempList = this.checkList.map(item => item.id)
+            bindTicket() {
+                const tempList = this.checkList.map(item => item.id);
                 const params = {
                     from_ticket: this.ticketInfo.id,
                     to_tickets: tempList,
-                }
+                };
                 this.$store.dispatch('change/bindTicket', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.manageCommon["关联成功"]'),
                         theme: 'success',
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.checkList = []
-                        this.$emit('submitSuccess')
-                    })
+                        this.checkList = [];
+                        this.$emit('submitSuccess');
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

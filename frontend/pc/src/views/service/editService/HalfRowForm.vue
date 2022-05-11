@@ -64,9 +64,9 @@
     </div>
 </template>
 <script>
-    import draggable from 'vuedraggable'
+    import draggable from 'vuedraggable';
     // import FormEditItem from './FormEditItem'
-    import FormViewItem from './FormViewItem'
+    import FormViewItem from './FormViewItem';
 
     export default {
         name: 'HalfRowForm',
@@ -90,40 +90,40 @@
             },
             addFieldStatus: Boolean,
         },
-        data () {
+        data() {
             return {
                 isEdit: this.checkEdit(),
                 localForms: this.getLocalForms(this.rowForms),
-            }
+            };
         },
         computed: {
-            editForm () {
+            editForm() {
                 if (this.isEdit) {
-                    return this.rowForms.find(item => item && item.id === this.crtForm)
+                    return this.rowForms.find(item => item && item.id === this.crtForm);
                 }
-                return null
+                return null;
             },
         },
         watch: {
-            rowForms (val) {
-                this.localForms = this.getLocalForms(val)
+            rowForms(val) {
+                this.localForms = this.getLocalForms(val);
             },
-            crtForm (val) {
-                this.isEdit = val !== '' ? this.checkEdit() : false
+            crtForm(val) {
+                this.isEdit = val !== '' ? this.checkEdit() : false;
             },
         },
         methods: {
-            getLocalForms (forms) {
-                return forms.map(item => item === undefined ? [] : [item])
+            getLocalForms(forms) {
+                return forms.map(item => item === undefined ? [] : [item]);
             },
-            checkEdit () {
-                return this.rowForms.find(item => item && item.id === this.crtForm)
+            checkEdit() {
+                return this.rowForms.find(item => item && item.id === this.crtForm);
             },
-            halfRowFormPut (to, from) {
-                return to.el.children.length === 0
+            halfRowFormPut(to, from) {
+                return to.el.children.length === 0;
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .click-status {

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
 
     export default {
         name: 'STRING',
@@ -55,8 +55,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -68,32 +68,32 @@
                 default: false,
             },
         },
-        data () {
-            return {}
+        data() {
+            return {};
         },
         computed: {
-            maxLength () {
+            maxLength() {
                 if (this.item.key === 'title') {
-                    return 120
+                    return 120;
                 }
                 if (this.item.key === 'task_name') { // 标准运维任务名限制 50
-                    return 50
+                    return 50;
                 }
-                return null
+                return null;
             },
         },
         watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
+            'item.val'() {
+                this.conditionField(this.item, this.fields);
             },
         },
-        mounted () {
-            this.conditionField(this.item, this.fields)
+        mounted() {
+            this.conditionField(this.item, this.fields);
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

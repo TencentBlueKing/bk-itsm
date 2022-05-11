@@ -153,11 +153,11 @@
     </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue'
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue'
-    import i18n from '@/i18n/index.js'
-    import ticketListMixins from './ticketListMixins.js'
+    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+    import i18n from '@/i18n/index.js';
+    import ticketListMixins from './ticketListMixins.js';
 
     const COLUMN_LIST = [
         {
@@ -211,7 +211,7 @@
             id: 'operate',
             label: i18n.t('m.manageCommon[\'操作\']'),
             minWidth: '80' },
-    ]
+    ];
 
     export default {
         name: 'CreatedList',
@@ -224,28 +224,28 @@
         props: {
             from: String,
         },
-        data () {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
+        data() {
+            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
             return {
                 columnList,
                 type: 'created',
                 isExportDialogShow: false,
                 // 评价
                 evaluationTicketInfo: {},
-            }
+            };
         },
         computed: {
-            fromRouter () {
-                return `${this.$route.name}`
+            fromRouter() {
+                return `${this.$route.name}`;
             },
         },
         methods: {
             // 打开满意度评价
-            onOpenEvaluationTicketModal (row) {
-                this.$refs.evaluationModal.show()
-                this.evaluationTicketInfo = row
+            onOpenEvaluationTicketModal(row) {
+                this.$refs.evaluationModal.show();
+                this.evaluationTicketInfo = row;
             },
-            reCreateTicket (row) {
+            reCreateTicket(row) {
                 const { href } = this.$router.resolve({
                     name: 'CreateTicket',
                     query: {
@@ -253,11 +253,11 @@
                         service_id: row.service_id,
                         rc_ticket_id: row.id,
                     },
-                })
-                window.open(href, '_blank')
+                });
+                window.open(href, '_blank');
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

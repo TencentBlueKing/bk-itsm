@@ -158,8 +158,8 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler.js'
-    import commonMix from '../../commonMix/common.js'
+    import { errorHandler } from '../../../utils/errorHandler.js';
+    import commonMix from '../../commonMix/common.js';
     export default {
         name: 'secondStep',
         mixins: [commonMix],
@@ -169,7 +169,7 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 versionStatus: true,
                 secondClick: false,
@@ -201,35 +201,35 @@
                 flowList: [],
                 isDropdownShow: false,
                 rules: {},
-            }
+            };
         },
-        async mounted () {
+        async mounted() {
             // 列表数据添加流转信息
-            await this.getTypeStatus()
-            await this.listAddFlow()
+            await this.getTypeStatus();
+            await this.listAddFlow();
             // 将数据转换
-            this.dataList = this.dataList.filter(item => !item.is_over)
-            this.dataList.forEach(item => {
-                this.$set(item, 'checkBoxStatus', {})
-                this.statusOwnList.forEach(statusItem => {
-                    item.checkBoxStatus[statusItem.key] = item.can_flow_to.indexOf(statusItem.id) !== -1
-                })
-            })
-            this.rules.threshold = this.checkCommonRules('select').select
-            this.rules.id = this.checkCommonRules('select').select
+            this.dataList = this.dataList.filter(item => !item.is_over);
+            this.dataList.forEach((item) => {
+                this.$set(item, 'checkBoxStatus', {});
+                this.statusOwnList.forEach((statusItem) => {
+                    item.checkBoxStatus[statusItem.key] = item.can_flow_to.indexOf(statusItem.id) !== -1;
+                });
+            });
+            this.rules.threshold = this.checkCommonRules('select').select;
+            this.rules.id = this.checkCommonRules('select').select;
         },
         methods: {
             // 返回
-            backButton () {
-                this.$parent.backTab()
+            backButton() {
+                this.$parent.backTab();
             },
-            ajaxSubmit () {
+            ajaxSubmit() {
                 const params = {
                     name: '启动',
                     service_type: this.statusType,
                     batch_create: true,
                     rules: [],
-                }
+                };
                 for (let i = 0; i < 2; i++) {
                     params.rules.push({
                         condition_type: 'STOP',
@@ -237,139 +237,139 @@
                             type: 'any',
                             expressions: [],
                         },
-                    })
+                    });
                 }
-                params.rules[1].condition_type = 'PAUSE'
+                params.rules[1].condition_type = 'PAUSE';
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
                     this.$bkMessage({
                         message: '保存成功',
                         theme: 'success',
-                    })
-                    this.$parent.backTab()
+                    });
+                    this.$parent.backTab();
                 })
-                    .catch(res => {
+                    .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
+                        });
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
-            nameFilter (val) {
-                return `${this.$t('m.slaContent[\'从\']')}【${val}】${this.$t('m.slaContent[\'可以流转至\']')}`
+            nameFilter(val) {
+                return `${this.$t('m.slaContent[\'从\']')}【${val}】${this.$t('m.slaContent[\'可以流转至\']')}`;
             },
-            async getTypeStatus () {
-                this.isDataLoading = true
+            async getTypeStatus() {
+                this.isDataLoading = true;
                 const params = {
                     // flow_status: 'RUNNING'
-                }
+                };
                 await this.$store.dispatch('ticketStatus/getTypeStatus', {
                     type: this.statusType,
                     params,
                 }).then((res) => {
-                    this.statusOwnList = res.data
-                    this.dataList = res.data
+                    this.statusOwnList = res.data;
+                    this.dataList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
+                    });
             },
-            initIsAutoTemp () {
-                this.isAutoTemp.info.threshold = null
-                this.isAutoTemp.info.id = ''
-                this.isAutoTemp.info.timeSpace = 'd'
+            initIsAutoTemp() {
+                this.isAutoTemp.info.threshold = null;
+                this.isAutoTemp.info.id = '';
+                this.isAutoTemp.info.timeSpace = 'd';
             },
             // 列表数据添加流转信息
-            async listAddFlow () {
-                this.isDataLoading = true
-                this.dataList.forEach(item => {
-                    this.$set(item, 'can_flow_to', [])
-                    this.$set(item, 'is_auto', false)
-                })
+            async listAddFlow() {
+                this.isDataLoading = true;
+                this.dataList.forEach((item) => {
+                    this.$set(item, 'can_flow_to', []);
+                    this.$set(item, 'is_auto', false);
+                });
                 await this.$store.dispatch('ticketStatus/getTypeFlow', this.statusType).then((res) => {
-                    const flowList = res.data
-                    flowList.forEach(item => {
+                    const flowList = res.data;
+                    flowList.forEach((item) => {
                         for (let i = 0; i < this.dataList.length; i++) {
                             if (this.dataList[i].id === item.from_status) {
-                                this.dataList[i].can_flow_to.push(item.to_status)
-                                return
+                                this.dataList[i].can_flow_to.push(item.to_status);
+                                return;
                             }
                         }
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
+                    });
                 await this.$store.dispatch('ticketStatus/getTypeAutoFlow', this.statusType).then((res) => {
-                    const autoList = res.data
+                    const autoList = res.data;
                     for (const key in autoList) {
                         for (let i = 0; i < this.dataList.length; i++) {
                             if (this.dataList[i].id === Number(key)) {
-                                this.dataList[i].is_auto = autoList[key]
+                                this.dataList[i].is_auto = autoList[key];
                             }
                         }
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            selectFlowTo (itemRow, itemCol) {
-                const flag = itemRow.can_flow_to.indexOf(itemCol.id)
+            selectFlowTo(itemRow, itemCol) {
+                const flag = itemRow.can_flow_to.indexOf(itemCol.id);
                 if (flag !== -1) {
-                    itemRow.can_flow_to.splice(flag, 1)
+                    itemRow.can_flow_to.splice(flag, 1);
                 } else {
-                    itemRow.can_flow_to.push(itemCol.id)
+                    itemRow.can_flow_to.push(itemCol.id);
                 }
             },
-            previousStep () {
-                this.$parent.changeTree(1, 'back')
+            previousStep() {
+                this.$parent.changeTree(1, 'back');
             },
-            async stepNext () {
-                await this.saveTypeFlow()
-                this.$parent.changeTree(1, 'next')
+            async stepNext() {
+                await this.saveTypeFlow();
+                this.$parent.changeTree(1, 'next');
             },
             // 保存指定服务类型下的工单自动流转状态
-            async saveTypeFlow () {
-                const transits = []
-                const type = this.statusType
-                this.dataList.forEach(item => {
-                    item.can_flow_to.forEach(ite => {
+            async saveTypeFlow() {
+                const transits = [];
+                const type = this.statusType;
+                this.dataList.forEach((item) => {
+                    item.can_flow_to.forEach((ite) => {
                         const tempTransits = {
                             from_status: item.id,
                             to_status: ite,
-                        }
-                        transits.push(tempTransits)
-                    })
-                })
+                        };
+                        transits.push(tempTransits);
+                    });
+                });
                 const params = {
                     service_type: type,
                     transits,
-                }
+                };
                 await this.$store.dispatch('ticketStatus/saveTypeFlow', params).then((res) => {
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
+                    });
             },
             // 自动流传设置点击事件
-            isAutoChange (itemRow) {
-                this.saveTypeFlow()
+            isAutoChange(itemRow) {
+                this.saveTypeFlow();
                 if (itemRow.is_auto) {
                     // 取消自动流转弹窗
                     this.$bkInfo({
@@ -377,116 +377,116 @@
                         title: this.$t('m.slaContent["确认取消？"]'),
                         subTitle: this.$t('m.slaContent["确认后，将取消自动流转！"]'),
                         confirmFn: () => {
-                            const { id } = itemRow
+                            const { id } = itemRow;
                             if (this.secondClick) {
-                                return
+                                return;
                             }
-                            this.secondClick = true
+                            this.secondClick = true;
                             this.$store.dispatch('ticketStatus/closeAutoFlow', id).then((res) => {
                                 this.$bkMessage({
                                     message: this.$t('m.manageCommon["取消成功"]'),
                                     theme: 'success',
-                                })
-                                this.listAddFlow()
+                                });
+                                this.listAddFlow();
                             })
                                 .catch((res) => {
-                                    errorHandler(res, this)
+                                    errorHandler(res, this);
                                 })
                                 .finally(() => {
-                                    this.secondClick = false
-                                })
+                                    this.secondClick = false;
+                                });
                         },
-                    })
+                    });
                 } else {
                     // 编辑自动流转弹窗
-                    this.getFlowList(itemRow)
-                    this.isAutoTemp.item = itemRow
-                    this.autoConfigDialog.isShow = true
+                    this.getFlowList(itemRow);
+                    this.isAutoTemp.item = itemRow;
+                    this.autoConfigDialog.isShow = true;
                 }
             },
-            async editRule (itemRow) {
-                this.saveTypeFlow()
-                this.getFlowList(itemRow)
-                const { id } = itemRow
+            async editRule(itemRow) {
+                this.saveTypeFlow();
+                this.getFlowList(itemRow);
+                const { id } = itemRow;
                 await this.$store.dispatch('ticketStatus/getOneAutoFlow', id).then((res) => {
-                    this.isAutoTemp.item = itemRow
-                    this.isAutoTemp.info.threshold = res.data.threshold
-                    this.isAutoTemp.info.timeSpace = res.data.threshold_unit
-                    this.isAutoTemp.info.id = res.data.to_status
+                    this.isAutoTemp.item = itemRow;
+                    this.isAutoTemp.info.threshold = res.data.threshold;
+                    this.isAutoTemp.info.timeSpace = res.data.threshold_unit;
+                    this.isAutoTemp.info.id = res.data.to_status;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
-                this.isAutoTemp.item = itemRow
-                this.autoConfigDialog.isShow = true
+                    });
+                this.isAutoTemp.item = itemRow;
+                this.autoConfigDialog.isShow = true;
             },
-            getFlowList (itemRow) {
-                this.flowList = []
-                itemRow.can_flow_to.forEach(item => {
+            getFlowList(itemRow) {
+                this.flowList = [];
+                itemRow.can_flow_to.forEach((item) => {
                     const temp = {
                         name: '',
                         id: item,
-                    }
+                    };
                     for (let i = 0; i < this.statusOwnList.length; i++) {
                         if (this.statusOwnList[i].id === item) {
-                            temp.name = this.statusOwnList[i].name
+                            temp.name = this.statusOwnList[i].name;
                         }
                     }
-                    this.flowList.push(temp)
-                })
+                    this.flowList.push(temp);
+                });
             },
             // 流转设定弹窗
-            confirmFn () {
-                this.$refs.autoForm.validate().then(validator => {
-                    this.ajaxConfirmFn()
-                }, validator => {
-                    console.warn(validator)
-                })
+            confirmFn() {
+                this.$refs.autoForm.validate().then((validator) => {
+                    this.ajaxConfirmFn();
+                }, (validator) => {
+                    console.warn(validator);
+                });
             },
-            ajaxConfirmFn () {
+            ajaxConfirmFn() {
                 const params = {
                     to_status: this.isAutoTemp.info.id,
                     threshold: this.isAutoTemp.info.threshold,
                     threshold_unit: this.isAutoTemp.info.timeSpace,
-                }
-                const { id } = this.isAutoTemp.item
+                };
+                const { id } = this.isAutoTemp.item;
                 this.$store.dispatch('ticketStatus/setAutoFlow', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: '操作成功',
                         theme: 'success',
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.autoConfigDialog.isShow = false
-                        this.isAutoTemp.item.is_auto = true
-                        this.listAddFlow()
-                        this.initIsAutoTemp()
-                    })
+                        this.autoConfigDialog.isShow = false;
+                        this.isAutoTemp.item.is_auto = true;
+                        this.listAddFlow();
+                        this.initIsAutoTemp();
+                    });
             },
-            cancelFn () {
-                this.autoConfigDialog.isShow = false
-                this.initIsAutoTemp()
+            cancelFn() {
+                this.autoConfigDialog.isShow = false;
+                this.initIsAutoTemp();
             },
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
-            dropdownShow () {
-                this.isDropdownShow = true
+            dropdownShow() {
+                this.isDropdownShow = true;
             },
-            dropdownHide () {
-                this.isDropdownShow = false
+            dropdownHide() {
+                this.isDropdownShow = false;
             },
-            timeHandler (time) {
-                this.$refs.dropdown.hide()
-                this.isAutoTemp.info.timeSpace = time.id
+            timeHandler(time) {
+                this.$refs.dropdown.hide();
+                this.isAutoTemp.info.timeSpace = time.id;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

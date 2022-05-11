@@ -25,57 +25,57 @@
  * @example 路由组件名统一首字母大写
  */
 
-import Vue from 'vue'
-import Router from 'vue-router'
-import bus from '../utils/bus'
-import routerModules from './modules/index.js'
+import Vue from 'vue';
+import Router from 'vue-router';
+import bus from '../utils/bus';
+import routerModules from './modules/index.js';
 
 // 首页
-const Home = () => import('../views/home/index.vue')
+const Home = () => import('../views/home/index.vue');
 
 // 打印页面
-const printOrder = () => import('../views/commonComponent/printOrder/index.vue')
+const printOrder = () => import('../views/commonComponent/printOrder/index.vue');
 // 工单处理页面
-const TicketDetail = () => import('../views/ticket/details/index.vue')
+const TicketDetail = () => import('../views/ticket/details/index.vue');
 // 工单处理页面-iframe
-const TicketDetailIframe = () => import('../views/ticket/detailsIframe/index.vue')
+const TicketDetailIframe = () => import('../views/ticket/detailsIframe/index.vue');
 // 流程设计
-const process = () => import('../views/processManagement/processDesign/index.vue')
-const ProcessHome = () => import('../views/processManagement/processDesign/processHome/ProcessHome.vue')
+const process = () => import('../views/processManagement/processDesign/index.vue');
+const ProcessHome = () => import('../views/processManagement/processDesign/processHome/ProcessHome.vue');
 // 流程编辑
-const processEdit = () => import('../views/processManagement/processDesign/processEdit/ProcessEdit.vue')
+const processEdit = () => import('../views/processManagement/processDesign/processEdit/ProcessEdit.vue');
 // 流程版本
-const flowVersion = () => import('../views/processManagement/version')
+const flowVersion = () => import('../views/processManagement/version');
 // 基础模型
-const basicModule = () => import('../views/processManagement/basicModule')
+const basicModule = () => import('../views/processManagement/basicModule');
 // 数据字典
-const dataDictionary = () => import('../views/systemConfig/dataDictionary.vue')
+const dataDictionary = () => import('../views/systemConfig/dataDictionary.vue');
 // 系统日志
-const systemLogs = () => import('../views/systemConfig/systemLogs.vue')
+const systemLogs = () => import('../views/systemConfig/systemLogs.vue');
 // 403页面
-const limitAccess = () => import('../views/403.vue')
-const exception = () => import('../components/common/exception')
+const limitAccess = () => import('../views/403.vue');
+const exception = () => import('../components/common/exception');
 
 // renderview 测试
-const RenderViewTest = () => import('../views/test/RenderViewTest.vue')
+const RenderViewTest = () => import('../views/test/RenderViewTest.vue');
 
 // 新的路由导航组件
-const TicketManage = () => import('../views/ticket/TicketManage.vue')
-const MyTicket = () => import('../views/ticket/MyTicket.vue')
-const AllTicket = () => import('../views/ticket/allTicket/index.vue')
-const CreateTicket = () => import('../views/ticket/CreateTicket.vue')
+const TicketManage = () => import('../views/ticket/TicketManage.vue');
+const MyTicket = () => import('../views/ticket/MyTicket.vue');
+const AllTicket = () => import('../views/ticket/allTicket/index.vue');
+const CreateTicket = () => import('../views/ticket/CreateTicket.vue');
 
 // 运营数据
-const OperationData = () => import('../views/operation/index.vue')
-const OperationHome = () => import('../views/operation/home.vue')
-const OperationService = () => import('../views/operation/service.vue')
+const OperationData = () => import('../views/operation/index.vue');
+const OperationHome = () => import('../views/operation/home.vue');
+const OperationService = () => import('../views/operation/service.vue');
 
 // 服务新路由
 // const Service = () => import('../views/service/index.vue')
 // const ServiceList = () => import('../views/service/ServiceList.vue')
 // const EditService = () => import('../views/service/editService/index.vue')
 
-Vue.use(Router)
+Vue.use(Router);
 
 // from webpack 2.4
 // https://github.com/webpack/webpack/releases/tag/v2.4.0
@@ -142,7 +142,7 @@ const routes = [
                 path: ':type(new|edit)/:step/',
                 name: 'ProcessEdit',
                 component: processEdit,
-                props: (route) => ({
+                props: route => ({
                     processId: route.query.processId,
                     type: route.params.type,
                     step: route.params.step,
@@ -268,21 +268,21 @@ const routes = [
         redirect: '/ticket/create',
     },
     ...routerModules,
-]
+];
 
 const router = new Router({
     mode: 'hash',
     routes,
-})
+});
 
 router.beforeEach((to, from, next) => {
     bus.$on('api-error:user-permission-denied', () => {
-        next({ path: '/limitAccess' })
-    })
+        next({ path: '/limitAccess' });
+    });
     bus.$on('api-error:application-deployed', () => {
-        next({ path: '/exception' })
-    })
-    next()
-})
+        next({ path: '/exception' });
+    });
+    next();
+});
 
-export default router
+export default router;

@@ -31,7 +31,7 @@
                 :ticket-trigger-list="ticketTriggerList"
                 @reloadTicket="reloadTicket">
             </ticket-header>
-            
+
             <div class="ticket-container">
                 <div class="ticket-container-left">
                     <!-- 基础信息/工单预览 -->
@@ -105,17 +105,17 @@
 </template>
 
 <script>
-    import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue'
-    import TicketHeader from './TicketHeader.vue'
-    import NoTicketContent from './components/NoTicketContent.vue'
-    import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue'
-    import commonMix from '@/views/commonMix/common.js'
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js'
-    import fieldMix from '@/views/commonMix/field.js'
-    import { mapState } from 'vuex'
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import { deepClone } from '@/utils/util'
-    import leftTicketContent from './leftTicketContent.vue'
+    import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue';
+    import TicketHeader from './TicketHeader.vue';
+    import NoTicketContent from './components/NoTicketContent.vue';
+    import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue';
+    import commonMix from '@/views/commonMix/common.js';
+    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+    import fieldMix from '@/views/commonMix/field.js';
+    import { mapState } from 'vuex';
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import { deepClone } from '@/utils/util';
+    import leftTicketContent from './leftTicketContent.vue';
 
     export default {
         name: 'TicketDetail',
@@ -127,13 +127,13 @@
             RightTicketTabs,
         },
         inject: ['reload'],
-        provide () {
+        provide() {
             return {
                 reloadTicket: this.reloadTicket,
-            }
+            };
         },
         mixins: [fieldMix, commonMix, apiFieldsWatch],
-        data () {
+        data() {
             return {
                 moreLoading: false, // 底部加载loading
                 leftTicketDom: '',
@@ -192,165 +192,165 @@
                 hasNodeOptAuth: false,
                 isShowAssgin: false,
                 basicStatus: true,
-            }
+            };
         },
         computed: {
             ...mapState({
                 openFunction: state => state.openFunction,
             }),
-            token () {
-                return this.$route.query.token
+            token() {
+                return this.$route.query.token;
             },
         },
         watch: {
-            isShowSla (val) {
+            isShowSla(val) {
                 if (val) {
-                    const slaCount = this.ticketInfo.sla.Length
-                    const slaDom = document.querySelector('.sla-information')
-                    slaDom.style.height = `${134 * slaCount}px`
+                    const slaCount = this.ticketInfo.sla.Length;
+                    const slaDom = document.querySelector('.sla-information');
+                    slaDom.style.height = `${134 * slaCount}px`;
                 }
             },
-            commentList (val) {
+            commentList(val) {
                 if (val.length > 0) {
-                    this.curCommentLength = val.length
+                    this.curCommentLength = val.length;
                 }
             },
         },
-        async mounted () {
-            await this.initData()
+        async mounted() {
+            await this.initData();
             if (this.$route.query.cache_key) { // 通知链接进入
-                this.getTicketNoticeInfo()
+                this.getTicketNoticeInfo();
             }
-            this.getProtocolsList()
+            this.getProtocolsList();
             this.$nextTick(function () {
-                this.leftTicketDom = document.querySelector('.comment-list')
-                this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll)
-            })
+                this.leftTicketDom = document.querySelector('.comment-list');
+                this.leftTicketDom.addEventListener('scroll', this.handleTicketScroll);
+            });
             if (this.$refs.leftTicketContent && this.$refs.leftTicketContent.currentStepList[0]) {
-                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate)
-                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth)
+                this.hasNodeOptAuth = this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
+                this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
             }
             if (this.ticketInfo && this.ticketInfo.auth_actions) {
                 // 当前节点有权限不显示异常分派
-                this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth
+                this.isShowAssgin = this.ticketInfo.auth_actions.includes('ticket_management') && !this.hasNodeOptAuth;
             }
         },
-        beforeDestroy () {
-            this.clearTicketTimer()
+        beforeDestroy() {
+            this.clearTicketTimer();
         },
         methods: {
             // 同步数据，需等待 ticketInfo 返回
-            async initData () {
-                this.ticketId = this.$route.query.id
-                await this.getTicketDetailInfo()
+            async initData() {
+                this.ticketId = this.$route.query.id;
+                await this.getTicketDetailInfo();
                 if (this.ticketErrorMessage) {
-                    this.clearTicketTimer()
-                    return false
+                    this.clearTicketTimer();
+                    return false;
                 }
-                this.getTriggers()
-                await this.getNodeList()
-                this.getCurrTickeStatusColor()
-                this.initCurrentStepData()
-                this.initTicketTimer()
-                this.initComments()
+                this.getTriggers();
+                await this.getNodeList();
+                this.getCurrTickeStatusColor();
+                this.initCurrentStepData();
+                this.initTicketTimer();
+                this.initComments();
             },
-            handleClickShowSla () {
-                this.isShowSla = !this.isShowSla
+            handleClickShowSla() {
+                this.isShowSla = !this.isShowSla;
             },
-            viewSlaRule () {
+            viewSlaRule() {
                 this.$router.push({
                     name: 'slaAgreement',
                     query: {
                         project_id: this.$route.query.project_id || 0,
                     },
-                })
+                });
             },
-            async initComments () {
+            async initComments() {
                 try {
-                    this.commentLoading = true
+                    this.commentLoading = true;
                     // 获取root id
-                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { ticket_id: this.ticketId, show_type: '' })
-                    this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id
-                    this.commentList = await this.getComments(1, 10)
+                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { ticket_id: this.ticketId, show_type: '' });
+                    this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id;
+                    this.commentList = await this.getComments(1, 10);
                 } catch (e) {
-                    console.log(e)
+                    console.log(e);
                 } finally {
-                    this.commentLoading = false
+                    this.commentLoading = false;
                 }
             },
-            getBacicInfoStatus (val) {
-                this.basicStatus = val
+            getBacicInfoStatus(val) {
+                this.basicStatus = val;
             },
-            async getComments (page, page_size) {
-                this.commentLoading = true
-                const commentList = []
+            async getComments(page, page_size) {
+                this.commentLoading = true;
+                const commentList = [];
                 const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
                     ticket_id: this.ticketId,
                     show_type: this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
                     page,
                     page_size,
-                })
+                });
                 commmentRes.data.items.forEach((item, index) => {
                     if (item.parent__id !== this.commentId) {
-                        this.getReplyCommet(item.parent__id, index)
+                        this.getReplyCommet(item.parent__id, index);
                     }
-                })
-                this.commentCount = commmentRes.data.count
-                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size) || 1
-                commentList.push(...commmentRes.data.items)
-                commentList.sort((a, b) => b.id - a.id)
-                this.commentLoading = false
-                return commentList.filter(item => item.remark_type !== 'ROOT')
+                });
+                this.commentCount = commmentRes.data.count;
+                this.totalPages = Math.ceil((commmentRes.data.count - 1) / page_size) || 1;
+                commentList.push(...commmentRes.data.items);
+                commentList.sort((a, b) => b.id - a.id);
+                this.commentLoading = false;
+                return commentList.filter(item => item.remark_type !== 'ROOT');
             },
-            async getReplyCommet (id, index) {
+            async getReplyCommet(id, index) {
                 if (id) {
-                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id })
-                    this.$set(this.commentList[index], 'parent_creator', res.data.creator)
-                    this.$set(this.commentList[index], 'parent_content', res.data.content)
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id });
+                    this.$set(this.commentList[index], 'parent_creator', res.data.creator);
+                    this.$set(this.commentList[index], 'parent_content', res.data.content);
                 }
             },
-            async addTargetComment (curComment) {
+            async addTargetComment(curComment) {
                 if (this.commentId !== curComment.parent__id) {
-                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id: curComment.parent__id })
-                    this.commentList.push(res.data)
-                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment)
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id: curComment.parent__id });
+                    this.commentList.push(res.data);
+                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment);
                 }
             },
-            handleTicketScroll () {
-                if (this.totalPages === 1) return
+            handleTicketScroll() {
+                if (this.totalPages === 1) return;
                 if (!this.isPageOver && !this.isThrottled && this.$refs.leftTicketContent.stepActiveTab === 'allComments') {
-                    this.isThrottled = true
+                    this.isThrottled = true;
                     const timer = setTimeout(async () => {
-                        this.isThrottled = false
-                        const el = this.leftTicketDom
+                        this.isThrottled = false;
+                        const el = this.leftTicketDom;
                         if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
-                            this.moreLoading = true
-                            this.page += 1
-                            clearTimeout(timer)
-                            const result = await this.getComments(this.page, this.page_size)
-                            this.commentList.push(...result)
-                            this.isPageOver = this.page === this.totalPages
-                            this.moreLoading = false
+                            this.moreLoading = true;
+                            this.page += 1;
+                            clearTimeout(timer);
+                            const result = await this.getComments(this.page, this.page_size);
+                            this.commentList.push(...result);
+                            this.isPageOver = this.page === this.totalPages;
+                            this.moreLoading = false;
                         }
-                    }, 500)
+                    }, 500);
                 }
             },
-            async refreshComment () {
-                this.commentList = await this.getComments(1, this.curCommentLength + 1)
-                this.page = 1
+            async refreshComment() {
+                this.commentList = await this.getComments(1, this.curCommentLength + 1);
+                this.page = 1;
             },
-            getProtocolsList () {
+            getProtocolsList() {
                 const params = {
                     project_id: this.ticketInfo.project_key,
-                }
-                this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
-                    const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
-                    const slathreshold = curSlas.map(item => {
-                        const condition = item.action_policies.map(ite => {
-                            const obj = {}
-                            obj[ite.type] = ite.condition.expressions[0].value
-                            return obj
-                        })
+                };
+                this.$store.dispatch('slaManagement/getProtocolsList', params).then((res) => {
+                    const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name));
+                    const slathreshold = curSlas.map((item) => {
+                        const condition = item.action_policies.map((ite) => {
+                            const obj = {};
+                            obj[ite.type] = ite.condition.expressions[0].value;
+                            return obj;
+                        });
                         // 1 3 2 4
                         // type 1  2 为响应
                         // type 3  4 为处理
@@ -360,247 +360,247 @@
                             pWarningThreshold: condition[1][3] / 100 || 1,
                             rTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[2][2] / 100 : 1,
                             pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100,
-                        }
-                    })
-                    this.threshold = [...slathreshold]
-                })
+                        };
+                    });
+                    this.threshold = [...slathreshold];
+                });
             },
             // 展示完整流程
-            viewProcess (val) {
-                this.$refs.leftTicketContent.changeDialogStatus(val)
+            viewProcess(val) {
+                this.$refs.leftTicketContent.changeDialogStatus(val);
             },
             // 单据完成评价
-            ticketFinishAppraise () {
-                this.$refs.ticketHeader.onTicketBtnClick('comment')
+            ticketFinishAppraise() {
+                this.$refs.ticketHeader.onTicketBtnClick('comment');
             },
             // 是否需要循环
-            isNeedToLoop () {
-                const isNeedLoop = this.nodeList.some(item => {
+            isNeedToLoop() {
+                const isNeedLoop = this.nodeList.some((item) => {
                     // 标准运维任务节点为 RUNNING 状态时
                     if (['TASK', 'TASK-SOPS'].includes(item.type) && item.status === 'RUNNING') {
-                        return true
+                        return true;
                     }
                     // 排队状态
                     if (item.status === 'QUEUEING') {
-                        return true
+                        return true;
                     }
                     // 特殊场景，等待当前操作人处理任务
                     if (item.is_schedule_ready === false) {
-                        return true
+                        return true;
                     }
                     // 会签或审批节点提交后，当前处理人task 为 RUNNING|EXECUTED状态，则继续轮询 FINISHED
-                    const currUserDealTask = (item.tasks && item.tasks.find(task => {
-                        const splitName = task.processor.replace(/\((.?)\)/, '')
-                        return splitName === window.username
-                    })) || {}
+                    const currUserDealTask = (item.tasks && item.tasks.find((task) => {
+                        const splitName = task.processor.replace(/\((.?)\)/, '');
+                        return splitName === window.username;
+                    })) || {};
                     if (['SIGN', 'APPROVAL'].includes(item.type) && ['RUNNING', 'EXECUTED'].includes(currUserDealTask.status)) {
-                        return true
+                        return true;
                     }
-                    return false
-                })
-                return isNeedLoop
+                    return false;
+                });
+                return isNeedLoop;
             },
             // 判断当前状态是否需要轮询
-            initTicketTimer () {
+            initTicketTimer() {
                 this.ticketTimer = setInterval(() => {
-                    const isNeedLoop = this.isNeedToLoop()
+                    const isNeedLoop = this.isNeedToLoop();
                     if (isNeedLoop && this.ticketInfo.current_status !== 'FINISHED') {
-                        this.startTicketTimer()
+                        this.startTicketTimer();
                     } else {
-                        this.clearTicketTimer()
+                        this.clearTicketTimer();
                     }
-                }, 5000)
+                }, 5000);
             },
-            clearTicketTimer () {
-                clearInterval(this.ticketTimer)
-                this.ticketTimer = null
+            clearTicketTimer() {
+                clearInterval(this.ticketTimer);
+                this.ticketTimer = null;
             },
             // 开始循环
-            startTicketTimer () {
+            startTicketTimer() {
                 const params = {
                     id: this.ticketId,
                     token: this.token || undefined,
-                }
-                this.$store.dispatch('deployOrder/getNodeList', params).then(async res => {
-                    const newNodeList = res.data
-                    const oldNodeList = this.nodeList
-                    const nodeStatusHasUpdate = newNodeList.some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)))
+                };
+                this.$store.dispatch('deployOrder/getNodeList', params).then(async (res) => {
+                    const newNodeList = res.data;
+                    const oldNodeList = this.nodeList;
+                    const nodeStatusHasUpdate = newNodeList.some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)));
                     if (nodeStatusHasUpdate) {
                         // 节点状态有更新
-                        this.nodeList = newNodeList
-                        this.updateNodeList(newNodeList)
-                        this.getTriggers()
-                        await this.getTicketDetailInfo()
-                        this.initCurrentStepData()
-                        await this.getCurrTickeStatusColor()
+                        this.nodeList = newNodeList;
+                        this.updateNodeList(newNodeList);
+                        this.getTriggers();
+                        await this.getTicketDetailInfo();
+                        this.initCurrentStepData();
+                        await this.getCurrTickeStatusColor();
                     }
-                })
+                });
             },
             // 获取单据信息详情
-            async getTicketDetailInfo () {
-                this.loading.ticketLoading = true
+            async getTicketDetailInfo() {
+                this.loading.ticketLoading = true;
                 const params = {
                     id: this.ticketId,
                     token: this.token || undefined,
-                }
+                };
 
                 await this.$store.dispatch('change/getOrderDetails', params).then((res) => {
-                    this.ticketInfo = res.data
+                    this.ticketInfo = res.data;
                 })
                     .catch((res) => {
                         // 显示 404 页面
-                        this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]')
+                        this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]');
                     })
                     .finally(() => {
-                        this.loading.ticketLoading = false
-                    })
+                        this.loading.ticketLoading = false;
+                    });
             },
             // 获取单据节点的详情
-            getNodeList () {
-                this.loading.nodeInfoLoading = true
+            getNodeList() {
+                this.loading.nodeInfoLoading = true;
                 const params = {
                     id: this.ticketId,
                     token: this.token || undefined,
-                }
+                };
                 return this.$store.dispatch('deployOrder/getNodeList', params).then((res) => {
-                    this.updateNodeList(res.data)
+                    this.updateNodeList(res.data);
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading.nodeInfoLoading = false
-                    })
+                        this.loading.nodeInfoLoading = false;
+                    });
             },
             // 更新节点信息
-            updateNodeList (newNodeList) {
-                const copyList = deepClone(newNodeList)
+            updateNodeList(newNodeList) {
+                const copyList = deepClone(newNodeList);
                 if (this.openFunction.FIRST_STATE_SWITCH) {
-                    this.firstStateFields = copyList.find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields
-                    this.firstStateFields.forEach(item => {
-                        this.$set(item, 'showFeild', !!item.show_type)
-                        this.$set(item, 'val', (item.value || ''))
-                        this.conditionField(item, this.firstStateFields)
-                    })
+                    this.firstStateFields = copyList.find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields;
+                    this.firstStateFields.forEach((item) => {
+                        this.$set(item, 'showFeild', !!item.show_type);
+                        this.$set(item, 'val', (item.value || ''));
+                        this.conditionField(item, this.firstStateFields);
+                    });
                 }
-                copyList.forEach(item => {
+                copyList.forEach((item) => {
                     if (item.status === 'AUTO_SUCCESS') {
-                        item.status = 'FINISHED'
+                        item.status = 'FINISHED';
                     }
-                })
-                this.nodeList = copyList
-                this.$store.commit('deployOrder/setNodeList', this.nodeList)
-                this.initCurrentStepData()
+                });
+                this.nodeList = copyList;
+                this.$store.commit('deployOrder/setNodeList', this.nodeList);
+                this.initCurrentStepData();
             },
             // 获取当前单据状态颜色
-            getCurrTickeStatusColor () {
-                const status = this.ticketInfo.current_status
-                const type = this.ticketInfo.service_type
+            getCurrTickeStatusColor() {
+                const status = this.ticketInfo.current_status;
+                const type = this.ticketInfo.service_type;
 
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type }).then((res) => {
-                    const item = res.data.find(m => m.key === status)
-                    this.$set(this.headerInfo, 'statusColor', item ? item.color_hex : '')
-                })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
-            },
-            // 获取单据手动触发器
-            getTriggers () {
-                this.$store.dispatch('trigger/getTicketHandleTriggers', { id: this.ticketId }).then(res => {
-                    this.nodeTriggerList = res.data.filter(trigger => trigger.signal_type === 'STATE')
-                    this.ticketTriggerList = res.data.filter(trigger => trigger.signal_type === 'FLOW')
+                    const item = res.data.find(m => m.key === status);
+                    this.$set(this.headerInfo, 'statusColor', item ? item.color_hex : '');
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
+            },
+            // 获取单据手动触发器
+            getTriggers() {
+                this.$store.dispatch('trigger/getTicketHandleTriggers', { id: this.ticketId }).then((res) => {
+                    this.nodeTriggerList = res.data.filter(trigger => trigger.signal_type === 'STATE');
+                    this.ticketTriggerList = res.data.filter(trigger => trigger.signal_type === 'FLOW');
+                })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 初始化当前步骤列表信息
-            initCurrentStepData (diffNode) {
-                this.$refs.leftTicketContent && this.$refs.leftTicketContent.initCurrentStepData()
+            initCurrentStepData(diffNode) {
+                this.$refs.leftTicketContent && this.$refs.leftTicketContent.initCurrentStepData();
             },
             // 重新加载
-            reloadTicket () {
-                this.reload()
+            reloadTicket() {
+                this.reload();
             },
             // 按下拖拽线
-            handleLineMouseDown (e) {
-                document.addEventListener('mouseup', this.handleMouseUp, false)
-                document.addEventListener('mousemove', this.handleLineMouseMove, false)
+            handleLineMouseDown(e) {
+                document.addEventListener('mouseup', this.handleMouseUp, false);
+                document.addEventListener('mousemove', this.handleLineMouseMove, false);
 
-                const minTabWidth = document.querySelector('.ticket-container-right .bk-tab-header .bk-tab-label-wrapper .bk-tab-label-list').clientWidth
-                const currTabWidth = document.querySelector('.ticket-container-right .bk-tab-header').clientWidth
+                const minTabWidth = document.querySelector('.ticket-container-right .bk-tab-header .bk-tab-label-wrapper .bk-tab-label-list').clientWidth;
+                const currTabWidth = document.querySelector('.ticket-container-right .bk-tab-header').clientWidth;
                 if (!this.dragLine.maxLength) {
                     // 误差
-                    const offset = 4
-                    this.dragLine.maxLength = currTabWidth - minTabWidth - offset
+                    const offset = 4;
+                    this.dragLine.maxLength = currTabWidth - minTabWidth - offset;
                 }
-                this.dragLine.startX = e.pageX
-                this.dragLine.canMove = true
+                this.dragLine.startX = e.pageX;
+                this.dragLine.canMove = true;
             },
             // 鼠标弹起
-            handleMouseUp (e) {
-                document.removeEventListener('mouseup', this.handleMouseUp, false)
-                document.removeEventListener('mousemove', this.handleLineMouseMove, false)
-                this.dragLine.base = this.dragLine.move
-                this.dragLine.canMove = false
+            handleMouseUp(e) {
+                document.removeEventListener('mouseup', this.handleMouseUp, false);
+                document.removeEventListener('mousemove', this.handleLineMouseMove, false);
+                this.dragLine.base = this.dragLine.move;
+                this.dragLine.canMove = false;
             },
             // 拖拽分屏
-            handleLineMouseMove (e) {
+            handleLineMouseMove(e) {
                 if (!this.dragLine.canMove) {
-                    return
+                    return;
                 }
-                const el = document.getElementById('ticketContainerRight')
-                const { startX, base, maxLength } = this.dragLine
-                const offsetX = e.pageX - startX
-                const moveX = base + offsetX
+                const el = document.getElementById('ticketContainerRight');
+                const { startX, base, maxLength } = this.dragLine;
+                const offsetX = e.pageX - startX;
+                const moveX = base + offsetX;
                 // 正向超出可移动最大长度，隐藏右侧面板
                 if (offsetX > 0 && maxLength - moveX <= 0) {
-                    this.showRightTabs = false
-                    this.dragLine.move = maxLength
-                    el.style.display = 'none'
-                    return
+                    this.showRightTabs = false;
+                    this.dragLine.move = maxLength;
+                    el.style.display = 'none';
+                    return;
                 }
                 window.requestAnimationFrame(() => {
-                    this.dragLine.move = moveX
-                    el.style.width = `calc(320px - ${moveX}px)`
-                })
+                    this.dragLine.move = moveX;
+                    el.style.width = `calc(320px - ${moveX}px)`;
+                });
             },
-            onShowRightContent () {
-                this.showRightTabs = true
+            onShowRightContent() {
+                this.showRightTabs = true;
                 // 还原到最小宽度
                 this.$nextTick(() => {
-                    const el = document.getElementById('ticketContainerRight')
-                    el.style.width = `calc(320px - ${this.dragLine.base}px)`
-                })
+                    const el = document.getElementById('ticketContainerRight');
+                    el.style.width = `calc(320px - ${this.dragLine.base}px)`;
+                });
             },
-            getTicketNoticeInfo () {
+            getTicketNoticeInfo() {
                 this.$store.dispatch('deployOrder/getTicketNoticeInfo', {
                     params: { cache_key: this.$route.query.cache_key },
-                }).then(res => {
+                }).then((res) => {
                     if (res.data && res.data.is_processed) {
-                        this.noticeInfo = res.data
-                        this.isShowNoticeDialog = true
+                        this.noticeInfo = res.data;
+                        this.isShowNoticeDialog = true;
                     } else {
                         // 删除 url cache_key
-                        this.onNoticeConfirm()
+                        this.onNoticeConfirm();
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
             // 确认
-            onNoticeConfirm () {
-                const query = deepClone(this.$route.query)
-                delete query.cache_key
+            onNoticeConfirm() {
+                const query = deepClone(this.$route.query);
+                delete query.cache_key;
                 this.$router.replace({
                     name: this.$route.name,
                     query,
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

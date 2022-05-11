@@ -145,13 +145,13 @@
     </div>
 </template>
 <script>
-    import debounce from 'throttle-debounce/debounce'
-    import bus from '@/utils/bus.js'
-    import { errorHandler } from '@/utils/errorHandler'
+    import debounce from 'throttle-debounce/debounce';
+    import bus from '@/utils/bus.js';
+    import { errorHandler } from '@/utils/errorHandler';
 
     export default {
         name: 'ServiceList',
-        data () {
+        data() {
             return {
                 type: 'latest',
                 latestList: [],
@@ -165,141 +165,141 @@
                 collectedLoading: false,
                 allLoading: false,
                 serviceClassfyLoading: false,
-            }
+            };
         },
         computed: {
-            loading () {
-                return this.latestLoading || this.allLoading || this.serviceClassfyLoading
+            loading() {
+                return this.latestLoading || this.allLoading || this.serviceClassfyLoading;
             },
-            serviceList () {
+            serviceList() {
                 if (this.type === 'latest') {
-                    return this.latestList
+                    return this.latestList;
                 }
                 const list = this.serviceClassify.map(item => ({
                     name: item.key,
                     label: item.name,
                     data: [],
-                }))
-                this.allList.forEach(service => {
-                    const group = list.find(item => item.name === service.key)
-                    group.data.push(service)
-                })
+                }));
+                this.allList.forEach((service) => {
+                    const group = list.find(item => item.name === service.key);
+                    group.data.push(service);
+                });
 
-                return list
+                return list;
             },
         },
         watch: {
-            serviceList (val) {
-                this.activeClassify = val.length > 0 ? val[0].name : ''
+            serviceList(val) {
+                this.activeClassify = val.length > 0 ? val[0].name : '';
             },
         },
-        created () {
-            this.getLatestService()
-            this.getAllService()
-            this.getServiceClassify()
-            this.searchHandler = debounce(500, val => {
-                this.onServiceSearch(val)
-            })
+        created() {
+            this.getLatestService();
+            this.getAllService();
+            this.getServiceClassify();
+            this.searchHandler = debounce(500, (val) => {
+                this.onServiceSearch(val);
+            });
         },
         methods: {
             // 获取最近使用的服务
-            getLatestService () {
-                this.latestLoading = true
+            getLatestService() {
+                this.latestLoading = true;
                 Promise.all([
                     this.$store.dispatch('service/getServiceFavorites'),
                     this.$store.dispatch('service/getRecentlyFavorite'),
-                ]).then(data => {
-                    const favoriteList = data[0].data
-                    const recentlyList = data[1].data.filter(item => favoriteList.findIndex(fItem => fItem.id === item.id) === -1)
-                    const len = favoriteList.length
-                    this.latestList = len > 16 ? favoriteList.slice(0, 16) : favoriteList.concat(recentlyList.slice(0, 16 - len))
+                ]).then((data) => {
+                    const favoriteList = data[0].data;
+                    const recentlyList = data[1].data.filter(item => favoriteList.findIndex(fItem => fItem.id === item.id) === -1);
+                    const len = favoriteList.length;
+                    this.latestList = len > 16 ? favoriteList.slice(0, 16) : favoriteList.concat(recentlyList.slice(0, 16 - len));
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.latestLoading = false
-                    })
+                        this.latestLoading = false;
+                    });
             },
             // 获取所有服务
-            getAllService () {
-                this.allLoading = true
-                this.$store.dispatch('service/getServiceList').then(resp => {
+            getAllService() {
+                this.allLoading = true;
+                this.$store.dispatch('service/getServiceList').then((resp) => {
                     if (resp.result) {
-                        this.allList = resp.data
+                        this.allList = resp.data;
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.allLoading = false
-                    })
+                        this.allLoading = false;
+                    });
             },
             // 获取服务分类信息
-            getServiceClassify () {
-                this.serviceClassfyLoading = true
+            getServiceClassify() {
+                this.serviceClassfyLoading = true;
                 return this.$store.dispatch('getCustom').then((res) => {
-                    this.serviceClassify = res.data
+                    this.serviceClassify = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.serviceClassfyLoading = false
-                    })
+                        this.serviceClassfyLoading = false;
+                    });
             },
-            onTabChange (type) {
-                this.type = type
+            onTabChange(type) {
+                this.type = type;
                 if (type === 'latest') {
-                    this.getLatestService()
+                    this.getLatestService();
                 } else {
-                    this.getAllService()
+                    this.getAllService();
                 }
             },
-            onCreateTicket () {
-                bus.$emit('openCreateTicketDialog')
+            onCreateTicket() {
+                bus.$emit('openCreateTicketDialog');
             },
-            handleClickoutside () {
-                this.isSearchResultShow = false
+            handleClickoutside() {
+                this.isSearchResultShow = false;
             },
-            onServiceSearch (val) {
-                this.isSearchResultShow = true
+            onServiceSearch(val) {
+                this.isSearchResultShow = true;
 
                 if (val) {
-                    const list = []
-                    const reg = new RegExp(val, 'i')
-                    this.allList.forEach(item => {
+                    const list = [];
+                    const reg = new RegExp(val, 'i');
+                    this.allList.forEach((item) => {
                         if (reg.test(item.name) && list.length < 6) {
-                            const highlightName = item.name.replace(reg, `<span style="color: #3a84ff;">${val}</span>`)
-                            const serviceTypeName = this.serviceClassify.find(classify => classify.key === item.key).name
-                            list.push(Object.assign({}, item, { highlightName, serviceTypeName }))
+                            const highlightName = item.name.replace(reg, `<span style="color: #3a84ff;">${val}</span>`);
+                            const serviceTypeName = this.serviceClassify.find(classify => classify.key === item.key).name;
+                            list.push(Object.assign({}, item, { highlightName, serviceTypeName }));
                         }
-                    })
-                    this.searchResultList = list.sort((a, b) => a.name.length - b.name.length)
+                    });
+                    this.searchResultList = list.sort((a, b) => a.name.length - b.name.length);
                 } else {
-                    this.searchResultList = []
-                    this.isSearchResultShow = false
+                    this.searchResultList = [];
+                    this.isSearchResultShow = false;
                 }
             },
-            onCollectClick (service) {
-                const curStatus = service.favorite
+            onCollectClick(service) {
+                const curStatus = service.favorite;
                 this.$store.dispatch('service/toggleServiceFavorite', {
                     id: service.id,
                     favorite: !curStatus,
                 }).then((res) => {
                     if (res.result) {
-                        const serviceItem = this.allList.find(item => item.id === service.id)
-                        service.favorite = !curStatus // 修改当前数据的收藏状态
-                        this.$set(serviceItem, 'favorite', !curStatus) // 修改当前数据对应的源数据收藏状态
+                        const serviceItem = this.allList.find(item => item.id === service.id);
+                        service.favorite = !curStatus; // 修改当前数据的收藏状态
+                        this.$set(serviceItem, 'favorite', !curStatus); // 修改当前数据对应的源数据收藏状态
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
-            onSelectService (service) {
-                const { id } = service
+            onSelectService(service) {
+                const { id } = service;
                 const routerObj = this.$router.resolve({
                     name: 'CreateTicket',
                     query: {
@@ -307,14 +307,14 @@
                         // project_id: service.project_key, // 首页提单不需要项目ID
                         from: 'Home',
                     },
-                })
-                window.open(routerObj.href, '_blank')
+                });
+                window.open(routerObj.href, '_blank');
             },
-            toggleFold () {
-                this.activeFold = !this.activeFold
+            toggleFold() {
+                this.activeFold = !this.activeFold;
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .service-list-section {

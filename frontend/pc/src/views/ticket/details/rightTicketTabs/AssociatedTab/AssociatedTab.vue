@@ -126,8 +126,8 @@
 </template>
 
 <script>
-    import AssociatedDialog from './AssociatedDialog.vue'
-    import { errorHandler } from '@/utils/errorHandler.js'
+    import AssociatedDialog from './AssociatedDialog.vue';
+    import { errorHandler } from '@/utils/errorHandler.js';
     export default {
         name: 'AssociatedTab',
         components: {
@@ -139,7 +139,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 loading: false,
                 isShowAddAssociation: false,
@@ -154,35 +154,35 @@
                 },
                 historyList: [],
                 associatedList: [],
-            }
+            };
         },
-        created () {
+        created() {
 
         },
-        mounted () {
-            this.getAssociates()
-            this.getAssociatesHistory()
+        mounted() {
+            this.getAssociates();
+            this.getAssociatesHistory();
         },
         methods: {
-            async getAssociates () {
+            async getAssociates() {
                 const params = {
                     id: this.ticketInfo.id,
-                }
-                this.loading = true
+                };
+                this.loading = true;
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
                 await this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
-                    this.associatedList = res.data
+                    this.associatedList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
             },
-            closeSideslider () {
+            closeSideslider() {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m["内容未保存，离开将取消操作！"]'),
@@ -193,85 +193,85 @@
                         // } else {
                         //     this.$refs.associated.setFields()
                         // }
-                        this.isShowAddAssociation = false
+                        this.isShowAddAssociation = false;
                     },
                     cancelFn: () => {
-                        this.isShowAddAssociation = true
+                        this.isShowAddAssociation = true;
                     },
-                })
+                });
             },
             // 获取关联历史
-            getAssociatesHistory () {
+            getAssociatesHistory() {
                 const params = {
                     id: this.ticketInfo.id,
                     type: 'DERIVE',
-                }
-                this.$store.dispatch('change/getBindHistory', params).then(res => {
-                    this.historyList = res.data
+                };
+                this.$store.dispatch('change/getBindHistory', params).then((res) => {
+                    this.historyList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            openAddAssociation () {
-                this.isShowAddAssociation = true
+            openAddAssociation() {
+                this.isShowAddAssociation = true;
             },
-            showHistory () {
+            showHistory() {
                 if (!this.historyList.length) {
-                    return
+                    return;
                 }
-                this.historyInfo.isShow = true
+                this.historyInfo.isShow = true;
             },
-            closeHistory () {
-                this.historyInfo.isShow = false
+            closeHistory() {
+                this.historyInfo.isShow = false;
             },
-            checkOne (rowData) {
+            checkOne(rowData) {
                 const routeUrl = this.$router.resolve({
                     name: 'TicketDetail',
                     query: {
                         id: `${rowData.id}`,
                         from: this.$route.query.from,
                     },
-                })
-                window.open(routeUrl.href, '_blank')
+                });
+                window.open(routeUrl.href, '_blank');
             },
             // 取消关联
-            unBindDialogShow (item) {
+            unBindDialogShow(item) {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.manageCommon["确认取消关联？"]'),
                     subTitle: this.$t('m.manageCommon["取消关联后，无法查看之间的关联信息"]'),
                     confirmFn: () => {
-                        this.unBind(item)
+                        this.unBind(item);
                     },
-                })
+                });
             },
-            async unBind (item) {
+            async unBind(item) {
                 const params = {
                     from_ticket: this.ticketInfo.id,
                     to_ticket: item.id,
-                }
+                };
                 await this.$store.dispatch('change/unbindTicket', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.manageCommon["取消关联成功"]'),
                         theme: 'success',
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.getAssociates()
-                        this.getAssociatesHistory()
-                    })
+                        this.getAssociates();
+                        this.getAssociatesHistory();
+                    });
             },
-            submitSuccess () {
-                this.isShowAddAssociation = false
-                this.getAssociates()
-                this.getAssociatesHistory()
+            submitSuccess() {
+                this.isShowAddAssociation = false;
+                this.getAssociates();
+                this.getAssociatesHistory();
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 

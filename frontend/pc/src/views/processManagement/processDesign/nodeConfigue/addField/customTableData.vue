@@ -68,12 +68,12 @@
         props: {
             customTableInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 typeList: [
                     { id: 'input', name: this.$t('m.treeinfo["输入框"]') },
@@ -84,34 +84,34 @@
                 ],
                 trueStatus: true,
                 falseStatus: false,
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        mounted () {
-            
+        mounted() {
+
         },
         methods: {
-            addTableData (item, index) {
+            addTableData(item, index) {
                 const valueInfo = {
                     name: '',
                     display: 'input',
                     choice: '',
                     required: false,
-                }
-                this.customTableInfo.list.splice(index + 1, 0, valueInfo)
+                };
+                this.customTableInfo.list.splice(index + 1, 0, valueInfo);
             },
-            reduceTableData (item, index) {
+            reduceTableData(item, index) {
                 if (this.customTableInfo.list.length === 1) {
-                    return
+                    return;
                 }
-                this.customTableInfo.list.splice(index, 1)
+                this.customTableInfo.list.splice(index, 1);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

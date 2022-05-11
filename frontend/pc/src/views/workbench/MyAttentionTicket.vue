@@ -27,8 +27,8 @@
     </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import AttentionList from '../ticket/AttentionList'
+    import NavTitle from '@/components/common/layout/NavTitle';
+    import AttentionList from '../ticket/AttentionList';
 
     export default {
         name: 'MyAttentionTicket',
@@ -36,5 +36,5 @@
             NavTitle,
             AttentionList,
         },
-    }
+    };
 </script>

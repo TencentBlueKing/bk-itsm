@@ -80,9 +80,9 @@
     </div>
 </template>
 <script>
-    import memberSelect from '../../../commonComponent/memberSelect'
-    import { mapState } from 'vuex'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import memberSelect from '../../../commonComponent/memberSelect';
+    import { mapState } from 'vuex';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         name: 'triggerFields',
@@ -92,117 +92,117 @@
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 keyList: [],
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
             ...mapState('trigger', {
                 triggerVariables: state => state.triggerVariables,
             }),
         },
         watch: {
-            triggerVariables (newVal) {
-                this.keyList = newVal
+            triggerVariables(newVal) {
+                this.keyList = newVal;
             },
         },
-        created () {
+        created() {
             // 当存在值的时候，初始化拉取数据
             if (this.item.value) {
-                this.keyList = this.triggerVariables
-                this.getConditionList()
+                this.keyList = this.triggerVariables;
+                this.getConditionList();
             }
         },
         methods: {
             // 根据条件的不同，填充不同的conditionList数据
-            getConditionList () {
+            getConditionList() {
                 // 获取选中的项
-                const checkItem = this.keyList.filter(item => item.key === this.item.key)[0]
-                const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX']
+                const checkItem = this.keyList.filter(item => item.key === this.item.key)[0];
+                const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX'];
                 if (typeList.some(item => item === checkItem.type)) {
                     // 数据字典
-                    this.$set(this.item, 'loading', true)
-                    this.$set(this.item, 'options', [])
+                    this.$set(this.item, 'loading', true);
+                    this.$set(this.item, 'options', []);
                     if (checkItem.source_type === 'DATADICT') {
                         this.$store.dispatch('datadict/get_data_by_key', {
                             key: checkItem.source_uri,
                             field_key: checkItem.key,
-                        }).then(res => {
-                            this.item.options = res.data.map(ite => {
+                        }).then((res) => {
+                            this.item.options = res.data.map((ite) => {
                                 const temp = {
                                     key: ite.key,
                                     name: ite.name,
-                                }
-                                return temp
-                            })
+                                };
+                                return temp;
+                            });
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.item.loading = false
-                            })
+                                this.item.loading = false;
+                            });
                     } else if (checkItem.source_type === 'API') {
                         this.$store.dispatch('apiRemote/get_data_workflow', {
                             kv_relation: checkItem.kv_relation,
                             api_instance_id: checkItem.api_instance_id,
-                        }).then(res => {
-                            this.item.options = res.data.map(ite => {
+                        }).then((res) => {
+                            this.item.options = res.data.map((ite) => {
                                 const temp = {
                                     key: ite.key,
                                     name: ite.name,
-                                }
-                                return temp
-                            })
+                                };
+                                return temp;
+                            });
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.item.loading = false
-                            })
+                                this.item.loading = false;
+                            });
                     } else if (checkItem.source_type === 'RPC') {
                         this.$store.dispatch('apiRemote/getRpcData', {
                             meta: checkItem.meta,
                             source_uri: checkItem.source_uri,
-                        }).then(res => {
-                            this.item.options = res.data.map(ite => {
+                        }).then((res) => {
+                            this.item.options = res.data.map((ite) => {
                                 const temp = {
                                     key: ite.key,
                                     name: ite.name,
-                                }
-                                return temp
-                            })
+                                };
+                                return temp;
+                            });
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.item.loading = false
-                            })
+                                this.item.loading = false;
+                            });
                     } else {
-                        this.item.options = checkItem.choice.map(ite => {
+                        this.item.options = checkItem.choice.map((ite) => {
                             const temp = {
                                 key: ite.key,
                                 name: ite.name,
-                            }
-                            return temp
-                        })
-                        this.item.loading = false
+                            };
+                            return temp;
+                        });
+                        this.item.loading = false;
                     }
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

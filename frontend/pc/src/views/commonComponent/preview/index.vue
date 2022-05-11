@@ -54,9 +54,9 @@
     </div>
 </template>
 <script>
-    import JsFlow from '@/assets/jsflow'
-    import NodeTemplate from './NodeTemplate.vue'
-    import toolPanel from './toolPanel.vue'
+    import JsFlow from '@/assets/jsflow';
+    import NodeTemplate from './NodeTemplate.vue';
+    import toolPanel from './toolPanel.vue';
 
     const endpointOptions = {
         endpoint: 'Dot',
@@ -72,17 +72,17 @@
         isSource: true, // 端点是否可以作为拖动源
         isTarget: true, // 端点是否可以作为拖动目标
         maxConnections: -1,
-    }
+    };
     const nodeOptions = {
         grid: [5, 5],
-    }
+    };
     const connectorOptions = {
         paintStyle: { fill: 'transparent', stroke: '#a9adb6', strokeWidth: 1 },
         hoverPaintStyle: { fill: 'transparent', stroke: '#3a84ff', strokeWidth: 2 },
         cssClass: 'bk-sops-connector',
         hoverClass: 'bk-sops-connector-hover',
         detachable: true, // 是否可以通过鼠标拖动连线
-    }
+    };
     export default {
         components: {
             JsFlow,
@@ -92,26 +92,26 @@
         props: {
             addList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             lineList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             previewInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             fullStatus: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             normalColor: {
@@ -119,7 +119,7 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 endpointOptions,
                 connectorOptions,
@@ -132,27 +132,27 @@
                 // 放大缩小极限
                 toolLimit: 4,
                 currentNode: {},
-            }
+            };
         },
         computed: {
-            nodeStatus () {
-                return this.$store.state.deployCommon.nodeStatus
+            nodeStatus() {
+                return this.$store.state.deployCommon.nodeStatus;
             },
         },
-        created () {
-            this.initDate()
+        created() {
+            this.initDate();
         },
-        mounted () {
-            this.addLineOverlay()
+        mounted() {
+            this.addLineOverlay();
             // window.addEventListener('mousewheel', this.handleScroll, false)
-            this.$refs.previewFlow.zoomOut(this.previewInfo.narrowSize)
+            this.$refs.previewFlow.zoomOut(this.previewInfo.narrowSize);
         },
         methods: {
             // 初始化数据
-            initDate () {
+            initDate() {
                 this.addList.forEach((item, index) => {
-                    const xValue = item.axis.x ? item.axis.x : (165 + index * 250)
-                    const yValue = item.axis.y ? item.axis.y : (195 + (index % 2 === 1 ? 5 : 0))
+                    const xValue = item.axis.x ? item.axis.x : (165 + index * 250);
+                    const yValue = item.axis.y ? item.axis.y : (195 + (index % 2 === 1 ? 5 : 0));
                     this.canvasData.nodes.push({
                         id: `node_${item.id}`,
                         x: xValue,
@@ -161,9 +161,9 @@
                         name: item.name,
                         showMore: false,
                         nodeInfo: item,
-                    })
-                    this.$set(this.nodeInfo, `node_${item.id}`, item)
-                })
+                    });
+                    this.$set(this.nodeInfo, `node_${item.id}`, item);
+                });
                 this.lineList.forEach((item, index) => {
                     this.canvasData.lines.push({
                         source: {
@@ -182,19 +182,19 @@
                                 strokeWidth: 1,
                             },
                         },
-                    })
-                })
+                    });
+                });
             },
             // 修改数据状态
-            changeDataStatus () {
+            changeDataStatus() {
                 // 更新节点的颜色
-                this.canvasData.nodes.forEach(item => {
-                    this.addList.forEach(node => {
+                this.canvasData.nodes.forEach((item) => {
+                    this.addList.forEach((node) => {
                         if (item.nodeInfo.id === node.id) {
-                            item.nodeInfo = node
+                            item.nodeInfo = node;
                         }
-                    })
-                })
+                    });
+                });
                 // 更新线条的颜色
                 // this.canvasData.lines.forEach(item => {
                 //     this.lineList.forEach(node => {
@@ -246,67 +246,67 @@
                 // })
             },
             // 注册线条的Lable
-            addLineOverlay () {
-                this.canvasData.lines.forEach(item => {
+            addLineOverlay() {
+                this.canvasData.lines.forEach((item) => {
                     const value = {
                         id: `label_${item.lineInfo.id}`,
                         type: 'Label',
                         name: `<span class="bk-label-test-name">${item.lineInfo.name || this.$t('m.treeinfo["默认"]')}</span>`,
                         cls: 'label-test',
                         location: 0.5,
-                    }
+                    };
                     if ((item.lineInfo.name !== '默认' && item.lineInfo.name !== 'Default') && item.lineInfo.name) {
-                        this.$refs.previewFlow.addLineOverlay(item, value)
+                        this.$refs.previewFlow.addLineOverlay(item, value);
                     }
-                })
+                });
             },
             // 画布操作
-            onZoomIn () {
+            onZoomIn() {
                 if (this.toolLimit > 9) {
-                    return
+                    return;
                 }
-                this.toolLimit += 1
+                this.toolLimit += 1;
                 if (this.$refs.previewFlow) {
-                    this.$refs.previewFlow.zoomIn()
+                    this.$refs.previewFlow.zoomIn();
                 }
             },
-            onZoomOut () {
+            onZoomOut() {
                 if (this.toolLimit === 0) {
-                    return
+                    return;
                 }
-                this.toolLimit -= 1
+                this.toolLimit -= 1;
                 if (this.$refs.previewFlow) {
-                    this.$refs.previewFlow.zoomOut()
+                    this.$refs.previewFlow.zoomOut();
                 }
             },
-            onResetPosition () {
-                this.$refs.jsFlow.resetPosition()
+            onResetPosition() {
+                this.$refs.jsFlow.resetPosition();
             },
             // 鼠标滚轮事件
-            handleScroll (e) {
+            handleScroll(e) {
                 if (e.deltaY > 0) {
-                    this.onZoomOut()
+                    this.onZoomOut();
                 } else {
-                    this.onZoomIn()
+                    this.onZoomIn();
                 }
             },
             // 点击节点操作
-            clickNodeInfo (node) {
+            clickNodeInfo(node) {
                 if (!this.previewInfo.canClick) {
-                    return
+                    return;
                 }
-                this.$parent.openNodeContent(node)
+                this.$parent.openNodeContent(node);
             },
-            submitNodeValue (node) {
-                this.currentNode = node
+            submitNodeValue(node) {
+                this.currentNode = node;
             },
-            onNodeMoveStop (node, event) {
+            onNodeMoveStop(node, event) {
                 if (node.x === this.currentNode.x && node.y === this.currentNode.y) {
-                    this.$parent.openNodeContent(node)
+                    this.$parent.openNodeContent(node);
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

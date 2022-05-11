@@ -157,8 +157,8 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    import addDataDirectory from './component/addDataDirectory.vue'
+    import { errorHandler } from '../../utils/errorHandler';
+    import addDataDirectory from './component/addDataDirectory.vue';
 
     export default {
         name: 'dataDictionary',
@@ -166,7 +166,7 @@
             addDataDirectory,
         },
         props: {},
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 secondClick: false,
@@ -192,134 +192,135 @@
                 },
                 // 侧边栏数据
                 slideData: {},
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
         watch: {},
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
             // 获取列表数据
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 // 重新获取数据时清空选中的数据
-                this.checkList = []
+                this.checkList = [];
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     key__contains: this.searchInfo.key,
-                }
-                this.isDataLoading = true
+                };
+                this.isDataLoading = true;
                 this.$store.dispatch('datadict/list', params).then((res) => {
-                    this.dataList = res.data.items.map(item => ({ ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] }))
+                    this.dataList = res.data.items.map(item => ({ ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] }));
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 }, (res) => {
-                    errorHandler(res, this)
+                    errorHandler(res, this);
                 })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection) {
+                this.checkList = selection;
             },
-            disabledFn (item, index) {
-                return !item.is_builtin
+            disabledFn(item) {
+                return !item.is_builtin;
             },
             // 删除数据
-            deleteData (item) {
+            deleteData(item) {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.systemConfig["确认删除此数据字典？"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('datadict/delete', id).then((res) => {
+                        this.secondClick = true;
+                        this.$store.dispatch('datadict/delete', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                                this.pagination.current = this.pagination.current === 1
+                                    ? 1 : this.pagination.current - 1;
                             }
-                            this.getList()
+                            this.getList();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
-            deleteAll () {
+            deleteAll() {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.systemConfig["确认删除此数据字典？"]'),
                     confirmFn: () => {
-                        const id = this.checkList.map(item => item.id).join(',')
+                        const id = this.checkList.map(item => item.id).join(',');
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('datadict/batchDelete', { id }).then((res) => {
+                        this.secondClick = true;
+                        this.$store.dispatch('datadict/batchDelete', { id }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getList(1)
+                            });
+                            this.getList(1);
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
             // 新增字典
-            openAddData (item) {
-                this.slideData = item
-                this.customSettings.title = item.id ? this.$t('m.systemConfig["编辑字典"]') : this.$t('m.systemConfig["新增字典"]')
-                this.customSettings.isShow = true
+            openAddData(item) {
+                this.slideData = item;
+                this.customSettings.title = item.id ? this.$t('m.systemConfig["编辑字典"]') : this.$t('m.systemConfig["新增字典"]');
+                this.customSettings.isShow = true;
             },
-            closeAddData () {
-                this.customSettings.isShow = false
+            closeAddData() {
+                this.customSettings.isShow = false;
             },
             // 关闭版本提示信息
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

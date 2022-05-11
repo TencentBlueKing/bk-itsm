@@ -47,25 +47,25 @@
 </template>
 
 <script>
-    import FullScreen from '../../common/FullScreen.vue'
-    import { appendTargetAttrToHtml } from '../../../utils/util'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import FullScreen from '../../common/FullScreen.vue';
+    import { appendTargetAttrToHtml } from '../../../utils/util';
+    import { errorHandler } from '../../../utils/errorHandler';
     // 基础样式
-    import 'codemirror/lib/codemirror.css'
-    import '@toast-ui/editor/dist/toastui-editor.css'
-    import '@toast-ui/editor/dist/toastui-editor-viewer.css'
+    import 'codemirror/lib/codemirror.css';
+    import '@toast-ui/editor/dist/toastui-editor.css';
+    import '@toast-ui/editor/dist/toastui-editor-viewer.css';
     // 代码高亮
-    import 'highlight.js/styles/github.css'
-    import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight'
-    import hljs from 'highlight.js'
-    import { Editor, Viewer } from '@toast-ui/vue-editor'
+    import 'highlight.js/styles/github.css';
+    import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
+    import hljs from 'highlight.js';
+    import { Editor, Viewer } from '@toast-ui/vue-editor';
     // 国际化
-    import '@toast-ui/editor/dist/i18n/zh-cn.js'
+    import '@toast-ui/editor/dist/i18n/zh-cn.js';
     // 需要代码高亮的语言
-    const codelanguage = ['javascript', 'java', 'python', 'shell', 'powershell', 'markdown']
-    codelanguage.forEach(item => {
-        hljs.registerLanguage(item, require(`highlight.js/lib/languages/${item}`))
-    })
+    const codelanguage = ['javascript', 'java', 'python', 'shell', 'powershell', 'markdown'];
+    codelanguage.forEach((item) => {
+        hljs.registerLanguage(item, require(`highlight.js/lib/languages/${item}`));
+    });
     export default {
         name: 'RichTextEditor',
         components: {
@@ -100,7 +100,7 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 isFull: false,
                 height: 250,
@@ -111,66 +111,66 @@
                     language: 'zh-CN',
                     plugins: [[codeSyntaxHighlight, { hljs }]],
                 },
-            }
+            };
         },
         watch: {
-            'value' (val) {
-                const editor = this.$refs.toastuiEditor && this.$refs.toastuiEditor.editor
-                editor && editor.setHtml(val, true)
+            'value'(val) {
+                const editor = this.$refs.toastuiEditor && this.$refs.toastuiEditor.editor;
+                editor && editor.setHtml(val, true);
             },
         },
-        mounted () {
-            window.addEventListener('resize', this.handleScreenChange)
+        mounted() {
+            window.addEventListener('resize', this.handleScreenChange);
         },
-        beforeDestroy () {
-            window.removeEventListener('resize', this.handleScreenChange)
+        beforeDestroy() {
+            window.removeEventListener('resize', this.handleScreenChange);
         },
         methods: {
-            getHtml () {
-                return this.$refs.toastuiEditor.invoke('getHtml')
+            getHtml() {
+                return this.$refs.toastuiEditor.invoke('getHtml');
             },
             /**
              * 修改 toastui-editor 模式栏默认样式
              */
-            onEditorLoad () {
+            onEditorLoad() {
                 try {
-                    const rootEl = this.$refs.toastuiEditor.getRootElement()
-                    const modeBarEl = rootEl.querySelector('.te-mode-switch-section')
-                    modeBarEl.classList.add('cus-change-mode')
-                    modeBarEl.querySelector('.te-switch-button.markdown').innerText = this.$t('m.common["Markdown模式"]')
-                    modeBarEl.querySelector('.te-switch-button.wysiwyg').innerText = this.$t('m.common["富文本模式"]')
+                    const rootEl = this.$refs.toastuiEditor.getRootElement();
+                    const modeBarEl = rootEl.querySelector('.te-mode-switch-section');
+                    modeBarEl.classList.add('cus-change-mode');
+                    modeBarEl.querySelector('.te-switch-button.markdown').innerText = this.$t('m.common["Markdown模式"]');
+                    modeBarEl.querySelector('.te-switch-button.wysiwyg').innerText = this.$t('m.common["富文本模式"]');
                 } catch (err) {
-                    errorHandler(err)
+                    errorHandler(err);
                 }
             },
-            onEditorBlur () {
-                const value = this.getHtml()
+            onEditorBlur() {
+                const value = this.getHtml();
                 // 匹配 html 字符串中 a 标签是否有 target 属性，没有则加上 target="_blank"
-                const replaceValue = appendTargetAttrToHtml(value)
-                this.$emit('change', replaceValue)
+                const replaceValue = appendTargetAttrToHtml(value);
+                this.$emit('change', replaceValue);
             },
-            setHeight (height) {
-                this.height = height
+            setHeight(height) {
+                this.height = height;
             },
-            getFullScreenContentHeight () {
-                return document.body.clientHeight - 50
+            getFullScreenContentHeight() {
+                return document.body.clientHeight - 50;
             },
-            handleScreenChange () {
+            handleScreenChange() {
                 if (this.isFull) {
-                    const height = this.getFullScreenContentHeight()
-                    this.setHeight(height)
+                    const height = this.getFullScreenContentHeight();
+                    this.setHeight(height);
                 }
             },
-            openFullScreen () {
-                this.isFull = true
-                this.handleScreenChange()
+            openFullScreen() {
+                this.isFull = true;
+                this.handleScreenChange();
             },
-            closeFullSreen () {
-                this.isFull = false
-                this.setHeight(250)
+            closeFullSreen() {
+                this.isFull = false;
+                this.setHeight(250);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

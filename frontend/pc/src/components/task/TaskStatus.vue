@@ -40,21 +40,21 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 info: '',
-            }
+            };
         },
         watch: {
-            status () {
-                this.getStatusInfo()
+            status() {
+                this.getStatusInfo();
             },
         },
-        created () {
-            this.getStatusInfo()
+        created() {
+            this.getStatusInfo();
         },
         methods: {
-            getStatusInfo () {
+            getStatusInfo() {
                 const statusMap = {
                     RUNNING: {
                         cls: 'running',
@@ -71,11 +71,11 @@
                         icon: 'bk-itsm-icon icon-itsm-icon-square-one',
                         text: this.$t('m.task["执行失败"]'),
                     },
-                }
-                this.info = statusMap[this.status] || ''
+                };
+                this.info = statusMap[this.status] || '';
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

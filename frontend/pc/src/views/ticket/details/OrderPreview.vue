@@ -90,10 +90,10 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import preview from '../../commonComponent/preview'
-    import NodeInfo from './nodeInfo/index.vue'
-    import { errorHandler } from '@/utils/errorHandler'
+    import axios from 'axios';
+    import preview from '../../commonComponent/preview';
+    import NodeInfo from './nodeInfo/index.vue';
+    import { errorHandler } from '@/utils/errorHandler';
 
     export default {
         name: 'OrderPreview',
@@ -105,30 +105,30 @@
             // 单据信息
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             nodeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             currentStepList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             loadingInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 clickSecond: false,
                 addList: [],
@@ -150,53 +150,53 @@
                 openNodeInfo: {},
                 nodeInfo: [],
                 isNodeLoading: true,
-            }
+            };
         },
         computed: {},
         watch: {
-            'basicInfomation.id' () {
-                this.getFlowInfo()
+            'basicInfomation.id'() {
+                this.getFlowInfo();
             },
         },
-        mounted () {
-            this.getFlowInfo()
+        mounted() {
+            this.getFlowInfo();
             // 轮询单据详情的数据
-            clearInterval(this.$store.state.deployOrder.intervalInfo.lines)
+            clearInterval(this.$store.state.deployOrder.intervalInfo.lines);
             this.$store.state.deployOrder.intervalInfo.lines = setInterval(() => {
-                this.intervalLines()
-            }, 2000)
+                this.intervalLines();
+            }, 2000);
         },
         methods: {
-            initInfo () {
-                this.$emit('reloadTicket')
+            initInfo() {
+                this.$emit('reloadTicket');
             },
             // 获取流程图数据
-            getFlowInfo () {
-                this.isDataLoading = true
-                const id = this.basicInfomation.flow_id
+            getFlowInfo() {
+                this.isDataLoading = true;
+                const id = this.basicInfomation.flow_id;
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
                     this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data
+                    this.addList = userResp.data;
                     this.addList.forEach((item, index) => {
-                        this.$set(item, 'indexInfo', index)
-                        this.$set(item, 'statusInfo', 'WAIT')
-                        this.nodeList.forEach(node => {
+                        this.$set(item, 'indexInfo', index);
+                        this.$set(item, 'statusInfo', 'WAIT');
+                        this.nodeList.forEach((node) => {
                             if (item.id === node.state_id) {
-                                item.statusInfo = node.status
+                                item.statusInfo = node.status;
                             }
-                        })
-                    })
-                    this.lineList = reposResp.data.items
-                    this.setLineStatus()
+                        });
+                    });
+                    this.lineList = reposResp.data.items;
+                    this.setLineStatus();
                 }))
                     .catch((res) => {
-                        console.log(res)
+                        console.log(res);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             /**
              * 设置线状态
@@ -204,82 +204,82 @@
              * 中间的线通过节点上的 from_transition_id 判断
              * 最后连接结束节点的线通过 last_transition_id 判断
              */
-            setLineStatus () {
-                const startNodeId = this.addList.find(node => node.type === 'START').id
-                this.lineList.forEach(line => {
+            setLineStatus() {
+                const startNodeId = this.addList.find(node => node.type === 'START').id;
+                this.lineList.forEach((line) => {
                     if (this.nodeList.find(node => Number(node.from_transition_id) === line.id)) {
-                        line.lineStatus = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS';
                     }
                     if (line.id === Number(this.basicInfomation.last_transition_id)) {
-                        line.lineStatus = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS';
                     }
                     if (line.from_state === startNodeId) {
-                        line.lineStatus = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS';
                     }
-                })
+                });
             },
             // 轮询线条颜色数据
-            intervalLines () {
+            intervalLines() {
                 this.addList.forEach((item, index) => {
-                    this.$set(item, 'indexInfo', index)
-                    this.$set(item, 'statusInfo', 'WAIT')
-                    this.nodeList.forEach(node => {
+                    this.$set(item, 'indexInfo', index);
+                    this.$set(item, 'statusInfo', 'WAIT');
+                    this.nodeList.forEach((node) => {
                         if (item.id === node.state_id) {
-                            item.statusInfo = node.status
+                            item.statusInfo = node.status;
                         }
-                    })
-                })
+                    });
+                });
                 if (this.$refs.preview) {
-                    this.$refs.preview.changeDataStatus()
+                    this.$refs.preview.changeDataStatus();
                 }
             },
             // 显示和关闭预览图全屏
-            openFull () {
-                this.previewInfo.narrowSize = 1.1
-                this.fullStatus = true
+            openFull() {
+                this.previewInfo.narrowSize = 1.1;
+                this.fullStatus = true;
             },
-            closeFull () {
-                this.previewInfo.narrowSize = 0.7
-                this.fullStatus = false
+            closeFull() {
+                this.previewInfo.narrowSize = 0.7;
+                this.fullStatus = false;
             },
             // 右侧弹窗动作
-            openNodeContent (node) {
+            openNodeContent(node) {
                 // 未执行的节点禁止查看
                 if (node.nodeInfo.statusInfo === 'WAIT') {
-                    return
+                    return;
                 }
-                this.isNodeLoading = true
-                this.openNodeInfo = node.nodeInfo
-                this.nodeContent.isShow = true
-                this.nodeContent.title = node.nodeInfo.name
-                this.getTicketNodeInfo(node)
+                this.isNodeLoading = true;
+                this.openNodeInfo = node.nodeInfo;
+                this.nodeContent.isShow = true;
+                this.nodeContent.title = node.nodeInfo.name;
+                this.getTicketNodeInfo(node);
             },
-            closeNodeContent () {
-                this.nodeContent.isShow = false
+            closeNodeContent() {
+                this.nodeContent.isShow = false;
             },
-            getTicketNodeInfo (node) {
-                const { id } = this.basicInfomation
+            getTicketNodeInfo(node) {
+                const { id } = this.basicInfomation;
                 const params = {
                     state_id: node.nodeInfo.id,
-                }
+                };
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
-                this.clickSecond = false
+                this.clickSecond = false;
                 this.$store.dispatch('deployOrder/getTicketNodeInfo', { params, id }).then((res) => {
-                    this.nodeInfo = [res.data]
-                    this.nodeContent.quick = (res.data.status === 'FINISHED' || !res.data.can_operate)
+                    this.nodeInfo = [res.data];
+                    this.nodeContent.quick = (res.data.status === 'FINISHED' || !res.data.can_operate);
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isNodeLoading = false
-                        this.clickSecond = false
-                    })
+                        this.isNodeLoading = false;
+                        this.clickSecond = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

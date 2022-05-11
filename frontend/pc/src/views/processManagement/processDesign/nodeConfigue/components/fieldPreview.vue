@@ -38,28 +38,28 @@
     </div>
 </template>
 <script>
-    import string from '../../../../commonComponent/fieldComponent/string.vue'
-    import link from '../../../../commonComponent/fieldComponent/link'
-    import int from '../../../../commonComponent/fieldComponent/int.vue'
-    import text from '../../../../commonComponent/fieldComponent/text.vue'
-    import checkbox from '../../../../commonComponent/fieldComponent/checkbox.vue'
-    import radio from '../../../../commonComponent/fieldComponent/radio.vue'
-    import select from '../../../../commonComponent/fieldComponent/select.vue'
-    import inputSelect from '../../../../commonComponent/fieldComponent/inputSelect'
-    import multiselect from '../../../../commonComponent/fieldComponent/multiselect.vue'
-    import date from '../../../../commonComponent/fieldComponent/date.vue'
-    import datetime from '../../../../commonComponent/fieldComponent/datetime.vue'
-    import member from '../../../../commonComponent/fieldComponent/member.vue'
-    import members from '../../../../commonComponent/fieldComponent/members.vue'
-    import table from '../../../../commonComponent/fieldComponent/table.vue'
-    import customtable from '../../../../commonComponent/fieldComponent/customtable.vue'
-    import editor from '../../../../commonComponent/fieldComponent/editor.vue'
-    import tree from '../../../../commonComponent/fieldComponent/tree.vue'
-    import file from '../../../../commonComponent/fieldComponent/file.vue'
-    import cascade from '../../../../commonComponent/fieldComponent/cascade.vue'
-    import sopsTemplate from '../../../../commonComponent/fieldComponent/sopsTemplate.vue'
-    import complexMembers from '../../../../commonComponent/fieldComponent/complexMembers.vue'
-    import customForm from '../../../../commonComponent/fieldComponent/customForm.vue'
+    import string from '../../../../commonComponent/fieldComponent/string.vue';
+    import link from '../../../../commonComponent/fieldComponent/link';
+    import int from '../../../../commonComponent/fieldComponent/int.vue';
+    import text from '../../../../commonComponent/fieldComponent/text.vue';
+    import checkbox from '../../../../commonComponent/fieldComponent/checkbox.vue';
+    import radio from '../../../../commonComponent/fieldComponent/radio.vue';
+    import select from '../../../../commonComponent/fieldComponent/select.vue';
+    import inputSelect from '../../../../commonComponent/fieldComponent/inputSelect';
+    import multiselect from '../../../../commonComponent/fieldComponent/multiselect.vue';
+    import date from '../../../../commonComponent/fieldComponent/date.vue';
+    import datetime from '../../../../commonComponent/fieldComponent/datetime.vue';
+    import member from '../../../../commonComponent/fieldComponent/member.vue';
+    import members from '../../../../commonComponent/fieldComponent/members.vue';
+    import table from '../../../../commonComponent/fieldComponent/table.vue';
+    import customtable from '../../../../commonComponent/fieldComponent/customtable.vue';
+    import editor from '../../../../commonComponent/fieldComponent/editor.vue';
+    import tree from '../../../../commonComponent/fieldComponent/tree.vue';
+    import file from '../../../../commonComponent/fieldComponent/file.vue';
+    import cascade from '../../../../commonComponent/fieldComponent/cascade.vue';
+    import sopsTemplate from '../../../../commonComponent/fieldComponent/sopsTemplate.vue';
+    import complexMembers from '../../../../commonComponent/fieldComponent/complexMembers.vue';
+    import customForm from '../../../../commonComponent/fieldComponent/customForm.vue';
 
     export default {
         name: 'preview',
@@ -102,12 +102,12 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
 
-            }
+            };
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

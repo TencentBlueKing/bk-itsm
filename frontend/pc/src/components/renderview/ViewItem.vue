@@ -48,9 +48,9 @@
     </div>
 </template>
 <script>
-    import TagText from './tags/TagText.vue'
-    import TagTable from './tags/TagTable.vue'
-    import { deepClone } from '../../utils/util'
+    import TagText from './tags/TagText.vue';
+    import TagTable from './tags/TagTable.vue';
+    import { deepClone } from '../../utils/util';
     export default {
         name: 'ViewItem',
         components: {
@@ -76,62 +76,62 @@
                 type: Number,
             },
         },
-        data () {
+        data() {
             return {
                 crumbsList: [],
                 childrenViewConfig: {
                     form_data: [],
                 },
-            }
+            };
         },
         computed: {
-            componentType () {
-                return `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`
+            componentType() {
+                return `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`;
             },
-            currentDisplatCrumbs () {
+            currentDisplatCrumbs() {
                 return this.crumbsList[this.crumbsList.length - 1] || {
                     label: '默认',
                     form_data: [],
-                }
+                };
             },
         },
-        created () {
-            this.appendCrumbsItem(this.form.label, this.form)
+        created() {
+            this.appendCrumbsItem(this.form.label, this.form);
         },
         methods: {
-            getAttrs (form) {
-                return { ...this.scheme.attrs, ...form }
+            getAttrs(form) {
+                return { ...this.scheme.attrs, ...form };
             },
             /**
              * 追加面包屑项
              * @param { String  } label 面包屑名
              * @param { Array  } formData 渲染数据
              */
-            appendCrumbsItem (label, formData) {
+            appendCrumbsItem(label, formData) {
                 this.crumbsList.push({
                     label,
                     form_data: deepClone(formData),
-                })
-                this.updateChildViewConfig()
+                });
+                this.updateChildViewConfig();
             },
-            getScheme (form) {
-                const { schemes } = this.getContext()
+            getScheme(form) {
+                const { schemes } = this.getContext();
                 if (schemes[form.scheme]) {
-                    return schemes[form.scheme]
+                    return schemes[form.scheme];
                 }
-                return {}
+                return {};
             },
-            onCrumbsClick (index) {
-                this.crumbsList = this.crumbsList.filter((item, i) => i <= index)
-                this.updateChildViewConfig()
+            onCrumbsClick(index) {
+                this.crumbsList = this.crumbsList.filter((item, i) => i <= index);
+                this.updateChildViewConfig();
             },
-            updateChildViewConfig () {
+            updateChildViewConfig() {
                 this.childrenViewConfig = {
                     form_data: deepClone(this.currentDisplatCrumbs.form_data),
-                }
+                };
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

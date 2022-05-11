@@ -124,18 +124,18 @@
 </template>
 
 <script>
-    import cookie from 'cookie'
+    import cookie from 'cookie';
     export default {
         name: 'priorityTable',
         props: {
             priorityConten: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 程度颜色
                 typeColorList: ['', '#99C5FF', '#FE9C00', '#EA3536'],
@@ -149,50 +149,50 @@
                 typeList: [],
                 isSub: false,
                 localeCookie: false,
-            }
+            };
         },
-        mounted () {
-            this.initDate()
+        mounted() {
+            this.initDate();
             // 获取英文的cookie值
-            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
+            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
         },
         methods: {
-            initDate () {
+            initDate() {
                 // 影响范围
-                this.scopeList = JSON.parse(JSON.stringify(this.priorityConten.info.impact))
-                this.scopeList.forEach(item => {
-                    item.name = this.$t(`m["${item.name}"]`)
-                })
-                this.scopCheckList = this.scopeList.map(item => {
+                this.scopeList = JSON.parse(JSON.stringify(this.priorityConten.info.impact));
+                this.scopeList.forEach((item) => {
+                    item.name = this.$t(`m["${item.name}"]`);
+                });
+                this.scopCheckList = this.scopeList.map((item) => {
                     if (item.is_enabled) {
-                        return item.key
+                        return item.key;
                     }
-                }).filter(item => item)
+                }).filter(item => item);
                 // 紧急程度
-                this.degreeList = JSON.parse(JSON.stringify(this.priorityConten.info.urgency))
-                this.degreeCheckList = this.degreeList.map(item => {
+                this.degreeList = JSON.parse(JSON.stringify(this.priorityConten.info.urgency));
+                this.degreeCheckList = this.degreeList.map((item) => {
                     if (item.is_enabled) {
-                        return item.key
+                        return item.key;
                     }
-                }).filter(item => item)
-                this.contentList = JSON.parse(JSON.stringify(this.priorityConten.info.priority_matrix))
-                this.typeList = JSON.parse(JSON.stringify(this.priorityConten.info.priority))
-                this.typeList.forEach(item => {
-                    item.name = this.$t(`m["${item.name}"]`)
-                })
+                }).filter(item => item);
+                this.contentList = JSON.parse(JSON.stringify(this.priorityConten.info.priority_matrix));
+                this.typeList = JSON.parse(JSON.stringify(this.priorityConten.info.priority));
+                this.typeList.forEach((item) => {
+                    item.name = this.$t(`m["${item.name}"]`);
+                });
             },
-            changeScopeCheck (newVal) {
-                this.scopeList.forEach(item => {
-                    item.is_enabled = newVal.some(check => check === item.key)
-                })
+            changeScopeCheck(newVal) {
+                this.scopeList.forEach((item) => {
+                    item.is_enabled = newVal.some(check => check === item.key);
+                });
             },
-            changeDegreeCheck (newVal) {
-                this.degreeList.forEach(item => {
-                    item.is_enabled = newVal.some(check => check === item.key)
-                })
+            changeDegreeCheck(newVal) {
+                this.degreeList.forEach((item) => {
+                    item.is_enabled = newVal.some(check => check === item.key);
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

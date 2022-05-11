@@ -88,9 +88,9 @@
     </div>
 </template>
 <script>
-    import memberSelect from '../../commonComponent/memberSelect'
-    import SelectTree from '../../../components/form/selectTree/index.vue'
-    import { errorHandler } from '../../../utils/util.js'
+    import memberSelect from '../../commonComponent/memberSelect';
+    import SelectTree from '../../../components/form/selectTree/index.vue';
+    import { errorHandler } from '../../../utils/util.js';
 
     export default {
         name: 'dealPerson',
@@ -101,30 +101,30 @@
         props: {
             firstLevelList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             checkValue: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             keyType: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isLoading: false,
                 formData: {
@@ -134,114 +134,114 @@
                 secondLevelList: [],
                 organizationList: [],
                 frontMemberField: [],
-            }
+            };
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
             if (this.nodeInfo.id) {
-                this.getFrontNodesList()
+                this.getFrontNodesList();
             }
         },
         methods: {
-            initData () {
-                this.formData.levelOne = this.checkValue.type
+            initData() {
+                this.formData.levelOne = this.checkValue.type;
                 // 处理人（不是提单节点去掉OPEN的默认值）
                 if (!this.nodeInfo.is_builtin && this.nodeInfo.processors_type === 'OPEN' && this.keyType === 'processors') {
-                    this.formData.levelOne = ''
+                    this.formData.levelOne = '';
                 }
                 // 初始化数据的时候区分
                 if (this.formData.levelOne === 'ORGANIZATION') {
-                    this.formData.levelSecond = this.checkValue.value
-                    this.getOrganization()
+                    this.formData.levelSecond = this.checkValue.value;
+                    this.getOrganization();
                 } else {
-                    this.getSecondLevelList(this.formData.levelOne)
+                    this.getSecondLevelList(this.formData.levelOne);
                     if (this.formData.levelOne === 'GENERAL') {
-                        this.formData.levelSecond = this.checkValue.value || ''
+                        this.formData.levelSecond = this.checkValue.value || '';
                     } else {
-                        this.formData.levelSecond = this.checkValue.value ? this.checkValue.value.split(',') : []
+                        this.formData.levelSecond = this.checkValue.value ? this.checkValue.value.split(',') : [];
                     }
                 }
             },
-            getSecondLevelList (value) {
+            getSecondLevelList(value) {
                 // 清空二级数据
-                this.formData.levelSecond = []
-                this.secondLevelList = []
+                this.formData.levelSecond = [];
+                this.secondLevelList = [];
                 if (value === 'ORGANIZATION') {
-                    this.formData.levelSecond = ''
-                    this.getOrganization()
+                    this.formData.levelSecond = '';
+                    this.getOrganization();
                 } else if (value === 'PERSON') {
-                    this.secondLevelList = []
+                    this.secondLevelList = [];
                 } else if (value === 'GENERAL') {
-                    this.formData.levelSecond = ''
-                    this.secondListFn(value)
+                    this.formData.levelSecond = '';
+                    this.secondListFn(value);
                 } else {
-                    this.secondListFn(value)
+                    this.secondListFn(value);
                 }
             },
             // 获取数据
-            secondListFn (value) {
+            secondListFn(value) {
                 if (!value) {
-                    return
+                    return;
                 }
-                this.isLoading = true
+                this.isLoading = true;
                 this.$store.dispatch('deployCommon/getSecondUser', {
                     role_type: value,
                     scope: 'shortcut',
                     project_key: this.$store.state.project.id,
                 }).then((res) => {
-                    const valueList = res.data
-                    const userList = []
+                    const valueList = res.data;
+                    const userList = [];
                     if (value === 'GENERAL') {
-                        valueList.forEach(item => {
+                        valueList.forEach((item) => {
                             userList.push({
                                 id: String(item.id),
                                 name: `${item.name}(${item.count})`,
                                 disabled: (item.count === 0),
-                            })
-                        })
+                            });
+                        });
                     } else {
-                        valueList.forEach(item => {
+                        valueList.forEach((item) => {
                             userList.push({
                                 id: String(item.id),
                                 name: item.name,
-                            })
-                        })
+                            });
+                        });
                     }
-                    this.secondLevelList = userList
+                    this.secondLevelList = userList;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isLoading = false
-                    })
+                        this.isLoading = false;
+                    });
             },
             // 组织架构
-            getOrganization () {
-                this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
+            getOrganization() {
+                this.$store.dispatch('cdeploy/getTreeInfo').then((res) => {
                     // 操作角色组织架构
-                    this.organizationList = res.data
+                    this.organizationList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 获取前置节点的字段信息
-            getFrontNodesList () {
+            getFrontNodesList() {
                 const params = {
                     workflow: this.nodeInfo.workflow,
                     state: this.nodeInfo.id,
                     exclude_self: true,
-                }
-                this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
-                    this.frontMemberField = res.data.filter(item => (item.type === 'MEMBERS' && item.validate_type === 'REQUIRE') || (item.type === 'MEMBER' && item.validate_type === 'REQUIRE'))
+                };
+                this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
+                    this.frontMemberField = res.data.filter(item => (item.type === 'MEMBERS' && item.validate_type === 'REQUIRE') || (item.type === 'MEMBER' && item.validate_type === 'REQUIRE'));
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

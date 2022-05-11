@@ -62,12 +62,12 @@
                 default: 800,
             },
         },
-        data () {
+        data() {
             return {
                 isShow: true,
-            }
+            };
         },
-    }
+    };
 </script>
 
 <style lang="scss">

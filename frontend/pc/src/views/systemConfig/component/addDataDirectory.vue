@@ -119,7 +119,10 @@
             :auto-close="dictDataTable.autoClose"
             :mask-close="dictDataTable.autoClose"
             @confirm="submitDictionary">
-            <p slot="header">{{ dictDataTable.formInfo.id ? $t('m.systemConfig["编辑字典数据"]') : $t('m.systemConfig["新增字典数据"]') }}</p>
+            <p slot="header">
+                {{ dictDataTable.formInfo.id
+                    ? $t('m.systemConfig["编辑字典数据"]') : $t('m.systemConfig["新增字典数据"]') }}
+            </p>
             <div class="bk-add-project bk-add-module">
                 <bk-form
                     :label-width="200"
@@ -169,9 +172,9 @@
 </template>
 
 <script>
-    import memberSelect from '../../commonComponent/memberSelect'
-    import SelectTree from '../../../components/form/selectTree/index.vue'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import memberSelect from '../../commonComponent/memberSelect';
+    import SelectTree from '../../../components/form/selectTree/index.vue';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'addData',
@@ -182,12 +185,12 @@
         props: {
             slideData: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 列表数据
                 isDataLoading: false,
@@ -259,106 +262,106 @@
                         },
                     ],
                 },
-            }
+            };
         },
         watch: {
-            'slideData.id' () {
+            'slideData.id'() {
                 if (this.slideData.id) {
-                    this.initData()
+                    this.initData();
                 }
             },
         },
-        mounted () {
+        mounted() {
             if (this.slideData.id) {
-                this.initData()
+                this.initData();
             }
         },
         methods: {
-            initData () {
-                this.addTableInfo.formInfo.id = this.slideData.id
-                this.addTableInfo.formInfo.ownersInputValue = this.slideData.ownersInputValue
-                this.addTableInfo.formInfo.key = this.slideData.key
-                this.addTableInfo.formInfo.name = this.slideData.name
-                this.addTableInfo.formInfo.desc = this.slideData.desc
-                this.addTableInfo.formInfo.is_enabled = this.slideData.is_enabled
-                this.getList()
+            initData() {
+                this.addTableInfo.formInfo.id = this.slideData.id;
+                this.addTableInfo.formInfo.ownersInputValue = this.slideData.ownersInputValue;
+                this.addTableInfo.formInfo.key = this.slideData.key;
+                this.addTableInfo.formInfo.name = this.slideData.name;
+                this.addTableInfo.formInfo.desc = this.slideData.desc;
+                this.addTableInfo.formInfo.is_enabled = this.slideData.is_enabled;
+                this.getList();
             },
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 const params = {
                     dict_table: this.slideData.id,
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
+                };
 
-                this.isDataLoading = true
+                this.isDataLoading = true;
                 this.$store.dispatch('dictdata/list', params).then((res) => {
-                    this.dataList = res.data.items
+                    this.dataList = res.data.items;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 创建/更新数据字典
-            save () {
-                this.$refs.dynamicForm.validate().then(validator => {
+            save() {
+                this.$refs.dynamicForm.validate().then(() => {
                     // create or update
                     const params = {
                         ...this.addTableInfo.formInfo,
                         owners: this.addTableInfo.formInfo.ownersInputValue.join(','),
-                    }
-                    delete params.ownersInputValue
+                    };
+                    delete params.ownersInputValue;
                     if (!this.addTableInfo.formInfo.id) {
-                        this.$store.dispatch('datadict/create', params).then(res => {
+                        this.$store.dispatch('datadict/create', params).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["添加成功"]'),
                                 theme: 'success',
-                            })
-                            this.$emit('getList', 1)
-                            this.$emit('openAddData', res.data)
+                            });
+                            this.$emit('getList', 1);
+                            this.$emit('openAddData', res.data);
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     } else {
-                        this.$store.dispatch('datadict/update', params).then(res => {
+                        this.$store.dispatch('datadict/update', params).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["更新成功"]'),
                                 theme: 'success',
-                            })
-                            this.$emit('getList', 1)
-                            this.$emit('closeAddData')
+                            });
+                            this.$emit('getList', 1);
+                            this.$emit('closeAddData');
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     }
-                })
+                });
             },
             // 取消
-            cancel () {
-                this.$emit('closeAddData')
+            cancel() {
+                this.$emit('closeAddData');
             },
             // 新增字典字段
-            addDictionary () {
+            addDictionary() {
                 this.dictDataTable.formInfo = {
                     id: '',
                     dict_table: '',
@@ -367,123 +370,124 @@
                     parent: '',
                     order: 1,
                     parentObj: {},
-                }
-                this.dictDataTable.isShow = true
-                this.getTreeInfo()
+                };
+                this.dictDataTable.isShow = true;
+                this.getTreeInfo();
             },
-            closeDictionary () {
-                this.dictDataTable.isShow = false
+            closeDictionary() {
+                this.dictDataTable.isShow = false;
             },
             // 编辑字典
-            async openDataDialog (item) {
-                this.dictDataTable.formInfo = JSON.parse(JSON.stringify(item)) || {}
-                this.dictDataTable.formInfo.parentObj = {}
-                await this.getTreeInfo()
-                this.dictDataTable.isShow = true
+            async openDataDialog(item) {
+                this.dictDataTable.formInfo = JSON.parse(JSON.stringify(item)) || {};
+                this.dictDataTable.formInfo.parentObj = {};
+                await this.getTreeInfo();
+                this.dictDataTable.isShow = true;
             },
             // 删除
-            openDelete (item) {
+            openDelete(item) {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.systemConfig["确认删除该条数据？"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('dictdata/delete', id).then((res) => {
+                        this.secondClick = true;
+                        this.$store.dispatch('dictdata/delete', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                                this.pagination.current = this.pagination.current === 1 
+                                    ? 1 : this.pagination.current - 1;
                             }
-                            this.getList()
+                            this.getList();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
-            submitDictionary () {
-                this.$refs.dialogForm.validate().then(validator => {
+            submitDictionary() {
+                this.$refs.dialogForm.validate().then(() => {
                     // create or update
                     if (!this.dictDataTable.formInfo.id) {
-                        this.dictDataTable.formInfo.dict_table = this.slideData.id
+                        this.dictDataTable.formInfo.dict_table = this.slideData.id;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('dictdata/create', this.dictDataTable.formInfo).then(res => {
+                        this.secondClick = true;
+                        this.$store.dispatch('dictdata/create', this.dictDataTable.formInfo).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["添加成功"]'),
                                 theme: 'success',
-                            })
-                            this.closeDictionary()
-                            this.getList(1)
+                            });
+                            this.closeDictionary();
+                            this.getList(1);
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     } else {
                         if (this.dictDataTable.formInfo.id === this.dictDataTable.formInfo.parent) {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["父级目录不能是自己！"]'),
                                 theme: 'warning',
-                            })
-                            return
+                            });
+                            return;
                         }
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('dictdata/update', this.dictDataTable.formInfo).then(res => {
+                        this.secondClick = true;
+                        this.$store.dispatch('dictdata/update', this.dictDataTable.formInfo).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["更新成功"]'),
                                 theme: 'success',
-                            })
-                            this.getList(1)
-                            this.closeDictionary()
+                            });
+                            this.getList(1);
+                            this.closeDictionary();
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     }
-                })
+                });
             },
             // tree操作
-            async getTreeInfo () {
+            async getTreeInfo() {
                 if (!this.addTableInfo.formInfo.key) {
-                    return
+                    return;
                 }
                 const params = {
                     key: this.addTableInfo.formInfo.key,
                     view_type: 'tree',
-                }
-                await this.$store.dispatch('dictdata/getTreeInfo', params).then(res => {
-                    this.dictDataTable.treeDataList = res.data
+                };
+                await this.$store.dispatch('dictdata/getTreeInfo', params).then((res) => {
+                    this.dictDataTable.treeDataList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            onParentChange (tree) {
-                this.dictDataTable.formInfo.parentObj = tree
+            onParentChange(tree) {
+                this.dictDataTable.formInfo.parentObj = tree;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

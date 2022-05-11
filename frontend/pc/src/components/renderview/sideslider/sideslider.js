@@ -20,9 +20,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue'
-import SidesliderVue from './Sideslider.vue'
-const SidesliderConstructor = Vue.extend(SidesliderVue)
+import Vue from 'vue';
+import SidesliderVue from './Sideslider.vue';
+const SidesliderConstructor = Vue.extend(SidesliderVue);
 
 const Sideslider = (options = {
     title: 'title',
@@ -42,17 +42,17 @@ const Sideslider = (options = {
         data: {
             isShow: false,
         },
-    })
-    instance.viewmodel = instance.$mount()
-    const parent = document.body
-    parent.appendChild(instance.viewmodel.$el)
-    instance.isShow = true
+    });
+    instance.viewmodel = instance.$mount();
+    const parent = document.body;
+    parent.appendChild(instance.viewmodel.$el);
+    instance.isShow = true;
     instance.$on('update:isShow', (show) => {
         if (!show) {
-            instance.isShow = false
+            instance.isShow = false;
         }
-    })
-    return instance.viewmodel
-}
+    });
+    return instance.viewmodel;
+};
 
-export default Sideslider
+export default Sideslider;

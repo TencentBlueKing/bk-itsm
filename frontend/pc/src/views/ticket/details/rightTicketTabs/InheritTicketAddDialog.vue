@@ -118,8 +118,8 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../utils/errorHandler'
-    import cookie from 'cookie'
+    import { errorHandler } from '../../../../utils/errorHandler';
+    import cookie from 'cookie';
 
     export default {
         name: 'InheritTicketAddDialog',
@@ -127,8 +127,8 @@
         props: {
             ticketInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             templateInfo: {
@@ -143,7 +143,7 @@
                 }),
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 tabInfoList: [],
@@ -168,41 +168,41 @@
                 checkList: [],
                 colorHexList: [],
                 localeCookie: false,
-            }
+            };
         },
         computed: {
-            changeFields () {
-                return this.fields
+            changeFields() {
+                return this.fields;
             },
-            fileStatus () {
-                return this.$store.state.fileStatus
+            fileStatus() {
+                return this.$store.state.fileStatus;
             },
             // 选择
-            allCheck () {
-                return this.tabInfoList.length && this.tabInfoList.filter(ticket => !this.getItemFlag(ticket)).length && this.tabInfoList.every(item => item.check || this.getItemFlag(item))
+            allCheck() {
+                return this.tabInfoList.length && this.tabInfoList.filter(ticket => !this.getItemFlag(ticket)).length && this.tabInfoList.every(item => item.check || this.getItemFlag(item));
             },
         },
         watch: {
-            'templateInfo.inheritType' () {
-                this.getList()
+            'templateInfo.inheritType'() {
+                this.getList();
             },
         },
-        async mounted () {
+        async mounted() {
             if (this.ticketInfo.related_type === 'master') {
-                this.templateInfo.inheritType = 'chooseChild'
+                this.templateInfo.inheritType = 'chooseChild';
             }
-            await this.getTypeStatus()
-            await this.getList()
-            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
+            await this.getTypeStatus();
+            await this.getList();
+            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
         },
         methods: {
-            getFlag (flag, info) {
-                const flag1 = flag === 'chooseMother' && (info.related_type === 'slave' || info.related_type === 'master')
-                const flag2 = flag === 'chooseChild' && info.related_type === 'slave'
-                return flag1 || flag2
+            getFlag(flag, info) {
+                const flag1 = flag === 'chooseMother' && (info.related_type === 'slave' || info.related_type === 'master');
+                const flag2 = flag === 'chooseChild' && info.related_type === 'slave';
+                return flag1 || flag2;
             },
-            openNewPage (rowData) {
-                const { id } = rowData
+            openNewPage(rowData) {
+                const { id } = rowData;
                 const { href } = this.$router.resolve({
                     name: 'commonInfo',
                     params: {
@@ -211,39 +211,39 @@
                     query: {
                         id: `${id}`,
                     },
-                })
-                window.open(href, '_blank')
+                });
+                window.open(href, '_blank');
             },
-            changeRadio () {
+            changeRadio() {
                 if (this.templateInfo.currentInheritType === this.templateInfo.inheritType) {
-                    return
+                    return;
                 }
-                this.templateInfo.currentInheritType = this.templateInfo.inheritType
-                this.tabInfoList.forEach(item => {
-                    item.check = false
-                })
+                this.templateInfo.currentInheritType = this.templateInfo.inheritType;
+                this.tabInfoList.forEach((item) => {
+                    item.check = false;
+                });
             },
             // 判断单据是否可选
-            getItemFlag (item) {
-                return (this.templateInfo.inheritType === 'chooseMother' && item.chooseMotherDisabled) || (this.templateInfo.inheritType === 'chooseChild' && item.chooseChildDisabled) || this.ticketInfo.related_type === 'slave'
+            getItemFlag(item) {
+                return (this.templateInfo.inheritType === 'chooseMother' && item.chooseMotherDisabled) || (this.templateInfo.inheritType === 'chooseChild' && item.chooseChildDisabled) || this.ticketInfo.related_type === 'slave';
             },
             // 判断是否可以提交
-            getButtonFlag () {
-                return this.tabInfoList.find(item => item.check)
+            getButtonFlag() {
+                return this.tabInfoList.find(item => item.check);
             },
             // 单选
-            checkOne (item) {
-                const check = JSON.parse(JSON.stringify(item.check))
+            checkOne(item) {
+                const check = JSON.parse(JSON.stringify(item.check));
                 if (this.templateInfo.inheritType === 'chooseMother') {
-                    this.tabInfoList.forEach(item => {
-                        item.check = false
-                    })
+                    this.tabInfoList.forEach((item) => {
+                        item.check = false;
+                    });
                 }
-                item.check = !check
-                this.$forceUpdate()
+                item.check = !check;
+                this.$forceUpdate();
             },
             // 获取列表
-            async getList () {
+            async getList() {
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
@@ -253,129 +253,129 @@
                     // 提单人
                     flow_id: this.ticketInfo.flow_id,
                     exclude_ticket_id__in: this.ticketInfo.id,
-                    current_status__in: this.colorHexList.map(status => {
+                    current_status__in: this.colorHexList.map((status) => {
                         if (!status.is_over) {
-                            return status.key
+                            return status.key;
                         }
                     }).join(','),
-                }
-                let resUrl = ''
-                this.getUrlInfo = ''
+                };
+                let resUrl = '';
+                this.getUrlInfo = '';
                 for (const key in params) {
-                    this.getUrlInfo += `${key}=${params[key]}`
-                    resUrl += `${key}=${params[key]}`
+                    this.getUrlInfo += `${key}=${params[key]}`;
+                    resUrl += `${key}=${params[key]}`;
                 }
-                this.isDataLoading = true
+                this.isDataLoading = true;
                 await this.$store.dispatch('change/getList', params).then((res) => {
                     if (resUrl !== this.getUrlInfo) {
-                        return
+                        return;
                     }
-                    this.tabInfoList = res.data.items
+                    this.tabInfoList = res.data.items;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
 
-                    this.tabInfoList.forEach(item => {
-                        this.$set(item, 'check', false)
-                        this.$set(item, 'chooseMotherDisabled', item.related_type === 'slave')
-                        this.$set(item, 'chooseChildDisabled', (item.related_type === 'master' || item.related_type === 'slave'))
-                    })
+                    this.tabInfoList.forEach((item) => {
+                        this.$set(item, 'check', false);
+                        this.$set(item, 'chooseMotherDisabled', item.related_type === 'slave');
+                        this.$set(item, 'chooseChildDisabled', (item.related_type === 'master' || item.related_type === 'slave'));
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 全选 半选
-            handleSelectAll () {
+            handleSelectAll() {
                 if (this.allCheck) {
-                    this.tabInfoList.forEach(item => {
+                    this.tabInfoList.forEach((item) => {
                         if (!this.getItemFlag(item)) {
-                            item.check = false
+                            item.check = false;
                         }
-                    })
+                    });
                 } else {
-                    this.tabInfoList.forEach(item => {
+                    this.tabInfoList.forEach((item) => {
                         if (!this.getItemFlag(item)) {
-                            item.check = true
+                            item.check = true;
                         }
-                    })
+                    });
                 }
-                this.$forceUpdate()
+                this.$forceUpdate();
             },
-            getstatusColor (row) {
-                const statusColor = this.colorHexList.filter(item => item.key === row.current_status)
+            getstatusColor(row) {
+                const statusColor = this.colorHexList.filter(item => item.key === row.current_status);
                 return statusColor.length ? {
                     color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
-                } : { color: '#3c96ff', border: '1px solid #3c96ff' }
+                } : { color: '#3c96ff', border: '1px solid #3c96ff' };
             },
-            async getTypeStatus () {
-                const params = {}
-                const type = this.ticketInfo.service_type
+            async getTypeStatus() {
+                const params = {};
+                const type = this.ticketInfo.service_type;
                 await this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
-                    this.colorHexList = res.data
+                    this.colorHexList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            clearInfo () {
-                this.searchForm.keyword = ''
-                this.getList()
+            clearInfo() {
+                this.searchForm.keyword = '';
+                this.getList();
             },
-            closeShow () {
-                this.$emit('close')
+            closeShow() {
+                this.$emit('close');
             },
-            submitTemplate () {
-                const params = {}
+            submitTemplate() {
+                const params = {};
                 if (this.templateInfo.inheritType === 'chooseChild') {
-                    params.from_ticket_ids = this.tabInfoList.filter(item => item.check).map(ite => ite.id)
-                    params.to_ticket_id = this.ticketInfo.id
+                    params.from_ticket_ids = this.tabInfoList.filter(item => item.check).map(ite => ite.id);
+                    params.to_ticket_id = this.ticketInfo.id;
                 } else {
-                    params.from_ticket_ids = [this.ticketInfo.id]
-                    params.to_ticket_id = this.tabInfoList.filter(item => item.check).map(ite => ite.id)[0]
+                    params.from_ticket_ids = [this.ticketInfo.id];
+                    params.to_ticket_id = this.tabInfoList.filter(item => item.check).map(ite => ite.id)[0];
                 }
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch('change/mergeTickets', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["关联成功"]'),
                         theme: 'success',
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                        this.checkList = []
-                        this.closeShow()
-                        this.reloadTicket()
-                    })
+                        this.secondClick = false;
+                        this.checkList = [];
+                        this.closeShow();
+                        this.reloadTicket();
+                    });
             },
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
-            renderRadio (h, { column, $index }) {
+            renderRadio(h, { column, $index }) {
                 if (this.templateInfo.inheritType === 'chooseMother') {
                     return h('bk-radio', {
                         props: {
                             disabled: true,
                         },
-                    })
+                    });
                 }
                 return h('bk-checkbox', {
                     props: {
@@ -385,10 +385,10 @@
                     on: {
                         change: this.handleSelectAll,
                     },
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

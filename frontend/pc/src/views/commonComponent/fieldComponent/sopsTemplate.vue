@@ -171,11 +171,11 @@
 </template>
 
 <script>
-    import NoData from '../../../components/common/NoData.vue'
-    import { errorHandler } from '../../../utils/errorHandler'
-    import { deepClone } from '../../../utils/util.js'
-    import mixins from '../../commonMix/field.js'
-    import commonMix from '../../commonMix/common.js'
+    import NoData from '../../../components/common/NoData.vue';
+    import { errorHandler } from '../../../utils/errorHandler';
+    import { deepClone } from '../../../utils/util.js';
+    import mixins from '../../commonMix/field.js';
+    import commonMix from '../../commonMix/common.js';
     export default {
         name: 'SOPS_TEMPLATE',
         components: {
@@ -190,8 +190,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -200,14 +200,14 @@
             },
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             typeInfo: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             disabled: {
@@ -215,7 +215,7 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 disabledRenderForm: false, // 单独禁用 renderform
                 editTask: true,
@@ -238,16 +238,16 @@
                 lastEditTaskName: '',
                 rules: {},
                 previewSopsTaskUrl: '',
-            }
+            };
         },
         computed: {
-            bkBizId () {
-                return this.basicInfomation ? (this.basicInfomation.bk_biz_id !== -1 ? this.basicInfomation.bk_biz_id : '') : ''
+            bkBizId() {
+                return this.basicInfomation ? (this.basicInfomation.bk_biz_id !== -1 ? this.basicInfomation.bk_biz_id : '') : '';
             },
-            showRenderForm () {
-                return this.item.sopsContent.constants.filter(item => item.show_type === 'show').length > 0
+            showRenderForm() {
+                return this.item.sopsContent.constants.filter(item => item.show_type === 'show').length > 0;
             },
-            formOptions () {
+            formOptions() {
                 return {
                     showRequired: true,
                     showGroup: true,
@@ -255,10 +255,10 @@
                     showHook: true,
                     showDesc: true,
                     formEdit: !this.disabled && !this.disabledRenderForm,
-                }
+                };
             },
         },
-        created () {
+        created() {
             if (!this.item.sopsContent) {
                 this.$set(this.item, 'sopsContent', {
                     id: '',
@@ -281,325 +281,325 @@
                         site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS,
                     },
                     constants: [],
-                })
+                });
             }
-            this.rules.id = this.checkCommonRules('select').select
-            this.rules.sopsTaskId = this.checkCommonRules('select').select
+            this.rules.id = this.checkCommonRules('select').select;
+            this.rules.sopsTaskId = this.checkCommonRules('select').select;
         },
-        async mounted () {
+        async mounted() {
             // 如果存在value信息，则需要解析信息进行渲染
             if (this.item.value) {
-                this.item.sopsContent.id = this.item.value.id
-                const templateInfo = this.templateList.find(item => item.id === this.item.sopsContent.id)
+                this.item.sopsContent.id = this.item.value.id;
+                const templateInfo = this.templateList.find(item => item.id === this.item.sopsContent.id);
                 if (templateInfo && templateInfo.bk_biz_id !== undefined) {
-                    this.item.sopsContent.context.project.bk_biz_id = templateInfo.bk_biz_id
-                    this.item.sopsContent.context.project.id = this.item.sopsContent.id
-                    this.item.sopsContent.context.project.name = this.item.name
+                    this.item.sopsContent.context.project.bk_biz_id = templateInfo.bk_biz_id;
+                    this.item.sopsContent.context.project.id = this.item.sopsContent.id;
+                    this.item.sopsContent.context.project.name = this.item.name;
                 }
-                this.item.sopsContent.constants = this.item.value.constants
-                this.item.value.constants.forEach(constant => {
+                this.item.sopsContent.constants = this.item.value.constants;
+                this.item.value.constants.forEach((constant) => {
                     if (constant.value) {
-                        this.item.sopsContent.formData[constant.key] = deepClone(constant.value)
+                        this.item.sopsContent.formData[constant.key] = deepClone(constant.value);
                     }
                     if (constant.is_quoted) {
-                        this.hookedVarList[constant.key] = true
+                        this.hookedVarList[constant.key] = true;
                     }
-                })
+                });
             }
-            this.editTask = !!this.item.value
+            this.editTask = !!this.item.value;
             if (this.editTask && this.item.value.id) { // 编辑任务时，需要加载模板详情
-                this.getTemplateDetail(this.item.value.bk_biz_id, this.item.value.id)
+                this.getTemplateDetail(this.item.value.bk_biz_id, this.item.value.id);
             }
-            this.getTicketOutput()
-            this.getTemplateList()
+            this.getTicketOutput();
+            this.getTemplateList();
         },
         methods: {
-            async getTicketOutput () {
+            async getTicketOutput() {
                 try {
-                    this.quoteVarsLoading = true
-                    const res = await this.$store.dispatch('ticket/getTicketOutput', this.basicInfomation.id)
-                    this.quoteVars = res.data
+                    this.quoteVarsLoading = true;
+                    const res = await this.$store.dispatch('ticket/getTicketOutput', this.basicInfomation.id);
+                    this.quoteVars = res.data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.quoteVarsLoading = false
+                    this.quoteVarsLoading = false;
                 }
             },
-            onSelectTpl (id) {
-                this.item.sopsContent.id = id
-                const templateInfo = this.templateList.find(item => item.id === this.item.sopsContent.id)
+            onSelectTpl(id) {
+                this.item.sopsContent.id = id;
+                const templateInfo = this.templateList.find(item => item.id === this.item.sopsContent.id);
                 if (templateInfo && templateInfo.bk_biz_id !== undefined) {
-                    this.item.sopsContent.context.project.bk_biz_id = templateInfo.bk_biz_id
-                    this.item.sopsContent.context.project.id = templateInfo.project_id
-                    this.item.sopsContent.context.project.name = templateInfo.project_name
+                    this.item.sopsContent.context.project.bk_biz_id = templateInfo.bk_biz_id;
+                    this.item.sopsContent.context.project.id = templateInfo.project_id;
+                    this.item.sopsContent.context.project.name = templateInfo.project_name;
                 }
-                this.hookedVarList = {}
-                this.quoteErrors = []
-                this.getTempaltePlanList()
-                this.getTemplateDetail(templateInfo.bk_biz_id, this.item.sopsContent.id)
+                this.hookedVarList = {};
+                this.quoteErrors = [];
+                this.getTempaltePlanList();
+                this.getTemplateDetail(templateInfo.bk_biz_id, this.item.sopsContent.id);
             },
             // 选择标准运维任务
-            onSopsTaskChange (sopsTaskId) {
+            onSopsTaskChange(sopsTaskId) {
                 if (!sopsTaskId) {
-                    return false
+                    return false;
                 }
-                this.hookedVarList = {}
-                this.quoteErrors = []
-                this.setTaskNameAndDisable(sopsTaskId)
-                this.getSopsTaskDetail(sopsTaskId)
+                this.hookedVarList = {};
+                this.quoteErrors = [];
+                this.setTaskNameAndDisable(sopsTaskId);
+                this.getSopsTaskDetail(sopsTaskId);
             },
             // 选择关联任务后，任务名称需要变成标准运维任务名称，且不能修改
-            setTaskNameAndDisable (taskId) {
-                const taskField = this.fields.find(m => m.key === 'task_name')
-                const targetTask = this.sopsTaskList.find(task => task.id === taskId)
+            setTaskNameAndDisable(taskId) {
+                const taskField = this.fields.find(m => m.key === 'task_name');
+                const targetTask = this.sopsTaskList.find(task => task.id === taskId);
                 if (taskField) {
-                    this.lastEditTaskName = taskField.val || taskField.value
-                    taskField.val = targetTask.name
-                    taskField.value = targetTask.name
-                    taskField.is_readonly = true
+                    this.lastEditTaskName = taskField.val || taskField.value;
+                    taskField.val = targetTask.name;
+                    taskField.value = targetTask.name;
+                    taskField.is_readonly = true;
                 }
                 // 关联已执行的任务不能再修改参数
-                this.disabledRenderForm = this.item.sopsContent.createWay === 'started_task'
+                this.disabledRenderForm = this.item.sopsContent.createWay === 'started_task';
             },
-            clearTaskNameAndDisable () {
+            clearTaskNameAndDisable() {
                 if (!this.item.sopsContent.sopsTask.id) {
-                    return
+                    return;
                 }
-                const taskField = this.fields.find(m => m.key === 'task_name')
+                const taskField = this.fields.find(m => m.key === 'task_name');
                 if (taskField) {
-                    taskField.val = this.lastEditTaskName
-                    taskField.value = this.lastEditTaskName
-                    taskField.is_readonly = false
+                    taskField.val = this.lastEditTaskName;
+                    taskField.value = this.lastEditTaskName;
+                    taskField.is_readonly = false;
                 }
             },
             // 获取标准运维任务详情
-            async getSopsTaskDetail (sopsTaskId) {
-                this.configLoading = true
+            async getSopsTaskDetail(sopsTaskId) {
+                this.configLoading = true;
                 const params = {
                     bk_biz_id: this.bkBizId,
                     task_id: sopsTaskId,
-                }
-                await this.$store.dispatch('taskFlow/getSopsTaskDetail', params).then(res => {
-                    this.previewSopsTaskUrl = res.data.task_url
-                    const constants = []
+                };
+                await this.$store.dispatch('taskFlow/getSopsTaskDetail', params).then((res) => {
+                    this.previewSopsTaskUrl = res.data.task_url;
+                    const constants = [];
                     for (const key in res.data.constants) {
                         if (res.data.constants[key].show_type === 'show') {
-                            constants.push(res.data.constants[key])
+                            constants.push(res.data.constants[key]);
                         }
                     }
-                    constants.sort((a, b) => a - b)
-                    this.item.sopsContent.constants = constants
-                    this.item.sopsContent.sopsTask.template_id = res.data.template_id
+                    constants.sort((a, b) => a - b);
+                    this.item.sopsContent.constants = constants;
+                    this.item.sopsContent.sopsTask.template_id = res.data.template_id;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.configLoading = false
-                    })
+                        this.configLoading = false;
+                    });
             },
-            getTemplateDetail (bizId, tplId) {
-                this.formLoading = true
+            getTemplateDetail(bizId, tplId) {
+                this.formLoading = true;
                 const params = {
                     template_id: tplId,
                     bk_biz_id: bizId || '',
-                }
-                this.$store.dispatch('getTemplateDetail', params).then(res => {
-                    const constants = []
-                    res.data.constants.forEach(item => {
-                        const constantItem = this.item.sopsContent.constants.find(cons => cons.key === item.key)
+                };
+                this.$store.dispatch('getTemplateDetail', params).then((res) => {
+                    const constants = [];
+                    res.data.constants.forEach((item) => {
+                        const constantItem = this.item.sopsContent.constants.find(cons => cons.key === item.key);
                         if (!this.editTask || constantItem) {
                             if (constantItem) {
-                                item = Object.assign(constantItem, item)
+                                item = Object.assign(constantItem, item);
                             }
                             if (item.is_meta) {
-                                item.meta = deepClone(item)
+                                item.meta = deepClone(item);
                             }
                             if (this.item.value) {
-                                item.value = deepClone(this.item.sopsContent.formData[item.key])
+                                item.value = deepClone(this.item.sopsContent.formData[item.key]);
                             }
-                            this.constantDefaultValue[item.key] = deepClone(item.value)
+                            this.constantDefaultValue[item.key] = deepClone(item.value);
                             if (item.show_type === 'show') {
-                                constants.push(item)
+                                constants.push(item);
                             }
                         }
-                    })
-                    this.item.sopsContent.constants = constants
-                    this.optionalNodeIdList = res.data.optional_ids
+                    });
+                    this.item.sopsContent.constants = constants;
+                    this.optionalNodeIdList = res.data.optional_ids;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.formLoading = false
-                    })
+                        this.formLoading = false;
+                    });
             },
             // 获取templateList的数据
-            async getTemplateList () {
-                this.loading.templateList = true
+            async getTemplateList() {
+                this.loading.templateList = true;
                 const params = {
                     bk_biz_id: this.bkBizId,
                     with_common: true,
-                }
-                await this.$store.dispatch('getTemplateList', params).then(res => {
-                    this.templateList = res.data
+                };
+                await this.$store.dispatch('getTemplateList', params).then((res) => {
+                    this.templateList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading.templateList = false
-                    })
+                        this.loading.templateList = false;
+                    });
             },
             // 获取标准运维任务列表
-            async getSopsTaskList () {
-                this.loading.sopsTaskList = true
+            async getSopsTaskList() {
+                this.loading.sopsTaskList = true;
                 const params = {
                     bk_biz_id: this.bkBizId,
                     is_started: this.item.sopsContent.createWay === 'started_task',
-                }
-                await this.$store.dispatch('taskFlow/getSopsTask', params).then(res => {
-                    this.sopsTaskList = res.data
+                };
+                await this.$store.dispatch('taskFlow/getSopsTask', params).then((res) => {
+                    this.sopsTaskList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading.sopsTaskList = false
-                    })
+                        this.loading.sopsTaskList = false;
+                    });
             },
             // 获取模板方案列表
-            async getTempaltePlanList () {
-                const { id } = this.item.sopsContent
-                const template = this.templateList.find(template => template.id === id)
+            async getTempaltePlanList() {
+                const { id } = this.item.sopsContent;
+                const template = this.templateList.find(template => template.id === id);
 
-                this.planList = []
-                this.loading.plan = true
+                this.planList = [];
+                this.loading.plan = true;
                 const params = {
                     bk_biz_id: template.bk_biz_id,
                     template_id: template.id,
-                }
-                await this.$store.dispatch('getTemplatePlanList', params).then(res => {
-                    this.planList = res.data
+                };
+                await this.$store.dispatch('getTemplatePlanList', params).then((res) => {
+                    this.planList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading.plan = false
-                    })
+                        this.loading.plan = false;
+                    });
             },
-            async onplanSelect (ids) {
-                const planList = []
+            async onplanSelect(ids) {
+                const planList = [];
                 if (ids.length > 0) {
-                    ids.forEach(item => {
-                        const plan = this.planList.find(plan => plan.id === item)
+                    ids.forEach((item) => {
+                        const plan = this.planList.find(plan => plan.id === item);
                         if (plan.data) {
-                            const twPlanList = JSON.parse(plan.data)
+                            const twPlanList = JSON.parse(plan.data);
                             for (let index = 0; index < twPlanList.length; index++) {
                                 if (planList.indexOf(twPlanList[index]) === -1) {
-                                    planList.push(twPlanList[index])
+                                    planList.push(twPlanList[index]);
                                 }
                             }
                         }
-                    })
-                    this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => !planList.includes(nodeId))
+                    });
+                    this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => !planList.includes(nodeId));
                 } else {
-                    this.item.sopsContent.exclude_task_nodes_id = []
+                    this.item.sopsContent.exclude_task_nodes_id = [];
                 }
-                const template = this.templateList.find(item => item.id === this.item.sopsContent.id)
+                const template = this.templateList.find(item => item.id === this.item.sopsContent.id);
                 try {
-                    this.formLoading = true
+                    this.formLoading = true;
                     const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
                         bk_biz_id: template.bk_biz_id,
                         template_id: template.id,
                         exclude_task_nodes_id: this.item.sopsContent.exclude_task_nodes_id,
-                    })
-                    const constants = []
+                    });
+                    const constants = [];
                     for (const key in res.data.pipeline_tree.constants) {
                         if (res.data.pipeline_tree.constants[key].show_type === 'show') {
-                            constants.push(res.data.pipeline_tree.constants[key])
+                            constants.push(res.data.pipeline_tree.constants[key]);
                         }
                     }
-                    constants.sort((a, b) => a.index - b.index)
-                    this.item.sopsContent.constants = constants
+                    constants.sort((a, b) => a.index - b.index);
+                    this.item.sopsContent.constants = constants;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.formLoading = false
+                    this.formLoading = false;
                 }
             },
-            jumpToSops () {
-                window.open(this.previewSopsTaskUrl)
+            jumpToSops() {
+                window.open(this.previewSopsTaskUrl);
             },
-            handleCreateWayChange (value) {
-                this.clearTaskNameAndDisable()
-                this.item.sopsContent.id = ''
-                this.item.sopsContent.planId = ''
-                this.item.sopsContent.constants = []
-                this.item.sopsContent.sopsTask.id = ''
+            handleCreateWayChange(value) {
+                this.clearTaskNameAndDisable();
+                this.item.sopsContent.id = '';
+                this.item.sopsContent.planId = '';
+                this.item.sopsContent.constants = [];
+                this.item.sopsContent.sopsTask.id = '';
                 if (value === 'task' || value === 'started_task') {
-                    this.getSopsTaskList()
+                    this.getSopsTaskList();
                 } else {
-                    this.getTemplateList()
+                    this.getTemplateList();
                 }
             },
-            onReloadPlanBtnClick () {
+            onReloadPlanBtnClick() {
                 if (this.item.sopsContent.id) {
-                    this.getTempaltePlanList()
+                    this.getTempaltePlanList();
                 }
             },
-            validate () {
-                this.$refs.taskForm.validate()
-                let renderFormStatus = true
+            validate() {
+                this.$refs.taskForm.validate();
+                let renderFormStatus = true;
                 if (this.disabled || this.disabledRenderForm) {
-                    renderFormStatus = true
+                    renderFormStatus = true;
                 } else if (this.$refs.renderForm) {
-                    renderFormStatus = this.$refs.renderForm.validate()
+                    renderFormStatus = this.$refs.renderForm.validate();
                 }
                 const formDataStatus = this.item.sopsContent.createWay === 'template'
                     ? !!this.item.sopsContent.id
-                    : !!this.item.sopsContent.sopsTask.id
+                    : !!this.item.sopsContent.sopsTask.id;
                 const quoteFormStatus = Object.keys(this.hookedVarList).every((key) => {
                     if (this.hookedVarList[key] && this.item.sopsContent.formData[key] === '') {
-                        this.quoteErrors.push(key)
-                        return false
+                        this.quoteErrors.push(key);
+                        return false;
                     }
-                    return true
-                })
-                return renderFormStatus && formDataStatus && quoteFormStatus
+                    return true;
+                });
+                return renderFormStatus && formDataStatus && quoteFormStatus;
             },
-            jumpToSopsSelectSchemePage () {
-                const templateId = this.item.sopsContent.id
-                const templateInfo = this.templateList.find(item => item.id === templateId)
-                const projectId = templateInfo.project_id
-                const selectSchemeUrl = `taskflow/newtask/${projectId}/selectnode/?template_id=${templateId}&entrance=templateEdit`
-                window.open(window.SOPS_URL + selectSchemeUrl, '__blank')
+            jumpToSopsSelectSchemePage() {
+                const templateId = this.item.sopsContent.id;
+                const templateInfo = this.templateList.find(item => item.id === templateId);
+                const projectId = templateInfo.project_id;
+                const selectSchemeUrl = `taskflow/newtask/${projectId}/selectnode/?template_id=${templateId}&entrance=templateEdit`;
+                window.open(window.SOPS_URL + selectSchemeUrl, '__blank');
             },
             // 引用/取消引用变量
-            onHookChange (val, scheme) {
-                this.$set(this.hookedVarList, scheme.tag_code, val)
-                const constantItem = this.item.sopsContent.constants.find(item => item.key === scheme.tag_code)
-                constantItem.is_quoted = val
+            onHookChange(val, scheme) {
+                this.$set(this.hookedVarList, scheme.tag_code, val);
+                const constantItem = this.item.sopsContent.constants.find(item => item.key === scheme.tag_code);
+                constantItem.is_quoted = val;
                 if (val) {
-                    this.item.sopsContent.formData[scheme.tag_code] = ''
+                    this.item.sopsContent.formData[scheme.tag_code] = '';
                 } else {
-                    this.item.sopsContent.formData[scheme.tag_code] = constantItem ? deepClone(this.constantDefaultValue[scheme.tag_code]) : ''
-                    const index = this.quoteErrors.findIndex(item => item === scheme.tag_code)
+                    this.item.sopsContent.formData[scheme.tag_code] = constantItem ? deepClone(this.constantDefaultValue[scheme.tag_code]) : '';
+                    const index = this.quoteErrors.findIndex(item => item === scheme.tag_code);
                     if (index > -1) {
-                        this.quoteErrors.splice(index, 1)
+                        this.quoteErrors.splice(index, 1);
                     }
                 }
             },
-            onSelectVar (id, scheme) {
-                this.item.sopsContent.formData[scheme.tag_code] = `\${${id}}`
-                const index = this.quoteErrors.findIndex(item => item === scheme.tag_code)
+            onSelectVar(id, scheme) {
+                this.item.sopsContent.formData[scheme.tag_code] = `\${${id}}`;
+                const index = this.quoteErrors.findIndex(item => item === scheme.tag_code);
                 if (index > -1) {
-                    this.quoteErrors.splice(index, 1)
+                    this.quoteErrors.splice(index, 1);
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

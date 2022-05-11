@@ -177,10 +177,10 @@
     </div>
 </template>
 <script>
-    import commonStep from './components/commonStep'
-    import memberSelect from '../../commonComponent/memberSelect'
-    import permission from '@/mixins/permission.js'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import commonStep from './components/commonStep';
+    import memberSelect from '../../commonComponent/memberSelect';
+    import permission from '@/mixins/permission.js';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'taskTemplate',
@@ -189,7 +189,7 @@
             memberSelect,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 infoStatus: true,
                 // 新增流程页面切换
@@ -251,181 +251,181 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        async mounted () {
-            await this.initData()
+        async mounted() {
+            await this.initData();
         },
         methods: {
-            async initData () {
-                this.stepList[0].signal = 'CREATE_TASK,DELETE_TASK'
-                this.stepList[1].signal = 'BEFORE_START_TASK,AFTER_FINISH_TASK'
-                this.stepList[2].signal = 'AFTER_CONFIRM_TASK'
-                await this.getTemplateList()
+            async initData() {
+                this.stepList[0].signal = 'CREATE_TASK,DELETE_TASK';
+                this.stepList[1].signal = 'BEFORE_START_TASK,AFTER_FINISH_TASK';
+                this.stepList[2].signal = 'AFTER_CONFIRM_TASK';
+                await this.getTemplateList();
             },
-            async getTemplateList () {
+            async getTemplateList() {
                 const params = {
                     name__icontains: this.searchKey,
-                }
-                this.listLoading = true
-                await this.$store.dispatch('taskTemplate/getTemplateList', params).then(res => {
-                    this.templateList = res.data
+                };
+                this.listLoading = true;
+                await this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
+                    this.templateList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.listLoading = false
-                    })
+                        this.listLoading = false;
+                    });
             },
-            cloneTemplate (item) {
+            cloneTemplate(item) {
                 if (!this.hasPermission(['task_template_manage'], item.auth_actions)) {
                     const resourceData = {
                         task_template: [{
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData);
+                    return;
                 }
                 if (item.component_type === 'SOPS') {
-                    return
+                    return;
                 }
                 this.$bkInfo({
                     title: this.$t('m.taskTemplate["确定克隆该模板？"]'),
                     confirmFn: () => {
-                        this.$store.dispatch('taskTemplate/cloneTemplate', item.id).then(res => {
+                        this.$store.dispatch('taskTemplate/cloneTemplate', item.id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.taskTemplate[\'克隆成功\']'),
                                 theme: 'success',
-                            })
+                            });
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.getTemplateList()
-                            })
+                                this.getTemplateList();
+                            });
                     },
-                })
+                });
             },
-            deleteTemplate (item) {
+            deleteTemplate(item) {
                 if (!this.hasPermission(['task_template_manage'], item.auth_actions)) {
                     const resourceData = {
                         task_template: [{
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData);
+                    return;
                 }
                 if (item.is_builtin) {
-                    return
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: '确认删除数据？',
                     subTitle: '数据如果被删除，此数据在流程中不可用。',
                     confirmFn: () => {
-                        this.$store.dispatch('taskTemplate/deleteTemplate', item.id).then(res => {
+                        this.$store.dispatch('taskTemplate/deleteTemplate', item.id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig[\'删除成功\']'),
                                 theme: 'success',
-                            })
+                            });
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.getTemplateList()
-                            })
+                                this.getTemplateList();
+                            });
                     },
-                })
+                });
             },
             // 编辑列表数据
-            editTemplate (item) {
+            editTemplate(item) {
                 if (!this.hasPermission(['task_template_view'], item.auth_actions)) {
                     const resourceData = {
                         task_template: [{
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['task_template_view'], item.auth_actions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['task_template_view'], item.auth_actions, resourceData);
+                    return;
                 }
-                this.changeStep(item)
+                this.changeStep(item);
             },
             // 新增模板
-            addTemplate () {
+            addTemplate() {
                 if (!this.hasPermission(['task_template_create'])) {
-                    this.applyForPermission(['task_template_create'], [], {})
-                    return
+                    this.applyForPermission(['task_template_create'], [], {});
+                    return;
                 }
-                this.firstStepInfo.name = this.firstStepInfo.desc = ''
-                this.firstStepInfo.ownersInputValue = []
-                this.addDialogInfo.isShow = true
+                this.firstStepInfo.name = this.firstStepInfo.desc = '';
+                this.firstStepInfo.ownersInputValue = [];
+                this.addDialogInfo.isShow = true;
             },
-            clearSearch () {
-                this.searchKey = ''
-                this.getTemplateList()
+            clearSearch() {
+                this.searchKey = '';
+                this.getTemplateList();
             },
-            changeStep (item) {
-                this.templateInfo.itemInfo = item.id ? item : {}
-                this.addStatus = !this.addStatus
+            changeStep(item) {
+                this.templateInfo.itemInfo = item.id ? item : {};
+                this.addStatus = !this.addStatus;
 
                 for (let i = 0; i < this.stepList.length; i++) {
-                    this.stepList[i].show = false
-                    this.stepList[i].is_draft = item.is_draft
-                    this.stepList[i].type = item.is_draft ? 'normal' : 'success'
+                    this.stepList[i].show = false;
+                    this.stepList[i].is_draft = item.is_draft;
+                    this.stepList[i].type = item.is_draft ? 'normal' : 'success';
                 }
-                this.stepList[0].show = true
-                this.stepList[0].type = 'primary'
-                this.changeTree(this.stepList[0], 0)
+                this.stepList[0].show = true;
+                this.stepList[0].type = 'primary';
+                this.changeTree(this.stepList[0], 0);
             },
             // 切换树状态
-            changeTree (item, index, source = 'step') {
+            changeTree(item, index, source = 'step') {
                 if (item.type === 'normal' || (item.type === 'primary' && !this.templateInfo.itemInfo.id)) {
-                    return
+                    return;
                 }
-                const finishedStep = source === 'step' ? index : this.stepList.length - 1
+                const finishedStep = source === 'step' ? index : this.stepList.length - 1;
                 for (let i = 0; i <= finishedStep; i++) {
-                    this.stepList[i].show = false
-                    this.stepList[i].is_draft = item.is_draft
-                    this.stepList[i].type = 'success'
+                    this.stepList[i].show = false;
+                    this.stepList[i].is_draft = item.is_draft;
+                    this.stepList[i].type = 'success';
                 }
-                this.stepList[index].show = true
-                this.stepList[index].type = 'primary'
+                this.stepList[index].show = true;
+                this.stepList[index].type = 'primary';
             },
-            changeTemplateInfo (item) {
-                this.templateInfo.itemInfo = item
+            changeTemplateInfo(item) {
+                this.templateInfo.itemInfo = item;
             },
             // 返回列表数据
-            backTab () {
+            backTab() {
                 const item = {
                     id: '',
                     is_draft: true,
-                }
-                this.changeStep(item)
-                this.getTemplateList()
+                };
+                this.changeStep(item);
+                this.getTemplateList();
             },
-            async saveTemplate () {
-                let valid = false
+            async saveTemplate() {
+                let valid = false;
                 await this.$refs.taskInfoForm.validate().then(() => {
-                    valid = true
-                }, () => {})
+                    valid = true;
+                }, () => {});
                 if (!valid) {
-                    return
+                    return;
                 }
                 const params = {
                     name: this.firstStepInfo.name,
@@ -433,24 +433,24 @@
                     owners: this.firstStepInfo.ownersInputValue.join(','),
                     is_draft: true,
                     desc: this.firstStepInfo.desc,
-                }
-                await this.$store.dispatch('taskTemplate/createNewTemplate', params).then(res => {
+                };
+                await this.$store.dispatch('taskTemplate/createNewTemplate', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.taskTemplate[\'保存成功\']'),
                         theme: 'success',
-                    })
-                    this.changeTemplateInfo(res.data)
-                    this.changeStep(this.templateInfo.itemInfo)
+                    });
+                    this.changeTemplateInfo(res.data);
+                    this.changeStep(this.templateInfo.itemInfo);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.addDialogInfo.isShow = false
-                    })
+                        this.addDialogInfo.isShow = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -178,12 +178,12 @@
 </template>
 
 <script>
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson'
-    import collapseTransition from '@/views/commonMix/collapse-transition.js'
-    import BasicCard from '@/components/common/layout/BasicCard.vue'
-    import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList.vue'
-    import TaskConfigPanel from './TaskConfigPanel.vue'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+    import collapseTransition from '@/views/commonMix/collapse-transition.js';
+    import BasicCard from '@/components/common/layout/BasicCard.vue';
+    import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList.vue';
+    import TaskConfigPanel from './TaskConfigPanel.vue';
+    import { errorHandler } from '../../../utils/errorHandler';
     const frequencyList = [
         { id: 0, name: '00:00' },
         { id: 1, name: '01:00' },
@@ -209,7 +209,7 @@
         { id: 21, name: '21:00' },
         { id: 22, name: '22:00' },
         { id: 23, name: '23:00' },
-    ]
+    ];
     export default {
         name: 'ServiceSettingStep',
         components: {
@@ -229,7 +229,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 frequencyList,
                 showMoreConfig: false,
@@ -267,28 +267,28 @@
                 },
                 slaValidateMsg: [],
                 slaValidateDialogShow: false,
-            }
+            };
         },
         computed: {
-            openFunction () {
-                return this.$store.state.openFunction
+            openFunction() {
+                return this.$store.state.openFunction;
             },
-            processId () {
-                return this.serviceInfo.workflow_id
+            processId() {
+                return this.serviceInfo.workflow_id;
             },
         },
         watch: {
-            'formData.revokeWay' (val) {
+            'formData.revokeWay'(val) {
                 if (val === 'specify_node' && !this.nodeList.length) {
-                    this.getNodeList()
+                    this.getNodeList();
                 }
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            initData () {
+            initData() {
                 const {
                     notify,
                     display_type,
@@ -300,69 +300,69 @@
                     notify_rule: notifyRule,
                     notify_freq: notifyFreq,
                     supervise_type,
-                } = this.serviceInfo
+                } = this.serviceInfo;
                 try {
-                    const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type)
-                    this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'not_support'
-                    this.formData.revokeState = revokeConfig.state
+                    const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type);
+                    this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'not_support';
+                    this.formData.revokeState = revokeConfig.state;
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
-                this.formData.is_auto_approve = this.flowInfo.is_auto_approve
+                this.formData.is_auto_approve = this.flowInfo.is_auto_approve;
                 this.formData.visibleRange = {
                     type: display_type,
                     value: display_role,
-                }
-                this.formData.otherSettings = []
+                };
+                this.formData.otherSettings = [];
                 if (canTicketAgency) {
-                    this.formData.otherSettings.push('can_ticket_agency')
+                    this.formData.otherSettings.push('can_ticket_agency');
                 }
                 if (isSuperviseNeeded) {
-                    this.formData.otherSettings.push('is_supervise_needed')
+                    this.formData.otherSettings.push('is_supervise_needed');
                 }
-                this.formData.notify = (notify || []).map(m => m.type)
+                this.formData.notify = (notify || []).map(m => m.type);
                 if (this.formData.notify.length) {
-                    this.formData.notify_rule = notifyRule
-                    this.formData.notify_freq = Number(notifyFreq) / 3600
+                    this.formData.notify_rule = notifyRule;
+                    this.formData.notify_freq = Number(notifyFreq) / 3600;
                 }
                 this.supervisePerson = {
                     type: supervise_type === 'EMPTY' ? 'STARTER' : supervise_type,
                     value: supervisor,
-                }
+                };
             },
             // 获取流程节点
-            getNodeList () {
-                this.nodeListLoading = true
-                this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then(res => {
-                    this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE')
+            getNodeList() {
+                this.nodeListLoading = true;
+                this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then((res) => {
+                    this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.nodeListLoading = false
-                    })
+                        this.nodeListLoading = false;
+                    });
             },
-            saveAndActionService (params) {
+            saveAndActionService(params) {
                 return this.$store.dispatch('service/saveAndActionService', {
                     id: this.serviceInfo.id,
                     params,
-                }).catch(res => {
-                    errorHandler(res, this)
+                }).catch((res) => {
+                    errorHandler(res, this);
                 })
                     .finally(() => {
-                        this.nodeListLoading = false
-                    })
+                        this.nodeListLoading = false;
+                    });
             },
-            goToServiceList () {
+            goToServiceList() {
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
                         project_id: this.$store.state.project.id,
                     },
-                })
+                });
             },
-            async validate () {
+            async validate() {
                 const params = {
                     workflow_config: {
                         supervise_type: 'EMPTY',
@@ -373,54 +373,54 @@
                         },
                         is_auto_approve: this.formData.is_auto_approve,
                     },
-                }
-                const workflow = params.workflow_config // 之前存在流程上的参数
+                };
+                const workflow = params.workflow_config; // 之前存在流程上的参数
                 // 可见范围
                 if (this.$refs.displayRange && !this.$refs.displayRange.verifyValue()) {
-                    return false
+                    return false;
                 }
                 if (this.$refs.taskConfigPanel) {
-                    await this.$refs.taskConfigPanel.validate()
+                    await this.$refs.taskConfigPanel.validate();
                 }
                 if (this.$refs.displayRange) {
-                    const data = this.$refs.displayRange.getValue()
-                    params.display_type = data.type
-                    params.display_role = data.value || undefined
+                    const data = this.$refs.displayRange.getValue();
+                    params.display_type = data.type;
+                    params.display_role = data.value || undefined;
                 }
-                workflow.is_auto_approve = this.formData.is_auto_approve
+                workflow.is_auto_approve = this.formData.is_auto_approve;
                 // 撤单方式
                 const {
                     revokeWay,
                     revokeState,
                     otherSettings,
                     notify,
-                } = this.formData
+                } = this.formData;
                 if (revokeWay === 'not_support') {
-                    workflow.is_revocable = false
+                    workflow.is_revocable = false;
                     // 这是字段
                 } else {
-                    workflow.is_revocable = true
-                    const type = this.revokeWayList.find(item => item.id === revokeWay).key
+                    workflow.is_revocable = true;
+                    const type = this.revokeWayList.find(item => item.id === revokeWay).key;
                     workflow.revoke_config = {
                         type,
                         state: revokeWay === 'specify_node' ? revokeState : 0,
-                    }
+                    };
                 }
                 // 其他设置
-                params.can_ticket_agency = otherSettings.some(key => key === 'can_ticket_agency')
-                workflow.is_supervise_needed = otherSettings.some(key => key === 'is_supervise_needed')
+                params.can_ticket_agency = otherSettings.some(key => key === 'can_ticket_agency');
+                workflow.is_supervise_needed = otherSettings.some(key => key === 'is_supervise_needed');
                 // 督办
                 if (this.$refs.supervisePerson && workflow.is_supervise_needed) {
-                    const { type, value } = this.$refs.supervisePerson.getValue()
+                    const { type, value } = this.$refs.supervisePerson.getValue();
                     if (type !== 'STARTER') {
-                        workflow.supervise_type = type
-                        workflow.supervisor = value
+                        workflow.supervise_type = type;
+                        workflow.supervisor = value;
                     }
                 }
                 // 通知方式
-                workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
-                workflow.notify_freq = 0
-                workflow.notify_rule = 'ONCE'
+                workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item));
+                workflow.notify_freq = 0;
+                workflow.notify_rule = 'ONCE';
 
                 // const canNotice = !!notify.length
                 // if (canNotice) {
@@ -433,20 +433,20 @@
 
                 // 任务配置
                 if (this.$refs.taskConfigPanel) {
-                    workflow.extras = {}
-                    workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams()
+                    workflow.extras = {};
+                    workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams();
                 }
-                const checkResult = await this.saveAndActionService(params)
-                await this.$store.dispatch('service/slaValidate', this.serviceInfo.id)
+                const checkResult = await this.saveAndActionService(params);
+                await this.$store.dispatch('service/slaValidate', this.serviceInfo.id);
                 if (!checkResult.result) {
-                    this.slaValidateMsg = checkResult.data.messages
-                    this.slaValidateDialogShow = true
-                    return { data: { result: false } }
+                    this.slaValidateMsg = checkResult.data.messages;
+                    this.slaValidateDialogShow = true;
+                    return { data: { result: false } };
                 }
-                return true
+                return true;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';

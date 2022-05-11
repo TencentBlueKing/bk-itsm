@@ -146,9 +146,9 @@
 </template>
 
 <script>
-    import mixins from '../../../../commonMix/mixins_api.js'
-    import exportTree from './exportApiTree.vue'
-    import _ from 'lodash'
+    import mixins from '../../../../commonMix/mixins_api.js';
+    import exportTree from './exportApiTree.vue';
+    import _ from 'lodash';
 
     export default {
         name: 'responseData',
@@ -159,8 +159,8 @@
         props: {
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             apiDetail: {
@@ -170,24 +170,24 @@
             },
             stateList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             remoteApiIid: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // apiDetail: this.apiDetailOri,
                 // 组织架构
@@ -245,43 +245,43 @@
                 maxLevelTree: [1, 1, 1],
                 settingKeyName: '',
                 settingValueName: '',
-            }
+            };
         },
         computed: {},
         watch: {
             'apiDetail.rsp_data':
                 {
-                    handler (newName, oldName) {
-                        this.initData()
+                    handler(newName, oldName) {
+                        this.initData();
                     },
                     deep: true,
                 },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            initData () {
-                this.responseTableDataChange()
+            initData() {
+                this.responseTableDataChange();
             },
-            async responseTableDataChange () {
+            async responseTableDataChange() {
                 this.selectInfo = {
                     selectkeylist: [],
                     selectkey: '',
                     selectvaluelist: [],
                     selectvalue: '',
-                }
+                };
                 this.organization = {
                     processorPerson: [],
                     processorTree: {},
                     assignorPerson: [],
                     assignorTree: {},
-                }
-                this.maxLevel = 1
-                this.maxLevelTree = [1, 1, 1]
-                this.settingKeyName = ''
-                this.settingValueName = ''
-                await this.changeInfo
+                };
+                this.maxLevel = 1;
+                this.maxLevelTree = [1, 1, 1];
+                this.settingKeyName = '';
+                this.settingValueName = '';
+                await this.changeInfo;
                 // 初始化数据
                 if (!Object.keys(this.apiDetail.rsp_data).length) {
                     this.apiDetail.responseTreeDataList = [{
@@ -294,340 +294,340 @@
                         desc: this.$t('m.treeinfo["初始化数据"]'),
                         parentInfo: '',
                         children: [],
-                    }]
-                    this.apiDetail.responseTableData = []
+                    }];
+                    this.apiDetail.responseTableData = [];
                 } else {
                     this.apiDetail.responseTreeDataList = await this.jsonschemaToList({
                         root: JSON.parse(JSON.stringify(this.apiDetail.rsp_data)), // root初始 Jsonschema数据结构
-                    })
+                    });
                     // 生成table表格数据
-                    this.apiDetail.responseTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetail.responseTreeDataList[0].children)))
+                    this.apiDetail.responseTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetail.responseTreeDataList[0].children)));
                 }
-                const responseTableData = await JSON.parse(JSON.stringify(this.apiDetail.responseTableData))
+                const responseTableData = await JSON.parse(JSON.stringify(this.apiDetail.responseTableData));
                 // 构造 引用变量
-                await responseTableData.forEach(item => {
-                    item.children = []
+                await responseTableData.forEach((item) => {
+                    item.children = [];
                     // 数据来源
-                    item.source_type = 'CUSTOM'
+                    item.source_type = 'CUSTOM';
                     // 值
-                    item.value = ''
+                    item.value = '';
                     // 属性
-                    item.name = item.key
+                    item.name = item.key;
                     // 是否可选
-                    item.isSelectAbled = false
+                    item.isSelectAbled = false;
                     // 是否选中
-                    item.isSelectedKey = false
+                    item.isSelectedKey = false;
                     // 是否禁用可选
-                    item.isSelectedKeyDisabled = false
+                    item.isSelectedKeyDisabled = false;
                     // 是否选中
-                    item.isSelectedValue = false
+                    item.isSelectedValue = false;
                     // 是否禁用可选
-                    item.isSelectedValueDisabled = !this.changeInfo.api_info
-                })
+                    item.isSelectedValueDisabled = !this.changeInfo.api_info;
+                });
                 // 多层列表数据 关联 table表格数据
-                await this.recordChildren(responseTableData)
+                await this.recordChildren(responseTableData);
                 // 标记父级元素 方便数据处理
-                await this.recordParent(responseTableData)
+                await this.recordParent(responseTableData);
                 // 标记可选 string/boolean/number // 已过滤多重列表
-                const canUseArray = await this.showSelectAbled(responseTableData)
+                const canUseArray = await this.showSelectAbled(responseTableData);
                 // 根据标记的可选非对象数据 向上逐级寻找可用array父级并标记  生成标记可用数组路径
-                await canUseArray.forEach(async item => {
-                    await this.markCanUseArray(item)
-                })
-                this.responseTableData = await responseTableData
+                await canUseArray.forEach(async (item) => {
+                    await this.markCanUseArray(item);
+                });
+                this.responseTableData = await responseTableData;
                 // 根据标记可用数组路径 拼接可用数组
-                const tempList = this.responseTableData.filter(item => (!item.level && item.key === 'data'))
-                this.cascaderData = await this.makeArrayTree(tempList)
+                const tempList = this.responseTableData.filter(item => (!item.level && item.key === 'data'));
+                this.cascaderData = await this.makeArrayTree(tempList);
                 // 派单人组织架构 - tree数据
-                this.organization.assignorPerson = this.cascaderData[0] || []
+                this.organization.assignorPerson = this.cascaderData[0] || [];
                 // 。。。赋值  。。。
                 if (this.changeInfo.api_info && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
                     // 赋值
-                    const rspData = await this.changeInfo.api_info.rsp_data.split('.')
+                    const rspData = await this.changeInfo.api_info.rsp_data.split('.');
                     const rspDataList = await rspData.map((item, index) => {
-                        item = `${index}_${item}`
-                        return item
-                    })
-                    const lastObj = `${rspDataList.length}_items_0`
-                    rspDataList.push(lastObj)
-                    const kvKeyAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.key}`
-                    const kvNameAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.name}`
-                    this.tampFormInfo.ancestorsList_str = rspDataList.toString() // 记录、标记已选中Array --> tree组件/选取数租
-                    this.responseTableData.forEach(ite => {
+                        item = `${index}_${item}`;
+                        return item;
+                    });
+                    const lastObj = `${rspDataList.length}_items_0`;
+                    rspDataList.push(lastObj);
+                    const kvKeyAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.key}`;
+                    const kvNameAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.name}`;
+                    this.tampFormInfo.ancestorsList_str = rspDataList.toString(); // 记录、标记已选中Array --> tree组件/选取数租
+                    this.responseTableData.forEach((ite) => {
                         // 关键字字段
                         if (ite.ancestorsList_str === kvKeyAncestorsStr) {
-                            ite.isSelectedKey = true
-                            this.tampFormInfo.isSelectedKey = ite.ancestorsList_str
-                            this.tampFormInfo.settingKeyName = ite.name
+                            ite.isSelectedKey = true;
+                            this.tampFormInfo.isSelectedKey = ite.ancestorsList_str;
+                            this.tampFormInfo.settingKeyName = ite.name;
                         }
                         // 显示字段
                         if (ite.ancestorsList_str === kvNameAncestorsStr) {
-                            ite.isSelectedValue = true
-                            this.tampFormInfo.isSelectedValue = ite.ancestorsList_str
-                            this.tampFormInfo.settingValueName = ite.name
+                            ite.isSelectedValue = true;
+                            this.tampFormInfo.isSelectedValue = ite.ancestorsList_str;
+                            this.tampFormInfo.settingValueName = ite.name;
                         }
-                    })
-                    await this.organization.assignorPerson.forEach(tree => {
-                        this.treeData(tree, 'assignors')
-                    })
+                    });
+                    await this.organization.assignorPerson.forEach((tree) => {
+                        this.treeData(tree, 'assignors');
+                    });
                     // 关键字字段/显示字段 及 相应列表
-                    this.selectInfo.selectkeylist = this.responseTableData.filter(ite => ite.ancestorsList.join() === rspDataList.join())
-                    this.selectInfo.selectkey = this.tampFormInfo.isSelectedKey
-                    this.selectInfo.selectvaluelist = _.cloneDeep(this.selectInfo.selectkeylist)
-                    this.selectInfo.selectvalue = this.tampFormInfo.isSelectedValue
-                    this.settingValueName = this.tampFormInfo.settingValueName
-                    this.settingKeyName = this.tampFormInfo.settingKeyName
-                    this.giveFirstCheckInfo(this.selectInfo.selectkeylist, kvKeyAncestorsStr)
-                    this.giveFirstCheckInfo(this.selectInfo.selectvaluelist, kvNameAncestorsStr)
+                    this.selectInfo.selectkeylist = this.responseTableData.filter(ite => ite.ancestorsList.join() === rspDataList.join());
+                    this.selectInfo.selectkey = this.tampFormInfo.isSelectedKey;
+                    this.selectInfo.selectvaluelist = _.cloneDeep(this.selectInfo.selectkeylist);
+                    this.selectInfo.selectvalue = this.tampFormInfo.isSelectedValue;
+                    this.settingValueName = this.tampFormInfo.settingValueName;
+                    this.settingKeyName = this.tampFormInfo.settingKeyName;
+                    this.giveFirstCheckInfo(this.selectInfo.selectkeylist, kvKeyAncestorsStr);
+                    this.giveFirstCheckInfo(this.selectInfo.selectvaluelist, kvNameAncestorsStr);
                 }
             },
-            giveFirstCheckInfo (list, way) {
-                list.forEach(item => {
+            giveFirstCheckInfo(list, way) {
+                list.forEach((item) => {
                     if (item.ancestorsList_str === way) {
-                        item.checkInfo = true
+                        item.checkInfo = true;
                     }
                     if ((item.has_children && item.children.length) && item.type === 'object') {
-                        this.giveFirstCheckInfo(item.children, way)
+                        this.giveFirstCheckInfo(item.children, way);
                     }
-                })
+                });
             },
-            treeData (tree, type) {
-                tree.checkInfo = false
-                tree.has_children = !!(tree.children && tree.children.length)
-                tree.showChildren = true
+            treeData(tree, type) {
+                tree.checkInfo = false;
+                tree.has_children = !!(tree.children && tree.children.length);
+                tree.showChildren = true;
                 // 选中操作角色
                 if (String(this.tampFormInfo.ancestorsList_str.split(',').slice(0, -1)
                     .toString()) === String(tree.ancestorsList_str) && type === 'assignors') {
-                    tree.checkInfo = true
-                    this.organization.assignorTree = tree
+                    tree.checkInfo = true;
+                    this.organization.assignorTree = tree;
                 }
                 if (!tree.has_children) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.treeData(item, type)
-                })
+                tree.children.forEach((item) => {
+                    this.treeData(item, type);
+                });
             },
             // 多层列表数据 关联 table表格数据
-            recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(item => item.level)
-                this.maxLevel = Math.max(...levelList)
+            recordChildren(tableData, levelInitial) {
+                const levelList = tableData.map(item => item.level);
+                this.maxLevel = Math.max(...levelList);
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
-                }
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item);
+                };
                 for (let i = this.maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => item.level === i).forEach(ite => {
-                        recordChildrenStep(tableData, ite)
-                    })
+                    tableData.filter(item => item.level === i).forEach((ite) => {
+                        recordChildrenStep(tableData, ite);
+                    });
                 }
             },
             // 标记父级元素 方便数据处理
-            recordParent (tableData, levelInitial) {
-                const maxLevelFun = this.maxLevel
+            recordParent(tableData, levelInitial) {
+                const maxLevelFun = this.maxLevel;
                 const recordParentStep = function (tableData, item) {
                     // tree.parentInfo = parentInfo
                     if (!item.level) {
-                        item.parentInfo = ''
+                        item.parentInfo = '';
                     } else {
-                        item.parentInfo = tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0]
+                        item.parentInfo = tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0];
                     }
-                }
+                };
                 for (let i = 0; i <= (levelInitial || maxLevelFun); i++) {
-                    tableData.filter(item => item.level === i).forEach(ite => {
-                        recordParentStep(tableData, ite)
-                    })
+                    tableData.filter(item => item.level === i).forEach((ite) => {
+                        recordParentStep(tableData, ite);
+                    });
                 }
             },
             // 根据标记的可选非对象数据 向上逐级寻找可用array父级并标记  生成标记可用数组路径
-            markCanUseArray (data) {
-                data.isCanUseArray = true
+            markCanUseArray(data) {
+                data.isCanUseArray = true;
                 if (data.level) {
-                    this.markCanUseArray(data.parentInfo)
+                    this.markCanUseArray(data.parentInfo);
                 }
             },
             // 根据标记可用数组路径 拼接可用数组
-            makeArrayTree (dataOri) {
-                const treeList = []
+            makeArrayTree(dataOri) {
+                const treeList = [];
                 const makeArrayTreeStep = function (treeListOri, data) {
-                    data.forEach(item => {
-                        data.name = item.name
-                        data.isSelect = false
-                        data.ancestorsList_str = item.ancestorsList_str
-                        const { children } = item
-                        data.children = []
-                        treeListOri.push(data)
+                    data.forEach((item) => {
+                        data.name = item.name;
+                        data.isSelect = false;
+                        data.ancestorsList_str = item.ancestorsList_str;
+                        const { children } = item;
+                        data.children = [];
+                        treeListOri.push(data);
                         if (children && children.length) {
-                            makeArrayTreeStep(data.children, children)
+                            makeArrayTreeStep(data.children, children);
                         }
-                    })
-                }
-                makeArrayTreeStep(treeList, dataOri)
-                return treeList
+                    });
+                };
+                makeArrayTreeStep(treeList, dataOri);
+                return treeList;
             },
-            changeState (item) {
-                item.showChildren = !item.showChildren
-                item.children.forEach(ite => {
-                    ite.isShow = item.showChildren
+            changeState(item) {
+                item.showChildren = !item.showChildren;
+                item.children.forEach((ite) => {
+                    ite.isShow = item.showChildren;
                     // this.$set(ite, 'isShow', item.showChildren)
-                })
+                });
                 if (!item.showChildren) {
-                    this.closeChildren(item)
+                    this.closeChildren(item);
                 }
             },
-            closeChildren (item) {
-                item.children.forEach(ite => {
-                    ite.isShow = false
+            closeChildren(item) {
+                item.children.forEach((ite) => {
+                    ite.isShow = false;
                     // this.$set(ite, 'isShow', item.showChildren)
                     if (ite.has_children) {
-                        ite.showChildren = false
-                        this.closeChildren(ite)
+                        ite.showChildren = false;
+                        this.closeChildren(ite);
                     }
-                })
+                });
             },
-            changeType (item) {
+            changeType(item) {
                 // ...
             },
             // old table选中key
-            selectOneKey (itemData) {
-                const { isSelectedKey } = itemData
-                this.responseTableData.forEach(item => {
-                    item.isSelectedKey = false
-                })
-                itemData.isSelectedKey = !isSelectedKey
-                this.responseTableData.filter(item => (item.isSelectAbled)).forEach(item => {
-                    item.isSelectedKeyDisabled = false
-                    item.isSelectedValueDisabled = item.parentInfo !== itemData.parentInfo
-                })
-                this.responseTableData.filter(item => (item.isSelectAbled && item.parentInfo !== itemData.parentInfo)).forEach(item => {
-                    item.isSelectedValue = false
-                })
+            selectOneKey(itemData) {
+                const { isSelectedKey } = itemData;
+                this.responseTableData.forEach((item) => {
+                    item.isSelectedKey = false;
+                });
+                itemData.isSelectedKey = !isSelectedKey;
+                this.responseTableData.filter(item => (item.isSelectAbled)).forEach((item) => {
+                    item.isSelectedKeyDisabled = false;
+                    item.isSelectedValueDisabled = item.parentInfo !== itemData.parentInfo;
+                });
+                this.responseTableData.filter(item => (item.isSelectAbled && item.parentInfo !== itemData.parentInfo)).forEach((item) => {
+                    item.isSelectedValue = false;
+                });
             },
             // old table选中value
-            selectOneValue (itemData) {
-                const { isSelectedValue } = itemData
-                this.responseTableData.forEach(item => {
-                    item.isSelectedValue = false
-                })
-                itemData.isSelectedValue = !isSelectedValue
+            selectOneValue(itemData) {
+                const { isSelectedValue } = itemData;
+                this.responseTableData.forEach((item) => {
+                    item.isSelectedValue = false;
+                });
+                itemData.isSelectedValue = !isSelectedValue;
             },
             // 计算祖先元素有几个是Array
-            countArrayAncestors (data) {
-                const ids = []
+            countArrayAncestors(data) {
+                const ids = [];
                 const countArrayAncestorsStep = function (item) {
                     if (item.parentInfo.type === 'array') {
-                        ids.push(item.parentInfo)
-                        countArrayAncestorsStep(item.parentInfo)
+                        ids.push(item.parentInfo);
+                        countArrayAncestorsStep(item.parentInfo);
                     }
                     if (item.parentInfo.type === 'object') {
-                        countArrayAncestorsStep(item.parentInfo)
+                        countArrayAncestorsStep(item.parentInfo);
                     }
-                }
-                countArrayAncestorsStep(data)
-                return ids
+                };
+                countArrayAncestorsStep(data);
+                return ids;
             },
             // 标记可选 string/boolean/number
-            async showSelectAbled (responseTableData) {
-                const canUseArray = []
+            async showSelectAbled(responseTableData) {
+                const canUseArray = [];
                 // list结构字段 是否可用
                 // 1.祖先元素是否有list结构--1对1--（有则该字段不能用）
                 const isArrayList = responseTableData.filter(item => (
                     item.type !== 'array' && item.type !== 'object' && item.level && (!item.children || !item.children.length)
                     && item.ancestorsList.indexOf('0_data') !== -1
-                ))
-                const isArrayListUp = isArrayList.filter(item => {
-                    const parentArray = this.countArrayAncestors(item)
-                    const count = parentArray.length
-                    const isabled = count === 1 && (item.parentInfo.type === 'array' || item.parentInfo.parentInfo.type === 'array') // && 后台不支持多层选值
+                ));
+                const isArrayListUp = isArrayList.filter((item) => {
+                    const parentArray = this.countArrayAncestors(item);
+                    const count = parentArray.length;
+                    const isabled = count === 1 && (item.parentInfo.type === 'array' || item.parentInfo.parentInfo.type === 'array'); // && 后台不支持多层选值
                     if (isabled && canUseArray.indexOf(parentArray[0]) === -1) {
-                        canUseArray.push(parentArray[0])
+                        canUseArray.push(parentArray[0]);
                     }
-                    return isabled
-                })
-                isArrayListUp.forEach(item => {
-                    item.isSelectAbled = true
-                })
-                return canUseArray
+                    return isabled;
+                });
+                isArrayListUp.forEach((item) => {
+                    item.isSelectAbled = true;
+                });
+                return canUseArray;
             },
-            showTree (index) {
+            showTree(index) {
                 if (!index) {
-                    const levelList = this.organization.assignorPerson.map(item => item.level)
-                    this.$set(this.maxLevelTree, 0, Math.max(...levelList) - 1)
+                    const levelList = this.organization.assignorPerson.map(item => item.level);
+                    this.$set(this.maxLevelTree, 0, Math.max(...levelList) - 1);
                 } else {
-                    const levelList = this.selectInfo.selectkeylist.map(item => item.level)
-                    this.$set(this.maxLevelTree, 1, Math.max(...levelList) - 1)
-                    this.$set(this.maxLevelTree, 2, Math.max(...levelList) - 1)
+                    const levelList = this.selectInfo.selectkeylist.map(item => item.level);
+                    this.$set(this.maxLevelTree, 1, Math.max(...levelList) - 1);
+                    this.$set(this.maxLevelTree, 2, Math.max(...levelList) - 1);
                 }
-                const temp = this.organizaInfo.assignorShow[index]
+                const temp = this.organizaInfo.assignorShow[index];
                 for (let i = 0; i < 3; i++) {
-                    this.$set(this.organizaInfo.assignorShow, i, false)
+                    this.$set(this.organizaInfo.assignorShow, i, false);
                 }
-                this.$set(this.organizaInfo.assignorShow, index, !temp)
+                this.$set(this.organizaInfo.assignorShow, index, !temp);
             },
-            closeOther0 () {
-                this.$set(this.organizaInfo.assignorShow, 0, false)
+            closeOther0() {
+                this.$set(this.organizaInfo.assignorShow, 0, false);
             },
-            closeOther1 () {
-                this.$set(this.organizaInfo.assignorShow, 1, false)
+            closeOther1() {
+                this.$set(this.organizaInfo.assignorShow, 1, false);
             },
-            closeOther2 () {
-                this.$set(this.organizaInfo.assignorShow, 2, false)
+            closeOther2() {
+                this.$set(this.organizaInfo.assignorShow, 2, false);
             },
-            recordCheckFn (tree) {
-                tree.checkInfo = false
+            recordCheckFn(tree) {
+                tree.checkInfo = false;
                 if (tree.children == null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.recordCheckFn(item)
-                })
+                tree.children.forEach((item) => {
+                    this.recordCheckFn(item);
+                });
             },
-            assignorToggle (value, index) {
+            assignorToggle(value, index) {
                 if (value.type === 'object' || (index && value.type === 'array')) {
-                    return
+                    return;
                 }
                 if (!index) {
-                    this.organization.assignorPerson.forEach(tree => {
-                        this.recordCheckFn(tree)
-                    })
-                    this.selectInfo.selectkeylist = value.children[0].children
-                    this.selectInfo.selectvaluelist = _.cloneDeep(this.selectInfo.selectkeylist)
+                    this.organization.assignorPerson.forEach((tree) => {
+                        this.recordCheckFn(tree);
+                    });
+                    this.selectInfo.selectkeylist = value.children[0].children;
+                    this.selectInfo.selectvaluelist = _.cloneDeep(this.selectInfo.selectkeylist);
                     // 选中的数据
-                    this.organization.assignorTree = value
-                    this.tampFormInfo.assignors = value.id
-                    this.checkInfo.assignors = false
+                    this.organization.assignorTree = value;
+                    this.tampFormInfo.assignors = value.id;
+                    this.checkInfo.assignors = false;
                 } else if (index === 1) {
-                    this.selectInfo.selectkeylist.forEach(tree => {
-                        this.recordCheckFn(tree)
-                    })
-                    this.selectInfo.selectkey = value.ancestorsList_str
-                    this.settingKeyName = value.name
-                    this.responseTableData.forEach(item => {
-                        item.isSelectedKey = false
-                    })
-                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedKey = true
+                    this.selectInfo.selectkeylist.forEach((tree) => {
+                        this.recordCheckFn(tree);
+                    });
+                    this.selectInfo.selectkey = value.ancestorsList_str;
+                    this.settingKeyName = value.name;
+                    this.responseTableData.forEach((item) => {
+                        item.isSelectedKey = false;
+                    });
+                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedKey = true;
                 } else {
-                    this.selectInfo.selectvaluelist.forEach(tree => {
-                        this.recordCheckFn(tree)
-                    })
-                    this.selectInfo.selectvalue = value.ancestorsList_str
-                    this.settingValueName = value.name
-                    this.responseTableData.forEach(item => {
-                        item.isSelectedValue = false
-                    })
-                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedValue = true
+                    this.selectInfo.selectvaluelist.forEach((tree) => {
+                        this.recordCheckFn(tree);
+                    });
+                    this.selectInfo.selectvalue = value.ancestorsList_str;
+                    this.settingValueName = value.name;
+                    this.responseTableData.forEach((item) => {
+                        item.isSelectedValue = false;
+                    });
+                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedValue = true;
                 }
-                value.checkInfo = true
+                value.checkInfo = true;
                 // 关闭窗口
-                this.closeTree(index)
+                this.closeTree(index);
             },
-            closeTree (index) {
-                this.$set(this.organizaInfo.assignorShow, index, false)
+            closeTree(index) {
+                this.$set(this.organizaInfo.assignorShow, index, false);
             },
-            toggleChildren () {
-                arguments[0].showChildren = !arguments[0].showChildren
+            toggleChildren() {
+                arguments[0].showChildren = !arguments[0].showChildren;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

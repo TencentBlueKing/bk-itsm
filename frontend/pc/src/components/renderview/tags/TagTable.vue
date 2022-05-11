@@ -44,7 +44,7 @@
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins'
+    import { getFormMixins } from '../formMixins';
     const tableAttrs = {
         column: {
             type: Array,
@@ -75,7 +75,7 @@
             type: Array,
             default: () => ([]),
         },
-    }
+    };
     export default {
         name: 'TagTable',
         components: {
@@ -86,25 +86,25 @@
             /**
              * scheme 优先级：from.scheme > item.scheme > item.type
              */
-            getScheme (item, form) {
-                const { schemes } = this.getContext()
+            getScheme(item, form) {
+                const { schemes } = this.getContext();
                 if (form && form.scheme && schemes[form.scheme]) {
-                    return schemes[form.scheme]
+                    return schemes[form.scheme];
                 }
                 if (item.scheme) {
-                    return schemes[item.scheme]
+                    return schemes[item.scheme];
                 }
                 if (form && form.type) {
                     return {
                         type: form.type,
-                    }
+                    };
                 }
                 return {
                     type: item.type,
-                }
+                };
             },
         },
-    }
+    };
 </script>
 <style lang="scss">
 .tag-data-table {

@@ -101,7 +101,8 @@
                         <router-link
                             target="_blank"
                             class="table-link mr10"
-                            :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from } }">
+                            :to="{ name: 'TicketDetail',
+                                   query: { id: props.row.id, project_id: props.row.project_key, from } }">
                             {{ props.row.can_operate ? $t(`m.manageCommon['处理']`) : $t('m.manageCommon["查看"]') }}
                         </router-link>
                     </template>
@@ -129,10 +130,10 @@
     </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch'
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue'
-    import i18n from '@/i18n/index.js'
-    import ticketListMixins from './ticketListMixins.js'
+    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+    import i18n from '@/i18n/index.js';
+    import ticketListMixins from './ticketListMixins.js';
 
     const COLUMN_LIST = [
         {
@@ -191,7 +192,7 @@
             id: 'operate',
             label: i18n.t('m.manageCommon[\'操作\']'),
             minWidth: '80' },
-    ]
+    ];
 
     export default {
         name: 'TodoList',
@@ -203,15 +204,15 @@
         props: {
             from: String,
         },
-        data () {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
+        data() {
+            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
             return {
                 columnList,
                 type: 'todo',
                 isExportDialogShow: false,
-            }
+            };
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

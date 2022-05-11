@@ -62,7 +62,7 @@
     </div>
 </template>
 <script>
-    import responseContent from './responseContent.vue'
+    import responseContent from './responseContent.vue';
 
     export default {
         name: 'responseCondition',
@@ -72,29 +72,29 @@
         props: {
             responseWayList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             responseList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             signal: String,
         },
-        data () {
+        data() {
             return {
                 wayList: [],
                 apiList: [],
-            }
+            };
         },
-        created () {
+        created() {
 
         },
         methods: {
-            addResponse (item, index) {
+            addResponse(item, index) {
                 this.responseList.splice(index + 1, 0, {
                     way: '',
                     wayInfo: {},
@@ -104,28 +104,29 @@
                         repeat: 'one',
                     },
                     isLoading: false,
-                })
+                });
             },
-            deleteResponse (item, index) {
+            deleteResponse(item, index) {
                 if (this.responseList.length === 1) {
-                    return
+                    return;
                 }
-                this.responseList.splice(index, 1)
+                this.responseList.splice(index, 1);
             },
             // 选中某一个类型
-            async selectedWay () {
+            async selectedWay() {
                 // 当存在校验显示时，将校验显示还原
                 if (arguments[2].wayStatus) {
-                    arguments[2].wayStatus = false
+                    arguments[2].wayStatus = false;
                 }
-                arguments[2].isLoading = true
-                arguments[2].wayInfo = JSON.parse(JSON.stringify(this.responseWayList.filter(node => node.key === arguments[0])[0]))
+                arguments[2].isLoading = true;
+                arguments[2].wayInfo = JSON.parse(
+                    JSON.stringify(this.responseWayList.filter(node => node.key === arguments[0])[0]));
                 setTimeout(() => {
-                    arguments[2].isLoading = false
-                }, 1000)
+                    arguments[2].isLoading = false;
+                }, 1000);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

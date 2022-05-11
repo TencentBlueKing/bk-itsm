@@ -28,7 +28,7 @@
  * 导航组件在做选中态匹配时优先级为：path 字段、prefix 字段
  */
 
-import i18n from '@/i18n/index.js'
+import i18n from '@/i18n/index.js';
 
 const ROUTE_LIST = [
     {
@@ -257,6 +257,6 @@ const ROUTE_LIST = [
             // }
         ],
     },
-]
+];
 
-export default ROUTE_LIST
+export default ROUTE_LIST;

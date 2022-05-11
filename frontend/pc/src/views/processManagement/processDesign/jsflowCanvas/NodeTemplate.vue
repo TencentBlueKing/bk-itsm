@@ -108,25 +108,25 @@
     </div>
 </template>
 <script>
-    import { deepClone } from '@/utils/util.js'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import { deepClone } from '@/utils/util.js';
+    import { errorHandler } from '../../../../utils/errorHandler';
     export default {
         name: 'NodeTemplate',
         props: {
             node: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             canvasData: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 moveFlag: false,
                 clickSecond: false,
@@ -154,87 +154,87 @@
                     { type: 'COPY', name: this.$t('m.treeinfo["复制节点"]'), iconStyle: 'icon-copy-new' },
                 ],
                 currentNode: {},
-            }
+            };
         },
-        mounted () {
-            this.toolStatus = localStorage.getItem('toolStatus') || false
+        mounted() {
+            this.toolStatus = localStorage.getItem('toolStatus') || false;
         },
         methods: {
-            hoverNode (node) {
+            hoverNode(node) {
                 if (node.nodeInfo && node.nodeInfo.errorInfo) {
-                    node.nodeInfo.errorInfo = false
+                    node.nodeInfo.errorInfo = false;
                 }
             },
-            moveDoneFn (node) {
-                this.moveFlag = false
+            moveDoneFn(node) {
+                this.moveFlag = false;
                 // 将拖拽节点的层级设置最高
-                const listInfo = document.getElementsByClassName('jsflow-node')
+                const listInfo = document.getElementsByClassName('jsflow-node');
                 for (let i = 0; i < listInfo.length; i++) {
-                    listInfo[i].style['z-index'] = 101
+                    listInfo[i].style['z-index'] = 101;
                 }
                 if (document.getElementById(node.id)) {
-                    document.getElementById(node.id).style['z-index'] = 102
+                    document.getElementById(node.id).style['z-index'] = 102;
                 }
             },
-            moveFn () {
-                this.moveFlag = true
+            moveFn() {
+                this.moveFlag = true;
             },
-            onNodeClick (node, event) {
-                this.currentNode = node
+            onNodeClick(node, event) {
+                this.currentNode = node;
                 // 往数组中添加数据属性
-                const showValue = Boolean(node.showMore)
-                this.$set(node, 'showMore', showValue)
+                const showValue = Boolean(node.showMore);
+                this.$set(node, 'showMore', showValue);
                 // 操作节点时往数据中添加
                 if (!this.moveFlag) {
                     // 点击节点操作(将点击节点的操作放到右键上实现)
                 } else {
-                    const valueNode = this.canvasData.nodes.find(item => item.id === node.id)
-                    this.$store.commit('deployCommon/changeNodeInfo', valueNode)
+                    const valueNode = this.canvasData.nodes.find(item => item.id === node.id);
+                    this.$store.commit('deployCommon/changeNodeInfo', valueNode);
                 }
-                this.moveFlag = false
+                this.moveFlag = false;
             },
-            clickNode (node, event) {
-                this.openconfigu()
+            clickNode(node, event) {
+                this.openconfigu();
             },
             // 右键事件
-            rightClickNode (node, event) {
+            rightClickNode(node, event) {
                 if (!node) {
-                    return
+                    return;
                 }
-                this.$emit('closeShow')
-                node.showMore = true
+                this.$emit('closeShow');
+                node.showMore = true;
             },
             // 配置详情
-            openconfigu () {
-                const node = deepClone(this.node)
-                const deviation = 3 // 允许偏差值
+            openconfigu() {
+                const node = deepClone(this.node);
+                const deviation = 3; // 允许偏差值
                 // 如果是move节点，则不触发点击事件
                 if (
                     Math.abs(node.x - this.currentNode.x) > deviation
                     || Math.abs(node.y - this.currentNode.y) > deviation
                 ) {
-                    return
+                    return;
                 }
                 // 如果是汇聚网关和并行网关则不触发事件
                 if (node.type === 'ROUTER-P' || node.type === 'COVERAGE' || node.type === 'START' || node.type === 'END') {
-                    return
+                    return;
                 }
-                this.$emit('configuNode', node.nodeInfo)
+                this.$emit('configuNode', node.nodeInfo);
             },
-            closeNode () {
-                this.node.showMore = false
+            closeNode() {
+                this.node.showMore = false;
             },
             // 新增节点
-            addNormal (node, value) {
+            addNormal(node, value) {
                 if (this.clickSecond) {
-                    return
+                    return;
                 }
-                this.clickSecond = true
-                this.$store.commit('deployCommon/changeNodeStatus', true)
+                this.clickSecond = true;
+                this.$store.commit('deployCommon/changeNodeStatus', true);
                 if (value.type !== 'COPY') {
                     // 获取当前节点的输出连线
-                    const lineList = this.canvasData.lines.filter(item => item.source.id === node.id)
-                    const xValue = (node.type === 'NORMAL' || node.type === 'TASK') ? 310 : 210
+                    const lineList = this.canvasData.lines.filter(item => item.source.id === node.id);
+                    const xValue = (node.type === 'NORMAL' || node.type === 'TASK') ? 310 : 210;
                     // 节点前后id值
                     const params = {
                         workflow: node.nodeInfo.workflow,
@@ -246,7 +246,7 @@
                             y: node.y + lineList.length * 80,
                         },
                         extras: {},
-                    }
+                    };
                     this.$store.dispatch('deployCommon/creatNode', { params }).then((res) => {
                         this.valueInfo.node = {
                             id: `node_${res.data.id}`,
@@ -256,20 +256,20 @@
                             name: res.data.name,
                             showMore: false,
                             nodeInfo: res.data,
-                        }
-                        this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
-                        this.addNewLine(node, res.data.id)
+                        };
+                        this.$emit('closeShow');
+                        this.$emit('updateNode', this.valueInfo);
+                        this.addNewLine(node, res.data.id);
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.clickSecond = false
-                            this.$store.commit('deployCommon/changeNodeStatus', false)
-                        })
+                            this.clickSecond = false;
+                            this.$store.commit('deployCommon/changeNodeStatus', false);
+                        });
                 } else {
-                    const { id } = this.node.nodeInfo
+                    const { id } = this.node.nodeInfo;
                     this.$store.dispatch('deployCommon/copyNode', id).then((res) => {
                         this.valueInfo.node = {
                             id: `node_${res.data.id}`,
@@ -279,22 +279,22 @@
                             name: res.data.name,
                             showMore: false,
                             nodeInfo: res.data,
-                        }
-                        this.$emit('closeShow')
-                        this.$emit('updateNode', this.valueInfo)
+                        };
+                        this.$emit('closeShow');
+                        this.$emit('updateNode', this.valueInfo);
                         // this.addNewLine(node, res.data.id)
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.clickSecond = false
-                            this.$store.commit('deployCommon/changeNodeStatus', false)
-                        })
+                            this.clickSecond = false;
+                            this.$store.commit('deployCommon/changeNodeStatus', false);
+                        });
                 }
             },
             // 新增线条
-            addNewLine (fromNode, toState) {
+            addNewLine(fromNode, toState) {
                 const lineParams = {
                     workflow: fromNode.nodeInfo.workflow,
                     name: this.$t('m.treeinfo["默认"]'),
@@ -304,7 +304,7 @@
                     },
                     from_state: fromNode.nodeInfo.id,
                     to_state: toState,
-                }
+                };
                 this.$store.dispatch('deployCommon/createLine', { lineParams }).then((res) => {
                     this.valueInfo.line = {
                         source: {
@@ -316,25 +316,25 @@
                             id: this.valueInfo.node.id,
                         },
                         lineInfo: res.data,
-                    }
-                    this.$emit('fastAddNode', this.valueInfo)
-                    this.$emit('updateLine', this.valueInfo.line, 'add')
+                    };
+                    this.$emit('fastAddNode', this.valueInfo);
+                    this.$emit('updateLine', this.valueInfo.line, 'add');
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 删除线条
-            clickDelete (node) {
-                this.$emit('openDelete', node)
+            clickDelete(node) {
+                this.$emit('openDelete', node);
             },
             // 隐藏提示
-            closeTool () {
-                this.toolStatus = true
-                localStorage.setItem('toolStatus', true)
+            closeTool() {
+                this.toolStatus = true;
+                localStorage.setItem('toolStatus', true);
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './jsflowCss/nodeTemplate.scss';

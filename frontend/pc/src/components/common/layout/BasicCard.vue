@@ -44,7 +44,7 @@
 </template>
 
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js'
+    import collapseTransition from '@/utils/collapse-transition.js';
     export default {
         name: 'BasicCard',
         components: {
@@ -72,20 +72,20 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 showMore: true,
-            }
+            };
         },
         watch: {
             isFold: {
-                handler () {
-                    this.showMore = this.firstUnfold
+                handler() {
+                    this.showMore = this.firstUnfold;
                 },
                 immediate: true,
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/common-section-card.scss';

@@ -47,7 +47,7 @@
     </div>
 </template>
 <script>
-    import debounce from 'throttle-debounce/debounce'
+    import debounce from 'throttle-debounce/debounce';
     export default {
         name: 'bk-number-input',
         props: {
@@ -65,8 +65,8 @@
             },
             exStyle: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             placeholder: {
@@ -92,11 +92,11 @@
             size: {
                 type: String,
                 default: 'large',
-                validator (value) {
+                validator(value) {
                     return [
                         'large',
                         'small',
-                    ].indexOf(value) > -1
+                    ].indexOf(value) > -1;
                 },
             },
             debounceTimer: {
@@ -104,7 +104,7 @@
                 default: 100,
             },
         },
-        data () {
+        data() {
             return {
                 isMax: false,
                 isMin: false,
@@ -114,133 +114,133 @@
                 minNumber: this.min,
                 isError: false,
                 inputDom: null,
-            }
+            };
         },
         watch: {
-            min () {
-                this.minNumber = this.min
+            min() {
+                this.minNumber = this.min;
             },
-            max () {
-                this.maxNumber = this.max
+            max() {
+                this.maxNumber = this.max;
             },
             value: {
                 immediate: true,
-                handler (value) {
-                    value = `${value}`
+                handler(value) {
+                    value = `${value}`;
                     if (value === '') {
-                        this.currentValue = value
-                        return
+                        this.currentValue = value;
+                        return;
                     }
 
-                    let newVal = parseInt(value)
+                    let newVal = parseInt(value);
 
                     if (this.type === 'decimals') {
-                        newVal = Number(value)
+                        newVal = Number(value);
                     }
 
-                    this.currentValue = value
+                    this.currentValue = value;
                 },
             },
         },
-        created () {
-            this.debounceHandleInput = debounce(this.debounceTimer, event => {
-                const { value } = event.target
-                this.inputHandler(value, event.target)
-            })
+        created() {
+            this.debounceHandleInput = debounce(this.debounceTimer, (event) => {
+                const { value } = event.target;
+                this.inputHandler(value, event.target);
+            });
         },
         methods: {
-            focus (event) {
-                this.isFocus = true
-                this.$emit('focus', event)
+            focus(event) {
+                this.isFocus = true;
+                this.$emit('focus', event);
             },
-            blur () {
-                this.isFocus = false
-                this.$emit('blur', event)
+            blur() {
+                this.isFocus = false;
+                this.$emit('blur', event);
             },
-            getPower (val) {
-                const valueString = val.toString()
-                const dotPosition = valueString.indexOf('.')
+            getPower(val) {
+                const valueString = val.toString();
+                const dotPosition = valueString.indexOf('.');
 
-                let power = 0
+                let power = 0;
                 if (dotPosition > -1) {
-                    power = valueString.length - dotPosition - 1
+                    power = valueString.length - dotPosition - 1;
                 }
-                return Math.pow(10, power)
+                return Math.pow(10, power);
             },
-            checkMinMax (val) {
+            checkMinMax(val) {
                 if (val <= this.minNumber) {
-                    val = this.minNumber
-                    this.isMin = true
+                    val = this.minNumber;
+                    this.isMin = true;
                 } else {
-                    this.isMin = false
+                    this.isMin = false;
                 }
                 if (val >= this.maxNumber) {
-                    val = this.maxNumber
-                    this.isMax = true
+                    val = this.maxNumber;
+                    this.isMax = true;
                 } else {
-                    this.isMax = false
+                    this.isMax = false;
                 }
-                return val
+                return val;
             },
-            inputHandler (value, target) {
+            inputHandler(value, target) {
                 if (value === '') {
-                    this.$emit('update:value', value)
-                    this.$emit('change', value)
-                    this.currentValue = value
-                    target && (target.value = value)
-                    return
+                    this.$emit('update:value', value);
+                    this.$emit('change', value);
+                    this.currentValue = value;
+                    target && (target.value = value);
+                    return;
                 }
                 if (value !== '' && value.indexOf('.') === (value.length - 1)) {
-                    return
+                    return;
                 }
 
                 if (value !== '' && value.indexOf('.') > -1 && Number(value) === 0) {
-                    return
+                    return;
                 }
                 // if (value !== '' && value.indexOf('-') === (value.length - 1)) {
                 //     return
                 // }
 
-                let newVal = parseInt(value)
+                let newVal = parseInt(value);
 
                 if (this.type === 'decimals') {
-                    newVal = Number(value)
+                    newVal = Number(value);
                 }
 
                 if (!isNaN(newVal)) {
-                    this.setCurrentValue(newVal, target)
+                    this.setCurrentValue(newVal, target);
                 } else {
-                    target.value = this.currentValue
+                    target.value = this.currentValue;
                 }
             },
-            setCurrentValue (val, target) {
+            setCurrentValue(val, target) {
                 // const oldVal = this.currentValue.toFixed(2)
-                val = this.checkMinMax(val)
-                this.$emit('update:value', val)
-                this.$emit('change', val)
-                this.currentValue = val
-                target && (target.value = val)
+                val = this.checkMinMax(val);
+                this.$emit('update:value', val);
+                this.$emit('change', val);
+                this.currentValue = val;
+                target && (target.value = val);
             },
-            add () {
-                if (this.disabled) return
-                const value = this.value || 0
-                if (typeof value !== 'number') return this.currentValue
-                const power = this.getPower(value)
-                const newVal = (power * value + power * this.steps) / power
-                if (newVal > this.max) return
-                this.setCurrentValue(newVal)
+            add() {
+                if (this.disabled) return;
+                const value = this.value || 0;
+                if (typeof value !== 'number') return this.currentValue;
+                const power = this.getPower(value);
+                const newVal = (power * value + power * this.steps) / power;
+                if (newVal > this.max) return;
+                this.setCurrentValue(newVal);
             },
-            minus () {
-                if (this.disabled) return
-                const value = this.value || 0
-                if (typeof value !== 'number') return this.currentValue
-                const power = this.getPower(value)
-                const newVal = parseInt(power * value - power * this.steps) / power
-                if (newVal < this.min) return
-                this.setCurrentValue(newVal)
+            minus() {
+                if (this.disabled) return;
+                const value = this.value || 0;
+                if (typeof value !== 'number') return this.currentValue;
+                const power = this.getPower(value);
+                const newVal = parseInt(power * value - power * this.steps) / power;
+                if (newVal < this.min) return;
+                this.setCurrentValue(newVal);
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .bk-number{

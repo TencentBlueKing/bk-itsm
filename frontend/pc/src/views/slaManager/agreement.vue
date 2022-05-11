@@ -216,11 +216,11 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue'
-    import addAgreement from './newAddAgreement'
-    import EmptyTip from '../project/components/emptyTip.vue'
-    import permission from '@/mixins/permission.js'
+    import { errorHandler } from '../../utils/errorHandler';
+    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
+    import addAgreement from './newAddAgreement';
+    import EmptyTip from '../project/components/emptyTip.vue';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'agreement',
@@ -230,7 +230,7 @@
             EmptyTip,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 isDataLoading: true,
                 versionStatus: true,
@@ -307,181 +307,181 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getList(1)
-            this.getModelList()
-            this.getTicketHighlight()
-            this.getModelPriority()
-            this.getNoticeList('EMAIL')
-            this.getNoticeList('WEIXIN')
+        mounted() {
+            this.getList(1);
+            this.getModelList();
+            this.getTicketHighlight();
+            this.getModelPriority();
+            this.getNoticeList('EMAIL');
+            this.getNoticeList('WEIXIN');
             if (this.$route.query.key === 'create') {
-                let itemObj = {}
-                if ('item' in this.$route.query) itemObj = JSON.parse(this.$route.query.item)
-                this.addAgreement(itemObj)
+                let itemObj = {};
+                if ('item' in this.$route.query) itemObj = JSON.parse(this.$route.query.item);
+                this.addAgreement(itemObj);
             }
         },
         methods: {
-            getList (page) {
+            getList(page) {
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
-                }
-                this.moreSearch.forEach(item => {
+                };
+                this.moreSearch.forEach((item) => {
                     if (Array.isArray(item.value) ? !!item.value.length : item.value !== '') {
-                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                     }
-                })
-                this.isDataLoading = true
+                });
+                this.isDataLoading = true;
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
-                    this.dataList = res.data.items
-                    this.searchToggle = res.data.items.length !== 0
+                    this.dataList = res.data.items;
+                    this.searchToggle = res.data.items.length !== 0;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 获取数据
-            getNoticeList (checkId) {
-                this.isDataLoading = true
-                const checkIdL = checkId.toLowerCase()
+            getNoticeList(checkId) {
+                this.isDataLoading = true;
+                const checkIdL = checkId.toLowerCase();
                 const params = {
                     notify_type: checkId,
                     used_by: 'SLA',
-                }
+                };
                 this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
-                    this[`${checkIdL}NotifyEventList`] = res.data.map(item => ({ id: item.id, name: item.action_name }))
+                    this[`${checkIdL}NotifyEventList`] = res.data.map(item => ({ id: item.id, name: item.action_name }));
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 获取服务模式列表数据
-            getModelList () {
+            getModelList() {
                 const params = {
                     project_key: this.$store.state.project.id,
-                }
-                this.$store.dispatch('sla/getScheduleList', params).then(res => {
-                    this.modelList = res.data
+                };
+                this.$store.dispatch('sla/getScheduleList', params).then((res) => {
+                    this.modelList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 获取单据高亮颜色
-            getTicketHighlight () {
+            getTicketHighlight() {
                 this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
-                    this.highlightObj = data.items[0]
+                    this.highlightObj = data.items[0];
                 })
-                    .catch(res => {
+                    .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
-                    })
+                        });
+                    });
             },
             // 单据高亮设置确认
-            HighlightSettingComfirm () {
-                this.isHighlightSetting = false
+            HighlightSettingComfirm() {
+                this.isHighlightSetting = false;
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
                         this.$bkMessage({
                             message: data.msg || this.$t('m.slaContent[\'成功更新单据高亮颜色\']'),
                             theme: 'success',
-                        })
+                        });
                     } else {
-                        this.getTicketHighlight()
+                        this.getTicketHighlight();
                     }
                 })
-                    .catch(res => {
+                    .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
-                    })
+                        });
+                    });
             },
             // 获取服务优先级
-            getModelPriority () {
+            getModelPriority() {
                 const params = {
                     dict_table__key: 'PRIORITY',
-                }
-                this.$store.dispatch('slaManagement/getPriority', { params }).then(res => {
-                    this.modelPriority = res.data
+                };
+                this.$store.dispatch('slaManagement/getPriority', { params }).then((res) => {
+                    this.modelPriority = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
             // 新增
-            addAgreement (item, reqPerm) {
-                const authResources = reqPerm === 'sla_agreement_create' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+            addAgreement(item, reqPerm) {
+                const authResources = reqPerm === 'sla_agreement_create' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions];
                 if (!this.hasPermission([reqPerm], authResources)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
+                    };
                     if (item.id) {
                         resourceData.sla_agreement = [{
                             id: item.id,
                             name: item.name,
-                        }]
+                        }];
                     }
-                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
+                    this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
                 } else {
-                    this.changeInfo.is_reply_need = item.is_reply_need
-                    this.changeInfo.info = item
+                    this.changeInfo.is_reply_need = item.is_reply_need;
+                    this.changeInfo.info = item;
                     // 区分新增和编辑
                     if (!item.id) {
-                        this.changeInfo.is_reply_need = true
+                        this.changeInfo.is_reply_need = true;
                         this.changeInfo.info = {
                             action_policies: [],
                             policies: [],
-                        }
+                        };
                     }
-                    this.changeInfo.isShow = true
+                    this.changeInfo.isShow = true;
                 }
             },
-            closeAgreement () {
-                this.changeInfo.isShow = false
+            closeAgreement() {
+                this.changeInfo.isShow = false;
             },
             // 删除
-            deleteAgreement (item) {
+            deleteAgreement(item) {
                 if (!this.hasPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -491,51 +491,51 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
+                    };
+                    this.applyForPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
                 } else {
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t('m.slaContent["确定删除该服务协议？"]'),
                         confirmFn: () => {
-                            const { id } = item
+                            const { id } = item;
                             if (this.secondClick) {
-                                return
+                                return;
                             }
-                            this.secondClick = true
-                            this.$store.dispatch('slaManagement/deleteProtocol', id).then((res) => {
+                            this.secondClick = true;
+                            this.$store.dispatch('slaManagement/deleteProtocol', id).then(() => {
                                 this.$bkMessage({
                                     message: this.$t('m.systemConfig["删除成功"]'),
                                     theme: 'success',
-                                })
-                                this.getList(1)
+                                });
+                                this.getList(1);
                             })
                                 .catch((res) => {
-                                    errorHandler(res, this)
+                                    errorHandler(res, this);
                                 })
                                 .finally(() => {
-                                    this.secondClick = false
-                                })
+                                    this.secondClick = false;
+                                });
                         },
-                    })
+                    });
                 }
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
-            searchMore () {
-                this.$refs.searchInfo.searchMore()
+            searchMore() {
+                this.$refs.searchInfo.searchMore();
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = item.multiSelect ? [] : ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = item.multiSelect ? [] : '';
+                });
+                this.getList(1);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

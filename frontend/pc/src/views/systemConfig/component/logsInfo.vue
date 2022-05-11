@@ -70,8 +70,8 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    import ace from '../../commonComponent/aceEditor'
+    import { errorHandler } from '../../../utils/errorHandler';
+    import ace from '../../commonComponent/aceEditor';
 
     export default {
         name: 'logsInfo',
@@ -81,12 +81,12 @@
         props: {
             logsObject: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 basicList: [
                     { name: this.$t('m.systemConfig["接口地址"]'), value: '', key: 'url' },
@@ -108,31 +108,31 @@
                     lang: 'json',
                 },
                 isDataLoading: false,
-            }
+            };
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            initData () {
-                this.isDataLoading = true
-                this.$store.dispatch('systemLog/retrive', this.logsObject.id).then(res => {
+            initData() {
+                this.isDataLoading = true;
+                this.$store.dispatch('systemLog/retrive', this.logsObject.id).then((res) => {
                     for (let i = 0; i < this.basicList.length; i++) {
-                        const property = this.basicList[i]
-                        property.value = res.data[property.key]
+                        const property = this.basicList[i];
+                        property.value = res.data[property.key];
                     }
-                    this.requestResponse.request = res.data.request_message
-                    this.requestResponse.response = JSON.stringify(res.data.response_message, null, 4)
+                    this.requestResponse.request = res.data.request_message;
+                    this.requestResponse.response = JSON.stringify(res.data.response_message, null, 4);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

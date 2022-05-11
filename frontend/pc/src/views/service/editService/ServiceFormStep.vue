@@ -183,13 +183,13 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler.js'
-    import commonMix from '../../commonMix/common.js'
-    import { deepClone } from '../../../utils/util.js'
-    import SelectTree from '../../../components/form/selectTree/index.vue'
-    import ServiceForm from './ServiceForm.vue'
-    import ChooseServiceTemplateDialog from './ChooseServiceTemplateDialog.vue'
-    import FormEditItem from './FormEditItem.vue'
+    import { errorHandler } from '../../../utils/errorHandler.js';
+    import commonMix from '../../commonMix/common.js';
+    import { deepClone } from '../../../utils/util.js';
+    import SelectTree from '../../../components/form/selectTree/index.vue';
+    import ServiceForm from './ServiceForm.vue';
+    import ChooseServiceTemplateDialog from './ChooseServiceTemplateDialog.vue';
+    import FormEditItem from './FormEditItem.vue';
 
     const fieldsLibrary = [
         { name: '单行文本', icon: 'icon-apps', type: 'STRING' },
@@ -211,12 +211,12 @@
         { name: '树形选择', icon: 'icon-apps', type: 'TREESELECT' },
         { name: '链接', icon: 'icon-apps', type: 'LINK' },
         { name: '自定义表单', icon: 'icon-apps', type: 'CUSTOM-FORM' },
-    ]
+    ];
     const serviceFormCreateWays = [
         { name: '选择推荐服务模板', key: 'recom', icon: 'icon-apps' },
         { name: '从已有的服务复制', key: 'created', icon: 'icon-apps' },
         { name: '自定义表单', key: 'custom', icon: 'icon-apps' },
-    ]
+    ];
     export default {
         name: 'ServiceFormStep',
         components: {
@@ -241,7 +241,7 @@
             },
             createTicketNodeId: Number,
         },
-        data () {
+        data() {
             return {
                 isCreateService: false,
                 fieldsLibrary,
@@ -287,232 +287,232 @@
                 fieldlist: [],
                 fieldsLibrarylist: fieldsLibrary,
                 servcieList: [],
-            }
+            };
         },
         computed: {
-            catalogDisplayName () {
-                return this.serviceInfo.bounded_catalogs ? this.serviceInfo.bounded_catalogs.join('/') : ''
+            catalogDisplayName() {
+                return this.serviceInfo.bounded_catalogs ? this.serviceInfo.bounded_catalogs.join('/') : '';
             },
         },
         watch: {
             isBasicFormEditting: {
-                handler (val) {
-                    if (val) this.getServiceDirectory()
+                handler(val) {
+                    if (val) this.getServiceDirectory();
                 },
                 immediate: true,
             },
         },
-        created () {
-            this.rules.name = this.checkCommonRules('name').name
+        created() {
+            this.rules.name = this.checkCommonRules('name').name;
             this.rules.name.push({
                 validator: this.handleRepeatServiceName,
                 message: this.$t('m[\'服务名称重复，请重新输入\']'),
                 trigger: 'blur',
-            })
-            this.rules.directory_id = this.checkCommonRules('required').required
-            this.rules.key = this.checkCommonRules('required').required
-            this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source
-            this.isBasicFormEditting = this.type === 'new'
-            this.serviceTemplateDisable = this.serviceId !== ''
+            });
+            this.rules.directory_id = this.checkCommonRules('required').required;
+            this.rules.key = this.checkCommonRules('required').required;
+            this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source;
+            this.isBasicFormEditting = this.type === 'new';
+            this.serviceTemplateDisable = this.serviceId !== '';
         },
-        async mounted () {
-            this.getAllServcie()
-            this.getPublicFieldList()
-            this.getServiceTypes()
-            const { name, desc, catalog_id: catalogId, key } = this.serviceInfo
-            this.formData.name = name
-            this.formData.desc = desc
-            this.formData.catalog_id = catalogId
-            this.formData.key = key
+        async mounted() {
+            this.getAllServcie();
+            this.getPublicFieldList();
+            this.getServiceTypes();
+            const { name, desc, catalog_id: catalogId, key } = this.serviceInfo;
+            this.formData.name = name;
+            this.formData.desc = desc;
+            this.formData.catalog_id = catalogId;
+            this.formData.key = key;
             if (this.type === 'edit') {
-                this.getCreateTicketNodeForm()
-                this.getCreateTicketNodeDetail()
+                this.getCreateTicketNodeForm();
+                this.getCreateTicketNodeDetail();
             } else {
-                this.isCreateService = true
-                this.formData.catalog_id = this.$route.query.catalog_id || ''
+                this.isCreateService = true;
+                this.formData.catalog_id = this.$route.query.catalog_id || '';
             }
         },
         methods: {
-            getAllServcie () {
+            getAllServcie() {
                 const params = {
                     project_key: this.$store.state.project.id,
                     catalog_id: 1,
-                }
-                this.$store.dispatch('catalogService/getServices', params).then(res => {
-                    this.servcieList = res.data || []
-                })
+                };
+                this.$store.dispatch('catalogService/getServices', params).then((res) => {
+                    this.servcieList = res.data || [];
+                });
             },
-            async handleRepeatServiceName (val) {
-                return !this.servcieList.find(item => item.name === val)
+            async handleRepeatServiceName(val) {
+                return !this.servcieList.find(item => item.name === val);
             },
-            handleDragLine (e) {
-                document.addEventListener('mouseup', this.handleMouseUp, false)
-                document.addEventListener('mousemove', this.handleLineMouseMove, false)
-                const el = document.querySelector('.edit-service-field')
-                this.dragLine.maxLength = el.clientWidth
-                this.dragLine.startX = e.pageX
-                this.dragLine.canMove = true
+            handleDragLine(e) {
+                document.addEventListener('mouseup', this.handleMouseUp, false);
+                document.addEventListener('mousemove', this.handleLineMouseMove, false);
+                const el = document.querySelector('.edit-service-field');
+                this.dragLine.maxLength = el.clientWidth;
+                this.dragLine.startX = e.pageX;
+                this.dragLine.canMove = true;
             },
-            handleMouseUp (e) {
-                document.removeEventListener('mouseup', this.handleMouseUp, false)
-                document.removeEventListener('mousemove', this.handleLineMouseMove, false)
-                this.dragLine.base = this.dragLine.move
-                this.dragLine.canMove = false
+            handleMouseUp(e) {
+                document.removeEventListener('mouseup', this.handleMouseUp, false);
+                document.removeEventListener('mousemove', this.handleLineMouseMove, false);
+                this.dragLine.base = this.dragLine.move;
+                this.dragLine.canMove = false;
             },
-            handleLineMouseMove (e) {
-                if (!this.dragLine.canMove) return
-                const el = document.querySelector('.edit-service-field')
-                const { startX, base } = this.dragLine
-                const offsetX = e.pageX - startX
-                const moveX = base + offsetX
-                if (offsetX > 0 && 600 - moveX <= 500) return
+            handleLineMouseMove(e) {
+                if (!this.dragLine.canMove) return;
+                const el = document.querySelector('.edit-service-field');
+                const { startX, base } = this.dragLine;
+                const offsetX = e.pageX - startX;
+                const moveX = base + offsetX;
+                if (offsetX > 0 && 600 - moveX <= 500) return;
                 window.requestAnimationFrame(() => {
-                    this.dragLine.move = moveX
-                    el.style.width = `calc(600px - ${moveX}px)`
-                })
+                    this.dragLine.move = moveX;
+                    el.style.width = `calc(600px - ${moveX}px)`;
+                });
             },
-            onFormEditClick (form) {
-                this.isShowRightEdit = true
-                this.crtForm = form.id
+            onFormEditClick(form) {
+                this.isShowRightEdit = true;
+                this.crtForm = form.id;
             },
-            onEditConfirm (form) {
-                this.$refs.serviceForm.onEditConfirm(form)
-                this.isShowRightEdit = false
+            onEditConfirm(form) {
+                this.$refs.serviceForm.onEditConfirm(form);
+                this.isShowRightEdit = false;
             },
-            onEditCancel () {
+            onEditCancel() {
                 if (this.crtForm === 'add') {
-                    this.cancelAddField()
+                    this.cancelAddField();
                 } else {
-                    this.crtForm = ''
+                    this.crtForm = '';
                 }
-                this.isShowRightEdit = false
+                this.isShowRightEdit = false;
             },
-            getAddFieldStatus (status) {
-                this.addFieldStatus = status
+            getAddFieldStatus(status) {
+                this.addFieldStatus = status;
             },
             // 获取已有字段（公共字段）
-            getPublicFieldList () {
+            getPublicFieldList() {
                 this.$store.dispatch('publicField/get_template_common_fields', { project_key: this.$store.state.project.id }).then((res) => {
                     // 隐藏字段
                     // const list = res.data.filter(item => item.key !== 'title' && !item.is_builtin && item.key !== 'bk_biz_id')
-                    this.fieldlist = res.data
-                    this.publicFields = res.data
+                    this.fieldlist = res.data;
+                    this.publicFields = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            filterFiled (value, fieldlist, field) {
+            filterFiled(value, fieldlist, field) {
                 if (value !== '') {
-                    const list = fieldlist.filter(item => {
-                        const reg = RegExp(value)
+                    const list = fieldlist.filter((item) => {
+                        const reg = RegExp(value);
                         if (item.name.match(reg)) {
-                            return item
+                            return item;
                         }
-                    })
-                    this[`${field}`] = list
+                    });
+                    this[`${field}`] = list;
                 } else {
-                    this[`${field}`] = fieldlist
+                    this[`${field}`] = fieldlist;
                 }
             },
-            handleSearchLibrary (value) {
-                this.filterFiled(value, this.fieldsLibrarylist, 'fieldsLibrary')
+            handleSearchLibrary(value) {
+                this.filterFiled(value, this.fieldsLibrarylist, 'fieldsLibrary');
             },
-            handleSearchField (value) {
-                this.filterFiled(value, this.fieldlist, 'publicFields')
+            handleSearchField(value) {
+                this.filterFiled(value, this.fieldlist, 'publicFields');
             },
             // 服务类型
-            getServiceTypes () {
+            getServiceTypes() {
                 this.$store.dispatch('getCustom').then((res) => {
-                    this.serviceTypeList = res.data
+                    this.serviceTypeList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 获取提单节点字段
-            getCreateTicketNodeForm () {
-                this.formLoading = true
+            getCreateTicketNodeForm() {
+                this.formLoading = true;
                 this.$store.dispatch('deployCommon/getFieldList', {
                     workflow: this.serviceInfo.workflow_id,
                     state: this.createTicketNodeId,
-                }).then(res => {
-                    res.data.forEach(item => {
-                        item.checkValue = false
-                        item.val = item.hasOwnProperty('default') ? deepClone(item.default) : ''
-                        item.showFeild = true
-                    })
-                    this.ticketNodeForm = res.data
+                }).then((res) => {
+                    res.data.forEach((item) => {
+                        item.checkValue = false;
+                        item.val = item.hasOwnProperty('default') ? deepClone(item.default) : '';
+                        item.showFeild = true;
+                    });
+                    this.ticketNodeForm = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.formLoading = false
-                    })
+                        this.formLoading = false;
+                    });
             },
             // 获取提单节点详情
-            getCreateTicketNodeDetail () {
-                this.detailLoading = true
+            getCreateTicketNodeDetail() {
+                this.detailLoading = true;
                 this.$store.dispatch('deployCommon/getOneStateInfo', {
                     id: this.createTicketNodeId,
-                }).then(res => {
-                    this.ticketNodeDetail = res.data
+                }).then((res) => {
+                    this.ticketNodeDetail = res.data;
                 })
                     .finally(() => {
-                        this.detailLoading = false
-                    })
+                        this.detailLoading = false;
+                    });
             },
-            onBasicFormSubmit () {
+            onBasicFormSubmit() {
                 if (this.isSubmitting) {
-                    return
+                    return;
                 }
                 this.$refs.basicForm.validate().then(async () => {
-                    const params = JSON.parse(JSON.stringify(this.formData))
-                    params.id = this.serviceId || undefined
-                    params.project_key = this.$store.state.project.id
-                    this.isSubmitting = true
+                    const params = JSON.parse(JSON.stringify(this.formData));
+                    params.id = this.serviceId || undefined;
+                    params.project_key = this.$store.state.project.id;
+                    this.isSubmitting = true;
                     if (this.type === 'edit') {
-                        await this.updateServiceInfo(params)
+                        await this.updateServiceInfo(params);
                     } else {
-                        await this.createService(params)
+                        await this.createService(params);
                     }
-                    this.isSubmitting = false
-                })
+                    this.isSubmitting = false;
+                });
             },
-            onBasicFormCancel () {
+            onBasicFormCancel() {
                 if (this.type === 'new') {
-                    this.isCreateService = false
+                    this.isCreateService = false;
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t('m.slaContent["确认返回？"]'),
                         confirmFn: () => {
-                            this.goBackToServiceList()
+                            this.goBackToServiceList();
                         },
                         cancelFn: () => {
-                            this.isCreateService = true
+                            this.isCreateService = true;
                         },
-                    })
+                    });
                 } else {
-                    this.isBasicFormEditting = false
+                    this.isBasicFormEditting = false;
                 }
             },
-            goBackToServiceList () {
+            goBackToServiceList() {
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
                         project_id: this.$store.state.project.id,
                         catalog_id: this.$route.query.catalog_id,
                     },
-                })
+                });
             },
             // 创建服务
-            createService (params) {
-                this.$store.dispatch('serviceEntry/createService', params).then(res => {
+            createService(params) {
+                this.$store.dispatch('serviceEntry/createService', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
-                    })
+                    });
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
@@ -523,79 +523,79 @@
                             serviceId: res.data.id,
                             project_id: this.$store.state.project.id,
                         },
-                    })
-                    this.isBasicFormEditting = false
+                    });
+                    this.isBasicFormEditting = false;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 修改服务
-            updateServiceInfo (params) {
-                this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+            updateServiceInfo(params) {
+                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["修改成功"]'),
                         theme: 'success',
-                    })
-                    this.isBasicFormEditting = false
-                    this.$emit('updateServiceInfo', res.data)
+                    });
+                    this.isBasicFormEditting = false;
+                    this.$emit('updateServiceInfo', res.data);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 关联目录树组件
-            async getServiceDirectory () {
+            async getServiceDirectory() {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
                     project_key: this.$store.state.project.id,
-                }).then(res => {
-                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
+                }).then((res) => {
+                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            async onCreateFormWayCLick (way) {
+            async onCreateFormWayCLick(way) {
                 if (this.isBasicFormEditting) {
                     try {
-                        await this.$refs.basicForm.validate()
+                        await this.$refs.basicForm.validate();
                     } catch (error) {
-                        return console.warn(error)
+                        return console.warn(error);
                     }
                 }
-                const { key } = way
+                const { key } = way;
                 if (key === 'recom' || key === 'created') {
-                    this.isShowChooseSerTempDialog = true
-                    this.currCreateFormWay = way
+                    this.isShowChooseSerTempDialog = true;
+                    this.currCreateFormWay = way;
                 } else {
-                    this.updateServiceSource('custom')
+                    this.updateServiceSource('custom');
                 }
             },
-            createServicePopoverShow () {
-                this.isDropdownShow = true
+            createServicePopoverShow() {
+                this.isDropdownShow = true;
             },
-            createServicePopoverHide () {
-                this.isDropdownShow = false
+            createServicePopoverHide() {
+                this.isDropdownShow = false;
             },
             // 更新原字段列表顺序
-            dragUpdateList (targetIndex, field) {
+            dragUpdateList(targetIndex, field) {
                 if (!field) {
                     this.$bkMessage({
                         message: this.$t('m["请先保存字段"]'),
                         offsetY: 80,
-                    })
-                    return
+                    });
+                    return;
                 }
-                const index = this.ticketNodeForm.findIndex(item => item.id === field.id)
-                this.ticketNodeForm.splice(index, 1)
-                this.ticketNodeForm.splice(targetIndex, 0, field)
+                const index = this.ticketNodeForm.findIndex(item => item.id === field.id);
+                this.ticketNodeForm.splice(index, 1);
+                this.ticketNodeForm.splice(targetIndex, 0, field);
                 if (field.layout === 'COL_6') { // 如果拖动表单存在半行位置字段，则需要保存更新后的位置信息
-                    this.saveHalfRowDragPos(field)
+                    this.saveHalfRowDragPos(field);
                 }
             },
             // 点击字段控件
-            onAddFormClick (val) {
+            onAddFormClick(val) {
                 const field = {
                     workflow: '',
                     id: '',
@@ -615,39 +615,39 @@
                     tips: '',
                     meta: {},
                     default: '',
-                }
-                this.addField(field)
+                };
+                this.addField(field);
             },
             // 添加字段
-            addField (field) {
+            addField(field) {
                 if (this.crtForm !== '') {
                     this.$bkMessage({
                         message: this.$t('m["请先将字段属性关闭"]'),
-                    })
-                    return
+                    });
+                    return;
                 }
-                this.isShowRightEdit = true
-                const form = Object.assign(deepClone(field), { id: 'add' })
-                this.ticketNodeForm.push(form)
-                this.crtForm = 'add'
+                this.isShowRightEdit = true;
+                const form = Object.assign(deepClone(field), { id: 'add' });
+                this.ticketNodeForm.push(form);
+                this.crtForm = 'add';
             },
             // 取消添加字段
-            cancelAddField () {
-                const index = this.ticketNodeForm.findIndex(item => item.id === 'add')
-                this.ticketNodeForm.splice(index, 1)
-                this.crtForm = ''
+            cancelAddField() {
+                const index = this.ticketNodeForm.findIndex(item => item.id === 'add');
+                this.ticketNodeForm.splice(index, 1);
+                this.crtForm = '';
             },
             // 字段克隆
-            fieldClone (form) {
-                const index = this.ticketNodeForm.findIndex(item => item.id === form.id)
-                const clonedForm = Object.assign(deepClone(form), { id: 'add' })
-                this.ticketNodeForm.splice(index + 1, 0, clonedForm)
-                this.crtForm = 'add'
+            fieldClone(form) {
+                const index = this.ticketNodeForm.findIndex(item => item.id === form.id);
+                const clonedForm = Object.assign(deepClone(form), { id: 'add' });
+                this.ticketNodeForm.splice(index + 1, 0, clonedForm);
+                this.crtForm = 'add';
             },
-            fieldDelete (form) {
+            fieldDelete(form) {
                 if (form.id === 'add') {
-                    this.onEditCancel()
-                    return
+                    this.onEditCancel();
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
@@ -655,73 +655,73 @@
                     subTitle: this.$t('m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]'),
                     confirmFn: () => {
                         if (this.pending.deleteField) {
-                            return
+                            return;
                         }
-                        this.pending.deleteField = true
-                        this.crtForm = ''
+                        this.pending.deleteField = true;
+                        this.crtForm = '';
                         const data = {
                             id: form.id,
                             params: {
                                 state_id: this.createTicketNodeId,
                             },
-                        }
+                        };
                         this.$store.dispatch('deployCommon/deleteField', data).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
-                            const index = this.ticketNodeForm.findIndex(item => item.id === form.id)
-                            this.ticketNodeForm.splice(index, 1)
+                            });
+                            const index = this.ticketNodeForm.findIndex(item => item.id === form.id);
+                            this.ticketNodeForm.splice(index, 1);
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.pending.deleteField = false
-                            })
+                                this.pending.deleteField = false;
+                            });
                     },
-                })
-                this.isShowRightEdit = false
+                });
+                this.isShowRightEdit = false;
             },
             // 保存字段
-            saveField (field) {
-                const index = this.ticketNodeForm.findIndex(item => item.id === field.id)
-                field.checkValue = false
-                field.showFeild = true
-                field.val = field.hasOwnProperty('default') ? deepClone(field.default) : ''
+            saveField(field) {
+                const index = this.ticketNodeForm.findIndex(item => item.id === field.id);
+                field.checkValue = false;
+                field.showFeild = true;
+                field.val = field.hasOwnProperty('default') ? deepClone(field.default) : '';
                 if (index > -1) { // 编辑
-                    this.ticketNodeForm.splice(index, 1, field)
+                    this.ticketNodeForm.splice(index, 1, field);
                 } else { // 新增
-                    this.ticketNodeForm.splice(-1, 1, field)
+                    this.ticketNodeForm.splice(-1, 1, field);
                 }
-                this.crtForm = ''
+                this.crtForm = '';
             },
             // 保存字段半行拖拽后的位置
-            saveHalfRowDragPos (field) {
-                const url = field.source === 'TABLE' ? 'cdeploy/changeNewModuleField' : 'cdeploy/changeNewField'
-                this.$store.dispatch(url, { params: field, id: field.id })
+            saveHalfRowDragPos(field) {
+                const url = field.source === 'TABLE' ? 'cdeploy/changeNewModuleField' : 'cdeploy/changeNewField';
+                this.$store.dispatch(url, { params: field, id: field.id });
             },
             /**
              * 记录服务表单创建来源
              */
-            updateServiceSource (source) {
-                this.getCreateTicketNodeForm() // 刷新列表
+            updateServiceSource(source) {
+                this.getCreateTicketNodeForm(); // 刷新列表
                 this.$store.dispatch('service/updateServiceSource', {
                     id: this.serviceId,
                     params: {
                         source,
                     },
                 }).then(() => {
-                    this.serviceInfo.source = source
+                    this.serviceInfo.source = source;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 校验当前步骤
-            async validate () {
+            async validate() {
                 if (this.isBasicFormEditting) {
-                    await this.$refs.basicForm.validate()
+                    await this.$refs.basicForm.validate();
                 }
                 // if (!this.showFieldOption) {
                 //     this.$bkMessage({
@@ -735,8 +735,8 @@
                     const {
                         assignors, assignors_type, can_deliver, delivers, delivers_type, distribute_type, extras,
                         is_draft, is_terminable, name, processors, processors_type, tag, type, workflow,
-                    } = this.ticketNodeDetail
-                    const fields = this.ticketNodeForm.filter(item => typeof item.id === 'number').map(item => item.id)
+                    } = this.ticketNodeDetail;
+                    const fields = this.ticketNodeForm.filter(item => typeof item.id === 'number').map(item => item.id);
                     const nodeDetail = {
                         assignors,
                         assignors_type,
@@ -754,26 +754,26 @@
                         type,
                         workflow,
                         fields,
-                    }
+                    };
                     return this.$store.dispatch('deployCommon/updateNode', {
                         params: nodeDetail,
                         id: this.createTicketNodeId,
-                    }).then(res => {
+                    }).then((res) => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',
-                        })
+                        });
                     }, (res) => {
-                        errorHandler(res, this)
-                        return Promise.reject(res)
-                    })
+                        errorHandler(res, this);
+                        return Promise.reject(res);
+                    });
                 }
             },
-            handleShowField () {
-                this.isShowField = !this.isShowField
+            handleShowField() {
+                this.isShowField = !this.isShowField;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';

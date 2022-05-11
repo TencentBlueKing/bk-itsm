@@ -39,7 +39,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
 
     export default {
         name: 'LINK',
@@ -52,8 +52,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -65,21 +65,21 @@
                 default: false,
             },
         },
-        data () {
-            return {}
+        data() {
+            return {};
         },
         watch: {
-            'item.val' () {
-                this.conditionField(this.item, this.fields)
+            'item.val'() {
+                this.conditionField(this.item, this.fields);
             },
         },
-        mounted () {
-            this.conditionField(this.item, this.fields)
+        mounted() {
+            this.conditionField(this.item, this.fields);
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

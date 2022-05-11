@@ -24,7 +24,7 @@
     <section class="code-editor"></section>
 </template>
 <script>
-    import * as monaco from 'monaco-editor'
+    import * as monaco from 'monaco-editor';
     const DEFAULT_OPTIONS = {
         language: 'javascript',
         theme: 'vs-dark',
@@ -34,7 +34,7 @@
         },
         wordWrap: 'on',
         wrappingIndent: 'same',
-    }
+    };
     export default {
         name: 'CodeEditor',
         props: {
@@ -44,65 +44,65 @@
             },
             options: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
-            const editorOptions = Object.assign({}, DEFAULT_OPTIONS, this.options, { value: this.value })
+        data() {
+            const editorOptions = Object.assign({}, DEFAULT_OPTIONS, this.options, { value: this.value });
             return {
                 editorOptions,
                 monacoInstance: null,
-            }
+            };
         },
         watch: {
-            value (val) {
-                const valInEditor = this.monacoInstance.getValue()
+            value(val) {
+                const valInEditor = this.monacoInstance.getValue();
                 if (val !== valInEditor) {
-                    this.monacoInstance.setValue(val)
+                    this.monacoInstance.setValue(val);
                 }
             },
             options: {
                 deep: true,
-                handler (val) {
-                    this.editorOptions = Object.assign({}, DEFAULT_OPTIONS, val, { value: this.value })
-                    this.updateOptions()
+                handler(val) {
+                    this.editorOptions = Object.assign({}, DEFAULT_OPTIONS, val, { value: this.value });
+                    this.updateOptions();
                 },
             },
         },
-        mounted () {
-            this.initIntance()
+        mounted() {
+            this.initIntance();
         },
-        beforeDestroy () {
+        beforeDestroy() {
             if (this.monacoInstance) {
-                this.monacoInstance.dispose()
+                this.monacoInstance.dispose();
             }
         },
         methods: {
-            initIntance () {
-                this.monacoInstance = monaco.editor.create(this.$el, this.editorOptions)
-                const model = this.monacoInstance.getModel()
-                model.setEOL(0) // 设置编辑器在各系统平台下 EOL 统一为 \n
+            initIntance() {
+                this.monacoInstance = monaco.editor.create(this.$el, this.editorOptions);
+                const model = this.monacoInstance.getModel();
+                model.setEOL(0); // 设置编辑器在各系统平台下 EOL 统一为 \n
                 if (this.value.indexOf('\r\n') > -1) { // 转换已保存的旧数据
-                    const textareaEl = document.createElement('textarea')
-                    textareaEl.value = this.value
-                    this.$emit('input', textareaEl.value)
+                    const textareaEl = document.createElement('textarea');
+                    textareaEl.value = this.value;
+                    this.$emit('input', textareaEl.value);
                 }
-                model.onDidChangeContent(event => {
-                    const value = this.monacoInstance.getValue()
-                    this.$emit('input', value)
-                })
+                model.onDidChangeContent((event) => {
+                    const value = this.monacoInstance.getValue();
+                    this.$emit('input', value);
+                });
                 this.monacoInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, () => {
-                    const value = this.monacoInstance.getValue()
-                    this.$emit('saveContent', value)
-                })
+                    const value = this.monacoInstance.getValue();
+                    this.$emit('saveContent', value);
+                });
             },
-            updateOptions () {
-                this.monacoInstance.updateOptions(this.editorOptions)
+            updateOptions() {
+                this.monacoInstance.updateOptions(this.editorOptions);
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .code-editor {

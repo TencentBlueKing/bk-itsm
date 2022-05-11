@@ -102,8 +102,8 @@
     </div>
 </template>
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler.js'
-    import apiFieldsWatch from '../../../../commonMix/api_fields_watch.js'
+    import { errorHandler } from '../../../../../utils/errorHandler.js';
+    import apiFieldsWatch from '../../../../commonMix/api_fields_watch.js';
 
     export default {
         name: 'hiddenConditions',
@@ -111,20 +111,20 @@
         props: {
             workflow: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             state: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             templateStage: {
@@ -133,75 +133,75 @@
             },
             templateInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             addOrigin: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         isOther: false,
                         addOriginInfo: {},
-                    }
+                    };
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isLoading: false,
                 listInfo: [],
                 conditionType: 'and',
                 fieldList: [],
                 checkStatus: false,
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        mounted () {
-            this.getFrontNodesList()
+        mounted() {
+            this.getFrontNodesList();
         },
         methods: {
-            getFrontNodesList () {
+            getFrontNodesList() {
                 if (!this.state && !this.templateInfo.id) {
-                    return
+                    return;
                 }
-                let url = ''
-                const params = {}
+                let url = '';
+                const params = {};
                 if (this.state) {
-                    url = 'apiRemote/get_related_fields'
-                    params.workflow = this.workflow
-                    params.state = this.state
+                    url = 'apiRemote/get_related_fields';
+                    params.workflow = this.workflow;
+                    params.state = this.state;
                 }
                 if (this.templateInfo.id) {
-                    url = 'taskTemplate/getFrontFieldsList'
-                    params.id = this.templateInfo.id
-                    params.stage = this.templateStage
+                    url = 'taskTemplate/getFrontFieldsList';
+                    params.id = this.templateInfo.id;
+                    params.stage = this.templateStage;
                 }
-                this.isLoading = true
-                this.$store.dispatch(url, params).then(res => {
-                    this.frontNodesList = res.data
-                    this.initData()
+                this.isLoading = true;
+                this.$store.dispatch(url, params).then((res) => {
+                    this.frontNodesList = res.data;
+                    this.initData();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isLoading = false
-                    })
+                        this.isLoading = false;
+                    });
             },
-            initData () {
+            initData() {
                 // 初始化listInfo的数据
-                this.listInfo = []
+                this.listInfo = [];
                 if (this.formInfo.show_conditions.expressions && this.formInfo.show_conditions.expressions.length) {
-                    this.formInfo.show_conditions.expressions.forEach(item => {
-                        this.frontNodesList.forEach(node => {
+                    this.formInfo.show_conditions.expressions.forEach((item) => {
+                        this.frontNodesList.forEach((node) => {
                             if (node.key === item.key) {
-                                const nodeStatus = (node.type === 'MULTISELECT' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT')
-                                const betweenList = this.checkBetweenList(node.type)
+                                const nodeStatus = (node.type === 'MULTISELECT' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT');
+                                const betweenList = this.checkBetweenList(node.type);
                                 this.listInfo.push({
                                     condition: item.condition,
                                     key: item.key,
@@ -210,11 +210,11 @@
                                     type: item.type,
                                     multiSelect: nodeStatus,
                                     betweenList,
-                                })
+                                });
                             }
-                        })
-                    })
-                    this.conditionType = this.formInfo.show_conditions.type
+                        });
+                    });
+                    this.conditionType = this.formInfo.show_conditions.type;
                 } else {
                     this.listInfo = [
                         {
@@ -226,47 +226,47 @@
                             multiSelect: false,
                             betweenList: this.checkBetweenList('STRING'),
                         },
-                    ]
-                    this.conditionType = 'and'
+                    ];
+                    this.conditionType = 'and';
                 }
                 // 初始化fieldList数据
-                this.fieldList = []
-                this.frontNodesList.forEach(item => {
+                this.fieldList = [];
+                this.frontNodesList.forEach((item) => {
                     // 去除掉当前的字段，字段类型为CUSTOMTABLE，FILE，RICHTEXT，TABLE，DATETIMERANGE，MEMBERS
-                    const exceptList = ['CUSTOMTABLE', 'FILE', 'RICHTEXT', 'TABLE', 'DATETIMERANGE', 'MEMBERS']
+                    const exceptList = ['CUSTOMTABLE', 'FILE', 'RICHTEXT', 'TABLE', 'DATETIMERANGE', 'MEMBERS'];
                     if (item.key !== this.formInfo.key && !exceptList.some(node => node === item.type)) {
-                        this.fieldList.push(item)
+                        this.fieldList.push(item);
                     }
-                })
-                this.fieldList.forEach(item => {
+                });
+                this.fieldList.forEach((item) => {
                     if (item.source_type === 'RPC') {
-                        this.getRpcData(item)
+                        this.getRpcData(item);
                     }
-                })
-                this.isNecessaryToWatch({ fields: this.fieldList }, 'workflow')
+                });
+                this.isNecessaryToWatch({ fields: this.fieldList }, 'workflow');
             },
-            getRpcData (item) {
-                this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
-                    item.choice = res.data
+            getRpcData(item) {
+                this.$store.dispatch('apiRemote/getRpcData', item).then((res) => {
+                    item.choice = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            checkBetweenList (typeValue) {
-                const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT']
-                const listTwo = ['DATE', 'DATETIME', 'DATETIMERANGE', 'INT']
-                let betweenList = []
+            checkBetweenList(typeValue) {
+                const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT'];
+                const listTwo = ['DATE', 'DATETIME', 'DATETIMERANGE', 'INT'];
+                let betweenList = [];
                 if (listOne.some(type => type === typeValue)) {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === 'issuperset' || methods.typeName === 'notissuperset'))
+                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === 'issuperset' || methods.typeName === 'notissuperset'));
                 } else if (listTwo.some(type => type === typeValue)) {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'))
+                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName !== 'issuperset' && methods.typeName !== 'notissuperset'));
                 } else {
-                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === '==' || methods.typeName === '!='))
+                    betweenList = this.globalChoise.methods.filter(methods => (methods.typeName === '==' || methods.typeName === '!='));
                 }
-                return betweenList
+                return betweenList;
             },
-            clearCondition () {
+            clearCondition() {
                 this.listInfo = [
                     {
                         condition: '',
@@ -277,31 +277,31 @@
                         multiSelect: false,
                         betweenList: this.checkBetweenList('STRING'),
                     },
-                ]
+                ];
             },
-            changeName (...value) {
-                const checkItem = this.fieldList.filter(item => item.key === value[0])[0]
-                const nodeStatus = (checkItem.type === 'MULTISELECT' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT')
-                const betweenList = this.checkBetweenList(checkItem.type)
-                value[2].type = checkItem.type
-                value[2].value = nodeStatus ? [] : ''
-                value[2].betweenList = betweenList
-                value[2].condition = ''
+            changeName(...value) {
+                const checkItem = this.fieldList.filter(item => item.key === value[0])[0];
+                const nodeStatus = (checkItem.type === 'MULTISELECT' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT');
+                const betweenList = this.checkBetweenList(checkItem.type);
+                value[2].type = checkItem.type;
+                value[2].value = nodeStatus ? [] : '';
+                value[2].betweenList = betweenList;
+                value[2].condition = '';
                 if (checkItem.type === 'SELECT' || checkItem.type === 'MULTISELECT' || checkItem.type === 'RADIO' || checkItem.type === 'CHECKBOX' || checkItem.type === 'MEMBERS' || checkItem.type === 'TREESELECT') {
-                    value[2].choiceList = []
-                    checkItem.choice.forEach(node => {
+                    value[2].choiceList = [];
+                    checkItem.choice.forEach((node) => {
                         value[2].choiceList.push({
                             key: node.key,
                             name: node.name,
-                        })
-                    })
-                    value[2].multiSelect = nodeStatus
+                        });
+                    });
+                    value[2].multiSelect = nodeStatus;
                 } else {
-                    value[2].choiceList = ''
+                    value[2].choiceList = '';
                 }
             },
             // 新增字段条件组
-            addNode (node, index) {
+            addNode(node, index) {
                 const value = {
                     condition: '',
                     key: '',
@@ -310,21 +310,21 @@
                     type: 'STRING',
                     multiSelect: false,
                     betweenList: this.checkBetweenList('STRING'),
-                }
-                this.listInfo.splice(index + 1, 0, value)
+                };
+                this.listInfo.splice(index + 1, 0, value);
             },
-            deleteNode (node, index) {
+            deleteNode(node, index) {
                 if (this.listInfo.length === 1) {
-                    return
+                    return;
                 }
-                this.listInfo.splice(index, 1)
+                this.listInfo.splice(index, 1);
             },
-            checkList () {
-                this.checkStatus = this.listInfo.some(item => (!item.key || !item.condition || (Array.isArray(item.value) ? !item.value.length : !item.value)))
-                return this.checkStatus
+            checkList() {
+                this.checkStatus = this.listInfo.some(item => (!item.key || !item.condition || (Array.isArray(item.value) ? !item.value.length : !item.value)));
+                return this.checkStatus;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

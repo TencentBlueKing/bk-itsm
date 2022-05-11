@@ -26,7 +26,7 @@
     </div>
 </template>
 <script>
-    import Chart from '@blueking/bkcharts'
+    import Chart from '@blueking/bkcharts';
 
     export default {
         name: 'BarChart',
@@ -53,11 +53,11 @@
             },
             chartData: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         x: [],
                         y: [],
-                    }
+                    };
                 },
             },
             loading: {
@@ -65,25 +65,25 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 chartInstance: null,
-            }
+            };
         },
         watch: {
-            loading (val) {
+            loading(val) {
                 if (!val) {
-                    this.updateChart()
+                    this.updateChart();
                 }
             },
         },
-        mounted () {
-            this.init()
+        mounted() {
+            this.init();
         },
         methods: {
-            init () {
-                const ctx = this.$refs.barChartWrap.querySelector('.bar-chart').getContext('2d')
-                const { x, y } = this.chartData
+            init() {
+                const ctx = this.$refs.barChartWrap.querySelector('.bar-chart').getContext('2d');
+                const { x, y } = this.chartData;
                 this.chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -117,15 +117,15 @@
                             mode: 'nearest',
                         },
                     },
-                })
+                });
             },
-            updateChart () {
-                this.chartInstance.data.datasets[0].data = this.chartData.y
-                this.chartInstance.data.labels = this.chartData.x
-                this.chartInstance.update()
+            updateChart() {
+                this.chartInstance.data.datasets[0].data = this.chartData.y;
+                this.chartInstance.data.labels = this.chartData.x;
+                this.chartInstance.update();
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
 

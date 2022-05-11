@@ -24,42 +24,42 @@
     <div class="trigger-dialog-box"></div>
 </template>
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
+    import { errorHandler } from '../../utils/errorHandler';
     export default {
         name: 'TicketTriggerDialog',
-        data () {
+        data() {
             return {
                 triggerId: '',
-            }
+            };
         },
         methods: {
-            openDialog (trigger) {
-                this.triggerId = trigger.id
+            openDialog(trigger) {
+                this.triggerId = trigger.id;
                 this.$bkInfo({
                     title: this.$t('m.common["确定执行该操作？"]'),
                     subTitle: trigger.display_name,
                     confirmFn: () => {
-                        this.executeTrigger(trigger)
+                        this.executeTrigger(trigger);
                     },
-                })
+                });
             },
-            executeTrigger (trigger) {
+            executeTrigger(trigger) {
                 this.$store.dispatch('trigger/executeHandleTriggers', this.triggerId).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
                         theme: 'success',
-                    })
-                    this.$store.commit('taskHistoryRefreshFunc')
+                    });
+                    this.$store.commit('taskHistoryRefreshFunc');
                     if (trigger.need_refresh || !trigger.can_repeat) {
-                        this.$emit('init-info')
+                        this.$emit('init-info');
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 

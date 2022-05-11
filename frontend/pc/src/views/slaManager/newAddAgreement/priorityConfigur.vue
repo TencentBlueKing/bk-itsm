@@ -151,31 +151,31 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js'
+    import commonMix from '../../commonMix/common.js';
     export default {
         name: 'priorityConfigur',
         mixins: [commonMix],
         props: {
             modelList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             modelPriority: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 程度颜色
                 typeColorList: ['', '#99C5FF', '#FE9C00', '#EA3536'],
@@ -196,30 +196,30 @@
                             required: true,
                             trigger: 'blur',
                             type: 'string',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                 },
                 iconOffset: 75,
-            }
+            };
         },
         watch: {
-            modelPriority () {
-                this.initData()
+            modelPriority() {
+                this.initData();
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
             // 初始化校验规则
-            this.scheduleRules = this.checkCommonRules('schedule')
-            this.handleTimeRules = this.checkCommonRules('handle_time')
+            this.scheduleRules = this.checkCommonRules('schedule');
+            this.handleTimeRules = this.checkCommonRules('handle_time');
         },
         methods: {
-            initData () {
-                const parentInfo = this.changeInfo.info
+            initData() {
+                const parentInfo = this.changeInfo.info;
                 // 区分初始化和编辑状态priorityList的值不同
                 if (!parentInfo.policies.length) {
-                    this.modelPriority.forEach(item => {
+                    this.modelPriority.forEach((item) => {
                         this.priorityList.push({
                             priority: item.key,
                             schedule: '',
@@ -231,11 +231,11 @@
                             timeCheck: false,
                             isRespDropdownShow: false,
                             isDealDropdownShow: false,
-                        })
-                    })
+                        });
+                    });
                 } else {
-                    this.priorityList = []
-                    parentInfo.policies.forEach(item => {
+                    this.priorityList = [];
+                    parentInfo.policies.forEach((item) => {
                         this.priorityList.push({
                             priority: item.priority,
                             schedule: item.schedule,
@@ -248,69 +248,69 @@
                             timeCheck: false,
                             isRespDropdownShow: false,
                             isDealDropdownShow: false,
-                        })
-                    })
+                        });
+                    });
                 }
                 // 深拷贝数据
-                this.historyPriority = JSON.parse(JSON.stringify(this.priorityList))
+                this.historyPriority = JSON.parse(JSON.stringify(this.priorityList));
             },
-            dropdownShow (item, key) {
+            dropdownShow(item, key) {
                 if (key === 'resp') {
-                    item.isRespDropdownShow = true
+                    item.isRespDropdownShow = true;
                 } else if (key === 'deal') {
-                    item.isDealDropdownShow = true
+                    item.isDealDropdownShow = true;
                 }
             },
-            dropdownHide (item, key) {
+            dropdownHide(item, key) {
                 if (key === 'resp') {
-                    item.isRespDropdownShow = false
+                    item.isRespDropdownShow = false;
                 } else if (key === 'deal') {
-                    item.isDealDropdownShow = false
+                    item.isDealDropdownShow = false;
                 }
             },
-            timeHandler (key, time, item, index, order) {
-                this.$refs[`dropdown${index}`][order].hide()
-                item[key] = time.id
+            timeHandler(key, time, item, index, order) {
+                this.$refs[`dropdown${index}`][order].hide();
+                item[key] = time.id;
             },
             // 跳转到新建服务模式
-            handleCreate () {
-                const routeData = this.$router.resolve({ path: '/project/sla_manage', query: { project_id: this.$store.state.project.id, key: 'create' } })
-                window.open(routeData.href, '_blank')
+            handleCreate() {
+                const routeData = this.$router.resolve({ path: '/project/sla_manage', query: { project_id: this.$store.state.project.id, key: 'create' } });
+                window.open(routeData.href, '_blank');
             },
             // 校验
-            async checkData () {
-                const validates = []
-                let valid = true
-                this.$refs.schedule.forEach(item => {
-                    validates.push(item.validate())
-                })
+            async checkData() {
+                const validates = [];
+                let valid = true;
+                this.$refs.schedule.forEach((item) => {
+                    validates.push(item.validate());
+                });
                 if (this.changeInfo.is_reply_need) {
-                    this.$refs.replyTime.forEach(item => {
-                        validates.push(item.validate())
-                    })
+                    this.$refs.replyTime.forEach((item) => {
+                        validates.push(item.validate());
+                    });
                 }
-                this.$refs.handleTime.forEach(item => {
-                    validates.push(item.validate())
-                })
+                this.$refs.handleTime.forEach((item) => {
+                    validates.push(item.validate());
+                });
                 await Promise.all(validates).then(() => {
-                    valid = false
+                    valid = false;
                 })
                     .catch(() => {
                         // 防止出现Uncaught
-                        valid = true
-                    })
-                return valid
+                        valid = true;
+                    });
+                return valid;
             },
-            clearFromError () {
-                const refs = ['schedule', 'replyTime', 'handleTime']
-                refs.forEach(item => {
-                    this.$refs[item].forEach(ite => {
-                        ite.clearError()
-                    })
-                })
+            clearFromError() {
+                const refs = ['schedule', 'replyTime', 'handleTime'];
+                refs.forEach((item) => {
+                    this.$refs[item].forEach((ite) => {
+                        ite.clearError();
+                    });
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>
@@ -330,7 +330,7 @@
             border-bottom: 1px dashed !important;
             cursor: pointer;
         }
-        
+
     }
     .bk-priority-head {
         @include clearfix;

@@ -42,9 +42,9 @@
     </div>
 </template>
 <script>
-    import EmptyTip from '../project/components/emptyTip.vue'
-    import bus from '@/utils/bus'
-    import permission from '@/mixins/permission.js'
+    import EmptyTip from '../project/components/emptyTip.vue';
+    import bus from '@/utils/bus';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'ProjectGuidePage',
@@ -52,7 +52,7 @@
             EmptyTip,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 emptyTip: {
                     title: this.$t('m[\'你当前没有任何项目权限，你可以\']'),
@@ -81,36 +81,36 @@
                         },
                     ],
                 },
-            }
+            };
         },
-        async created () {
-            const res = await this.$store.dispatch('project/getProjectAllList')
-            this.$store.commit('project/setProjectList', res.data)
-            const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'))
+        async created() {
+            const res = await this.$store.dispatch('project/getProjectAllList');
+            this.$store.commit('project/setProjectList', res.data);
+            const projectsWithViewPerm = res.data.filter(item => item.auth_actions.includes('project_view'));
             if (projectsWithViewPerm.length !== 0) {
-                this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } })
+                this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } });
             }
         },
         methods: {
-            handleCreateProject () {
-                bus.$emit('openCreateProjectDialog')
+            handleCreateProject() {
+                bus.$emit('openCreateProjectDialog');
             },
-            async handleApplyProject () {
-                const { projectInfo } = this.$store.state.project
+            async handleApplyProject() {
+                const { projectInfo } = this.$store.state.project;
                 const resourceData = {
                     project: [{
                         id: projectInfo.key || '0',
                         name: projectInfo.name || '默认项目',
                     }],
-                }
-                const params = this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData, true)
-                const res = await this.$store.dispatch('common/getIamUrl', params)
+                };
+                const params = this.applyForPermission(['project_view'], projectInfo.auth_actions, resourceData, true);
+                const res = await this.$store.dispatch('common/getIamUrl', params);
                 if (res.data) {
-                    window.open(res.data.url, '__blank')
+                    window.open(res.data.url, '__blank');
                 }
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .project-guide-page {

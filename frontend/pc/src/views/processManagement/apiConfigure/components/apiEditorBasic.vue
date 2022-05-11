@@ -82,40 +82,40 @@
 </template>
 
 <script>
-    import memberSelect from '../../../commonComponent/memberSelect'
+    import memberSelect from '../../../commonComponent/memberSelect';
     export default {
         name: 'apiEditorBasic',
         components: { memberSelect },
         props: {
             detailInfoOri: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 分类列表
             treeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 接口列表
             pathList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 内建系统列表
             isBuiltinIdList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 请求方式
                 typeList: [
@@ -131,43 +131,43 @@
                     { id: 1, name: this.$t('m.systemConfig["已完成"]') },
                 ],
                 isDropdownShow: false,
-            }
+            };
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get () {
-                    return this.detailInfoOri
+                get() {
+                    return this.detailInfoOri;
                 },
                 // setter
-                set (newVal) {
-                    this.$parent.DetailInfo = newVal
+                set(newVal) {
+                    this.$parent.DetailInfo = newVal;
                 },
             },
         },
         watch: {},
-        mounted () {
+        mounted() {
         },
         methods: {
-            switchChange (isActivated) {
-                this.basicInfo.is_activated = isActivated
+            switchChange(isActivated) {
+                this.basicInfo.is_activated = isActivated;
             },
-            dropdownShow () {
-                this.isDropdownShow = true
+            dropdownShow() {
+                this.isDropdownShow = true;
             },
-            dropdownHide () {
-                this.isDropdownShow = false
+            dropdownHide() {
+                this.isDropdownShow = false;
             },
-            requestHandler (requestway, requestwayIndex) {
-                this.$refs.requestwayDrop.hide()
-                this.$emit('changeRequest', requestway.name)
+            requestHandler(requestway, requestwayIndex) {
+                this.$refs.requestwayDrop.hide();
+                this.$emit('changeRequest', requestway.name);
             },
-            changeMethod (val) {
-                this.basicInfo.method = val
+            changeMethod(val) {
+                this.basicInfo.method = val;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

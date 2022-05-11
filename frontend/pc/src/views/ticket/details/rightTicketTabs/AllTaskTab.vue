@@ -90,11 +90,11 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler'
-    import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue'
-    import dealTask from '../taskInfo/dealTask.vue'
-    import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue'
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js'
+    import { errorHandler } from '@/utils/errorHandler';
+    import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue';
+    import dealTask from '../taskInfo/dealTask.vue';
+    import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue';
+    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
 
     export default {
         name: '',
@@ -109,7 +109,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 isListLoading: false,
                 taskList: [],
@@ -120,38 +120,38 @@
                     type: 'SEE',
                 },
                 taskTemplateTypes: TASK_TEMPLATE_TYPES,
-            }
+            };
         },
-        mounted () {
-            this.getTaskList()
+        mounted() {
+            this.getTaskList();
         },
         methods: {
             // 获取任务列表
-            getTaskList () {
-                this.isListLoading = true
+            getTaskList() {
+                this.isListLoading = true;
                 const params = {
                     ticket_id: this.ticketInfo.id,
-                }
-                return this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
-                    this.taskList = res.data
+                };
+                return this.$store.dispatch('taskFlow/getTaskList', params).then((res) => {
+                    this.taskList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isListLoading = false
-                    })
+                        this.isListLoading = false;
+                    });
             },
-            onViewTask (row) {
-                this.dealTaskInfo.show = true
-                this.dealTaskInfo.itemContent = row
+            onViewTask(row) {
+                this.dealTaskInfo.show = true;
+                this.dealTaskInfo.itemContent = row;
             },
-            getTaskTypeName (type) {
-                const target = this.taskTemplateTypes.find(m => m.type === type)
-                return target ? target.name : type
+            getTaskTypeName(type) {
+                const target = this.taskTemplateTypes.find(m => m.type === type);
+                return target ? target.name : type;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .all-task-list {

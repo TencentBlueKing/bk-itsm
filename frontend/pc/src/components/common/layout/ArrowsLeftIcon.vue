@@ -29,7 +29,7 @@
 <script>
     export default {
         name: 'ArrowsLeftIcon',
-    }
+    };
 </script>
 <style lang="scss">
 .header-title-icon {

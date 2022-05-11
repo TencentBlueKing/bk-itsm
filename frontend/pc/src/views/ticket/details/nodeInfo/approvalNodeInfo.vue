@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import fieldsDone from '../components/fieldsDone.vue'
+    import fieldsDone from '../components/fieldsDone.vue';
 
     export default {
         name: 'approvalNodeInfo',
@@ -44,16 +44,16 @@
         props: {
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
-            }
+            };
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

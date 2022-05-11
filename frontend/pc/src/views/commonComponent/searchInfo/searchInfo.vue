@@ -96,9 +96,9 @@
 </template>
 
 <script>
-    import collapseTransition from '../../../utils/collapse-transition'
-    import commonCascade from '../commonCascade'
-    import memberSelect from '../memberSelect'
+    import collapseTransition from '../../../utils/collapse-transition';
+    import commonCascade from '../commonCascade';
+    import memberSelect from '../memberSelect';
 
     export default {
         name: 'searchInfo',
@@ -110,33 +110,33 @@
         props: {
             moreSearch: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 searchWord: '',
                 showMore: false,
-            }
+            };
         },
         methods: {
-            searchMore () {
-                this.showMore = !this.showMore
+            searchMore() {
+                this.showMore = !this.showMore;
             },
-            closeSearch () {
-                this.showMore = false
+            closeSearch() {
+                this.showMore = false;
             },
-            searchContent () {
-                this.$parent.getList(1, true)
+            searchContent() {
+                this.$parent.getList(1, true);
             },
-            clearSearch () {
-                this.$parent.clearSearch()
-                this.$parent.getList(1, true)
+            clearSearch() {
+                this.$parent.clearSearch();
+                this.$parent.getList(1, true);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

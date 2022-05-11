@@ -113,9 +113,9 @@
 </template>
 
 <script>
-    import RenderView from '../../../components/renderview/RenderView'
-    import { deepClone } from '../../../utils/util.js'
-    import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils'
+    import RenderView from '../../../components/renderview/RenderView';
+    import { deepClone } from '../../../utils/util.js';
+    import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils';
 
     export default {
         name: 'fieldPreview',
@@ -141,7 +141,7 @@
                 default: () => '',
             },
         },
-        data () {
+        data() {
             return {
                 downFileUrl: '',
                 cloneFields: [],
@@ -149,57 +149,57 @@
                     formData: [],
                     context: {},
                 },
-            }
+            };
         },
         watch: {
             fields: {
-                handler () {
-                    this.initFields()
+                handler() {
+                    this.initFields();
                 },
                 immediate: true,
             },
         },
         methods: {
-            initFields () {
-                this.cloneFields = deepClone(this.fields)
-                this.cloneFields.forEach(item => {
+            initFields() {
+                this.cloneFields = deepClone(this.fields);
+                this.cloneFields.forEach((item) => {
                     if (item.type === 'CUSTOM-FORM') {
-                        item.value = typeof item.value === 'string' ? JSON.parse(item.value) : item.value
+                        item.value = typeof item.value === 'string' ? JSON.parse(item.value) : item.value;
                     }
                     if (item.type === 'FILE') {
-                        this.$set(item, 'fileShow', [])
-                        const temp = JSON.parse(item.value)
+                        this.$set(item, 'fileShow', []);
+                        const temp = JSON.parse(item.value);
                         for (const key in temp) {
-                            item.fileShow.push({ ...temp[key], key })
+                            item.fileShow.push({ ...temp[key], key });
                         }
                     }
-                })
+                });
             },
-            goToLink (url) {
+            goToLink(url) {
                 if (url.indexOf('http') !== 0) {
-                    url = `http://${url}`
+                    url = `http://${url}`;
                 }
-                window.open(url, '_blank')
+                window.open(url, '_blank');
             },
-            valToList () {
-                const tempObj = JSON.parse(this.item.value)
+            valToList() {
+                const tempObj = JSON.parse(this.item.value);
                 for (const key in tempObj) {
-                    this.fileList.push(tempObj[key])
+                    this.fileList.push(tempObj[key]);
                 }
             },
-            downFile (file, item) {
-                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
-                window.open(this.downFileUrl)
+            downFile(file, item) {
+                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${item.id}/download_file/?unique_key=${file.key}&file_type=ticket`;
+                window.open(this.downFileUrl);
             },
-            onBlur () {
-                const markValue = this.editor.getMarkdown()
-                this.item.val = markValue
+            onBlur() {
+                const markValue = this.editor.getMarkdown();
+                this.item.val = markValue;
             },
-            getCustomTableDisplayValue (column, value) {
-                return getCustomTableDisplayValue(column, value)
+            getCustomTableDisplayValue(column, value) {
+                return getCustomTableDisplayValue(column, value);
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

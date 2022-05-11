@@ -162,15 +162,15 @@
     </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import apiFieldsWatchMixin from '@/views/commonMix/api_fields_watch.js'
-    import FieldInfo from '@/views/managePage/billCom/fieldInfo.vue'
-    import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue'
-    import commonMix from '@/views/commonMix/common.js'
-    import { errorHandler } from '@/utils/errorHandler'
-    import { deepClone } from '../../utils/util'
-    import memberSelect from '@/views/commonComponent/memberSelect'
-    import CreateTicketSuccess from './details/components/createTicketSuccess.vue'
+    import NavTitle from '@/components/common/layout/NavTitle';
+    import apiFieldsWatchMixin from '@/views/commonMix/api_fields_watch.js';
+    import FieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+    import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue';
+    import commonMix from '@/views/commonMix/common.js';
+    import { errorHandler } from '@/utils/errorHandler';
+    import { deepClone } from '../../utils/util';
+    import memberSelect from '@/views/commonComponent/memberSelect';
+    import CreateTicketSuccess from './details/components/createTicketSuccess.vue';
 
     export default {
         name: 'CreateTicket',
@@ -183,7 +183,7 @@
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
-        data () {
+        data() {
             return {
                 submitting: false,
                 serviceLoading: false,
@@ -208,145 +208,145 @@
                 isRemindPageShow: false,
                 routerInfo: {},
                 isShowTemplateList: false,
-            }
+            };
         },
         watch: {
-            '$route' () {
-                this.reload()
+            '$route'() {
+                this.reload();
             },
         },
-        created () {
-            this.initData()
+        created() {
+            this.initData();
         },
         methods: {
-            async initData () {
+            async initData() {
                 // 校验规则
-                this.rules.name = this.checkCommonRules('name').name
-                this.serviceId = this.$route.query.service_id
-                
-                this.getTemplateList()
-                await this.getServiceDetail()
-                await this.getFieldList()
+                this.rules.name = this.checkCommonRules('name').name;
+                this.serviceId = this.$route.query.service_id;
+
+                this.getTemplateList();
+                await this.getServiceDetail();
+                await this.getFieldList();
                 // 重新提单
                 if (this.$route.query.rc_ticket_id) {
-                    this.getReCreateTicketInfo()
+                    this.getReCreateTicketInfo();
                 }
             },
             // 展示模板选择
-            handleTemplateSelect () {
+            handleTemplateSelect() {
                 if (this.templateList.length === 0) {
                     this.$bkMessage({
                         message: this.$t('m[\'暂无模板\']'),
                         offsetY: 80,
-                    })
-                    return
+                    });
+                    return;
                 }
-                this.isShowTemplateList = !this.isShowTemplateList
+                this.isShowTemplateList = !this.isShowTemplateList;
             },
             // 获取服务详情
-            getServiceDetail () {
-                this.serviceLoading = true
+            getServiceDetail() {
+                this.serviceLoading = true;
                 return this.$store.dispatch('service/getServiceDetail', this.serviceId).then((res) => {
-                    this.service = res.data
-                    this.favorite = res.data.favorite
+                    this.service = res.data;
+                    this.favorite = res.data.favorite;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.serviceLoading = false
-                    })
+                        this.serviceLoading = false;
+                    });
             },
             // 获取提单模板列表
-            getTemplateList () {
-                this.templateListLoading = true
+            getTemplateList() {
+                this.templateListLoading = true;
                 const params = {
                     service: this.serviceId,
-                }
+                };
                 return this.$store.dispatch('change/getTemplateList', params).then((res) => {
-                    this.templateList = res.data
+                    this.templateList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.templateListLoading = false
-                    })
+                        this.templateListLoading = false;
+                    });
             },
             // 获取提单字段
-            getFieldList () {
-                this.fieldListLoading = true
+            getFieldList() {
+                this.fieldListLoading = true;
                 const params = {
                     service_id: this.serviceId,
-                }
+                };
                 return this.$store.dispatch('change/getSubmitFields', params).then(async (res) => {
-                    this.fieldList = res.data
-                    this.fieldList.forEach(item => {
+                    this.fieldList = res.data;
+                    this.fieldList.forEach((item) => {
                         if (item.type === 'CASCADE') {
-                            item.type = 'SELECT'
+                            item.type = 'SELECT';
                         }
-                        this.$set(item, 'showFeild', true)
-                        this.$set(item, 'val', item.value)
-                        this.$set(item, 'service', this.service.key)
-                    })
+                        this.$set(item, 'showFeild', true);
+                        this.$set(item, 'val', item.value);
+                        this.$set(item, 'service', this.service.key);
+                    });
                     this.isNecessaryToWatch({ fields: this.fieldList }, 'submit', () => {
                         // TO IMPROVE 加载完成、重新赋值， isNecessaryToWatch 会去异步加载 choice 数据
-                        this.fieldList.forEach(item => {
-                            this.reCreateFieldList.forEach(node => {
+                        this.fieldList.forEach((item) => {
+                            this.reCreateFieldList.forEach((node) => {
                                 if (item.key === node.key) {
-                                    item.val = node.value
+                                    item.val = node.value;
                                 }
-                            })
-                        })
-                    })
+                            });
+                        });
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.fieldListLoading = false
-                    })
+                        this.fieldListLoading = false;
+                    });
             },
             // 获取重新提单单据参数信息
-            getReCreateTicketInfo () {
-                const id = this.$route.query.rc_ticket_id
-                this.fieldListLoading = true
+            getReCreateTicketInfo() {
+                const id = this.$route.query.rc_ticket_id;
+                this.fieldListLoading = true;
                 return this.$store.dispatch('change/getCreateTicektParams', { id }).then((res) => {
                     if (res.result && res.data.fields && res.data.fields.length) {
-                        this.reCreateFieldList = res.data.fields
-                        this.fieldList.forEach(item => {
-                            res.data.fields.forEach(node => {
+                        this.reCreateFieldList = res.data.fields;
+                        this.fieldList.forEach((item) => {
+                            res.data.fields.forEach((node) => {
                                 if (item.key === node.key) {
-                                    item.val = node.value
+                                    item.val = node.value;
                                 }
-                            })
-                        })
+                            });
+                        });
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.fieldListLoading = false
-                    })
+                        this.fieldListLoading = false;
+                    });
             },
             // 创建单据
-            onCreateTicket () {
+            onCreateTicket() {
                 if (this.submitting) {
-                    return
+                    return;
                 }
                 // 将字段中的时间转换一遍
-                this.$refs.fieldInfo.fieldChange()
+                this.$refs.fieldInfo.fieldChange();
                 // 字段值校验
                 if (!this.$refs.fieldInfo.checkValue()) {
                     this.$nextTick(() => {
-                        const errEl = document.querySelector('.bk-task-error')
-                        document.querySelector('.create-ticket-body').scrollTop = errEl ? errEl.getBoundingClientRect().y + 200 : 0
-                    })
-                    return false
+                        const errEl = document.querySelector('.bk-task-error');
+                        document.querySelector('.create-ticket-body').scrollTop = errEl ? errEl.getBoundingClientRect().y + 200 : 0;
+                    });
+                    return false;
                 }
 
-                this.submitting = true
+                this.submitting = true;
                 const params = {
                     catalog_id: this.service.catalog_id,
                     service_id: this.service.id,
@@ -354,8 +354,8 @@
                     fields: [],
                     creator: this.creator[0] || window.username,
                     attention: this.remindCheck,
-                }
-                this.fieldList.forEach(item => {
+                };
+                this.fieldList.forEach((item) => {
                     // 提单环节需要传入隐藏字段，处理节点不需要
                     params.fields.push({
                         type: item.type,
@@ -363,14 +363,14 @@
                         key: item.key,
                         value: item.showFeild ? item.value : '',
                         choice: item.choice,
-                    })
-                })
+                    });
+                });
                 this.$store.dispatch('change/submit', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.common["提交成功！"]'),
                         theme: 'success',
-                    })
-                    this.isRemindPageShow = true
+                    });
+                    this.isRemindPageShow = true;
                     this.routerInfo = {
                         name: 'TicketDetail',
                         params: {
@@ -379,173 +379,173 @@
                         query: {
                             id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined,
                         },
-                    }
+                    };
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.submitting = false
-                    })
+                        this.submitting = false;
+                    });
             },
             // 修改服务
-            onChangeService () {
-                this.isCreateTicketDialogShow = true
+            onChangeService() {
+                this.isCreateTicketDialogShow = true;
             },
-            getSaveTemplateParams () {
+            getSaveTemplateParams() {
                 const params = {
                     name: this.templateFormData.name,
                     service: this.serviceId,
                     template: [],
-                }
+                };
                 // 不能保存的字段类型
-                const excludeTypes = ['FILE', 'TABLE', 'CUSTOMTABLE']
-                this.fieldList.forEach(item => {
+                const excludeTypes = ['FILE', 'TABLE', 'CUSTOMTABLE'];
+                this.fieldList.forEach((item) => {
                     if (item.val !== '' && !excludeTypes.includes(item.type)) {
                         const templateItem = {
                             id: item.id,
                             key: item.key,
                             type: item.type,
                             value: item.val,
-                        }
+                        };
                         if (templateItem.type === 'DATE') {
-                            templateItem.value = this.standardDayTime(templateItem.value)
+                            templateItem.value = this.standardDayTime(templateItem.value);
                         }
                         if (templateItem.type === 'DATETIME') {
-                            templateItem.value = this.standardTime(templateItem.value)
+                            templateItem.value = this.standardTime(templateItem.value);
                         }
-                        params.template.push(templateItem)
+                        params.template.push(templateItem);
                     }
-                })
-                
-                return params
+                });
+
+                return params;
             },
             // 更新模板
-            onOpenUpdateTemplate () {
-                const params = deepClone(this.getSaveTemplateParams())
+            onOpenUpdateTemplate() {
+                const params = deepClone(this.getSaveTemplateParams());
                 if (!params.template.length) {
                     this.$bkMessage({
                         message: this.$t('m.common["无字段可以保存"]'),
                         theme: 'warning',
-                    })
-                    this.cancelTemplate()
-                    return false
+                    });
+                    this.cancelTemplate();
+                    return false;
                 }
                 if (this.submitting) {
-                    return false
+                    return false;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.common["确认更新模板？"]'),
                     subTitle: this.$t('m.common["更新模板操作将会覆盖原先模板的信息"]'),
                     confirmFn: () => {
-                        this.submitting = true
-                        const id = this.tempalteId
-                        const { name } = this.templateList.find(template => template.id === this.tempalteId)
-                        params.name = name
+                        this.submitting = true;
+                        const id = this.tempalteId;
+                        const { name } = this.templateList.find(template => template.id === this.tempalteId);
+                        params.name = name;
 
-                        this.$store.dispatch('change/updateTemplate', { params, id }).then(res => {
+                        this.$store.dispatch('change/updateTemplate', { params, id }).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.common["模板更新成功"]'),
                                 theme: 'success',
                                 ellipsisLine: 0,
-                            })
+                            });
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.getTemplateList()
-                                this.submitting = false
-                            })
+                                this.getTemplateList();
+                                this.submitting = false;
+                            });
                     },
-                })
+                });
             },
             // 保存模板
-            onSaveTemplate () {
-                const params = this.getSaveTemplateParams()
+            onSaveTemplate() {
+                const params = this.getSaveTemplateParams();
                 if (!params.template.length) {
                     this.$bkMessage({
                         message: this.$t('m.common["无字段可以保存"]'),
                         theme: 'warning',
-                    })
-                    this.cancelTemplate()
-                    return false
+                    });
+                    this.cancelTemplate();
+                    return false;
                 }
                 if (this.submitting) {
-                    return false
+                    return false;
                 }
-                this.$refs.templateForm.validate().then(validator => {
-                    this.submitting = true
+                this.$refs.templateForm.validate().then((validator) => {
+                    this.submitting = true;
                     this.$store.dispatch('change/submitTemplate', params).then((res) => {
-                        this.getTemplateList()
+                        this.getTemplateList();
                         this.$bkMessage({
                             message: this.$t('m.common["保存成功"]'),
                             theme: 'success',
-                        })
+                        });
                     })
                         .catch((res) => {
-                            errorHandler(res, this)
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.submitting = false
-                            this.cancelTemplate()
-                        })
-                })
+                            this.submitting = false;
+                            this.cancelTemplate();
+                        });
+                });
             },
             // 取消模板
-            cancelTemplate () {
-                this.templateFormData.name = ''
-                this.$refs.templatePopover.hideHandler()
+            cancelTemplate() {
+                this.templateFormData.name = '';
+                this.$refs.templatePopover.hideHandler();
             },
             // 选择模板
-            handleTemplateChange (id) {
-                this.tempalteId = id
-                const template = this.templateList.find(template => template.id === id).template || []
-                this.fieldList.forEach(item => {
-                    template.forEach(node => {
+            handleTemplateChange(id) {
+                this.tempalteId = id;
+                const template = this.templateList.find(template => template.id === id).template || [];
+                this.fieldList.forEach((item) => {
+                    template.forEach((node) => {
                         if (item.key === node.key) {
-                            item.val = node.value
+                            item.val = node.value;
                         }
-                    })
-                })
+                    });
+                });
             },
-            onBackIconClick () {
-                let route
+            onBackIconClick() {
+                let route;
                 if (this.$route.query.from) {
                     route = {
                         name: this.$route.query.from,
-                    }
+                    };
                 } else {
                     route = {
                         name: 'projectTicket',
                         query: {
                             project_id: this.$store.state.project.id,
                         },
-                    }
+                    };
                 }
-                this.$router.push(route)
+                this.$router.push(route);
             },
-            onCollectClick () {
+            onCollectClick() {
                 this.$store.dispatch('service/toggleServiceFavorite', {
                     id: this.serviceId,
                     favorite: !this.favorite,
                 }).then((res) => {
                     if (res.result) {
-                        this.favorite = !this.favorite // 修改当前数据的收藏状态
+                        this.favorite = !this.favorite; // 修改当前数据的收藏状态
                     }
                     this.$bkMessage({
                         message: this.favorite ? this.$t('m.manageCommon[\'收藏成功\']') : this.$t('m.manageCommon[\'取消成功\']'),
                         theme: 'success',
                         ellipsisLine: 0,
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
 @import '../../scss/mixins/scroller.scss';

@@ -67,16 +67,16 @@
             },
         },
         computed: {
-            ratioCls () {
+            ratioCls() {
                 if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
-                    return 'ratio-equal'
+                    return 'ratio-equal';
                 } if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
-                    return 'ratio-up'
+                    return 'ratio-up';
                 }
-                return 'ratio-down'
+                return 'ratio-down';
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .summary-card {

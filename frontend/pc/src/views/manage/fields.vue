@@ -26,12 +26,12 @@
     </div>
 </template>
 <script>
-    import PublicFields from '../processManagement/publicField/index.vue'
+    import PublicFields from '../processManagement/publicField/index.vue';
 
     export default {
         name: 'Fields',
         components: {
             PublicFields,
         },
-    }
+    };
 </script>

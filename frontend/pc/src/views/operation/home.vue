@@ -183,17 +183,17 @@
     </div>
 </template>
 <script>
-    import dayjs from 'dayjs'
-    import throttle from 'lodash/throttle'
-    import SummaryCard from './components/summaryCard.vue'
-    import ChartCard from './components/chartCard.vue'
-    import TableChart from './components/tableChart.vue'
-    import LineChart from './components/lineChart.vue'
-    import BarChart from './components/barChart.vue'
-    import PieChart from './components/pieChart.vue'
-    import i18n from '@/i18n/index.js'
+    import dayjs from 'dayjs';
+    import throttle from 'lodash/throttle';
+    import SummaryCard from './components/summaryCard.vue';
+    import ChartCard from './components/chartCard.vue';
+    import TableChart from './components/tableChart.vue';
+    import LineChart from './components/lineChart.vue';
+    import BarChart from './components/barChart.vue';
+    import PieChart from './components/pieChart.vue';
+    import i18n from '@/i18n/index.js';
 
-    const FORMAT = 'YYYY-MM-DD'
+    const FORMAT = 'YYYY-MM-DD';
 
     const SERVICE_TABLE_COLUMNS = [
         {
@@ -206,8 +206,8 @@
             key: 'service_name',
             name: i18n.t('m[\'服务名称\']'),
             link: true,
-            handler (data) {
-                this.$router.push({ name: this.$route.query.project_id ? 'projectOperationService' : 'OperationService', params: { id: data.service_id }, query: { project_id: this.$route.query.project_id } })
+            handler(data) {
+                this.$router.push({ name: this.$route.query.project_id ? 'projectOperationService' : 'OperationService', params: { id: data.service_id }, query: { project_id: this.$route.query.project_id } });
             },
         },
         {
@@ -219,8 +219,8 @@
             name: i18n.t('m[\'单量（占比）\']'),
             sort: true,
             align: 'right',
-            format (data) {
-                return `${data.count}(${data.ratio})`
+            format(data) {
+                return `${data.count}(${data.ratio})`;
             },
         },
         {
@@ -237,7 +237,7 @@
             align: 'right',
             width: 110,
         },
-    ]
+    ];
     const BIZ_TABLE_COLUMNS = [
         {
             key: 'order',
@@ -262,7 +262,7 @@
             align: 'right',
             width: 120,
         },
-    ]
+    ];
     const CREATOR_TABLE_COLUMNS = [
         {
             key: 'order',
@@ -286,14 +286,14 @@
             align: 'right',
             width: 120,
         },
-    ]
+    ];
 
     const STATUS_MAP = {
         RUNNING: '进行中',
         FINISHED: '已完成',
         REVOKED: '已撤销',
         TERMINATED: '已终止',
-    }
+    };
 
     export default {
         name: 'OperationHome',
@@ -305,10 +305,10 @@
             BarChart,
             PieChart,
         },
-        data () {
-            const end = dayjs().format(FORMAT)
+        data() {
+            const end = dayjs().format(FORMAT);
             const start = dayjs().subtract(1, 'month')
-                .format(FORMAT)
+                .format(FORMAT);
             return {
                 dateRange: [start, end],
                 isDateSelectorFixed: false,
@@ -379,73 +379,73 @@
                 shortcuts: [
                     {
                         text: this.$t('m[\'今天\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
-                            const start = dayjs().format(FORMAT)
-                            return [start, end]
+                        value() {
+                            const end = dayjs().format(FORMAT);
+                            const start = dayjs().format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'昨天\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'day')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'前天\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(2, 'day')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'一周前\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'week')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'一个月前\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'三个月前\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(3, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'半年前\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(6, 'month')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                     {
                         text: this.$t('m[\'一年前\']'),
-                        value () {
-                            const end = dayjs().format(FORMAT)
+                        value() {
+                            const end = dayjs().format(FORMAT);
                             const start = dayjs().subtract(1, 'year')
-                                .format(FORMAT)
-                            return [start, end]
+                                .format(FORMAT);
+                            return [start, end];
                         },
                     },
                 ],
@@ -464,72 +464,72 @@
                     addedService: false,
                 },
                 project_key: this.$route.query.project_id || undefined,
-            }
+            };
         },
-        created () {
-            this.getSummaryData()
-            this.getDetailData()
-            this.getBizList()
-            this.handleDateSelectorPosition = throttle(this.scrollHandler, 300)
+        created() {
+            this.getSummaryData();
+            this.getDetailData();
+            this.getBizList();
+            this.handleDateSelectorPosition = throttle(this.scrollHandler, 300);
         },
-        mounted () {
-            this.$parent.$el.addEventListener('scroll', this.handleDateSelectorPosition, false)
+        mounted() {
+            this.$parent.$el.addEventListener('scroll', this.handleDateSelectorPosition, false);
         },
-        beforeDestroy () {
-            this.$parent.$el.removeEventListener('scroll', this.handleDateSelectorPosition, false)
+        beforeDestroy() {
+            this.$parent.$el.removeEventListener('scroll', this.handleDateSelectorPosition, false);
         },
         methods: {
-            getDetailData () {
-                this.getServiceUseData()
-                this.getBizUseData()
-                this.getTicketClassifyData()
-                this.getTicketStatusData()
-                this.getCreatorData()
-                this.getTop10CreateTicketUserData()
-                this.getTop10TicketOrganizationData()
-                this.getAddedTicketData()
-                this.getAddedUserData()
-                this.getAddedServiceData()
+            getDetailData() {
+                this.getServiceUseData();
+                this.getBizUseData();
+                this.getTicketClassifyData();
+                this.getTicketStatusData();
+                this.getCreatorData();
+                this.getTop10CreateTicketUserData();
+                this.getTop10TicketOrganizationData();
+                this.getAddedTicketData();
+                this.getAddedUserData();
+                this.getAddedServiceData();
             },
             // 概览数据
-            async getSummaryData () {
-                this.loading.summary = true
+            async getSummaryData() {
+                this.loading.summary = true;
                 try {
                     const params = {
                         project_key: this.project_key,
-                    }
+                    };
                     const resp = await Promise.all([
                         this.$store.dispatch('operation/getSummaryTotalData', params),
                         this.$store.dispatch('operation/getSummaryWeekData', params),
-                    ])
+                    ]);
                     this.summaryData = {
                         total: resp[0].data,
                         week: resp[1].data,
-                    }
+                    };
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.summary = false
+                    this.loading.summary = false;
                 }
             },
             // 加载业务列表
-            async getBizList () {
-                this.loading.bizList = true
+            async getBizList() {
+                this.loading.bizList = true;
                 try {
                     const params = {
                         project_key: this.project_key,
-                    }
-                    const resp = await this.$store.dispatch('eventType/getAppList', params)
-                    this.bizList = resp.data
+                    };
+                    const resp = await this.$store.dispatch('eventType/getAppList', params);
+                    this.bizList = resp.data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.bizList = false
+                    this.loading.bizList = false;
                 }
             },
             // 服务使用统计
-            async getServiceUseData (order) {
-                this.loading.serviceUse = true
+            async getServiceUseData(order) {
+                this.loading.serviceUse = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -538,19 +538,19 @@
                         page: this.serviceTablePagination.current,
                         service_name: this.serviceSearchStr,
                         order_by: order,
-                    }
-                    const resp = await this.$store.dispatch('operation/getServiceUseData', params)
-                    this.serviceTablePagination.count = resp.data.count
-                    this.serviceUseData = resp.data.items
+                    };
+                    const resp = await this.$store.dispatch('operation/getServiceUseData', params);
+                    this.serviceTablePagination.count = resp.data.count;
+                    this.serviceUseData = resp.data.items;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.serviceUse = false
+                    this.loading.serviceUse = false;
                 }
             },
             // 业务使用统计
-            async getBizUseData (order) {
-                this.loading.bizUse = true
+            async getBizUseData(order) {
+                this.loading.bizUse = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -559,71 +559,71 @@
                         page: this.bizTablePagination.current,
                         biz_id: this.bizSearchIds,
                         order_by: order,
-                    }
-                    const resp = await this.$store.dispatch('operation/getBizUseData', params)
-                    this.bizTablePagination.count = resp.data.count
-                    this.bizUseData = resp.data.items
+                    };
+                    const resp = await this.$store.dispatch('operation/getBizUseData', params);
+                    this.bizTablePagination.count = resp.data.count;
+                    this.bizUseData = resp.data.items;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.bizUse = false
+                    this.loading.bizUse = false;
                 }
             },
             // 单据数量-按类型统计
-            async getTicketClassifyData () {
-                this.loading.ticketClassify = true
+            async getTicketClassifyData() {
+                this.loading.ticketClassify = true;
                 try {
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
-                    }
-                    const resp = await this.$store.dispatch('operation/getTicketClassifyData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getTicketClassifyData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, service_type } = item
-                        data.x.push(service_type)
-                        data.y.push(count)
-                    })
-                    this.ticketClassifyData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, service_type } = item;
+                        data.x.push(service_type);
+                        data.y.push(count);
+                    });
+                    this.ticketClassifyData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.ticketClassify = false
+                    this.loading.ticketClassify = false;
                 }
             },
             // 单据状态占比
-            async getTicketStatusData () {
-                this.loading.ticketStatus = true
+            async getTicketStatusData() {
+                this.loading.ticketStatus = true;
                 try {
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
-                    }
-                    const resp = await this.$store.dispatch('operation/getTicketStatusData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getTicketStatusData', params);
                     const data = {
                         labels: [],
                         value: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { status, count } = item
-                        data.labels.push(STATUS_MAP[status])
-                        data.value.push(count)
-                    })
-                    this.ticketStatusData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { status, count } = item;
+                        data.labels.push(STATUS_MAP[status]);
+                        data.value.push(count);
+                    });
+                    this.ticketStatusData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.ticketStatus = false
+                    this.loading.ticketStatus = false;
                 }
             },
             // 提单人数
-            async getCreatorData () {
-                this.loading.creator = true
+            async getCreatorData() {
+                this.loading.creator = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -631,80 +631,80 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.creatorChartDismension,
                         resource_type: 'creator',
-                    }
-                    const resp = await this.$store.dispatch('operation/getResourceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getResourceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.creatorData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.creatorData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.creator = false
+                    this.loading.creator = false;
                 }
             },
             // top 10 提单用户
-            async getTop10CreateTicketUserData () {
-                this.loading.top10CreateTicketUser = true
+            async getTop10CreateTicketUserData() {
+                this.loading.top10CreateTicketUser = true;
                 try {
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
-                    }
-                    const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params)
-                    const data = resp.data.map(item => {
+                    };
+                    const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params);
+                    const data = resp.data.map((item) => {
                         if (item.organization.length > 0) {
-                            const fullOrganization = this.getFullOrganization(item.organization)
-                            item.organization_full = fullOrganization.reverse().join('/')
-                            item.organization = item.organization[0].name
+                            const fullOrganization = this.getFullOrganization(item.organization);
+                            item.organization_full = fullOrganization.reverse().join('/');
+                            item.organization = item.organization[0].name;
                         } else {
-                            item.organization = '--'
+                            item.organization = '--';
                         }
-                        return item
-                    })
-                    this.top10CreateTicketUserData = data
+                        return item;
+                    });
+                    this.top10CreateTicketUserData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.top10CreateTicketUser = false
+                    this.loading.top10CreateTicketUser = false;
                 }
             },
             // top 10 单据分布占比
-            async getTop10TicketOrganizationData () {
-                this.loading.top10TicketOrganization = true
+            async getTop10TicketOrganizationData() {
+                this.loading.top10TicketOrganization = true;
                 try {
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
-                    }
-                    const resp = await this.$store.dispatch('operation/getTop10TicketOrganizationData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getTop10TicketOrganizationData', params);
                     const data = {
                         labels: [],
                         value: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { organization, count } = item
-                        data.labels.push(organization)
-                        data.value.push(count)
-                    })
-                    this.top10TicketOrganizationData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { organization, count } = item;
+                        data.labels.push(organization);
+                        data.value.push(count);
+                    });
+                    this.top10TicketOrganizationData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.top10TicketOrganization = false
+                    this.loading.top10TicketOrganization = false;
                 }
             },
             // 新增单量
-            async getAddedTicketData () {
-                this.loading.addedTicket = true
+            async getAddedTicketData() {
+                this.loading.addedTicket = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -712,27 +712,27 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedTicketChartDismension,
                         resource_type: 'ticket',
-                    }
-                    const resp = await this.$store.dispatch('operation/getResourceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getResourceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.addedTicketData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.addedTicketData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.addedTicket = false
+                    this.loading.addedTicket = false;
                 }
             },
             // 新增用户数
-            async getAddedUserData () {
-                this.loading.addedUser = true
+            async getAddedUserData() {
+                this.loading.addedUser = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -740,27 +740,27 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedUserChartDismension,
                         resource_type: 'user',
-                    }
-                    const resp = await this.$store.dispatch('operation/getResourceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getResourceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.addedUserData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.addedUserData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.addedUser = false
+                    this.loading.addedUser = false;
                 }
             },
             // 新增服务
-            async getAddedServiceData () {
-                this.loading.addedService = true
+            async getAddedServiceData() {
+                this.loading.addedService = true;
                 try {
                     const params = {
                         project_key: this.project_key,
@@ -768,98 +768,98 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedServiceChartDismension,
                         resource_type: 'service',
-                    }
-                    const resp = await this.$store.dispatch('operation/getResourceCountData', params)
+                    };
+                    const resp = await this.$store.dispatch('operation/getResourceCountData', params);
                     const data = {
                         x: [],
                         y: [],
-                    }
-                    resp.data.forEach(item => {
-                        const { count, date } = item
-                        data.x.push(date)
-                        data.y.push(count)
-                    })
-                    this.addedServiceData = data
+                    };
+                    resp.data.forEach((item) => {
+                        const { count, date } = item;
+                        data.x.push(date);
+                        data.y.push(count);
+                    });
+                    this.addedServiceData = data;
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 } finally {
-                    this.loading.addedService = false
+                    this.loading.addedService = false;
                 }
             },
-            getFullOrganization (organization) {
-                const target = organization[0]
-                let fullOrganization = [target.name]
+            getFullOrganization(organization) {
+                const target = organization[0];
+                let fullOrganization = [target.name];
                 if (target.family && target.family.length > 0) {
-                    const nextName = this.getFullOrganization(target.family)
-                    fullOrganization = fullOrganization.concat(nextName)
+                    const nextName = this.getFullOrganization(target.family);
+                    fullOrganization = fullOrganization.concat(nextName);
                 }
-                return fullOrganization
+                return fullOrganization;
             },
-            onSelectDate (value) {
-                this.dateRange = value
-                this.serviceTablePagination.current = 1
-                this.bizTablePagination.current = 1
-                this.getDetailData()
+            onSelectDate(value) {
+                this.dateRange = value;
+                this.serviceTablePagination.current = 1;
+                this.bizTablePagination.current = 1;
+                this.getDetailData();
             },
-            scrollHandler (e) {
-                this.isDateSelectorFixed = e.target.scrollTop > 150
+            scrollHandler(e) {
+                this.isDateSelectorFixed = e.target.scrollTop > 150;
             },
-            handleServiceSearch (val) {
-                this.serviceSearchStr = val || undefined
-                this.serviceTablePagination.current = 1
-                this.getServiceUseData()
+            handleServiceSearch(val) {
+                this.serviceSearchStr = val || undefined;
+                this.serviceTablePagination.current = 1;
+                this.getServiceUseData();
             },
-            handleBizSearch (val) {
-                this.bizTablePagination.current = 1
+            handleBizSearch(val) {
+                this.bizTablePagination.current = 1;
                 if (val !== '') {
-                    const matched = this.bizList.filter(item => item.name.toLowerCase().includes(val))
+                    const matched = this.bizList.filter(item => item.name.toLowerCase().includes(val));
                     if (matched.length > 0) {
-                        this.bizSearchIds = matched.map(item => item.key).join(',')
-                        this.getBizUseData()
+                        this.bizSearchIds = matched.map(item => item.key).join(',');
+                        this.getBizUseData();
                     } else {
-                        this.bizTablePagination.count = 0
-                        this.bizUseData = []
-                        this.bizSearchIds = undefined
+                        this.bizTablePagination.count = 0;
+                        this.bizUseData = [];
+                        this.bizSearchIds = undefined;
                     }
                 } else {
-                    this.bizSearchIds = undefined
-                    this.getBizUseData()
+                    this.bizSearchIds = undefined;
+                    this.getBizUseData();
                 }
             },
-            onServiceTablePageChange (page) {
-                this.serviceTablePagination.current = page
-                this.getServiceUseData()
+            onServiceTablePageChange(page) {
+                this.serviceTablePagination.current = page;
+                this.getServiceUseData();
             },
-            onServiceTableOrderChange (order) {
-                this.serviceTablePagination.current = 1
-                this.getServiceUseData(order)
+            onServiceTableOrderChange(order) {
+                this.serviceTablePagination.current = 1;
+                this.getServiceUseData(order);
             },
-            onBizTablePageChange (page) {
-                this.bizTablePagination.current = page
-                this.getBizUseData()
+            onBizTablePageChange(page) {
+                this.bizTablePagination.current = page;
+                this.getBizUseData();
             },
-            onBizTableOrderChange (order) {
-                this.bizTablePagination.current = 1
-                this.getBizUseData(order)
+            onBizTableOrderChange(order) {
+                this.bizTablePagination.current = 1;
+                this.getBizUseData(order);
             },
-            onCreatorDimensionChange (val) {
-                this.creatorChartDismension = val
-                this.getCreatorData()
+            onCreatorDimensionChange(val) {
+                this.creatorChartDismension = val;
+                this.getCreatorData();
             },
-            onAddedTicketDimensionChange (val) {
-                this.addedTicketChartDismension = val
-                this.getAddedTicketData()
+            onAddedTicketDimensionChange(val) {
+                this.addedTicketChartDismension = val;
+                this.getAddedTicketData();
             },
-            onAddedUserDimensionChange (val) {
-                this.addedUserChartDismension = val
-                this.getAddedUserData()
+            onAddedUserDimensionChange(val) {
+                this.addedUserChartDismension = val;
+                this.getAddedUserData();
             },
-            onAddedServiceDimensionChange (val) {
-                this.addedServiceChartDismension = val
-                this.getAddedServiceData()
+            onAddedServiceDimensionChange(val) {
+                this.addedServiceChartDismension = val;
+                this.getAddedServiceData();
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .operation-home {

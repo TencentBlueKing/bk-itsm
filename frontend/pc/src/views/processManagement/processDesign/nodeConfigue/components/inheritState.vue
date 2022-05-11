@@ -56,114 +56,114 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler'
+    import { errorHandler } from '../../../../../utils/errorHandler';
     export default {
         name: 'inheritState',
         props: {
             workflow: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             state: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             showTabList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             configur: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 trueStatus: true,
                 falseStatus: false,
                 dataList: [],
                 checkList: [],
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        mounted () {
-            this.getTicketTables()
+        mounted() {
+            this.getTicketTables();
         },
         methods: {
             // 流程模型字段源
-            getTicketTables () {
-                const params = {}
-                const id = this.workflow
-                this.isDataLoading = true
+            getTicketTables() {
+                const params = {};
+                const id = this.workflow;
+                this.isDataLoading = true;
                 this.$store.dispatch('basicModule/get_ticket_tables', { params, id }).then((res) => {
-                    this.dataList = res.data.fields
-                    this.dataList.forEach(item => {
+                    this.dataList = res.data.fields;
+                    this.dataList.forEach((item) => {
                         // 字段类型
-                        this.globalChoise.field_type.forEach(node => {
+                        this.globalChoise.field_type.forEach((node) => {
                             if (item.type === node.typeName) {
-                                this.$set(item, 'typeName', node.name)
+                                this.$set(item, 'typeName', node.name);
                             }
-                        })
-                        this.$set(item, 'is_readonly', false)
-                        this.$set(item, 'is_disabled', false)
-                        this.showTabList.forEach(tableItem => {
+                        });
+                        this.$set(item, 'is_readonly', false);
+                        this.$set(item, 'is_disabled', false);
+                        this.showTabList.forEach((tableItem) => {
                             if (item.key === tableItem.key) {
-                                item.is_readonly = tableItem.is_readonly
-                                item.is_disabled = true
+                                item.is_readonly = tableItem.is_readonly;
+                                item.is_disabled = true;
                             }
-                        })
+                        });
                         // key === 'priority'的is_readonly总为true
                         if (item.key === 'priority') {
-                            item.is_readonly = true
+                            item.is_readonly = true;
                         }
-                    })
+                    });
                     // 提单节点去掉key === 'current_status'
                     if (this.configur.is_first_state) {
-                        this.dataList = this.dataList.filter(item => item.key !== 'current_status')
+                        this.dataList = this.dataList.filter(item => item.key !== 'current_status');
                     }
                     // 初始化将勾选的数据选上
                     this.$nextTick(() => {
-                        this.dataList.forEach(item => {
+                        this.dataList.forEach((item) => {
                             if (item.is_disabled) {
-                                this.$refs.table.toggleRowSelection(item, true)
+                                this.$refs.table.toggleRowSelection(item, true);
                             }
-                        })
-                    })
+                        });
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection, row) {
+                this.checkList = selection;
             },
-            disabledFn (item, index) {
-                const disabledStatus = this.showTabList.some(tableItem => tableItem.key === item.key)
-                return !disabledStatus
+            disabledFn(item, index) {
+                const disabledStatus = this.showTabList.some(tableItem => tableItem.key === item.key);
+                return !disabledStatus;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
-    
+
 </style>

@@ -111,13 +111,13 @@
 </template>
 
 <script>
-    import ace from '../../../commonComponent/aceEditor/index.js'
-    import mixins from '../../../commonMix/mixins_api.js'
-    import apiEditorBasic from './apiEditorBasic.vue'
-    import apiEditorRequest from './apiEditorRequest.vue'
-    import apiEditorResult from './apiEditorResult.vue'
-    import apiEditorOthers from './apiEditorOthers.vue'
-    import { errorHandler } from '../../../../utils/errorHandler.js'
+    import ace from '../../../commonComponent/aceEditor/index.js';
+    import mixins from '../../../commonMix/mixins_api.js';
+    import apiEditorBasic from './apiEditorBasic.vue';
+    import apiEditorRequest from './apiEditorRequest.vue';
+    import apiEditorResult from './apiEditorResult.vue';
+    import apiEditorOthers from './apiEditorOthers.vue';
+    import { errorHandler } from '../../../../utils/errorHandler.js';
 
     export default {
         components: {
@@ -131,30 +131,30 @@
         props: {
             apiDetailInfoCommon: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             treeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             pathList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isBuiltinIdList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 dataProcess: {
@@ -163,18 +163,18 @@
                     fullScreen: true,
                     lang: 'python',
                 },
-            }
+            };
         },
         computed: {
             // 基本设置
             DetailInfo: {
                 // getter
-                get () {
-                    return this.apiDetailInfoCommon
+                get() {
+                    return this.apiDetailInfoCommon;
                 },
                 // setter
-                set (newVal) {
-                    this.$parent.apiDetailInfoCommon = newVal
+                set(newVal) {
+                    this.$parent.apiDetailInfoCommon = newVal;
                 },
             },
         },
@@ -189,54 +189,54 @@
             //     deep: true
             // }
         },
-        mounted () {
+        mounted() {
         },
         methods: {
-            changBlur (val) {
-                this.DetailInfo.map_code = val
+            changBlur(val) {
+                this.DetailInfo.map_code = val;
             },
-            reqChangBlur (val) {
-                this.DetailInfo.before_req = val
+            reqChangBlur(val) {
+                this.DetailInfo.before_req = val;
             },
-            getRemoteApiDetail (id) {
-                this.$parent.$parent.getRemoteApiDetail(id)
+            getRemoteApiDetail(id) {
+                this.$parent.$parent.getRemoteApiDetail(id);
             },
-            async updateApi () {
+            async updateApi() {
                 if (this.secondClick || !this.DetailInfo.treeDataList || !this.DetailInfo.responseTreeDataList) {
-                    return
+                    return;
                 }
-                this.DetailInfo.req_headers = this.DetailInfo.req_headers.filter(item => !!item.name)
-                this.DetailInfo.req_params = this.DetailInfo.req_params.filter(item => !!item.name)
+                this.DetailInfo.req_headers = this.DetailInfo.req_headers.filter(item => !!item.name);
+                this.DetailInfo.req_params = this.DetailInfo.req_params.filter(item => !!item.name);
                 // body Jsonschema数据结构
-                const rootdata = await this.listToJsonschema(this.DetailInfo.treeDataList)
-                this.DetailInfo.req_body = await rootdata.root // root初始 Jsonschema数据结构
+                const rootdata = await this.listToJsonschema(this.DetailInfo.treeDataList);
+                this.DetailInfo.req_body = await rootdata.root; // root初始 Jsonschema数据结构
 
                 // response Jsonschema数据结构
-                const responseRootdata = await this.listToJsonschema(this.DetailInfo.responseTreeDataList)
-                this.DetailInfo.rsp_data = await responseRootdata.root // root初始 Jsonschema数据结构
-                this.DetailInfo.owners = this.DetailInfo.ownersInputValue.join(',')
-                delete this.DetailInfo.ownersInputValue
-                await delete this.DetailInfo.treeDataList
-                await delete this.DetailInfo.responseTreeDataList
+                const responseRootdata = await this.listToJsonschema(this.DetailInfo.responseTreeDataList);
+                this.DetailInfo.rsp_data = await responseRootdata.root; // root初始 Jsonschema数据结构
+                this.DetailInfo.owners = this.DetailInfo.ownersInputValue.join(',');
+                delete this.DetailInfo.ownersInputValue;
+                await delete this.DetailInfo.treeDataList;
+                await delete this.DetailInfo.responseTreeDataList;
 
-                const params = this.DetailInfo
-                this.secondClick = true
-                await this.$store.dispatch('apiRemote/put_remote_api', params).then(res => {
+                const params = this.DetailInfo;
+                this.secondClick = true;
+                await this.$store.dispatch('apiRemote/put_remote_api', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["更新成功"]'),
                         theme: 'success',
-                    })
-                    this.getRemoteApiDetail(this.DetailInfo.id)
+                    });
+                    this.getRemoteApiDetail(this.DetailInfo.id);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 切换接口类型，改变请求参数数据
-            changeRequest (val) {
+            changeRequest(val) {
                 if (val === 'POST') {
                     // 如果this.DetailInfo.req_params的数据存在值时弹出提示清空
                     if (this.DetailInfo.req_params && this.DetailInfo.req_params.length && this.DetailInfo.req_params.some(item => (item.name || item.sample !== ''))) {
@@ -250,12 +250,12 @@
                                     sample: '',
                                     desc: '',
                                     value: '',
-                                }]
-                                this.$refs.apiEditorBasic.changeMethod(val)
+                                }];
+                                this.$refs.apiEditorBasic.changeMethod(val);
                             },
-                        })
+                        });
                     } else {
-                        this.$refs.apiEditorBasic.changeMethod(val)
+                        this.$refs.apiEditorBasic.changeMethod(val);
                     }
                 } else {
                     if (this.DetailInfo.treeDataList[0].children && this.DetailInfo.treeDataList[0].children.length) {
@@ -263,17 +263,17 @@
                             type: 'warning',
                             title: this.$t('m.systemConfig[\'此操作将清空请求参数\']'),
                             confirmFn: () => {
-                                this.DetailInfo.treeDataList[0].children = []
-                                this.$refs.apiEditorBasic.changeMethod(val)
+                                this.DetailInfo.treeDataList[0].children = [];
+                                this.$refs.apiEditorBasic.changeMethod(val);
                             },
-                        })
+                        });
                     } else {
-                        this.$refs.apiEditorBasic.changeMethod(val)
+                        this.$refs.apiEditorBasic.changeMethod(val);
                     }
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

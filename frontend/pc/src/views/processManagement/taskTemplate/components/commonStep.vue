@@ -149,10 +149,10 @@
 </template>
 
 <script>
-    import fieldConfig from '../../processDesign/nodeConfigue/components/fieldConfig'
-    import commonTriggerList from './commonTriggerList'
-    import memberSelect from '../../../commonComponent/memberSelect'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import fieldConfig from '../../processDesign/nodeConfigue/components/fieldConfig';
+    import commonTriggerList from './commonTriggerList';
+    import memberSelect from '../../../commonComponent/memberSelect';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         name: 'commonStep',
@@ -164,8 +164,8 @@
         props: {
             templateInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             step: {
@@ -174,12 +174,12 @@
             },
             stepList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 firstStepInfo: {
                     name: '',
@@ -201,35 +201,35 @@
                 buttonLoading: false,
                 // 模板信息会在编辑时保存，这里单独保存
                 changedTemplateInfo: {},
-            }
+            };
         },
         watch: {
-            step () {
-                this.initData()
+            step() {
+                this.initData();
             },
         },
-        async mounted () {
-            await this.initData()
+        async mounted() {
+            await this.initData();
         },
         methods: {
-            async initData () {
-                this.changedTemplateInfo = JSON.parse(JSON.stringify(this.templateInfo.itemInfo))
-                this.firstStepInfo.name = this.changedTemplateInfo.name
-                this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : []
-                this.firstStepInfo.desc = this.changedTemplateInfo.desc
+            async initData() {
+                this.changedTemplateInfo = JSON.parse(JSON.stringify(this.templateInfo.itemInfo));
+                this.firstStepInfo.name = this.changedTemplateInfo.name;
+                this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
+                this.firstStepInfo.desc = this.changedTemplateInfo.desc;
             },
-            cancelStep () {
-                this.$parent.backTab()
+            cancelStep() {
+                this.$parent.backTab();
             },
             // 下一步操作
-            async stepChange (type = 'next', isDraft = false, isTemplate = '') {
+            async stepChange(type = 'next', isDraft = false, isTemplate = '') {
                 if (isTemplate === 'changeName') {
-                    let valid = false
+                    let valid = false;
                     await this.$refs.taskInfoForm.validate().then(() => {
-                        valid = true
-                    }, () => {})
+                        valid = true;
+                    }, () => {});
                     if (!valid) {
-                        return
+                        return;
                     }
                 }
                 const patch = {
@@ -242,62 +242,62 @@
                         desc: this.firstStepInfo.desc,
                     },
                     id: this.changedTemplateInfo.id,
-                }
+                };
                 if (!isTemplate) {
                     patch.params.task_fields = {
                         stage: this.stepList[this.step].stage,
                         task_field_ids: this.$refs.field.showTabList.map(field => field.id),
-                    }
+                    };
                 }
-                this.buttonLoading = true
-                this.$store.dispatch('taskTemplate/updateTemplate', patch).then(res => {
+                this.buttonLoading = true;
+                this.$store.dispatch('taskTemplate/updateTemplate', patch).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.taskTemplate[\'保存成功\']'),
                         theme: 'success',
-                    })
-                    this.changedTemplateInfo = res.data
+                    });
+                    this.changedTemplateInfo = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally((res) => {
-                        this.$parent.changeTemplateInfo(this.changedTemplateInfo)
-                        this.initData()
-                        this.buttonLoading = false
+                        this.$parent.changeTemplateInfo(this.changedTemplateInfo);
+                        this.initData();
+                        this.buttonLoading = false;
                         if (isTemplate) {
-                            this.cancelEdit(isTemplate)
-                            return
+                            this.cancelEdit(isTemplate);
+                            return;
                         }
                         if (isDraft) {
-                            return
+                            return;
                         }
                         if (this.step === 2) {
-                            this.$parent.backTab()
-                            return
+                            this.$parent.backTab();
+                            return;
                         }
-                        const stepIndex = type === 'previous' ? this.step - 1 : this.step + 1
+                        const stepIndex = type === 'previous' ? this.step - 1 : this.step + 1;
                         const temp = {
                             id: stepIndex + 1,
                             name: this.stepList[stepIndex].name,
                             type: 'primary',
                             is_draft: this.changedTemplateInfo.is_draft,
                             show: false,
-                        }
-                        this.$parent.changeTree(temp, stepIndex)
-                    })
+                        };
+                        this.$parent.changeTree(temp, stepIndex);
+                    });
             },
-            cancelEdit (type) {
-                this.firstStepInfo[type] = ''
+            cancelEdit(type) {
+                this.firstStepInfo[type] = '';
                 if (type === 'changeName') {
-                    this.firstStepInfo.name = this.changedTemplateInfo.name
+                    this.firstStepInfo.name = this.changedTemplateInfo.name;
                 } else if (type === 'changeOwners') {
-                    this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : []
+                    this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
                 } else {
-                    this.firstStepInfo.desc = this.changedTemplateInfo.desc
+                    this.firstStepInfo.desc = this.changedTemplateInfo.desc;
                 }
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

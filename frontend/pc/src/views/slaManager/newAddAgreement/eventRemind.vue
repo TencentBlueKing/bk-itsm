@@ -168,49 +168,49 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js'
+    import commonMix from '../../commonMix/common.js';
     export default {
         name: 'priorityConfigur',
         mixins: [commonMix],
         props: {
             modelList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             emailNotifyEventList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             weixinNotifyEventList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             modelPriority: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             hasCheckBox: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
         },
-        data () {
+        data() {
             return {
                 priorityList: [],
                 isDropdownShow: false,
@@ -248,7 +248,7 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                 },
@@ -259,7 +259,7 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                     weixin_notify: [
@@ -268,43 +268,43 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => !!v,
+                            validator: v => !!v,
                         },
                     ],
                 },
                 iconOffset: 75,
-            }
+            };
         },
         watch: {
-            modelPriority () {
+            modelPriority() {
                 if (!this.changeInfo.info.id) {
-                    this.priorityList = JSON.parse(JSON.stringify(this.modelPriority))
+                    this.priorityList = JSON.parse(JSON.stringify(this.modelPriority));
                 }
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
             // 初始化校验规则
-            this.scheduleRules = this.checkCommonRules('schedule')
-            this.selectRules = this.checkCommonRules('select')
+            this.scheduleRules = this.checkCommonRules('schedule');
+            this.selectRules = this.checkCommonRules('select');
         },
         methods: {
-            initData () {
-                const parentInfo = this.changeInfo.info
+            initData() {
+                const parentInfo = this.changeInfo.info;
                 // 区分初始化和编辑状态priorityList的值不同
                 if (!parentInfo.policies.length) {
-                    this.priorityList = JSON.parse(JSON.stringify(this.modelPriority))
+                    this.priorityList = JSON.parse(JSON.stringify(this.modelPriority));
                 } else {
-                    this.priorityList = []
-                    let pushData = {}
-                    let emailNotify = ''
-                    let weixinNotify = ''
-                    this.modelPriority.forEach(item => {
-                        pushData = item
-                        parentInfo.action_policies.forEach(policie => {
+                    this.priorityList = [];
+                    let pushData = {};
+                    let emailNotify = '';
+                    let weixinNotify = '';
+                    this.modelPriority.forEach((item) => {
+                        pushData = item;
+                        parentInfo.action_policies.forEach((policie) => {
                             if (policie.type === item.type) {
-                                emailNotify = policie.actions[0].config.notify.find(notifyObj => notifyObj.notify_type === 'email')
-                                weixinNotify = policie.actions[0].config.notify.find(notifyObj => notifyObj.notify_type === 'weixin')
+                                emailNotify = policie.actions[0].config.notify.find(notifyObj => notifyObj.notify_type === 'email');
+                                weixinNotify = policie.actions[0].config.notify.find(notifyObj => notifyObj.notify_type === 'weixin');
                                 pushData = {
                                     ...item,
                                     isCheck: true,
@@ -316,73 +316,73 @@
                                     notify_rule: policie.actions[0].config.notify_rule,
                                     notify_freq: policie.actions[0].config.notify_freq,
                                     freq_unit: policie.actions[0].config.freq_unit,
-                                }
+                                };
                             }
-                        })
-                        this.priorityList.push(pushData)
-                    })
+                        });
+                        this.priorityList.push(pushData);
+                    });
                 }
             },
-            dropdownShow () {
-                this.isDropdownShow = true
+            dropdownShow() {
+                this.isDropdownShow = true;
             },
-            dropdownHide () {
-                this.isDropdownShow = false
+            dropdownHide() {
+                this.isDropdownShow = false;
             },
-            timeHandler (time, item, index) {
-                this.$refs[`dropdown${index}`][0].hide()
-                item.freq_unit = time.id
+            timeHandler(time, item, index) {
+                this.$refs[`dropdown${index}`][0].hide();
+                item.freq_unit = time.id;
             },
             // 跳转到新建服务模式
-            handleCreate () {
-                this.$router.push({ name: 'slaManager', params: { key: 'create' } })
+            handleCreate() {
+                this.$router.push({ name: 'slaManager', params: { key: 'create' } });
             },
-            notifyFreqChange (notifyFreq, index) {
+            notifyFreqChange(notifyFreq, index) {
                 if (notifyFreq <= 0) {
-                    this.priorityList[index].notify_freq = 10
+                    this.priorityList[index].notify_freq = 10;
                     this.$bkMessage({
                         message: this.$t('m.slaContent["不可设置小于等于0的数字"]'),
                         theme: 'warning',
-                    })
+                    });
                 }
             },
-            notifyTypeChange (notifyTypeList, index) {
+            notifyTypeChange(notifyTypeList, index) {
                 if (notifyTypeList.length === 1) {
-                    this.oldNotifyTypeList[index] = notifyTypeList
+                    this.oldNotifyTypeList[index] = notifyTypeList;
                 }
                 if (notifyTypeList.length === 0) {
-                    this.priorityList[index].notify_type_list = [...this.oldNotifyTypeList[index]]
+                    this.priorityList[index].notify_type_list = [...this.oldNotifyTypeList[index]];
                     this.$bkMessage({
                         message: this.$t('m.slaContent["至少选择一项提醒方式"]'),
                         theme: 'warning',
-                    })
+                    });
                 }
             },
             // 校验
-            async checkData () {
-                const validates = []
-                let valid = true
-                const checkIndexList = []
-                this.priorityList.forEach(mp => {
-                    if (!mp.hasCheckBox || mp.isCheck) checkIndexList.push(mp.type)
-                })
-                this.$refs.receivers.forEach(item => {
-                    if (checkIndexList.indexOf(item.model.type) !== -1) validates.push(item.validate())
-                })
-                this.$refs.notifyType.forEach(item => {
-                    if (!item.model.hasCheckBox || item.model.isCheck) validates.push(item.validate())
-                })
+            async checkData() {
+                const validates = [];
+                let valid = true;
+                const checkIndexList = [];
+                this.priorityList.forEach((mp) => {
+                    if (!mp.hasCheckBox || mp.isCheck) checkIndexList.push(mp.type);
+                });
+                this.$refs.receivers.forEach((item) => {
+                    if (checkIndexList.indexOf(item.model.type) !== -1) validates.push(item.validate());
+                });
+                this.$refs.notifyType.forEach((item) => {
+                    if (!item.model.hasCheckBox || item.model.isCheck) validates.push(item.validate());
+                });
                 await Promise.all(validates).then(() => {
-                    valid = false
+                    valid = false;
                 })
                     .catch(() => {
                         // 防止出现Uncaught
-                        valid = true
-                    })
-                return valid
+                        valid = true;
+                    });
+                return valid;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>
@@ -403,7 +403,7 @@
             border-bottom: 1px dashed !important;
             cursor: pointer;
         }
-        
+
     }
     .bk-priority-head {
         @include clearfix;

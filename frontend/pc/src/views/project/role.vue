@@ -181,10 +181,10 @@
     </div>
 </template>
 <script>
-    import memberSelect from '../commonComponent/memberSelect'
-    import permission from '@/mixins/permission.js'
-    import { errorHandler } from '../../utils/errorHandler'
-    import EmptyTip from '../project/components/emptyTip.vue'
+    import memberSelect from '../commonComponent/memberSelect';
+    import permission from '@/mixins/permission.js';
+    import { errorHandler } from '../../utils/errorHandler';
+    import EmptyTip from '../project/components/emptyTip.vue';
 
     export default {
         components: {
@@ -192,7 +192,7 @@
             EmptyTip,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 // 二次点击
                 secondClick: false,
@@ -251,87 +251,87 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
-            getList () {
-                this.isDataLoading = true
+            getList() {
+                this.isDataLoading = true;
                 const params = {
                     role_type: 'GENERAL',
                     name__icontains: this.searchName,
                     project_key: this.$store.state.project.id,
-                }
+                };
                 this.$store.dispatch('user/getRoleList', params).then((res) => {
-                    this.tableList = res.data
-                    this.searchToggle = res.data.length !== 0
-                    this.tableList.forEach(item => {
-                        this.$set(item, 'staffInputValue', item.members ? item.members.split(',') : [])
-                        this.$set(item, 'ownersInputValue', item.owners ? item.owners.split(',') : [])
-                    })
+                    this.tableList = res.data;
+                    this.searchToggle = res.data.length !== 0;
+                    this.tableList.forEach((item) => {
+                        this.$set(item, 'staffInputValue', item.members ? item.members.split(',') : []);
+                        this.$set(item, 'ownersInputValue', item.owners ? item.owners.split(',') : []);
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 保存修改，新增
-            submitUser () {
-                this.$refs.dynamicForm.validate().then(validator => {
+            submitUser() {
+                this.$refs.dynamicForm.validate().then((validator) => {
                     if (this.formData.staffInputValue.length === 0) {
                         this.$bkMessage({
                             message: this.$t('m.user["人员不能为空！"]'),
                             theme: 'warning',
-                        })
-                        return
+                        });
+                        return;
                     }
                     if (this.secondClick) {
-                        return
+                        return;
                     }
-                    this.secondClick = true
+                    this.secondClick = true;
                     if (this.itemContent.id) {
-                        this.updateUser()
+                        this.updateUser();
                     } else {
-                        this.addUser()
+                        this.addUser();
                     }
-                })
+                });
             },
             // 新增
-            addUser () {
+            addUser() {
                 const params = {
                     members: '',
                     name: this.formData.name,
                     role_type: 'GENERAL',
                     project_key: this.$store.state.project.id,
-                }
-                params.members = this.formData.staffInputValue.join(',')
-                params.owners = this.formData.ownersInputValue.join(',')
+                };
+                params.members = this.formData.staffInputValue.join(',');
+                params.owners = this.formData.ownersInputValue.join(',');
                 this.$store.dispatch('user/submit', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.user[\'新增成功\']'),
                         theme: 'success',
-                    })
-                    this.openDialog.isShow = false
-                    this.getList()
+                    });
+                    this.openDialog.isShow = false;
+                    this.getList();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 更新
-            updateUser () {
+            updateUser() {
                 const params = {
                     id: this.itemContent.id,
                     role_key: this.itemContent.role_key,
@@ -339,39 +339,39 @@
                     name: this.formData.name,
                     role_type: 'GENERAL',
                     project_key: this.$store.state.project.id,
-                }
-                params.members = this.formData.staffInputValue.join(',')
-                params.owners = this.formData.ownersInputValue.join(',')
+                };
+                params.members = this.formData.staffInputValue.join(',');
+                params.owners = this.formData.ownersInputValue.join(',');
                 this.$store.dispatch('user/update', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.user[\'保存成功\']'),
                         theme: 'success',
-                    })
-                    this.openDialog.isShow = false
-                    this.getList()
+                    });
+                    this.openDialog.isShow = false;
+                    this.getList();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 编辑
-            showEditor (item, type) {
+            showEditor(item, type) {
                 // 编辑权限校验
-                const authAction = type === 'new' ? 'user_group_create' : 'user_group_edit'
-                const curPermissions = type === 'new' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
+                const authAction = type === 'new' ? 'user_group_create' : 'user_group_edit';
+                const curPermissions = type === 'new' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions];
                 if (!this.hasPermission([authAction], curPermissions || [])) {
-                    let resourceData = {}
-                    const { projectInfo } = this.$store.state.project
+                    let resourceData = {};
+                    const { projectInfo } = this.$store.state.project;
                     if (authAction === 'user_group_create') {
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
                                 name: projectInfo.name,
                             }],
-                        }
+                        };
                     } else {
                         resourceData = {
                             project: [{
@@ -382,22 +382,22 @@
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
+                        };
                     }
-                    this.applyForPermission([authAction], curPermissions, resourceData)
-                    return false
+                    this.applyForPermission([authAction], curPermissions, resourceData);
+                    return false;
                 }
-                this.openDialog.isShow = true
-                this.formData.name = item.name
-                this.formData.staffInputValue = item.staffInputValue
-                this.formData.ownersInputValue = item.ownersInputValue
-                this.itemContent = item
+                this.openDialog.isShow = true;
+                this.formData.name = item.name;
+                this.formData.staffInputValue = item.staffInputValue;
+                this.formData.ownersInputValue = item.ownersInputValue;
+                this.itemContent = item;
             },
             // 删除
-            deleteUser (item) {
+            deleteUser(item) {
                 // 删除权限校验
                 if (!this.hasPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -407,41 +407,41 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['user_group_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return false;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.user["确认要删除此角色？"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
+                        this.secondClick = true;
                         this.$store.dispatch('user/delete', id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.user["删除成功"]'),
                                 theme: 'success',
-                            })
+                            });
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                                this.getList()
-                            })
+                                this.secondClick = false;
+                                this.getList();
+                            });
                     },
-                })
+                });
             },
             // 人员选择器赋值
-            handleChange (name, value) {
-                this.formData.staffInputValue = value
+            handleChange(name, value) {
+                this.formData.staffInputValue = value;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

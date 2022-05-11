@@ -85,9 +85,9 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    import editorNotice from './editorNotice.vue'
-    import permission from '@/mixins/permission.js'
+    import { errorHandler } from '../../../utils/errorHandler';
+    import editorNotice from './editorNotice.vue';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'noticeConfigure',
@@ -95,7 +95,7 @@
             editorNotice,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 isDataLoading: true,
                 remindWayList: [
@@ -111,62 +111,62 @@
                     width: 700,
                     formInfo: {},
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getNoticeList()
+        mounted() {
+            this.getNoticeList();
         },
         methods: {
             // 获取数据
-            getNoticeList () {
-                this.isDataLoading = true
+            getNoticeList() {
+                this.isDataLoading = true;
                 const params = {
                     notify_type: this.checkId,
-                }
+                };
                 this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
-                    this.noticeList = res.data
+                    this.noticeList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            changeNotice (item, index) {
-                this.checkId = item.id
-                this.getNoticeList()
+            changeNotice(item, index) {
+                this.checkId = item.id;
+                this.getNoticeList();
             },
-            editorInfo (item) {
+            editorInfo(item) {
                 if (!this.hasPermission(['notification_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['notification_manage'], this.$store.state.project.projectAuthActions, {})
-                    return
+                    this.applyForPermission(['notification_manage'], this.$store.state.project.projectAuthActions, {});
+                    return;
                 }
-                this.noticeInfo.formInfo = item
-                this.noticeInfo.show = true
+                this.noticeInfo.formInfo = item;
+                this.noticeInfo.show = true;
             },
-            closeEditor () {
-                this.noticeInfo.show = false
+            closeEditor() {
+                this.noticeInfo.show = false;
             },
-            closeSideslider () {
+            closeSideslider() {
                 this.$bkInfo({
                     title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.noticeInfo.show = false
+                        this.noticeInfo.show = false;
                     },
                     cancelFn: () => {
-                        this.noticeInfo.show = true
+                        this.noticeInfo.show = true;
                     },
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

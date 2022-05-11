@@ -131,10 +131,10 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    import firstStep from './ticketStatus/firstStep'
-    import secondStep from './ticketStatus/secondStep'
-    import permission from '@/mixins/permission.js'
+    import { errorHandler } from '../../utils/errorHandler';
+    import firstStep from './ticketStatus/firstStep';
+    import secondStep from './ticketStatus/secondStep';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'ticketStatus',
@@ -143,7 +143,7 @@
             secondStep,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 business: false,
@@ -178,142 +178,142 @@
                 treeTag: '',
                 statusType: '',
                 tagName: '',
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getTypeStatusList()
+        mounted() {
+            this.getTypeStatusList();
         },
         methods: {
-            getTypeStatusList () {
-                this.isDataLoading = true
+            getTypeStatusList() {
+                this.isDataLoading = true;
                 this.$store.dispatch('ticketStatus/getFourTypesList').then((res) => {
-                    this.dataList = res.data
-                    const temp = this.dataList.findIndex(item => item.id === 3)
-                    this.dataList.splice(temp, 1)
+                    this.dataList = res.data;
+                    const temp = this.dataList.findIndex(item => item.id === 3);
+                    this.dataList.splice(temp, 1);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 编辑工单状态
-            editStatus (item) {
+            editStatus(item) {
                 if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {})
-                    return
+                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
+                    return;
                 }
-                this.tagName = item.service_type_name
-                this.statusType = item.service_type
-                this.editInfo.itemInfo = item
-                this.editInfo.newNode = item.id
-                this.processStatus.addNew = !this.processStatus.addNew
-                this.changeTree(0, 'first')
+                this.tagName = item.service_type_name;
+                this.statusType = item.service_type;
+                this.editInfo.itemInfo = item;
+                this.editInfo.newNode = item.id;
+                this.processStatus.addNew = !this.processStatus.addNew;
+                this.changeTree(0, 'first');
             },
             // 配置工单状态
-            configStatus (item) {
+            configStatus(item) {
                 if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {})
-                    return
+                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
+                    return;
                 }
-                this.tagName = item.service_type_name
-                this.statusType = item.service_type
-                this.editInfo.itemInfo = {}
-                this.editInfo.newNode = null
-                this.processStatus.addNew = !this.processStatus.addNew
-                this.changeTree(0, 'first')
+                this.tagName = item.service_type_name;
+                this.statusType = item.service_type;
+                this.editInfo.itemInfo = {};
+                this.editInfo.newNode = null;
+                this.processStatus.addNew = !this.processStatus.addNew;
+                this.changeTree(0, 'first');
             },
-            trClick (item) {
+            trClick(item) {
                 if (item.configured) {
-                    this.editStatus(item)
+                    this.editStatus(item);
                 } else {
-                    this.configStatus(item)
+                    this.configStatus(item);
                 }
             },
             // 切换树状态
-            changeTree (index, type) {
+            changeTree(index, type) {
                 if (this.editInfo.itemInfo.id) {
                     if (type === 'first') {
                         for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false
-                            this.lineList[i].type = 'success'
+                            this.lineList[i].show = false;
+                            this.lineList[i].type = 'success';
                         }
-                        this.lineList[0].show = true
-                        this.lineList[0].type = 'primary'
+                        this.lineList[0].show = true;
+                        this.lineList[0].type = 'primary';
                     }
                     if (type === 'next') {
-                        this.lineList[index].type = 'success'
-                        this.lineList[index].show = false
-                        this.lineList[index + 1].type = 'primary'
-                        this.lineList[index + 1].show = 'true'
+                        this.lineList[index].type = 'success';
+                        this.lineList[index].show = false;
+                        this.lineList[index + 1].type = 'primary';
+                        this.lineList[index + 1].show = 'true';
                     }
                     if (type === 'back') {
-                        this.lineList[index].type = 'success'
-                        this.lineList[index].show = false
-                        this.lineList[index - 1].type = 'primary'
-                        this.lineList[index - 1].show = 'true'
+                        this.lineList[index].type = 'success';
+                        this.lineList[index].show = false;
+                        this.lineList[index - 1].type = 'primary';
+                        this.lineList[index - 1].show = 'true';
                     }
                     if (type === 'change') {
                         for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false
-                            this.lineList[i].type = 'success'
+                            this.lineList[i].show = false;
+                            this.lineList[i].type = 'success';
                         }
-                        this.lineList[index].type = 'primary'
-                        this.lineList[index].show = true
+                        this.lineList[index].type = 'primary';
+                        this.lineList[index].show = true;
                     }
                 } else {
                     if (type === 'first') {
                         for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false
-                            this.lineList[i].type = 'normal'
+                            this.lineList[i].show = false;
+                            this.lineList[i].type = 'normal';
                         }
-                        this.lineList[0].show = true
-                        this.lineList[0].type = 'primary'
+                        this.lineList[0].show = true;
+                        this.lineList[0].type = 'primary';
                     }
                     if (type === 'next') {
-                        this.lineList[index].type = 'success'
-                        this.lineList[index].show = false
-                        this.lineList[index + 1].type = 'primary'
-                        this.lineList[index + 1].show = 'true'
+                        this.lineList[index].type = 'success';
+                        this.lineList[index].show = false;
+                        this.lineList[index + 1].type = 'primary';
+                        this.lineList[index + 1].show = 'true';
                     }
                     if (type === 'back') {
-                        this.lineList[index].type = 'normal'
-                        this.lineList[index].show = false
-                        this.lineList[index - 1].type = 'primary'
-                        this.lineList[index - 1].show = 'true'
+                        this.lineList[index].type = 'normal';
+                        this.lineList[index].show = false;
+                        this.lineList[index - 1].type = 'primary';
+                        this.lineList[index - 1].show = 'true';
                     }
                     if (type === 'change') {
                         if (this.lineList[index].type === 'normal') {
-                            return
+                            return;
                         }
-                        const temp = this.lineList.findIndex(item => item.show)
-                        this.lineList[temp].show = false
-                        this.lineList[temp].type = 'normal'
-                        this.lineList[index].type = 'primary'
-                        this.lineList[index].show = true
+                        const temp = this.lineList.findIndex(item => item.show);
+                        this.lineList[temp].show = false;
+                        this.lineList[temp].type = 'normal';
+                        this.lineList[index].type = 'primary';
+                        this.lineList[index].show = true;
                     }
                 }
             },
-            backTab () {
-                this.statusType = ''
-                this.editInfo.itemInfo = {}
-                this.editInfo.newNode = null
-                this.processStatus.addNew = !this.processStatus.addNew
-                this.changeTree(0, 'first')
-                this.getTypeStatusList()
+            backTab() {
+                this.statusType = '';
+                this.editInfo.itemInfo = {};
+                this.editInfo.newNode = null;
+                this.processStatus.addNew = !this.processStatus.addNew;
+                this.changeTree(0, 'first');
+                this.getTypeStatusList();
             },
             // 关闭版本提示信息
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

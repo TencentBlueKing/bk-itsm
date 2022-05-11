@@ -50,24 +50,24 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
+    import { errorHandler } from '../../utils/errorHandler';
     export default {
         name: 'BusinessCard',
         props: {
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 memberList: [],
                 memberValList: [
@@ -78,58 +78,58 @@
                 ],
                 showInfo: false,
                 localLoading: false,
-            }
+            };
         },
         computed: {
-            memberVal () {
-                return this.basicInfomation.creator ? this.basicInfomation.creator : this.item.val
+            memberVal() {
+                return this.basicInfomation.creator ? this.basicInfomation.creator : this.item.val;
             },
         },
-        created () {
+        created() {
             if (window.run_site !== 'bmw') {
-                this.memberValList.push({ type: 'qq', name: this.$t('m.newCommon["QQ"]') })
-                this.memberValList.push({ type: 'wx_userid', name: this.$t('m.newCommon["微信"]') })
-                this.memberValList.push({ type: 'time_zone', name: this.$t('m.newCommon["时区"]') })
+                this.memberValList.push({ type: 'qq', name: this.$t('m.newCommon["QQ"]') });
+                this.memberValList.push({ type: 'wx_userid', name: this.$t('m.newCommon["微信"]') });
+                this.memberValList.push({ type: 'time_zone', name: this.$t('m.newCommon["时区"]') });
             }
         },
         methods: {
-            showMessage () {
+            showMessage() {
                 if (!this.memberVal) {
-                    return
+                    return;
                 }
-                this.localLoading = true
-                const valList = this.memberVal.split(',')
-                const userIds = valList.map(name => name.replace(/\(.*\)$/, ''))
+                this.localLoading = true;
+                const valList = this.memberVal.split(',');
+                const userIds = valList.map(name => name.replace(/\(.*\)$/, ''));
                 const params = {
                     users: userIds.join(','),
-                }
+                };
                 this.$store.dispatch('getPersonInfo', params).then((res) => {
                     if (res.data && res.data.length) {
-                        this.memberList = res.data
-                        this.memberList.forEach(info => {
+                        this.memberList = res.data;
+                        this.memberList.forEach((info) => {
                             if (info.departments && info.departments.length) {
                                 const depName = info.departments.reduce((names, dep, index) => {
                                     if (index) {
-                                        names += '\n'
+                                        names += '\n';
                                     }
-                                    names += dep.full_name
-                                    return names
-                                }, '')
-                                info.departmentsDispName = depName
+                                    names += dep.full_name;
+                                    return names;
+                                }, '');
+                                info.departmentsDispName = depName;
                             }
-                        })
-                        this.showInfo = true
+                        });
+                        this.showInfo = true;
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.localLoading = false
-                    })
+                        this.localLoading = false;
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

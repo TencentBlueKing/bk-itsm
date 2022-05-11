@@ -29,21 +29,21 @@
     export default {
         name: 'CreateService',
         components: {},
-        data () {
+        data() {
             return {
 
-            }
+            };
         },
-        created () {
+        created() {
 
         },
-        mounted () {
+        mounted() {
 
         },
         methods: {
 
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 

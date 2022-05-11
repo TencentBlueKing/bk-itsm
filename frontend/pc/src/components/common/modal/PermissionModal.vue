@@ -41,65 +41,65 @@
     </bk-dialog>
 </template>
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import PermissionContent from '../layout/PermissionContent.vue'
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import PermissionContent from '../layout/PermissionContent.vue';
     export default {
         name: 'permissionModal',
         components: {
             PermissionContent,
         },
-        data () {
+        data() {
             return {
                 isModalShow: false,
                 hasClicked: false,
                 permissionData: {},
                 loading: false,
                 lock: require('../../../images/lock-radius.svg'),
-            }
+            };
         },
         watch: {
-            isModalShow (val) {
+            isModalShow(val) {
                 if (val) {
-                    this.loadPermissionUrl()
+                    this.loadPermissionUrl();
                 }
             },
         },
         methods: {
-            async loadPermissionUrl () {
+            async loadPermissionUrl() {
                 try {
-                    this.loading = true
-                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData)
+                    this.loading = true;
+                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData);
                     if (res.result) {
-                        this.url = res.data.url
+                        this.url = res.data.url;
                     } else {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     }
                 } catch (err) {
-                    errorHandler(err, this)
+                    errorHandler(err, this);
                 } finally {
-                    this.loading = false
+                    this.loading = false;
                 }
             },
-            show (data) {
-                this.isModalShow = true
-                this.permissionData = data
+            show(data) {
+                this.isModalShow = true;
+                this.permissionData = data;
             },
-            goToApply () {
+            goToApply() {
                 if (this.loading) {
-                    return
+                    return;
                 }
                 if (this.hasClicked) {
-                    window.location.reload()
+                    window.location.reload();
                 } else {
-                    this.hasClicked = true
-                    window.open(this.url, '__blank')
+                    this.hasClicked = true;
+                    window.open(this.url, '__blank');
                 }
             },
-            onCloseDialog () {
-                this.isModalShow = false
+            onCloseDialog() {
+                this.isModalShow = false;
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .button-group {
@@ -107,5 +107,5 @@
             margin-left: 7px;
         }
     }
-    
+
 </style>

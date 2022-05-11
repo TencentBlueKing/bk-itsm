@@ -52,32 +52,32 @@
     </div>
 </template>
 <script>
-    import string from '../../commonComponent/fieldComponent/string.vue'
-    import link from '../../commonComponent/fieldComponent/link'
-    import int from '../../commonComponent/fieldComponent/int.vue'
-    import text from '../../commonComponent/fieldComponent/text.vue'
-    import checkbox from '../../commonComponent/fieldComponent/checkbox.vue'
-    import radio from '../../commonComponent/fieldComponent/radio.vue'
-    import select from '../../commonComponent/fieldComponent/select.vue'
-    import inputSelect from '../../commonComponent/fieldComponent/inputSelect'
-    import multiselect from '../../commonComponent/fieldComponent/multiselect.vue'
-    import date from '../../commonComponent/fieldComponent/date.vue'
-    import datetime from '../../commonComponent/fieldComponent/datetime.vue'
-    import member from '../../commonComponent/fieldComponent/member.vue'
-    import members from '../../commonComponent/fieldComponent/members.vue'
-    import table from '../../commonComponent/fieldComponent/table.vue'
-    import customtable from '../../commonComponent/fieldComponent/customtable.vue'
-    import editor from '../../commonComponent/fieldComponent/editor.vue'
-    import tree from '../../commonComponent/fieldComponent/tree.vue'
-    import file from '../../commonComponent/fieldComponent/file.vue'
-    import cascade from '../../commonComponent/fieldComponent/cascade.vue'
-    import sopsTemplate from '../../commonComponent/fieldComponent/sopsTemplate.vue'
-    import devopsTemplate from '../../commonComponent/fieldComponent/devopsTemplate.vue'
+    import string from '../../commonComponent/fieldComponent/string.vue';
+    import link from '../../commonComponent/fieldComponent/link';
+    import int from '../../commonComponent/fieldComponent/int.vue';
+    import text from '../../commonComponent/fieldComponent/text.vue';
+    import checkbox from '../../commonComponent/fieldComponent/checkbox.vue';
+    import radio from '../../commonComponent/fieldComponent/radio.vue';
+    import select from '../../commonComponent/fieldComponent/select.vue';
+    import inputSelect from '../../commonComponent/fieldComponent/inputSelect';
+    import multiselect from '../../commonComponent/fieldComponent/multiselect.vue';
+    import date from '../../commonComponent/fieldComponent/date.vue';
+    import datetime from '../../commonComponent/fieldComponent/datetime.vue';
+    import member from '../../commonComponent/fieldComponent/member.vue';
+    import members from '../../commonComponent/fieldComponent/members.vue';
+    import table from '../../commonComponent/fieldComponent/table.vue';
+    import customtable from '../../commonComponent/fieldComponent/customtable.vue';
+    import editor from '../../commonComponent/fieldComponent/editor.vue';
+    import tree from '../../commonComponent/fieldComponent/tree.vue';
+    import file from '../../commonComponent/fieldComponent/file.vue';
+    import cascade from '../../commonComponent/fieldComponent/cascade.vue';
+    import sopsTemplate from '../../commonComponent/fieldComponent/sopsTemplate.vue';
+    import devopsTemplate from '../../commonComponent/fieldComponent/devopsTemplate.vue';
 
-    import apiFieldsWatch from '../../commonMix/api_fields_watch.js'
-    import commonMix from '../../commonMix/common.js'
-    import { isEmpty } from '../../../utils/util'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import apiFieldsWatch from '../../commonMix/api_fields_watch.js';
+    import commonMix from '../../commonMix/common.js';
+    import { isEmpty } from '../../../utils/util';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'fieldInfo',
@@ -118,8 +118,8 @@
             },
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             origin: {
@@ -128,8 +128,8 @@
             },
             typeInfo: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             disabled: {
@@ -137,131 +137,131 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 rotate: false,
                 labelWidth: 200,
-            }
+            };
         },
-        created () {
+        created() {
             // 内置一个校验参数
-            this.fields.forEach(item => {
-                this.$set(item, 'checkValue', false)
-            })
+            this.fields.forEach((item) => {
+                this.$set(item, 'checkValue', false);
+            });
         },
-        mounted () {
+        mounted() {
             this.$nextTick(() => {
-                this.labelWidth = this.$refs.fieldContent.clientWidth / 2 || 200
-            })
+                this.labelWidth = this.$refs.fieldContent.clientWidth / 2 || 200;
+            });
         },
         methods: {
-            freshBtn (item) {
-                this.rotate = !this.rotate
+            freshBtn(item) {
+                this.rotate = !this.rotate;
                 if (this.$route.name === 'CreateTicket') {
-                    this.freshApi(item, this.fields, 'submit')
+                    this.freshApi(item, this.fields, 'submit');
                 } else {
-                    this.freshApi(item, this.fields, 'field')
+                    this.freshApi(item, this.fields, 'field');
                 }
             },
-            freshRpc (item) {
-                this.rotate = !this.rotate
-                this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
-                    item.choice = res.data
-                    item.val = ''
+            freshRpc(item) {
+                this.rotate = !this.rotate;
+                this.$store.dispatch('apiRemote/getRpcData', item).then((res) => {
+                    item.choice = res.data;
+                    item.val = '';
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 字段值进行装换
-            fieldChange () {
-                this.fieldFormatting(this.fields)
+            fieldChange() {
+                this.fieldFormatting(this.fields);
             },
             // 内置任务模板字段校验 标准运维/蓝盾
-            checkBuiltInTaskTemplate () {
-                const checks = []
+            checkBuiltInTaskTemplate() {
+                const checks = [];
                 this.fields.forEach((item, index) => {
                     if (item.type === 'SOPS_TEMPLATE' || item.type === 'DEVOPS_TEMPLATE') {
-                        checks.push(this.$refs[`component${index}`][0].validate())
+                        checks.push(this.$refs[`component${index}`][0].validate());
                     }
-                })
-                return checks.every(check => !!check)
+                });
+                return checks.every(check => !!check);
             },
             // 字段间联合校验
-            jointVerification () {
-                let allPass = true
-                const relateValid = this.relatedRegex(this.fields, isEmpty(this.allFieldList) ? this.fields : this.allFieldList)
-                relateValid.validList.forEach(item => {
+            jointVerification() {
+                let allPass = true;
+                const relateValid = this.relatedRegex(this.fields, isEmpty(this.allFieldList) ? this.fields : this.allFieldList);
+                relateValid.validList.forEach((item) => {
                     if (!item.result) {
-                        allPass = false
-                        item.validList.forEach(it => {
-                            const target = this.fields.find(field => field.key === it.key)
+                        allPass = false;
+                        item.validList.forEach((it) => {
+                            const target = this.fields.find(field => field.key === it.key);
                             if (target && !target.checkValue) { // 字段处理验证通过状态才去改变，不然会去覆盖原来错误提示
-                                target.checkValue = true
-                                target.checkMessage = it.tips
+                                target.checkValue = true;
+                                target.checkMessage = it.tips;
                             }
-                        })
+                        });
                     }
-                })
-                return allPass
+                });
+                return allPass;
             },
             // 必填校验
-            requiredVerification () {
+            requiredVerification() {
                 // 字段为空校验
-                const requireValidList = this.fields.filter(it => it.showFeild && it.validate_type === 'REQUIRE').filter(it => {
+                const requireValidList = this.fields.filter(it => it.showFeild && it.validate_type === 'REQUIRE').filter((it) => {
                     if (it.type === 'CUSTOMTABLE') {
                         // 自定义表格需要单独校验每一列
-                        return it.meta.columns.some(column => column.required)
+                        return it.meta.columns.some(column => column.required);
                     }
                     if (it.type === 'SOPS_TEMPLATE' || it.type === 'DEVOPS_TEMPLATE') {
-                        return false
+                        return false;
                     }
-                    return true
-                })
-                const validateList = requireValidList.filter(it => {
-                    let checkValue = false
-                    it.checkValue = false
-                    let msg = '' // 自定义校验报错内容
+                    return true;
+                });
+                const validateList = requireValidList.filter((it) => {
+                    let checkValue = false;
+                    it.checkValue = false;
+                    let msg = ''; // 自定义校验报错内容
                     switch (it.type) {
                         case 'TABLE':
-                            let allEmpty1 = true
-                            it.choice.forEach(item => {
+                            let allEmpty1 = true;
+                            it.choice.forEach((item) => {
                                 if (it.value[0][item.key] !== '') {
-                                    allEmpty1 = false
+                                    allEmpty1 = false;
                                 } else {
-                                    msg += (`${item.name}, `)
+                                    msg += (`${item.name}, `);
                                 }
-                            })
-                            checkValue = allEmpty1
+                            });
+                            checkValue = allEmpty1;
                             if (msg) {
-                                msg += this.$t('m.newCommon["为必填项！"]')
+                                msg += this.$t('m.newCommon["为必填项！"]');
                             }
-                            break
+                            break;
                         case 'CUSTOMTABLE':
-                            let allEmpty2 = false
-                            it.meta.columns.forEach(column => it.value.forEach(row => {
+                            let allEmpty2 = false;
+                            it.meta.columns.forEach(column => it.value.forEach((row) => {
                                 if (column.required && isEmpty(row[column.key])) {
-                                    msg += (`${column.name}, `)
-                                    allEmpty2 = true
+                                    msg += (`${column.name}, `);
+                                    allEmpty2 = true;
                                 }
-                            }))
-                            checkValue = allEmpty2
+                            }));
+                            checkValue = allEmpty2;
                             if (msg) {
-                                msg += this.$t('m.newCommon["为必填项！"]')
+                                msg += this.$t('m.newCommon["为必填项！"]');
                             }
-                            break
+                            break;
                         default:
-                            checkValue = isEmpty(it.value)
+                            checkValue = isEmpty(it.value);
                     }
                     if (msg) {
-                        it.checkMessage = msg
-                        checkValue = true
+                        it.checkMessage = msg;
+                        checkValue = true;
                     }
-                    it.checkValue = checkValue
-                    return checkValue
-                })
-                const sopStatus = this.checkBuiltInTaskTemplate()
-                return !validateList.length && sopStatus
+                    it.checkValue = checkValue;
+                    return checkValue;
+                });
+                const sopStatus = this.checkBuiltInTaskTemplate();
+                return !validateList.length && sopStatus;
             },
             /**
              * 字段校验
@@ -269,14 +269,14 @@
              * 2、联合字段校验
              * 3、必填校验
              */
-            checkValue () {
-                this.fieldChange()
-                const allPass1 = this.requiredVerification()
-                const allPass2 = this.jointVerification()
-                return allPass1 && allPass2
+            checkValue() {
+                this.fieldChange();
+                const allPass1 = this.requiredVerification();
+                const allPass2 = this.jointVerification();
+                return allPass1 && allPass2;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

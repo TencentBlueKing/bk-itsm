@@ -159,19 +159,19 @@
 </template>
 
 <script>
-    import mixins from '../../../commonMix/mixins_api.js'
+    import mixins from '../../../commonMix/mixins_api.js';
 
     export default {
         mixins: [mixins],
         props: {
             apiDetailInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 bodyTableData: [],
                 responseTableData: [],
@@ -241,75 +241,75 @@
                         otherInfo: 'input: 123',
                     },
                 ],
-            }
+            };
         },
         computed: {},
         watch: {
-            apiDetailInfo (newVal, oldVal) {
-                this.initDate()
+            apiDetailInfo(newVal, oldVal) {
+                this.initDate();
             },
         },
-        mounted () {
-            this.initDate()
+        mounted() {
+            this.initDate();
         },
         methods: {
-            async bodyTableDataChange () {
-                const bodyTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.bodyTableData))
-                await bodyTableData.forEach(item => {
-                    item.children = []
-                })
-                await this.recordChildren(bodyTableData)
-                this.bodyTableData = await bodyTableData
+            async bodyTableDataChange() {
+                const bodyTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.bodyTableData));
+                await bodyTableData.forEach((item) => {
+                    item.children = [];
+                });
+                await this.recordChildren(bodyTableData);
+                this.bodyTableData = await bodyTableData;
             },
-            responseTableDataChange () {
-                this.responseTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.responseTableData))
-                this.responseTableData.forEach(item => {
-                    item.children = []
-                })
-                this.recordChildren(this.responseTableData)
+            responseTableDataChange() {
+                this.responseTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.responseTableData));
+                this.responseTableData.forEach((item) => {
+                    item.children = [];
+                });
+                this.recordChildren(this.responseTableData);
             },
-            initDate () {
+            initDate() {
                 if (this.apiDetailInfo.bodyJsonData) {
-                    this.bodyDetailConfig.value = JSON.stringify(this.apiDetailInfo.bodyJsonData.root, null, 4)
+                    this.bodyDetailConfig.value = JSON.stringify(this.apiDetailInfo.bodyJsonData.root, null, 4);
                 }
-                this.bodyTableDataChange()
-                this.responseTableDataChange()
+                this.bodyTableDataChange();
+                this.responseTableDataChange();
             },
-            editorInitAfter (val) {
+            editorInitAfter(val) {
                 // ...
             },
-            changeState (item) {
-                item.showChildren = !item.showChildren
-                item.children.forEach(ite => {
-                    ite.isShow = item.showChildren
-                })
+            changeState(item) {
+                item.showChildren = !item.showChildren;
+                item.children.forEach((ite) => {
+                    ite.isShow = item.showChildren;
+                });
                 if (!item.showChildren) {
-                    this.closeChildren(item)
+                    this.closeChildren(item);
                 }
             },
-            closeChildren (item) {
-                item.children.forEach(ite => {
-                    ite.isShow = false
+            closeChildren(item) {
+                item.children.forEach((ite) => {
+                    ite.isShow = false;
                     if (ite.has_children) {
-                        ite.showChildren = false
-                        this.closeChildren(ite)
+                        ite.showChildren = false;
+                        this.closeChildren(ite);
                     }
-                })
+                });
             },
-            recordChildren (tableData) {
-                const levelList = tableData.map(item => item.level)
-                const maxLevel = Math.max(...levelList)
+            recordChildren(tableData) {
+                const levelList = tableData.map(item => item.level);
+                const maxLevel = Math.max(...levelList);
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
-                }
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item);
+                };
                 for (let i = maxLevel; i > 0; i--) {
-                    tableData.filter(item => item.level === i).forEach(ite => {
-                        recordChildrenStep(tableData, ite)
-                    })
+                    tableData.filter(item => item.level === i).forEach((ite) => {
+                        recordChildrenStep(tableData, ite);
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

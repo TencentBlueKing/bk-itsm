@@ -36,7 +36,7 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue'
+    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
 
     export default {
         name: 'sopsNodeLog',
@@ -49,7 +49,7 @@
                 default: () => ({}),
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

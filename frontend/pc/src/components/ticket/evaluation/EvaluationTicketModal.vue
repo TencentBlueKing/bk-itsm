@@ -56,8 +56,8 @@
 </template>
 
 <script>
-    import EvaluationTicketContent from './EvaluationTicketContent.vue'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import EvaluationTicketContent from './EvaluationTicketContent.vue';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'EvaluationTicketModal',
@@ -70,58 +70,58 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 submitting: false,
                 loading: false,
                 isShow: false,
                 satisfactInfo: {},
-            }
+            };
         },
         watch: {
-            isShow (val) {
+            isShow(val) {
                 if (val) {
-                    this.getEvaluation()
+                    this.getEvaluation();
                 }
             },
         },
         methods: {
             // 获取评论
-            async getEvaluation () {
-                this.loading = true
+            async getEvaluation() {
+                this.loading = true;
                 const params = {
                     id: this.ticketInfo.comment_id,
-                }
+                };
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
                 await this.$store.dispatch('evaluation/getEvaluation', params).then((res) => {
-                    this.satisfactInfo = res.data
+                    this.satisfactInfo = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
             },
-            show () {
-                this.isShow = true
+            show() {
+                this.isShow = true;
             },
-            onModelSubmitBtnClick () {
-                this.$refs.evaluationContent.onSubmit()
-                return false
+            onModelSubmitBtnClick() {
+                this.$refs.evaluationContent.onSubmit();
+                return false;
             },
-            onSubmitSuccess () {
-                this.isShow = false
-                this.submitting = false
-                this.$emit('submitSuccess')
+            onSubmitSuccess() {
+                this.isShow = false;
+                this.submitting = false;
+                this.$emit('submitSuccess');
             },
-            onBeforeSubmit () {
-                this.submitting = true
+            onBeforeSubmit() {
+                this.submitting = true;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 .evaluation-wrap {

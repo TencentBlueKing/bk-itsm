@@ -89,67 +89,67 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 isFullScreen: false,
-            }
+            };
         },
         methods: {
             // 当前操作节点打开全屏
-            openFullScreen () {
-                this.isFullScreen = true
+            openFullScreen() {
+                this.isFullScreen = true;
                 this.$bkMessage({
                     message: this.$t('m.common["按 ESC 键退出全屏"]'),
-                })
-                document.addEventListener('keydown', this.handlerKeyDown)
+                });
+                document.addEventListener('keydown', this.handlerKeyDown);
             },
             // 关闭全屏
-            onCloseFullScreen () {
-                this.isFullScreen = false
+            onCloseFullScreen() {
+                this.isFullScreen = false;
             },
             // 关闭全屏 - esc
-            handlerKeyDown (event) {
+            handlerKeyDown(event) {
                 if (event.keyCode === 27) {
-                    this.onCloseFullScreen()
-                    document.removeEventListener('keydown', this.handlerKeyDown)
+                    this.onCloseFullScreen();
+                    document.removeEventListener('keydown', this.handlerKeyDown);
                 }
             },
-            getPath (stage, index) {
+            getPath(stage, index) {
                 if (index === 0) {
-                    return 'M 60 2 L 55 2 Q 50 2 50 7 L 50 60 Q 50 62 45 62 L 0 62'
+                    return 'M 60 2 L 55 2 Q 50 2 50 7 L 50 60 Q 50 62 45 62 L 0 62';
                 }
-                const height = (stage.containers[index - 1].elements.length + 1) * 56
-                return `M 50 2 L 50 ${height - 10} Q 50 ${height - 5} 45 ${height - 5} L 0 ${height - 5}`
+                const height = (stage.containers[index - 1].elements.length + 1) * 56;
+                return `M 50 2 L 50 ${height - 10} Q 50 ${height - 5} 45 ${height - 5} L 0 ${height - 5}`;
             },
-            getSvgStyle (stage, index) {
+            getSvgStyle(stage, index) {
                 if (index === 0) {
-                    return ''
+                    return '';
                 }
-                const height = (stage.containers[index - 1].elements.length + 1) * 56
-                const top = height - 27
-                return top ? `top: ${-top}px;` : ''
+                const height = (stage.containers[index - 1].elements.length + 1) * 56;
+                const top = height - 27;
+                return top ? `top: ${-top}px;` : '';
             },
-            isElementCanExecute (element) {
+            isElementCanExecute(element) {
                 if (!element.additionalOptions || !element.additionalOptions.runCondition) {
-                    return true
+                    return true;
                 }
-                const { runCondition, customVariables, enable } = element.additionalOptions
+                const { runCondition, customVariables, enable } = element.additionalOptions;
                 if (!enable) {
-                    return false
+                    return false;
                 }
                 switch (runCondition) {
                     case 'CUSTOM_VARIABLE_MATCH':
-                        const allVarCheck = customVariables.every(varible => !!varible.value)
-                        return allVarCheck
+                        const allVarCheck = customVariables.every(varible => !!varible.value);
+                        return allVarCheck;
                     case 'CUSTOM_VARIABLE_MATCH_NOT_RUN':
-                        const allVarCheck2 = customVariables.every(varible => !!varible.value)
-                        return !allVarCheck2
+                        const allVarCheck2 = customVariables.every(varible => !!varible.value);
+                        return !allVarCheck2;
                     default:
-                        return true
+                        return true;
                 }
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '../../scss/animation/rotation.scss';

@@ -20,23 +20,23 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import { checkDataType } from './getDataType'
+import { checkDataType } from './getDataType';
 
 export const errorHandler = (error, instance) => {
     if (checkDataType(error) === 'Object' && error.status === 401) {
-        return false
+        return false;
     }
-    let msg = ''
+    let msg = '';
     if (error && error.data && error.data.msg) {
-        msg = error.data.msg
+        msg = error.data.msg;
     } else if (error && error.message) {
-        msg = error.message
+        msg = error.message;
     } else {
-        msg = error
+        msg = error;
     }
-    console.log(error)
+    console.log(error);
     instance.$bkMessage({
         message: msg,
         theme: 'error',
-    })
-}
+    });
+};

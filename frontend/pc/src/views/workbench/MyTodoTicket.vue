@@ -27,8 +27,8 @@
     </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import TodoList from '../ticket/TodoList'
+    import NavTitle from '@/components/common/layout/NavTitle';
+    import TodoList from '../ticket/TodoList';
 
     export default {
         name: 'MyTodoTicket',
@@ -36,5 +36,5 @@
             NavTitle,
             TodoList,
         },
-    }
+    };
 </script>

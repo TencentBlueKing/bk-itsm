@@ -94,11 +94,11 @@
 </template>
 
 <script>
-    import fieldsDone from '../../components/fieldsDone.vue'
-    import autoNodeInfo from '../../nodeInfo/autoNodeInfo.vue'
-    import sopsNodeLog from './sopsNodeLog.vue'
-    import devopsNodeLog from './devopsNodeLog.vue'
-    import fieldPreview from '@/views/commonComponent/fieldPreview/index.vue'
+    import fieldsDone from '../../components/fieldsDone.vue';
+    import autoNodeInfo from '../../nodeInfo/autoNodeInfo.vue';
+    import sopsNodeLog from './sopsNodeLog.vue';
+    import devopsNodeLog from './devopsNodeLog.vue';
+    import fieldPreview from '@/views/commonComponent/fieldPreview/index.vue';
 
     export default {
         name: 'ticketLogDetail',
@@ -119,16 +119,16 @@
                 default: () => (null),
             },
         },
-        data () {
+        data() {
             return {
                 basicList: [
                     { name: this.$t('m.newCommon["节点名称"]'), value: '', key: 'from_state_name' },
                     { name: this.$t('m.newCommon["处理人"]'), value: '', key: 'operator' },
                     { name: this.$t('m.newCommon["处理时间"]'), value: '', key: 'operate_at' },
                 ],
-            }
+            };
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

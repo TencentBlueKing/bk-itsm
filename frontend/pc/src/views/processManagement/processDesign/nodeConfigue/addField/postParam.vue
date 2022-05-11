@@ -126,7 +126,7 @@
 </template>
 
 <script>
-    import mixins from '../../../../commonMix/mixins_api.js'
+    import mixins from '../../../../commonMix/mixins_api.js';
 
     export default {
         name: 'postParam',
@@ -135,8 +135,8 @@
             // body参数配置信息
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // api接口信息
@@ -148,15 +148,15 @@
             // 引用变量/字段/全局变量
             stateList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 是否仅展示 数据
             isStatic: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             // 自定义数据
@@ -172,18 +172,18 @@
             },
             entry: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 trueSatatus: true,
                 falseSatatus: false,
@@ -214,28 +214,28 @@
                     value: '',
                     placeholder: this.$t('m.treeinfo["请选择数据来源"]'),
                 },
-            }
+            };
         },
         computed: {
-            tableList () {
-                return this.bodyTableData.filter(item => item.isShow)
+            tableList() {
+                return this.bodyTableData.filter(item => item.isShow);
             },
         },
         watch: {
-            apiDetail (newVal, oldVal) {
-                this.initData()
+            apiDetail(newVal, oldVal) {
+                this.initData();
             },
         },
-        async mounted () {
-            await this.isStatic
-            await this.bodyValue
-            await this.initData()
+        async mounted() {
+            await this.isStatic;
+            await this.bodyValue;
+            await this.initData();
         },
         methods: {
-            initData () {
-                this.bodyTableDataChange()
+            initData() {
+                this.bodyTableDataChange();
             },
-            async bodyTableDataChange () {
+            async bodyTableDataChange() {
                 // 初始化数据 多层列表
                 if (!Object.keys(this.apiDetail.req_body).length) {
                     this.apiDetail.treeDataList = [{
@@ -248,152 +248,152 @@
                         desc: this.$t('m.treeinfo["初始化数据"]'),
                         parentInfo: '',
                         children: [],
-                    }]
-                    this.apiDetail.bodyTableData = []
+                    }];
+                    this.apiDetail.bodyTableData = [];
                 } else {
                     this.apiDetail.treeDataList = await this.jsonschemaToList({
                         root: JSON.parse(JSON.stringify(this.apiDetail.req_body)), // root初始 Jsonschema数据结构
-                    })
+                    });
                     // 赋值
                     if (!this.isStatic && !this.isCustom) {
                         // 配置信息（api字段/自动节点配置信息） 赋值
                         if (this.changeInfo.api_info && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
-                            this.apiDetail.treeDataList = this.jsonValueToTree(this.changeInfo.api_info.req_body, JSON.parse(JSON.stringify(this.apiDetail.treeDataList)))
+                            this.apiDetail.treeDataList = this.jsonValueToTree(this.changeInfo.api_info.req_body, JSON.parse(JSON.stringify(this.apiDetail.treeDataList)));
                         }
                     } else {
                         // 静态展示（自动节点执行信息） 赋值
-                        this.apiDetail.treeDataList = this.jsonValueToTree(this.bodyValue, JSON.parse(JSON.stringify(this.apiDetail.treeDataList)))
+                        this.apiDetail.treeDataList = this.jsonValueToTree(this.bodyValue, JSON.parse(JSON.stringify(this.apiDetail.treeDataList)));
                     }
                     // 生成table表格数据
-                    this.apiDetail.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetail.treeDataList[0].children)))
+                    this.apiDetail.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetail.treeDataList[0].children)));
                 }
-                const bodyTableData = await JSON.parse(JSON.stringify(this.apiDetail.bodyTableData))
+                const bodyTableData = await JSON.parse(JSON.stringify(this.apiDetail.bodyTableData));
                 // 加入/引用变量
-                await bodyTableData.forEach(item => {
+                await bodyTableData.forEach((item) => {
                     // 校验数据
-                    item.isCheck = false
-                    item.isSatisfied = false
+                    item.isCheck = false;
+                    item.isSatisfied = false;
                     // 定位
-                    item.el = null
-                    item.customValue = item.value || ''
-                    item.name = item.key || ''
-                    item.children = []
-                    item.source_type = item.source_type || 'CUSTOM'
-                    item.value = (item.value !== undefined) ? item.value : ''
-                    item.value_key = ((item.value_key !== undefined) && item.value_key.toString()) ? item.value_key : ''
-                })
+                    item.el = null;
+                    item.customValue = item.value || '';
+                    item.name = item.key || '';
+                    item.children = [];
+                    item.source_type = item.source_type || 'CUSTOM';
+                    item.value = (item.value !== undefined) ? item.value : '';
+                    item.value_key = ((item.value_key !== undefined) && item.value_key.toString()) ? item.value_key : '';
+                });
                 // 多层列表数据 关联 table表格数据
-                await this.recordChildren(bodyTableData)
-                this.bodyTableData = await bodyTableData
+                await this.recordChildren(bodyTableData);
+                this.bodyTableData = await bodyTableData;
             },
-            recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(item => item.level)
-                const maxLevel = Math.max(...levelList)
+            recordChildren(tableData, levelInitial) {
+                const levelList = tableData.map(item => item.level);
+                const maxLevel = Math.max(...levelList);
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
-                }
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item);
+                };
                 for (let i = maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => item.level === i).forEach(ite => {
-                        recordChildrenStep(tableData, ite)
-                    })
+                    tableData.filter(item => item.level === i).forEach((ite) => {
+                        recordChildrenStep(tableData, ite);
+                    });
                 }
             },
             // 展示子集
-            changeState (item) {
-                item.showChildren = !item.showChildren
-                item.children.forEach(ite => {
-                    ite.isShow = item.showChildren
-                })
+            changeState(item) {
+                item.showChildren = !item.showChildren;
+                item.children.forEach((ite) => {
+                    ite.isShow = item.showChildren;
+                });
                 if (!item.showChildren) {
-                    this.closeChildren(item)
+                    this.closeChildren(item);
                 }
             },
             // 关闭所有子集
-            closeChildren (item) {
-                item.children.forEach(ite => {
-                    ite.isShow = false
+            closeChildren(item) {
+                item.children.forEach((ite) => {
+                    ite.isShow = false;
                     if (ite.has_children) {
-                        ite.showChildren = false
-                        this.closeChildren(ite)
+                        ite.showChildren = false;
+                        this.closeChildren(ite);
                     }
-                })
+                });
             },
-            changeType (item) {
+            changeType(item) {
             },
             // 计算所有子孙元素
-            async countChildren (dataOri) {
-                let count = 0
+            async countChildren(dataOri) {
+                let count = 0;
                 const countChildrenStep = function (data) {
                     if (data.children && data.children.length) {
                         for (let i = 0; i < data.children.length; i++) {
-                            count++
-                            countChildrenStep(data.children[i])
+                            count++;
+                            countChildrenStep(data.children[i]);
                         }
                     }
-                }
-                await countChildrenStep(dataOri)
-                return count
+                };
+                await countChildrenStep(dataOri);
+                return count;
             },
             // 清除变量值
-            async cleanValue (item) {
-                const copyItem = JSON.parse(JSON.stringify(item))
+            async cleanValue(item) {
+                const copyItem = JSON.parse(JSON.stringify(item));
                 const countChildrenStep = function (data) {
-                    data.value = ''
-                    data.source_type = 'CUSTOM'
+                    data.value = '';
+                    data.source_type = 'CUSTOM';
                     if (data.children && data.children.length) {
                         for (let i = 0; i < data.children.length; i++) {
-                            countChildrenStep(data.children[i])
+                            countChildrenStep(data.children[i]);
                         }
                     }
-                }
-                await countChildrenStep(copyItem)
-                return copyItem
+                };
+                await countChildrenStep(copyItem);
+                return copyItem;
             },
             // 计算子元素
-            countSon (itemChildren) {
-                const item = this.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey))[0]
-                return item.children.length === 1
+            countSon(itemChildren) {
+                const item = this.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey))[0];
+                return item.children.length === 1;
             },
             // 添加 array 列表元素
-            async addChildren (itemChildren) {
-                const item = this.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey))[0]
+            async addChildren(itemChildren) {
+                const item = this.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey))[0];
 
-                const index = this.bodyTableData.indexOf(item) + 1
-                const count = await this.countChildren(item)
-                const copyItem = await this.cleanValue(item.children[0])
+                const index = this.bodyTableData.indexOf(item) + 1;
+                const count = await this.countChildren(item);
+                const copyItem = await this.cleanValue(item.children[0]);
                 const insertList = await this.treeToTableList(
                     JSON.parse(JSON.stringify([...item.children, copyItem])), item.level + 1,
                     item.primaryKey, 'array', item.ancestorsList
-                )
-                await insertList.forEach(ite => {
-                    ite.children = []
-                })
-                item.children = insertList.filter(ite => ite.level === item.level + 1)
-                await this.recordChildren(insertList, item.level + 1)
-                this.bodyTableData.splice(index, count, ...insertList)
+                );
+                await insertList.forEach((ite) => {
+                    ite.children = [];
+                });
+                item.children = insertList.filter(ite => ite.level === item.level + 1);
+                await this.recordChildren(insertList, item.level + 1);
+                this.bodyTableData.splice(index, count, ...insertList);
             },
             // 删除元素
-            async deletChildren (item) {
+            async deletChildren(item) {
                 if (this.countSon(item)) {
-                    return
+                    return;
                 }
-                const currentObj = this.bodyTableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey))[0].children
+                const currentObj = this.bodyTableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey))[0].children;
                 if (currentObj.length <= 1) {
-                    return
+                    return;
                 }
-                currentObj.splice(currentObj.indexOf(item), 1)
-                const index = this.bodyTableData.indexOf(item)
-                const count = await this.countChildren(item)
-                this.bodyTableData.splice(index, count + 1)
+                currentObj.splice(currentObj.indexOf(item), 1);
+                const index = this.bodyTableData.indexOf(item);
+                const count = await this.countChildren(item);
+                this.bodyTableData.splice(index, count + 1);
             },
-            async changeField (node, value) {
-                await value
+            async changeField(node, value) {
+                await value;
             },
-            addNewItem (data) {
-                this.$emit('addNewItem', data)
+            addNewItem(data) {
+                this.$emit('addNewItem', data);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

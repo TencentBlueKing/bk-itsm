@@ -45,7 +45,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
     export default {
         name: 'CHECKBOX',
         mixins: [mixins],
@@ -57,8 +57,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -70,55 +70,55 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 loading: false,
                 selects: [],
-            }
+            };
         },
         watch: {
-            'item.val' (val) {
-                this.selects = val === '' ? [] : val.split(',')
-                this.conditionField(this.item, this.fields)
+            'item.val'(val) {
+                this.selects = val === '' ? [] : val.split(',');
+                this.conditionField(this.item, this.fields);
             },
             'item.choice': {
-                handler () {
-                    this.resetCheckboxGroupData()
+                handler() {
+                    this.resetCheckboxGroupData();
                 },
                 deep: true,
             },
         },
-        async created () {
-            this.item.choice = await this.getFieldOptions(this.item, this.isPreview)
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice)
-            this.item.val = valueStatus ? this.item.val : ''
-            this.selects = this.item.val === '' ? [] : this.item.val.split(',')
-            this.conditionField(this.item, this.fields)
+        async created() {
+            this.item.choice = await this.getFieldOptions(this.item, this.isPreview);
+            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+            this.item.val = valueStatus ? this.item.val : '';
+            this.selects = this.item.val === '' ? [] : this.item.val.split(',');
+            this.conditionField(this.item, this.fields);
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
         methods: {
-            selected (val) {
-                this.item.val = val.join(',')
-                this.item.checkValue = false
+            selected(val) {
+                this.item.val = val.join(',');
+                this.item.checkValue = false;
             },
             /**
              * bk-checkbox-group 组件临时兼容处理，待 magicbox 解决后更新
              * checkbox 子组件动态重新渲染后，父组件的 checkboxItems 未更新，导致实际渲染的组件和 checkboxItems 记录的不一致
              */
-            resetCheckboxGroupData () {
-                const { key } = this.item
+            resetCheckboxGroupData() {
+                const { key } = this.item;
                 if (this.$refs[key]) {
-                    this.$refs[key].checkboxItems = []
-                    this.loading = true
+                    this.$refs[key].checkboxItems = [];
+                    this.loading = true;
                     this.$nextTick(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

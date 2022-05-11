@@ -170,10 +170,10 @@
 </template>
 
 <script>
-    import collapseTransition from '../../../utils/collapse-transition'
-    import memberSelect from '../../../views/commonComponent/memberSelect'
-    import commonMix from '../../../views/commonMix/common.js'
-    import { isEmpty } from '@/utils/util.js'
+    import collapseTransition from '../../../utils/collapse-transition';
+    import memberSelect from '../../../views/commonComponent/memberSelect';
+    import commonMix from '../../../views/commonMix/common.js';
+    import { isEmpty } from '@/utils/util.js';
 
     export default {
         name: 'searchInfo',
@@ -185,32 +185,32 @@
         props: {
             forms: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             searchResultList: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             panel: String,
             curServcie: Object,
             isCustomTab: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             isEditTab: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isHighlightSetting: false,
                 highlightObj: {
@@ -230,178 +230,178 @@
                     create_at__lte: this.$t('m["提单时间结束"]'),
                     bk_biz_id: this.$t('m["业务"]'),
                 },
-            }
+            };
         },
         computed: {
-            searchResult () {
+            searchResult() {
                 if (this.searchResultList[this.panel]) {
-                    const result = this.searchResultList[this.panel].map(item => {
-                        const list = Object.keys(item).map(ite => `${this.formField[ite]}: ${item[ite]}`)
-                        return list
-                    })
-                    return result
+                    const result = this.searchResultList[this.panel].map((item) => {
+                        const list = Object.keys(item).map(ite => `${this.formField[ite]}: ${item[ite]}`);
+                        return list;
+                    });
+                    return result;
                 }
-                return []
+                return [];
             },
-            isfilter () {
-                return this.isCustomTab
+            isfilter() {
+                return this.isCustomTab;
             },
         },
         watch: {
             forms: {
-                handler (val) {
-                    this.searchForms = val.filter(item => item.display)
+                handler(val) {
+                    this.searchForms = val.filter(item => item.display);
                 },
                 deep: true,
                 immediate: true,
             },
         },
-        async created () {
-            await this.getCatalogList()
-            this.getTicketHighlight()
-            const { query } = this.$route
-            const queryList = Object.keys(query)
-            const formKey = this.searchForms.map(item => item.key)
-            this.searchForms.forEach(item => {
+        async created() {
+            await this.getCatalogList();
+            this.getTicketHighlight();
+            const { query } = this.$route;
+            const queryList = Object.keys(query);
+            const formKey = this.searchForms.map(item => item.key);
+            this.searchForms.forEach((item) => {
                 if (queryList.includes(item.key)) {
                     if (item.type === 'select') {
-                        query[item.key].split(',').map(ite => {
-                            item.value.push(ite)
-                        })
+                        query[item.key].split(',').map((ite) => {
+                            item.value.push(ite);
+                        });
                     } else if (item.type === 'member') {
-                        item.value.push(query[item.key])
+                        item.value.push(query[item.key]);
                     } else if (item.type === 'cascade') {
-                        item.list.map(ite => {
+                        item.list.map((ite) => {
                             if (ite.id === Number(query[item.key])) {
-                                item.value.push(ite.id)
+                                item.value.push(ite.id);
                             } else {
-                                ite.children.map(ites => {
+                                ite.children.map((ites) => {
                                     if (ites.id === Number(query[item.key])) {
-                                        item.value.push(ite.id)
-                                        item.value.push(ites.id)
+                                        item.value.push(ite.id);
+                                        item.value.push(ites.id);
                                     }
-                                })
+                                });
                             }
-                        })
+                        });
                     } else {
-                        item.value = query[item.key]
+                        item.value = query[item.key];
                     }
                 }
-            })
+            });
             // 判断url参数有没有搜索字段
             if (formKey.some(item => queryList.includes(item))) {
-                this.showMore = true
-                this.onSearchClick()
+                this.showMore = true;
+                this.onSearchClick();
             }
         },
         methods: {
             // 过滤参数
-            async getCatalogList () {
+            async getCatalogList() {
                 const params = {
                     show_deleted: true,
-                }
+                };
                 if (this.$route.query.project_id) {
-                    params.project_key = this.$route.query.project_id
+                    params.project_key = this.$route.query.project_id;
                 }
-                const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
-                const result = res.data[0] ? res.data[0].children : []
-                const formItem = this.searchForms.find(item => item.key === 'catalog_id')
+                const res = await this.$store.dispatch('serviceCatalog/getTreeData', params);
+                const result = res.data[0] ? res.data[0].children : [];
+                const formItem = this.searchForms.find(item => item.key === 'catalog_id');
                 if (this.isfilter && 'conditions' in this.curServcie) {
-                    const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
-                    formItem.list = list
+                    const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])];
+                    formItem.list = list;
                 }
             },
-            getTreebyId (list, id) {
-                if (!id) return []
+            getTreebyId(list, id) {
+                if (!id) return [];
                 for (let i = 0; i < list.length; i++) {
-                    const node = list[i]
+                    const node = list[i];
                     if (node.id === id) {
-                        return node
+                        return node;
                     }
                     if (node.children && node.children.length > 0) {
-                        this.getTreebyId(node.children, id)
+                        this.getTreebyId(node.children, id);
                     }
                 }
             },
-            getParams () {
-                const params = {}
+            getParams() {
+                const params = {};
                 // 过滤条件
                 for (const item of this.searchForms) {
                     if (isEmpty(item.value)) {
-                        continue
+                        continue;
                     }
                     if (item.type === 'cascade') { // 服务目录
-                        params[item.key] = item.value[item.value.length - 1]
+                        params[item.key] = item.value[item.value.length - 1];
                     } else if (item.type === 'datetime') { // 时间
                         if (item.value[0] && item.value[1]) {
-                            const gteTime = this.standardTime(item.value[0])
-                            const lteTime = this.standardTime(item.value[1])
-                            params.create_at__gte = gteTime
-                            params.create_at__lte = lteTime
+                            const gteTime = this.standardTime(item.value[0]);
+                            const lteTime = this.standardTime(item.value[1]);
+                            params.create_at__gte = gteTime;
+                            params.create_at__lte = lteTime;
                         }
                     } else if (Array.isArray(item.value)) { // 数组
-                        params[item.key] = item.value.join(',')
+                        params[item.key] = item.value.join(',');
                     } else {
-                        params[item.key] = item.value
+                        params[item.key] = item.value;
                     }
                 }
-                return params
+                return params;
             },
-            onSearchClick () {
-                this.$emit('search', this.getParams(), true)
+            onSearchClick() {
+                this.$emit('search', this.getParams(), true);
             },
-            onSearchResult (index) {
-                const params = this.searchResultList[this.panel][index]
-                this.$emit('search', params, false)
+            onSearchResult(index) {
+                const params = this.searchResultList[this.panel][index];
+                this.$emit('search', params, false);
             },
-            onClearClick () {
-                this.searchForms.forEach(item => {
-                    item.value = item.multiSelect ? [] : ''
-                })
-                this.$emit('search', {})
-                this.$emit('clear')
+            onClearClick() {
+                this.searchForms.forEach((item) => {
+                    item.value = item.multiSelect ? [] : '';
+                });
+                this.$emit('search', {});
+                this.$emit('clear');
             },
             // 展开高级搜索
-            onShowSearchMore () {
-                this.showMore = !this.showMore
+            onShowSearchMore() {
+                this.showMore = !this.showMore;
             },
             // change 事件，执行 form 中的回调函数
-            onFormChange (val, form) {
-                this.$emit('formChange', form.key, val, this.searchForms)
+            onFormChange(val, form) {
+                this.$emit('formChange', form.key, val, this.searchForms);
             },
-            getTicketHighlight () {
+            getTicketHighlight() {
                 this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
-                    this.highlightObj = data.items[0]
+                    this.highlightObj = data.items[0];
                 })
-                    .catch(res => {
+                    .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
-                    })
+                        });
+                    });
             },
-            highlightSettingConfirm () {
-                this.isHighlightSetting = false
+            highlightSettingConfirm() {
+                this.isHighlightSetting = false;
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
                         this.$bkMessage({
                             message: data.msg || this.$t('m.slaContent[\'成功更新单据高亮颜色\']'),
                             theme: 'success',
-                        })
-                        this.$emit('onChangeHighlight')
+                        });
+                        this.$emit('onChangeHighlight');
                     } else {
-                        this.getTicketHighlight()
+                        this.getTicketHighlight();
                     }
                 })
-                    .catch(res => {
+                    .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
-                        })
-                    })
+                        });
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

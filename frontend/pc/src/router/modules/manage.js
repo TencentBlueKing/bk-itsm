@@ -20,16 +20,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-const Index = () => import('../../views/manage/index.vue')
+const Index = () => import('../../views/manage/index.vue');
 // const PublicService = () => import('../../views/manage/service.vue')
-const PublicFields = () => import('../../views/manage/fields.vue')
-const PublicAPI = () => import('../../views/manage/api.vue')
-const NotifySetting = () => import('../../views/processManagement/notice/noticeConfigure.vue')
-const TaskTpl = () => import('../../views/processManagement/taskTemplate/index.vue')
-const SlaPriority = () => import('../../views/slaManager/priority.vue')
+const PublicFields = () => import('../../views/manage/fields.vue');
+const PublicAPI = () => import('../../views/manage/api.vue');
+const NotifySetting = () => import('../../views/processManagement/notice/noticeConfigure.vue');
+const TaskTpl = () => import('../../views/processManagement/taskTemplate/index.vue');
+const SlaPriority = () => import('../../views/slaManager/priority.vue');
 // 单据状态管理
-const TicketStatus = () => import('../../views/slaManager/ticketStatus.vue')
-const GlobalSetting = () => import('../../views/manage/globalSetting.vue')
+const TicketStatus = () => import('../../views/slaManager/ticketStatus.vue');
+const GlobalSetting = () => import('../../views/manage/globalSetting.vue');
 
 // const basicModule = () => import('../../views/processManagement/basicModule/index.vue')
 // const dataDictionary = () => import('../../views/systemConfig/dataDictionary.vue')
@@ -92,4 +92,4 @@ export default [
             // }
         ],
     },
-]
+];

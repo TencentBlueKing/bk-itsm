@@ -16,8 +16,8 @@
 </template>
 
 <script>
-    import E from 'wangeditor'
-    import { position, offset } from 'caret-pos'
+    import E from 'wangeditor';
+    import { position, offset } from 'caret-pos';
     export default {
         name: 'commentEditor',
         props: {
@@ -25,7 +25,7 @@
             commentType: String,
             commentTypeReply: String,
         },
-        data () {
+        data() {
             return {
                 editor: null,
                 editorData: '',
@@ -34,47 +34,47 @@
                 showFlag: 'none',
                 list: [],
                 isInsideComment: false,
-            }
+            };
         },
         watch: {
-            editorData () {
-                const text = this.editor.txt.html()
-                this.$emit('changebuttonStatus', !!text)
+            editorData() {
+                const text = this.editor.txt.html();
+                this.$emit('changebuttonStatus', !!text);
                 if (text.charAt(text.length - 1) === '@') {
-                    this.showFlag = 'block'
-                    const textDom = this.editor.$textElem.elems[0]
-                    const pos = position(textDom) // { left: 15, top: 30, height: 20, pos: 15 }
-                    const off = offset(textDom)
-                    console.log(pos, off)
-                    const wangED = document.querySelector(`#${this.editorId}`)
+                    this.showFlag = 'block';
+                    const textDom = this.editor.$textElem.elems[0];
+                    const pos = position(textDom); // { left: 15, top: 30, height: 20, pos: 15 }
+                    const off = offset(textDom);
+                    console.log(pos, off);
+                    const wangED = document.querySelector(`#${this.editorId}`);
                     // 菜单的高度
-                    const menuH = wangED.offsetHeight - textDom.offsetHeight
-                    this.left = pos.left
-                    this.top = menuH + pos.height + pos.top
+                    const menuH = wangED.offsetHeight - textDom.offsetHeight;
+                    this.left = pos.left;
+                    this.top = menuH + pos.height + pos.top;
                     // const childEle = document.getElementsByClassName('bullet-box')[0]
                     // console.log(childEle)
                 } else {
-                    this.showFlag = 'none'
+                    this.showFlag = 'none';
                 }
             },
-            commentType (val) {
-                this.isInsideComment = val === 'INSIDE' || false
+            commentType(val) {
+                this.isInsideComment = val === 'INSIDE' || false;
             },
             // 回复类型根据当前评论类型
-            commentTypeReply (val) {
+            commentTypeReply(val) {
                 if (val) {
-                    this.isInsideComment = val === 'INSIDE' || false
+                    this.isInsideComment = val === 'INSIDE' || false;
                 }
             },
         },
-        mounted () {
-            const editor = new E(`#${this.editorId}`)
+        mounted() {
+            const editor = new E(`#${this.editorId}`);
             editor.config.onchange = (newHtml) => {
-                this.editorData = newHtml
-                this.$emit('editorContent', newHtml)
-            }
-            editor.config.height = 150
-            editor.config.zIndex = 400
+                this.editorData = newHtml;
+                this.$emit('editorContent', newHtml);
+            };
+            editor.config.height = 150;
+            editor.config.zIndex = 400;
             editor.config.excludeMenus = [
                 'emoticon',
                 'video',
@@ -88,38 +88,38 @@
                 'link',
                 'list',
                 'quote',
-            ]
-            editor.create()
-            this.editor = editor
+            ];
+            editor.create();
+            this.editor = editor;
             if (this.commentType === 'INSIDE' || this.commentTypeReply) {
-                this.isInsideComment = true
+                this.isInsideComment = true;
             }
         },
         methods: {
-            selectLine (item) {
-                const text = this.editor.txt.html()
-                this.editor.txt.html(`${text}<span class="at-person">${item.name}<span>` + '  ')
+            selectLine(item) {
+                const text = this.editor.txt.html();
+                this.editor.txt.html(`${text}<span class="at-person">${item.name}<span>` + '  ');
             },
-            handleChangeType () {
+            handleChangeType() {
                 if (this.commentTypeReply) {
-                    return
+                    return;
                 }
                 if (this.ticketInfo && this.ticketInfo.is_over) {
-                    return
+                    return;
                 }
                 if (!this.$store.state.ticket.hasTicketNodeOptAuth) {
                     this.$bkMessage({
                         message: this.$t('m["你当前无法发表内部评论"]'),
                         theme: 'warning ',
-                    })
-                    return
+                    });
+                    return;
                 }
-                this.isInsideComment = !this.isInsideComment
-                const type = this.isInsideComment ? 'INSIDE' : 'PUBLIC'
-                this.$emit('postComment', type)
+                this.isInsideComment = !this.isInsideComment;
+                const type = this.isInsideComment ? 'INSIDE' : 'PUBLIC';
+                this.$emit('postComment', type);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

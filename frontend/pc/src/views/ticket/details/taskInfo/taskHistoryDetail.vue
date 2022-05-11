@@ -122,8 +122,8 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import mixins from '../../../commonMix/mixins_api.js'
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import mixins from '../../../commonMix/mixins_api.js';
     export default {
         name: 'taskHistoryDetail',
         mixins: [mixins],
@@ -134,239 +134,239 @@
             },
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             nodeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 loading: false,
                 historyInfo: '',
                 activeName: 'send_email_message',
-            }
+            };
         },
         computed: {
-            apiTableData () {
-                let temp = []
+            apiTableData() {
+                let temp = [];
                 if (this.historyInfo.fields[1] && this.historyInfo.fields[1].key === 'req_params' && this.historyInfo.fields[1].apiContent) {
-                    temp = this.historyInfo.fields[1].apiContent.bodyTableData.filter(item => item.isShow)
+                    temp = this.historyInfo.fields[1].apiContent.bodyTableData.filter(item => item.isShow);
                 }
-                return temp
+                return temp;
             },
         },
         watch: {
-            historyId () {
-                this.getDetail()
+            historyId() {
+                this.getDetail();
             },
         },
-        async created () {
-            await this.getDetail()
+        async created() {
+            await this.getDetail();
         },
         methods: {
-            getDetail () {
+            getDetail() {
                 if (!this.historyId) {
-                    return
+                    return;
                 }
-                this.loading = true
-                this.$store.dispatch('taskFlow/getHistoryDetail', this.historyId).then(res => {
-                    this.historyInfo = res.data
-                    this.giveSignalInfo()
-                    this.historyInfo.fields.forEach(async field => {
+                this.loading = true;
+                this.$store.dispatch('taskFlow/getHistoryDetail', this.historyId).then((res) => {
+                    this.historyInfo = res.data;
+                    this.giveSignalInfo();
+                    this.historyInfo.fields.forEach(async (field) => {
                         if (field.key === 'sub_message_component') {
-                            this.giveMessageData()
+                            this.giveMessageData();
                         }
                         if (field.key === 'api_source') {
-                            await this.giveApiData()
+                            await this.giveApiData();
                         }
                         if (field.key === 'states') {
-                            field.value = this.nodeList.find(node => Number(node.state_id) === Number(field.value)).name
+                            field.value = this.nodeList.find(node => Number(node.state_id) === Number(field.value)).name;
                         }
                         if (field.key === 'field_key') {
-                            let tempAllFields = []
-                            this.nodeList.forEach(node => {
-                                tempAllFields = tempAllFields.concat(node.fields)
-                            })
-                            field.value = tempAllFields.find(item => item.key === field.value).name
+                            let tempAllFields = [];
+                            this.nodeList.forEach((node) => {
+                                tempAllFields = tempAllFields.concat(node.fields);
+                            });
+                            field.value = tempAllFields.find(item => item.key === field.value).name;
                         }
                         if (field.key === 'processors') {
-                            field.value = JSON.parse(JSON.stringify(field.value)).members.replace(/^(\s|,)+|(\s|,)+$/g, '')
+                            field.value = JSON.parse(JSON.stringify(field.value)).members.replace(/^(\s|,)+|(\s|,)+$/g, '');
                         }
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
             },
-            giveSignalInfo () {
-                let senderName = ''
+            giveSignalInfo() {
+                let senderName = '';
                 if (this.historyInfo.signal_type === 'STATE') {
-                    senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender)).name
+                    senderName = this.nodeList.find(node => Number(node.state_id) === Number(this.historyInfo.sender)).name;
                 } else {
-                    senderName = this.basicInfomation.title
+                    senderName = this.basicInfomation.title;
                 }
-                this.historyInfo.signal_name += this.$t('m.task["["]') + senderName + this.$t('m.task["]"]')
+                this.historyInfo.signal_name += this.$t('m.task["["]') + senderName + this.$t('m.task["]"]');
             },
-            giveMessageData () {
-                this.historyInfo.fields[0].value.forEach(item => {
-                    this.$set(item, 'checked', (item.checked || false))
-                    this.$set(item, 'label', item.name)
-                    this.$set(item, 'icon', '')
+            giveMessageData() {
+                this.historyInfo.fields[0].value.forEach((item) => {
+                    this.$set(item, 'checked', (item.checked || false));
+                    this.$set(item, 'label', item.name);
+                    this.$set(item, 'icon', '');
                     switch (item.code) {
                         case 'send_email_message':
-                            item.icon = 'icon-email'
-                            break
+                            item.icon = 'icon-email';
+                            break;
                         case 'send_sms_message':
-                            item.icon = 'icon-mobile'
-                            break
+                            item.icon = 'icon-mobile';
+                            break;
                         case 'send_wechat_message':
-                            item.icon = 'icon-weixin'
-                            break
+                            item.icon = 'icon-weixin';
+                            break;
                     }
-                    item.name = item.code
-                })
+                    item.name = item.code;
+                });
             },
-            giveApiData () {
+            giveApiData() {
                 const params = {
                     id: this.historyInfo.fields[0].value,
-                }
-                this.$store.dispatch('apiRemote/get_remote_api_detail', params).then(res => {
-                    const backValue = res.data
-                    this.historyInfo.fields.forEach(async field => {
+                };
+                this.$store.dispatch('apiRemote/get_remote_api_detail', params).then((res) => {
+                    const backValue = res.data;
+                    this.historyInfo.fields.forEach(async (field) => {
                         if (field.key === 'api_source') {
-                            field.value = `${backValue.remote_system_name}/${backValue.name}`
+                            field.value = `${backValue.remote_system_name}/${backValue.name}`;
                         } else {
-                            this.$set(field, 'apiContent', backValue)
-                            this.$set(field.apiContent, 'bodyTableData', [])
-                            this.$set(field.apiContent, 'treeDataList', {})
+                            this.$set(field, 'apiContent', backValue);
+                            this.$set(field.apiContent, 'bodyTableData', []);
+                            this.$set(field.apiContent, 'treeDataList', {});
                             field.apiContent.treeDataList = await this.jsonschemaToList({
                                 root: JSON.parse(JSON.stringify(field.apiContent.req_body)),
-                            })
+                            });
                             // 如果数据已经存在，则进行表格初始化赋值
                             if (field.value) {
-                                field.apiContent.treeDataList = this.jsonValueTreeList(field.value, JSON.parse(JSON.stringify(field.apiContent.treeDataList)))
+                                field.apiContent.treeDataList = this.jsonValueTreeList(field.value, JSON.parse(JSON.stringify(field.apiContent.treeDataList)));
                             }
                             // 生成table表格数据
-                            field.apiContent.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(field.apiContent.treeDataList[0].children)))
-                            const bodyTableData = JSON.parse(JSON.stringify(field.apiContent.bodyTableData))
+                            field.apiContent.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(field.apiContent.treeDataList[0].children)));
+                            const bodyTableData = JSON.parse(JSON.stringify(field.apiContent.bodyTableData));
                             // 加入/引用变量
-                            bodyTableData.forEach(item => {
-                                item.name = item.key || ''
-                                item.children = []
-                                item.value = (item.value !== undefined) ? item.value : ''
-                            })
+                            bodyTableData.forEach((item) => {
+                                item.name = item.key || '';
+                                item.children = [];
+                                item.value = (item.value !== undefined) ? item.value : '';
+                            });
                             // 多层列表数据 关联 table表格数据
-                            this.recordChildren(bodyTableData)
-                            field.apiContent.bodyTableData = await bodyTableData
+                            this.recordChildren(bodyTableData);
+                            field.apiContent.bodyTableData = await bodyTableData;
                         }
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            jsonValueTreeList (jsonData, treeDataList) {
+            jsonValueTreeList(jsonData, treeDataList) {
                 const listToJsonStep = function (lastObject, insertObject, key, item, lastType) {
                     if (lastType === 'object') {
-                        const reqData = insertObject.filter(ite => ite.key === key)
+                        const reqData = insertObject.filter(ite => ite.key === key);
                         if (!reqData.length) {
-                            return
+                            return;
                         }
                         // reqData[0]
                         if (item.constructor.name.toLowerCase() === 'array') {
                             if (!reqData[0].children || !reqData[0].children.length) {
-                                return
+                                return;
                             }
-                            const oneItem = JSON.parse(JSON.stringify(Object.assign({ parentInfo: '' }, reqData[0].children[0])))
+                            const oneItem = JSON.parse(JSON.stringify(Object.assign({ parentInfo: '' }, reqData[0].children[0])));
                             for (let i = 1; i < item.length; i++) {
-                                reqData[0].children.push(oneItem)
+                                reqData[0].children.push(oneItem);
                             }
                             for (const j in item) {
-                                listToJsonStep(reqData[0].children, reqData[0].children[j], 'items', item[j], 'array')
+                                listToJsonStep(reqData[0].children, reqData[0].children[j], 'items', item[j], 'array');
                             }
                         } else if (item.constructor.name.toLowerCase() === 'object') {
                             for (const j in item) {
-                                listToJsonStep(reqData[0], reqData[0].children, j, item[j], 'object')
+                                listToJsonStep(reqData[0], reqData[0].children, j, item[j], 'object');
                             }
                         } else {
-                            reqData[0].value = item
+                            reqData[0].value = item;
                         }
                     } else if (lastType === 'array') {
                         if (item.constructor.name.toLowerCase() === 'array') {
-                            const reqData = insertObject.filter(ite => ite.key === key)
+                            const reqData = insertObject.filter(ite => ite.key === key);
                             if (!reqData.length) {
-                                return
+                                return;
                             }
                             if (!reqData[0].children || !reqData[0].children.length) {
-                                return
+                                return;
                             }
-                            const oneItem = JSON.parse(JSON.stringify(insertObject.children[0]))
+                            const oneItem = JSON.parse(JSON.stringify(insertObject.children[0]));
                             for (let i = 1; i < item.length; i++) {
-                                insertObject.children.push(oneItem)
+                                insertObject.children.push(oneItem);
                             }
                             for (const j in item) {
-                                listToJsonStep(insertObject.children, insertObject.children[j], 'items', item[j], 'array')
+                                listToJsonStep(insertObject.children, insertObject.children[j], 'items', item[j], 'array');
                             }
                         } else if (item.constructor.name.toLowerCase() === 'object') {
                             for (const j in item) {
-                                listToJsonStep(insertObject, insertObject.children, j, item[j], 'object')
+                                listToJsonStep(insertObject, insertObject.children, j, item[j], 'object');
                             }
                         } else {
-                            insertObject.value = item
+                            insertObject.value = item;
                         }
                     }
-                }
+                };
                 for (const key in jsonData) {
-                    listToJsonStep(treeDataList[0], treeDataList[0].children, key, jsonData[key], 'object', 0)
+                    listToJsonStep(treeDataList[0], treeDataList[0].children, key, jsonData[key], 'object', 0);
                 }
-                return treeDataList
+                return treeDataList;
             },
-            recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(item => item.level)
-                const maxLevel = Math.max(...levelList)
+            recordChildren(tableData, levelInitial) {
+                const levelList = tableData.map(item => item.level);
+                const maxLevel = Math.max(...levelList);
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
-                }
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item);
+                };
                 for (let i = maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => item.level === i).forEach(ite => {
-                        recordChildrenStep(tableData, ite)
-                    })
+                    tableData.filter(item => item.level === i).forEach((ite) => {
+                        recordChildrenStep(tableData, ite);
+                    });
                 }
             },
             // 展示子集
-            changeState (item) {
-                item.showChildren = !item.showChildren
-                item.children.forEach(ite => {
-                    ite.isShow = item.showChildren
-                })
+            changeState(item) {
+                item.showChildren = !item.showChildren;
+                item.children.forEach((ite) => {
+                    ite.isShow = item.showChildren;
+                });
                 if (!item.showChildren) {
-                    this.closeChildren(item)
+                    this.closeChildren(item);
                 }
             },
             // 关闭所有子集
-            closeChildren (item) {
-                item.children.forEach(ite => {
-                    ite.isShow = false
+            closeChildren(item) {
+                item.children.forEach((ite) => {
+                    ite.isShow = false;
                     if (ite.has_children) {
-                        ite.showChildren = false
-                        this.closeChildren(ite)
+                        ite.showChildren = false;
+                        this.closeChildren(ite);
                     }
-                })
+                });
             },
-            changPanel (name) {
-                this.activeName = name
+            changPanel(name) {
+                this.activeName = name;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

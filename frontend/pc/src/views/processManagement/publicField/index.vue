@@ -210,13 +210,13 @@
     </div>
 </template>
 <script>
-    import i18n from '@/i18n/index.js'
-    import commonMix from '../../commonMix/common.js'
-    import permission from '@/mixins/permission.js'
-    import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue'
-    import addField from '../processDesign/nodeConfigue/addField'
-    import EmptyTip from '../../project/components/emptyTip.vue'
-    import { errorHandler } from '../../../utils/errorHandler.js'
+    import i18n from '@/i18n/index.js';
+    import commonMix from '../../commonMix/common.js';
+    import permission from '@/mixins/permission.js';
+    import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue';
+    import addField from '../processDesign/nodeConfigue/addField';
+    import EmptyTip from '../../project/components/emptyTip.vue';
+    import { errorHandler } from '../../../utils/errorHandler.js';
 
     export default {
         name: 'publicField',
@@ -233,7 +233,7 @@
                 default: i18n.t('m[\'字段\']'),
             },
         },
-        data () {
+        data() {
             return {
                 ordering: '-update_at',
                 secondClick: false,
@@ -335,120 +335,120 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            createFieldPerm () {
-                return this.projectId ? ['field_create'] : ['public_field_create']
+            createFieldPerm() {
+                return this.projectId ? ['field_create'] : ['public_field_create'];
             },
-            editFieldPerm () {
-                return this.projectId ? ['field_edit'] : ['public_field_edit']
+            editFieldPerm() {
+                return this.projectId ? ['field_edit'] : ['public_field_edit'];
             },
-            deleteFieldPerm () {
-                return this.projectId ? ['field_delete'] : ['public_field_delete']
+            deleteFieldPerm() {
+                return this.projectId ? ['field_delete'] : ['public_field_delete'];
             },
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
-            curPermission () {
-                return this.projectId ? this.$store.state.project.projectAuthActions : []
+            curPermission() {
+                return this.projectId ? this.$store.state.project.projectAuthActions : [];
             },
         },
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     ordering: this.ordering,
-                }
-                params.project_key = this.projectId || 'public'
+                };
+                params.project_key = this.projectId || 'public';
                 // 过滤条件
-                this.moreSearch.forEach(item => {
+                this.moreSearch.forEach((item) => {
                     if (item.type === 'datetime') {
                         if (item.value && item.value[0]) {
-                            const gteTime = this.standardTime(item.value[0])
-                            const lteTime = this.standardTime(item.value[1])
-                            params.update_at__gte = gteTime
-                            params.update_at__lte = lteTime
+                            const gteTime = this.standardTime(item.value[0]);
+                            const lteTime = this.standardTime(item.value[1]);
+                            params.update_at__gte = gteTime;
+                            params.update_at__lte = lteTime;
                         }
                     } else {
                         if (item.type === 'input') {
-                            params[item.typeKey] = item.value
+                            params[item.typeKey] = item.value;
                         } else {
                             if (((Array.isArray(item.value) && item.value.length) && (item.value)) && item.typeKey) {
-                                params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                                params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                             }
                         }
                     }
-                })
-                this.isDataLoading = true
+                });
+                this.isDataLoading = true;
                 this.$store.dispatch('publicField/get_template_fields', params).then((res) => {
-                    this.dataList = res.data.items
-                    this.searchToggle = res.data.items.length !== 0
+                    this.dataList = res.data.items;
+                    this.searchToggle = res.data.items.length !== 0;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handleSortChange (data) {
-                const { order } = data
+            handleSortChange(data) {
+                const { order } = data;
                 if (order === 'descending') {
-                    this.ordering = '-update_at'
+                    this.ordering = '-update_at';
                 } else {
-                    this.ordering = undefined
+                    this.ordering = undefined;
                 }
-                this.getList()
+                this.getList();
             },
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
-            searchMore () {
+            searchMore() {
                 // 类型
                 this.moreSearch[2].list = this.globalChoise.field_type.map(item => ({
                     key: item.typeName,
                     name: item.name,
-                }))
-                this.$refs.searchInfo.searchMore()
+                }));
+                this.$refs.searchInfo.searchMore();
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = item.multiSelect ? [] : ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = item.multiSelect ? [] : '';
+                });
+                this.getList(1);
             },
             // 删除字段
-            deleteField (item) {
+            deleteField(item) {
                 if (!this.hasPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    let resourceData = null
+                    let resourceData = null;
                     if (this.projectId) {
-                        const { projectInfo } = this.$store.state.project
+                        const { projectInfo } = this.$store.state.project;
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
@@ -458,62 +458,62 @@
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
+                        };
                     } else {
                         resourceData = {
                             public_field: [{
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
+                        };
                     }
-                    this.applyForPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
+                    this.applyForPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
                 } else {
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t('m.treeinfo["确认删除此字段？"]'),
                         subTitle: this.$t('m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]'),
                         confirmFn: () => {
-                            const { id } = item
+                            const { id } = item;
                             if (this.secondClick) {
-                                return
+                                return;
                             }
-                            this.secondClick = true
+                            this.secondClick = true;
                             this.$store.dispatch('publicField/delet_template_fields', { id }).then((res) => {
                                 this.$bkMessage({
                                     message: this.$t('m.systemConfig["删除成功"]'),
                                     theme: 'success',
-                                })
+                                });
                                 if (this.dataList.length === 1) {
-                                    this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                                    this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1;
                                 }
-                                this.getList()
+                                this.getList();
                             })
                                 .catch((res) => {
-                                    errorHandler(res, this)
+                                    errorHandler(res, this);
                                 })
                                 .finally(() => {
-                                    this.secondClick = false
-                                })
+                                    this.secondClick = false;
+                                });
                         },
-                    })
+                    });
                 }
             },
             // 新增字段
-            addField () {
+            addField() {
                 if (!this.hasPermission(this.createFieldPerm, this.curPermission)) {
-                    let resourceData = {}
+                    let resourceData = {};
                     if (this.projectId) {
-                        const { projectInfo } = this.$store.state.project
+                        const { projectInfo } = this.$store.state.project;
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
                                 name: projectInfo.name,
                             }],
-                        }
+                        };
                     }
-                    this.applyForPermission(this.createFieldPerm, this.curPermission, resourceData)
-                    return
+                    this.applyForPermission(this.createFieldPerm, this.curPermission, resourceData);
+                    return;
                 }
                 this.changeInfo = {
                     workflow: '',
@@ -535,20 +535,20 @@
                     meta: {
                         code: '',
                     },
-                }
-                this.changeInfo.project_key = this.projectId || 'public'
-                this.sliderInfo.title = this.$t('m.deployPage["新增字段"]')
-                this.sliderInfo.show = true
+                };
+                this.changeInfo.project_key = this.projectId || 'public';
+                this.sliderInfo.title = this.$t('m.deployPage["新增字段"]');
+                this.sliderInfo.show = true;
             },
-            closeShade () {
-                this.sliderInfo.show = false
+            closeShade() {
+                this.sliderInfo.show = false;
             },
             // 编辑字段
-            openField (item, reqPerm) {
+            openField(item, reqPerm) {
                 if (!this.hasPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    let resourceData = null
+                    let resourceData = null;
                     if (this.projectId) {
-                        const { projectInfo } = this.$store.state.project
+                        const { projectInfo } = this.$store.state.project;
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
@@ -558,38 +558,38 @@
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
+                        };
                     } else {
                         resourceData = {
                             public_field: [{
                                 id: item.id,
                                 name: item.name,
                             }],
-                        }
+                        };
                     }
-                    this.applyForPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return
+                    this.applyForPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return;
                 }
-                this.changeInfo = item
-                this.changeInfo.is_tips = item.is_tips || false
-                this.sliderInfo.title = this.$t('m.treeinfo["编辑字段"]')
-                this.sliderInfo.show = true
+                this.changeInfo = item;
+                this.changeInfo.is_tips = item.is_tips || false;
+                this.sliderInfo.title = this.$t('m.treeinfo["编辑字段"]');
+                this.sliderInfo.show = true;
             },
             // 关闭前验证字段表单
-            closeSideslider () {
+            closeSideslider() {
                 this.$bkInfo({
                     title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.sliderInfo.show = false
+                        this.sliderInfo.show = false;
                     },
                     cancelFn: () => {
-                        this.sliderInfo.show = true
+                        this.sliderInfo.show = true;
                     },
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

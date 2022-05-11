@@ -173,9 +173,9 @@
 </template>
 
 <script>
-    import InheritTicketAddDialog from './InheritTicketAddDialog'
-    import { errorHandler } from '@/utils/errorHandler'
-    
+    import InheritTicketAddDialog from './InheritTicketAddDialog';
+    import { errorHandler } from '@/utils/errorHandler';
+
     export default {
         name: 'InheritTicketTab',
         components: {
@@ -185,12 +185,12 @@
         props: {
             ticketInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isShowAddInheritTicket: false,
                 secondClick: false,
@@ -229,116 +229,116 @@
                 },
                 unBindItem: '',
                 checkList: [],
-            }
+            };
         },
-        async mounted () {
-            this.getInheritStateList()
-            await this.getHistoryList()
+        async mounted() {
+            this.getInheritStateList();
+            await this.getHistoryList();
         },
         methods: {
-            closeSideslider () {
+            closeSideslider() {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m["内容未保存，离开将取消操作！"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.isShowAddInheritTicket = false
+                        this.isShowAddInheritTicket = false;
                     },
                     cancelFn: () => {
-                        this.isShowAddInheritTicket = true
+                        this.isShowAddInheritTicket = true;
                     },
-                })
+                });
             },
-            showHistory () {
+            showHistory() {
                 if (!this.historyList.length) {
-                    return
+                    return;
                 }
-                this.historyInfo.isShow = true
+                this.historyInfo.isShow = true;
             },
-            giveUnbindInfo (type, item = {}) {
+            giveUnbindInfo(type, item = {}) {
                 if (type === 'batch') {
-                    this.unBindItem = this.inheritStateList.map(item => item.id)
-                    this.unBindInfo.type = 'throwChild'
-                    this.unBindInfo.title = this.$t('m.newCommon["确认解绑子单？"]')
-                    this.unBindInfo.content = this.$t('m.newCommon["解绑后，子单将不会同步母单状态及处理信息，单据的后续处理各自独立，不在影响"]')
+                    this.unBindItem = this.inheritStateList.map(item => item.id);
+                    this.unBindInfo.type = 'throwChild';
+                    this.unBindInfo.title = this.$t('m.newCommon["确认解绑子单？"]');
+                    this.unBindInfo.content = this.$t('m.newCommon["解绑后，子单将不会同步母单状态及处理信息，单据的后续处理各自独立，不在影响"]');
                 } else {
                     if (item.related_status === 'RUNNING') {
-                        return
+                        return;
                     }
-                    this.unBindItem = item
-                    this.unBindInfo.type = 'throwMother'
-                    this.unBindInfo.title = this.$t('m.newCommon["确认解绑母单？"]')
-                    this.unBindInfo.content = this.$t('m.newCommon["解绑后，母单将不会同步子单状态及处理信息，单据的后续处理各自独立，不在影响"]')
+                    this.unBindItem = item;
+                    this.unBindInfo.type = 'throwMother';
+                    this.unBindInfo.title = this.$t('m.newCommon["确认解绑母单？"]');
+                    this.unBindInfo.content = this.$t('m.newCommon["解绑后，母单将不会同步子单状态及处理信息，单据的后续处理各自独立，不在影响"]');
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.unBindInfo.title,
                     subTitle: this.unBindInfo.content,
                     confirmFn: () => {
-                        this.unbindFun()
+                        this.unbindFun();
                     },
-                })
+                });
             },
-            getInheritStateList () {
+            getInheritStateList() {
                 const params = {
                     id: this.ticketInfo.id,
-                }
+                };
                 if (this.$route.query.token) {
-                    params.token = this.$route.query.token
+                    params.token = this.$route.query.token;
                 }
-                this.tableLoading = true
-                this.$store.dispatch('change/getInheritState', params).then(res => {
-                    this.masterOrSlave = res.data.related_type
+                this.tableLoading = true;
+                this.$store.dispatch('change/getInheritState', params).then((res) => {
+                    this.masterOrSlave = res.data.related_type;
 
-                    this.inheritStateList = res.data.master_slave_tickets.map(item => {
-                        let tempStatusName = ''
+                    this.inheritStateList = res.data.master_slave_tickets.map((item) => {
+                        let tempStatusName = '';
                         switch (item.related_status) {
                             case 'BIND_SUCCESS':
-                                tempStatusName = this.$t('m.newCommon["已绑定"]')
-                                break
+                                tempStatusName = this.$t('m.newCommon["已绑定"]');
+                                break;
                             case 'BIND_FAILED':
-                                tempStatusName = this.$t('m.newCommon["绑定失败"]')
-                                break
+                                tempStatusName = this.$t('m.newCommon["绑定失败"]');
+                                break;
                             case 'UNBIND_SUCCESS':
-                                tempStatusName = this.$t('m.newCommon["解绑成功"]')
-                                break
+                                tempStatusName = this.$t('m.newCommon["解绑成功"]');
+                                break;
                             case 'RUNNING':
-                                tempStatusName = this.$t('m.newCommon["解绑中"]')
-                                break
+                                tempStatusName = this.$t('m.newCommon["解绑中"]');
+                                break;
                             case 'UNBIND_FAILED':
-                                tempStatusName = this.$t('m.newCommon["解绑失败"]')
-                                break
+                                tempStatusName = this.$t('m.newCommon["解绑失败"]');
+                                break;
                             default:
-                                break
+                                break;
                         }
-                        return { ...item, status: tempStatusName }
-                    })
+                        return { ...item, status: tempStatusName };
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.tableLoading = false
-                    })
+                        this.tableLoading = false;
+                    });
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection, row) {
+                this.checkList = selection;
             },
-            disabledFn (item, index) {
-                return this.masterOrSlave !== 'slave'
+            disabledFn(item, index) {
+                return this.masterOrSlave !== 'slave';
             },
-            openAddInheritSlider () {
+            openAddInheritSlider() {
                 if (this.ticketInfo.is_over) {
-                    return
+                    return;
                 }
-                this.isShowAddInheritTicket = true
+                this.isShowAddInheritTicket = true;
             },
-            checkOne (rowData) {
-                const { id } = rowData
+            checkOne(rowData) {
+                const { id } = rowData;
                 const { href } = this.$router.resolve({
                     name: 'commonInfo',
                     params: {
@@ -347,56 +347,56 @@
                     query: {
                         id: `${id}`,
                     },
-                })
-                window.open(href, '_blank')
+                });
+                window.open(href, '_blank');
             },
-            unbindFun () {
-                const params = {}
+            unbindFun() {
+                const params = {};
                 if (this.unBindInfo.type === 'throwMother') {
-                    params.master_ticket_id = this.unBindItem.id
-                    params.slave_ticket_ids = [this.ticketInfo.id]
+                    params.master_ticket_id = this.unBindItem.id;
+                    params.slave_ticket_ids = [this.ticketInfo.id];
                 } else {
-                    params.master_ticket_id = this.ticketInfo.id
-                    params.slave_ticket_ids = this.checkList.map(it => it.id)
+                    params.master_ticket_id = this.ticketInfo.id;
+                    params.slave_ticket_ids = this.checkList.map(it => it.id);
                 }
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
-                this.$store.dispatch('change/unBindInherit', params).then(res => {
+                this.secondClick = true;
+                this.$store.dispatch('change/unBindInherit', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["解绑成功"]'),
                         theme: 'success',
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
-                    .finally(res => {
-                        this.checkList = []
-                        this.secondClick = false
-                        this.getInheritStateList()
-                        this.getHistoryList()
+                    .finally((res) => {
+                        this.checkList = [];
+                        this.secondClick = false;
+                        this.getInheritStateList();
+                        this.getHistoryList();
                     // this.reloadTicket()
-                    })
+                    });
             },
-            async getHistoryList () {
+            async getHistoryList() {
                 const params = {
                     id: this.ticketInfo.id,
                     type: 'MASTER_SLAVE',
-                }
-                await this.$store.dispatch('change/getBindHistory', params).then(res => {
-                    this.historyList = res.data
+                };
+                await this.$store.dispatch('change/getBindHistory', params).then((res) => {
+                    this.historyList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            closeHistory () {
-                this.historyInfo.isShow = false
+            closeHistory() {
+                this.historyInfo.isShow = false;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

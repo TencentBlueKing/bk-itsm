@@ -58,7 +58,7 @@
                 </bk-form-item>
             </bk-form>
         </basic-card>
-    
+
         <basic-card class="mt20" :card-label="$t(`m.treeinfo['字段配置']`)">
             <field-config
                 ref="field"
@@ -66,7 +66,7 @@
                 :configur="configur">
             </field-config>
         </basic-card>
-        
+
         <basic-card
             class="mt20"
             v-bkloading="{ isLoading: getConditionFlag }"
@@ -174,11 +174,11 @@
     </div>
 </template>
 <script>
-    import fieldConfig from './components/fieldConfig.vue'
-    import memberSelect from '../../../commonComponent/memberSelect'
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList'
-    import BasicCard from '@/components/common/layout/BasicCard.vue'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import fieldConfig from './components/fieldConfig.vue';
+    import memberSelect from '../../../commonComponent/memberSelect';
+    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+    import BasicCard from '@/components/common/layout/BasicCard.vue';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         name: 'signNode',
@@ -192,19 +192,19 @@
             // 流程信息
             flowInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 节点信息
             configur: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 secondClick: false,
                 getConditionFlag: false,
@@ -292,8 +292,8 @@
                     ],
                     processors: [
                         {
-                            validator (val) {
-                                return val.length
+                            validator(val) {
+                                return val.length;
                             },
                             message: this.$t('m.newCommon[\'请选择处理人\']'),
                             trigger: 'blur',
@@ -316,113 +316,113 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.cdeploy.configurInfo
+            globalChoise() {
+                return this.$store.state.cdeploy.configurInfo;
             },
-            openFunction () {
-                return this.$store.state.openFunction
+            openFunction() {
+                return this.$store.state.openFunction;
             },
         },
         watch: {
-            'formInfo.processors' () {
-                this.setAllTooltip()
+            'formInfo.processors'() {
+                this.setAllTooltip();
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            async initData () {
-                await this.getAllConditions()
-                this.formInfo.name = this.configur.name
-                this.formInfo.is_sequential = this.configur.is_sequential
-                this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : []
+            async initData() {
+                await this.getAllConditions();
+                this.formInfo.name = this.configur.name;
+                this.formInfo.is_sequential = this.configur.is_sequential;
+                this.formInfo.processors = this.configur.processors ? this.configur.processors.split(',') : [];
                 if (this.configur.finish_condition && this.configur.finish_condition.expressions) {
-                    this.finishCondition = JSON.parse(JSON.stringify(this.configur.finish_condition))
-                    this.finishCondition.expressions.forEach(group => {
-                        group.expressions = group.expressions.map(expression => {
+                    this.finishCondition = JSON.parse(JSON.stringify(this.configur.finish_condition));
+                    this.finishCondition.expressions.forEach((group) => {
+                        group.expressions = group.expressions.map((expression) => {
                             const tooltipInfo = {
                                 disabled: true,
                                 content: '',
                                 placements: ['top'],
-                            }
-                            return { ...expression, tooltipInfo }
-                        })
-                    })
+                            };
+                            return { ...expression, tooltipInfo };
+                        });
+                    });
                 } else {
-                    this.passRateExpression.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
-                    this.finishCondition.expressions[0].expressions.push(JSON.parse(JSON.stringify(this.passRateExpression)))
-                    this.giveTooltip(this.passRateExpression)
+                    this.passRateExpression.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key;
+                    this.finishCondition.expressions[0].expressions.push(JSON.parse(JSON.stringify(this.passRateExpression)));
+                    this.giveTooltip(this.passRateExpression);
                 }
             },
             // 所有条件添加tootip
-            setAllTooltip () {
-                this.finishCondition.expressions.forEach(group => {
-                    group.expressions.forEach(expression => {
-                        this.giveTooltip(expression)
-                    })
-                })
+            setAllTooltip() {
+                this.finishCondition.expressions.forEach((group) => {
+                    group.expressions.forEach((expression) => {
+                        this.giveTooltip(expression);
+                    });
+                });
             },
             // 获取提前结束可选条件
-            async getAllConditions () {
-                const { id } = this.configur
-                this.getConditionFlag = true
-                await this.$store.dispatch('apiRemote/get_sign_conditions', id).then(res => {
-                    this.allCondition = res.data
+            async getAllConditions() {
+                const { id } = this.configur;
+                this.getConditionFlag = true;
+                await this.$store.dispatch('apiRemote/get_sign_conditions', id).then((res) => {
+                    this.allCondition = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.getConditionFlag = false
-                    })
+                        this.getConditionFlag = false;
+                    });
             },
             // 条件选择回调
-            selectCondition (val, condition, eIndex, gIndex) {
+            selectCondition(val, condition, eIndex, gIndex) {
                 if (gIndex === 0 && eIndex === 0 && condition.meta.code === 'PROCESS_COUNT') {
                     this.$bkInfo({
                         type: 'warning',
                         title: this.$t('m.treeinfo[\'确定更改“处理人数”？\']'),
                         subTitle: this.$t('m.treeinfo[\'若更改该条件，则忽略处理人数，条件满足即结束\']'),
                         cancelFn: () => {
-                            condition.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key
+                            condition.key = this.allCondition.find(one => one.meta.code === 'PROCESS_COUNT').key;
                         },
                         confirmFn: () => {
-                            this.changeCondition(condition)
+                            this.changeCondition(condition);
                         },
-                    })
+                    });
                 } else {
-                    this.changeCondition(condition)
+                    this.changeCondition(condition);
                 }
             },
-            changeCondition (condition) {
-                condition.meta.code = this.allCondition.find(one => one.key === condition.key).meta.code
-                condition.meta.unit = this.allCondition.find(one => one.key === condition.key).meta.unit || 'INT'
-                this.giveTooltip(condition)
+            changeCondition(condition) {
+                condition.meta.code = this.allCondition.find(one => one.key === condition.key).meta.code;
+                condition.meta.unit = this.allCondition.find(one => one.key === condition.key).meta.unit || 'INT';
+                this.giveTooltip(condition);
             },
             // 设置条件tooltip
-            giveTooltip (expression) {
+            giveTooltip(expression) {
                 if (!expression.key) {
-                    expression.tooltipInfo.disabled = false
-                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择条件\']')
-                    return
+                    expression.tooltipInfo.disabled = false;
+                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择条件\']');
+                    return;
                 }
                 if (!(expression.meta.code === 'PASS_RATE' || expression.meta.code === 'REJECT_RATE') && !this.formInfo.processors.length) {
-                    expression.tooltipInfo.disabled = false
-                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择处理人\']')
-                    return
+                    expression.tooltipInfo.disabled = false;
+                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择处理人\']');
+                    return;
                 }
-                expression.tooltipInfo.disabled = true
-                expression.tooltipInfo.content = ''
+                expression.tooltipInfo.disabled = true;
+                expression.tooltipInfo.content = '';
             },
             // 确认
-            async submitNode () {
-                let validates = [this.$refs.nodeInfoForm.validate()]
+            async submitNode() {
+                let validates = [this.$refs.nodeInfoForm.validate()];
                 if (this.$refs.finishConditionForms && this.$refs.finishConditionForms.length) {
-                    validates = validates.concat(this.$refs.finishConditionForms.map(form => form.validate()))
+                    validates = validates.concat(this.$refs.finishConditionForms.map(form => form.validate()));
                 }
                 await Promise.all(validates).then(() => {
                     const params = {
@@ -431,54 +431,54 @@
                         type: this.configur.type,
                         is_terminable: false,
                         processors_type: 'PERSON',
-                    }
+                    };
                     // 基本信息
-                    params.name = this.formInfo.name
-                    params.is_sequential = this.formInfo.is_sequential
-                    params.processors = this.formInfo.processors.join(',')
+                    params.name = this.formInfo.name;
+                    params.is_sequential = this.formInfo.is_sequential;
+                    params.processors = this.formInfo.processors.join(',');
                     // 字段配置
-                    const fieldInfo = this.$refs.field.showTabList
-                    params.fields = fieldInfo.map(item => item.id)
+                    const fieldInfo = this.$refs.field.showTabList;
+                    params.fields = fieldInfo.map(item => item.id);
                     // 提前结束条件
-                    this.finishCondition.expressions.forEach(group => {
-                        group.expressions.forEach(expression => {
-                            delete expression.tooltipInfo
-                        })
-                    })
-                    params.finish_condition = this.finishCondition
-                    const { id } = this.configur
+                    this.finishCondition.expressions.forEach((group) => {
+                        group.expressions.forEach((expression) => {
+                            delete expression.tooltipInfo;
+                        });
+                    });
+                    params.finish_condition = this.finishCondition;
+                    const { id } = this.configur;
                     if (this.secondClick) {
-                        return
+                        return;
                     }
-                    this.secondClick = true
+                    this.secondClick = true;
                     this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',
-                        })
-                        this.$emit('closeConfigur', true)
+                        });
+                        this.$emit('closeConfigur', true);
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.secondClick = false
-                        })
+                            this.secondClick = false;
+                        });
                 })
                     .catch((validator) => {
                         // 防止出现Uncaught
-                        console.log(validator)
-                    })
+                        console.log(validator);
+                    });
             },
             // 取消
-            closeNode () {
-                this.$emit('closeConfigur', false)
+            closeNode() {
+                this.$emit('closeConfigur', false);
             },
             // 添加删除条件
-            operateExpression (expressionGroup, type = 'add', eIndex, gIndex, expression) {
+            operateExpression(expressionGroup, type = 'add', eIndex, gIndex, expression) {
                 if (type === 'del') {
                     if (expressionGroup.expressions.length === 1) {
-                        return
+                        return;
                     }
                     if (gIndex === 0 && eIndex === 0 && expression.meta.code === 'PROCESS_COUNT') {
                         this.$bkInfo({
@@ -486,18 +486,18 @@
                             title: this.$t('m.treeinfo[\'确定删除“处理人数”？\']'),
                             subTitle: this.$t('m.treeinfo[\'若删除该条件，则忽略处理人数，条件满足即结束\']'),
                             confirmFn: () => {
-                                expressionGroup.expressions.splice(eIndex, 1)
+                                expressionGroup.expressions.splice(eIndex, 1);
                             },
-                        })
+                        });
                     } else {
-                        expressionGroup.expressions.splice(eIndex, 1)
+                        expressionGroup.expressions.splice(eIndex, 1);
                     }
                 } else {
-                    expressionGroup.expressions.push(JSON.parse(JSON.stringify(this.emptyExpression)))
+                    expressionGroup.expressions.push(JSON.parse(JSON.stringify(this.emptyExpression)));
                 }
             },
             // 添加组条件
-            operateGroup (type = 'add', index) {
+            operateGroup(type = 'add', index) {
                 if (type === 'del') {
                     if (this.finishCondition.expressions.length === 1) {
                         this.$bkInfo({
@@ -505,21 +505,21 @@
                             title: this.$t('m.treeinfo[\'确定删除唯一的条件组？\']'),
                             subTitle: this.$t('m.treeinfo[\'若删除，则必须所有人处理完成才结束\']'),
                             confirmFn: () => {
-                                this.finishCondition.expressions.splice(index, 1)
+                                this.finishCondition.expressions.splice(index, 1);
                             },
-                        })
+                        });
                     } else {
-                        this.finishCondition.expressions.splice(index, 1)
+                        this.finishCondition.expressions.splice(index, 1);
                     }
                 } else {
                     this.finishCondition.expressions.push({
                         expressions: [JSON.parse(JSON.stringify(this.emptyExpression))],
                         type: 'and',
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

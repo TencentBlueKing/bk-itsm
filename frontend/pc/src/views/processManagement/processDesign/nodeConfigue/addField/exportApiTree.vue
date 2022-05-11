@@ -68,7 +68,7 @@
     </ul>
 </template>
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js'
+    import collapseTransition from '@/utils/collapse-transition.js';
 
     export default {
         name: 'exportTree',
@@ -78,8 +78,8 @@
         props: {
             treeDataList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             treeIndex: {
@@ -91,29 +91,29 @@
                 default: 0,
             },
         },
-        data () {
+        data() {
             return {
                 pLeft: `padding-left:${25 * (this.treeIndex + 1)}px; padding-right: 10px;`,
-            }
+            };
         },
         methods: {
             // 展开子级
-            toggleChildren (item) {
-                this.$emit('toggleChildren', item)
+            toggleChildren(item) {
+                this.$emit('toggleChildren', item);
             },
-            toggle (item) {
-                this.$emit('toggle', item, this.isKeyValue)
+            toggle(item) {
+                this.$emit('toggle', item, this.isKeyValue);
             },
             // 复选框勾选的数据
-            checkItem (item) {
-                this.$emit('selectItem', item)
+            checkItem(item) {
+                this.$emit('selectItem', item);
             },
             // 组件内调用组件，需要抛出数据两次
-            selectItem (item) {
-                this.$emit('selectItem', item)
+            selectItem(item) {
+                this.$emit('selectItem', item);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -80,30 +80,30 @@
         props: {
             prcTable: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             stateList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 sourceTypeList: [
                     {
@@ -117,44 +117,44 @@
                         name: this.$t('m.treeinfo["引用变量"]'),
                     },
                 ],
-            }
+            };
         },
         computed: {},
         watch: {
-            prcTable (newVal, oldVal) {
-                this.initData()
+            prcTable(newVal, oldVal) {
+                this.initData();
             },
         },
-        async mounted () {
-            await this.changeInfo
-            this.initData()
+        async mounted() {
+            await this.changeInfo;
+            this.initData();
         },
         methods: {
-            initData () {
-                this.prcTable.forEach(item => {
-                    this.$set(item, 'isCheck', false)
-                    this.$set(item, 'isSatisfied', false)
-                    this.$set(item, 'el', null)
-                    this.$set(item, 'source_type', 'CUSTOM')
-                    this.$set(item, 'value_key', '')
+            initData() {
+                this.prcTable.forEach((item) => {
+                    this.$set(item, 'isCheck', false);
+                    this.$set(item, 'isSatisfied', false);
+                    this.$set(item, 'el', null);
+                    this.$set(item, 'source_type', 'CUSTOM');
+                    this.$set(item, 'value_key', '');
                     // 赋值
                     for (const key in this.changeInfo.meta) {
                         if (item.name === key) {
                             if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
-                                item.source_type = 'FIELDS'
-                                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0]
+                                item.source_type = 'FIELDS';
+                                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0];
                             } else {
-                                item.source_type = 'CUSTOM'
-                                item.value = this.changeInfo.meta[key]
+                                item.source_type = 'CUSTOM';
+                                item.value = this.changeInfo.meta[key];
                             }
                         }
                     }
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
-    
+
 </style>

@@ -244,9 +244,9 @@
     </div>
 </template>
 <script>
-    import { errorHandler } from '../../utils/errorHandler'
-    import versionLog from '../systemConfig/component/versionLog.vue'
-    import permission from '@/mixins/permission.js'
+    import { errorHandler } from '../../utils/errorHandler';
+    import versionLog from '../systemConfig/component/versionLog.vue';
+    import permission from '@/mixins/permission.js';
 
     export default {
         name: 'attachmentStorage',
@@ -254,7 +254,7 @@
             versionLog,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 clearStorageTime: localStorage.getItem('clearStorageTime') || this.$t('m.home["暂无"]'),
                 // placeholder: "请填写以 ''/'' 结尾的绝对目录.",
@@ -348,159 +348,159 @@
                 },
                 // 获取开关状态按钮禁用
                 isAllStatusGetting: false,
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
         watch: {},
-        async created () {
-            await this.getEnableStatusAndStorage()
+        async created() {
+            await this.getEnableStatusAndStorage();
         },
-        async mounted () {
-            await this.getVersionList()
+        async mounted() {
+            await this.getVersionList();
         },
         methods: {
-            async getEnableStatusAndStorage () {
-                this.isAllStatusGetting = true
-                await this.$store.dispatch('attachmentStorage/getEnableStatus').then(res => {
-                    const tempObj = {}
-                    res.data.forEach(item => {
+            async getEnableStatusAndStorage() {
+                this.isAllStatusGetting = true;
+                await this.$store.dispatch('attachmentStorage/getEnableStatus').then((res) => {
+                    const tempObj = {};
+                    res.data.forEach((item) => {
                         if (item.key === 'SYS_FILE_PATH') {
-                            this.moduleInfo.systemPath.formerValue = this.moduleInfo.systemPath.nowValue = tempObj.SYS_FILE_PATH = item.value
-                            this.moduleInfo.systemPath.id = item.id || ''
+                            this.moduleInfo.systemPath.formerValue = this.moduleInfo.systemPath.nowValue = tempObj.SYS_FILE_PATH = item.value;
+                            this.moduleInfo.systemPath.id = item.id || '';
                         } else if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {
-                            this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key] = item.value === 'on'
-                            this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || ''
+                            this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key] = item.value === 'on';
+                            this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
                         }
-                    })
-                    this.$store.commit('changeOpenFunction', tempObj)
+                    });
+                    this.$store.commit('changeOpenFunction', tempObj);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isAllStatusGetting = false
-                    })
+                        this.isAllStatusGetting = false;
+                    });
             },
-            cancelPath () {
-                this.moduleInfo.systemPath.changing = false
-                this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue
+            cancelPath() {
+                this.moduleInfo.systemPath.changing = false;
+                this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
             },
-            async allSwitchChange (openStatus, type) {
+            async allSwitchChange(openStatus, type) {
                 if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {})
-                    return
+                    this.applyForPermission(['global_settings_manage'], [], {});
+                    return;
                 }
                 if (this.isAllStatusGetting) {
-                    return
+                    return;
                 }
-                const { id } = this.moduleInfo[type]
+                const { id } = this.moduleInfo[type];
                 const params = {
                     type: 'FUNCTION',
                     key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
                     value: openStatus ? 'on' : 'off',
-                }
+                };
                 if (type === 'systemPath') {
-                    params.value = this.moduleInfo.systemPath.nowValue
-                    params.type = 'PATH'
+                    params.value = this.moduleInfo.systemPath.nowValue;
+                    params.type = 'PATH';
                 }
-                this.isAllStatusGetting = true
+                this.isAllStatusGetting = true;
                 await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.home["更新成功"]'),
                         theme: 'success',
-                    })
-                    this.getEnableStatusAndStorage()
+                    });
+                    this.getEnableStatusAndStorage();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                        this.getEnableStatusAndStorage()
-                        this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue
+                        errorHandler(res, this);
+                        this.getEnableStatusAndStorage();
+                        this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
                     })
                     .finally(() => {
-                        this.moduleInfo.systemPath.changing = false
-                        this.isAllStatusGetting = false
-                    })
+                        this.moduleInfo.systemPath.changing = false;
+                        this.isAllStatusGetting = false;
+                    });
             },
             // 一键清除 缓存
-            handleClear () {
+            handleClear() {
                 if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {})
-                    return
+                    this.applyForPermission(['global_settings_manage'], [], {});
+                    return;
                 }
                 // https://paas-poc.o.qcloud.com/t/itsm/api/misc/clean_cache/
                 if (this.issending === true) {
-                    return
+                    return;
                 }
-                this.issending = true
+                this.issending = true;
                 this.$store.dispatch('attachmentStorage/clearStorage', {}).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.home["清除缓存成功"]'),
                         theme: 'success',
-                    })
-                    this.clearStorageTime = new Date().toLocaleString('zh', { hour12: false })
-                    window.localStorage.setItem('clearStorageTime', this.clearStorageTime)
+                    });
+                    this.clearStorageTime = new Date().toLocaleString('zh', { hour12: false });
+                    window.localStorage.setItem('clearStorageTime', this.clearStorageTime);
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
                         setTimeout(() => {
-                            this.issending = false
-                        }, 10000)
-                    })
+                            this.issending = false;
+                        }, 10000);
+                    });
             },
-            seeLog () {
-                this.versionLogData.show = true
+            seeLog() {
+                this.versionLogData.show = true;
             },
-            async getVersionList () {
-                await this.$store.dispatch('version/version_logs').then(res => {
-                    this.rowVersionList = res.data.data
-                    this.updatedVersion = this.rowVersionList[0].version
-                    this.rowVersionList.forEach(item => {
+            async getVersionList() {
+                await this.$store.dispatch('version/version_logs').then((res) => {
+                    this.rowVersionList = res.data.data;
+                    this.updatedVersion = this.rowVersionList[0].version;
+                    this.rowVersionList.forEach((item) => {
                         const ite = {
                             name: `V${item.version}`,
-                        }
-                        this.versionList.push(ite)
-                    })
+                        };
+                        this.versionList.push(ite);
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
 
-                    })
+                    });
             },
-            async onKeyUpdate () {
+            async onKeyUpdate() {
                 const params = {
                     version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
                     version_to: this.updatedVersion,
-                }
+                };
                 await this.$store.dispatch('version/oneKeymigrate', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.home["提交成功，后台执行升级中"]'),
                         theme: 'success',
-                    })
+                    });
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.formerVersion = ''
-                    })
+                        this.formerVersion = '';
+                    });
             },
-            handleChangeSystemPath () {
+            handleChangeSystemPath() {
                 if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {})
-                    return
+                    this.applyForPermission(['global_settings_manage'], [], {});
+                    return;
                 }
-                this.moduleInfo.systemPath.changing = true
+                this.moduleInfo.systemPath.changing = true;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

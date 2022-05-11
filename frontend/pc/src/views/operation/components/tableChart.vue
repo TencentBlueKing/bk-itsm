@@ -87,12 +87,12 @@
             },
             pagination: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         current: 1,
                         count: 0,
                         limit: 10,
-                    }
+                    };
                 },
             },
             showTop3Color: {
@@ -113,42 +113,42 @@
             },
         },
         methods: {
-            getRowOrder (index) {
-                return index + (this.pagination.current - 1) * this.pagination.limit + 1
+            getRowOrder(index) {
+                return index + (this.pagination.current - 1) * this.pagination.limit + 1;
             },
-            getOrderCls (index) {
-                let cls = ''
+            getOrderCls(index) {
+                let cls = '';
                 if (this.pagination.current === 1 && index <= 2) {
                     if (index === 0) {
-                        cls = 'first-order'
+                        cls = 'first-order';
                     } else if (index === 1) {
-                        cls = 'second-order'
+                        cls = 'second-order';
                     } else {
-                        cls = 'third-order'
+                        cls = 'third-order';
                     }
                 }
-                return cls
+                return cls;
             },
-            handleSortChange (data) {
-                const { prop, order } = data
-                let sortCondition
+            handleSortChange(data) {
+                const { prop, order } = data;
+                let sortCondition;
                 if (order === 'ascending') {
-                    sortCondition = prop
+                    sortCondition = prop;
                 } else if (order === 'descending') {
-                    sortCondition = `-${prop}`
+                    sortCondition = `-${prop}`;
                 }
-                this.$emit('onOrderChange', sortCondition)
+                this.$emit('onOrderChange', sortCondition);
             },
-            handlePageChange (page) {
-                this.$emit('onPageChange', page)
+            handlePageChange(page) {
+                this.$emit('onPageChange', page);
             },
-            handlerCellClick (col, data) {
+            handlerCellClick(col, data) {
                 if (typeof col.handler === 'function') {
-                    col.handler.call(this, data)
+                    col.handler.call(this, data);
                 }
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .order {

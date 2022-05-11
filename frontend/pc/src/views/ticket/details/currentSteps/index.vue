@@ -64,10 +64,10 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import mixins from '@/views/commonMix/field.js'
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js'
-    import CurrentStepItem from './CurrentStepItem.vue'
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import mixins from '@/views/commonMix/field.js';
+    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+    import CurrentStepItem from './CurrentStepItem.vue';
 
     export default {
         name: 'CurrentSteps',
@@ -79,20 +79,20 @@
             // 单据信息
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             currentStepList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             nodeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             openStatus: {
@@ -101,8 +101,8 @@
             },
             nodeTriggerList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             loading: {
@@ -113,7 +113,7 @@
             readOnly: Boolean,
             isShowAssgin: Boolean,
         },
-        data () {
+        data() {
             return {
                 allGroups: [],
                 allFieldList: [],
@@ -131,19 +131,19 @@
                 // 手动触发器下拉框状态
                 isDropdownShow: false,
                 basicInDomHeight: 54, // 基本信息初始高度
-            }
+            };
         },
         watch: {
-            isShowBasicInfo () {
-                this.getBasicHeight()
+            isShowBasicInfo() {
+                this.getBasicHeight();
             },
         },
-        mounted () {
-            this.getBasicHeight()
+        mounted() {
+            this.getBasicHeight();
         },
         methods: {
-            loadData () {
-                this.getAllGroups()
+            loadData() {
+                this.getAllGroups();
             },
             /**
              * 初始化数据
@@ -211,26 +211,26 @@
             //     this.$emit('updateStepNodeNumber', this.currentList.length)
             // },
             // 获取所有组
-            getAllGroups () {
-                const params = 'is_processor=true'
+            getAllGroups() {
+                const params = 'is_processor=true';
                 this.$store.dispatch('deployCommon/getUser', { params }).then((res) => {
-                    const disabledList = ['VARIABLE', 'STARTER_LEADER', 'IAM']
-                    this.allGroups = res.data.filter(item => !disabledList.includes(item.type))
+                    const disabledList = ['VARIABLE', 'STARTER_LEADER', 'IAM'];
+                    this.allGroups = res.data.filter(item => !disabledList.includes(item.type));
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
-            getBasicHeight () {
-                const basicDom = document.querySelector('.base-info-content')
-                this.basicInDomHeight = basicDom.clientHeight
+            getBasicHeight() {
+                const basicDom = document.querySelector('.base-info-content');
+                this.basicInDomHeight = basicDom.clientHeight;
             },
             // 成功后的回调事件
-            successFn () {
-                this.$emit('handlerSubmitSuccess')
+            successFn() {
+                this.$emit('handlerSubmitSuccess');
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

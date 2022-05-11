@@ -43,8 +43,8 @@
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins'
-    import Sideslider from '../sideslider/sideslider.js'
+    import { getFormMixins } from '../formMixins';
+    import Sideslider from '../sideslider/sideslider.js';
 
     const textAttrs = {
         styles: {
@@ -55,43 +55,43 @@
             type: [String, Array],
             default: '',
         },
-    }
+    };
     export default {
         name: 'TagText',
         mixins: [getFormMixins(textAttrs)],
-        data () {
-            return {}
+        data() {
+            return {};
         },
         computed: {
-            hasChildren () {
-                return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length
+            hasChildren() {
+                return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length;
             },
         },
         methods: {
-            onClick () {
+            onClick() {
                 if (!this.hasChildren) {
-                    return
+                    return;
                 }
-                let title = ''
+                let title = '';
                 if (Array.isArray(this.value)) {
-                    title = this.value.map(item => (item.label || '') + item.value).join(',')
+                    title = this.value.map(item => (item.label || '') + item.value).join(',');
                 } else {
-                    title = (this.label || '') + this.value
+                    title = (this.label || '') + this.value;
                 }
-                const context = this.getContext()
+                const context = this.getContext();
                 if (context.config && context.config.mode === 'combine') {
-                    const topViewItem = this.getTopViewItem()
-                    topViewItem.appendCrumbsItem(title, this.form.children)
+                    const topViewItem = this.getTopViewItem();
+                    topViewItem.appendCrumbsItem(title, this.form.children);
                 } else {
                     Sideslider({
                         title,
                         formData: this.form.children,
                         context,
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -39,40 +39,40 @@
         props: {
             routerInfo: Object,
         },
-        data () {
+        data() {
             return {
                 time: 30,
                 timer: '',
                 isStart: true,
-            }
+            };
         },
-        mounted () {
-            this.countDown()
+        mounted() {
+            this.countDown();
         },
         methods: {
-            countDown () {
+            countDown() {
                 if (this.isStart) {
                     this.timer = setInterval(() => {
-                        this.time--
+                        this.time--;
                         if (this.time === 0) {
-                            clearInterval(this.timer)
-                            this.jumpPage()
+                            clearInterval(this.timer);
+                            this.jumpPage();
                         }
-                    }, 1000)
+                    }, 1000);
                 }
             },
-            jumpPage () {
-                clearInterval(this.timer)
-                this.isStart = false
-                this.$router.push(this.routerInfo)
+            jumpPage() {
+                clearInterval(this.timer);
+                this.isStart = false;
+                this.$router.push(this.routerInfo);
             },
-            onBackClick () {
-                clearInterval(this.timer)
-                this.isStart = false
-                this.$emit('onBackIconClick')
+            onBackClick() {
+                clearInterval(this.timer);
+                this.isStart = false;
+                this.$emit('onBackIconClick');
             },
         },
-    }
+    };
 </script>
 <style scoped lang="scss">
     .tip-box {

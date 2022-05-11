@@ -140,11 +140,16 @@
                     <bk-table-column :label="$t(`m.deployPage['状态']`)" width="80">
                         <template slot-scope="props">
                             <span class="bk-status-color"
-                                :class="{ 'bk-status-gray': !props.row.is_enabled, 'bk-status-primary': props.row.is_draft }">
+                                :class="{ 'bk-status-gray': !props.row.is_enabled,
+                                    'bk-status-primary': props.row.is_draft }">
                             </span>
                             <span style="margin-left: 5px;"
-                                :title="props.row.is_draft ? $t(`m.deployPage['草稿']`) : (props.row.is_enabled ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
-                                {{props.row.is_draft ? $t(`m.deployPage["草稿"]`) : (props.row.is_enabled ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
+                                :title="props.row.is_draft
+                                    ? $t(`m.deployPage['草稿']`) : (props.row.is_enabled
+                                    ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
+                                {{props.row.is_draft
+                                    ? $t(`m.deployPage["草稿"]`) : (props.row.is_enabled
+                                    ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
                             </span>
                         </template>
                     </bk-table-column>
@@ -155,7 +160,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
+                                        props.row.auth_actions)
                                 }]"
                                 @click="onFlowEdit(props.row)">
                                 {{ $t('m.deployPage["编辑"]') }}
@@ -164,9 +170,11 @@
                                 v-cursor="{ active: !hasPermission(['workflow_deploy'], props.row.auth_actions) }"
                                 text
                                 theme="primary"
-                                :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions) && (props.row.is_draft || !props.row.is_enabled)"
+                                :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions)
+                                    && (props.row.is_draft || !props.row.is_enabled)"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_deploy'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['workflow_deploy'],
+                                        props.row.auth_actions)
                                 }]"
                                 @click="onFlowDeploy(props.row)">
                                 {{ $t('m.deployPage["部署"]') }}
@@ -176,7 +184,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
+                                    props.row.auth_actions)
                                 }]"
                                 @click="onFlowPreview(props.row)">
                                 {{ $t('m.deployPage["预览"]') }}
@@ -185,9 +194,11 @@
                                 v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
                                 text
                                 theme="primary"
-                                :disabled="hasPermission(['workflow_manage'], props.row.auth_actions) && props.row.is_draft"
+                                :disabled="hasPermission(['workflow_manage'], props.row.auth_actions)
+                                    && props.row.is_draft"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
+                                        props.row.auth_actions)
                                 }]"
                                 @click="onFlowExport(props.row)">
                                 {{ $t('m.deployPage["导出"]') }}
@@ -197,7 +208,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'], props.row.auth_actions)
+                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
+                                        props.row.auth_actions)
                                 }]"
                                 @click="deleteConfirm(props.row)">
                                 {{ $t('m.deployPage["删除"]') }}
@@ -263,12 +275,12 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
-    import commonMix from '../../../commonMix/common.js'
-    import searchInfo from '../../../commonComponent/searchInfo/searchInfo.vue'
-    import preview from '../../../commonComponent/preview'
-    import permission from '@/mixins/permission.js'
-    import { errorHandler } from '../../../../utils/errorHandler.js'
+    import axios from 'axios';
+    import commonMix from '../../../commonMix/common.js';
+    import searchInfo from '../../../commonComponent/searchInfo/searchInfo.vue';
+    import preview from '../../../commonComponent/preview';
+    import permission from '@/mixins/permission.js';
+    import { errorHandler } from '../../../../utils/errorHandler.js';
 
     export default {
         name: 'ProcessHome',
@@ -277,7 +289,7 @@
             preview,
         },
         mixins: [commonMix, permission],
-        data () {
+        data() {
             return {
                 // 组件升级数据更新
                 versionStatus: true,
@@ -356,94 +368,95 @@
                     },
                 },
                 rules: {},
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
+        mounted() {
             // 获取列表数据
-            this.getList()
+            this.getList();
             // 校验
-            this.rules.name = this.checkCommonRules('name').name
+            this.rules.name = this.checkCommonRules('name').name;
         },
         methods: {
             // 获取列表数据
-            getList (page) {
+            getList(page) {
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
+                };
                 // 过滤条件
-                this.moreSearch.forEach(item => {
-                    if ((Array.isArray(item.value) ? !!item.value.length : item.value !== '') && item.typeKey !== 'is_enabled') {
-                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                this.moreSearch.forEach((item) => {
+                    if ((Array.isArray(item.value)
+                        ? !!item.value.length : item.value !== '') && item.typeKey !== 'is_enabled') {
+                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                     }
-                })
+                });
                 if (this.moreSearch[2].value === -1) {
-                    params.is_draft = 1
-                    params.is_enabled = ''
+                    params.is_draft = 1;
+                    params.is_enabled = '';
                 } else if (this.moreSearch[2].value === 0) {
-                    params.is_enabled = 0
-                    params.is_draft = 0
+                    params.is_enabled = 0;
+                    params.is_draft = 0;
                 } else if (this.moreSearch[2].value === 1) {
-                    params.is_enabled = 1
+                    params.is_enabled = 1;
                 }
 
-                this.isDataLoading = true
+                this.isDataLoading = true;
                 this.$store.dispatch('deployCommon/getList', params).then((res) => {
-                    this.dataList = res.data.items
+                    this.dataList = res.data.items;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
-            searchMore () {
-                this.$refs.searchInfo.searchMore()
+            searchMore() {
+                this.$refs.searchInfo.searchMore();
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = item.multiSelect ? [] : ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = item.multiSelect ? [] : '';
+                });
+                this.getList(1);
             },
             // 新增流程
-            addProcess () {
+            addProcess() {
                 // 创建权限校验
                 if (!this.hasPermission(['workflow_create'])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['workflow_create'], [], resourceData)
+                    };
+                    this.applyForPermission(['workflow_create'], [], resourceData);
                 } else {
                     this.$router.push({
                         name: 'ProcessEdit',
@@ -451,14 +464,14 @@
                             type: 'new',
                             step: 'processInfo',
                         },
-                    })
+                    });
                 }
             },
             // 编辑流程
-            onFlowEdit (item, index) {
+            onFlowEdit(item) {
                 // 流程管理权限校验
                 if (!this.CheckFowPermisson(item)) {
-                    return
+                    return;
                 }
                 this.$router.push({
                     name: 'ProcessEdit',
@@ -469,88 +482,93 @@
                     query: {
                         processId: item.id,
                     },
-                })
+                });
             },
             // 上传文件模板
-            handleFile (e) {
-                const fileInfo = e.target.files[0]
+            handleFile(e) {
+                const fileInfo = e.target.files[0];
                 if (fileInfo.size <= 10 * 1024 * 1024) {
-                    const data = new FormData()
-                    data.append('file', fileInfo)
-                    const fileType = 'json'
+                    const data = new FormData();
+                    data.append('file', fileInfo);
+                    const fileType = 'json';
                     this.$store.dispatch('cdeploy/flowFileUpload', { fileType, data }).then((res) => {
                         this.$bkMessage({
-                            message: `${this.$t('m.deployPage["成功导入"]')}${res.data.success}${this.$t('m.deployPage["个流程，"]')}${this.$t('m.deployPage["失败"]')}${res.data.failed}${this.$t('m.deployPage["个"]')}`,
+                            message: `${this.$t('m.deployPage["成功导入"]')}
+                                ${res.data.success}
+                                ${this.$t('m.deployPage["个流程，"]')}
+                                ${this.$t('m.deployPage["失败"]')}
+                                ${res.data.failed}
+                                ${this.$t('m.deployPage["个"]')}`,
                             theme: 'success',
-                        })
-                        this.getList(1)
+                        });
+                        this.getList(1);
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.fileVal = ''
-                            e.target.value = null
-                        })
+                            this.fileVal = '';
+                            e.target.value = null;
+                        });
                 } else {
-                    this.fileVal = ''
-                    e.target.value = null
+                    this.fileVal = '';
+                    e.target.value = null;
                     this.$bkMessage({
                         message: this.$t('m.deployPage["文件大小不能超过10MB"]'),
                         theme: 'error',
-                    })
+                    });
                 }
             },
             // 部署流程
-            onFlowDeploy (item, index) {
+            onFlowDeploy(item) {
                 // 流程管理权限校验
                 if (!this.CheckFowPermisson(item, ['workflow_deploy'])) {
-                    return
+                    return;
                 }
                 if (item.is_draft || !item.is_enabled) {
-                    return
+                    return;
                 }
-                this.deployInfo.isShow = true
-                this.deployInfo.formInfo.name = item.name
-                this.deployInfo.formInfo.id = item.id
+                this.deployInfo.isShow = true;
+                this.deployInfo.formInfo.name = item.name;
+                this.deployInfo.formInfo.id = item.id;
             },
-            submitForm () {
-                this.$refs.deployForm.validate().then(validator => {
+            submitForm() {
+                this.$refs.deployForm.validate().then(() => {
                     if (this.secondClick) {
-                        return
+                        return;
                     }
-                    this.secondClick = true
-                    const { id } = this.deployInfo.formInfo
+                    this.secondClick = true;
+                    const { id } = this.deployInfo.formInfo;
                     const params = {
                         name: this.deployInfo.formInfo.name,
-                    }
-                    this.$store.dispatch('cdeploy/deployFlow', { params, id }).then((res) => {
+                    };
+                    this.$store.dispatch('cdeploy/deployFlow', { params, id }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.deployPage["流程部署成功，请关联服务后使用"]'),
                             theme: 'success',
-                        })
+                        });
                     })
                         .catch((res) => {
-                            errorHandler(res, this)
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.secondClick = false
-                            this.deployInfo.isShow = false
-                        })
-                }, validator => {})
+                            this.secondClick = false;
+                            this.deployInfo.isShow = false;
+                        });
+                }, () => {});
             },
             // 流程预览
-            onFlowPreview (item) {
+            onFlowPreview(item) {
                 // 流程管理权限校验
                 if (!this.CheckFowPermisson(item)) {
-                    return
+                    return;
                 }
-                const { id } = item
+                const { id } = item;
                 if (!id) {
-                    return
+                    return;
                 }
-                this.processInfo.isShow = !this.processInfo.isShow
-                this.processInfo.loading = true
+                this.processInfo.isShow = !this.processInfo.isShow;
+                this.processInfo.loading = true;
                 axios.all([
                     this.$store.dispatch('deployCommon/getStates', { workflow: id }),
                     this.$store.dispatch('deployCommon/getChartLink', {
@@ -558,80 +576,81 @@
                         page_size: 1000,
                     }),
                 ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data
+                    this.addList = userResp.data;
                     for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i
+                        this.addList[i].indexInfo = i;
                     }
-                    this.lineList = reposResp.data.items
+                    this.lineList = reposResp.data.items;
                 }))
                     .finally(() => {
-                        this.processInfo.loading = false
-                    })
+                        this.processInfo.loading = false;
+                    });
             },
             // 导出
-            onFlowExport (item) {
+            onFlowExport(item) {
                 // 流程管理权限校验
                 if (!this.CheckFowPermisson(item)) {
-                    return
+                    return;
                 }
                 this.$bkInfo({
                     title: this.$t('m.deployPage["确认导出？"]'),
                     confirmFn: () => {
-                        window.open(`${window.SITE_URL}api/workflow/templates/${item.id}/exports/`)
+                        window.open(`${window.SITE_URL}api/workflow/templates/${item.id}/exports/`);
                     },
-                })
+                });
             },
             // 删除确认
-            deleteConfirm (item) {
+            deleteConfirm(item) {
                 // 流程管理权限校验
                 if (!this.CheckFowPermisson(item)) {
-                    return
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.deployPage["确认删除此流程？"]'),
                     subTitle: this.$t('m.deployPage["流程一旦删除，将无法还原，请谨慎操作"]'),
                     confirmFn: () => {
-                        const params = item.id
+                        const params = item.id;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
-                        this.$store.dispatch('cdeploy/deleteDesign', { params }).then((res) => {
+                        this.secondClick = true;
+                        this.$store.dispatch('cdeploy/deleteDesign', { params }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                                this.pagination.current = this.pagination.current === 1
+                                    ? 1 : this.pagination.current - 1;
                             }
-                            this.getList()
+                            this.getList();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
             // 关闭版本提示信息
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
             // 导入流程权限校验
-            onProcessImportPermissonApply () {
+            onProcessImportPermissonApply() {
                 // 创建权限校验
                 if (!this.hasPermission(['workflow_create'])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['workflow_create'], [], resourceData)
+                    };
+                    this.applyForPermission(['workflow_create'], [], resourceData);
                 }
             },
             /**
@@ -639,10 +658,10 @@
              * @param {Object} item 流程实例数据
              * @param {Array} req 申请的权限
              */
-            CheckFowPermisson (item, req = ['workflow_manage']) {
+            CheckFowPermisson(item, req = ['workflow_manage']) {
                 // 流程管理权限校验
                 if (!this.hasPermission(req, item.auth_actions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -652,14 +671,14 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(req, item.auth_actions, resourceData)
-                    return false
+                    };
+                    this.applyForPermission(req, item.auth_actions, resourceData);
+                    return false;
                 }
-                return true
+                return true;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

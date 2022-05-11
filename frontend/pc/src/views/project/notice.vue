@@ -113,15 +113,15 @@
 </template>
 
 <script>
-    import editorNotice from '../processManagement/notice/editorNotice.vue'
-    import permission from '@/mixins/permission.js'
+    import editorNotice from '../processManagement/notice/editorNotice.vue';
+    import permission from '@/mixins/permission.js';
     export default {
         name: 'Notice',
         components: {
             editorNotice,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 acticeTab: 'WEIXIN',
                 isShowEdit: false,
@@ -179,154 +179,154 @@
                 searchNotice: '',
                 customRow: 5,
                 actionLoading: false,
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
         watch: {
             acticeTab: {
-                handler (val) {
-                    this.formData.noticeType = val
+                handler(val) {
+                    this.formData.noticeType = val;
                 },
                 immediate: true,
             },
         },
-        mounted () {
-            this.getNoticeList()
+        mounted() {
+            this.getNoticeList();
         },
         methods: {
-            changeNotice (item, index) {
-                this.acticeTab = item.id
-                this.getNoticeList()
+            changeNotice(item, index) {
+                this.acticeTab = item.id;
+                this.getNoticeList();
             },
-            async handleSelectUserBy (val) {
+            async handleSelectUserBy(val) {
                 try {
-                    this.actionLoading = true
-                    this.actionList = []
-                    this.formData.noticeAction = ''
+                    this.actionLoading = true;
+                    this.actionList = [];
+                    this.formData.noticeAction = '';
                     const parmas = {
                         used_by: val,
-                    }
-                    const res = await this.$store.dispatch('project/getAction', parmas)
-                    console.log(res)
+                    };
+                    const res = await this.$store.dispatch('project/getAction', parmas);
+                    console.log(res);
                     if (res.data && res.result) {
-                        const list = res.data
+                        const list = res.data;
                         for (const item in list) {
                             this.actionList.push({
                                 id: item,
                                 name: list[item],
-                            })
+                            });
                         }
-                        console.log(this.actionList)
+                        console.log(this.actionList);
                     }
                 } catch (e) {
-                    console.log(e)
+                    console.log(e);
                 } finally {
-                    this.actionLoading = false
+                    this.actionLoading = false;
                 }
             },
-            getNoticeList (isSearch) {
-                this.isDataLoading = true
+            getNoticeList(isSearch) {
+                this.isDataLoading = true;
                 const params = {
                     project_key: this.$route.query.project_id,
                     notify_type: this.acticeTab,
-                }
-                if (isSearch) params.content_template__icontains = this.searchNotice
+                };
+                if (isSearch) params.content_template__icontains = this.searchNotice;
                 this.$store.dispatch('project/getProjectNotice', { params }).then((res) => {
-                    this.noticeList = res.data
+                    this.noticeList = res.data;
                 })
                     .catch((res) => {
-                        console.log(res)
+                        console.log(res);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            submitNotice () {
-                Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(res => {
-                    const { title, message } = this.$refs.editorNotice.formInfo
+            submitNotice() {
+                Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then((res) => {
+                    const { title, message } = this.$refs.editorNotice.formInfo;
                     const params = {
                         title_template: title,
                         content_template: message,
                         project_key: this.$route.query.project_id,
-                    }
-                    const url = this.isEdit ? 'project/updateProjectNotice' : 'project/addProjectNotice'
-                    if (this.isEdit) params.id = this.editNoticeId
-                    params.notify_type = this.formData.noticeType
-                    params.action = this.formData.noticeAction
-                    params.used_by = this.formData.noticeUserBy
+                    };
+                    const url = this.isEdit ? 'project/updateProjectNotice' : 'project/addProjectNotice';
+                    if (this.isEdit) params.id = this.editNoticeId;
+                    params.notify_type = this.formData.noticeType;
+                    params.action = this.formData.noticeAction;
+                    params.used_by = this.formData.noticeUserBy;
                     // 调取接口数据
-                    this.$store.dispatch(url, params).then(res => {
+                    this.$store.dispatch(url, params).then((res) => {
                         this.$bkMessage({
                             message: res.message,
                             theme: 'success',
-                        })
-                        this.isShowEdit = false
-                        this.getNoticeList()
-                        this.clearFromData()
+                        });
+                        this.isShowEdit = false;
+                        this.getNoticeList();
+                        this.clearFromData();
                     })
-                        .catch(e => {
+                        .catch((e) => {
                             this.$bkMessage({
                                 message: e.data.message,
                                 theme: 'error',
-                            })
-                        })
-                })
+                            });
+                        });
+                });
             },
-            clearFromData () {
-                this.formData.noticeAction = ''
-                this.formData.noticeUserBy = ''
+            clearFromData() {
+                this.formData.noticeAction = '';
+                this.formData.noticeUserBy = '';
                 this.$refs.editorNotice.formInfo = {
                     title: '',
                     message: '',
-                }
+                };
             },
-            closeNotice () {
-                this.$refs.basicFrom.clearError()
-                this.$refs.editorNotice.$refs.wechatForm.clearError()
-                this.clearFromData()
-                this.isShowEdit = false
+            closeNotice() {
+                this.$refs.basicFrom.clearError();
+                this.$refs.editorNotice.$refs.wechatForm.clearError();
+                this.clearFromData();
+                this.isShowEdit = false;
             },
             // 新增配置
-            addNotice () {
-                this.isEdit = false
-                this.isShowEdit = true
+            addNotice() {
+                this.isEdit = false;
+                this.isShowEdit = true;
             },
-            editNotice (row) {
-                this.editNoticeId = row.id
-                this.formData.noticeUserBy = row.used_by
-                this.handleSelectUserBy(row.used_by)
-                this.formData.noticeAction = row.action
+            editNotice(row) {
+                this.editNoticeId = row.id;
+                this.formData.noticeUserBy = row.used_by;
+                this.handleSelectUserBy(row.used_by);
+                this.formData.noticeAction = row.action;
                 this.$refs.editorNotice.formInfo = {
                     title: row.title_template,
                     message: row.content_template,
-                }
-                this.isEdit = true
-                this.isShowEdit = true
+                };
+                this.isEdit = true;
+                this.isShowEdit = true;
             },
-            deleteNotice (row) {
+            deleteNotice(row) {
                 this.$bkInfo({
                     title: this.$t('m["确认要删除？"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.$store.dispatch('project/deleteProjectNotice', row.id).then(res => {
+                        this.$store.dispatch('project/deleteProjectNotice', row.id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m["删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getNoticeList()
-                        })
+                            });
+                            this.getNoticeList();
+                        });
                     },
-                })
+                });
             },
-            closeEditor () {
-                this.isShowEdit = false
+            closeEditor() {
+                this.isShowEdit = false;
             },
         },
-    }
+    };
 
 </script>
 

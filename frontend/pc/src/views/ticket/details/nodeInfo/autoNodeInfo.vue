@@ -161,9 +161,9 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/addField/getParam.vue'
-    import postParam from '@/views/processManagement/processDesign/nodeConfigue/addField/postParam.vue'
-    import ace from '@/views/commonComponent/aceEditor'
+    import getParam from '@/views/processManagement/processDesign/nodeConfigue/addField/getParam.vue';
+    import postParam from '@/views/processManagement/processDesign/nodeConfigue/addField/postParam.vue';
+    import ace from '@/views/commonComponent/aceEditor';
 
     export default {
         name: 'autoNodeInfo',
@@ -175,19 +175,19 @@
         props: {
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 // 返回数据 -- ace编辑器展示
                 bodyDetailConfig: {
@@ -200,31 +200,31 @@
                 },
                 isShowAce: false,
                 isFull: false,
-            }
+            };
         },
         computed: {
             // 拼接/接口名
-            apiName () {
-                const remoteSystem = this.nodeInfo.api_info.remote_api_info.remote_system_name || ''
-                const remoteApi = this.nodeInfo.api_info.remote_api_info.name || ''
-                return `${remoteSystem}/${remoteApi}`
+            apiName() {
+                const remoteSystem = this.nodeInfo.api_info.remote_api_info.remote_system_name || '';
+                const remoteApi = this.nodeInfo.api_info.remote_api_info.name || '';
+                return `${remoteSystem}/${remoteApi}`;
             },
         },
-        async mounted () {
-            await this.nodeInfo
+        async mounted() {
+            await this.nodeInfo;
             if (this.nodeInfo && Object.keys(this.bodyDetailConfig.value).length) {
-                this.bodyDetailConfig.value = JSON.stringify(this.nodeInfo.api_info.response, null, 4)
+                this.bodyDetailConfig.value = JSON.stringify(this.nodeInfo.api_info.response, null, 4);
             }
         },
         methods: {
-            editorInitAfter (val) {
+            editorInitAfter(val) {
                 // ...
             },
-            blur (content, $editor, $fn) {
-                this.bodyDetailConfig.value = content
+            blur(content, $editor, $fn) {
+                this.bodyDetailConfig.value = content;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

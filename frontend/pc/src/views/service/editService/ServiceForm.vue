@@ -83,10 +83,10 @@
 </template>
 
 <script>
-    import draggable from 'vuedraggable'
-    import HalfRowForm from './HalfRowForm'
+    import draggable from 'vuedraggable';
+    import HalfRowForm from './HalfRowForm';
     // import FormEditItem from './FormEditItem'
-    import FormViewItem from './FormViewItem'
+    import FormViewItem from './FormViewItem';
 
     export default {
         name: 'ServiceForm',
@@ -103,72 +103,72 @@
             crtForm: [String, Number],
             addFieldStatus: Boolean,
         },
-        data () {
+        data() {
             return {
                 formList: this.transFieldsToDraggable(this.forms),
-            }
+            };
         },
         watch: {
-            forms (val) {
-                this.formList = this.transFieldsToDraggable(val)
+            forms(val) {
+                this.formList = this.transFieldsToDraggable(val);
             },
         },
-        mounted () {
+        mounted() {
         },
         methods: {
             // 将字段列表转换为拖拽组件所需格式
-            transFieldsToDraggable (data) {
-                const list = []
-                data.forEach(item => {
-                    const lastForm = list[list.length - 1]
+            transFieldsToDraggable(data) {
+                const list = [];
+                data.forEach((item) => {
+                    const lastForm = list[list.length - 1];
                     if (item.layout === 'COL_6') {
                         if (Array.isArray(lastForm) && lastForm[1] === undefined && item.meta.layout_position === 'right') {
-                            lastForm[1] = item
+                            lastForm[1] = item;
                         } else {
-                            const halfRowForm = item.meta.layout_position === 'right' ? [undefined, item] : [item, undefined]
-                            list.push(halfRowForm)
+                            const halfRowForm = item.meta.layout_position === 'right' ? [undefined, item] : [item, undefined];
+                            list.push(halfRowForm);
                         }
-                        return
+                        return;
                     }
-                    list.push(item)
-                })
-                return list
+                    list.push(item);
+                });
+                return list;
             },
             // 整行表单拖拽
-            onRowDragEnd (evt) {
+            onRowDragEnd(evt) {
                 // console.log('整行拖拽', evt)
-                const id = Number(evt.item.dataset.id)
-                const field = this.forms.find(item => item.id === id)
-                let targetIndex = evt.newIndex
+                const id = Number(evt.item.dataset.id);
+                const field = this.forms.find(item => item.id === id);
+                let targetIndex = evt.newIndex;
                 for (let i = 0; i < evt.newIndex; i++) { // 考虑半行表单的情况
                     if (Array.isArray(this.formList[i]) && this.formList[i].every(item => item !== undefined)) {
-                        targetIndex += 1
+                        targetIndex += 1;
                     }
                 }
-                this.$emit('dragUpdateList', targetIndex, field)
+                this.$emit('dragUpdateList', targetIndex, field);
             },
             // 半行表单拖拽到整行
-            onHalfRowDragToRow (evt) {
+            onHalfRowDragToRow(evt) {
                 // console.log('半行表单拖拽到整行', evt)
-                const id = Number(evt.item.dataset.id)
-                let targetIndex = evt.newIndex
+                const id = Number(evt.item.dataset.id);
+                let targetIndex = evt.newIndex;
                 if (this.forms.find(item => item.id === id)) {
-                    const field = this.forms.find(item => item.id === id)
+                    const field = this.forms.find(item => item.id === id);
                     for (let i = 0; i < evt.newIndex; i++) { // 考虑半行表单的情况
-                        const rowForms = this.formList[i]
+                        const rowForms = this.formList[i];
                         if (Array.isArray(rowForms)) {
                             // 存在包含两个半行表单行，且不存在当前拖拽表单
                             if (rowForms.every(item => item !== undefined && item.id !== id)) {
-                                targetIndex += 1
+                                targetIndex += 1;
                             }
                             // 存在包含一个半行表单行，且该表单为当前拖拽表单
                             if (rowForms.some(item => item === undefined) && rowForms.find(item => item && item.id === id)) {
-                                targetIndex -= 1
+                                targetIndex -= 1;
                             }
                         }
                     }
-                    field.meta.layout_position = 'left'
-                    this.$emit('dragUpdateList', targetIndex, field)
+                    field.meta.layout_position = 'left';
+                    this.$emit('dragUpdateList', targetIndex, field);
                 } else {
                     const field = {
                         api_info: evt.item._underlying_vm_.api_info,
@@ -191,28 +191,28 @@
                         tips: '',
                         meta: {},
                         default: '',
-                    }
-                    this.$emit('onAddFormClick', targetIndex, field)
+                    };
+                    this.$emit('onAddFormClick', targetIndex, field);
                 }
             },
             // 半行表单拖拽到半行
-            onHalfRowDragToHalfRow (evt) {
-                let targetIndex
-                const id = Number(evt.item.dataset.id)
-                const rowIndex = Number(evt.target.dataset.rowindex)
-                const rowForms = this.formList[rowIndex]
-                const otherForm = rowForms.find(item => item)
-                const otherFormIndex = this.forms.findIndex(item => item.id === otherForm.id)
+            onHalfRowDragToHalfRow(evt) {
+                let targetIndex;
+                const id = Number(evt.item.dataset.id);
+                const rowIndex = Number(evt.target.dataset.rowindex);
+                const rowForms = this.formList[rowIndex];
+                const otherForm = rowForms.find(item => item);
+                const otherFormIndex = this.forms.findIndex(item => item.id === otherForm.id);
                 if (this.forms.find(item => item.id === id)) {
-                    const field = this.forms.find(item => item.id === id)
+                    const field = this.forms.find(item => item.id === id);
                     if (rowForms[0] === undefined) {
-                        field.meta.layout_position = 'left'
-                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
+                        field.meta.layout_position = 'left';
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1;
                     } else {
-                        field.meta.layout_position = 'right'
-                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
+                        field.meta.layout_position = 'right';
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1;
                     }
-                    this.$emit('dragUpdateList', targetIndex, field)
+                    this.$emit('dragUpdateList', targetIndex, field);
                 } else {
                     const field = {
                         api_info: evt.item._underlying_vm_.api_info,
@@ -235,56 +235,56 @@
                         tips: '',
                         meta: {},
                         default: '',
-                    }
+                    };
                     if (rowForms[0] === undefined) {
-                        field.meta.layout_position = 'left'
-                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1
+                        field.meta.layout_position = 'left';
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === 0) ? otherFormIndex : otherFormIndex - 1;
                     } else {
-                        field.meta.layout_position = 'right'
-                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1
+                        field.meta.layout_position = 'right';
+                        targetIndex = (field.id === otherForm.id || otherFormIndex === this.forms.length - 1) ? otherFormIndex : otherFormIndex + 1;
                     }
-                    this.$emit('onAddFormClick', targetIndex, field)
+                    this.$emit('onAddFormClick', targetIndex, field);
                 }
             },
             // 切换为字段编辑
-            onFormEditClick (form) {
-                this.$emit('onFormEditClick', form)
+            onFormEditClick(form) {
+                this.$emit('onFormEditClick', form);
             },
             // 字段克隆
-            onFormCloneClick (form) {
+            onFormCloneClick(form) {
                 if (this.crtForm) {
-                    return
+                    return;
                 }
-                this.$emit('fieldClone', form)
+                this.$emit('fieldClone', form);
             },
             // 字段编辑取消
-            onEditCancel () {
+            onEditCancel() {
                 if (this.crtForm === 'add') {
-                    this.$emit('cancelAdd')
+                    this.$emit('cancelAdd');
                 } else {
-                    this.$emit('update:crtForm', '')
+                    this.$emit('update:crtForm', '');
                 }
             },
             // 字段编辑保存
-            onEditConfirm (form) {
-                const originForm = this.forms.find(item => item.id === form.id)
+            onEditConfirm(form) {
+                const originForm = this.forms.find(item => item.id === form.id);
                 if (originForm) {
                     if (form.layout === 'COL_12') {
-                        form.layout_position = ''
+                        form.layout_position = '';
                     } else {
                         if (originForm.layout === 'COL_12') {
-                            form.layout_position = 'left'
+                            form.layout_position = 'left';
                         }
                     }
                 } else {
                     if (form.layout === 'COL_6') {
-                        form.layout_position = 'left'
+                        form.layout_position = 'left';
                     }
                 }
-                this.$emit('saveField', Object.assign({}, originForm, form))
+                this.$emit('saveField', Object.assign({}, originForm, form));
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';

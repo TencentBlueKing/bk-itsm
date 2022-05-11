@@ -171,8 +171,8 @@
 </template>
 
 <script>
-    import exportTree from '../../../../commonComponent/treeInfo/exportTree.vue'
-    import mixins from '../../../../commonMix/mixins_api.js'
+    import exportTree from '../../../../commonComponent/treeInfo/exportTree.vue';
+    import mixins from '../../../../commonMix/mixins_api.js';
 
     export default {
         name: 'nodeCondition',
@@ -183,20 +183,20 @@
         props: {
             lineInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             apiDetail: {
@@ -206,24 +206,24 @@
             },
             workflow: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             state: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             stateList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 booleanList: [
                     {
@@ -243,43 +243,43 @@
                     processors: false,
                 },
                 scrollTopStatus: 0,
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
         watch: {
-            apiDetail (newVal, oldVal) {
-                this.initData()
+            apiDetail(newVal, oldVal) {
+                this.initData();
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            async initData () {
+            async initData() {
             },
-            globalChoiseFilter (choiseMethods, type) {
-                return choiseMethods.filter(item => {
-                    const stringList = ['==', '!=', 'startswith', 'endswith', 'not contains', 'contains']
-                    const numberList = ['==', '!=', '>', '>=', '<', '<=']
-                    const booleanList = ['==', '!=']
+            globalChoiseFilter(choiseMethods, type) {
+                return choiseMethods.filter((item) => {
+                    const stringList = ['==', '!=', 'startswith', 'endswith', 'not contains', 'contains'];
+                    const numberList = ['==', '!=', '>', '>=', '<', '<='];
+                    const booleanList = ['==', '!='];
                     switch (type) {
                         case 'string':
-                            return stringList.indexOf(item.typeName) !== -1
+                            return stringList.indexOf(item.typeName) !== -1;
                         case 'number':
-                            return numberList.indexOf(item.typeName) !== -1
+                            return numberList.indexOf(item.typeName) !== -1;
                         case 'boolean':
-                            return booleanList.indexOf(item.typeName) !== -1
+                            return booleanList.indexOf(item.typeName) !== -1;
                         default:
-                            return true
+                            return true;
                     }
-                })
+                });
             },
             // 新增关系组
-            addCondition () {
+            addCondition() {
                 const value = {
                     type: 'and',
                     checkInfo: false,
@@ -301,20 +301,20 @@
                             },
                         },
                     ],
-                }
-                value.expressions.forEach(item => {
-                    item.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson))
-                })
-                this.lineInfo.expressions.push(value)
+                };
+                value.expressions.forEach((item) => {
+                    item.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
+                });
+                this.lineInfo.expressions.push(value);
             },
-            delteCondition (item, index) {
+            delteCondition(item, index) {
                 if (this.lineInfo.expressions.length === 1) {
-                    return
+                    return;
                 }
-                this.lineInfo.expressions.splice(index, 1)
+                this.lineInfo.expressions.splice(index, 1);
             },
             // 新增字段条件组
-            addNode (item, index) {
+            addNode(item, index) {
                 const value = {
                     condition: '',
                     key: '',
@@ -330,63 +330,63 @@
                     organizaInfo: {
                         assignorShow: false,
                     },
-                }
-                value.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson))
-                item.expressions.splice(index + 1, 0, value)
+                };
+                value.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
+                item.expressions.splice(index + 1, 0, value);
             },
-            deleteNode (item, index) {
+            deleteNode(item, index) {
                 if (item.expressions.length === 1) {
-                    return
+                    return;
                 }
-                item.expressions.splice(index, 1)
+                item.expressions.splice(index, 1);
             },
-            showTree (item) {
-                const assignorShow = !item.organizaInfo.assignorShow
-                this.closeOther()
-                item.organizaInfo.assignorShow = assignorShow
+            showTree(item) {
+                const assignorShow = !item.organizaInfo.assignorShow;
+                this.closeOther();
+                item.organizaInfo.assignorShow = assignorShow;
             },
-            closeOther () {
-                this.lineInfo.expressions.forEach(item => {
-                    item.expressions.forEach(ite => {
-                        ite.organizaInfo.assignorShow = false
-                    })
-                })
+            closeOther() {
+                this.lineInfo.expressions.forEach((item) => {
+                    item.expressions.forEach((ite) => {
+                        ite.organizaInfo.assignorShow = false;
+                    });
+                });
             },
-            recordCheckFn (tree) {
-                tree.checkInfo = false
+            recordCheckFn(tree) {
+                tree.checkInfo = false;
                 if (tree.children == null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.recordCheckFn(item)
-                })
+                tree.children.forEach((item) => {
+                    this.recordCheckFn(item);
+                });
             },
-            assignorToggle () {
-                arguments[1].type = arguments[0].type
-                arguments[1].name = arguments[0].name
-                arguments[1].key = arguments[0].ancestorsList_str
-                arguments[1].organization.assignorPerson.forEach(tree => {
-                    this.recordCheckFn(tree)
-                })
-                arguments[0].checkInfo = true
+            assignorToggle() {
+                arguments[1].type = arguments[0].type;
+                arguments[1].name = arguments[0].name;
+                arguments[1].key = arguments[0].ancestorsList_str;
+                arguments[1].organization.assignorPerson.forEach((tree) => {
+                    this.recordCheckFn(tree);
+                });
+                arguments[0].checkInfo = true;
 
                 // 选中的数据
-                arguments[1].organization.assignorTree = arguments[0]
+                arguments[1].organization.assignorTree = arguments[0];
 
-                this.checkInfo.assignors = false
+                this.checkInfo.assignors = false;
 
                 // 关闭窗口
-                this.closeTree(arguments[1])
+                this.closeTree(arguments[1]);
             },
-            closeTree (item) {
-                item.organizaInfo.assignorShow = false
+            closeTree(item) {
+                item.organizaInfo.assignorShow = false;
             },
-            toggleChildren () {
-                arguments[0].showChildren = !arguments[0].showChildren
-                arguments[1].organization.assignorPerson = JSON.parse(JSON.stringify(arguments[1].organization.assignorPerson))
+            toggleChildren() {
+                arguments[0].showChildren = !arguments[0].showChildren;
+                arguments[1].organization.assignorPerson = JSON.parse(JSON.stringify(arguments[1].organization.assignorPerson));
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

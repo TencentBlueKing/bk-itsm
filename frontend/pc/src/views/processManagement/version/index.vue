@@ -144,7 +144,8 @@
                             theme="primary"
                             :title="$t(`m.flowManager['预览']`)"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_manage'], props.row.auth_actions)
+                                'btn-permission-disable': !hasPermission(['flow_version_manage'],
+                                    props.row.auth_actions)
                             }]"
                             @click="onFlowPreview(props.row)">
                             {{ $t('m.flowManager["预览"]') }}
@@ -155,7 +156,8 @@
                             theme="primary"
                             :title="$t(`m.flowManager['还原']`)"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_restore'], props.row.auth_actions)
+                                'btn-permission-disable': !hasPermission(['flow_version_restore'],
+                                    props.row.auth_actions)
                             }]"
                             @click="openConfirmDialog(props.row, 'restore')">
                             {{ $t('m.flowManager["还原"]') }}
@@ -165,9 +167,11 @@
                             text
                             theme="primary"
                             :title="$t(`m.flowManager['删除']`)"
-                            :disabled="hasPermission(['flow_version_manage'], props.row.auth_actions) && !!props.row.service_cnt"
+                            :disabled="hasPermission(['flow_version_manage'], props.row.auth_actions)
+                                && !!props.row.service_cnt"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_manage'], props.row.auth_actions)
+                                'btn-permission-disable': !hasPermission(['flow_version_manage'],
+                                    props.row.auth_actions)
                             }]"
                             @click="openConfirmDialog(props.row, 'delete')">
                             {{ $t('m.flowManager["删除"]') }}
@@ -202,11 +206,11 @@
     </div>
 </template>
 <script>
-    import axios from 'axios'
-    import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue'
-    import preview from '../../commonComponent/preview'
-    import permission from '@/mixins/permission.js'
-    import { errorHandler } from '../../../utils/errorHandler'
+    import axios from 'axios';
+    import searchInfo from '../../commonComponent/searchInfo/searchInfo.vue';
+    import preview from '../../commonComponent/preview';
+    import permission from '@/mixins/permission.js';
+    import { errorHandler } from '../../../utils/errorHandler';
 
     export default {
         name: 'FlowVersion',
@@ -215,7 +219,7 @@
             preview,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 secondClick: false,
                 versionStatus: true,
@@ -279,260 +283,260 @@
                 },
                 addList: [],
                 lineList: [],
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 // 重新获取数据时清空选中的数据
-                this.checkList = []
+                this.checkList = [];
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.moreSearch.forEach(item => {
+                };
+                this.moreSearch.forEach((item) => {
                     if (Array.isArray(item.value) ? !!item.value.length : !!item.value) {
-                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                     }
-                })
-                this.isDataLoading = true
-                this.$store.dispatch('workflowVersion/list', params).then(res => {
-                    this.dataList = res.data.items
-                    this.dataList.forEach(item => {
-                        this.$set(item, 'checkStatus', false)
-                    })
+                });
+                this.isDataLoading = true;
+                this.$store.dispatch('workflowVersion/list', params).then((res) => {
+                    this.dataList = res.data.items;
+                    this.dataList.forEach((item) => {
+                        this.$set(item, 'checkStatus', false);
+                    });
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.dataList.forEach(item => {
+            handleSelectAll(selection) {
+                this.dataList.forEach((item) => {
                     // 关联了当前这个流程版本的服务的数量不为 0 且有管理权限
                     if (!item.service_cnt && this.hasPermission(['flow_version_manage'], item.auth_actions)) {
-                        item.checkStatus = !!selection.length
+                        item.checkStatus = !!selection.length;
                     }
-                })
+                });
                 // 选中有权限数据
-                this.checkList = selection.filter(item => this.hasPermission(['flow_version_manage'], item.auth_actions))
+                this.checkList = selection.filter(item => this.hasPermission(['flow_version_manage'], item.auth_actions));
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection) {
+                this.checkList = selection;
             },
-            disabledFn (item, index) {
-                return !item.service_cnt
+            disabledFn(item) {
+                return !item.service_cnt;
             },
-            changeCheck (value) {
+            changeCheck(value) {
                 // 改变中选态，与表头选择相呼应
-                this.$refs.versionTable.toggleRowSelection(value, value.checkStatus)
+                this.$refs.versionTable.toggleRowSelection(value, value.checkStatus);
                 if (value.checkStatus) {
                     if (!this.checkList.some(item => item.id === value.id)) {
-                        this.checkList.push(value)
+                        this.checkList.push(value);
                     }
                 } else {
-                    this.checkList = this.checkList.filter(item => item.id !== value.id)
+                    this.checkList = this.checkList.filter(item => item.id !== value.id);
                 }
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
-            searchMore () {
-                this.$refs.searchInfo.searchMore()
+            searchMore() {
+                this.$refs.searchInfo.searchMore();
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = item.multiSelect ? [] : ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = item.multiSelect ? [] : '';
+                });
+                this.getList(1);
             },
-            changePageSize () {
+            changePageSize() {
                 if (this.customPaging.page_size < 5) {
-                    this.customPaging.page_size = 5
+                    this.customPaging.page_size = 5;
                 } else if (this.customPaging.page_size > 100) {
-                    this.customPaging.page_size = 100
+                    this.customPaging.page_size = 100;
                 }
 
-                this.getList(1)
+                this.getList(1);
             },
             // 点击分页回调
-            pageChange (page) {
-                this.customPaging.page = page
-                this.getList()
+            pageChange(page) {
+                this.customPaging.page = page;
+                this.getList();
             },
             /**
              * 打开二次确认弹窗
              * @param {Object} item 操作数据项
              * @param {type} type 操作类型
              */
-            openConfirmDialog (item, type) {
+            openConfirmDialog(item, type) {
                 if (type === 'delete' && !this.checkfowManagePermisson(item)) {
-                    return
+                    return;
                 }
                 if (type === 'restore' && !this.checkfowRestorePermisson(item)) {
-                    return
+                    return;
                 }
                 const titleMap = new Map([
                     ['delete', this.$t('m.flowManager["流程版本删除确认"]')],
                     ['restore', this.$t('m.flowManager["流程版本还原确认"]')],
                     ['export', this.$t('m.flowManager["流程版本导出确认"]')],
                     ['batchDelete', this.$t('m.flowManager["流程版本批量删除确认"]')],
-                ])
+                ]);
                 const contentMap = new Map([
                     ['delete', this.$t('m.flowManager["删除之后服务将无法关联这些流程版本"]')],
                     ['restore', this.$t('m.flowManager["还原后请移步到流程设计处编辑"]')],
                     ['export', this.$t('m.flowManager["确认后将导出当前版本的流程数据为JSON格式的文件"]')],
                     ['batchDelete', this.$t('m.flowManager["删除之后服务将无法关联这些流程版本"]')],
-                ])
+                ]);
                 if (item.service_cnt && type === 'delete') {
-                    return
+                    return;
                 }
 
-                this.deleteInfo.info = item
-                this.deleteInfo.type = type
+                this.deleteInfo.info = item;
+                this.deleteInfo.type = type;
                 this.$bkInfo({
                     type: 'warning',
                     title: titleMap.get(type),
                     subTitle: contentMap.get(type),
                     confirmFn: () => {
-                        this.submitFn()
+                        this.submitFn();
                     },
-                })
+                });
             },
-            submitFn () {
+            submitFn() {
                 if (this.deleteInfo.type === 'delete') {
-                    this.deleteSubmit()
+                    this.deleteSubmit();
                 } else if (this.deleteInfo.type === 'restore') {
-                    this.restoreSubmit()
+                    this.restoreSubmit();
                 } else if (this.deleteInfo.type === 'export') {
-                    this.exportSubmit()
+                    this.exportSubmit();
                 } else if (this.deleteInfo.type === 'batchDelete') {
-                    this.batchDeleteSubmit()
+                    this.batchDeleteSubmit();
                 }
             },
             // 批量删除
-            batchDeleteSubmit () {
+            batchDeleteSubmit() {
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
-                const idArr = this.checkList.map(item => item.id)
-                const id = idArr.join(',')
-                this.$store.dispatch('workflowVersion/batchDelete', { id }).then(res => {
+                this.secondClick = true;
+                const idArr = this.checkList.map(item => item.id);
+                const id = idArr.join(',');
+                this.$store.dispatch('workflowVersion/batchDelete', { id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.flowManager["批量删除成功"]'),
                         theme: 'success',
-                    })
-                    this.checkList = []
-                    this.getList()
+                    });
+                    this.checkList = [];
+                    this.getList();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 删除
-            deleteSubmit () {
+            deleteSubmit() {
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
-                this.$store.dispatch('workflowVersion/delete', this.deleteInfo.info.id).then(res => {
+                this.secondClick = true;
+                this.$store.dispatch('workflowVersion/delete', this.deleteInfo.info.id).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.flowManager["删除成功"]'),
                         theme: 'success',
-                    })
-                    this.getList(1)
+                    });
+                    this.getList(1);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 还原
-            restoreSubmit () {
+            restoreSubmit() {
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
-                this.$store.dispatch('workflowVersion/restore', this.deleteInfo.info.id).then(res => {
+                this.secondClick = true;
+                this.$store.dispatch('workflowVersion/restore', this.deleteInfo.info.id).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.flowManager["成功还原该流程，请前往【流程设计】查看"]'),
                         theme: 'success',
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
             // 流程预览
-            onFlowPreview (item) {
+            onFlowPreview(item) {
                 if (!this.checkfowManagePermisson(item)) {
-                    return
+                    return;
                 }
-                const { id } = item
+                const { id } = item;
                 if (!id) {
-                    return
+                    return;
                 }
-                this.processInfo.isShow = !this.processInfo.isShow
-                this.processInfo.loading = true
+                this.processInfo.isShow = !this.processInfo.isShow;
+                this.processInfo.loading = true;
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
                     this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data
+                    this.addList = userResp.data;
                     for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i
+                        this.addList[i].indexInfo = i;
                     }
-                    this.lineList = reposResp.data.items
+                    this.lineList = reposResp.data.items;
                 }))
                     .finally(() => {
-                        this.processInfo.loading = false
-                    })
+                        this.processInfo.loading = false;
+                    });
             },
             // 关闭版本提示信息
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
             // 流程版本管理权限校验
-            checkfowManagePermisson (item) {
+            checkfowManagePermisson(item) {
                 if (!this.hasPermission(['flow_version_manage'], item.auth_actions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -542,16 +546,16 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['flow_version_manage'], item.auth_actions, resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['flow_version_manage'], item.auth_actions, resourceData);
+                    return false;
                 }
-                return true
+                return true;
             },
             // check 流程版本还原权限
-            checkfowRestorePermisson (item) {
+            checkfowRestorePermisson(item) {
                 if (!this.hasPermission(['flow_version_restore'], item.auth_actions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -565,14 +569,14 @@
                             id: item.workflow_id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['flow_version_restore'], item.auth_actions, resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['flow_version_restore'], item.auth_actions, resourceData);
+                    return false;
                 }
-                return true
+                return true;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

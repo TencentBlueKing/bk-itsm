@@ -92,11 +92,11 @@
     </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import ServiceFormStep from './ServiceFormStep.vue'
-    import ServiceProcessStep from './ServiceProcessStep.vue'
-    import ServiceSettingStep from './ServiceSettingStep.vue'
-    import { errorHandler } from '@/utils/errorHandler'
+    import NavTitle from '@/components/common/layout/NavTitle';
+    import ServiceFormStep from './ServiceFormStep.vue';
+    import ServiceProcessStep from './ServiceProcessStep.vue';
+    import ServiceSettingStep from './ServiceSettingStep.vue';
+    import { errorHandler } from '@/utils/errorHandler';
 
     export default {
         name: 'ServiceEdit',
@@ -120,7 +120,7 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 serviceLoading: this.type === 'edit',
                 flowInfoLoading: false,
@@ -128,101 +128,101 @@
                 serviceInfo: {},
                 flowInfo: {},
                 isShowNodeConfig: false, // 编辑节点配置
-            }
+            };
         },
         computed: {
-            currStep () {
-                const routeMap = ['basic', 'process', 'setting']
-                const index = routeMap.indexOf(this.step)
-                return index + 1
+            currStep() {
+                const routeMap = ['basic', 'process', 'setting'];
+                const index = routeMap.indexOf(this.step);
+                return index + 1;
             },
-            prevStepBtnName () {
-                return this.currStep === 1 ? this.$t('m[\'返回\']') : this.$t('m.treeinfo["上一步"]')
+            prevStepBtnName() {
+                return this.currStep === 1 ? this.$t('m[\'返回\']') : this.$t('m.treeinfo["上一步"]');
             },
-            nextStepBtnName () {
-                return this.currStep < 3 ? this.$t('m.common[\'下一步\']') : this.$t('m.newCommon["提交"]')
+            nextStepBtnName() {
+                return this.currStep < 3 ? this.$t('m.common[\'下一步\']') : this.$t('m.newCommon["提交"]');
             },
-            stepList () {
-                let status1; let status2; let status3
+            stepList() {
+                let status1; let status2; let status3;
                 if (this.type !== 'new') { // 创建成功
-                    status1 = 'done'
-                    status2 = 'done'
+                    status1 = 'done';
+                    status2 = 'done';
                 }
                 if (this.type !== 'new' && this.serviceInfo.is_valid) { // 已启用
-                    status3 = 'done'
+                    status3 = 'done';
                 }
                 const list = [
                     { title: this.$t('m.tickets[\'服务表单\']'), icon: 1, status: status1 },
                     { title: this.$t('m.tickets[\'服务流程\']'), icon: 2, status: status2 },
                     { title: this.$t('m.taskTemplate[\'高级配置\']'), icon: 3, status: status3 },
-                ]
-                list[this.currStep - 1].status = undefined
-                return list
+                ];
+                list[this.currStep - 1].status = undefined;
+                return list;
             },
         },
         watch: {
-            '$route' (to, from) {
+            '$route'(to, from) {
                 if (to.params.type !== from.params.type) {
-                    this.initData()
+                    this.initData();
                 }
             },
         },
-        mounted () {
-            this.initData()
+        mounted() {
+            this.initData();
         },
         methods: {
-            async initData () {
+            async initData() {
                 if (this.type === 'edit') {
-                    await this.getServiceDetail()
-                    this.getFlowDetailInfo()
+                    await this.getServiceDetail();
+                    this.getFlowDetailInfo();
                 }
             },
             // 获取服务详情
-            getServiceDetail () {
-                this.serviceLoading = true
+            getServiceDetail() {
+                this.serviceLoading = true;
                 return this.$store.dispatch('service/getServiceDetail', this.serviceId).then((res) => {
-                    this.serviceInfo = res.data
+                    this.serviceInfo = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.serviceLoading = false
-                    })
+                        this.serviceLoading = false;
+                    });
             },
             // 获取流程详情
-            getFlowDetailInfo () {
-                this.flowInfoLoading = true
+            getFlowDetailInfo() {
+                this.flowInfoLoading = true;
                 this.$store.dispatch('design/getFlowDetail', { params: this.serviceInfo.workflow_id }).then((res) => {
-                    this.flowInfo = res.data
+                    this.flowInfo = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.flowInfoLoading = false
-                    })
+                        this.flowInfoLoading = false;
+                    });
             },
             // 更新服务信息
-            updateServiceInfo (data) {
-                this.serviceInfo = data
+            updateServiceInfo(data) {
+                this.serviceInfo = data;
             },
-            setConfigStatus (val) {
-                this.isShowNodeConfig = val
+            setConfigStatus(val) {
+                this.isShowNodeConfig = val;
             },
-            onBackIconClick () {
+            onBackIconClick() {
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
                         project_id: this.$store.state.project.id,
                         catalog_id: this.$route.query.catalog_id,
                     },
-                })
+                });
             },
-            onStepChange (index) {
-                const step = ['basic', 'process', 'setting']
+            onStepChange(index) {
+                const step = ['basic', 'process', 'setting'];
                 if (this.type === 'new') {
-                    return
+                    return;
                 }
                 this.$router.push({
                     name: 'projectServiceEdit',
@@ -234,10 +234,10 @@
                         serviceId: this.serviceId,
                         project_id: this.$store.state.project.id,
                     },
-                })
+                });
             },
             // 上一步
-            onPrevStepClick () {
+            onPrevStepClick() {
                 if (this.currStep === 1) {
                     this.$router.push({
                         name: 'projectServiceList',
@@ -245,7 +245,7 @@
                             project_id: this.$store.state.project.id,
                             ...this.$route.query,
                         },
-                    })
+                    });
                 } else {
                     this.$router.push({
                         name: 'projectServiceEdit',
@@ -256,27 +256,27 @@
                         query: {
                             ...this.$route.query,
                         },
-                    })
+                    });
                 }
             },
             // 下一步
-            onNextStepClick () {
-                this.isSubmitting = true
+            onNextStepClick() {
+                this.isSubmitting = true;
                 const stepRefMap = {
                     basic: 'serviceFormStep',
                     process: 'serviceProcessStep',
                     setting: 'serviceSettingStep',
-                }
-                const refName = stepRefMap[this.step]
+                };
+                const refName = stepRefMap[this.step];
                 this.$refs[refName].validate().then((res = {}) => {
                     if (res.data && res.data.result === false) {
-                        return
+                        return;
                     }
                     // next
                     if (this.step !== 'setting') {
-                        const nextStep = this.step === 'basic' ? 'process' : 'setting'
+                        const nextStep = this.step === 'basic' ? 'process' : 'setting';
                         if (this.step === 'basic' && !this.serviceInfo.source) {
-                            this.$refs[refName].updateServiceSource('custom')
+                            this.$refs[refName].updateServiceSource('custom');
                         }
                         this.$router.push({
                             name: 'projectServiceEdit',
@@ -287,27 +287,27 @@
                             query: {
                                 ...this.$route.query,
                             },
-                        })
+                        });
                     } else {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',
-                        })
+                        });
                         this.$router.push({
                             name: 'projectServiceList',
                             query: {
                                 project_id: this.$store.state.project.id,
                                 catalog_id: this.$route.query.catalog_id,
                             },
-                        })
+                        });
                     }
                 })
                     .finally(() => {
-                        this.isSubmitting = false
-                    })
+                        this.isSubmitting = false;
+                    });
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
 @import '~@/scss/mixins/scroller.scss';

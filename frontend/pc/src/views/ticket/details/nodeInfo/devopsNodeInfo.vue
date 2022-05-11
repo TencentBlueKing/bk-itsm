@@ -77,34 +77,34 @@
         props: {
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 taskStatus: {
                     FINISHED: this.$t('m.task["执行成功"]'),
                     RUNNING: this.$t('m.task["执行中"]'),
                     FAILED: this.$t('m.task["执行失败"]'),
                 },
-            }
+            };
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
-    
+
     .bk-sops-node-content {
         font-size: 14px;
         color: #63656E;

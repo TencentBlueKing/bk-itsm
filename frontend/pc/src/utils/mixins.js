@@ -20,8 +20,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import _ from 'lodash'
-import { errorHandler } from '../utils/errorHandler'
+import _ from 'lodash';
+import { errorHandler } from '../utils/errorHandler';
 export default {
 
     props: {
@@ -34,54 +34,54 @@ export default {
             default: false,
         },
     },
-    data () {
+    data() {
 
     },
-    created () {
+    created() {
     },
     watch: {
     },
     methods: {
         debounce: _.debounce(async function () {
-            this.item.choice = await this.getFieldOptions(this.item, this.isPreview)
-            this.options = this.item.choice
+            this.item.choice = await this.getFieldOptions(this.item, this.isPreview);
+            this.options = this.item.choice;
         }, 1000, {
             leading: true,
             trailing: true,
             maxWait: 2000,
         }),
         // 自定义表单数据处理
-        async getFieldOptions (item, type) {
-            await item
-            let data = []
+        async getFieldOptions(item, type) {
+            await item;
+            let data = [];
             switch (item.source_type) {
                 case 'CUSTOM':
-                    data = item.choice
-                    break
+                    data = item.choice;
+                    break;
                 case 'API':
                     // TODO ajax请求-wl
                     if (type && item.id) {
-                        const reqParams = item.relyOn || {}
-                        reqParams.id = item.id
-                        await this.$store.dispatch('apiRemote/get_data', reqParams).then(res => {
+                        const reqParams = item.relyOn || {};
+                        reqParams.id = item.id;
+                        await this.$store.dispatch('apiRemote/get_data', reqParams).then((res) => {
                             data = res.data.map(item => ({
                                 key: item.key,
                                 name: item.name,
-                            }))
+                            }));
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     } else {
-                        data = []
-                        item.choice.forEach(node => {
+                        data = [];
+                        item.choice.forEach((node) => {
                             data.push({
                                 key: node.id,
                                 name: node.name,
-                            })
-                        })
+                            });
+                        });
                     }
-                    break
+                    break;
                 case 'DATADICT':
                     // 请求数据字典数据
                     if (type && item.type !== 'TREESELECT') {
@@ -90,38 +90,38 @@ export default {
                             field_key: item.key,
                             service: item.service,
                             current_status: item.ticket_status,
-                        }).then(res => {
+                        }).then((res) => {
                             data = res.data.map(item => ({
                                 key: item.id,
                                 name: item.name,
-                            }))
+                            }));
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     } else {
-                        data = []
-                        item.choice.forEach(node => {
+                        data = [];
+                        item.choice.forEach((node) => {
                             data.push({
                                 key: node.id,
                                 name: node.name,
-                            })
-                        })
+                            });
+                        });
                     }
-                    break
+                    break;
             }
-            return data
+            return data;
         },
-        itemSelect () {
+        itemSelect() {
             if (this.item.related_fields.be_relied) {
                 this.item.related_fields.be_relied.forEach((fieldKey) => {
                     this.fields.forEach((field) => {
                         if (field.key == fieldKey) {
-                            this.$set(field.relyOn, this.item.key, this.item.val)
+                            this.$set(field.relyOn, this.item.key, this.item.val);
                         }
-                    })
-                })
+                    });
+                });
             }
         },
     },
-}
+};

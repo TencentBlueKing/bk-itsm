@@ -62,9 +62,9 @@
 </template>
 
 <script>
-    import task from './task'
-    import taskHistory from './taskHistory'
-    import slaRecord from './slaRecord'
+    import task from './task';
+    import taskHistory from './taskHistory';
+    import slaRecord from './slaRecord';
     export default {
         name: 'taskLog',
         components: {
@@ -75,50 +75,50 @@
         props: {
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             nodeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             openFunction: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 checkInfo: '',
                 showArticle: '',
                 showTask: '',
                 showHistory: '',
-            }
+            };
         },
-        mounted () {
-            this.showTask = this.openFunction.TASK_SWITCH && this.basicInfomation.task_schemas.length
-            this.showArticle = window.is_article_tag_show
-            this.showHistory = window.is_itsm_admin
-            this.checkInfo = 'slaRecord'
+        mounted() {
+            this.showTask = this.openFunction.TASK_SWITCH && this.basicInfomation.task_schemas.length;
+            this.showArticle = window.is_article_tag_show;
+            this.showHistory = window.is_itsm_admin;
+            this.checkInfo = 'slaRecord';
             if (this.showTask) {
-                this.checkInfo = 'task'
+                this.checkInfo = 'task';
             } else if (this.showArticle) {
-                this.checkInfo = 'article'
+                this.checkInfo = 'article';
             } else if (this.showHistory) {
-                this.checkInfo = 'taskHistory'
+                this.checkInfo = 'taskHistory';
             }
         },
         methods: {
-            updateCurrentStep () {
-                this.$emit('updateCurrentStep')
+            updateCurrentStep() {
+                this.$emit('updateCurrentStep');
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

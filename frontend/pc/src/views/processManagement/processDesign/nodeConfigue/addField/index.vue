@@ -387,16 +387,16 @@
     </div>
 </template>
 <script>
-    import commonMix from '../../../../commonMix/common.js'
-    import dataSource from './dataSource.vue'
-    import dataContent from './dataContent.vue'
-    import customTableData from './customTableData.vue'
-    import defaultValue from './defaultValue.vue'
-    import hiddenConditions from './hiddenConditions.vue'
-    import pinyin from 'pinyin'
-    import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field'
-    import { errorHandler } from '../../../../../utils/errorHandler.js'
-    
+    import commonMix from '../../../../commonMix/common.js';
+    import dataSource from './dataSource.vue';
+    import dataContent from './dataContent.vue';
+    import customTableData from './customTableData.vue';
+    import defaultValue from './defaultValue.vue';
+    import hiddenConditions from './hiddenConditions.vue';
+    import pinyin from 'pinyin';
+    import { CUSTOM_FORM_DEFAULT_VALUE } from '../../../../../constants/field';
+    import { errorHandler } from '../../../../../utils/errorHandler.js';
+
     export default {
         name: 'addField',
         components: {
@@ -414,37 +414,37 @@
             },
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             workflow: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             state: {
                 type: [String, Number],
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             // 标准运维变量
             sospInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 公共字段
             addOrigin: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         isOther: false,
                         addOriginInfo: {},
-                    }
+                    };
                 },
             },
             isEditPublic: {
@@ -457,8 +457,8 @@
             },
             templateInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 挂载后是否触发 changeType
@@ -468,7 +468,7 @@
             },
             nodesList: Array,
         },
-        data () {
+        data() {
             return {
                 isShowDataSource: false,
                 isDataLoading: false,
@@ -620,55 +620,55 @@
                 // 任务内置字段特殊处理
                 fieldTypeList: [],
                 hiddenConditionStatus: true,
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
-            isShowDataSourcebtn () {
-                return (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'CUSTOM') && (Object.keys(this.apiDetail).length !== 0 || this.fieldInfo.list.length !== 0)
+            isShowDataSourcebtn() {
+                return (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'CUSTOM') && (Object.keys(this.apiDetail).length !== 0 || this.fieldInfo.list.length !== 0);
             },
-            isDisabled () {
-                return this.formInfo.source_type === 'API' && !this.apiInfo.api_info.remote_api_id
+            isDisabled() {
+                return this.formInfo.source_type === 'API' && !this.apiInfo.api_info.remote_api_id;
             },
         },
         watch: {
             formInfo: {
-                handler (val) {
-                    this.$emit('getAddFieldStatus', val.name !== '')
+                handler(val) {
+                    this.$emit('getAddFieldStatus', val.name !== '');
                 },
                 deep: true,
             },
         },
-        async mounted () {
-            this.isDataLoading = true
-            await this.initData()
-            this.rules.name = this.checkCommonRules('name').name
-            this.rules.key = this.checkCommonRules('key').key
-            this.rules.type = this.checkCommonRules('select').select
-            this.rules.tips = this.checkCommonRules('select').select
-            this.rules.prevId = this.checkCommonRules('select').select
-            this.isDataLoading = false
+        async mounted() {
+            this.isDataLoading = true;
+            await this.initData();
+            this.rules.name = this.checkCommonRules('name').name;
+            this.rules.key = this.checkCommonRules('key').key;
+            this.rules.type = this.checkCommonRules('select').select;
+            this.rules.tips = this.checkCommonRules('select').select;
+            this.rules.prevId = this.checkCommonRules('select').select;
+            this.isDataLoading = false;
             if (this.changeInfo.id === 'add' && this.autoSelectedType) {
-                this.changeType()
+                this.changeType();
             }
         },
         methods: {
-            openDataSource () {
-                this.isShowDataSource = true
+            openDataSource() {
+                this.isShowDataSource = true;
             },
-            fieldNameChange () {
-                const keyElement = this.$refs.fieldForm.$data.formItems.find(item => item.property === 'key')
+            fieldNameChange() {
+                const keyElement = this.$refs.fieldForm.$data.formItems.find(item => item.property === 'key');
                 if (keyElement.fieldValue) {
-                    keyElement.validator.content = ''
-                    keyElement.validator.state = ''
+                    keyElement.validator.content = '';
+                    keyElement.validator.state = '';
                 }
             },
             // 初始化赋值数据
-            initData () {
+            initData() {
                 // 去掉时间间隔的选项
-                this.fieldTypeList = this.globalChoise.field_type.filter(item => item.typeName !== 'DATETIMERANGE')
+                this.fieldTypeList = this.globalChoise.field_type.filter(item => item.typeName !== 'DATETIMERANGE');
                 if ((this.changeInfo.type === 'COMPLEX-MEMBERS' || this.changeInfo.type === 'SOPS_TEMPLATE') && this.addOrigin.addOriginInfo.type === 'templateField') {
                     this.fieldTypeList = this.fieldTypeList.concat([
                         {
@@ -679,87 +679,87 @@
                             name: this.$t('m.common[\'标准运维模板\']'),
                             typeName: 'SOPS_TEMPLATE',
                         },
-                    ])
+                    ]);
                 }
                 // 在不同的数据源里面添加不同的desc
-                this.globalChoise.source_type.forEach(item => {
-                    const descInfo = item.typeName === 'CUSTOM' ? this.$t('m.treeinfo[\'自定义数据每行的name和key都不能相同。\']') : this.$t('m.treeinfo[\'接口中的数据详情\']')
-                    this.$set(item, 'desc', descInfo)
-                })
+                this.globalChoise.source_type.forEach((item) => {
+                    const descInfo = item.typeName === 'CUSTOM' ? this.$t('m.treeinfo[\'自定义数据每行的name和key都不能相同。\']') : this.$t('m.treeinfo[\'接口中的数据详情\']');
+                    this.$set(item, 'desc', descInfo);
+                });
                 if (!this.nodesList) {
-                    this.getFrontNodesList()
+                    this.getFrontNodesList();
                 } else {
-                    this.frontNodesList = this.nodesList
+                    this.frontNodesList = this.nodesList;
                 }
-                this.assignmentData()
-                this.changeRegex('ASSOCIATED_FIELD_VALIDATION')
+                this.assignmentData();
+                this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
                 // 获取字段校验方式
-                this.getRegexList()
+                this.getRegexList();
                 // 获取PRC数据
-                this.getRpcList()
-                this.getSysDictList()
-                this.getPreStates()
+                this.getRpcList();
+                this.getSysDictList();
+                this.getPreStates();
             },
-            assignmentData (publicValue) {
-                const assignValue = publicValue || this.changeInfo
-                this.formInfo.name = assignValue.name
-                this.formInfo.key = assignValue.key
-                this.formInfo.type = assignValue.type
-                this.formInfo.regex = assignValue.regex
+            assignmentData(publicValue) {
+                const assignValue = publicValue || this.changeInfo;
+                this.formInfo.name = assignValue.name;
+                this.formInfo.key = assignValue.key;
+                this.formInfo.type = assignValue.type;
+                this.formInfo.regex = assignValue.regex;
                 if (this.formInfo.regex === 'CUSTOM') {
-                    this.formInfo.customRegex = assignValue.custom_regex || ''
+                    this.formInfo.customRegex = assignValue.custom_regex || '';
                 }
                 if (assignValue.regex_config && assignValue.regex_config.rule) {
-                    this.changeRegex('ASSOCIATED_FIELD_VALIDATION')
-                    this.formInfo.regex_config.rule.type = assignValue.regex_config.rule.type
+                    this.changeRegex('ASSOCIATED_FIELD_VALIDATION');
+                    this.formInfo.regex_config.rule.type = assignValue.regex_config.rule.type;
 
-                    this.formInfo.regex_config = assignValue.regex_config
+                    this.formInfo.regex_config = assignValue.regex_config;
                 }
-                this.formInfo.layout = assignValue.layout
-                this.formInfo.validate = assignValue.validate_type
-                this.formInfo.desc = assignValue.desc
-                this.formInfo.is_tips = assignValue.is_tips
-                this.formInfo.tips = assignValue.tips
-                this.formInfo.default_value = (this.showType.multipleList.some(item => item === assignValue.type) && assignValue.default !== '') ? assignValue.default.split(',') : (assignValue.default || '')
+                this.formInfo.layout = assignValue.layout;
+                this.formInfo.validate = assignValue.validate_type;
+                this.formInfo.desc = assignValue.desc;
+                this.formInfo.is_tips = assignValue.is_tips;
+                this.formInfo.tips = assignValue.tips;
+                this.formInfo.default_value = (this.showType.multipleList.some(item => item === assignValue.type) && assignValue.default !== '') ? assignValue.default.split(',') : (assignValue.default || '');
                 // 数据源
-                this.formInfo.source_type = assignValue.source_type
+                this.formInfo.source_type = assignValue.source_type;
                 if (assignValue.source_type === 'CUSTOM') {
                     if (assignValue.type === 'FILE') {
                         for (const key in assignValue.choice) {
-                            this.fileList.push(assignValue.choice[key])
+                            this.fileList.push(assignValue.choice[key]);
                         }
                     } else if (assignValue.choice.length !== 0) {
-                        this.fieldInfo.list = []
-                        assignValue.choice.forEach(item => {
+                        this.fieldInfo.list = [];
+                        assignValue.choice.forEach((item) => {
                             this.fieldInfo.list.push({
                                 name: item.name,
                                 key: item.key,
                                 required: !!item.required,
                                 nameCheck: false,
                                 keyCheck: false,
-                            })
-                        })
+                            });
+                        });
                     }
                 } else if (this.formInfo.source_type === 'API') {
-                    this.apiInfo.api_info = assignValue.api_info
+                    this.apiInfo.api_info = assignValue.api_info;
                 } else if (this.formInfo.source_type === 'DATADICT') {
-                    this.formInfo.source_uri = assignValue.source_uri
-                    this.dictionaryData.check = this.formInfo.source_uri
+                    this.formInfo.source_uri = assignValue.source_uri;
+                    this.dictionaryData.check = this.formInfo.source_uri;
                 } else if (this.formInfo.source_type === 'RPC') {
-                    this.formInfo.source_uri = assignValue.source_uri
-                    this.prcData.check = assignValue.source_uri
+                    this.formInfo.source_uri = assignValue.source_uri;
+                    this.prcData.check = assignValue.source_uri;
                 }
                 // 隐藏条件
-                this.formInfo.show_type = (assignValue.show_type === 0)
-                this.formInfo.show_conditions = assignValue.show_conditions || {}
+                this.formInfo.show_type = (assignValue.show_type === 0);
+                this.formInfo.show_conditions = assignValue.show_conditions || {};
                 if (this.formInfo.type === 'CUSTOMTABLE') {
-                    this.customTableInfo.list = []
+                    this.customTableInfo.list = [];
                     if (assignValue.meta.hasOwnProperty('columns')) {
-                        assignValue.meta.columns.forEach(node => {
-                            const valChoice = []
-                            node.choice.forEach(vaule => {
-                                valChoice.push(vaule.name)
-                            })
+                        assignValue.meta.columns.forEach((node) => {
+                            const valChoice = [];
+                            node.choice.forEach((vaule) => {
+                                valChoice.push(vaule.name);
+                            });
                             this.customTableInfo.list.push({
                                 name: node.name,
                                 display: node.display,
@@ -767,585 +767,585 @@
                                 required: node.required,
                                 nameCheck: false,
                                 check: false,
-                            })
-                        })
+                            });
+                        });
                     } else {
-                        this.customTableInfo.list.push({ name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false })
+                        this.customTableInfo.list.push({ name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false });
                     }
                 }
                 // 标准运维变量
                 if (Object.keys(this.sospInfo).length) {
-                    this.formInfo.name = this.sospInfo.name || ''
-                    this.formInfo.validate = 'REQUIRE'
+                    this.formInfo.name = this.sospInfo.name || '';
+                    this.formInfo.validate = 'REQUIRE';
                 }
 
-                this.assignValue = JSON.parse(JSON.stringify(assignValue))
+                this.assignValue = JSON.parse(JSON.stringify(assignValue));
             },
             // 获取前置节点的字段信息
-            async getFrontNodesList () {
+            async getFrontNodesList() {
                 if (!this.state && !this.templateInfo.id) {
-                    return
+                    return;
                 }
-                let url = ''
-                const params = {}
+                let url = '';
+                const params = {};
                 if (this.state) {
-                    url = 'apiRemote/get_related_fields'
-                    params.workflow = this.workflow
-                    params.state = this.state
+                    url = 'apiRemote/get_related_fields';
+                    params.workflow = this.workflow;
+                    params.state = this.state;
                 }
                 if (this.templateInfo.id) {
-                    url = 'taskTemplate/getFrontFieldsList'
-                    params.id = this.templateInfo.id
-                    params.stage = this.templateStage
+                    url = 'taskTemplate/getFrontFieldsList';
+                    params.id = this.templateInfo.id;
+                    params.stage = this.templateStage;
                 }
-                await this.$store.dispatch(url, params).then(res => {
-                    this.frontNodesList = res.data
+                await this.$store.dispatch(url, params).then((res) => {
+                    this.frontNodesList = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 操作字段关联条件
-            addExpression () {
+            addExpression() {
                 this.formInfo.regex_config.rule.expressions.push({
                     condition: '',
                     key: '',
                     source: 'field',
                     type: this.formInfo.type,
                     value: '',
-                })
+                });
             },
-            deleteExpression (index) {
+            deleteExpression(index) {
                 if (this.formInfo.regex_config.rule.expressions.length === 1) {
-                    return
+                    return;
                 }
-                this.formInfo.regex_config.rule.expressions.splice(index, 1)
+                this.formInfo.regex_config.rule.expressions.splice(index, 1);
             },
             // 改变字段类型，需要进行操作
-            async changeType (val) {
+            async changeType(val) {
                 // 改变字段类型，清空正则规则表达式
-                this.formInfo.regex = 'EMPTY'
-                this.formInfo.customRegex = ''
+                this.formInfo.regex = 'EMPTY';
+                this.formInfo.customRegex = '';
                 // 表格，自定义表格，富文本，自定义表单（整行显示）
                 if (this.showType.layoutList.includes(this.formInfo.type)) {
-                    this.formInfo.layout = 'COL_12'
+                    this.formInfo.layout = 'COL_12';
                 }
                 // 改变字段类型，清空自定义数据，数据字典数据
-                this.formInfo.field = ''
-                this.dictionaryData.check = ''
+                this.formInfo.field = '';
+                this.dictionaryData.check = '';
                 // 改变字段类型，改变数据源类型
                 if (this.formInfo.type === 'TREESELECT') {
-                    this.formInfo.source_type = 'DATADICT'
+                    this.formInfo.source_type = 'DATADICT';
                 } else {
-                    this.formInfo.source_type = 'CUSTOM'
+                    this.formInfo.source_type = 'CUSTOM';
                 }
                 if (!this.fieldInfo.list.length) {
                     this.fieldInfo.list = [
                         { name: '', key: '', required: false, nameCheck: false, keyCheck: false },
-                    ]
+                    ];
                 }
                 if (this.formInfo.type === 'CUSTOM-FORM') {
-                    this.formInfo.default_value = CUSTOM_FORM_DEFAULT_VALUE
+                    this.formInfo.default_value = CUSTOM_FORM_DEFAULT_VALUE;
                 }
-                await this.getRegexList()
-                this.formInfo.regex_config.rule.expressions = []
+                await this.getRegexList();
+                this.formInfo.regex_config.rule.expressions = [];
             },
             // 改变正则表达式，清空自定义规则
-            changeRegex (data) {
-                this.formInfo.customRegex = ''
+            changeRegex(data) {
+                this.formInfo.customRegex = '';
                 if (data === 'ASSOCIATED_FIELD_VALIDATION') {
-                    this.regexFieldList = this.frontNodesList.filter(item => this.formInfo.type === 'INT' ? item.type === this.formInfo.type : item.type === 'DATE' || item.type === 'DATETIME').filter(item => item.id !== this.changeInfo.id)
+                    this.regexFieldList = this.frontNodesList.filter(item => this.formInfo.type === 'INT' ? item.type === this.formInfo.type : item.type === 'DATE' || item.type === 'DATETIME').filter(item => item.id !== this.changeInfo.id);
                     if (['DATE', 'DATETIME'].includes(this.formInfo.type)) {
                         this.regexFieldList.push({
                             name: '系统时间',
                             id: 'system_time',
                             key: 'system_time',
                             source: 'system',
-                        })
+                        });
                     }
-                    this.betweenList = this.allBetweenList.filter(item => this.formInfo.type === 'INT' ? item.available === 'INT' : item.available === 'DATE')
+                    this.betweenList = this.allBetweenList.filter(item => this.formInfo.type === 'INT' ? item.available === 'INT' : item.available === 'DATE');
                     this.betweenList.push({
                         name: '等于',
                         typeName: '==',
-                    })
+                    });
                     if (!this.formInfo.regex_config.rule.expressions.length) {
-                        this.addExpression()
+                        this.addExpression();
                     }
                 }
             },
-            getRegexList () {
-                const params = this.formInfo.type
+            getRegexList() {
+                const params = this.formInfo.type;
                 this.$store.dispatch('cdeploy/regexList', params).then((res) => {
                     this.regexList = res.data.regex_choice.map(item => ({
                         name: item[1] ? item[1] : this.$t('m.treeinfo["无"]'),
                         typeName: item[0],
-                    }))
+                    }));
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            onRegexFieldChange (key, expression) {
+            onRegexFieldChange(key, expression) {
                 // system 表示系统内置条件，field 表示来源节点
-                const systemCondition = ['system_time']
-                expression.source = systemCondition.includes(key) ? 'system' : 'field'
+                const systemCondition = ['system_time'];
+                expression.source = systemCondition.includes(key) ? 'system' : 'field';
             },
             // 选择字段关系字段后填充接口所需内容
-            relateSelected (...value) {
-                value[2].type = value[1].type
-                value[2].source = value[1].source
+            relateSelected(...value) {
+                value[2].type = value[1].type;
+                value[2].source = value[1].source;
             },
             // 自动填充key值
-            putKey () {
+            putKey() {
                 if (typeof this.changeInfo.id !== 'number') {
-                    this.formInfo.key = ''
+                    this.formInfo.key = '';
                     const transfer = pinyin(this.formInfo.name, {
                         style: pinyin.STYLE_NORMAL,
                         heteronym: false,
-                    })
-                    transfer.forEach(item => {
-                        this.formInfo.key = `${this.formInfo.key}${item}`
-                    })
-                    this.formInfo.key = this.formInfo.key.toUpperCase()
-                    this.formInfo.key = this.formInfo.key.replace(/\ /g, '_')
+                    });
+                    transfer.forEach((item) => {
+                        this.formInfo.key = `${this.formInfo.key}${item}`;
+                    });
+                    this.formInfo.key = this.formInfo.key.toUpperCase();
+                    this.formInfo.key = this.formInfo.key.replace(/\ /g, '_');
                     if (this.formInfo.key.length >= 32) {
-                        this.formInfo.key = this.formInfo.key.substr(0, 32)
+                        this.formInfo.key = this.formInfo.key.substr(0, 32);
                     }
                 }
             },
-            changeApiInfo (val) {
-                this.apiDetail = val
+            changeApiInfo(val) {
+                this.apiDetail = val;
             },
             // rpc数据
-            getRpcData (val) {
-                this.prcTable = val
+            getRpcData(val) {
+                this.prcTable = val;
             },
             // 上传文件模板
-            handleFile (e) {
-                const fileInfo = e.target.files[0]
-                const maxSize = 100000
-                const fileSize = fileInfo.size / 1024
-                const fileName = fileInfo.name
+            handleFile(e) {
+                const fileInfo = e.target.files[0];
+                const maxSize = 100000;
+                const fileSize = fileInfo.size / 1024;
+                const fileName = fileInfo.name;
                 for (let i = 0; i < this.fileList.length; i++) {
                     if (fileName === this.fileList[i].name) {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["此文件已经上传"]'),
                             theme: 'error',
-                        })
-                        return
+                        });
+                        return;
                     }
                 }
 
                 if (fileSize <= maxSize) {
-                    const data = new FormData()
-                    data.append('field_file', fileInfo)
+                    const data = new FormData();
+                    data.append('field_file', fileInfo);
                     this.$store.dispatch('cdeploy/fileUpload', { data }).then((res) => {
                         for (const key in res.data.succeed_files) {
-                            this.fileList.push({ ...res.data.succeed_files[key], key })
+                            this.fileList.push({ ...res.data.succeed_files[key], key });
                         }
-                        this.fileVal = ''
+                        this.fileVal = '';
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["上传成功"]'),
                             theme: 'success',
-                        })
+                        });
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
-                        })
+                        .catch((res) => {
+                            errorHandler(res, this);
+                        });
                 } else {
-                    this.fileVal = ''
+                    this.fileVal = '';
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["该文件大小超过100MB！"]'),
                         theme: 'error',
-                    })
+                    });
                 }
             },
             // 删除文件
-            deleteFile (item, index) {
-                this.fileList.splice(index, 1)
+            deleteFile(item, index) {
+                this.fileList.splice(index, 1);
             },
             // 保存，取消
-            async addField () {
-                const params = await this.getDataContent()
+            async addField() {
+                const params = await this.getDataContent();
                 if (!params) {
-                    return
+                    return;
                 }
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 if (typeof this.changeInfo.id === 'number') {
-                    const { id } = this.changeInfo
-                    let url = this.changeInfo.source === 'TABLE' ? 'cdeploy/changeNewModuleField' : 'cdeploy/changeNewField'
+                    const { id } = this.changeInfo;
+                    let url = this.changeInfo.source === 'TABLE' ? 'cdeploy/changeNewModuleField' : 'cdeploy/changeNewField';
                     // 公共字段
                     if (this.addOrigin.isOther && this.addOrigin.addOriginInfo.updateUrl) {
-                        url = this.addOrigin.addOriginInfo.updateUrl
+                        url = this.addOrigin.addOriginInfo.updateUrl;
                         if (this.addOrigin.addOriginInfo.type === 'templateField') {
-                            params.task_schema_id = this.templateInfo.id
-                            params.stage = this.templateStage
+                            params.task_schema_id = this.templateInfo.id;
+                            params.stage = this.templateStage;
                             if (params.type === 'COMPLEX-MEMBERS' || params.type === 'SOPS_TEMPLATE') {
-                                delete params.type
+                                delete params.type;
                             }
                         }
                     }
                     // 项目下编辑字段
                     if (this.changeInfo.project_key) {
-                        params.project_key = this.changeInfo.project_key
+                        params.project_key = this.changeInfo.project_key;
                     }
                     this.$store.dispatch(url, { params, id }).then((res) => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["修改成功"]'),
                             theme: 'success',
-                        })
-                        this.$emit('closeShade')
+                        });
+                        this.$emit('closeShade');
 
                         // 公共字段 / 添加前置节点字段(重新拉取数据)
                         if (this.addOrigin.isOther && this.addOrigin.addOriginInfo.updateUrl && this.addOrigin.addOriginInfo.type !== 'templateField' && this.$parent.$parent.getList) {
-                            this.$parent.$parent.getList()
+                            this.$parent.$parent.getList();
                         } else if (this.$parent.$parent.getTableList) {
-                            this.$parent.$parent.getTableList()
+                            this.$parent.$parent.getTableList();
                         } else {
-                            this.$emit('getRelatedFields')
+                            this.$emit('getRelatedFields');
                         }
-                        this.$emit('onConfirm', Object.assign({}, this.changeInfo, params))
+                        this.$emit('onConfirm', Object.assign({}, this.changeInfo, params));
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.secondClick = false
-                        })
+                            this.secondClick = false;
+                        });
                 } else {
-                    params.state = this.state
+                    params.state = this.state;
                     if (Object.keys(this.sospInfo).length) {
-                        params.state = this.formInfo.prevId
+                        params.state = this.formInfo.prevId;
                     }
-                    let url = 'cdeploy/addNewField'
+                    let url = 'cdeploy/addNewField';
                     // 公共字段
                     if (this.addOrigin.isOther && this.addOrigin.addOriginInfo.addUrl) {
-                        url = this.addOrigin.addOriginInfo.addUrl
+                        url = this.addOrigin.addOriginInfo.addUrl;
                         if (this.addOrigin.addOriginInfo.type === 'templateField') {
-                            params.task_schema_id = this.templateInfo.id
-                            params.stage = this.templateStage
+                            params.task_schema_id = this.templateInfo.id;
+                            params.stage = this.templateStage;
                         }
                     }
                     // 项目下新增字段
                     if (this.changeInfo.project_key) {
-                        params.project_key = this.changeInfo.project_key
+                        params.project_key = this.changeInfo.project_key;
                     }
 
                     this.$store.dispatch(url, { params }).then((res) => {
-                        this.addNew = res.data
+                        this.addNew = res.data;
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["新增成功"]'),
                             theme: 'success',
-                        })
-                        this.$emit('closeShade')
+                        });
+                        this.$emit('closeShade');
 
                         // 公共字段 / 添加前置节点字段(重新拉取数据)
                         if (this.addOrigin.isOther && this.addOrigin.addOriginInfo.addUrl) {
                             if (this.addOrigin.addOriginInfo.type === 'templateField' && this.$parent.$parent.getTableList) {
-                                this.$parent.$parent.getTableList()
+                                this.$parent.$parent.getTableList();
                             } else if (this.$parent.$parent.getList) {
-                                this.$parent.$parent.getList()
+                                this.$parent.$parent.getList();
                             }
                         } else if (this.$parent.$parent.getTableList) {
-                            this.$parent.$parent.getTableList()
+                            this.$parent.$parent.getTableList();
                         } else {
-                            this.$emit('getRelatedFields')
+                            this.$emit('getRelatedFields');
                             if (this.$parent.$parent.showNew) {
-                                this.$parent.$parent.showNew(this.sospInfo, res)
+                                this.$parent.$parent.showNew(this.sospInfo, res);
                             }
                         }
-                        this.$emit('onConfirm', res.data)
+                        this.$emit('onConfirm', res.data);
                     })
-                        .catch(res => {
-                            errorHandler(res, this)
+                        .catch((res) => {
+                            errorHandler(res, this);
                         })
                         .finally(() => {
-                            this.secondClick = false
-                        })
+                            this.secondClick = false;
+                        });
                 }
             },
-            onCancelClick () {
-                this.$emit('closeShade')
-                this.$emit('onCancel')
+            onCancelClick() {
+                this.$emit('closeShade');
+                this.$emit('onCancel');
             },
             // 字段校验
-            checkInfo () {
-                this.$refs.fieldForm.validate().then(validator => {
+            checkInfo() {
+                this.$refs.fieldForm.validate().then((validator) => {
                     // 数据源校验
                     if (this.$refs.dataSource && this.$refs.dataSource.checkSouce()) {
-                        return
+                        return;
                     }
                     // 自定义数据校验
                     if (this.checkField()) {
-                        return
+                        return;
                     }
                     // 字段释疑
                     if (this.formInfo.is_tips && !this.formInfo.tips) {
                         this.$bkMessage({
                             theme: 'warning',
                             message: this.$t('m.treeinfo["字段释疑为必填项"]'),
-                        })
-                        return
+                        });
+                        return;
                     }
-                    this.addField()
-                }, validator => {
-                    console.error(validator)
-                })
+                    this.addField();
+                }, (validator) => {
+                    console.error(validator);
+                });
             },
-            async getDataContent () {
+            async getDataContent() {
                 // 区分模型字段，内置字段，基础字段
-                const params = {}
+                const params = {};
                 // 公用字段信息
-                params.layout = this.formInfo.layout
-                params.validate_type = this.formInfo.validate
-                params.regex = this.formInfo.regex
-                params.regex_config = this.formInfo.regex_config
+                params.layout = this.formInfo.layout;
+                params.validate_type = this.formInfo.validate;
+                params.regex = this.formInfo.regex;
+                params.regex_config = this.formInfo.regex_config;
                 // 字段默认值
-                params.default = ''
+                params.default = '';
                 if (this.showType.belongDefaultList.some(defaultType => defaultType === this.formInfo.type)) {
-                    const defaultList = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER']
-                    let formDefault = []
+                    const defaultList = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER'];
+                    let formDefault = [];
                     if (defaultList.some(defaultItem => defaultItem === this.formInfo.type) && this.formInfo.default_value) {
-                        formDefault = this.formInfo.default_value.filter(defaultItem => defaultItem !== '')
+                        formDefault = this.formInfo.default_value.filter(defaultItem => defaultItem !== '');
                     }
-                    params.default = defaultList.some(defaultItem => defaultItem === this.formInfo.type) ? formDefault.join(',') : this.formInfo.default_value
+                    params.default = defaultList.some(defaultItem => defaultItem === this.formInfo.type) ? formDefault.join(',') : this.formInfo.default_value;
                 }
                 // 隐藏字段值
                 if (this.$refs.hiddenConditions) {
                     if (this.$refs.hiddenConditions.checkList()) {
-                        this.hiddenConditionStatus = false
-                        return false
+                        this.hiddenConditionStatus = false;
+                        return false;
                     }
-                    const hiddenList = this.$refs.hiddenConditions.listInfo
+                    const hiddenList = this.$refs.hiddenConditions.listInfo;
                     params.show_conditions = {
                         type: this.$refs.hiddenConditions.conditionType,
                         expressions: [],
-                    }
-                    hiddenList.forEach(item => {
+                    };
+                    hiddenList.forEach((item) => {
                         params.show_conditions.expressions.push({
                             key: item.key,
                             condition: item.condition,
                             value: Array.isArray(item.value) ? item.value.join(',') : item.value,
                             type: item.type,
-                        })
-                    })
-                    params.show_type = 0
+                        });
+                    });
+                    params.show_type = 0;
                 } else {
-                    params.show_type = 1
-                    params.show_conditions = {}
+                    params.show_type = 1;
+                    params.show_conditions = {};
                 }
                 // 只有基础字段才需要的值
                 if (this.changeInfo.source !== 'TABLE') {
-                    params.workflow = this.workflow
-                    params.name = this.formInfo.name
-                    params.key = this.formInfo.key
-                    params.type = this.formInfo.type
-                    params.desc = this.formInfo.desc
-                    params.source_type = this.formInfo.source_type || 'CUSTOM'
-                    params.custom_regex = this.formInfo.customRegex
-                    params.is_tips = this.formInfo.is_tips
-                    params.tips = this.formInfo.tips
+                    params.workflow = this.workflow;
+                    params.name = this.formInfo.name;
+                    params.key = this.formInfo.key;
+                    params.type = this.formInfo.type;
+                    params.desc = this.formInfo.desc;
+                    params.source_type = this.formInfo.source_type || 'CUSTOM';
+                    params.custom_regex = this.formInfo.customRegex;
+                    params.is_tips = this.formInfo.is_tips;
+                    params.tips = this.formInfo.tips;
                     // 文件字段特殊处理
                     if (this.formInfo.type === 'FILE') {
-                        params.choice = {}
-                        this.fileList.forEach(file => {
-                            this.$set(params.choice, file.key, file)
-                        })
+                        params.choice = {};
+                        this.fileList.forEach((file) => {
+                            this.$set(params.choice, file.key, file);
+                        });
                     } else {
                         // 不同的数据源传递的数据不同
                         if (this.formInfo.source_type === 'CUSTOM') {
-                            params.choice = []
+                            params.choice = [];
                             // 常规数据需要传choice的字段类型（表格，单选下拉，多选下拉，复选框，单选框）
                             if (this.formInfo.type === 'SELECT' || this.formInfo.type === 'MULTISELECT' || this.formInfo.type === 'CHECKBOX' || this.formInfo.type === 'RADIO' || this.formInfo.type === 'INPUTSELECT') {
-                                this.fieldInfo.list.forEach(item => {
+                                this.fieldInfo.list.forEach((item) => {
                                     params.choice.push({
                                         key: item.key,
                                         name: item.name,
-                                    })
-                                })
+                                    });
+                                });
                             } else if (this.formInfo.type === 'TABLE') {
-                                this.fieldInfo.list.forEach(item => {
+                                this.fieldInfo.list.forEach((item) => {
                                     params.choice.push({
                                         key: item.key,
                                         name: item.name,
                                         required: item.required,
-                                    })
-                                })
+                                    });
+                                });
                             }
                         } else if (this.formInfo.source_type === 'API') {
                             if (this.formInfo.source_type === 'API') {
                                 // api参数校验
-                                const isre = await this.$refs.dataContent[0].apiFz()
+                                const isre = await this.$refs.dataContent[0].apiFz();
                                 if (!isre) {
-                                    return false
+                                    return false;
                                 }
                             }
-                            params.api_info = this.apiInfo.api_info
-                            params.kv_relation = this.apiInfo.kv_relation
+                            params.api_info = this.apiInfo.api_info;
+                            params.kv_relation = this.apiInfo.kv_relation;
                         } else if (this.formInfo.source_type === 'DATADICT') {
-                            params.choice = []
-                            params.source_uri = this.dictionaryData.check
+                            params.choice = [];
+                            params.source_uri = this.dictionaryData.check;
                         }
                     }
                     // 复杂表格数据
                     if (this.formInfo.type === 'CUSTOMTABLE') {
-                        this.customTableInfo.list.forEach(item => {
-                            let choiceList = []
+                        this.customTableInfo.list.forEach((item) => {
+                            let choiceList = [];
                             if (item.choice && (item.display === 'select' || item.display === 'multiselect')) {
-                                choiceList = item.choice.split('\n').filter(node => node.length > 0)
+                                choiceList = item.choice.split('\n').filter(node => node.length > 0);
                             }
-                            item.nameCheck = item.name.length === 0 || item.name.length > 120
-                            item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'))
-                        })
-                        const checkNameStatus = this.customTableInfo.list.some(item => item.nameCheck)
-                        const checkValueStatus = this.customTableInfo.list.some(item => item.check)
+                            item.nameCheck = item.name.length === 0 || item.name.length > 120;
+                            item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'));
+                        });
+                        const checkNameStatus = this.customTableInfo.list.some(item => item.nameCheck);
+                        const checkValueStatus = this.customTableInfo.list.some(item => item.check);
                         if (checkNameStatus || checkValueStatus) {
                             this.$bkMessage({
                                 theme: 'warning',
                                 message: this.$t('m.treeinfo["请填写正确格式的自定义数据"]'),
-                            })
-                            return false
+                            });
+                            return false;
                         }
-                        params.meta = {}
-                        params.meta.columns = []
-                        this.customTableInfo.list.forEach(item => {
-                            let choiceList = item.choice.split('\n').filter(node => node.length > 0)
-                            choiceList = Array.from(new Set(choiceList))
+                        params.meta = {};
+                        params.meta.columns = [];
+                        this.customTableInfo.list.forEach((item) => {
+                            let choiceList = item.choice.split('\n').filter(node => node.length > 0);
+                            choiceList = Array.from(new Set(choiceList));
                             params.meta.columns.push({
                                 name: item.name,
                                 display: item.display,
                                 choice: item.choice.length ? choiceList : [],
                                 required: item.required,
-                            })
-                        })
+                            });
+                        });
                     }
                     // RPC数据
                     if (this.formInfo.source_type === 'RPC') {
-                        params.source_uri = this.prcData.check
-                        params.meta = {}
-                        this.prcTable.forEach(prcInfo => {
-                            const prcValue = prcInfo.source_type === 'CUSTOM' ? prcInfo.value : (`\${params_${prcInfo.value_key}}`)
-                            params.meta[prcInfo.name] = prcValue
-                        })
+                        params.source_uri = this.prcData.check;
+                        params.meta = {};
+                        this.prcTable.forEach((prcInfo) => {
+                            const prcValue = prcInfo.source_type === 'CUSTOM' ? prcInfo.value : (`\${params_${prcInfo.value_key}}`);
+                            params.meta[prcInfo.name] = prcValue;
+                        });
                     }
                 }
-                return this.timeConversion(params)
+                return this.timeConversion(params);
             },
             // 将时间转换一下
-            timeConversion (params) {
+            timeConversion(params) {
                 // 默认值
                 if (params.default !== '') {
                     if (params.type === 'DATE' || params.type === 'DATETIME') {
-                        params.default = params.type === 'DATE' ? this.standardDayTime(params.default) : this.standardTime(params.default)
+                        params.default = params.type === 'DATE' ? this.standardDayTime(params.default) : this.standardTime(params.default);
                     }
                 }
                 // 隐藏条件
                 if (params.show_conditions && params.show_conditions.expressions && params.show_conditions.expressions.length) {
-                    params.show_conditions.expressions.forEach(item => {
+                    params.show_conditions.expressions.forEach((item) => {
                         if (item.type === 'DATE' || item.type === 'DATETIME') {
-                            item.value = item.type === 'DATE' ? this.standardDayTime(item.value) : this.standardTime(item.value)
+                            item.value = item.type === 'DATE' ? this.standardDayTime(item.value) : this.standardTime(item.value);
                         }
-                    })
+                    });
                 }
-                return params
+                return params;
             },
             // 字段校验
-            checkField () {
-                this.checkStatus.customStatus = false
-                this.checkStatus.customTableStatus = false
-                this.checkStatus.customFormStatus = false
+            checkField() {
+                this.checkStatus.customStatus = false;
+                this.checkStatus.customTableStatus = false;
+                this.checkStatus.customFormStatus = false;
                 // 自定义数据
-                const customTypeList = ['SELECT', 'MULTISELECT', 'CHECKBOX', 'RADIO', 'TABLE']
+                const customTypeList = ['SELECT', 'MULTISELECT', 'CHECKBOX', 'RADIO', 'TABLE'];
                 if (customTypeList.some(item => this.formInfo.type === item) && this.formInfo.source_type === 'CUSTOM') {
                     // 判断key，name的值
-                    this.fieldInfo.list.forEach(item => {
-                        item.nameCheck = item.name.length > 120 || item.name.length === 0
-                        item.keyCheck = !(/^[a-zA-Z0-9_]+$/.test(item.key))
-                    })
+                    this.fieldInfo.list.forEach((item) => {
+                        item.nameCheck = item.name.length > 120 || item.name.length === 0;
+                        item.keyCheck = !(/^[a-zA-Z0-9_]+$/.test(item.key));
+                    });
                     // 判断重复的key和name
                     this.fieldInfo.list.forEach((item, index) => {
                         this.fieldInfo.list.forEach((node, nodeIndex) => {
                             if (index !== nodeIndex) {
                                 if (node.key === item.key) {
-                                    item.keyCheck = true
+                                    item.keyCheck = true;
                                 }
                                 if (node.name === item.name) {
-                                    item.nameCheck = true
+                                    item.nameCheck = true;
                                 }
                             }
-                        })
-                    })
-                    this.checkStatus.customStatus = this.fieldInfo.list.some(item => (item.nameCheck || item.keyCheck))
+                        });
+                    });
+                    this.checkStatus.customStatus = this.fieldInfo.list.some(item => (item.nameCheck || item.keyCheck));
                 }
 
                 if (this.formInfo.type === 'CUSTOMTABLE') {
-                    const repeatName = []
-                    this.customTableInfo.list.forEach(item => {
-                        let choiceList = []
+                    const repeatName = [];
+                    this.customTableInfo.list.forEach((item) => {
+                        let choiceList = [];
                         if (item.choice && (item.display === 'select' || item.display === 'multiselect')) {
-                            choiceList = item.choice.split('\n').filter(node => node.length > 0)
+                            choiceList = item.choice.split('\n').filter(node => node.length > 0);
                         }
-                        item.nameCheck = item.name.length === 0 || item.name.length > 120
-                        item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'))
+                        item.nameCheck = item.name.length === 0 || item.name.length > 120;
+                        item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'));
                         if (!repeatName.includes(item.name)) {
-                            repeatName.push(item.name)
+                            repeatName.push(item.name);
                         } else {
-                            item.nameCheck = true
+                            item.nameCheck = true;
                         }
-                    })
-                    this.checkStatus.customTableStatus = this.customTableInfo.list.some(item => (item.nameCheck || item.check))
+                    });
+                    this.checkStatus.customTableStatus = this.customTableInfo.list.some(item => (item.nameCheck || item.check));
                 }
                 if (this.formInfo.type === 'CUSTOM-FORM') {
                     try {
-                        const customFormDefaultValue = JSON.parse(this.formInfo.default_value)
+                        const customFormDefaultValue = JSON.parse(this.formInfo.default_value);
                         if (customFormDefaultValue) {
                             // 至少含义 schemes 和 form_data 字段
-                            this.checkStatus.customFormStatus = !customFormDefaultValue.schemes || !customFormDefaultValue.form_data
+                            this.checkStatus.customFormStatus = !customFormDefaultValue.schemes || !customFormDefaultValue.form_data;
                         }
                     } catch (error) {
-                        this.checkStatus.customFormStatus = true
+                        this.checkStatus.customFormStatus = true;
                     }
                 }
-                return this.checkStatus.customStatus || this.checkStatus.customTableStatus || this.checkStatus.customFormStatus
+                return this.checkStatus.customStatus || this.checkStatus.customTableStatus || this.checkStatus.customFormStatus;
             },
             // 获取RPC数据
-            getRpcList () {
+            getRpcList() {
                 this.$store.dispatch('datadict/getPrcData').then((res) => {
-                    this.prcData.list = res.data
+                    this.prcData.list = res.data;
                     if (this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check).length) {
-                        this.prcTable = this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check)[0].req_params
+                        this.prcTable = this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check)[0].req_params;
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
             // 获取字典列表
-            getSysDictList () {
+            getSysDictList() {
                 this.$store.dispatch('datadict/list', {}).then((res) => {
-                    this.dictionaryData.list = res.data.filter(item => item.is_enabled)
+                    this.dictionaryData.list = res.data.filter(item => item.is_enabled);
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
             // 获取前置节点
-            getPreStates () {
+            getPreStates() {
                 if (!this.state) {
-                    return
+                    return;
                 }
                 this.$store.dispatch('deployCommon/getPreStates', { id: this.state }).then((res) => {
-                    this.prevNodeList = res.data
+                    this.prevNodeList = res.data;
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
-                    })
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

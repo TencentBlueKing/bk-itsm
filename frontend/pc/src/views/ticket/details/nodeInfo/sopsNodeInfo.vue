@@ -88,7 +88,7 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue'
+    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
 
     export default {
         name: 'sopsNodeInfo',
@@ -98,35 +98,35 @@
         props: {
             nodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 status: '',
                 errorLength: '',
-            }
+            };
         },
-        mounted () {
-            this.status = this.nodeInfo.api_info.sops_result
-            this.errorLength = this.nodeInfo.api_info.error_message ? this.nodeInfo.api_info.error_message.length : 0
+        mounted() {
+            this.status = this.nodeInfo.api_info.sops_result;
+            this.errorLength = this.nodeInfo.api_info.error_message ? this.nodeInfo.api_info.error_message.length : 0;
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>
     @import '../../../../scss/mixins/clearfix.scss';
     @import '../../../../scss/mixins/scroller.scss';
-    
+
     .bk-sops-node-content {
         font-size: 14px;
         color: #63656E;

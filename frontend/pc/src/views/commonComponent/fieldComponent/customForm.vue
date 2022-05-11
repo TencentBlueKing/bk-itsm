@@ -37,8 +37,8 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
-    import RenderView from '../../../components/renderview/RenderView'
+    import mixins from '../../commonMix/field.js';
+    import RenderView from '../../../components/renderview/RenderView';
 
     export default {
         name: 'CUSTOM-FORM',
@@ -54,52 +54,52 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 formData: [],
                 context: {},
                 errMessage: '',
-            }
+            };
         },
         watch: {
             'item.val': {
-                handler () {
-                    this.conditionField(this.item, this.fields)
-                    this.initRenderView()
+                handler() {
+                    this.conditionField(this.item, this.fields);
+                    this.initRenderView();
                 },
                 immediate: true,
-                
+
             },
         },
-        mounted () {
+        mounted() {
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
         methods: {
-            initRenderView () {
-                this.errMessage = ''
+            initRenderView() {
+                this.errMessage = '';
                 try {
-                    const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val
-                    const { form_data: formData, schemes, config } = data
+                    const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val;
+                    const { form_data: formData, schemes, config } = data;
                     // 渲染表单
-                    this.formData = formData
+                    this.formData = formData;
                     this.context = {
                         schemes,
                         config,
-                    }
+                    };
                 } catch (err) {
-                    this.errMessage = err
-                    this.formData = []
+                    this.errMessage = err;
+                    this.formData = [];
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -18,9 +18,9 @@
 </template>
 
 <script>
-    import CodeEditor from '../../components/CodeEditor'
-    import RenderView from '../../components/renderview/RenderView'
-    import { CUSTOM_FORM_TEMPLATE } from '../../constants/customFormTemplate'
+    import CodeEditor from '../../components/CodeEditor';
+    import RenderView from '../../components/renderview/RenderView';
+    import { CUSTOM_FORM_TEMPLATE } from '../../constants/customFormTemplate';
 
     export default {
         name: 'RenderViewTest',
@@ -28,7 +28,7 @@
             RenderView,
             CodeEditor,
         },
-        data () {
+        data() {
             return {
                 errMessage: null,
                 jsonConfigStr: JSON.stringify(CUSTOM_FORM_TEMPLATE, null, 4),
@@ -37,12 +37,12 @@
                 editorConfig: {
                     language: 'json',
                 },
-            }
+            };
         },
         watch: {
             jsonConfigStr: {
-                handler () {
-                    this.initRenderView()
+                handler() {
+                    this.initRenderView();
                 },
                 immediate: true,
             },
@@ -51,23 +51,23 @@
             /**
              * 初始化
              */
-            initRenderView () {
-                this.errMessage = ''
+            initRenderView() {
+                this.errMessage = '';
                 try {
-                    const { form_data: formData, schemes, config } = JSON.parse(this.jsonConfigStr)
+                    const { form_data: formData, schemes, config } = JSON.parse(this.jsonConfigStr);
                     // 渲染表单
-                    this.formData = formData
+                    this.formData = formData;
                     this.context = {
                         schemes,
                         config,
-                    }
+                    };
                 } catch (err) {
-                    this.errMessage = err
-                    this.formData = []
+                    this.errMessage = err;
+                    this.formData = [];
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

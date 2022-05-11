@@ -101,8 +101,8 @@
         props: {
             changeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             apiDetail: {
@@ -112,44 +112,44 @@
             },
             stateList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 是否仅展示 数据
             isStatic: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             isCustom: {
                 type: Boolean,
-                default () {
-                    return false
+                default() {
+                    return false;
                 },
             },
             // 静态展示 -- 参数值
             queryValue: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             entry: {
                 type: String,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
             formInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 paramTableData: [],
                 // 校验
@@ -173,58 +173,58 @@
                     value: '',
                     placeholder: this.$t('m.treeinfo["请选择数据来源"]'),
                 },
-            }
+            };
         },
         computed: {},
         watch: {
-            apiDetail (newVal, oldVal) {
-                this.initData()
+            apiDetail(newVal, oldVal) {
+                this.initData();
             },
         },
-        async mounted () {
-            await this.changeInfo
-            await this.isStatic
-            await this.queryValue
-            await this.initData()
+        async mounted() {
+            await this.changeInfo;
+            await this.isStatic;
+            await this.queryValue;
+            await this.initData();
         },
         methods: {
-            async initData () {
-                const paramTableData = await JSON.parse(JSON.stringify(this.apiDetail.req_params)) || []
-                await paramTableData.forEach(item => {
-                    item.isCheck = false
-                    item.isSatisfied = false
+            async initData() {
+                const paramTableData = await JSON.parse(JSON.stringify(this.apiDetail.req_params)) || [];
+                await paramTableData.forEach((item) => {
+                    item.isCheck = false;
+                    item.isSatisfied = false;
                     // 定位
-                    item.el = null
-                    item.customValue = item.value || ''
-                    item.source_type = 'CUSTOM'
-                    item.value_key = ''
+                    item.el = null;
+                    item.customValue = item.value || '';
+                    item.source_type = 'CUSTOM';
+                    item.value_key = '';
                     // 赋值
                     if (!this.isStatic) {
                         // 配置信息（api字段/自动节点配置信息） 赋值
                         if (this.changeInfo.api_info && Object.keys(this.changeInfo.api_info.req_params).length
                             && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
                             if (/^\$\{params_.*\}$/.test(this.changeInfo.api_info.req_params[item.name])) {
-                                item.source_type = 'FIELDS'
+                                item.source_type = 'FIELDS';
                                 item.value_key = this.changeInfo.api_info.req_params[item.name] ? JSON.parse(JSON.stringify(this.changeInfo.api_info.req_params[item.name])).replace(/^\$\{params_/, '')
-                                    .replace(/\}$/, '') : ''
+                                    .replace(/\}$/, '') : '';
                             } else {
-                                const reqParamsName = this.changeInfo.api_info.req_params[item.name]
-                                item.source_type = 'CUSTOM'
-                                item.value = reqParamsName
+                                const reqParamsName = this.changeInfo.api_info.req_params[item.name];
+                                item.source_type = 'CUSTOM';
+                                item.value = reqParamsName;
                             }
                         }
                     } else {
                         // 静态展示（自动节点执行信息） 赋值
-                        item.value = this.queryValue[item.name] || ''
+                        item.value = this.queryValue[item.name] || '';
                     }
-                })
-                this.paramTableData = await JSON.parse(JSON.stringify(paramTableData))
+                });
+                this.paramTableData = await JSON.parse(JSON.stringify(paramTableData));
             },
-            addNewItem (data) {
-                this.$emit('addNewItem', data)
+            addNewItem(data) {
+                this.$emit('addNewItem', data);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -126,10 +126,10 @@
     </div>
 </template>
 <script>
-    import i18n from '@/i18n/index.js'
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import permission from '@/mixins/permission.js'
-    import EditProjectDialog from './editProjectDialog.vue'
+    import i18n from '@/i18n/index.js';
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import permission from '@/mixins/permission.js';
+    import EditProjectDialog from './editProjectDialog.vue';
 
     export default {
         name: 'ProjectList',
@@ -137,7 +137,7 @@
             EditProjectDialog,
         },
         mixins: [permission],
-        data () {
+        data() {
             return {
                 keyword: '',
                 list: [],
@@ -159,93 +159,93 @@
                     count: 0,
                     limit: 10,
                 },
-            }
+            };
         },
         computed: {
-            editDialogTitle () {
-                return this.editingProject ? i18n.t('m["编辑项目"]') : i18n.t('m["新建项目"]')
+            editDialogTitle() {
+                return this.editingProject ? i18n.t('m["编辑项目"]') : i18n.t('m["新建项目"]');
             },
         },
-        created () {
-            this.getProjectList()
+        created() {
+            this.getProjectList();
         },
-        beforeRouteEnter (to, from, next) {
+        beforeRouteEnter(to, from, next) {
             if (from.name) {
-                window.previousRouter = from.fullPath
+                window.previousRouter = from.fullPath;
             }
-            next()
+            next();
         },
-        beforeRouteLeave (to, from, next) {
-            window.previousRouter = null
-            next()
+        beforeRouteLeave(to, from, next) {
+            window.previousRouter = null;
+            next();
         },
         methods: {
-            async getProjectList () {
-                this.listLoading = true
+            async getProjectList() {
+                this.listLoading = true;
                 try {
-                    const { current, limit } = this.pagination
+                    const { current, limit } = this.pagination;
                     const params = {
                         page_size: limit,
                         page: current,
                         ordering: this.ordering,
-                    }
+                    };
                     if (this.keyword !== '') {
-                        params.name__icontains = this.keyword
+                        params.name__icontains = this.keyword;
                     }
-                    const res = await this.$store.dispatch('project/getProjectList', params)
-                    this.pagination.count = res.data.count
-                    this.list = res.data.items
+                    const res = await this.$store.dispatch('project/getProjectList', params);
+                    this.pagination.count = res.data.count;
+                    this.list = res.data.items;
                 } catch (e) {
-                    errorHandler(e, this)
+                    errorHandler(e, this);
                 } finally {
-                    this.listLoading = false
+                    this.listLoading = false;
                 }
             },
-            getNameColor (index) {
-                return ['#90a1ff', '#bb90ff', '#ffd990'][index]
+            getNameColor(index) {
+                return ['#90a1ff', '#bb90ff', '#ffd990'][index];
             },
-            onSearchProject () {
-                this.pagination.current = 1
-                this.getProjectList()
+            onSearchProject() {
+                this.pagination.current = 1;
+                this.getProjectList();
             },
-            onCreateProject () {
+            onCreateProject() {
                 if (!this.hasPermission(['project_create'])) {
-                    this.applyForPermission(['project_create'], [], {})
-                    return
+                    this.applyForPermission(['project_create'], [], {});
+                    return;
                 }
-                this.isEditDialogShow = true
+                this.isEditDialogShow = true;
                 this.projectForm = {
                     name: '',
                     key: '',
                     desc: '',
                     color: this.getNameColor(this.pagination.count % 3),
-                }
-                this.editingProject = null
+                };
+                this.editingProject = null;
             },
-            onEditProject (props) {
-                this.editingProject = props.row
+            onEditProject(props) {
+                this.editingProject = props.row;
                 if (!this.hasPermission(['project_edit'], this.editingProject.auth_actions)) {
                     const resourceData = {
                         project: [{
                             id: this.editingProject.key,
                             name: this.editingProject.name,
                         }],
-                    }
-                    this.applyForPermission(['project_edit'], this.editingProject.auth_actions, resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['project_edit'], this.editingProject.auth_actions, resourceData);
+                    return false;
                 }
-                this.projectForm = Object.assign({}, props.row)
+                this.projectForm = Object.assign({}, props.row);
                 if (!this.projectForm.color) {
-                    this.projectForm.color = this.getNameColor(props.$index % 3)
+                    this.projectForm.color = this.getNameColor(props.$index % 3);
                 }
-                this.isEditDialogShow = true
+                this.isEditDialogShow = true;
             },
-            onProjectDialogConfirm () {
-                this.isEditDialogShow = false
-                this.getProjectList()
+            onProjectDialogConfirm() {
+                this.isEditDialogShow = false;
+                this.getProjectList();
             },
-            onProjectDialogCancel () {
-                this.isEditDialogShow = false
+            onProjectDialogCancel() {
+                this.isEditDialogShow = false;
             },
             // onEditProjectConfirm () {
             //     this.$refs.projectForm.validate().then(async (result) => {
@@ -265,64 +265,64 @@
             //         }
             //     })
             // },
-            onDeleteProject (project) {
+            onDeleteProject(project) {
                 if (!this.hasPermission(['project_edit'], project.auth_actions)) {
                     const resourceData = {
                         project: [{
                             id: project.key,
                             name: project.name,
                         }],
-                    }
-                    this.applyForPermission(['project_edit'], project.auth_actions, resourceData)
-                    return false
+                    };
+                    this.applyForPermission(['project_edit'], project.auth_actions, resourceData);
+                    return false;
                 }
-                this.editingProject = project
-                this.isDeleteDialogShow = true
+                this.editingProject = project;
+                this.isDeleteDialogShow = true;
             },
-            async onDeleteProjectConfirm () {
-                this.deleteProjectPending = true
+            async onDeleteProjectConfirm() {
+                this.deleteProjectPending = true;
                 try {
-                    await this.$store.dispatch('project/deleteProject', this.editingProject.key)
-                    this.editingProject = null
-                    this.isDeleteDialogShow = false
+                    await this.$store.dispatch('project/deleteProject', this.editingProject.key);
+                    this.editingProject = null;
+                    this.isDeleteDialogShow = false;
                     if (this.list.length === 1) {
-                        this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                        this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1;
                     }
-                    this.getProjectList()
+                    this.getProjectList();
                 } catch (e) {
-                    errorHandler(e, this)
+                    errorHandler(e, this);
                 } finally {
-                    this.deleteProjectPending = false
+                    this.deleteProjectPending = false;
                 }
             },
-            handleSortChange (data) {
+            handleSortChange(data) {
                 if (data.order === 'ascending') {
-                    this.ordering = data.prop
+                    this.ordering = data.prop;
                 } else if (data.order === 'descending') {
-                    this.ordering = data.prop
+                    this.ordering = data.prop;
                 } else {
-                    this.ordering = undefined
+                    this.ordering = undefined;
                 }
-                this.getProjectList()
+                this.getProjectList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getProjectList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getProjectList();
             },
-            handlePageLimitChange (limit) {
-                this.pagination.limit = limit
-                this.pagination.current = 1
-                this.getProjectList()
+            handlePageLimitChange(limit) {
+                this.pagination.limit = limit;
+                this.pagination.current = 1;
+                this.getProjectList();
             },
-            handleGoBack () {
+            handleGoBack() {
                 if (window.previousRouter) {
-                    this.$router.push(window.previousRouter)
+                    this.$router.push(window.previousRouter);
                 } else {
-                    this.$router.push({ name: 'Home' })
+                    this.$router.push({ name: 'Home' });
                 }
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .project-list-page {

@@ -99,14 +99,14 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
-    import LogTab from './LogTab.vue'
-    import AssociatedTab from './AssociatedTab/AssociatedTab.vue'
-    import InheritTicket from './InheritTicketTab.vue'
-    import EmailNoticeTab from './EmailNoticeTab.vue'
-    import CommentTab from './CommentTab.vue'
-    import AllTaskTab from './AllTaskTab.vue'
-    import taskHistory from '../taskInfo/taskHistory.vue'
+    import { mapState } from 'vuex';
+    import LogTab from './LogTab.vue';
+    import AssociatedTab from './AssociatedTab/AssociatedTab.vue';
+    import InheritTicket from './InheritTicketTab.vue';
+    import EmailNoticeTab from './EmailNoticeTab.vue';
+    import CommentTab from './CommentTab.vue';
+    import AllTaskTab from './AllTaskTab.vue';
+    import taskHistory from '../taskInfo/taskHistory.vue';
 
     export default {
         name: 'RightTiketTabs',
@@ -130,7 +130,7 @@
             },
             hasNodeOptAuth: Boolean,
         },
-        data () {
+        data() {
             return {
                 activeTab: 'log',
                 isUseSla: true,
@@ -138,7 +138,7 @@
                 isResponseTimeout: true,
                 isDisposeTimeout: false,
                 isNormal: false, // sla正常时间内
-            }
+            };
         },
         computed: {
             ...mapState({
@@ -146,23 +146,23 @@
             }),
         },
         methods: {
-            handleClickShowSla () {
-                this.isShowSla = !this.isShowSla
+            handleClickShowSla() {
+                this.isShowSla = !this.isShowSla;
             },
             // 跳转对应项目下sla
-            viewSlaRule () {
+            viewSlaRule() {
                 this.$router.push({
                     name: 'slaAgreement',
                     query: {
                         project_id: this.$route.query.project_id || 0,
                     },
-                })
+                });
             },
-            viewProcess (val) {
-                this.$emit('viewProcess', val)
+            viewProcess(val) {
+                this.$emit('viewProcess', val);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -76,8 +76,8 @@
     </div>
 </template>
 <script>
-    import fieldInfo from '../../../managePage/billCom/fieldInfo'
-    import { mapState } from 'vuex'
+    import fieldInfo from '../../../managePage/billCom/fieldInfo';
+    import { mapState } from 'vuex';
 
     export default {
         name: 'modifyFields',
@@ -87,12 +87,12 @@
         props: {
             fieldSchema: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 fieldKeyItem: '',
                 fieldValueItem: '',
@@ -111,55 +111,55 @@
                     },
                 ],
                 variableList: [],
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
             ...mapState('trigger', {
                 triggerVariables: state => state.triggerVariables,
             }),
         },
         watch: {
-            triggerVariables (newVal) {
-                this.variableList = newVal
+            triggerVariables(newVal) {
+                this.variableList = newVal;
             },
         },
-        mounted () {
-            this.variableList = this.triggerVariables
-            this.initData()
+        mounted() {
+            this.variableList = this.triggerVariables;
+            this.initData();
         },
         methods: {
-            initData () {
-                this.fieldSchema.forEach(item => {
-                    this.$set(item, 'referenceType', (item.ref_type || 'custom'))
-                })
-                this.fieldKeyItem = this.fieldSchema[0]
-                this.fieldValueItem = this.fieldSchema[1]
-                this.$set(this.fieldValueItem, 'itemInfo', [])
+            initData() {
+                this.fieldSchema.forEach((item) => {
+                    this.$set(item, 'referenceType', (item.ref_type || 'custom'));
+                });
+                this.fieldKeyItem = this.fieldSchema[0];
+                this.fieldValueItem = this.fieldSchema[1];
+                this.$set(this.fieldValueItem, 'itemInfo', []);
                 if (this.fieldKeyItem.value) {
-                    const tempItemInfo = this.fieldKeyItem.choice.filter(item => item.key === this.fieldKeyItem.value)
-                    tempItemInfo[0].value = tempItemInfo[0].val = this.fieldValueItem.value
-                    this.fieldValueItem.itemInfo = tempItemInfo
-                    this.show = true
+                    const tempItemInfo = this.fieldKeyItem.choice.filter(item => item.key === this.fieldKeyItem.value);
+                    tempItemInfo[0].value = tempItemInfo[0].val = this.fieldValueItem.value;
+                    this.fieldValueItem.itemInfo = tempItemInfo;
+                    this.show = true;
                 }
             },
-            selectedFieldKey (key) {
-                this.fieldValueItem.itemInfo.splice(0, this.fieldValueItem.itemInfo.length)
-                this.show = false
+            selectedFieldKey(key) {
+                this.fieldValueItem.itemInfo.splice(0, this.fieldValueItem.itemInfo.length);
+                this.show = false;
                 this.$nextTick(() => {
-                    const temp = this.fieldKeyItem.choice.find(item => item.key === key)
-                    temp.showFeild = true
-                    this.fieldValueItem.itemInfo.push(temp)
-                    this.show = true
-                })
+                    const temp = this.fieldKeyItem.choice.find(item => item.key === key);
+                    temp.showFeild = true;
+                    this.fieldValueItem.itemInfo.push(temp);
+                    this.show = true;
+                });
             },
-            selectedReference () {
-                this.fieldValueItem.itemInfo[0].value = ''
+            selectedReference() {
+                this.fieldValueItem.itemInfo[0].value = '';
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

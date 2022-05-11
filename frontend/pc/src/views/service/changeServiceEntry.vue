@@ -139,12 +139,12 @@
 </template>
 
 <script>
-    import commonMix from '../commonMix/common.js'
-    import memberSelect from '../commonComponent/memberSelect'
-    import SelectTree from '../../components/form/selectTree'
-    import DealPerson from '../processManagement/processDesign/nodeConfigue/components/dealPerson'
-    import { errorHandler } from '../../utils/errorHandler.js'
-    import { isEmpty } from '../../utils/util.js'
+    import commonMix from '../commonMix/common.js';
+    import memberSelect from '../commonComponent/memberSelect';
+    import SelectTree from '../../components/form/selectTree';
+    import DealPerson from '../processManagement/processDesign/nodeConfigue/components/dealPerson';
+    import { errorHandler } from '../../utils/errorHandler.js';
+    import { isEmpty } from '../../utils/util.js';
 
     export default {
         name: 'changeServiceEntry',
@@ -158,33 +158,33 @@
             // 弹窗内容
             addDirectory: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 关联流程
             flowList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 服务级别
             slaList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             // 服务类型
             codeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 clickSecond: false,
                 // 服务目录列表
@@ -219,37 +219,37 @@
                 },
                 // 校验规则
                 rules: {},
-            }
+            };
         },
         computed: {
-            openFunction () {
-                return this.$store.state.openFunction
+            openFunction() {
+                return this.$store.state.openFunction;
             },
         },
-        created () {
-            this.initData()
+        created() {
+            this.initData();
         },
-        mounted () {
+        mounted() {
             // 关联服务
-            this.getTreeInfo()
+            this.getTreeInfo();
             // 校验规则
-            this.rules.name = this.checkCommonRules('name').name
-            this.rules.workflow = this.checkCommonRules('select').select
-            this.rules.key = this.checkCommonRules('select').select
-            this.rules.admin = this.checkCommonRules('select').select
+            this.rules.name = this.checkCommonRules('name').name;
+            this.rules.workflow = this.checkCommonRules('select').select;
+            this.rules.key = this.checkCommonRules('select').select;
+            this.rules.admin = this.checkCommonRules('select').select;
         },
         methods: {
             // 切换可见范围人员类型
-            changeProcessor (type) {
+            changeProcessor(type) {
                 if (type === 'GENERAL') {
-                    this.getGeneral()
+                    this.getGeneral();
                 } else if (type === 'ORGANIZATION') {
-                    this.getOrganization()
+                    this.getOrganization();
                 }
-                this.directory.formInfo.display_role = []
+                this.directory.formInfo.display_role = [];
             },
             // 初始化数据
-            initData () {
+            initData() {
                 const {
                     name,
                     workflow,
@@ -262,7 +262,7 @@
                     display_role: displayRole,
                     owners,
                     catalog_id: catalogId,
-                } = this.addDirectory.formInfo
+                } = this.addDirectory.formInfo;
                 this.directory.formInfo = {
                     // 服务名称
                     name: name || '',
@@ -286,116 +286,116 @@
                     owners: owners || '',
                     // 服务目录
                     catalog_id: isEmpty(catalogId) ? 0 : catalogId,
-                }
+                };
                 this.dealPersonValue = {
                     type: displayType || 'OPEN',
                     value: displayRole || '',
-                }
+                };
             },
             // 校验数据
-            checkForm () {
-                this.checkInfo.name = this.directory.formInfo.name.length === 0 || this.directory.formInfo.name.length > 120
-                this.checkInfo.workflow = !this.directory.formInfo.workflow
-                this.checkInfo.key = !this.directory.formInfo.key
-                this.checkInfo.admin = this.directory.formInfo.admin.length === 0
+            checkForm() {
+                this.checkInfo.name = this.directory.formInfo.name.length === 0 || this.directory.formInfo.name.length > 120;
+                this.checkInfo.workflow = !this.directory.formInfo.workflow;
+                this.checkInfo.key = !this.directory.formInfo.key;
+                this.checkInfo.admin = this.directory.formInfo.admin.length === 0;
                 if (this.$refs.displayRange && !this.$refs.displayRange.verifyValue()) {
-                    this.checkInfo.displayRange = true
+                    this.checkInfo.displayRange = true;
                 }
                 // 是否全部为 false
-                const checkList = Object.keys(this.checkInfo).map(key => this.checkInfo[key])
-                return checkList.every(bool => bool === false)
+                const checkList = Object.keys(this.checkInfo).map(key => this.checkInfo[key]);
+                return checkList.every(bool => bool === false);
             },
             // 保存
-            submitAdd () {
+            submitAdd() {
                 // 校验
-                this.$refs.dynamicForm.validate().then(validator => {
-                    
-                }, validator => {
+                this.$refs.dynamicForm.validate().then((validator) => {
 
-                })
+                }, (validator) => {
+
+                });
                 if (!this.checkForm()) {
-                    return
+                    return;
                 }
 
-                this.directory.formInfo.owners = this.directory.formInfo.admin.join(',')
+                this.directory.formInfo.owners = this.directory.formInfo.admin.join(',');
                 if (this.$refs.displayRange) {
-                    const data = this.$refs.displayRange.getValue()
-                    this.directory.formInfo.display_type = data.type
-                    this.directory.formInfo.display_role = data.value
+                    const data = this.$refs.displayRange.getValue();
+                    this.directory.formInfo.display_type = data.type;
+                    this.directory.formInfo.display_role = data.value;
                 }
                 if (['OPEN'].includes(this.directory.formInfo.display_type)) {
-                    delete this.directory.formInfo.display_role
+                    delete this.directory.formInfo.display_role;
                 }
                 if (this.addDirectory.type === 'new') {
-                    this.addNewEntry()
+                    this.addNewEntry();
                 } else {
-                    this.changeEntry()
+                    this.changeEntry();
                 }
             },
             // 关闭
-            closeAdd () {
-                this.$parent.$parent.toggleDialog()
+            closeAdd() {
+                this.$parent.$parent.toggleDialog();
             },
             // 添加服务
-            addNewEntry () {
+            addNewEntry() {
                 // 关联服务
-                const formInfo = JSON.parse(JSON.stringify(this.directory.formInfo))
-                delete formInfo.admin
+                const formInfo = JSON.parse(JSON.stringify(this.directory.formInfo));
+                delete formInfo.admin;
                 if (this.clickSecond) {
-                    return
+                    return;
                 }
-                this.clickSecond = true
-                this.$store.dispatch('serviceEntry/createService', formInfo).then(res => {
+                this.clickSecond = true;
+                this.$store.dispatch('serviceEntry/createService', formInfo).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["添加成功"]'),
                         theme: 'success',
-                    })
-                    this.$parent.$parent.toggleDialog()
-                    this.$parent.$parent.getList(1)
+                    });
+                    this.$parent.$parent.toggleDialog();
+                    this.$parent.$parent.getList(1);
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.clickSecond = false
-                    })
+                        this.clickSecond = false;
+                    });
             },
             // 修改服务
-            changeEntry () {
-                this.directory.formInfo.id = this.addDirectory.id
+            changeEntry() {
+                this.directory.formInfo.id = this.addDirectory.id;
                 if (this.clickSecond) {
-                    return
+                    return;
                 }
-                this.clickSecond = true
-                const params = JSON.parse(JSON.stringify(this.directory.formInfo))
-                this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+                this.clickSecond = true;
+                const params = JSON.parse(JSON.stringify(this.directory.formInfo));
+                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["修改成功"]'),
                         theme: 'success',
-                    })
-                    this.$parent.$parent.toggleDialog()
-                    this.$parent.$parent.getList()
+                    });
+                    this.$parent.$parent.toggleDialog();
+                    this.$parent.$parent.getList();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.clickSecond = false
-                    })
+                        this.clickSecond = false;
+                    });
             },
             // 关联目录树组件
-            async getTreeInfo () {
+            async getTreeInfo() {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true, project_key: this.$store.state.project.id,
-                }).then(res => {
-                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
+                }).then((res) => {
+                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
 .display-range {

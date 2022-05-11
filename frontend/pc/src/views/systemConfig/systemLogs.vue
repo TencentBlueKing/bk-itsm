@@ -130,10 +130,10 @@
     </div>
 </template>
 <script>
-    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue'
-    import logsInfo from './component/logsInfo.vue'
-    import commonMix from '../commonMix/common.js'
-    import { errorHandler } from '../../utils/errorHandler'
+    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
+    import logsInfo from './component/logsInfo.vue';
+    import commonMix from '../commonMix/common.js';
+    import { errorHandler } from '../../utils/errorHandler';
 
     export default {
         name: 'SystemLogs',
@@ -142,7 +142,7 @@
             logsInfo,
         },
         mixins: [commonMix],
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 secondClick: false,
@@ -218,104 +218,104 @@
                     width: 700,
                     logsObject: {},
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 // 重新获取数据时清空选中的数据
-                this.checkList = []
+                this.checkList = [];
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                }
-                this.moreSearch.forEach(item => {
+                };
+                this.moreSearch.forEach((item) => {
                     if (item.type === 'datetime' && item.value && item.value[0]) {
-                        const d = new Date(item.value[0])
-                        const gteTime = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-                        const lte = new Date(item.value[1])
-                        const lteTime = `${lte.getFullYear()}-${lte.getMonth() + 1}-${lte.getDate()} ${lte.getHours()}:${lte.getMinutes()}:${lte.getSeconds()}`
-                        params.date_created__gte = gteTime
-                        params.date_created__lte = lteTime
+                        const d = new Date(item.value[0]);
+                        const gteTime = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+                        const lte = new Date(item.value[1]);
+                        const lteTime = `${lte.getFullYear()}-${lte.getMonth() + 1}-${lte.getDate()} ${lte.getHours()}:${lte.getMinutes()}:${lte.getSeconds()}`;
+                        params.date_created__gte = gteTime;
+                        params.date_created__lte = lteTime;
                     } else {
                         if (item.value && item.typeKey) {
-                            params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                            params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                         }
                     }
-                })
+                });
                 // 请求方法
-                this.isDataLoading = true
-                this.$store.dispatch('systemLog/list', params).then(res => {
-                    this.dataList = res.data.items
+                this.isDataLoading = true;
+                this.$store.dispatch('systemLog/list', params).then((res) => {
+                    this.dataList = res.data.items;
                     // 分页
-                    this.pagination.current = res.data.page
-                    this.pagination.count = res.data.count
+                    this.pagination.current = res.data.page;
+                    this.pagination.count = res.data.count;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.checkList = selection
+            handleSelectAll(selection) {
+                this.checkList = selection;
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection) {
+                this.checkList = selection;
             },
             // 查看日志
-            seeLogs (item) {
-                this.customSettings.logsObject = item
-                this.customSettings.isShow = true
+            seeLogs(item) {
+                this.customSettings.logsObject = item;
+                this.customSettings.isShow = true;
             },
             // 导出日志
-            exportLog (item) {
-                window.open(`${window.SITE_URL}api/tracker/records/${item.id}/exports/`)
+            exportLog(item) {
+                window.open(`${window.SITE_URL}api/tracker/records/${item.id}/exports/`);
             },
             // 批量导出日志
-            exportLogs () {
-                const idArr = this.checkList.map(item => item.id)
-                const logs = idArr.join(',')
-                window.open(`${window.SITE_URL}api/tracker/records/batch_exports/?logs=${logs}`)
+            exportLogs() {
+                const idArr = this.checkList.map(item => item.id);
+                const logs = idArr.join(',');
+                window.open(`${window.SITE_URL}api/tracker/records/batch_exports/?logs=${logs}`);
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
-            searchMore () {
-                this.$refs.searchInfo.searchMore()
+            searchMore() {
+                this.$refs.searchInfo.searchMore();
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = '';
+                });
+                this.getList(1);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

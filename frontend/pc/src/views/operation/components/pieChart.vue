@@ -26,7 +26,7 @@
     </div>
 </template>
 <script>
-    import Chart from '@blueking/bkcharts'
+    import Chart from '@blueking/bkcharts';
 
     export default {
         name: 'PieChart',
@@ -37,11 +37,11 @@
             },
             chartData: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         labels: [],
                         value: [],
-                    }
+                    };
                 },
             },
             loading: {
@@ -49,25 +49,25 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 chartInstance: null,
-            }
+            };
         },
         watch: {
-            loading (val) {
+            loading(val) {
                 if (!val) {
-                    this.updateChart()
+                    this.updateChart();
                 }
             },
         },
-        mounted () {
-            this.init()
+        mounted() {
+            this.init();
         },
         methods: {
-            init () {
-                const ctx = this.$refs.pieChartWrap.querySelector('.pie-chart').getContext('2d')
-                const { labels, value } = this.chartData
+            init() {
+                const ctx = this.$refs.pieChartWrap.querySelector('.pie-chart').getContext('2d');
+                const { labels, value } = this.chartData;
                 this.chartInstance = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
@@ -97,24 +97,24 @@
                             },
                             tooltip: {
                                 callbacks: {
-                                    label (context) {
-                                        const total = context.dataset.data.reduce((a, c) => a + c)
-                                        const percent = (context.dataPoint / total * 100).toFixed(2)
-                                        return `${context.label}: ${percent}%`
+                                    label(context) {
+                                        const total = context.dataset.data.reduce((a, c) => a + c);
+                                        const percent = (context.dataPoint / total * 100).toFixed(2);
+                                        return `${context.label}: ${percent}%`;
                                     },
                                 },
                             },
                         },
                     },
-                })
+                });
             },
-            updateChart () {
-                this.chartInstance.data.datasets[0].data = this.chartData.value
-                this.chartInstance.data.labels = this.chartData.labels
-                this.chartInstance.update()
+            updateChart() {
+                this.chartInstance.data.datasets[0].data = this.chartData.value;
+                this.chartInstance.data.labels = this.chartData.labels;
+                this.chartInstance.update();
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
 

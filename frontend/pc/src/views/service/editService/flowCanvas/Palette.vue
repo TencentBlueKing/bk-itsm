@@ -82,12 +82,12 @@
 <script>
     export default {
         name: 'Palette',
-        data () {
+        data() {
             return {
                 devsopDisable: window.RUN_VER,
-            }
+            };
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .disable {

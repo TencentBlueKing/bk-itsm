@@ -360,13 +360,13 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import NavTitle from '@/components/common/layout/NavTitle'
-    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue'
-    import permission from '@/mixins/permission.js'
-    import commonMix from '@/views/commonMix/common.js'
-    import { errorHandler } from '../../utils/errorHandler'
-    import treeInfo from './directoryCom/treeInfo.vue'
+    import axios from 'axios';
+    import NavTitle from '@/components/common/layout/NavTitle';
+    import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';
+    import permission from '@/mixins/permission.js';
+    import commonMix from '@/views/commonMix/common.js';
+    import { errorHandler } from '../../utils/errorHandler';
+    import treeInfo from './directoryCom/treeInfo.vue';
     // import selectTree from '@/components/form/selectTree/index.vue'
 
     export default {
@@ -378,7 +378,7 @@
             // selectTree
         },
         mixins: [permission, commonMix],
-        data () {
+        data() {
             return {
                 treeInfo: {
                     node: {},
@@ -457,127 +457,127 @@
                 editValue: '',
                 tableHoverId: '',
                 isImportServiceShow: false,
-            }
+            };
         },
         watch: {
-            'treeInfo.node' () {
-                this.getList(1)
+            'treeInfo.node'() {
+                this.getList(1);
             },
-            importCatalogId (val) {
+            importCatalogId(val) {
                 if (val.length !== 0) {
-                    this.isCheckImport = false
+                    this.isCheckImport = false;
                 }
             },
-            isImportServiceShow (val) {
+            isImportServiceShow(val) {
                 if (!val) {
-                    this.importFileNameList = []
-                    this.$nextTick(_ => {
-                        this.$refs.importInput.value = ''
-                    })
+                    this.importFileNameList = [];
+                    this.$nextTick((_) => {
+                        this.$refs.importInput.value = '';
+                    });
                 }
             },
         },
-        created () {
-            this.rules.name = this.checkCommonRules('name').name
-            this.rules.directory_id = this.checkCommonRules('required').required
-            this.rules.key = this.checkCommonRules('required').required
+        created() {
+            this.rules.name = this.checkCommonRules('name').name;
+            this.rules.directory_id = this.checkCommonRules('required').required;
+            this.rules.key = this.checkCommonRules('required').required;
         },
-        mounted () {
-            this.getServiceTypes()
-            this.getList()
-            this.getSlaList()
-            this.getServiceDirectory()
+        mounted() {
+            this.getServiceTypes();
+            this.getList();
+            this.getSlaList();
+            this.getServiceDirectory();
         },
         methods: {
-            cellMouseEnter (row) {
-                this.tableHoverId = row.id
+            cellMouseEnter(row) {
+                this.tableHoverId = row.id;
             },
-            cellMouseLeave (row) {
-                this.tableHoverId = ''
+            cellMouseLeave(row) {
+                this.tableHoverId = '';
             },
-            handleChangeTree (val) {
-                this.editValue = val[val.length - 1]
+            handleChangeTree(val) {
+                this.editValue = val[val.length - 1];
             },
-            closeFile () {
-                this.importFileNameList = []
-                this.$refs.importInput.value = ''
+            closeFile() {
+                this.importFileNameList = [];
+                this.$refs.importInput.value = '';
             },
-            handleFile (e) {
-                const filename = e.target.value.split('\\').slice(-1)
-                this.importFileNameList = []
+            handleFile(e) {
+                const filename = e.target.value.split('\\').slice(-1);
+                this.importFileNameList = [];
                 if (filename.length !== 0 && filename[0] !== '') {
-                    this.importFileNameList.push(filename[0])
-                    this.isCheckImport = false
+                    this.importFileNameList.push(filename[0]);
+                    this.isCheckImport = false;
                 }
             },
-            closeImport () {
-                this.importCatalogId = []
-                this.isCheckImport = false
-                this.isImportServiceShow = false
+            closeImport() {
+                this.importCatalogId = [];
+                this.isCheckImport = false;
+                this.isImportServiceShow = false;
             },
-            importConfirm () {
-                const formdata = new FormData()
-                formdata.append('file', this.$refs.importInput.files[0])
-                formdata.append('catalog_id', this.importCatalogId.slice(-1))
-                formdata.append('project_key', this.$route.query.project_id)
+            importConfirm() {
+                const formdata = new FormData();
+                formdata.append('file', this.$refs.importInput.files[0]);
+                formdata.append('catalog_id', this.importCatalogId.slice(-1));
+                formdata.append('project_key', this.$route.query.project_id);
                 if (this.importCatalogId.length === 0) {
-                    this.isCheckImport = true
-                    this.errorName = this.$t('m["目录"]')
-                    return
+                    this.isCheckImport = true;
+                    this.errorName = this.$t('m["目录"]');
+                    return;
                 }
                 if (this.importFileNameList.length === 0) {
-                    this.isCheckImport = true
-                    this.errorName = this.$t('m["文件"]')
-                    return
+                    this.isCheckImport = true;
+                    this.errorName = this.$t('m["文件"]');
+                    return;
                 }
-                this.isImportServiceShow = false
-                this.$store.dispatch('serviceEntry/importService', formdata).then(res => {
+                this.isImportServiceShow = false;
+                this.$store.dispatch('serviceEntry/importService', formdata).then((res) => {
                     this.$bkMessage({
                         message: res.message,
                         theme: 'success',
-                    })
-                    this.importCatalogId = []
-                    this.isImportServiceShow = false
-                    this.isCheckImport = false
-                    this.getList(1)
-                })
+                    });
+                    this.importCatalogId = [];
+                    this.isImportServiceShow = false;
+                    this.isCheckImport = false;
+                    this.getList(1);
+                });
             },
-            importService () {
-                this.isImportServiceShow = true
+            importService() {
+                this.isImportServiceShow = true;
             },
-            exportService (row) {
-                window.open(`${window.SITE_URL}api/service/projects/${row.id}/export/`)
+            exportService(row) {
+                window.open(`${window.SITE_URL}api/service/projects/${row.id}/export/`);
             },
-            handleChange (type, row) {
+            handleChange(type, row) {
                 // this.editValue = row.name
                 switch (type) {
                     case 'name':
-                        this.changeFrom.name = row.id
-                        this.changeFrom.serviceType = ''
-                        this.changeFrom.bounded_catalogs = ''
-                        this.editValue = row.name
-                        break
+                        this.changeFrom.name = row.id;
+                        this.changeFrom.serviceType = '';
+                        this.changeFrom.bounded_catalogs = '';
+                        this.editValue = row.name;
+                        break;
                     case 'key':
-                        this.changeFrom.name = ''
-                        this.changeFrom.serviceType = row.id
-                        this.changeFrom.bounded_catalogs = ''
-                        this.editValue = row.key
-                        break
+                        this.changeFrom.name = '';
+                        this.changeFrom.serviceType = row.id;
+                        this.changeFrom.bounded_catalogs = '';
+                        this.editValue = row.key;
+                        break;
                     case 'catalog_id':
-                        this.changeFrom.name = ''
-                        this.changeFrom.serviceType = ''
-                        this.changeFrom.bounded_catalogs = row.id
-                        break
+                        this.changeFrom.name = '';
+                        this.changeFrom.serviceType = '';
+                        this.changeFrom.bounded_catalogs = row.id;
+                        break;
                 }
             },
-            closeEdit () {
-                this.changeFrom.name = ''
-                this.changeFrom.serviceType = ''
-                this.changeFrom.bounded_catalogs = ''
+            closeEdit() {
+                this.changeFrom.name = '';
+                this.changeFrom.serviceType = '';
+                this.changeFrom.bounded_catalogs = '';
             },
-            submitEditService (type, row) {
-                const curRow = row
-                curRow[type] = this.editValue
+            submitEditService(type, row) {
+                const curRow = row;
+                curRow[type] = this.editValue;
                 const params = {
                     catalog_id: curRow.catalog_id,
                     id: curRow.id,
@@ -585,95 +585,95 @@
                     name: curRow.name,
                     project_key: curRow.project_key,
                     desc: '',
-                }
-                this.$store.dispatch('serviceEntry/updateService', params).then(res => {
+                };
+                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["修改成功"]'),
                         theme: 'success',
-                    })
-                    this.editValue = ''
-                    this.closeEdit()
-                    this.getList()
-                })
+                    });
+                    this.editValue = '';
+                    this.closeEdit();
+                    this.getList();
+                });
             },
             // 获取数据
-            getList (page) {
+            getList(page) {
                 // 查询时复位页码
                 if (page !== undefined) {
-                    this.pagination.current = page
+                    this.pagination.current = page;
                 }
                 // 重新获取数据时清空选中的数据
-                this.checkList = []
+                this.checkList = [];
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
                     ordering: '-update_at',
                     catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id,
-                }
-                this.moreSearch.forEach(item => {
+                };
+                this.moreSearch.forEach((item) => {
                     if (item.value !== '' && item.typeKey) {
-                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
+                        params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value;
                     }
-                })
+                });
                 if (!this.treeInfo.node.id) {
-                    return
+                    return;
                 }
-                this.isDataLoading = true
-                this.$store.dispatch('catalogService/getServices', params).then(res => {
+                this.isDataLoading = true;
+                this.$store.dispatch('catalogService/getServices', params).then((res) => {
                     if (res.data !== null) {
                         if (Object.keys(res.data).length > 0) {
-                            this.dataList = res.data.items
+                            this.dataList = res.data.items;
                             this.dataList.forEach((item, index) => {
-                                this.$set(item, 'checkStatus', false)
-                            })
+                                this.$set(item, 'checkStatus', false);
+                            });
                             // 分页
-                            this.pagination.current = res.data.page
-                            this.pagination.count = res.data.count
+                            this.pagination.current = res.data.page;
+                            this.pagination.count = res.data.count;
                         } else {
-                            this.dataList = []
+                            this.dataList = [];
                         }
                     } else {
-                        this.dataList = []
+                        this.dataList = [];
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            async getServiceDirectory () {
+            async getServiceDirectory() {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
                     project_key: this.$store.state.project.id,
-                }).then(res => {
-                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
+                }).then((res) => {
+                    this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            onBasicFormSubmit () {
+            onBasicFormSubmit() {
                 this.$refs.basicForm.validate().then(async () => {
-                    const params = JSON.parse(JSON.stringify(this.formData))
-                    params.id = this.serviceId || undefined
-                    params.project_key = this.$store.state.project.id
-                    this.isSubmitting = true
-                    await this.createService(params)
-                    this.isSubmitting = false
-                })
+                    const params = JSON.parse(JSON.stringify(this.formData));
+                    params.id = this.serviceId || undefined;
+                    params.project_key = this.$store.state.project.id;
+                    this.isSubmitting = true;
+                    await this.createService(params);
+                    this.isSubmitting = false;
+                });
             },
-            onBasicFormCancel () {
-                this.isBasicFormEditting = false
+            onBasicFormCancel() {
+                this.isBasicFormEditting = false;
             },
-            createService (params) {
-                this.$store.dispatch('serviceEntry/createService', params).then(res => {
+            createService(params) {
+                this.$store.dispatch('serviceEntry/createService', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
-                    })
+                    });
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
@@ -685,55 +685,55 @@
                             project_id: this.$store.state.project.id,
                             fromCatalog: this.treeInfo.node.id,
                         },
-                    })
-                    this.isBasicFormEditting = false
+                    });
+                    this.isBasicFormEditting = false;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 服务类型
-            getServiceTypes () {
+            getServiceTypes() {
                 this.$store.dispatch('getCustom').then((res) => {
-                    this.serviceTypeList = res.data
-                    this.serviceTypesMap = res.data
-                    this.moreSearch[1].list = res.data
+                    this.serviceTypeList = res.data;
+                    this.serviceTypesMap = res.data;
+                    this.moreSearch[1].list = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 服务级别列表
-            getSlaList () {
+            getSlaList() {
                 const params = {
                     is_enabled: true,
                     project_key: this.$store.state.project.id,
-                }
-                this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
-                    this.slaList = res.data
-                    this.moreSearch[2].list = res.data
-                    this.moreSearch[2].list.forEach(item => {
-                        this.$set(item, 'key', item.id)
-                    })
+                };
+                this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
+                    this.slaList = res.data;
+                    this.moreSearch[2].list = res.data;
+                    this.moreSearch[2].list.forEach((item) => {
+                        this.$set(item, 'key', item.id);
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
-            disabledFn (item, index) {
-                return !item.bounded_catalogs[0]
+            disabledFn(item, index) {
+                return !item.bounded_catalogs[0];
             },
             // 创建服务权限点击时校验
-            onServiceCreatePermissonCheck () {
+            onServiceCreatePermissonCheck() {
                 if (!this.hasPermission(['service_create'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
+                    };
+                    this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData);
                 } else {
                     // this.isBasicFormEditting = true
                     this.$router.push({
@@ -746,17 +746,17 @@
                             project_id: this.$route.query.project_id,
                             catalog_id: this.$route.query.catalog_id,
                         },
-                    })
+                    });
                 }
             },
             // 编辑
-            async changeEntry (item, type) {
-                let serviceId = item.id
+            async changeEntry(item, type) {
+                let serviceId = item.id;
                 if (type === 'clone') {
                     // 获取克隆id
                     try {
-                        const res = await this.$store.dispatch('serviceEntry/cloneService', item.id)
-                        serviceId = res.data.id
+                        const res = await this.$store.dispatch('serviceEntry/cloneService', item.id);
+                        serviceId = res.data.id;
                         if (res.data && res.data.id) {
                             this.$router.push({
                                 name: 'projectServiceEdit',
@@ -769,13 +769,13 @@
                                     project_id: this.$store.state.project.id,
                                     catalog_id: this.$route.query.catalog_id,
                                 },
-                            })
+                            });
                         }
                     } catch (e) {
                         this.$bkMessage({
                             theme: 'warning',
                             message: e.data.message,
-                        })
+                        });
                     }
                 } else {
                     this.$router.push({
@@ -789,7 +789,7 @@
                             project_id: this.$store.state.project.id,
                             catalog_id: this.$route.query.catalog_id,
                         },
-                    })
+                    });
                 }
             },
             /**
@@ -797,8 +797,8 @@
              * @params {Array} required 需要的权限
              * @params {Object} row 数据对象
              */
-            onServicePermissonCheck (required, row) {
-                const { projectInfo } = this.$store.state.project
+            onServicePermissonCheck(required, row) {
+                const { projectInfo } = this.$store.state.project;
                 const resourceData = {
                     service: [{
                         id: row.id,
@@ -808,139 +808,139 @@
                         id: projectInfo.key,
                         name: projectInfo.name,
                     }],
-                }
-                this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData)
+                };
+                this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData);
             },
-            deleteCheck () {
+            deleteCheck() {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.serviceConfig["确认删除服务？"]'),
                     subTitle: this.$t('m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]'),
                     confirmFn: () => {
-                        const idArr = this.checkList.map(item => item.id)
-                        const id = idArr.join(',')
+                        const idArr = this.checkList.map(item => item.id);
+                        const id = idArr.join(',');
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
+                        this.secondClick = true;
                         this.$store.dispatch('serviceEntry/batchDeleteService', { id }).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getList(1)
+                            });
+                            this.getList(1);
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
             // 删除
-            deleteOne (item) {
+            deleteOne(item) {
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.serviceConfig["确认删除服务？"]'),
                     subTitle: this.$t('m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         if (this.secondClick) {
-                            return
+                            return;
                         }
-                        this.secondClick = true
+                        this.secondClick = true;
                         this.$store.dispatch('serviceEntry/deleteService', id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除成功"]'),
                                 theme: 'success',
-                            })
+                            });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
+                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1;
                             }
-                            this.getList()
+                            this.getList();
                         })
                             .catch((res) => {
-                                errorHandler(res, this)
+                                errorHandler(res, this);
                             })
                             .finally(() => {
-                                this.secondClick = false
-                            })
+                                this.secondClick = false;
+                            });
                     },
-                })
+                });
             },
             // 简单查询
-            searchContent () {
-                this.getList(1)
+            searchContent() {
+                this.getList(1);
             },
             // 清空搜索表单
-            clearSearch () {
-                this.moreSearch.forEach(item => {
-                    item.value = ''
-                })
-                this.getList(1)
+            clearSearch() {
+                this.moreSearch.forEach((item) => {
+                    item.value = '';
+                });
+                this.getList(1);
             },
-            searchMore () {
-                this.$refs.searchInfo.searchMore()
+            searchMore() {
+                this.$refs.searchInfo.searchMore();
             },
-            handlePageChange (page) {
-                this.pagination.current = page
-                this.getList()
+            handlePageChange(page) {
+                this.pagination.current = page;
+                this.getList();
             },
             // 分页过滤数据
-            handlePageLimitChange () {
-                this.pagination.limit = arguments[0]
-                this.getList()
+            handlePageLimitChange() {
+                this.pagination.limit = arguments[0];
+                this.getList();
             },
-            changeCheck (value) {
+            changeCheck(value) {
                 // 改变中选态，与表头选择相呼应
-                this.$refs.serviceTable.toggleRowSelection(value, value.checkStatus)
+                this.$refs.serviceTable.toggleRowSelection(value, value.checkStatus);
                 if (value.checkStatus) {
                     if (!this.checkList.some(item => item.id === value.id)) {
-                        this.checkList.push(value)
+                        this.checkList.push(value);
                     }
                 } else {
-                    this.checkList = this.checkList.filter(item => item.id !== value.id)
+                    this.checkList = this.checkList.filter(item => item.id !== value.id);
                 }
             },
             // 全选 半选
-            handleSelectAll (selection) {
-                this.dataList.forEach(item => {
+            handleSelectAll(selection) {
+                this.dataList.forEach((item) => {
                     if (!item.bounded_catalogs[0] && this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                        item.checkStatus = !!selection.length
+                        item.checkStatus = !!selection.length;
                     }
-                })
+                });
                 // 选中有权限数据
-                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions]))
+                this.checkList = selection.filter(item => this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions]));
             },
-            handleSelect (selection, row) {
-                this.checkList = selection
+            handleSelect(selection, row) {
+                this.checkList = selection;
             },
             // 流程预览
-            processShow (item) {
-                const id = item.workflow
-                this.processInfo.isShow = !this.processInfo.isShow
-                this.processInfo.loading = true
+            processShow(item) {
+                const id = item.workflow;
+                this.processInfo.isShow = !this.processInfo.isShow;
+                this.processInfo.loading = true;
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
                     this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data
+                    this.addList = userResp.data;
                     for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i
+                        this.addList[i].indexInfo = i;
                     }
-                    this.lineList = reposResp.data.items
+                    this.lineList = reposResp.data.items;
                 }))
                     .finally(() => {
-                        this.processInfo.loading = false
-                    })
+                        this.processInfo.loading = false;
+                    });
             },
-            hiddenTree () {
-                this.isHiddenDirectory = !this.isHiddenDirectory
+            hiddenTree() {
+                this.isHiddenDirectory = !this.isHiddenDirectory;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';

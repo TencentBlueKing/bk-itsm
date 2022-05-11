@@ -38,10 +38,10 @@
     </div>
 </template>
 <script>
-    import PermissionContent from './PermissionContent.vue'
-    import permission from '@/mixins/permission.js'
-    import _ from 'lodash'
-    import { errorHandler } from '@/utils/errorHandler.js'
+    import PermissionContent from './PermissionContent.vue';
+    import permission from '@/mixins/permission.js';
+    import _ from 'lodash';
+    import { errorHandler } from '@/utils/errorHandler.js';
 
     export default {
         name: 'PermissionApply',
@@ -52,70 +52,70 @@
         props: {
             permissionData: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         type: 'project', // 无权限类型: project、other
                         permission: null,
-                    }
+                    };
                 },
             },
         },
-        data () {
+        data() {
             return {
                 url: '',
                 loading: false,
                 hasClicked: false,
                 authActions: [],
-            }
+            };
         },
         watch: {
             permissionData: {
                 deep: true,
                 immediate: true,
-                handler (val, oldVal) {
+                handler(val, oldVal) {
                     if (!_.isEqual(val, oldVal)) {
-                        this.loadPermissionUrl()
+                        this.loadPermissionUrl();
                     }
                 },
             },
         },
-        created () {
+        created() {
             if (this.permissionData.permission) {
-                this.loadPermissionUrl()
+                this.loadPermissionUrl();
             }
         },
         methods: {
-            applyBtnClick () {
-                this.goToAuthCenter()
+            applyBtnClick() {
+                this.goToAuthCenter();
             },
-            goToAuthCenter () {
+            goToAuthCenter() {
                 if (this.loading || !this.url) {
-                    return
+                    return;
                 }
                 if (this.hasClicked) {
-                    window.location.reload()
+                    window.location.reload();
                 } else {
-                    this.hasClicked = true
-                    window.open(this.url, '__blank')
+                    this.hasClicked = true;
+                    window.open(this.url, '__blank');
                 }
             },
-            async loadPermissionUrl () {
+            async loadPermissionUrl() {
                 try {
-                    this.loading = true
-                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData.permission)
+                    this.loading = true;
+                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData.permission);
                     if (res.result) {
-                        this.url = res.data.url
+                        this.url = res.data.url;
                     } else {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     }
                 } catch (err) {
-                    errorHandler(err, this)
+                    errorHandler(err, this);
                 } finally {
-                    this.loading = false
+                    this.loading = false;
                 }
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .permisson-apply {

@@ -69,9 +69,9 @@
     </bk-dialog>
 </template>
 <script>
-    import { deepClone } from '@/utils/util'
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import i18n from '@/i18n/index.js'
+    import { deepClone } from '@/utils/util';
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import i18n from '@/i18n/index.js';
 
     export default {
         name: 'EditProjectDialog',
@@ -83,18 +83,18 @@
             title: String,
             project: {
                 type: Object,
-                default () {
+                default() {
                     return {
                         name: '',
                         key: '',
                         desc: '',
                         color: '',
-                    }
+                    };
                 },
             },
             editDialogFormDisable: Boolean,
         },
-        data () {
+        data() {
             return {
                 projectForm: deepClone(this.project),
                 editProjectPending: false,
@@ -112,8 +112,8 @@
                         },
                         {
                             validator: this.validateName,
-                            message (val) {
-                                return `${val}-此项目名称已存在`
+                            message(val) {
+                                return `${val}-此项目名称已存在`;
                             },
                             trigger: 'blur',
                         },
@@ -136,8 +136,8 @@
                         },
                         {
                             validator: this.validateKey,
-                            message (val) {
-                                return `${val}-此项目代号已存在`
+                            message(val) {
+                                return `${val}-此项目代号已存在`;
                             },
                             trigger: 'blur',
                         },
@@ -150,50 +150,50 @@
                         },
                     ],
                 },
-            }
+            };
         },
         watch: {
-            isShow (val) {
+            isShow(val) {
                 if (val) {
-                    this.projectForm = deepClone(this.project)
+                    this.projectForm = deepClone(this.project);
                 }
             },
         },
         methods: {
-            projectValidateList (list, type) {
-                const projectList = []
-                projectList.push(list)
+            projectValidateList(list, type) {
+                const projectList = [];
+                projectList.push(list);
                 if (this.title === i18n.t('m["编辑项目"]')) {
-                    projectList.length = 0
-                    const result = list.filter(item => item[type] !== this.project[type])
-                    projectList.push(result)
+                    projectList.length = 0;
+                    const result = list.filter(item => item[type] !== this.project[type]);
+                    projectList.push(result);
                 }
-                return projectList[0]
+                return projectList[0];
             },
-            async validateName (val) {
-                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name')
-                return !projectList.map(item => item.name).includes(val)
+            async validateName(val) {
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name');
+                return !projectList.map(item => item.name).includes(val);
             },
-            async validateKey (val) {
-                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key')
-                return !projectList.map(item => item.key).includes(val)
+            async validateKey(val) {
+                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key');
+                return !projectList.map(item => item.key).includes(val);
             },
-            onEditProjectConfirm () {
+            onEditProjectConfirm() {
                 this.$refs.projectForm.validate().then(async (result) => {
                     if (result) {
-                        this.editProjectPending = true
-                        const url = this.project.key ? 'project/updateProject' : 'project/createProject'
+                        this.editProjectPending = true;
+                        const url = this.project.key ? 'project/updateProject' : 'project/createProject';
                         try {
-                            await this.$store.dispatch(url, this.projectForm)
-                            this.$emit('confirm', this.projectForm.key)
+                            await this.$store.dispatch(url, this.projectForm);
+                            this.$emit('confirm', this.projectForm.key);
                         } catch (e) {
-                            errorHandler(e, this)
+                            errorHandler(e, this);
                         } finally {
-                            this.editProjectPending = false
+                            this.editProjectPending = false;
                         }
                     }
-                })
+                });
             },
         },
-    }
+    };
 </script>

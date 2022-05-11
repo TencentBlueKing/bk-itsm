@@ -96,10 +96,10 @@
     </div>
 </template>
 <script>
-    import memberSelect from '../../../commonComponent/memberSelect'
-    import exportTree from '../../../commonComponent/treeInfo/exportTree.vue'
-    import { mapState } from 'vuex'
-    import { errorHandler } from '../../../../utils/errorHandler'
+    import memberSelect from '../../../commonComponent/memberSelect';
+    import exportTree from '../../../commonComponent/treeInfo/exportTree.vue';
+    import { mapState } from 'vuex';
+    import { errorHandler } from '../../../../utils/errorHandler';
 
     export default {
         name: 'changeConductor',
@@ -110,24 +110,24 @@
         props: {
             itemInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             recipientItem: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             recipientIndex: {
                 type: Number,
-                default () {
-                    return ''
+                default() {
+                    return '';
                 },
             },
         },
-        data () {
+        data() {
             return {
                 recipientKeyList: [],
                 roles: {
@@ -136,203 +136,203 @@
                     viewTreeOpen: false,
                 },
                 variableList: [],
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
             ...mapState('trigger', {
                 triggerVariables: state => state.triggerVariables,
             }),
         },
         watch: {
-            triggerVariables (newVal) {
-                this.variableList = newVal
+            triggerVariables(newVal) {
+                this.variableList = newVal;
             },
         },
-        created () {
+        created() {
             // 处理人去掉（不限，提单人，派单人指定，无）
-            const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY']
-            this.recipientKeyList = this.globalChoise.processor_type.filter(item => !filterList.some(filterName => filterName === item.typeName))
+            const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY'];
+            this.recipientKeyList = this.globalChoise.processor_type.filter(item => !filterList.some(filterName => filterName === item.typeName));
             // 如果一级字段存在值，则调用二级字段列表
             if (this.recipientItem.key) {
-                this.recipientItem.secondLevelList = []
+                this.recipientItem.secondLevelList = [];
                 if (this.recipientItem.key === 'ORGANIZATION') {
-                    this.getOrganization()
+                    this.getOrganization();
                 } else if (this.recipientItem.key === 'VARIABLE') {
-                    this.recipientItem.value = this.recipientItem.value
+                    this.recipientItem.value = this.recipientItem.value;
                 } else if (this.recipientItem.key === 'PERSON') {
-                    this.recipientItem.secondLevelList = []
-                    this.recipientItem.value = Array.isArray(this.recipientItem.value) ? this.recipientItem.value : this.recipientItem.value.split(',')
+                    this.recipientItem.secondLevelList = [];
+                    this.recipientItem.value = Array.isArray(this.recipientItem.value) ? this.recipientItem.value : this.recipientItem.value.split(',');
                 } else {
-                    this.recipientItem.value = Array.isArray(this.recipientItem.value) ? this.recipientItem.value : this.recipientItem.value.split(',')
-                    this.secondListFn(this.recipientItem)
+                    this.recipientItem.value = Array.isArray(this.recipientItem.value) ? this.recipientItem.value : this.recipientItem.value.split(',');
+                    this.secondListFn(this.recipientItem);
                 }
             }
         },
-        mounted () {
-            this.variableList = this.triggerVariables
+        mounted() {
+            this.variableList = this.triggerVariables;
         },
         methods: {
-            getSecondLevelList () {
+            getSecondLevelList() {
                 // 清空二级数据
-                this.recipientItem.value = []
-                this.recipientItem.secondLevelList = []
+                this.recipientItem.value = [];
+                this.recipientItem.secondLevelList = [];
                 if (this.recipientItem.key === 'ORGANIZATION') {
-                    this.recipientItem.value = ''
-                    this.getOrganization()
+                    this.recipientItem.value = '';
+                    this.getOrganization();
                 } else if (this.recipientItem.key === 'VARIABLE') {
-                    this.recipientItem.value = ''
+                    this.recipientItem.value = '';
                 } else if (this.recipientItem.key === 'PERSON') {
-                    this.recipientItem.secondLevelList = []
+                    this.recipientItem.secondLevelList = [];
                 } else {
-                    this.secondListFn(this.recipientItem)
+                    this.secondListFn(this.recipientItem);
                 }
             },
             // 获取数据
-            secondListFn (recipientItem) {
+            secondListFn(recipientItem) {
                 if (!recipientItem.key) {
-                    return
+                    return;
                 }
-                recipientItem.isLoading = true
+                recipientItem.isLoading = true;
                 this.$store.dispatch('deployCommon/getSecondUser', {
                     role_type: recipientItem.key,
                     project_key: this.$store.state.project.id,
                 }).then((res) => {
-                    const valueList = res.data
-                    const userList = []
+                    const valueList = res.data;
+                    const userList = [];
                     if (recipientItem.key === 'GENERAL') {
-                        valueList.forEach(item => {
+                        valueList.forEach((item) => {
                             userList.push({
                                 id: String(item.id),
                                 name: `${item.name}(${item.count})`,
                                 disabled: (item.count === 0),
-                            })
-                        })
+                            });
+                        });
                     } else {
-                        valueList.forEach(item => {
+                        valueList.forEach((item) => {
                             userList.push({
                                 id: String(item.id),
                                 name: item.name,
-                            })
-                        })
+                            });
+                        });
                     }
-                    recipientItem.secondLevelList = userList
+                    recipientItem.secondLevelList = userList;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        recipientItem.isLoading = false
-                    })
+                        recipientItem.isLoading = false;
+                    });
             },
             // 组织架构
-            getOrganization () {
-                this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
+            getOrganization() {
+                this.$store.dispatch('cdeploy/getTreeInfo').then((res) => {
                     // 操作角色组织架构
-                    this.roles.viewTreeDataList = res.data
-                    this.roles.viewTreeDataList.forEach(tree => {
-                        this.treeData(tree, 'view')
-                    })
+                    this.roles.viewTreeDataList = res.data;
+                    this.roles.viewTreeDataList.forEach((tree) => {
+                        this.treeData(tree, 'view');
+                    });
                     if (this.roles.viewtree.route.length) {
-                        this.roles.viewTreeDataList.forEach(tree => {
-                            this.openChildren(tree, 'view')
-                        })
+                        this.roles.viewTreeDataList.forEach((tree) => {
+                            this.openChildren(tree, 'view');
+                        });
                     }
                 })
-                    .catch(res => {
+                    .catch((res) => {
 
-                    })
+                    });
             },
-            recordCheckFn (tree) {
-                tree.checkInfo = false
+            recordCheckFn(tree) {
+                tree.checkInfo = false;
                 if (tree.children == null || (tree.children && !tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.recordCheckFn(item)
-                })
+                tree.children.forEach((item) => {
+                    this.recordCheckFn(item);
+                });
             },
-            toggleInfo (value) {
-                this.roles.viewTreeDataList.forEach(tree => {
-                    this.recordCheckFn(tree)
-                })
-                value.checkInfo = true
+            toggleInfo(value) {
+                this.roles.viewTreeDataList.forEach((tree) => {
+                    this.recordCheckFn(tree);
+                });
+                value.checkInfo = true;
                 // 选中的数据
-                this.roles.viewtree = value
-                this.concatName()
-                this.recipientItem.value = value.id
+                this.roles.viewtree = value;
+                this.concatName();
+                this.recipientItem.value = value.id;
                 // 关闭窗口
-                this.closeTree()
+                this.closeTree();
             },
-            toggleChildren () {
+            toggleChildren() {
                 if (arguments[1] === 'view') {
-                    arguments[0].showChildren = !arguments[0].showChildren
-                    this.roles.viewTreeDataList = JSON.parse(JSON.stringify(this.roles.viewTreeDataList))
+                    arguments[0].showChildren = !arguments[0].showChildren;
+                    this.roles.viewTreeDataList = JSON.parse(JSON.stringify(this.roles.viewTreeDataList));
                 }
             },
-            openChildren (tree, type) {
-                tree.showChildren = false
+            openChildren(tree, type) {
+                tree.showChildren = false;
                 if (type === 'view') {
-                    tree.showChildren = this.roles.viewtree.route.some(item => String(item.id) === String(tree.id))
+                    tree.showChildren = this.roles.viewtree.route.some(item => String(item.id) === String(tree.id));
                 }
                 if (!(tree.children && tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.openChildren(item, type)
-                })
+                tree.children.forEach((item) => {
+                    this.openChildren(item, type);
+                });
             },
-            treeData (tree, type) {
-                tree.checkInfo = false
-                tree.has_children = !!(tree.children && tree.children.length)
+            treeData(tree, type) {
+                tree.checkInfo = false;
+                tree.has_children = !!(tree.children && tree.children.length);
                 // 选中可见角色
                 if (String(this.recipientItem.value) === String(tree.id) && type === 'view') {
-                    tree.checkInfo = true
-                    this.roles.viewtree = tree
-                    this.concatName()
+                    tree.checkInfo = true;
+                    this.roles.viewtree = tree;
+                    this.concatName();
                 }
                 if (!tree.has_children) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.treeData(item, type)
-                })
+                tree.children.forEach((item) => {
+                    this.treeData(item, type);
+                });
             },
-            showTree (type) {
+            showTree(type) {
                 if (type === 'view') {
-                    this.roles.viewTreeOpen = !this.roles.viewTreeOpen
-                    this.roles.otherTreeOpen = false
+                    this.roles.viewTreeOpen = !this.roles.viewTreeOpen;
+                    this.roles.otherTreeOpen = false;
                 }
             },
-            closeTree () {
-                this.roles.viewTreeOpen = false
+            closeTree() {
+                this.roles.viewTreeOpen = false;
             },
-            concatName () {
-                let nameList = []
+            concatName() {
+                let nameList = [];
                 if (this.roles.viewtree.route.length) {
-                    nameList = this.roles.viewtree.route.map(item => item.name)
+                    nameList = this.roles.viewtree.route.map(item => item.name);
                 }
-                nameList.push(this.roles.viewtree.name)
-                this.$set(this.roles.viewtree, 'showName', nameList.join('/'))
+                nameList.push(this.roles.viewtree.name);
+                this.$set(this.roles.viewtree, 'showName', nameList.join('/'));
             },
-            addRecipient () {
+            addRecipient() {
                 this.itemInfo.value.splice(this.recipientIndex + 1, 0, {
                     type: '',
                     value: '',
                     secondLevelList: [],
                     isLoading: false,
-                })
+                });
             },
-            deleteRecipient () {
+            deleteRecipient() {
                 if (this.itemInfo.value.length === 1) {
-                    return
+                    return;
                 }
-                this.itemInfo.value.splice(this.recipientIndex, 1)
+                this.itemInfo.value.splice(this.recipientIndex, 1);
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

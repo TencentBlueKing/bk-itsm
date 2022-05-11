@@ -92,9 +92,9 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../utils/errorHandler.js'
-    import ace from '../../../commonComponent/aceEditor/index.js'
-    import mixins from '../../../commonMix/mixins_api.js'
+    import { errorHandler } from '../../../../utils/errorHandler.js';
+    import ace from '../../../commonComponent/aceEditor/index.js';
+    import mixins from '../../../commonMix/mixins_api.js';
 
     export default {
         components: {
@@ -104,12 +104,12 @@
         props: {
             apiDetailInfoCommon: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 trueStatus: true,
                 falseStatus: false,
@@ -153,35 +153,35 @@
                 bodyValue: '1415',
                 secondClick: false,
                 activeName: [],
-            }
+            };
         },
-        async mounted () {
-            await this.apiDetailInfoCommon
-            await this.DetailInfo
-            this.initDate()
+        async mounted() {
+            await this.apiDetailInfoCommon;
+            await this.DetailInfo;
+            this.initDate();
         },
         methods: {
-            initDate () {
+            initDate() {
                 if (this.DetailInfo.bodyJsonData) {
-                    this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo.bodyJsonData.root, null, 4)
+                    this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo.bodyJsonData.root, null, 4);
                 }
                 if (this.DetailInfo.req_params && this.DetailInfo.req_params.length) {
-                    this.DetailInfo.req_params.forEach(item => {
-                        item.is_necessary = !!item.is_necessary
-                    })
+                    this.DetailInfo.req_params.forEach((item) => {
+                        item.is_necessary = !!item.is_necessary;
+                    });
                 }
             },
-            showConten (val) {
-                this.showInfo[val] = !this.showInfo[val]
+            showConten(val) {
+                this.showInfo[val] = !this.showInfo[val];
             },
-            async testUrl () {
+            async testUrl() {
                 this.showInfo = {
                     headers: false,
                     query: false,
                     body: false,
-                }
+                };
                 if (this.secondClick) {
-                    return
+                    return;
                 }
                 const params = {
                     id: this.DetailInfo.id,
@@ -193,50 +193,50 @@
                     variables: {},
                     map_code: this.$parent.dataProcess.value,
                     before_req: this.$parent.reqDataProcess.value,
-                }
-                this.secondClick = true
-                await this.$store.dispatch('apiRemote/run_remote_api', params).then(res => {
-                    this.$parent.alarmDetailConfig.value = JSON.stringify(res.data, null, 4)
+                };
+                this.secondClick = true;
+                await this.$store.dispatch('apiRemote/run_remote_api', params).then((res) => {
+                    this.$parent.alarmDetailConfig.value = JSON.stringify(res.data, null, 4);
                     if (res.data.result) {
-                        this.$parent.isSuccess = false
+                        this.$parent.isSuccess = false;
                     }
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
-            blur (content, $editor, $fn) {
+            blur(content, $editor, $fn) {
                 try {
-                    this.bodyDetailConfig.value = JSON.stringify(JSON.parse(content), null, 4)
+                    this.bodyDetailConfig.value = JSON.stringify(JSON.parse(content), null, 4);
                 } catch (e) {
-                    return
+                    return;
                 }
 
                 try {
-                    JSON.parse(this.bodyDetailConfig.value)
+                    JSON.parse(this.bodyDetailConfig.value);
                 } catch (err) {
                     // this.$bkMessage({
                     //     message: err.message ? err.message : err,
                     //     theme: 'error'
                     // })
-                    return
+                    return;
                 }
-                this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value))
+                this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value));
             },
-            listTojson (listdata) {
-                const jsondata = {}
+            listTojson(listdata) {
+                const jsondata = {};
                 if (listdata.length) {
-                    listdata.forEach(item => {
-                        jsondata[item.name] = item.value
-                    })
+                    listdata.forEach((item) => {
+                        jsondata[item.name] = item.value;
+                    });
                 }
-                return jsondata
+                return jsondata;
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

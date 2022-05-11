@@ -138,10 +138,10 @@
     </div>
 </template>
 <script>
-    import businessCard from '@/components/common/BusinessCard.vue'
-    import RenderView from '@/components/renderview/RenderView'
-    import { appendTargetAttrToHtml } from '@/utils/util'
-    import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils'
+    import businessCard from '@/components/common/BusinessCard.vue';
+    import RenderView from '@/components/renderview/RenderView';
+    import { appendTargetAttrToHtml } from '@/utils/util';
+    import { getCustomTableDisplayValue } from '@/components/RenderField/fieldUtils';
 
     export default {
         name: 'fieldsDone',
@@ -152,8 +152,8 @@
         props: {
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             fields: {
@@ -178,8 +178,8 @@
             },
             item: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             origin: {
@@ -193,7 +193,7 @@
             },
             basicInfoType: Array,
         },
-        data () {
+        data() {
             return {
                 showMore: false,
                 showInfo: true,
@@ -207,93 +207,93 @@
                     formData: [],
                     context: {},
                 },
-            }
+            };
         },
         computed: {
-            profile () {
+            profile() {
                 if (!this.basicInfomation) {
-                    return
+                    return;
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
                     department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
-                }
+                };
             },
-            fieldType () {
-                return this.basicInfoType ? this.basicInfoType.includes(this.item.type) : []
+            fieldType() {
+                return this.basicInfoType ? this.basicInfoType.includes(this.item.type) : [];
             },
         },
-        created () {
+        created() {
             if (this.item.type === 'CUSTOM-FORM') {
-                const data = typeof this.item.value === 'string' ? JSON.parse(this.item.value) : this.item.value
-                const { form_data, schemes, config } = data
+                const data = typeof this.item.value === 'string' ? JSON.parse(this.item.value) : this.item.value;
+                const { form_data, schemes, config } = data;
                 this.customForm = {
                     formData: form_data,
                     context: { schemes, config },
-                }
+                };
             }
         },
-        mounted () {
-            this.$set(this.item, 'isEdit', false)
-            this.reloadCurPage()
+        mounted() {
+            this.$set(this.item, 'isEdit', false);
+            this.reloadCurPage();
             if (this.item.type === 'FILE') {
-                this.valToList()
+                this.valToList();
             }
             if (this.item.type === 'RICHTEXT') {
                 // 这里可以兼容之前创建的 a 标签没加 _blank 的 value,显示时加上
-                this.item.value = appendTargetAttrToHtml(this.item.value)
+                this.item.value = appendTargetAttrToHtml(this.item.value);
             }
         },
         methods: {
-            goToLink (url) {
+            goToLink(url) {
                 if (url.indexOf('http') !== 0) {
-                    url = `http://${url}`
+                    url = `http://${url}`;
                 }
-                window.open(url, '_blank')
+                window.open(url, '_blank');
             },
-            valToList () {
-                const { value } = this.item
-                const tempObj = value ? JSON.parse(value) : {}
+            valToList() {
+                const { value } = this.item;
+                const tempObj = value ? JSON.parse(value) : {};
                 for (const key in tempObj) {
-                    this.fileList.push({ ...tempObj[key], key })
+                    this.fileList.push({ ...tempObj[key], key });
                 }
             },
-            reloadCurPage () {
-                this.routerKey = +new Date()
+            reloadCurPage() {
+                this.routerKey = +new Date();
             },
-            edit (item) {
-                this.fields.forEach(ite => {
-                    ite.isEdit = false
-                })
-                this.$set(this.item, 'isEdit', true)
+            edit(item) {
+                this.fields.forEach((ite) => {
+                    ite.isEdit = false;
+                });
+                this.$set(this.item, 'isEdit', true);
             },
             // 11.01 修改 附件上传
-            downFile (file) {
-                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${this.item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
-                window.open(this.downFileUrl)
+            downFile(file) {
+                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${this.item.id}/download_file/?unique_key=${file.key}&file_type=ticket`;
+                window.open(this.downFileUrl);
             },
             // 解析字符串为数组-特定表格数据场景
-            getParseValue (val) {
+            getParseValue(val) {
                 if (Array.isArray(val)) {
-                    return val
+                    return val;
                 }
                 if (typeof val === 'string') {
-                    let newVal = []
+                    let newVal = [];
                     try {
-                        newVal = JSON.parse(val.replace(/\'/g, '"'))
+                        newVal = JSON.parse(val.replace(/\'/g, '"'));
                     } catch (error) {
-                        console.error(val)
+                        console.error(val);
                     }
-                    return newVal
+                    return newVal;
                 }
-                return []
+                return [];
             },
-            getCustomTableDisplayValue (column, value) {
-                return getCustomTableDisplayValue(column, value)
+            getCustomTableDisplayValue(column, value) {
+                return getCustomTableDisplayValue(column, value);
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
     @import '../../../../scss/mixins/clearfix.scss';

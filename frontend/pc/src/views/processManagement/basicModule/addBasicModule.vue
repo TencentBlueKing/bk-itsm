@@ -124,9 +124,9 @@
 </template>
 
 <script>
-    import draggable from 'vuedraggable'
-    import { errorHandler } from '../../../utils/errorHandler.js'
-    import commonMix from '../../commonMix/common.js'
+    import draggable from 'vuedraggable';
+    import { errorHandler } from '../../../utils/errorHandler.js';
+    import commonMix from '../../commonMix/common.js';
 
     export default {
         name: 'addBasicModule',
@@ -137,18 +137,18 @@
         props: {
             slideData: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             publicList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 isDataLoading: false,
                 addTableInfo: {
@@ -163,110 +163,108 @@
                 dataList: [],
                 fieldsList: [],
                 rules: {},
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
         },
-        mounted () {
-            this.initData()
-            this.rules = this.checkCommonRules('name')
+        mounted() {
+            this.initData();
+            this.rules = this.checkCommonRules('name');
         },
         methods: {
-            initData () {
-                this.publicList.forEach(item => {
-                    this.globalChoise.field_type.forEach(node => {
+            initData() {
+                this.publicList.forEach((item) => {
+                    this.globalChoise.field_type.forEach((node) => {
                         if (item.type === node.typeName) {
-                            this.$set(item, 'typeName', node.name)
+                            this.$set(item, 'typeName', node.name);
                         }
-                    })
-                })
-                this.fieldsList = this.publicList.filter(item => (item.key !== 'title' && item.key !== 'current_status'))
+                    });
+                });
+                this.fieldsList = this.publicList.filter(item => (item.key !== 'title' && item.key !== 'current_status'));
                 if (this.slideData.id) {
-                    this.addTableInfo.formInfo.id = this.slideData.id
-                    this.addTableInfo.formInfo.name = this.slideData.name
-                    this.addTableInfo.formInfo.desc = this.slideData.desc
-                    this.addTableInfo.formInfo.fields = this.slideData.fields_order
+                    this.addTableInfo.formInfo.id = this.slideData.id;
+                    this.addTableInfo.formInfo.name = this.slideData.name;
+                    this.addTableInfo.formInfo.desc = this.slideData.desc;
+                    this.addTableInfo.formInfo.fields = this.slideData.fields_order;
                     // 初始化列表数据
-                    this.dataList = JSON.parse(JSON.stringify(this.slideData.fields))
-                    this.dataList.forEach(item => {
-                        this.globalChoise.field_type.forEach(node => {
+                    this.dataList = JSON.parse(JSON.stringify(this.slideData.fields));
+                    this.dataList.forEach((item) => {
+                        this.globalChoise.field_type.forEach((node) => {
                             if (item.type === node.typeName) {
-                                this.$set(item, 'typeName', node.name)
+                                this.$set(item, 'typeName', node.name);
                             }
-                        })
-                    })
+                        });
+                    });
                 } else {
-                    this.dataList = this.publicList.filter(item => (item.key === 'title' || item.key === 'current_status'))
-                    this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id)
+                    this.dataList = this.publicList.filter(item => (item.key === 'title' || item.key === 'current_status'));
+                    this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
                 }
             },
             // 创建/更新数据字典
-            save () {
-                this.$refs.addForm.validate().then(validator => {
+            save() {
+                this.$refs.addForm.validate().then(() => {
                     const params = {
                         desc: this.addTableInfo.formInfo.desc,
                         fields: this.addTableInfo.formInfo.fields,
                         fields_order: this.addTableInfo.formInfo.fields,
                         id: this.addTableInfo.formInfo.id,
                         name: this.addTableInfo.formInfo.name,
-                    }
+                    };
                     // create or update
                     if (!this.addTableInfo.formInfo.id) {
-                        this.$store.dispatch('basicModule/add_tables', { params }).then(res => {
+                        this.$store.dispatch('basicModule/add_tables', { params }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["添加成功"]'),
                                 theme: 'success',
-                            })
-                            this.cancel()
-                            this.$parent.$parent.getList()
+                            });
+                            this.cancel();
+                            this.$parent.$parent.getList();
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     } else {
                         this.$store.dispatch('basicModule/update_tables', {
                             params,
                             id: this.addTableInfo.formInfo.id,
-                        }).then(res => {
+                        }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["更新成功"]'),
                                 theme: 'success',
-                            })
-                            this.cancel()
-                            this.$parent.$parent.getList()
+                            });
+                            this.cancel();
+                            this.$parent.$parent.getList();
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
-                            })
+                            .catch((res) => {
+                                errorHandler(res, this);
+                            });
                     }
-                }, validator => {
-
-                })
+                }, () => {});
             },
             // 取消
-            cancel () {
-                this.$parent.$parent.closeShade()
+            cancel() {
+                this.$parent.$parent.closeShade();
             },
-            typeSelected (...value) {
-                this.addTableInfo.formInfo.fields = value[0]
-                this.dataList = []
-                value[0].forEach(node => {
-                    this.publicList.forEach(item => {
+            typeSelected(...value) {
+                this.addTableInfo.formInfo.fields = value[0];
+                this.dataList = [];
+                value[0].forEach((node) => {
+                    this.publicList.forEach((item) => {
                         if (item.id === node) {
-                            this.dataList.push(item)
+                            this.dataList.push(item);
                         }
-                    })
-                })
+                    });
+                });
             },
             // 拖动结束后的数据
-            updateInfo (evt) {
-                this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id)
+            updateInfo() {
+                this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

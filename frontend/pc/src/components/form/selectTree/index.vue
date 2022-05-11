@@ -47,8 +47,8 @@
 </template>
 
 <script>
-    import Tree from './Tree.vue'
-    import { deepClone } from '../../../utils/util.js'
+    import Tree from './Tree.vue';
+    import { deepClone } from '../../../utils/util.js';
     export default {
         name: 'SelectTree',
         components: {
@@ -81,110 +81,110 @@
             },
             organizationLoading: Boolean,
         },
-        data () {
+        data() {
             return {
                 isShowTree: false,
                 displayName: '',
                 displayList: [],
                 checked: null,
-            }
+            };
         },
         watch: {
-            list () {
-                this.initData()
+            list() {
+                this.initData();
             },
-            value (val) {
-                this.initData()
+            value(val) {
+                this.initData();
             },
-            loading () {
-                this.initData()
+            loading() {
+                this.initData();
             },
         },
-        created () {
-            this.initData()
+        created() {
+            this.initData();
         },
         methods: {
-            initData () {
-                this.displayList = deepClone(this.list)
+            initData() {
+                this.displayList = deepClone(this.list);
                 if (this.displayList.length) {
-                    this.displayList.forEach(tree => {
-                        this.setCheckedValue(tree)
-                    })
+                    this.displayList.forEach((tree) => {
+                        this.setCheckedValue(tree);
+                    });
                 }
                 if (this.value && this.checked) {
-                    this.displayList.forEach(tree => {
-                        this.openChildren(tree)
-                    })
+                    this.displayList.forEach((tree) => {
+                        this.openChildren(tree);
+                    });
                 }
                 if (this.checked) {
-                    this.$emit('change', deepClone(this.checked))
+                    this.$emit('change', deepClone(this.checked));
                 }
             },
-            setCheckedValue (tree) {
-                this.$set(tree, 'checkInfo', false)
-                this.$set(tree, 'has_children', !!(tree.children && tree.children.length))
+            setCheckedValue(tree) {
+                this.$set(tree, 'checkInfo', false);
+                this.$set(tree, 'has_children', !!(tree.children && tree.children.length));
                 if (this.value && String(this.value) === String(tree.id)) {
-                    tree.checkInfo = true
-                    this.checked = tree
-                    this.setDispalyName()
-                    return
+                    tree.checkInfo = true;
+                    this.checked = tree;
+                    this.setDispalyName();
+                    return;
                 }
                 if (tree.has_children) {
-                    this.$set(tree, 'showChildren', false)
-                    tree.children.forEach(item => {
-                        this.setCheckedValue(item)
-                    })
+                    this.$set(tree, 'showChildren', false);
+                    tree.children.forEach((item) => {
+                        this.setCheckedValue(item);
+                    });
                 }
             },
-            openChildren (tree) {
-                this.$set(tree, 'showChildren', false)
-                this.$set(tree, 'showChildren', this.checked.route.some(item => String(item.id) === String(tree.id)))
+            openChildren(tree) {
+                this.$set(tree, 'showChildren', false);
+                this.$set(tree, 'showChildren', this.checked.route.some(item => String(item.id) === String(tree.id)));
                 if (!(tree.children && tree.children.length)) {
-                    return
+                    return;
                 }
-                tree.children.forEach(item => {
-                    this.openChildren(item)
-                })
+                tree.children.forEach((item) => {
+                    this.openChildren(item);
+                });
             },
-            setDispalyName () {
-                let nameList = []
+            setDispalyName() {
+                let nameList = [];
                 if (this.checked.route.length) {
-                    nameList = this.checked.route.map(item => item.name)
+                    nameList = this.checked.route.map(item => item.name);
                 }
-                nameList.push(this.checked.name)
-                this.displayName = nameList.join('/')
+                nameList.push(this.checked.name);
+                this.displayName = nameList.join('/');
             },
-            showTree () {
+            showTree() {
                 if (this.loading) {
-                    return
+                    return;
                 }
-                this.isShowTree = true
+                this.isShowTree = true;
             },
-            closeTree () {
-                this.isShowTree = false
+            closeTree() {
+                this.isShowTree = false;
             },
-            toggleInfo (tree) {
-                this.checked = tree
-                this.setDispalyName()
-                this.cancelAllSectedStatus()
-                this.$set(tree, 'checkInfo', true)
-                this.$emit('selected', tree.id)
-                this.$emit('change', deepClone(tree))
-                this.closeTree()
+            toggleInfo(tree) {
+                this.checked = tree;
+                this.setDispalyName();
+                this.cancelAllSectedStatus();
+                this.$set(tree, 'checkInfo', true);
+                this.$emit('selected', tree.id);
+                this.$emit('change', deepClone(tree));
+                this.closeTree();
             },
-            cancelAllSectedStatus (list = this.displayList) {
+            cancelAllSectedStatus(list = this.displayList) {
                 list.forEach((tree) => {
-                    this.$set(tree, 'checkInfo', false)
+                    this.$set(tree, 'checkInfo', false);
                     if (tree.children && tree.children.length) {
-                        this.cancelAllSectedStatus(tree.children)
+                        this.cancelAllSectedStatus(tree.children);
                     }
-                })
+                });
             },
-            toggleChildren (item) {
-                this.$set(item, 'showChildren', !item.showChildren)
+            toggleChildren(item) {
+                this.$set(item, 'showChildren', !item.showChildren);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

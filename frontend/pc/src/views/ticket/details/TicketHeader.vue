@@ -205,11 +205,11 @@
 </template>
 
 <script>
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue'
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue'
-    import StepSubmitDialog from './StepSubmitDialog.vue'
-    import { errorHandler } from '@/utils/errorHandler'
-    import cookie from 'cookie'
+    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+    import StepSubmitDialog from './StepSubmitDialog.vue';
+    import { errorHandler } from '@/utils/errorHandler';
+    import cookie from 'cookie';
 
     export default {
         name: 'TicketHeader',
@@ -232,7 +232,7 @@
                 default: () => ({}),
             },
         },
-        data () {
+        data() {
             return {
                 isSubmitting: false,
                 hasAttention: false,
@@ -241,75 +241,75 @@
                 disabledText: this.$t('m.newCommon["暂无权限或单据已结束"]'),
                 ticketOperateType: '',
                 localeCookie: false,
-            }
+            };
         },
-        mounted () {
-            this.initData()
-            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn'
+        mounted() {
+            this.initData();
+            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
         },
         methods: {
-            initData () {
-                this.hasAttention = this.ticketInfo.followers ? this.ticketInfo.followers.some(name => name === window.username) : false
+            initData() {
+                this.hasAttention = this.ticketInfo.followers ? this.ticketInfo.followers.some(name => name === window.username) : false;
             },
             // 关注
-            onAttention () {
-                const { id } = this.ticketInfo
+            onAttention() {
+                const { id } = this.ticketInfo;
                 const params = {
                     attention: !this.hasAttention,
-                }
-                const bkMessage = this.hasAttention ? this.$t('m.manageCommon[\'取消关注成功~\']') : this.$t('m.manageCommon[\'添加关注成功~\']')
+                };
+                const bkMessage = this.hasAttention ? this.$t('m.manageCommon[\'取消关注成功~\']') : this.$t('m.manageCommon[\'添加关注成功~\']');
                 this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: bkMessage,
                         theme: 'success',
                         ellipsisLine: 0,
-                    })
-                    this.hasAttention = !this.hasAttention
+                    });
+                    this.hasAttention = !this.hasAttention;
                 })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
                             ellipsisLine: 0,
-                        })
-                    })
+                        });
+                    });
             },
             // 单据操作按钮点击
-            onTicketBtnClick (type, item) {
-                this.$refs.dropdown.hide()
-                
+            onTicketBtnClick(type, item) {
+                this.$refs.dropdown.hide();
+
                 switch (type) {
                     case 'print':
                         const { href } = this.$router.resolve({
                             path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
-                        })
-                        window.open(href, '_blank')
-                        break
+                        });
+                        window.open(href, '_blank');
+                        break;
                     case 'trigger':
-                        this.openTriggerDialog(item)
-                        break
+                        this.openTriggerDialog(item);
+                        break;
                     case 'comment':
-                        this.$refs.evaluationModal.show()
-                        break
+                        this.$refs.evaluationModal.show();
+                        break;
                     default:
-                        this.ticketOperatingHandler(type)
+                        this.ticketOperatingHandler(type);
                 }
             },
             // 单据操作
-            ticketOperatingHandler (type) {
+            ticketOperatingHandler(type) {
                 // 督办,撤单
                 if (type === 'widthdraw' || type === 'supervise') {
-                    this.confirmOperating(type)
+                    this.confirmOperating(type);
                 }
                 if (type === 'suspend' || type === 'close' || type === 'restore') {
-                    this.ticketOperateType = type
+                    this.ticketOperateType = type;
                     this.$nextTick(() => {
-                        this.$refs.ticketOperate.openCel()
-                    })
+                        this.$refs.ticketOperate.openCel();
+                    });
                 }
             },
             // 二次确认操作
-            confirmOperating (type) {
+            confirmOperating(type) {
                 const infoMap = {
                     widthdraw: {
                         title: this.$t('m.newCommon["确认撤销此单据？"]'),
@@ -327,78 +327,78 @@
                         successText: this.$t('m.newCommon["督办成功"]'),
                         params: {},
                     },
-                }
+                };
                 this.$bkInfo({
                     type: 'warning',
                     title: infoMap[type].title,
                     subTitle: infoMap[type].instructions,
                     confirmFn: () => {
-                        this.submitOperating(type, infoMap)
+                        this.submitOperating(type, infoMap);
                     },
-                })
+                });
             },
             // 提交操作
-            submitOperating (type, infoMap) {
-                this.isSubmitting = true
-                const { id } = this.ticketInfo
-                const { dispatchAcationPath, params, successText } = infoMap[type]
+            submitOperating(type, infoMap) {
+                this.isSubmitting = true;
+                const { id } = this.ticketInfo;
+                const { dispatchAcationPath, params, successText } = infoMap[type];
                 this.$store.dispatch(dispatchAcationPath, { params, id }).then((res) => {
                     this.$bkMessage({
                         message: successText,
                         theme: 'success',
-                    })
-                    this.reloadTicket()
+                    });
+                    this.reloadTicket();
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isSubmitting = false
-                    })
+                        this.isSubmitting = false;
+                    });
             },
             // 单据手动触发器
-            openTriggerDialog (trigger) {
-                this.$refs.ticketTriggerDialog.openDialog(trigger)
+            openTriggerDialog(trigger) {
+                this.$refs.ticketTriggerDialog.openDialog(trigger);
             },
-            reloadTicket () {
-                this.$emit('reloadTicket')
+            reloadTicket() {
+                this.$emit('reloadTicket');
             },
-            triggerSuccessCallback () {
-                this.reloadTicket()
+            triggerSuccessCallback() {
+                this.reloadTicket();
             },
-            onRefreshBtnClick () {
-                this.rotate = !this.rotate
+            onRefreshBtnClick() {
+                this.rotate = !this.rotate;
                 setTimeout(() => {
-                    this.reloadTicket()
-                }, 500)
+                    this.reloadTicket();
+                }, 500);
             },
-            evaluationSubmitSuccess () {
-                this.reloadTicket()
+            evaluationSubmitSuccess() {
+                this.reloadTicket();
             },
-            getDisabledContentText (isCommented) {
-                return isCommented ? this.$t('m.newCommon["已评价"]') : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]')
+            getDisabledContentText(isCommented) {
+                return isCommented ? this.$t('m.newCommon["已评价"]') : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
             },
-            onBackClick () {
-                const from = this.$route.query.from || ''
+            onBackClick() {
+                const from = this.$route.query.from || '';
                 if (from === 'projectTicket' || from === '') {
                     this.$router.push({
                         name: 'projectTicket',
                         query: {
                             project_id: this.$route.query.project_id,
                         },
-                    })
+                    });
                 } else if (from === 'created') {
                     this.$router.push({
                         name: 'myCreatedTicket',
-                    })
+                    });
                 } else {
                     this.$router.push({
                         name: from,
-                    })
+                    });
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

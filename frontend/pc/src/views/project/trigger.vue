@@ -26,14 +26,14 @@
     </div>
 </template>
 <script>
-    import PublicTrigger from '../processManagement/publicTrigger/index'
+    import PublicTrigger from '../processManagement/publicTrigger/index';
 
     export default {
         name: 'Trigger',
         components: {
             PublicTrigger,
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .public-trigger-page {

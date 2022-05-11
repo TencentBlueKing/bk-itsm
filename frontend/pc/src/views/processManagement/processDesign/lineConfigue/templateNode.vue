@@ -56,12 +56,12 @@
         props: {
             node: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
         },
-        data () {
+        data() {
             return {
                 typeList: [
                     { type: 'NORMAL', iconStyle: 'icon-icon-person' },
@@ -71,12 +71,12 @@
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                 ],
-            }
+            };
         },
         methods: {
 
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

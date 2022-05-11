@@ -139,9 +139,9 @@
     </div>
 </template>
 <script>
-    import memberInfo from '../common/memberInfo.vue'
-    import { mapState } from 'vuex'
-    import insertText from '@/utils/insertText.js'
+    import memberInfo from '../common/memberInfo.vue';
+    import { mapState } from 'vuex';
+    import insertText from '@/utils/insertText.js';
 
     export default {
         name: 'changeConductor',
@@ -151,8 +151,8 @@
         props: {
             itemInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             origin: {
@@ -163,83 +163,83 @@
                 type: Number,
             },
         },
-        data () {
+        data() {
             return {
                 precision: 0,
                 insertValue: '',
                 variableList: [],
-            }
+            };
         },
         computed: {
-            globalChoise () {
-                return this.$store.state.common.configurInfo
+            globalChoise() {
+                return this.$store.state.common.configurInfo;
             },
             ...mapState('trigger', {
                 triggerVariables: state => state.triggerVariables,
             }),
         },
         watch: {
-            triggerVariables (newVal) {
-                this.variableList = newVal
+            triggerVariables(newVal) {
+                this.variableList = newVal;
             },
         },
-        created () {
+        created() {
             // 如果是单选或者多选的时候且可引用变量时，在choice添加引用变量的选项
             if ((this.itemInfo.type === 'SELECT' || this.itemInfo.type === 'MULTISELECT') && this.itemInfo.use_variable) {
                 if (!this.itemInfo.choice.some(node => node.key === 'VARIABLE')) {
                     this.itemInfo.choice.push({
                         key: 'VARIABLE',
                         name: '引用变量',
-                    })
-                    const valueInfo = this.itemInfo.type === 'MULTISELECT' ? [] : ''
-                    this.$set(this.itemInfo, 'insertValue', valueInfo)
+                    });
+                    const valueInfo = this.itemInfo.type === 'MULTISELECT' ? [] : '';
+                    this.$set(this.itemInfo, 'insertValue', valueInfo);
                 }
             }
-            this.$set(this.itemInfo, 'referenceType', (this.itemInfo.referenceType || 'custom'))
+            this.$set(this.itemInfo, 'referenceType', (this.itemInfo.referenceType || 'custom'));
             // 初始化默认值
             if (this.itemInfo.ref_type) {
-                this.itemInfo.referenceType = this.itemInfo.ref_type
+                this.itemInfo.referenceType = this.itemInfo.ref_type;
                 if (this.itemInfo.ref_type === 'reference') {
                     if (this.itemInfo.type === 'SELECT' || this.itemInfo.type === 'MULTISELECT') {
-                        this.itemInfo.insertValue = this.itemInfo.type === 'MULTISELECT' ? this.itemInfo.value.split(',') : this.itemInfo.value
-                        this.itemInfo.value = 'VARIABLE'
+                        this.itemInfo.insertValue = this.itemInfo.type === 'MULTISELECT' ? this.itemInfo.value.split(',') : this.itemInfo.value;
+                        this.itemInfo.value = 'VARIABLE';
                     }
                 } else {
                     if (this.itemInfo.type === 'MULTISELECT') {
-                        this.itemInfo.value = this.itemInfo.value ? this.itemInfo.value.split(',') : []
+                        this.itemInfo.value = this.itemInfo.value ? this.itemInfo.value.split(',') : [];
                     }
                 }
             } else {
                 if (this.itemInfo.type === 'MULTISELECT') {
-                    this.itemInfo.value = this.itemInfo.value ? this.itemInfo.value.split(',') : []
+                    this.itemInfo.value = this.itemInfo.value ? this.itemInfo.value.split(',') : [];
                 }
             }
         },
-        mounted () {
-            this.variableList = this.triggerVariables
+        mounted() {
+            this.variableList = this.triggerVariables;
         },
         methods: {
-            changeInsert (value) {
+            changeInsert(value) {
                 this.itemInfo.value = insertText(
                     this.$el.querySelector('.bk-form-textarea, .bk-form-input'),
                     `conductorId${this.index}`,
                     this.itemInfo.value,
                     `\${${value}}`,
                     this
-                )
-                this.itemInfo.referenceType = 'import'
-                this.insertValue = ''
+                );
+                this.itemInfo.referenceType = 'import';
+                this.insertValue = '';
             },
-            changeImport () {
-                this.itemInfo.referenceType = 'reference'
+            changeImport() {
+                this.itemInfo.referenceType = 'reference';
             },
-            changeMessagePanel (value, $event) {
+            changeMessagePanel(value, $event) {
                 if (value && this.origin === 'message') {
-                    this.$emit('change-panel-status')
+                    this.$emit('change-panel-status');
                 }
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -98,10 +98,10 @@
     </div>
 </template>
 <script>
-    import commonMix from '../../../commonMix/common.js'
-    import memberSelect from '../../../commonComponent/memberSelect'
-    import { errorHandler } from '../../../../utils/errorHandler.js'
-    import SectionCard from '@/components/common/layout/SectionCard'
+    import commonMix from '../../../commonMix/common.js';
+    import memberSelect from '../../../commonComponent/memberSelect';
+    import { errorHandler } from '../../../../utils/errorHandler.js';
+    import SectionCard from '@/components/common/layout/SectionCard';
 
     export default {
         name: 'CreateProcess',
@@ -110,8 +110,8 @@
         props: {
             flowInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             isNewFlow: {
@@ -127,7 +127,7 @@
                 required: true,
             },
         },
-        data () {
+        data() {
             return {
                 // 基础模型类型
                 flowModuleTypes: [],
@@ -158,57 +158,57 @@
                     index: 0,
                     firstStep: {},
                 },
-            }
+            };
         },
         watch: {
-            flowInfo () {
-                this.initInfo()
+            flowInfo() {
+                this.initInfo();
             },
         },
-        mounted () {
-            this.getFlowModuleTypes()
+        mounted() {
+            this.getFlowModuleTypes();
             // 判断是编辑数据还是新增数据
             if (!this.isNewFlow) {
-                this.initInfo()
+                this.initInfo();
             }
             // 校验
-            this.rules.name = this.checkCommonRules('name').name
-            this.rules.flowModuleType = this.checkCommonRules('select').select
+            this.rules.name = this.checkCommonRules('name').name;
+            this.rules.flowModuleType = this.checkCommonRules('select').select;
         },
         methods: {
             // 基础模型类型
-            getFlowModuleTypes () {
+            getFlowModuleTypes() {
                 const params = {
                     all: true,
-                }
-                this.$store.dispatch('basicModule/get_tables', params).then(res => {
-                    this.flowModuleTypes = res.data
+                };
+                this.$store.dispatch('basicModule/get_tables', params).then((res) => {
+                    this.flowModuleTypes = res.data;
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
-                    })
+                    .catch((res) => {
+                        errorHandler(res, this);
+                    });
             },
             // 通过ID获取数据
-            initInfo () {
-                this.formInfo.name = this.flowInfo.name
-                this.formInfo.owners = this.flowInfo.owners ? this.flowInfo.owners.split(',') : []
-                this.formInfo.desc = this.flowInfo.desc
-                this.formInfo.flowType = this.flowInfo.flow_type
-                this.formInfo.flowModuleType = this.flowInfo.table || ''
-                this.formInfo.flowModuleTypeDisabled = !!this.flowInfo.table
-                this.formInfo.business = this.flowInfo.is_biz_needed
-                this.formInfo.useIam = this.flowInfo.is_iam_used
+            initInfo() {
+                this.formInfo.name = this.flowInfo.name;
+                this.formInfo.owners = this.flowInfo.owners ? this.flowInfo.owners.split(',') : [];
+                this.formInfo.desc = this.flowInfo.desc;
+                this.formInfo.flowType = this.flowInfo.flow_type;
+                this.formInfo.flowModuleType = this.flowInfo.table || '';
+                this.formInfo.flowModuleTypeDisabled = !!this.flowInfo.table;
+                this.formInfo.business = this.flowInfo.is_biz_needed;
+                this.formInfo.useIam = this.flowInfo.is_iam_used;
             },
             // 数据校验
-            changeText () {
-                this.$refs.stepOneForm.validate().then(validator => {
-                    this.stepNext()
-                })
+            changeText() {
+                this.$refs.stepOneForm.validate().then((validator) => {
+                    this.stepNext();
+                });
             },
             // 下一步操作
-            stepNext () {
+            stepNext() {
                 if (this.isSaveing) {
-                    return
+                    return;
                 }
                 // 基础参数
                 const params = {
@@ -219,18 +219,18 @@
                     desc: this.formInfo.desc,
                     is_biz_needed: this.formInfo.business,
                     is_iam_used: this.formInfo.useIam,
-                }
+                };
                 // 保存
-                this.$emit('saveFlowInfo', params, this.isNewFlow)
-                this.$emit('onBusinessChange', this.formInfo.business)
+                this.$emit('saveFlowInfo', params, this.isNewFlow);
+                this.$emit('onBusinessChange', this.formInfo.business);
             },
-            previousStep () {
+            previousStep() {
                 this.$router.push({
                     name: 'ProcessHome',
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

@@ -26,7 +26,7 @@
 <script>
     export default {
         name: 'TicketMange',
-    }
+    };
 </script>
 <style lang="scss">
     @import '../../scss/mixins/scroller.scss';

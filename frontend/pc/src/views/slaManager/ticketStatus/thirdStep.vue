@@ -85,7 +85,7 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
+    import { errorHandler } from '../../../utils/errorHandler';
     export default {
         name: 'thirdStep',
         props: {
@@ -94,7 +94,7 @@
                 default: '',
             },
         },
-        data () {
+        data() {
             return {
                 versionStatus: true,
                 secondClick: false,
@@ -118,116 +118,116 @@
                 endTips: '',
                 ignoreTips: '',
                 statusLoading: false,
-            }
+            };
         },
-        async mounted () {
-            await this.getTypeStatus()
-            await this.getInfo()
+        async mounted() {
+            await this.getTypeStatus();
+            await this.getInfo();
         },
         methods: {
-            endSelectFn (value) {
-                this.ignoreCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
-                const itemList = this.endCheckboxList.filter(item => value.indexOf(item.id) !== -1)
-                itemList.forEach(item => {
-                    this.spliceOne(item, this.ignoreCheckboxList)
-                })
-                this.tempEnd = JSON.parse(JSON.stringify(itemList))
+            endSelectFn(value) {
+                this.ignoreCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList));
+                const itemList = this.endCheckboxList.filter(item => value.indexOf(item.id) !== -1);
+                itemList.forEach((item) => {
+                    this.spliceOne(item, this.ignoreCheckboxList);
+                });
+                this.tempEnd = JSON.parse(JSON.stringify(itemList));
             },
-            ignoreSelectFn (value) {
-                this.endCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
-                const itemList = this.ignoreCheckboxList.filter(item => value.indexOf(item.id) !== -1)
-                itemList.forEach(item => {
-                    this.spliceOne(item, this.endCheckboxList)
-                })
-                this.tempIgnore = JSON.parse(JSON.stringify(itemList))
+            ignoreSelectFn(value) {
+                this.endCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList));
+                const itemList = this.ignoreCheckboxList.filter(item => value.indexOf(item.id) !== -1);
+                itemList.forEach((item) => {
+                    this.spliceOne(item, this.endCheckboxList);
+                });
+                this.tempIgnore = JSON.parse(JSON.stringify(itemList));
             },
-            spliceOne (item, list) {
-                const temp = list.findIndex(ite => ite.key === item.key)
-                list.splice(temp, 1)
+            spliceOne(item, list) {
+                const temp = list.findIndex(ite => ite.key === item.key);
+                list.splice(temp, 1);
             },
-            addOne (item, list) {
-                list.unshift(item)
+            addOne(item, list) {
+                list.unshift(item);
             },
-            async getInfo () {
-                this.statusLoading = true
+            async getInfo() {
+                this.statusLoading = true;
                 await this.$store.dispatch('ticketStatus/getSubmitFlow', this.statusType).then((res) => {
-                    const tempList = res.data
-                    tempList.forEach(item => {
+                    const tempList = res.data;
+                    tempList.forEach((item) => {
                         if (item.condition_type === 'STOP') {
-                            item.condition.expressions.forEach(it => {
-                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0]
+                            item.condition.expressions.forEach((it) => {
+                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0];
                                 if (temp && temp.id) {
-                                    this.formDataInfo.endStatus.info.push(temp.id)
-                                    this.spliceOne(temp, this.ignoreCheckboxList)
-                                    this.tempEnd.push(temp)
+                                    this.formDataInfo.endStatus.info.push(temp.id);
+                                    this.spliceOne(temp, this.ignoreCheckboxList);
+                                    this.tempEnd.push(temp);
                                 }
-                            })
+                            });
                             if (item.id) {
-                                this.formDataInfo.endStatus.endId = item.id
+                                this.formDataInfo.endStatus.endId = item.id;
                             }
                         }
                         if (item.condition_type === 'PAUSE') {
-                            item.condition.expressions.forEach(it => {
-                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0]
+                            item.condition.expressions.forEach((it) => {
+                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0];
                                 if (temp && temp.id) {
-                                    this.formDataInfo.ignoreStatus.info.push(temp.id)
-                                    this.spliceOne(temp, this.endCheckboxList)
-                                    this.tempIgnore.push(temp)
+                                    this.formDataInfo.ignoreStatus.info.push(temp.id);
+                                    this.spliceOne(temp, this.endCheckboxList);
+                                    this.tempIgnore.push(temp);
                                 }
-                            })
+                            });
                             if (item.id) {
-                                this.formDataInfo.ignoreStatus.ignoreId = item.id
+                                this.formDataInfo.ignoreStatus.ignoreId = item.id;
                             }
                         }
-                    })
+                    });
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.statusLoading = false
-                    })
+                        this.statusLoading = false;
+                    });
             },
-            async getTypeStatus () {
-                this.isDataLoading = true
-                const params = {}
+            async getTypeStatus() {
+                this.isDataLoading = true;
+                const params = {};
                 await this.$store.dispatch('ticketStatus/getTypeStatus', {
                     type: this.statusType,
                     params,
                 }).then((res) => {
-                    this.statusList = res.data
-                    this.statusList.forEach(item => {
+                    this.statusList = res.data;
+                    this.statusList.forEach((item) => {
                         if (item.is_over) {
-                            this.isOverNameList.push(item.name)
+                            this.isOverNameList.push(item.name);
                         } else {
-                            this.threeCheckboxList.push(item)
+                            this.threeCheckboxList.push(item);
                         }
-                    })
-                    this.endCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
-                    this.ignoreCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
-                    this.endTips = this.isOverNameList.join('/')
-                    this.ignoreTips = this.$t('m.slaContent[\'说明： 挂起状态默认为SLA不计入统计时长的状态\']')
+                    });
+                    this.endCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList));
+                    this.ignoreCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList));
+                    this.endTips = this.isOverNameList.join('/');
+                    this.ignoreTips = this.$t('m.slaContent[\'说明： 挂起状态默认为SLA不计入统计时长的状态\']');
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isDataLoading = false
-                    })
+                        this.isDataLoading = false;
+                    });
             },
-            previousStep () {
-                this.$parent.changeTree(2, 'back')
+            previousStep() {
+                this.$parent.changeTree(2, 'back');
             },
-            submit () {
-                this.ajaxSubmit()
+            submit() {
+                this.ajaxSubmit();
             },
-            ajaxSubmit () {
+            ajaxSubmit() {
                 const params = {
                     name: '启动',
                     service_type: this.statusType,
                     batch_create: true,
                     rules: [],
-                }
+                };
                 for (let i = 0; i < 2; i++) {
                     params.rules.push({
                         condition_type: 'STOP',
@@ -235,60 +235,60 @@
                             type: 'any',
                             expressions: [],
                         },
-                    })
+                    });
                 }
-                params.rules[1].condition_type = 'PAUSE'
-                this.threeCheckboxList.forEach(item => {
-                    this.formDataInfo.endStatus.info.forEach(ite => {
+                params.rules[1].condition_type = 'PAUSE';
+                this.threeCheckboxList.forEach((item) => {
+                    this.formDataInfo.endStatus.info.forEach((ite) => {
                         if (item.id === ite * 1) {
                             const temp = {
                                 name: 'current_status',
                                 value: item.key,
                                 operator: 'equal_to',
-                            }
-                            params.rules[0].condition.expressions.push(temp)
+                            };
+                            params.rules[0].condition.expressions.push(temp);
                         }
-                    })
+                    });
                     if (this.formDataInfo.endStatus.endId) {
-                        params.rules[0].id = this.formDataInfo.endStatus.endId * 1
+                        params.rules[0].id = this.formDataInfo.endStatus.endId * 1;
                     }
-                    this.formDataInfo.ignoreStatus.info.forEach(ite => {
+                    this.formDataInfo.ignoreStatus.info.forEach((ite) => {
                         if (item.id === ite * 1) {
                             const temp = {
                                 name: 'current_status',
                                 value: item.key,
                                 operator: 'equal_to',
-                            }
-                            params.rules[1].condition.expressions.push(temp)
+                            };
+                            params.rules[1].condition.expressions.push(temp);
                         }
-                    })
+                    });
                     if (this.formDataInfo.ignoreStatus.ignoreId) {
-                        params.rules[1].id = this.formDataInfo.ignoreStatus.ignoreId * 1
+                        params.rules[1].id = this.formDataInfo.ignoreStatus.ignoreId * 1;
                     }
-                })
+                });
                 if (this.secondClick) {
-                    return
+                    return;
                 }
-                this.secondClick = true
+                this.secondClick = true;
                 this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
                     this.$bkMessage({
                         message: '保存成功',
                         theme: 'success',
-                    })
-                    this.$parent.backTab()
+                    });
+                    this.$parent.backTab();
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.secondClick = false
-                    })
+                        this.secondClick = false;
+                    });
             },
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang="scss">

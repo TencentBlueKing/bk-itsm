@@ -40,7 +40,7 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js'
+    import mixins from '../../commonMix/field.js';
 
     export default {
         name: 'INT',
@@ -54,8 +54,8 @@
             },
             fields: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             isCurrent: {
@@ -67,27 +67,27 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 max: Number.MAX_SAFE_INTEGER,
                 isErrMessage: false,
-            }
+            };
         },
         watch: {
-            'item.val' (val) {
-                this.isErrMessage = val > this.max || false
-                this.conditionField(this.item, this.fields)
+            'item.val'(val) {
+                this.isErrMessage = val > this.max || false;
+                this.conditionField(this.item, this.fields);
             },
         },
-        mounted () {
+        mounted() {
             if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value
+                this.item.val = this.item.value;
             }
         },
         methods: {},
-    }
+    };
 </script>
 
 <style lang='scss' scoped>
-    
+
 </style>

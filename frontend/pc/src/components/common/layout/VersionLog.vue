@@ -62,12 +62,12 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js'
-    import _ from 'lodash'
+    import { errorHandler } from '@/utils/errorHandler.js';
+    import _ from 'lodash';
 
     export default {
         name: 'VersionLog',
-        data () {
+        data() {
             return {
                 loading: false,
                 markdownText: '',
@@ -75,56 +75,56 @@
                 versionInfo: {
                     version: '',
                 },
-            }
+            };
         },
         computed: {},
         watch: {},
-        created () {
+        created() {
 
         },
-        async mounted () {
-            await this.getVersionList()
-            this.initData()
+        async mounted() {
+            await this.getVersionList();
+            this.initData();
         },
         methods: {
-            initData () {
+            initData() {
                 if (this.versionList.length) {
-                    this.versionInfo = this.versionList[0]
-                    this.changeVersion(this.versionList[0])
+                    this.versionInfo = this.versionList[0];
+                    this.changeVersion(this.versionList[0]);
                 }
             },
-            async getVersionList () {
-                this.loading = true
-                return this.$store.dispatch('version/version_logs').then(res => {
-                    this.versionList = res.data.data
+            async getVersionList() {
+                this.loading = true;
+                return this.$store.dispatch('version/version_logs').then((res) => {
+                    this.versionList = res.data.data;
                 })
-                    .catch(res => {
-                        errorHandler(res.data.message, this)
+                    .catch((res) => {
+                        errorHandler(res.data.message, this);
                     })
                     .finally(() => {
-                        this.loading = false
-                    })
+                        this.loading = false;
+                    });
             },
-            changeVersion (item) {
-                this.versionInfo = item
+            changeVersion(item) {
+                this.versionInfo = item;
                 if (typeof this.versionInfo.log === 'string') {
-                    this.versionInfo.log = _.split(this.versionInfo.log, '\n')
+                    this.versionInfo.log = _.split(this.versionInfo.log, '\n');
                 }
-                this.markdownText = ''
-                this.markdownText = this.addSpan(this.versionInfo.log)
+                this.markdownText = '';
+                this.markdownText = this.addSpan(this.versionInfo.log);
             },
-            addSpan (log) {
-                let result = ''
+            addSpan(log) {
+                let result = '';
                 log.forEach((item) => {
-                    const arrayStr = item.split('')
-                    arrayStr.splice(arrayStr.findIndex(str => str === '[' || str === '【'), 0, '<span>')
-                    arrayStr.splice(arrayStr.findIndex(str => str === ']' || str === '】') + 1, 0, '</span>')
-                    result += arrayStr.join('')
-                })
-                return result
+                    const arrayStr = item.split('');
+                    arrayStr.splice(arrayStr.findIndex(str => str === '[' || str === '【'), 0, '<span>');
+                    arrayStr.splice(arrayStr.findIndex(str => str === ']' || str === '】') + 1, 0, '</span>');
+                    result += arrayStr.join('');
+                });
+                return result;
             },
         },
-    }
+    };
 </script>
 <style lang='scss' scoped>
 @import '../../../scss/mixins/clearfix.scss';

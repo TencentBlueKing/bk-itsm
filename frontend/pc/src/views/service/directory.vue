@@ -44,28 +44,28 @@
     </div>
 </template>
 <script>
-    import treeInfo from './directoryCom/treeInfo.vue'
-    import treeTable from './directoryCom/treeTable.vue'
+    import treeInfo from './directoryCom/treeInfo.vue';
+    import treeTable from './directoryCom/treeTable.vue';
 
     export default {
         components: {
             treeInfo,
             treeTable,
         },
-        data () {
+        data() {
             return {
                 // 节点信息
                 treeInfo: {
                     node: {},
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

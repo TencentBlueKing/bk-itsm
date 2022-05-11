@@ -26,12 +26,12 @@
     </div>
 </template>
 <script>
-    import PublicApi from '../processManagement/apiConfigure/index.vue'
+    import PublicApi from '../processManagement/apiConfigure/index.vue';
 
     export default {
         name: 'APIS',
         components: {
             PublicApi,
         },
-    }
+    };
 </script>

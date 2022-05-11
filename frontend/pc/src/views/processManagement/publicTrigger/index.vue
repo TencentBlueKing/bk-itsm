@@ -126,10 +126,10 @@
     </div>
 </template>
 <script>
-    import { errorHandler } from '../../../utils/errorHandler'
-    import permission from '@/mixins/permission.js'
-    import addTrigger from './addTrigger.vue'
-    import EmptyTip from '../../project/components/emptyTip.vue'
+    import { errorHandler } from '../../../utils/errorHandler';
+    import permission from '@/mixins/permission.js';
+    import addTrigger from './addTrigger.vue';
+    import EmptyTip from '../../project/components/emptyTip.vue';
 
     export default {
         name: 'publicTrigger',
@@ -141,7 +141,7 @@
         props: {
             projectId: String,
         },
-        data () {
+        data() {
             return {
                 versionStatus: true,
                 searchKey: '',
@@ -185,73 +185,73 @@
                         },
                     ],
                 },
-            }
+            };
         },
         computed: {
-            sliderStatus () {
-                return this.$store.state.common.slideStatus
+            sliderStatus() {
+                return this.$store.state.common.slideStatus;
             },
         },
-        mounted () {
-            this.getList()
+        mounted() {
+            this.getList();
         },
         methods: {
-            closeVersion () {
-                this.versionStatus = false
+            closeVersion() {
+                this.versionStatus = false;
             },
             // 新增触发器
-            addTrigger () {
+            addTrigger() {
                 if (!this.hasPermission(['triggers_create'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
                             name: projectInfo.name,
                         }],
-                    }
-                    this.applyForPermission(['triggers_create'], this.$store.state.project.projectAuthActions, resourceData)
-                    return
+                    };
+                    this.applyForPermission(['triggers_create'], this.$store.state.project.projectAuthActions, resourceData);
+                    return;
                 }
-                this.triggerInfo = {}
-                this.sliderInfo.title = this.$t('m.taskTemplate["创建触发器"]')
-                this.sliderInfo.show = true
+                this.triggerInfo = {};
+                this.sliderInfo.title = this.$t('m.taskTemplate["创建触发器"]');
+                this.sliderInfo.show = true;
             },
             // 搜索
-            searchInfo () {
-                this.getList()
+            searchInfo() {
+                this.getList();
             },
-            clearSearch () {
-                this.getList()
+            clearSearch() {
+                this.getList();
             },
-            getList () {
+            getList() {
                 const params = {
                     source_id__in: 0,
                     source_type__in: 'basic',
                     sender__in: 0,
                     name__icontains: this.searchKey,
-                }
+                };
                 if (this.projectId) {
-                    params.project_key = this.projectId
+                    params.project_key = this.projectId;
                 }
-                this.searchToggle = !this.searchKey
-                this.isLoading = true
+                this.searchToggle = !this.searchKey;
+                this.isLoading = true;
                 this.$store.dispatch('trigger/getTriggerTable', params).then((res) => {
                     this.triggerList = res.data.map(trigger => ({
                         ...trigger,
                         iconKey: this.iconList.find(icon => icon.typeName === trigger.icon).key,
-                    }))
+                    }));
                 })
-                    .catch(res => {
-                        errorHandler(res, this)
+                    .catch((res) => {
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                        this.isLoading = false
-                    })
+                        this.isLoading = false;
+                    });
             },
             // 修改触发器
-            changeTrigger (item, index) {
+            changeTrigger(item, index) {
                 if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -261,21 +261,21 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return
+                    };
+                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return;
                 }
-                this.triggerInfo = item
-                this.sliderInfo.title = this.$t('m.trigger["编辑触发器"]')
-                this.sliderInfo.show = true
+                this.triggerInfo = item;
+                this.sliderInfo.title = this.$t('m.trigger["编辑触发器"]');
+                this.sliderInfo.show = true;
             },
-            closeTrigger () {
-                this.sliderInfo.show = false
+            closeTrigger() {
+                this.sliderInfo.show = false;
             },
             // 删除触发器
-            deleteTrigger (item, index) {
+            deleteTrigger(item, index) {
                 if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project
+                    const { projectInfo } = this.$store.state.project;
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
@@ -285,34 +285,34 @@
                             id: item.id,
                             name: item.name,
                         }],
-                    }
-                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
-                    return
+                    };
+                    this.applyForPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    return;
                 }
                 this.$bkInfo({
                     type: 'warning',
                     title: this.$t('m.trigger["确认删除触发器？"]'),
                     subTitle: this.$t('m.trigger["触发器删除将不可使用"]'),
                     confirmFn: () => {
-                        const { id } = item
+                        const { id } = item;
                         this.$store.dispatch('trigger/deleteTrigger', id).then((res) => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
-                            })
-                            this.getList()
+                            });
+                            this.getList();
                         })
-                            .catch(res => {
-                                errorHandler(res, this)
+                            .catch((res) => {
+                                errorHandler(res, this);
                             })
                             .finally(() => {
 
-                            })
+                            });
                     },
-                })
+                });
             },
         },
-    }
+    };
 </script>
 
 <style lang='scss' scoped>

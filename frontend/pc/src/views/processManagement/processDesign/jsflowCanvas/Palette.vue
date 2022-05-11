@@ -76,10 +76,10 @@
 <script>
     export default {
         name: 'Palette',
-        mounted () {
+        mounted() {
             // this.$emit('registerPaletteEvent')
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     ul {

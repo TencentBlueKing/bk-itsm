@@ -26,14 +26,14 @@
     </div>
 </template>
 <script>
-    import AllTicketList from '../ticket/allTicket/index'
+    import AllTicketList from '../ticket/allTicket/index';
 
     export default {
         name: 'ProjectTicket',
         components: {
             AllTicketList,
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     .all-ticket-page {

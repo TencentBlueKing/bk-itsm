@@ -130,14 +130,14 @@
 </template>
 
 <script>
-    import CurrentSteps from '../currentSteps/index.vue'
-    import fieldPreview from '@/views/commonComponent/fieldPreview'
-    import autoNodeInfo from './autoNodeInfo.vue'
-    import sopsNodeInfo from './sopsNodeInfo.vue'
-    import devopsNodeInfo from './devopsNodeInfo.vue'
-    import signNodeInfo from './signNodeInfo'
-    import approvalNodeInfo from './approvalNodeInfo'
-    import { errorHandler } from '@/utils/errorHandler'
+    import CurrentSteps from '../currentSteps/index.vue';
+    import fieldPreview from '@/views/commonComponent/fieldPreview';
+    import autoNodeInfo from './autoNodeInfo.vue';
+    import sopsNodeInfo from './sopsNodeInfo.vue';
+    import devopsNodeInfo from './devopsNodeInfo.vue';
+    import signNodeInfo from './signNodeInfo';
+    import approvalNodeInfo from './approvalNodeInfo';
+    import { errorHandler } from '@/utils/errorHandler';
 
     export default {
         name: 'nodeContent',
@@ -155,32 +155,32 @@
             // 单据信息
             basicInfomation: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 打开节点
             openNodeInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             // 说有节点信息
             nodeList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
             currentStepList: {
                 type: Array,
-                default () {
-                    return []
+                default() {
+                    return [];
                 },
             },
         },
-        data () {
+        data() {
             return {
                 basicList: [
                     { name: this.$t('m.newCommon["节点名称"]'), value: '', key: 'name' },
@@ -188,63 +188,63 @@
                     { name: this.$t('m.newCommon["处理时间"]'), value: '', key: 'update_at' },
                 ],
                 openStatus: true,
-            }
+            };
         },
         computed: {
-            nodeListCurren () {
-                const nodeListCurren = this.nodeList.filter(item => item.state_id === this.openNodeInfo.id)
+            nodeListCurren() {
+                const nodeListCurren = this.nodeList.filter(item => item.state_id === this.openNodeInfo.id);
                 if (nodeListCurren[0]) {
                     for (let i = 0; i < this.basicList.length; i++) {
-                        const property = this.basicList[i]
-                        property.value = JSON.parse(JSON.stringify((nodeListCurren[0][property.key] || '')))
+                        const property = this.basicList[i];
+                        property.value = JSON.parse(JSON.stringify((nodeListCurren[0][property.key] || '')));
                     }
                 }
-                return nodeListCurren
+                return nodeListCurren;
             },
         },
-        mounted () {
+        mounted() {
             setTimeout(() => {
                 if (this.nodeList[0] && this.nodeList[0].status !== 'FINISHED'
                     && this && !this._isDestroyed) {
-                    this.getTicketNodeInfo(this.openNodeInfo)
+                    this.getTicketNodeInfo(this.openNodeInfo);
                 }
-            }, 10000)
+            }, 10000);
         },
         methods: {
-            initInfo () {
-                this.$emit('initInfo')
+            initInfo() {
+                this.$emit('initInfo');
             },
-            getTicketNodeInfo (openNodeInfo) {
-                const { id } = this.basicInfomation
+            getTicketNodeInfo(openNodeInfo) {
+                const { id } = this.basicInfomation;
                 const params = {
                     state_id: openNodeInfo.id,
-                }
+                };
                 this.$store.dispatch('deployOrder/getTicketNodeInfo', { params, id }).then((res) => {
                     if (res.data.status !== 'FINISHED' && this && !this._isDestroyed && !this.basicInfomation.is_over) {
                         // 判断数据 和上次请求是否相同
                         if (this.nodeList[0].toString() !== res.data.toString()) {
-                            this.nodeInfo[0] = res.data
+                            this.nodeInfo[0] = res.data;
                         }
                         // 轮询
                         const setTimeoutFunc = setTimeout(() => {
-                            this.getTicketNodeInfo(this.openNodeInfo)
-                        }, 10000)
+                            this.getTicketNodeInfo(this.openNodeInfo);
+                        }, 10000);
                         this.$once('hook:beforeDestroy', () => {
-                            clearInterval(setTimeoutFunc)
-                        })
+                            clearInterval(setTimeoutFunc);
+                        });
                     }
                 })
                     .catch((res) => {
-                        errorHandler(res, this)
+                        errorHandler(res, this);
                     })
                     .finally(() => {
-                    })
+                    });
             },
-            closeSlider () {
-                this.$emit('closeSlider')
+            closeSlider() {
+                this.$emit('closeSlider');
             },
         },
-    }
+    };
 </script>
 
 <style scoped lang='scss'>

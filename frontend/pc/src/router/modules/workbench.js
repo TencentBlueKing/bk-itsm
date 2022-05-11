@@ -20,11 +20,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import MyTodoTicket from '../../views/workbench/MyTodoTicket.vue'
-import MyApprovalTicket from '../../views/workbench/MyApprovalTicket.vue'
-import MyCreatedTicket from '../../views/workbench/MyCreatedTicket.vue'
-import MyAttentionTicket from '../../views/workbench/MyAttentionTicket.vue'
-import AllTicket from '../../views/workbench/AllTicket.vue'
+import MyTodoTicket from '../../views/workbench/MyTodoTicket.vue';
+import MyApprovalTicket from '../../views/workbench/MyApprovalTicket.vue';
+import MyCreatedTicket from '../../views/workbench/MyCreatedTicket.vue';
+import MyAttentionTicket from '../../views/workbench/MyAttentionTicket.vue';
+import AllTicket from '../../views/workbench/AllTicket.vue';
 
 export default [
     {
@@ -52,4 +52,4 @@ export default [
         name: 'allUserTicket',
         component: AllTicket,
     },
-]
+];

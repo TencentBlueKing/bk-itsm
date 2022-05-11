@@ -88,14 +88,14 @@
         props: {
             node: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             previewInfo: {
                 type: Object,
-                default () {
-                    return {}
+                default() {
+                    return {};
                 },
             },
             normalColor: {
@@ -103,7 +103,7 @@
                 default: false,
             },
         },
-        data () {
+        data() {
             return {
                 moveFlag: false,
                 typeList: [
@@ -115,32 +115,32 @@
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
                 ],
-            }
+            };
         },
-        mounted () {
+        mounted() {
 
         },
         methods: {
-            movdeDoneFn () {
-                this.moveFlag = false
+            movdeDoneFn() {
+                this.moveFlag = false;
             },
-            moveFn () {
-                this.moveFlag = true
+            moveFn() {
+                this.moveFlag = true;
             },
-            onNodeClick (node, event) {
+            onNodeClick(node, event) {
                 if (!this.moveFlag) {
                     // 对于开始，结束，网关，汇聚不弹出信息
                     if (node.type === 'START' || node.type === 'END' || node.type === 'ROUTER-P' || node.type === 'COVERAGE') {
-                        return
+                        return;
                     }
-                    this.$emit('clickNodeInfo', node)
+                    this.$emit('clickNodeInfo', node);
                 } else {
-                    this.$emit('submitNodeValue', node)
+                    this.$emit('submitNodeValue', node);
                 }
-                this.moveFlag = false
+                this.moveFlag = false;
             },
         },
-    }
+    };
 </script>
 <style lang="scss" scoped>
     @import './nodeTemplate.scss';
