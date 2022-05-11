@@ -59,38 +59,57 @@
                     <ul>
                         <li
                             data-test-id="directoty-li-addCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_create'], 
-                                $store.state.project.projectAuthActions), zIndex: 3001 }"
+                            v-cursor="{
+                                active: !hasPermission(
+                                    ['catalog_create'],
+                                    $store.state.project.projectAuthActions
+                                ),
+                                zIndex: 3001
+                            }"
                             :title="$t(`m.serviceConfig['新增']`)"
                             :class="{
                                 'bk-disabled-add': String(treeInfo.node.level) === '3',
-                                'text-permission-disable': !hasPermission(['catalog_create'],
-                                    $store.state.project.projectAuthActions)
-                                }"
+                                'text-permission-disable': !hasPermission(
+                                    ['catalog_create'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             @click="openAdd">
                             <span>{{ $t('m.serviceConfig["新增"]') }}</span>
                         </li>
                         <li
                             data-test-id="directoty-li-editCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_edit'],
-                                $store.state.project.projectAuthActions) }"
+                            v-cursor="{
+                                active: !hasPermission(
+                                    ['catalog_edit'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             :title="$t(`m.serviceConfig['编辑']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_edit'],
-                                    $store.state.project.projectAuthActions)
-                                }"
+                                'text-permission-disable': !hasPermission(
+                                    ['catalog_edit'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             @click="openUpdate">
                             <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
                         </li>
                         <li
                             data-test-id="directoty-li-delCatalogue"
-                            v-cursor="{ active: !hasPermission(['catalog_delete'],
-                                $store.state.project.projectAuthActions) }"
+                            v-cursor="{
+                                active: !hasPermission(
+                                    ['catalog_delete'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             :title="$t(`m.serviceConfig['删除']`)"
                             :class="{
-                                'text-permission-disable': !hasPermission(['catalog_delete'],
-                                    $store.state.project.projectAuthActions)
-                                }"
+                                'text-permission-disable': !hasPermission(
+                                    ['catalog_delete'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             @click="openDelete">
                             <span>{{ $t('m.serviceConfig["删除"]') }}</span>
                         </li>
@@ -345,9 +364,11 @@
                             name: projectInfo.name,
                         }],
                     };
-                    this.applyForPermission(['catalog_create'],
+                    this.applyForPermission(
+                        ['catalog_create'],
                         this.$store.state.project.projectAuthActions,
-                        resourceData);
+                        resourceData
+                    );
                     return;
                 }
                 if (String(this.treeInfo.node.level) === '3') {
@@ -440,9 +461,11 @@
                             name: projectInfo.name,
                         }],
                     };
-                    this.applyForPermission(['catalog_edit'],
+                    this.applyForPermission(
+                        ['catalog_edit'],
                         this.$store.state.project.projectAuthActions,
-                        resourceData);
+                        resourceData
+                    );
                     return;
                 }
                 if (!this.treeInfo.node.id) {
@@ -473,8 +496,11 @@
                             name: projectInfo.name,
                         }],
                     };
-                    this.applyForPermission(['catalog_delete'],
-                        this.$store.state.project.projectAuthActions, resourceData);
+                    this.applyForPermission(
+                        ['catalog_delete'],
+                        this.$store.state.project.projectAuthActions,
+                        resourceData
+                    );
                     return;
                 }
                 if (!this.treeInfo.node.id) {

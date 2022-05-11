@@ -95,7 +95,10 @@
                     <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
                         <template slot-scope="props">
                             <bk-button
-                                v-if="!hasPermission(editFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                v-if="!hasPermission(
+                                    editFieldPerm,
+                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                                )"
                                 data-test-id="field_button_viewfield"
                                 v-cursor
                                 text
@@ -118,7 +121,9 @@
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" min-width="150">
                         <template slot-scope="props">
-                            <span :title="typeTransition(props.row.type)">{{ typeTransition(props.row.type) || '--' }}</span>
+                            <span :title="typeTransition(props.row.type)">
+                                {{ typeTransition(props.row.type) || '--' }}
+                            </span>
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['字段值']`)" width="220">
@@ -148,7 +153,10 @@
                         <template slot-scope="props">
                             <!-- 编辑 -->
                             <bk-button
-                                v-if="!hasPermission(editFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                v-if="!hasPermission(
+                                    editFieldPerm,
+                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                                )"
                                 v-cursor
                                 data-test-id="field_button_editfield_permission"
                                 text
@@ -157,12 +165,19 @@
                                 @click="openField(props.row, editFieldPerm)">
                                 {{ $t('m.deployPage["编辑"]') }}
                             </bk-button>
-                            <bk-button data-test-id="field_button_editfield" v-else theme="primary" text @click="openField(props.row)">
+                            <bk-button
+                                data-test-id="field_button_editfield"
+                                v-else theme="primary"
+                                text
+                                @click="openField(props.row)">
                                 {{ $t('m.deployPage["编辑"]') }}
                             </bk-button>
                             <!-- 删除 -->
                             <bk-button
-                                v-if="!hasPermission(deleteFieldPerm, [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                v-if="!hasPermission(
+                                    deleteFieldPerm,
+                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                                )"
                                 data-test-id="field_button_deletefield_permission"
                                 v-cursor
                                 text
@@ -445,7 +460,14 @@
             },
             // 删除字段
             deleteField(item) {
-                if (!this.hasPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
+                const isAuth = this.hasPermission(
+                    this.deleteFieldPerm,
+                    [
+                        ...this.$store.state.project.projectAuthActions,
+                        ...item.auth_actions
+                    ]
+                );
+                if (!isAuth) {
                     let resourceData = null;
                     if (this.projectId) {
                         const { projectInfo } = this.$store.state.project;
@@ -467,7 +489,13 @@
                             }],
                         };
                     }
-                    this.applyForPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    this.applyForPermission(
+                        this.deleteFieldPerm,
+                        [
+                            ...this.$store.state.project.projectAuthActions,
+                            ...item.auth_actions],
+                        resourceData
+                    );
                 } else {
                     this.$bkInfo({
                         type: 'warning',
@@ -479,13 +507,14 @@
                                 return;
                             }
                             this.secondClick = true;
-                            this.$store.dispatch('publicField/delet_template_fields', { id }).then((res) => {
+                            this.$store.dispatch('publicField/delet_template_fields', { id }).then(() => {
                                 this.$bkMessage({
                                     message: this.$t('m.systemConfig["删除成功"]'),
                                     theme: 'success',
                                 });
                                 if (this.dataList.length === 1) {
-                                    this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1;
+                                    this.pagination.current = this.pagination.current === 1
+                                        ? 1 : this.pagination.current - 1;
                                 }
                                 this.getList();
                             })
@@ -545,7 +574,14 @@
             },
             // 编辑字段
             openField(item, reqPerm) {
-                if (!this.hasPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
+                const isAuth = this.hasPermission(
+                    reqPerm,
+                    [
+                        ...this.$store.state.project.projectAuthActions,
+                        ...item.auth_actions
+                    ]
+                );
+                if (!isAuth) {
                     let resourceData = null;
                     if (this.projectId) {
                         const { projectInfo } = this.$store.state.project;
@@ -567,7 +603,14 @@
                             }],
                         };
                     }
-                    this.applyForPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+                    this.applyForPermission(
+                        reqPerm,
+                        [
+                            ...this.$store.state.project.projectAuthActions,
+                            ...item.auth_actions
+                        ],
+                        resourceData
+                    );
                     return;
                 }
                 this.changeInfo = item;

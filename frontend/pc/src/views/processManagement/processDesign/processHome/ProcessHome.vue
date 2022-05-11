@@ -140,16 +140,16 @@
                     <bk-table-column :label="$t(`m.deployPage['状态']`)" width="80">
                         <template slot-scope="props">
                             <span class="bk-status-color"
-                                :class="{ 'bk-status-gray': !props.row.is_enabled,
-                                    'bk-status-primary': props.row.is_draft }">
+                                :class="{ 'bk-status-gray':
+                                    !props.row.is_enabled, 'bk-status-primary': props.row.is_draft }">
                             </span>
                             <span style="margin-left: 5px;"
                                 :title="props.row.is_draft
                                     ? $t(`m.deployPage['草稿']`) : (props.row.is_enabled
-                                    ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
+                                        ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
                                 {{props.row.is_draft
                                     ? $t(`m.deployPage["草稿"]`) : (props.row.is_enabled
-                                    ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
+                                        ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
                             </span>
                         </template>
                     </bk-table-column>
@@ -160,8 +160,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
-                                        props.row.auth_actions)
+                                    'btn-permission-disable':
+                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
                                 }]"
                                 @click="onFlowEdit(props.row)">
                                 {{ $t('m.deployPage["编辑"]') }}
@@ -173,8 +173,8 @@
                                 :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions)
                                     && (props.row.is_draft || !props.row.is_enabled)"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_deploy'],
-                                        props.row.auth_actions)
+                                    'btn-permission-disable':
+                                        !hasPermission(['workflow_deploy'], props.row.auth_actions)
                                 }]"
                                 @click="onFlowDeploy(props.row)">
                                 {{ $t('m.deployPage["部署"]') }}
@@ -184,8 +184,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
-                                    props.row.auth_actions)
+                                    'btn-permission-disable':
+                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
                                 }]"
                                 @click="onFlowPreview(props.row)">
                                 {{ $t('m.deployPage["预览"]') }}
@@ -197,8 +197,8 @@
                                 :disabled="hasPermission(['workflow_manage'], props.row.auth_actions)
                                     && props.row.is_draft"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
-                                        props.row.auth_actions)
+                                    'btn-permission-disable':
+                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
                                 }]"
                                 @click="onFlowExport(props.row)">
                                 {{ $t('m.deployPage["导出"]') }}
@@ -208,8 +208,8 @@
                                 text
                                 theme="primary"
                                 :class="[{
-                                    'btn-permission-disable': !hasPermission(['workflow_manage'],
-                                        props.row.auth_actions)
+                                    'btn-permission-disable':
+                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
                                 }]"
                                 @click="deleteConfirm(props.row)">
                                 {{ $t('m.deployPage["删除"]') }}

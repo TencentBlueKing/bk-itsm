@@ -401,7 +401,7 @@
                                 theme: 'success',
                             });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 
+                                this.pagination.current = this.pagination.current === 1
                                     ? 1 : this.pagination.current - 1;
                             }
                             this.getList();

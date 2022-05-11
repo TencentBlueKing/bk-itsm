@@ -56,10 +56,14 @@
                         </bk-option>
                     </bk-select>
                 </div>
-                <div style="float: left; width: 268px; margin-left: 10px" v-if="fieldValueItem.referenceType === 'custom'">
+                <div
+                    style="float: left; width: 268px; margin-left: 10px"
+                    v-if="fieldValueItem.referenceType === 'custom'">
                     <field-info :fields="fieldValueItem.itemInfo" :origin="'trigger'" v-if="show"></field-info>
                 </div>
-                <div style="float: left; width: 268px; margin-left: 10px" v-if="fieldValueItem.referenceType === 'reference'">
+                <div
+                    style="float: left; width: 268px; margin-left: 10px"
+                    v-if="fieldValueItem.referenceType === 'reference'">
                     <bk-select style="width: 270px;"
                         v-model="fieldValueItem.itemInfo[0].value"
                         ext-cls="bk-insert-info"
@@ -140,7 +144,8 @@
                 this.$set(this.fieldValueItem, 'itemInfo', []);
                 if (this.fieldKeyItem.value) {
                     const tempItemInfo = this.fieldKeyItem.choice.filter(item => item.key === this.fieldKeyItem.value);
-                    tempItemInfo[0].value = tempItemInfo[0].val = this.fieldValueItem.value;
+                    tempItemInfo[0].val = this.fieldValueItem.value;
+                    tempItemInfo[0].value = tempItemInfo[0].val;
                     this.fieldValueItem.itemInfo = tempItemInfo;
                     this.show = true;
                 }

@@ -38,10 +38,18 @@
                     <template slot="btns">
                         <bk-button
                             data-test-id="sla_button_createAgreement_permission"
-                            v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
+                            v-cursor="{
+                                active: !hasPermission(
+                                    ['sla_agreement_create'],
+                                    $store.state.project.projectAuthActions
+                                )
+                            }"
                             theme="primary"
                             :class="{
-                                'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
+                                'btn-permission-disable': !hasPermission(
+                                    ['sla_agreement_create'],
+                                    $store.state.project.projectAuthActions
+                                )
                             }"
                             @click="addAgreement({}, 'sla_agreement_create')">
                             {{ $t('m["立即创建"]') }}
@@ -52,19 +60,27 @@
                     <!-- 提示信息 -->
                     <div class="bk-itsm-version" v-if="versionStatus">
                         <i class="bk-icon icon-info-circle"></i>
-                        <span>{{ $t('m.slaContent["服务协议：制定不同的服务协议内容。包括不同优先级下的服务模式，服务解决时长。可以制定多个不同的服务协议策略，它将会应用到具体的每个服务中。"]') }}</span>
+                        <span>
+                            <!-- {{ $t('m.slaContent["服务协议：制定不同的服务协议内容。包括不同优先级下的服务模式
+                                ，服务解决时长。可以制定多个不同的服务协议策略，它将会应用到具体的每个服务中。"]') }} -->
+                        </span>
                         <i class="bk-icon icon-close" @click="closeVersion"></i>
                     </div>
                     <div class="bk-only-btn">
                         <div class="bk-more-search">
                             <bk-button
                                 data-test-id="sla_button_createAgreement"
-                                v-cursor="{ active: !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions) }"
+                                v-cursor="{ active:
+                                    !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
+                                }"
                                 :theme="'primary'"
                                 :title="$t(`m.managePage['新增']`)"
                                 icon="plus"
                                 :class="['mr10', 'plus-cus', {
-                                    'btn-permission-disable': !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
+                                    'btn-permission-disable': !hasPermission(
+                                        ['sla_agreement_create'],
+                                        $store.state.project.projectAuthActions
+                                    )
                                 }]"
                                 @click="addAgreement({}, 'sla_agreement_create')">
                                 {{ $t('m.managePage["新增"]') }}
@@ -104,7 +120,10 @@
                             <template slot-scope="props">
                                 <bk-button
                                     data-test-id="sla_button_agreementEditFromName"
-                                    v-if="!hasPermission(['sla_agreement_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                                    v-if="!hasPermission(
+                                        ['sla_agreement_edit'],
+                                        [...props.row.auth_actions, ...$store.state.project.projectAuthActions]
+                                    )"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -125,7 +144,9 @@
                         <bk-table-column :label="$t(`m.slaContent['应用服务数']`)">
                             <template slot-scope="props">
                                 <bk-popover placement="top" trigger="click" theme="light" max-width="500px">
-                                    <span style="cursor: pointer;" :title="props.row.service_count || '0'">{{props.row.service_count || '0'}}</span>
+                                    <span style="cursor: pointer;"
+                                        :title="props.row.service_count || '0'">{{props.row.service_count || '0'}}
+                                    </span>
                                     <div slot="content" style="white-space: normal;">
                                         <p>{{ props.row.service_names.toString() }}</p>
                                     </div>
@@ -147,7 +168,8 @@
                                 <span class="bk-status-color"
                                     :class="{ 'bk-status-gray': !props.row.is_enabled }"></span>
                                 <span style="margin-left: 5px;"
-                                    :title="(props.row.is_enabled ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
+                                    :title="(props.row.is_enabled
+                                        ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
                                     {{(props.row.is_enabled ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
                                 </span>
                             </template>
@@ -157,7 +179,10 @@
                                 <!-- 编辑 -->
                                 <bk-button
                                     data-test-id="sla_button_agreementEditFromOperate1"
-                                    v-if="!hasPermission(['sla_agreement_edit'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                    v-if="!hasPermission(
+                                        ['sla_agreement_edit'],
+                                        [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                                    )"
                                     v-cursor
                                     text
                                     theme="primary"
@@ -176,7 +201,10 @@
                                 <!-- 删除 -->
                                 <bk-button
                                     data-test-id="sla_button_agreementDeleteFromOperate1"
-                                    v-if="!hasPermission(['sla_agreement_delete'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                                    v-if="!hasPermission(
+                                        ['sla_agreement_delete'],
+                                        [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                                    )"
                                     v-cursor
                                     text
                                     theme="primary"

@@ -31,15 +31,22 @@
                 <div class="bk-version-number">
                     <ul>
                         <li v-for="(item, index) in versionList"
-                            :class="{ 'bk-border-bottom': (index === versionList.length - 1), 'bk-click': versionInfo.version === item.version }"
+                            :class="{
+                                'bk-border-bottom': (index === versionList.length - 1),
+                                'bk-click': versionInfo.version === item.version
+                            }"
                             :key="index"
                             @click="changeVersion(item, index)">
-                            <p :class="{ 'bk-number-name': true,'bk-version-click-color': versionInfo.version === item.version }">
+                            <p :class="{
+                                'bk-number-name': true,
+                                'bk-version-click-color': versionInfo.version === item.version }">
                                 <span>V{{item.version}}</span>
                                 <span class="bk-current-version"
                                     v-if="item.is_latest === true">{{ $t('m.wiki["当前版本"]')}}</span>
                             </p>
-                            <p :class="{ 'bk-number-time': true,'bk-version-click-color': versionInfo.version === item.version }">
+                            <p :class="{
+                                'bk-number-time': true,
+                                'bk-version-click-color': versionInfo.version === item.version }">
                                 {{item.create_at}}</p>
                             <div class="bk-version-click" v-if="versionInfo.version === item.version"></div>
                         </li>

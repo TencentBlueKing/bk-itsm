@@ -262,13 +262,14 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('basicModule/delet_tables', { id }).then((res) => {
+                        this.$store.dispatch('basicModule/delet_tables', { id }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
                             });
                             if (this.dataList.length === 1) {
-                                this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1;
+                                this.pagination.current = this.pagination.current === 1
+                                    ? 1 : this.pagination.current - 1;
                             }
                             this.getList();
                         })

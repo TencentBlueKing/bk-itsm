@@ -61,9 +61,7 @@
                     :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
                     :title="$t(`m.systemConfig['点击上传']`)"
                     class="mr10 bk-btn-file">
-                    <input :type="!projectId
-                        && !hasPermission(['public_api_create'])
-                            ? 'button' : 'file'"
+                    <input :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'"
                         :value="fileVal"
                         class="bk-input-file"
                         @change="handleFile"

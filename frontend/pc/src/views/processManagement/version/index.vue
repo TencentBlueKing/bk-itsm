@@ -144,8 +144,8 @@
                             theme="primary"
                             :title="$t(`m.flowManager['预览']`)"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_manage'],
-                                    props.row.auth_actions)
+                                'btn-permission-disable':
+                                    !hasPermission(['flow_version_manage'], props.row.auth_actions)
                             }]"
                             @click="onFlowPreview(props.row)">
                             {{ $t('m.flowManager["预览"]') }}
@@ -156,8 +156,8 @@
                             theme="primary"
                             :title="$t(`m.flowManager['还原']`)"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_restore'],
-                                    props.row.auth_actions)
+                                'btn-permission-disable':
+                                    !hasPermission(['flow_version_restore'], props.row.auth_actions)
                             }]"
                             @click="openConfirmDialog(props.row, 'restore')">
                             {{ $t('m.flowManager["还原"]') }}
@@ -170,8 +170,8 @@
                             :disabled="hasPermission(['flow_version_manage'], props.row.auth_actions)
                                 && !!props.row.service_cnt"
                             :class="[{
-                                'btn-permission-disable': !hasPermission(['flow_version_manage'],
-                                    props.row.auth_actions)
+                                'btn-permission-disable':
+                                    !hasPermission(['flow_version_manage'], props.row.auth_actions)
                             }]"
                             @click="openConfirmDialog(props.row, 'delete')">
                             {{ $t('m.flowManager["删除"]') }}
