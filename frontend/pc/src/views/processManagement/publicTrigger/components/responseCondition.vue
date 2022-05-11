@@ -119,8 +119,7 @@
                     arguments[2].wayStatus = false;
                 }
                 arguments[2].isLoading = true;
-                arguments[2].wayInfo = JSON.parse(
-                    JSON.stringify(this.responseWayList.filter(node => node.key === arguments[0])[0]));
+                arguments[2].wayInfo = JSON.parse(JSON.stringify(this.responseWayList.filter(node => node.key === arguments[0])[0]));
                 setTimeout(() => {
                     arguments[2].isLoading = false;
                 }, 1000);

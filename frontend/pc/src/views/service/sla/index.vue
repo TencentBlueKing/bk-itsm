@@ -387,7 +387,7 @@
                 }
             },
             handleSetAgreement() {
-                this.$refs.agreementForm.validate().then(_ => {
+                this.$refs.agreementForm.validate().then((_) => {
                     if (!this.isNodeClick && this.agreeType === 'add') {
                         this.serviceData.sla.push(this.agreementEditData);
                     }
@@ -520,7 +520,7 @@
                     return;
                 }
                 this.submitPending = true;
-                this.$store.dispatch('serviceEntry/updateService', params).then(_ => {
+                this.$store.dispatch('serviceEntry/updateService', params).then((_) => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',

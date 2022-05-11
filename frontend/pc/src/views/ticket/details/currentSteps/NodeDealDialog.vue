@@ -207,7 +207,7 @@
                     'ASSIGN_LEADER',
                     'IAM',
                     'API',
-                    'ORGANIZATION'
+                    'ORGANIZATION',
                 ],
             };
         },
@@ -260,7 +260,7 @@
                 } else if (handlerType === 'PERSON') { // 类型为个人, 只能在 originHandler 中选
                     includeTypeList = ['PERSON'];
                     specifyIdList = [{ type: 'PERSON', list: originHandler.split(',').filter(id => !!id) }];
-                } else { 
+                } else {
                     // 其他默认类型（通用角色、组织架构、cmdb 角色...）
                     // PERSON 只能在 handler 中选，`handlerType` 只能在 originHandler 中选
                     includeTypeList = ['PERSON', handlerType];
@@ -308,7 +308,7 @@
             },
             // 确认事件
             submitForm() {
-                this.$refs.dialogForm.validate().then(_ => {
+                this.$refs.dialogForm.validate().then((_) => {
                     let person = {};
                     if (this.$refs.personSelect) {
                         const res = this.$refs.personSelect.verifyValue();

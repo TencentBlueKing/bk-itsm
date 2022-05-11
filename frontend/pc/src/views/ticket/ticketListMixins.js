@@ -251,12 +251,12 @@ const ticketListMixins = {
                     this.listLoading = false;
                 });
         },
+        // @param {Array} exclude 排除字段（不需要去加载的字段）
         /**
          * 异步加载列表中的某些字段信息
          * @param {Array} originList 单据列表
-         * @param {Array} exclude 排除字段（不需要去加载的字段）
          */
-        asyncReplaceTicketListAttr(originList, exclude = []) {
+        asyncReplaceTicketListAttr(originList) {
             if (originList.length === 0) {
                 return;
             }
@@ -316,7 +316,7 @@ const ticketListMixins = {
             const ids = copyList.map(ticket => ticket.id);
             this.$store.dispatch('ticket/getTicketscanOperate', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
-                    originList.forEach((ticket, index) => {
+                    originList.forEach((ticket) => {
                         const replaceValue = res.data.hasOwnProperty(ticket.id) ? res.data[ticket.id] : false;
                         this.$set(ticket, 'can_operate', replaceValue);
                     });
@@ -326,7 +326,7 @@ const ticketListMixins = {
                     errorHandler(res, this);
                 });
         },
-        getRowStyle({ row, rowIndex }) {
+        getRowStyle({ row }) {
             return `background-color: ${row.sla_color}`;
         },
         getPriorityColor(row) {
@@ -362,7 +362,7 @@ const ticketListMixins = {
                 }
             });
         },
-        handleSearchFormChange(key, val, forms) {
+        handleSearchFormChange(key, val) {
             // to do something
             if (key === 'catalog_id') {
                 const formItem = this.searchForms.find(item => item.key === 'service_id__in');
@@ -414,7 +414,7 @@ const ticketListMixins = {
                 attention: !row.hasAttention,
             };
             let bkMessage = '';
-            this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
+            this.$store.dispatch('deployOrder/setAttention', { params, id }).then(() => {
                 if (row.hasAttention) {
                     row.hasAttention = false;
                     bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']');

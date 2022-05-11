@@ -464,7 +464,7 @@
                     this.deleteFieldPerm,
                     [
                         ...this.$store.state.project.projectAuthActions,
-                        ...item.auth_actions
+                        ...item.auth_actions,
                     ]
                 );
                 if (!isAuth) {
@@ -578,7 +578,7 @@
                     reqPerm,
                     [
                         ...this.$store.state.project.projectAuthActions,
-                        ...item.auth_actions
+                        ...item.auth_actions,
                     ]
                 );
                 if (!isAuth) {
@@ -607,7 +607,7 @@
                         reqPerm,
                         [
                             ...this.$store.state.project.projectAuthActions,
-                            ...item.auth_actions
+                            ...item.auth_actions,
                         ],
                         resourceData
                     );

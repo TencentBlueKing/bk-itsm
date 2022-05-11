@@ -293,8 +293,7 @@
                 return !item.has_relationships;
             },
             getstatusColor(row) {
-                const statusColor = this.colorHexList.filter(item =>
-                    item.service_type === row.service_type && item.key === row.current_status);
+                const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status);
                 return statusColor.length ? {
                     color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
                 } : { color: '#3c96ff', border: '1px solid #3c96ff' };
