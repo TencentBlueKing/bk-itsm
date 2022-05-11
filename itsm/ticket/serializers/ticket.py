@@ -1377,7 +1377,6 @@ class TicketStateOperateExceptionSerializer(serializers.Serializer):
         ]
 
         self.run_validators(data)
-        print(validated_data)
         return validated_data
 
     def to_representation(self, instance):

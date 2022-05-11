@@ -316,6 +316,10 @@ class WebHookService(ItsmBaseService):
                 processors,
             )
             return False
+
+        # 更新全局变量
+        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
+
         if success_exp:
             try:
                 rule = BoolRule(success_exp)
@@ -342,8 +346,6 @@ class WebHookService(ItsmBaseService):
                 )
                 return False
 
-        # 更新全局变量
-        variable_output = self.update_variables(resp, ticket_id, state_id, variables)
         # 设置状态
         self.update_info(current_node, variables=variable_output)
 
