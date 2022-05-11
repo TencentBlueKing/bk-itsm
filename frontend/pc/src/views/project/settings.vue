@@ -129,6 +129,7 @@
                         message: this.$t(`m.home["更新成功"]`),
                         theme: 'success'
                     })
+                }).finally(() => {
                     this.getSettingsDate()
                 })
             },
