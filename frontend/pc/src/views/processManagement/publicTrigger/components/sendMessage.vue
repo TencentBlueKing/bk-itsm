@@ -117,12 +117,13 @@
                 this.activeName = name
             },
             changePanelStatus (panel, pIndex) {
-                this.show = false
-                this.$nextTick(() => {
-                    panel.checked = true
-                    this.itemInfo.sub_components.splice(pIndex, 1, panel)
-                    this.show = true
-                })
+                console.log(panel, pIndex)
+                // this.show = false
+                // this.$nextTick(() => {
+                //     panel.checked = true
+                //     this.itemInfo.sub_components.splice(pIndex, 1)
+                //     this.show = true
+                // })
             }
         }
     }
