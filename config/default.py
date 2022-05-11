@@ -91,7 +91,6 @@ INSTALLED_APPS += (
     "corsheaders",
     "django_filters",
     # "autofixture",
-    "requests_tracker",
     # wiki
     "django.contrib.humanize.apps.HumanizeConfig",
     "django_nyt.apps.DjangoNytConfig",
