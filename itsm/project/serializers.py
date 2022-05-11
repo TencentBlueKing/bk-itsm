@@ -113,7 +113,7 @@ class ProjectSettingSerializer(serializers.ModelSerializer):
     key = serializers.CharField(required=True, max_length=32)
     value = serializers.CharField(required=True, max_length=32)
     project_key = serializers.CharField(
-        required=True, max_length=32, source="project_id"
+        required=False, max_length=32, source="project_id"
     )
 
     def run_validation(self, data=empty):
