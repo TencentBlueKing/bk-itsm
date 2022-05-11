@@ -59,16 +59,16 @@
                 type: Object,
                 required: true,
                 default: () => {
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {}
@@ -79,7 +79,7 @@
                     this.item.val = []
                     const obj = {}
                     for (let i = 0; i < this.item.choice.length; i++) {
-                        const key = this.item.choice[i].key
+                        const { key } = this.item.choice[i]
                         obj[key] = ''
                     }
                     this.item.val.push(obj)
@@ -87,14 +87,14 @@
                 if (typeof this.$parent.refresh === 'function') {
                     this.$parent.refresh()
                 }
-            }
+            },
         },
         created () {
             if (this.item.val === '' || (Array.isArray(this.item.val) && !this.item.val.length)) {
                 this.item.val = []
                 const obj = {}
                 for (let i = 0; i < this.item.choice.length; i++) {
-                    const key = this.item.choice[i].key
+                    const { key } = this.item.choice[i]
                     obj[key] = ''
                 }
                 this.item.val.push(obj)
@@ -104,7 +104,7 @@
             addOne () {
                 const obj = {}
                 for (let i = 0; i < this.item.choice.length; i++) {
-                    const key = this.item.choice[i].key
+                    const { key } = this.item.choice[i]
                     obj[key] = ''
                 }
                 this.item.val.push(obj)
@@ -113,18 +113,18 @@
                 if (this.item.val.length === 1) {
                     this.$bkMessage({
                         message: '默认行不能删除',
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                 } else {
                     this.$bkInfo({
                         title: '确认要删除此条数据？',
                         confirmFn: () => {
                             this.item.val.splice(props.$index, 1)
-                        }
+                        },
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

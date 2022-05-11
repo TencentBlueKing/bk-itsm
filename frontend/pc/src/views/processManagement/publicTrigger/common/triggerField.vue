@@ -87,19 +87,19 @@
     export default {
         name: 'triggerFields',
         components: {
-            memberSelect
+            memberSelect,
         },
         props: {
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
-                keyList: []
+                keyList: [],
             }
         },
         computed: {
@@ -107,13 +107,13 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         watch: {
-            triggerVariables: function (newVal) {
+            triggerVariables (newVal) {
                 this.keyList = newVal
-            }
+            },
         },
         created () {
             // 当存在值的时候，初始化拉取数据
@@ -135,67 +135,73 @@
                     if (checkItem.source_type === 'DATADICT') {
                         this.$store.dispatch('datadict/get_data_by_key', {
                             key: checkItem.source_uri,
-                            field_key: checkItem.key
+                            field_key: checkItem.key,
                         }).then(res => {
                             this.item.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.item.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.item.loading = false
+                            })
                     } else if (checkItem.source_type === 'API') {
                         this.$store.dispatch('apiRemote/get_data_workflow', {
                             kv_relation: checkItem.kv_relation,
-                            api_instance_id: checkItem.api_instance_id
+                            api_instance_id: checkItem.api_instance_id,
                         }).then(res => {
                             this.item.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.item.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.item.loading = false
+                            })
                     } else if (checkItem.source_type === 'RPC') {
                         this.$store.dispatch('apiRemote/getRpcData', {
                             meta: checkItem.meta,
-                            source_uri: checkItem.source_uri
+                            source_uri: checkItem.source_uri,
                         }).then(res => {
                             this.item.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.item.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.item.loading = false
+                            })
                     } else {
                         this.item.options = checkItem.choice.map(ite => {
                             const temp = {
                                 key: ite.key,
-                                name: ite.name
+                                name: ite.name,
                             }
                             return temp
                         })
                         this.item.loading = false
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

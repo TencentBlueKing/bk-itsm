@@ -282,21 +282,21 @@
             newTask,
             dealTask,
             taskLibrary,
-            taskHandleTrigger
+            taskHandleTrigger,
         },
         props: {
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -308,10 +308,10 @@
                 // 新建任务
                 taskInfo: {
                     show: false,
-                    title: this.$t(`m.task['新建任务']`),
+                    title: this.$t('m.task[\'新建任务\']'),
                     addLoading: false,
                     width: 660,
-                    itemContent: {}
+                    itemContent: {},
                 },
                 // 头部数据
                 dropdownShow: false,
@@ -321,34 +321,34 @@
                 taskList: [],
                 // 状态列表
                 statusList: [
-                    { key: 'NEW', name: this.$t(`m.task['新']`) },
-                    { key: 'QUEUE', name: this.$t(`m.task['待处理']`) },
-                    { key: 'WAITING_FOR_OPERATE', name: this.$t(`m.task['待处理']`) },
-                    { key: 'WAITING_FOR_BACKEND', name: this.$t(`m.task['后台处理中']`) },
-                    { key: 'RUNNING', name: this.$t(`m.task['执行中']`) },
-                    { key: 'WAITING_FOR_CONFIRM', name: this.$t(`m.task['待总结']`) },
-                    { key: 'FINISHED', name: this.$t(`m.task['已完成']`) },
-                    { key: 'FAILED', name: this.$t(`m.deployPage['失败']`) }
+                    { key: 'NEW', name: this.$t('m.task[\'新\']') },
+                    { key: 'QUEUE', name: this.$t('m.task[\'待处理\']') },
+                    { key: 'WAITING_FOR_OPERATE', name: this.$t('m.task[\'待处理\']') },
+                    { key: 'WAITING_FOR_BACKEND', name: this.$t('m.task[\'后台处理中\']') },
+                    { key: 'RUNNING', name: this.$t('m.task[\'执行中\']') },
+                    { key: 'WAITING_FOR_CONFIRM', name: this.$t('m.task[\'待总结\']') },
+                    { key: 'FINISHED', name: this.$t('m.task[\'已完成\']') },
+                    { key: 'FAILED', name: this.$t('m.deployPage[\'失败\']') },
                 ],
                 // 处理任务
                 dealTaskInfo: {
                     show: false,
-                    title: this.$t(`m.task['处理任务']`),
+                    title: this.$t('m.task[\'处理任务\']'),
                     loading: false,
                     width: 660,
                     itemContent: {},
-                    type: ''
+                    type: '',
                 },
                 // 任务库弹窗
                 libraryList: [],
                 libraryInfo: {
                     show: false,
-                    title: this.$t(`m.task['从任务库创建']`),
+                    title: this.$t('m.task[\'从任务库创建\']'),
                     loading: false,
-                    width: 660
+                    width: 660,
                 },
                 libraryName: '',
-                libraryShow: false
+                libraryShow: false,
             }
         },
         computed: {
@@ -357,7 +357,7 @@
             },
             refreshTask () {
                 return this.$store.state.taskFlow.refreshTask
-            }
+            },
         },
         watch: {
             refreshTask () {
@@ -365,7 +365,7 @@
                     this.getTaskList()
                     this.getLibraryList()
                 }
-            }
+            },
         },
         mounted () {
             this.getTaskList()
@@ -390,11 +390,10 @@
                     }
                     if (val1 < val2) {
                         return (type === 'ascending' ? -1 : 1)
-                    } else if (val1 > val2) {
+                    } if (val1 > val2) {
                         return (type === 'ascending' ? 1 : -1)
-                    } else {
-                        return 0
                     }
+                    return 0
                 }
             },
             // 修改task任务（new）
@@ -403,7 +402,7 @@
                     return
                 }
                 this.taskInfo.itemContent = item
-                this.taskInfo.title = item.id ? this.$t(`m.task['编辑任务']`) : this.$t(`m.task['新建任务']`)
+                this.taskInfo.title = item.id ? this.$t('m.task[\'编辑任务\']') : this.$t('m.task[\'新建任务\']')
                 this.taskInfo.show = true
             },
             closeSlider () {
@@ -414,10 +413,10 @@
                 this.dealTaskInfo.itemContent = item
                 this.dealTaskInfo.type = type
                 const typeObject = {
-                    SEE: this.$t(`m.task['查看任务']`),
-                    OPERATE: this.$t(`m.task['处理任务']`),
-                    CONFIRM: this.$t(`m.task['总结任务']`),
-                    RETRY: this.$t(`m.task['重试任务']`)
+                    SEE: this.$t('m.task[\'查看任务\']'),
+                    OPERATE: this.$t('m.task[\'处理任务\']'),
+                    CONFIRM: this.$t('m.task[\'总结任务\']'),
+                    RETRY: this.$t('m.task[\'重试任务\']'),
                 }
                 this.dealTaskInfo.title = typeObject[type]
                 this.dealTaskInfo.show = true
@@ -429,7 +428,7 @@
             getTaskList () {
                 const params = {
                     ticket_id: this.basicInfomation.id,
-                    username: this.myTask ? window.username : ''
+                    username: this.myTask ? window.username : '',
                 }
                 this.listLoading = true
                 this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
@@ -439,17 +438,19 @@
                         this.$set(item, 'orderInfo', item.order)
                     })
                     this.minWidth = 80
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.listLoading = false
-                    this.$store.commit('taskFlow/changeTaskStatus', false)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.listLoading = false
+                        this.$store.commit('taskFlow/changeTaskStatus', false)
+                    })
             },
             intervalTask () {
                 const params = {
                     ticket_id: this.basicInfomation.id,
-                    username: this.myTask ? window.username : ''
+                    username: this.myTask ? window.username : '',
                 }
                 this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
                     this.taskList.forEach(item => {
@@ -468,32 +469,36 @@
                             this.$emit('updateCurrentStep')
                         }
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.firstInitPage = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.firstInitPage = false
+                    })
             },
             // 删除列表数据
             deleteTask (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.task['确认删除任务？']`),
-                    subTitle: this.$t(`m.task['任务如果被删除，与任务相关的触发动作将会一并删除。']`),
+                    title: this.$t('m.task[\'确认删除任务？\']'),
+                    subTitle: this.$t('m.task[\'任务如果被删除，与任务相关的触发动作将会一并删除。\']'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         this.$store.dispatch('taskFlow/deleteTask', id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.task['删除成功']`),
-                                theme: 'success'
+                                message: this.$t('m.task[\'删除成功\']'),
+                                theme: 'success',
                             })
                             this.getTaskList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+
+                            })
+                    },
                 })
             },
             // 处理任务成功回调
@@ -506,21 +511,23 @@
             ignoreTask (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.task['确认忽略任务？']`),
+                    title: this.$t('m.task[\'确认忽略任务？\']'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         this.$store.dispatch('taskFlow/ignoreTask', id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.newCommon['成功']`),
-                                theme: 'success'
+                                message: this.$t('m.newCommon[\'成功\']'),
+                                theme: 'success',
                             })
                             this.getTaskList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+
+                            })
+                    },
                 })
             },
             // 改变处理顺序
@@ -532,18 +539,20 @@
                 this.minWidth = 180
             },
             submitOrder (value) {
-                const id = value.id
+                const { id } = value
                 const params = {
-                    order: Number(value.orderInfo)
+                    order: Number(value.orderInfo),
                 }
                 this.$store.dispatch('taskFlow/editorTask', { params, id }).then((res) => {
                     value.order = Number(value.orderInfo)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    value.orderStatus = true
-                    this.minWidth = 80
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        value.orderStatus = true
+                        this.minWidth = 80
+                    })
             },
             closeOrder (value) {
                 const orderValue = this.taskList.filter(item => item.id === value.id)[0].order
@@ -574,20 +583,22 @@
                 }
                 const params = {
                     name: this.libraryName,
-                    tasks: this.taskList
+                    tasks: this.taskList,
                 }
                 this.$store.dispatch('taskFlow/creatLibrary', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['任务库创建成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'任务库创建成功\']'),
+                        theme: 'success',
                     })
                     this.closeLibrary()
                     this.getLibraryList()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             closeLibrary () {
                 this.libraryName = ''
@@ -597,13 +608,15 @@
             getLibraryList () {
                 this.$store.dispatch('taskFlow/getLibraryList').then((res) => {
                     this.libraryList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
+            },
+        },
     }
 </script>
 

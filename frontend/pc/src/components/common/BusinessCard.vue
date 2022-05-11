@@ -58,38 +58,38 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 memberList: [],
                 memberValList: [
-                    { type: 'display_name', name: this.$t(`m.newCommon["中文名"]`) },
-                    { type: 'email', name: this.$t(`m.newCommon["邮箱"]`) },
+                    { type: 'display_name', name: this.$t('m.newCommon["中文名"]') },
+                    { type: 'email', name: this.$t('m.newCommon["邮箱"]') },
                     // { type: 'phone', name: this.$t(`m.newCommon["手机"]`) }
-                    { type: 'departmentsDispName', name: this.$t(`m.newCommon["部门信息"]`) }
+                    { type: 'departmentsDispName', name: this.$t('m.newCommon["部门信息"]') },
                 ],
                 showInfo: false,
-                localLoading: false
+                localLoading: false,
             }
         },
         computed: {
             memberVal () {
                 return this.basicInfomation.creator ? this.basicInfomation.creator : this.item.val
-            }
+            },
         },
         created () {
             if (window.run_site !== 'bmw') {
-                this.memberValList.push({ type: 'qq', name: this.$t(`m.newCommon["QQ"]`) })
-                this.memberValList.push({ type: 'wx_userid', name: this.$t(`m.newCommon["微信"]`) })
-                this.memberValList.push({ type: 'time_zone', name: this.$t(`m.newCommon["时区"]`) })
+                this.memberValList.push({ type: 'qq', name: this.$t('m.newCommon["QQ"]') })
+                this.memberValList.push({ type: 'wx_userid', name: this.$t('m.newCommon["微信"]') })
+                this.memberValList.push({ type: 'time_zone', name: this.$t('m.newCommon["时区"]') })
             }
         },
         methods: {
@@ -101,7 +101,7 @@
                 const valList = this.memberVal.split(',')
                 const userIds = valList.map(name => name.replace(/\(.*\)$/, ''))
                 const params = {
-                    users: userIds.join(',')
+                    users: userIds.join(','),
                 }
                 this.$store.dispatch('getPersonInfo', params).then((res) => {
                     if (res.data && res.data.length) {
@@ -120,13 +120,15 @@
                         })
                         this.showInfo = true
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.localLoading = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.localLoading = false
+                    })
+            },
+        },
     }
 </script>
 

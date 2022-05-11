@@ -124,7 +124,7 @@
     export default {
         name: 'CreateTicketDialog',
         props: {
-            isShow: Boolean
+            isShow: Boolean,
         },
         data () {
             return {
@@ -137,7 +137,7 @@
                 selectedService: null,
                 latestLoading: false,
                 allLoading: false,
-                activeName: 'requset'
+                activeName: 'requset',
             }
         },
         computed: {
@@ -149,7 +149,7 @@
                 const list = this.serviceClassify.map(item => ({
                     name: item.key,
                     label: item.name,
-                    data: []
+                    data: [],
                 }))
                 data.forEach(service => {
                     const group = list.find(item => item.name === service.key)
@@ -163,7 +163,7 @@
                     serviceCount[item.name] = item.data.length
                 })
                 return serviceCount
-            }
+            },
         },
         watch: {
             isShow (val) {
@@ -171,7 +171,7 @@
                     this.getAllService()
                     this.getServiceClassify()
                 }
-            }
+            },
         },
         created () {
             this.searchHandler = debounce(500, val => {
@@ -186,22 +186,26 @@
                     if (resp.result) {
                         this.allList = resp.data
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.allLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.allLoading = false
+                    })
             },
             // 获取服务分类信息
             getServiceClassify () {
                 this.serviceClassfyLoading = true
                 return this.$store.dispatch('getCustom').then((res) => {
                     this.serviceClassify = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceClassfyLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceClassfyLoading = false
+                    })
             },
             onServiceSearch (val) {
                 if (val) {
@@ -224,19 +228,20 @@
             onCollectClick (service) {
                 this.$store.dispatch('service/toggleServiceFavorite', {
                     id: service.id,
-                    favorite: !service.favorite
+                    favorite: !service.favorite,
                 }).then((res) => {
                     if (res.result) {
                         this.$set(service, 'favorite', !service.favorite)
                     }
                     this.$bkMessage({
-                        message: service.favorite ? this.$t(`m.manageCommon['收藏成功']`) : this.$t(`m.manageCommon['取消成功']`),
+                        message: service.favorite ? this.$t('m.manageCommon[\'收藏成功\']') : this.$t('m.manageCommon[\'取消成功\']'),
                         theme: 'success',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 点击服务
             onSelectService (service) {
@@ -246,10 +251,10 @@
                     name: 'CreateTicket',
                     query: {
                         service_id: id,
-                        key: key,
+                        key,
                         project_id: this.$route.query.project_id,
-                        from: this.$route.name
-                    }
+                        from: this.$route.name,
+                    },
                 })
             },
             handleTabChange (name) {
@@ -260,8 +265,8 @@
                 this.selectedService = null
                 this.searchList = []
                 this.searchModel = false
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

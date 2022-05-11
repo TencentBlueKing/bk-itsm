@@ -177,15 +177,15 @@
         name: 'addData',
         components: {
             SelectTree,
-            memberSelect
+            memberSelect,
         },
         props: {
             slideData: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -196,7 +196,7 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 新增
                 dictDataTable: {
@@ -215,11 +215,11 @@
                         parent: '',
                         parentObj: '',
                         is_readonly: false,
-                        order: 1
+                        order: 1,
                     },
                     // 树元素
                     treeOpen: false,
-                    treeDataList: []
+                    treeDataList: [],
                 },
                 // 是否启用
                 addTableInfo: {
@@ -229,8 +229,8 @@
                         name: '',
                         desc: '',
                         ownersInputValue: [],
-                        is_enabled: false
-                    }
+                        is_enabled: false,
+                    },
                 },
                 // 校验规则
                 rules: {
@@ -238,27 +238,27 @@
                         {
                             required: true,
                             message: this.$t('m.systemConfig["编码格式为英文数字及下划线"]'),
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             regex: /^[a-zA-Z0-9_]+$/,
                             message: this.$t('m.systemConfig["格式为长度小于120"]'),
-                            trigger: 'blur'
-                        }
+                            trigger: 'blur',
+                        },
                     ],
                     name: [
                         {
                             required: true,
                             message: this.$t('m.systemConfig["格式为长度小于120"]'),
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             max: 120,
                             message: this.$t('m.systemConfig["格式为长度小于120"]'),
-                            trigger: 'blur'
-                        }
-                    ]
-                }
+                            trigger: 'blur',
+                        },
+                    ],
+                },
             }
         },
         watch: {
@@ -266,7 +266,7 @@
                 if (this.slideData.id) {
                     this.initData()
                 }
-            }
+            },
         },
         mounted () {
             if (this.slideData.id) {
@@ -291,7 +291,7 @@
                 const params = {
                     dict_table: this.slideData.id,
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
 
                 this.isDataLoading = true
@@ -300,11 +300,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -321,31 +323,33 @@
                     // create or update
                     const params = {
                         ...this.addTableInfo.formInfo,
-                        owners: this.addTableInfo.formInfo.ownersInputValue.join(',')
+                        owners: this.addTableInfo.formInfo.ownersInputValue.join(','),
                     }
                     delete params.ownersInputValue
                     if (!this.addTableInfo.formInfo.id) {
                         this.$store.dispatch('datadict/create', params).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["添加成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["添加成功"]'),
+                                theme: 'success',
                             })
                             this.$emit('getList', 1)
                             this.$emit('openAddData', res.data)
-                        }).catch(res => {
-                            errorHandler(res, this)
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     } else {
                         this.$store.dispatch('datadict/update', params).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["更新成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["更新成功"]'),
+                                theme: 'success',
                             })
                             this.$emit('getList', 1)
                             this.$emit('closeAddData')
-                        }).catch(res => {
-                            errorHandler(res, this)
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     }
                 })
             },
@@ -362,7 +366,7 @@
                     name: '',
                     parent: '',
                     order: 1,
-                    parentObj: {}
+                    parentObj: {},
                 }
                 this.dictDataTable.isShow = true
                 this.getTreeInfo()
@@ -381,56 +385,60 @@
             openDelete (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认删除该条数据？"]`),
+                    title: this.$t('m.systemConfig["确认删除该条数据？"]'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('dictdata/delete', id).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             if (this.dataList.length === 1) {
                                 this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
                             }
                             this.getList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             submitDictionary () {
                 this.$refs.dialogForm.validate().then(validator => {
                     // create or update
                     if (!this.dictDataTable.formInfo.id) {
-                        this.dictDataTable.formInfo['dict_table'] = this.slideData.id
+                        this.dictDataTable.formInfo.dict_table = this.slideData.id
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('dictdata/create', this.dictDataTable.formInfo).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["添加成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["添加成功"]'),
+                                theme: 'success',
                             })
                             this.closeDictionary()
                             this.getList(1)
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
                     } else {
                         if (this.dictDataTable.formInfo.id === this.dictDataTable.formInfo.parent) {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["父级目录不能是自己！"]`),
-                                theme: 'warning'
+                                message: this.$t('m.systemConfig["父级目录不能是自己！"]'),
+                                theme: 'warning',
                             })
                             return
                         }
@@ -440,16 +448,18 @@
                         this.secondClick = true
                         this.$store.dispatch('dictdata/update', this.dictDataTable.formInfo).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["更新成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["更新成功"]'),
+                                theme: 'success',
                             })
                             this.getList(1)
                             this.closeDictionary()
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
                     }
                 })
             },
@@ -460,18 +470,19 @@
                 }
                 const params = {
                     key: this.addTableInfo.formInfo.key,
-                    view_type: 'tree'
+                    view_type: 'tree',
                 }
                 await this.$store.dispatch('dictdata/getTreeInfo', params).then(res => {
                     this.dictDataTable.treeDataList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             onParentChange (tree) {
                 this.dictDataTable.formInfo.parentObj = tree
-            }
-        }
+            },
+        },
     }
 </script>
 

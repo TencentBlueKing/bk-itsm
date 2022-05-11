@@ -35,20 +35,20 @@
         mixins: [permission],
         data () {
             return {
-                projectDetailLoading: false
+                projectDetailLoading: false,
             }
         },
         computed: {
             ...mapState({
-                projectListLoading: state => state.project.projectListLoading
-            })
+                projectListLoading: state => state.project.projectListLoading,
+            }),
         },
         watch: {
             '$store.state.project.id' (val) {
                 if (val) {
                     this.getProjectDetail()
                 }
-            }
+            },
         },
         created () {
             if (this.$store.state.project.id !== this.$route.query.project_id && this.$route.query.project_id !== '') {
@@ -89,8 +89,8 @@
                 } finally {
                     this.$store.commit('project/setProjectListLoading', false)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

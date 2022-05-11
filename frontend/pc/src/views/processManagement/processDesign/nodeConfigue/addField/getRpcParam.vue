@@ -82,26 +82,26 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             changeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             stateList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             formInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -109,21 +109,21 @@
                     {
                         id: 1,
                         key: 'CUSTOM',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'FIELDS',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
-                ]
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
+                ],
             }
         },
         computed: {},
         watch: {
             prcTable (newVal, oldVal) {
                 this.initData()
-            }
+            },
         },
         async mounted () {
             await this.changeInfo
@@ -141,17 +141,17 @@
                     for (const key in this.changeInfo.meta) {
                         if (item.name === key) {
                             if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
-                                item['source_type'] = 'FIELDS'
-                                item['value_key'] = this.changeInfo.meta[key].split('${params_')[1].split('}')[0]
+                                item.source_type = 'FIELDS'
+                                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0]
                             } else {
-                                item['source_type'] = 'CUSTOM'
+                                item.source_type = 'CUSTOM'
                                 item.value = this.changeInfo.meta[key]
                             }
                         }
                     }
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

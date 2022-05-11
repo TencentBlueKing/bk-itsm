@@ -25,7 +25,7 @@
 </template>
 <script>
     export default {
-        name: 'TicketMange'
+        name: 'TicketMange',
     }
 </script>
 <style lang="scss">

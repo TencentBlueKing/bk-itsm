@@ -121,7 +121,7 @@
             BasicInformation,
             OrderPreview,
             CurrentSteps,
-            WangEditor
+            WangEditor,
         },
         mixins: [commonMix, fieldMix, apiFieldsWatch],
         props: {
@@ -142,8 +142,8 @@
                 type: Boolean,
                 default () {
                     return true
-                }
-            }
+                },
+            },
         },
         inject: ['reloadTicket'],
         data () {
@@ -156,7 +156,7 @@
                 allFieldList: [],
                 currentStepLoading: false,
                 activeName: ['ticket'],
-                isShow: false
+                isShow: false,
             }
         },
         computed: {
@@ -168,7 +168,7 @@
             },
             currSetpIsIframe () {
                 return this.$route.name === 'TicketDetailIframe'
-            }
+            },
         },
         watch: {
             hasNodeOptAuth (val) {
@@ -185,7 +185,7 @@
             },
             isShowBasicInfo (val) {
                 this.$emit('getBacicInfoStatus', val)
-            }
+            },
         },
         methods: {
             initCurrentStepData () {
@@ -250,8 +250,8 @@
             },
             addTargetComment (val) {
                 this.$emit('addTargetComment', val)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

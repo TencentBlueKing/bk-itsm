@@ -82,7 +82,7 @@
         connector: ['Flowchart', { stub: [10, 16], alwaysRespectStub: true, gap: 2, cornerRadius: 10 }],
         // connector: ['Bezier', { curviness: 60, stub: [0, 10], gap: 3, cornerRadius: 3, alwaysRespectStubs: true }],
         connectorOverlays: [
-            ['PlainArrow', { width: 8, length: 6, location: 1, id: 'arrow' }]
+            ['PlainArrow', { width: 8, length: 6, location: 1, id: 'arrow' }],
         ],
         paintStyle: { fill: 'rgba(0, 0, 0, 0)', stroke: '', strokeWidth: 1, radius: 8 },
         hoverPaintStyle: { fill: '#EE8F62', stroke: '#EE8F62', radius: 8 },
@@ -90,50 +90,50 @@
         hoverClass: 'template-canvas-endpoint-hover',
         isSource: false, // 端点是否可以作为拖动源
         isTarget: false, // 端点是否可以作为拖动目标
-        maxConnections: -1
+        maxConnections: -1,
     }
     const nodeOptions = {
         grid: [5, 5],
-        stop: true
+        stop: true,
     }
     const connectorOptions = {
         paintStyle: { fill: 'transparent', stroke: '#a9adb6', strokeWidth: 1 },
         hoverPaintStyle: { fill: 'transparent', stroke: '#3a84ff', strokeWidth: 2 },
         cssClass: 'bk-sops-connector',
         hoverClass: 'bk-sops-connector-hover',
-        detachable: false // 是否可以通过鼠标拖动连线
+        detachable: false, // 是否可以通过鼠标拖动连线
     }
     export default {
         name: 'SecondFlow',
         components: {
             JsFlow,
-            NodeTemplate
+            NodeTemplate,
         },
         props: {
             addList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             lineList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             serviceAgreementList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             flowInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -145,55 +145,55 @@
                 nodeOptions,
                 canvasData: {
                     nodes: [],
-                    lines: []
+                    lines: [],
                 },
                 toolsInfo: [
                     [
                         {
                             type: 'zoomIn',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['放大']`),
-                            cls: 'bk-itsm-icon icon-flow-other-add'
+                            title: this.$t('m.treeinfo[\'放大\']'),
+                            cls: 'bk-itsm-icon icon-flow-other-add',
                         },
                         {
                             type: 'zoomOut',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['缩小']`),
-                            cls: 'bk-itsm-icon icon-flow-other-reduc'
+                            title: this.$t('m.treeinfo[\'缩小\']'),
+                            cls: 'bk-itsm-icon icon-flow-other-reduc',
                         },
                         {
                             type: 'fullPagePosition',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['全屏']`),
-                            cls: 'bk-itsm-icon icon-flow-restore'
+                            title: this.$t('m.treeinfo[\'全屏\']'),
+                            cls: 'bk-itsm-icon icon-flow-restore',
                         },
                         {
                             type: 'frameSelect',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['框选']`),
-                            cls: 'bk-itsm-icon icon-choose-node'
-                        }
+                            title: this.$t('m.treeinfo[\'框选\']'),
+                            cls: 'bk-itsm-icon icon-choose-node',
+                        },
                     ],
                     [
                         {
                             type: 'zoomIn',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['放大']`),
-                            cls: 'bk-itsm-icon icon-flow-other-add'
+                            title: this.$t('m.treeinfo[\'放大\']'),
+                            cls: 'bk-itsm-icon icon-flow-other-add',
                         },
                         {
                             type: 'zoomOut',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['缩小']`),
-                            cls: 'bk-itsm-icon icon-flow-other-reduc'
+                            title: this.$t('m.treeinfo[\'缩小\']'),
+                            cls: 'bk-itsm-icon icon-flow-other-reduc',
                         },
                         {
                             type: 'frameSelect',
                             name: ' ',
-                            title: this.$t(`m.treeinfo['框选']`),
-                            cls: 'bk-itsm-icon icon-choose-node'
-                        }
-                    ]
+                            title: this.$t('m.treeinfo[\'框选\']'),
+                            cls: 'bk-itsm-icon icon-choose-node',
+                        },
+                    ],
                 ],
                 nodeInfo: {},
                 // 放大缩小极限
@@ -201,14 +201,14 @@
                 // 删除节点
                 deleteInfo: {
                     isShow: false,
-                    title: this.$t(`m.treeinfo["确认删除"]`),
-                    content: this.$t(`m.treeinfo["确认后，此节点将从该流程中移除！"]`),
-                    info: {}
+                    title: this.$t('m.treeinfo["确认删除"]'),
+                    content: this.$t('m.treeinfo["确认后，此节点将从该流程中移除！"]'),
+                    info: {},
                 },
                 drawStatus: false,
                 isFullPage: false,
                 currentNode: {},
-                instance: []
+                instance: [],
             }
         },
         computed: {
@@ -217,7 +217,7 @@
             },
             stateNodeInfo () {
                 return this.$store.state.deployCommon.nodeInfo
-            }
+            },
         },
         created () {
             this.initDate()
@@ -234,7 +234,7 @@
                     const xValue = item.axis.x ? item.axis.x : (165 + index * 250)
                     const yValue = item.axis.y ? item.axis.y : (195 + (index % 2 === 1 ? 5 : 0))
                     this.canvasData.nodes.push({
-                        id: 'node_' + item.id,
+                        id: `node_${item.id}`,
                         x: xValue,
                         y: yValue,
                         type: item.type,
@@ -246,11 +246,11 @@
                                 fill: 'rgba(0, 0, 0, 0)',
                                 stroke: 'rgba(52, 138, 243, 0.15)',
                                 strokeWidth: 1,
-                                radius: 7
-                            }
-                        }
+                                radius: 7,
+                            },
+                        },
                     })
-                    this.$set(this.nodeInfo, 'node_' + item.id, item)
+                    this.$set(this.nodeInfo, `node_${item.id}`, item)
                 })
                 this.getLineData()
             },
@@ -259,20 +259,20 @@
                     this.canvasData.lines.push({
                         source: {
                             arrow: item.axis.start || 'Right',
-                            id: 'node_' + item.from_state
+                            id: `node_${item.from_state}`,
                         },
                         target: {
                             arrow: item.axis.end || 'Left',
-                            id: 'node_' + item.to_state
+                            id: `node_${item.to_state}`,
                         },
                         lineInfo: item,
                         options: {
                             paintStyle: {
                                 fill: 'transparent',
                                 stroke: this.getLineColor(item.id),
-                                strokeWidth: this.getLineColor(item.id) === '#a9adb6' ? 1 : 2
-                            }
-                        }
+                                strokeWidth: this.getLineColor(item.id) === '#a9adb6' ? 1 : 2,
+                            },
+                        },
                     })
                 })
             },
@@ -300,23 +300,20 @@
             getLineColor (lineId) {
                 if ('color' in this.hoverSlaObj && 'lines' in this.hoverSlaObj) {
                     return this.hoverSlaObj.lines.indexOf(lineId) !== -1 ? this.hoverSlaObj.color : 'rgba(176, 180, 189, 0.3)'
-                } else {
-                    return '#a9adb6'
                 }
+                return '#a9adb6'
             },
             getLabelColor (lineId) {
                 if ('color' in this.hoverSlaObj && 'lines' in this.hoverSlaObj) {
                     return this.hoverSlaObj.lines.indexOf(lineId) !== -1 ? '#a9adb6' : 'rgba(176, 180, 189, 0.3)'
-                } else {
-                    return '#a9adb6'
                 }
+                return '#a9adb6'
             },
             isHoverNode (nodeId) {
                 if ('color' in this.hoverSlaObj && 'lines' in this.hoverSlaObj) {
                     return this.hoverSlaObj.states.indexOf(nodeId) === -1
-                } else {
-                    return false
                 }
+                return false
             },
             // 保存节点报错 给错误节点标红
             errorNodes (valueList) {
@@ -336,7 +333,7 @@
                         target: item.target,
                         lineInfo: item.lineInfo,
                         id: item.lineInfo.id,
-                        name: item.lineInfo.name
+                        name: item.lineInfo.name,
                     }
                     this.lineOverlay(value)
                 })
@@ -350,24 +347,24 @@
                 }
                 const labelColor = this.getLabelColor(value.id)
                 // 判断label的样式(两个以上线条的时候显示label样式)
-                const labelName = `<span class="bk-label-test-name" style="color: ${labelColor}; border-color: ${labelColor}">${value.name || this.$t(`m.treeinfo["默认"]`)}</span>`
+                const labelName = `<span class="bk-label-test-name" style="color: ${labelColor}; border-color: ${labelColor}">${value.name || this.$t('m.treeinfo["默认"]')}</span>`
                 const lineInfo = {
-                    id: 'label_' + value.id,
+                    id: `label_${value.id}`,
                     type: 'Label',
                     name: labelName,
                     cls: 'label-test',
-                    location: 0.5
+                    location: 0.5,
                 }
                 this.$refs.jsFlow.addLineOverlay(value, lineInfo)
             },
             removerLine (value) {
                 this.$refs.jsFlow.removeConnector({
                     source: {
-                        id: value.sourceId
+                        id: value.sourceId,
                     },
                     target: {
-                        id: value.targetId
-                    }
+                        id: value.targetId,
+                    },
                 })
             },
             // 点击tool事件
@@ -395,7 +392,7 @@
             onConnectionDragStop (source, targetId, event) {
                 const params = {
                     sourceId: source.id,
-                    targetId: targetId
+                    targetId,
                 }
                 if (!this.checkLineInfo(params)) {
                     return
@@ -404,8 +401,8 @@
                 const line = {
                     source,
                     target: {
-                        id: targetId
-                    }
+                        id: targetId,
+                    },
                 }
                 const nodeEl = document.getElementById(targetId)
                 const nodeRects = nodeEl.getBoundingClientRect()
@@ -428,17 +425,17 @@
                 this.$refs.jsFlow.createConnector(line)
                 const connection = {
                     sourceId: source.id,
-                    targetId: targetId,
+                    targetId,
                     sourceEndpoint: {
                         anchor: {
-                            type: source.arrow
-                        }
+                            type: source.arrow,
+                        },
                     },
                     targetEndpoint: {
                         anchor: {
-                            type: arrow
-                        }
-                    }
+                            type: arrow,
+                        },
+                    },
                 }
                 this.drawLine(connection)
                 this.drawStatus = false
@@ -449,53 +446,47 @@
             },
             checkLineInfo (params) {
                 // 根据前后ID来获取前后节点的信息
-                const fromNode = this.canvasData.nodes.filter(item => {
-                    return (item.id === params.sourceId)
-                })
-                const toNode = this.canvasData.nodes.filter(item => {
-                    return (item.id === params.targetId)
-                })
+                const fromNode = this.canvasData.nodes.filter(item => (item.id === params.sourceId))
+                const toNode = this.canvasData.nodes.filter(item => (item.id === params.targetId))
                 const statusValue = {
                     status: true,
-                    msg: ''
+                    msg: '',
                 }
                 // 开始节点只能输出（且只能单一输出），结束节点只能输入
                 if (fromNode[0].type === 'START') {
-                    const startStatus = this.canvasData.lines.some(item => {
-                        return item.source.id === fromNode[0].id
-                    })
+                    const startStatus = this.canvasData.lines.some(item => item.source.id === fromNode[0].id)
                     if (startStatus) {
                         statusValue.status = false
-                        statusValue.msg = this.$t(`m.treeinfo["开始节点只能单一输出！"]`)
+                        statusValue.msg = this.$t('m.treeinfo["开始节点只能单一输出！"]')
                     }
                 }
                 if (toNode[0].type === 'START') {
                     statusValue.status = false
-                    statusValue.msg = this.$t(`m.treeinfo["开始节点只能输出！"]`)
+                    statusValue.msg = this.$t('m.treeinfo["开始节点只能输出！"]')
                 }
                 if (fromNode[0].type === 'END') {
                     statusValue.status = false
-                    statusValue.msg = this.$t(`m.treeinfo["结束节点只能输入！"]`)
+                    statusValue.msg = this.$t('m.treeinfo["结束节点只能输入！"]')
                 }
                 if (fromNode[0].type === 'START' && toNode[0].type === 'END') {
                     statusValue.status = false
-                    statusValue.msg = this.$t(`m.treeinfo["开始节点和结束节点不能直接相连！"]`)
+                    statusValue.msg = this.$t('m.treeinfo["开始节点和结束节点不能直接相连！"]')
                 }
                 if (params.sourceId === params.targetId) {
                     statusValue.status = false
-                    statusValue.msg = this.$t(`m.treeinfo["自身不能相连！"]`)
+                    statusValue.msg = this.$t('m.treeinfo["自身不能相连！"]')
                 }
                 // 已存在相同的连线不能相连
                 for (let i = 0; i < this.canvasData.lines.length; i++) {
                     if (params.sourceId === this.canvasData.lines[i].source.id && params.targetId === this.canvasData.lines[i].target.id) {
                         statusValue.status = false
-                        statusValue.msg = this.$t(`m.treeinfo["已存在的连线！"]`)
+                        statusValue.msg = this.$t('m.treeinfo["已存在的连线！"]')
                     }
                 }
                 if (!statusValue.status) {
                     this.$bkMessage({
                         message: statusValue.msg,
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                 }
                 // 用于判断是否是手动绘制
@@ -507,7 +498,7 @@
                 let sourceId = ''
                 const errorId = {
                     targetId: '',
-                    sourceId: ''
+                    sourceId: '',
                 }
                 this.canvasData.nodes.forEach((item, index) => {
                     if (item.id === params.sourceId) {
@@ -521,18 +512,16 @@
                 })
                 const lineParams = {
                     workflow: this.addList[0].workflow,
-                    name: this.$t(`m.treeinfo["默认"]`),
+                    name: this.$t('m.treeinfo["默认"]'),
                     axis: {
                         start: params.sourceEndpoint.anchor.type,
-                        end: params.targetEndpoint.anchor.type
+                        end: params.targetEndpoint.anchor.type,
                     },
                     from_state: sourceId,
-                    to_state: targetId
+                    to_state: targetId,
                 }
                 // 在移动的过程中 可能出现重复的连线
-                const errorStatus = this.canvasData.lines.some(item => {
-                    return (item.source.id === errorId.sourceId && item.target.id === errorId.targetId)
-                })
+                const errorStatus = this.canvasData.lines.some(item => (item.source.id === errorId.sourceId && item.target.id === errorId.targetId))
                 if (errorStatus) {
                     return
                 }
@@ -545,38 +534,38 @@
                     const value = [{
                         source: {
                             arrow: lineParams.axis.start,
-                            id: params.sourceId
+                            id: params.sourceId,
                         },
                         target: {
                             arrow: lineParams.axis.end,
-                            id: params.targetId
+                            id: params.targetId,
                         },
                         lineInfo: res.data,
                         id: res.data.id,
-                        name: res.data.name
+                        name: res.data.name,
                     }]
                     this.updateLine(value, 'add')
                     // 新增线条需要注册label事件
                     this.lineOverlay(value[0])
-                }).catch(res => {
-                    errorHandler(res, this)
-                    const errorStatus = this.canvasData.lines.some(item => {
-                        return (item.source.id === errorId.sourceId && item.target.id === errorId.targetId)
-                    })
-                    if (!errorStatus) {
-                        // 删除画布上的线条
-                        this.$refs.jsFlow.removeConnector({
-                            source: {
-                                id: errorId.sourceId
-                            },
-                            target: {
-                                id: errorId.targetId
-                            }
-                        })
-                    }
-                }).finally(() => {
-                    this.clickSecond = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                        const errorStatus = this.canvasData.lines.some(item => (item.source.id === errorId.sourceId && item.target.id === errorId.targetId))
+                        if (!errorStatus) {
+                            // 删除画布上的线条
+                            this.$refs.jsFlow.removeConnector({
+                                source: {
+                                    id: errorId.sourceId,
+                                },
+                                target: {
+                                    id: errorId.targetId,
+                                },
+                            })
+                        }
+                    })
+                    .finally(() => {
+                        this.clickSecond = false
+                    })
             },
             // 更新线条的数据
             updateLine (params, type) {
@@ -648,14 +637,14 @@
                 this.canvasData.nodes.forEach(item => {
                     const differenceValue = {
                         x: item.x - value.node.x,
-                        y: item.y - value.node.y
+                        y: item.y - value.node.y,
                     }
                     if (value.node.id !== item.id && differenceValue.y >= -40 && differenceValue.x >= -150 && differenceValue.x <= 150) {
                         const valueInfo = {
                             id: item.id,
                             nodeInfo: item.nodeInfo,
                             x: item.x,
-                            y: item.y + 100
+                            y: item.y + 100,
                         }
                         valueList.push(valueInfo)
                         setTimeout(() => {
@@ -675,7 +664,7 @@
                 })
             },
             deleteNode () {
-                const id = this.deleteInfo.info.nodeInfo.id
+                const { id } = this.deleteInfo.info.nodeInfo
                 if (this.clickSecond) {
                     return
                 }
@@ -685,8 +674,8 @@
                         // ...
                     } else {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["删除成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["删除成功"]'),
+                            theme: 'success',
                         })
                     }
                     // 删除节点获取节点上的所以连线，并将连线数组更新
@@ -696,13 +685,13 @@
                         listInfo.push({
                             source: {
                                 arrow: 'Left',
-                                id: valueList[i].sourceId
+                                id: valueList[i].sourceId,
                             },
                             target: {
                                 arrow: 'Left',
-                                id: valueList[i].targetId
+                                id: valueList[i].targetId,
                             },
-                            lineInfo: {}
+                            lineInfo: {},
                         })
                     }
                     if (listInfo.length) {
@@ -711,14 +700,16 @@
                     // 删除画布上的节点
                     this.$refs.jsFlow.removeNode(this.deleteInfo.info)
                     this.closeDelete()
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
-                }).finally(() => {
-                    this.clickSecond = false
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+                    .finally(() => {
+                        this.clickSecond = false
+                    })
             },
             closeDelete () {
                 this.deleteInfo.isShow = false
@@ -749,7 +740,7 @@
                     if (node.id !== item.id) {
                         const differenceValue = {
                             x: item.x - node.x,
-                            y: item.y - node.y
+                            y: item.y - node.y,
                         }
                         // 移动节点为NORMAL，ROUTER，TASK
                         if (node.type === 'NORMAL' || node.type === 'ROUTER' || node.type === 'TASK') {
@@ -785,7 +776,7 @@
                     const valueInfo = {
                         id: node.id,
                         x: this.stateNodeInfo.x,
-                        y: this.stateNodeInfo.y
+                        y: this.stateNodeInfo.y,
                     }
                     this.$refs.jsFlow.setNodePosition(valueInfo)
                     for (let i = 0; i < this.canvasData.nodes.length; i++) {
@@ -812,7 +803,7 @@
                     parent: [],
                     parentLine: [],
                     children: [],
-                    childrenLine: []
+                    childrenLine: [],
                 }
                 // 去掉两条线共存的现象
                 const otherList = []
@@ -865,7 +856,7 @@
                             tempArr.push({
                                 cArrow: c.anchor,
                                 pArrow: p.anchor,
-                                distance: Math.pow(c.x - p.x, 2) + Math.pow(c.y - p.y, 2)
+                                distance: Math.pow(c.x - p.x, 2) + Math.pow(c.y - p.y, 2),
                             })
                         })
                         tempArr = tempArr.sort(compare('distance'))
@@ -881,11 +872,11 @@
                     const theBestArrowGroup = tempArr[0]
                     const lineValue = {
                         source: {
-                            id: pN
+                            id: pN,
                         },
                         target: {
-                            id: node.id
-                        }
+                            id: node.id,
+                        },
                     }
                     this.deleteBestLine(lineValue, theBestArrowGroup)
                 })
@@ -898,7 +889,7 @@
                             tempArr2.push({
                                 cArrow: p.anchor,
                                 pArrow: c.anchor,
-                                distance: Math.pow(c.x - p.x, 2) + Math.pow(c.y - p.y, 2)
+                                distance: Math.pow(c.x - p.x, 2) + Math.pow(c.y - p.y, 2),
                             })
                         })
                         tempArr2 = tempArr2.sort(compare('distance'))
@@ -914,11 +905,11 @@
                     const theBestArrowGroup = tempArr2[0]
                     const lineValue = {
                         source: {
-                            id: node.id
+                            id: node.id,
                         },
                         target: {
-                            id: cN
-                        }
+                            id: cN,
+                        },
                     }
                     this.deleteBestLine(lineValue, theBestArrowGroup)
                 })
@@ -930,31 +921,29 @@
                     {
                         anchor: 'Right',
                         x: value.x + (typeList.some(item => item === value.type) ? 150 : 40),
-                        y: value.y + 20
+                        y: value.y + 20,
                     },
                     {
                         anchor: 'Bottom',
                         x: value.x + (typeList.some(item => item === value.type) ? 75 : 20),
-                        y: value.y + 40
-                    }
+                        y: value.y + 40,
+                    },
                 ]
                 return listInfo
             },
             deleteBestLine (lineValue, theBestArrowGroup) {
                 // 当最优连线和原连线一样时，则不进行操作
-                const valueStuta = this.canvasData.lines.some(item => {
-                    return (item.source.id === lineValue.source.id && item.target.id === lineValue.target.id && item.source.arrow === theBestArrowGroup.pArrow && item.target.arrow === theBestArrowGroup.cArrow)
-                })
+                const valueStuta = this.canvasData.lines.some(item => (item.source.id === lineValue.source.id && item.target.id === lineValue.target.id && item.source.arrow === theBestArrowGroup.pArrow && item.target.arrow === theBestArrowGroup.cArrow))
                 if (valueStuta) {
                     return
                 }
                 this.$refs.jsFlow.removeConnector({
                     source: {
-                        id: lineValue.source.id
+                        id: lineValue.source.id,
                     },
                     target: {
-                        id: lineValue.target.id
-                    }
+                        id: lineValue.target.id,
+                    },
                 })
                 this.canvasData.lines.forEach(item => {
                     if (item.source.id === lineValue.source.id && item.target.id === lineValue.target.id) {
@@ -963,13 +952,13 @@
                         const value = {
                             source: {
                                 arrow: theBestArrowGroup.pArrow,
-                                id: lineValue.source.id
+                                id: lineValue.source.id,
                             },
                             target: {
                                 arrow: theBestArrowGroup.cArrow,
-                                id: lineValue.target.id
+                                id: lineValue.target.id,
                             },
-                            lineInfo: item.lineInfo
+                            lineInfo: item.lineInfo,
                         }
                         this.$refs.jsFlow.createConnector(value)
                         // 新增线条需要注册label事件
@@ -978,7 +967,7 @@
                             target: value.target,
                             lineInfo: value.lineInfo,
                             id: item.lineInfo.id,
-                            name: item.lineInfo.name
+                            name: item.lineInfo.name,
                         }
                         this.lineOverlay(labelValue)
                     }
@@ -989,20 +978,21 @@
                 const params = {
                     axis: {
                         x: node.x,
-                        y: node.y
-                    }
+                        y: node.y,
+                    },
                 }
-                const id = node.nodeInfo.id
+                const { id } = node.nodeInfo
                 this.$store.dispatch('deployCommon/updateNodeAxis', { params, id }).then((res) => {
                     // ...
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
-            }
-        }
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+            },
+        },
     }
 </script>
 

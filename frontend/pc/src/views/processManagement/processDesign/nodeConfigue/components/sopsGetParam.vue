@@ -151,7 +151,7 @@
     export default {
         name: 'sopsGetParam',
         components: {
-            addField
+            addField,
         },
         props: {
             quoteVars: Array,
@@ -160,59 +160,59 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             constants: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isStaticData: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             }, // 流程信息
             flowInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 节点信息
             stateList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 是否仅展示 数据
             isStatic: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             hookedVarList: Object,
             isHook: {
                 type: Boolean,
                 default () {
                     return true
-                }
+                },
             },
             isEdit: {
                 type: Boolean,
                 default () {
                     return true
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -230,21 +230,21 @@
                     showLabel: true,
                     showHook: this.isHook,
                     showDesc: true,
-                    formEdit: !this.disabled && !this.disabledRenderForm && this.isEdit
+                    formEdit: !this.disabled && !this.disabledRenderForm && this.isEdit,
                 },
                 fieldList: [],
                 checkInfo: {
                     name: '',
-                    road: ''
+                    road: '',
                 },
                 biz: [
                     {
-                        name: this.$t(`m.treeinfo["业务"]`),
+                        name: this.$t('m.treeinfo["业务"]'),
                         custom_type: '',
                         source_type: 'custom',
                         value: '--',
-                        key: 1
-                    }
+                        key: 1,
+                    },
                 ],
                 changeInfo: {
                     workflow: '',
@@ -262,27 +262,27 @@
                     regex: 'EMPTY',
                     custom_regex: '',
                     is_tips: false,
-                    tips: ''
+                    tips: '',
                 },
                 sourceTypeList: [
                     {
                         id: 1,
                         key: 'custom',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'component_inputs',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
                 ],
                 sliderInfo: {
-                    title: this.$t(`m.treeinfo["添加变量"]`),
+                    title: this.$t('m.treeinfo["添加变量"]'),
                     show: false,
-                    width: 700
+                    width: 700,
                 },
                 showTabData: {},
-                sopsTableInfo: []
+                sopsTableInfo: [],
             }
         },
         computed: {},
@@ -292,7 +292,7 @@
             },
             isEdit () {
                 this.renderKey = new Date().getTime()
-            }
+            },
         },
         mounted () {
             if (this.isStatic) {
@@ -300,7 +300,7 @@
                 this.isStaticData.forEach((item) => {
                     const ite = {
                         name: item.name,
-                        value: item.value
+                        value: item.value,
                     }
                     this.sopsTableInfo.push(ite)
                 })
@@ -336,7 +336,7 @@
             addNewItem (data) {
                 this.showTabData = data
                 this.sliderInfo.show = true
-                this.$refs['selectSops' + data.key].close()
+                this.$refs[`selectSops${data.key}`].close()
             },
             closeShade () {
                 this.sliderInfo.show = false
@@ -347,8 +347,8 @@
                         item.value = res.data.key
                     }
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -30,30 +30,30 @@
         theme: 'vs-dark',
         automaticLayout: true,
         minimap: {
-            enabled: false
+            enabled: false,
         },
         wordWrap: 'on',
-        wrappingIndent: 'same'
+        wrappingIndent: 'same',
     }
     export default {
         name: 'CodeEditor',
         props: {
             value: {
                 type: String,
-                default: ''
+                default: '',
             },
             options: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             const editorOptions = Object.assign({}, DEFAULT_OPTIONS, this.options, { value: this.value })
             return {
                 editorOptions,
-                monacoInstance: null
+                monacoInstance: null,
             }
         },
         watch: {
@@ -68,8 +68,8 @@
                 handler (val) {
                     this.editorOptions = Object.assign({}, DEFAULT_OPTIONS, val, { value: this.value })
                     this.updateOptions()
-                }
-            }
+                },
+            },
         },
         mounted () {
             this.initIntance()
@@ -100,8 +100,8 @@
             },
             updateOptions () {
                 this.monacoInstance.updateOptions(this.editorOptions)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

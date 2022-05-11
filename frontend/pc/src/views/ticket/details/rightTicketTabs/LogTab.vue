@@ -79,22 +79,22 @@
     export default {
         name: 'LogTab',
         components: {
-            ticketLogDetail
+            ticketLogDetail,
         },
         mixins: [fieldMix],
         props: {
-            ticketInfo: Object
+            ticketInfo: Object,
         },
         data () {
             return {
                 dispalyLogInfo: null,
-                flowStartText: this.$t(`m.newCommon["流程开始"]`),
+                flowStartText: this.$t('m.newCommon["流程开始"]'),
                 loading: false,
                 list: [],
                 isShowDetail: false,
                 imgUrl: require('@/images/orderFinished.png'),
                 commentInfo: {},
-                processorList: []
+                processorList: [],
             }
         },
         computed: {
@@ -102,18 +102,18 @@
                 return this.ticketInfo.is_over && Number(this.ticketInfo.comment_id) !== -1
             },
             ...mapState({
-                nodeList: state => state.deployOrder.nodeList
+                nodeList: state => state.deployOrder.nodeList,
             }),
             token () {
                 return this.$route.query.token
-            }
+            },
         },
         watch: {
             nodeList (val) {
                 if (val.length !== 0) {
                     this.getCurrentProcess()
                 }
-            }
+            },
         },
         created () {
             this.getOperationLogList()
@@ -123,15 +123,15 @@
         methods: {
             // 获取流转日志-操作日志
             getOperationLogList () {
-                const id = this.$route.query.id
+                const { id } = this.$route.query
                 if (!id) {
                     return
                 }
                 this.loading = true
                 const params = {}
-                params['ticket'] = id
+                params.ticket = id
                 if (this.$route.query.token) {
-                    params['token'] = this.$route.query.token
+                    params.token = this.$route.query.token
                 }
                 this.$store.dispatch('change/getLog', params).then((res) => {
                     this.list = []
@@ -149,11 +149,13 @@
                             this.list.push(JSON.parse(JSON.stringify(item)))
                         }
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             getCurrentProcess () {
                 this.nodeList.forEach(item => {
@@ -166,16 +168,16 @@
                         from_state_name: item.name || '',
                         from_state_type: '',
                         id: -1,
-                        message: this.$t(`m["正在进行中"]`) + '  ' + item.processors,
+                        message: `${this.$t('m["正在进行中"]')}  ${item.processors}`,
                         operate_at: item.update_at,
                         operator: item.processors,
                         processors: '',
                         processors_type: '',
                         showMore: false,
-                        tag: `【${item.name}】` + this.$t(`m["正在进行中"]`) + ', ' + this.$t(`m["当前处理人"]`) + item.processors || '--',
+                        tag: `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}` || '--',
                         ticket: this.ticketInfo.id,
                         ticket_id: this.ticketInfo.id,
-                        type: 'primary'
+                        type: 'primary',
                     }
                     if (item.status === 'RUNNING') {
                         this.list.push(processor)
@@ -204,8 +206,8 @@
             },
             handleEvaluate () {
                 console.log('去评价')
-            }
-        }
+            },
+        },
     }
 </script>
 

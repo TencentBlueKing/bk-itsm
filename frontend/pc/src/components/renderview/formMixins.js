@@ -23,24 +23,24 @@
 export const COMMON_ATTRS = {
     label: {
         type: String,
-        required: false
+        required: false,
     },
     hiddenLabel: {
         type: Boolean,
-        default: false
+        default: false,
     },
     form: {
         type: Object,
-        default: () => ({})
+        default: () => ({}),
     },
     children: {
         type: [String, Array],
-        required: false
+        required: false,
     },
     desc: {
         type: String,
-        required: false
-    }
+        required: false,
+    },
 }
 export function getFormMixins (attrs) {
     const privateProps = {} // 继承属性
@@ -52,12 +52,12 @@ export function getFormMixins (attrs) {
     return {
         props: {
             ...COMMON_ATTRS,
-            ...privateProps
+            ...privateProps,
         },
         inject: ['getContext'],
         data () {
             return {
-                value: this.$attrs['value'] ? this.$attrs['value'] : attrs['value'].default
+                value: this.$attrs.value ? this.$attrs.value : attrs.value.default,
             }
         },
         methods: {
@@ -75,7 +75,7 @@ export function getFormMixins (attrs) {
                     }
                 }
                 return vueTag
-            }
-        }
+            },
+        },
     }
 }

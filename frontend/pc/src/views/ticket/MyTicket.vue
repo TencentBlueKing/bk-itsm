@@ -213,93 +213,93 @@
     const PANELS = [
         {
             name: 'todo',
-            label: i18n.t(`m.tickets['我的待办']`)
+            label: i18n.t('m.tickets[\'我的待办\']'),
         },
         {
             name: 'approval',
-            label: i18n.t(`m.tickets['待我审批']`)
+            label: i18n.t('m.tickets[\'待我审批\']'),
         },
         {
             name: 'created',
-            label: i18n.t(`m.tickets['我的申请']`)
+            label: i18n.t('m.tickets[\'我的申请\']'),
         },
         {
             name: 'attention',
-            label: i18n.t(`m.tickets['我的关注']`)
+            label: i18n.t('m.tickets[\'我的关注\']'),
         },
         {
             name: 'history',
-            label: i18n.t(`m.tickets['我的历史']`)
-        }
+            label: i18n.t('m.tickets[\'我的历史\']'),
+        },
     ]
     const COLUMN_LIST = [
         {
             id: 'id',
-            label: i18n.t(`m.manageCommon['单号']`),
+            label: i18n.t('m.manageCommon[\'单号\']'),
             width: '200',
-            disabled: true
+            disabled: true,
         },
         {
             id: 'title',
-            label: i18n.t(`m.manageCommon['标题']`),
+            label: i18n.t('m.manageCommon[\'标题\']'),
             minWidth: '180' },
         {
             id: 'service_name',
-            label: i18n.t(`m.home['服务']`),
+            label: i18n.t('m.home[\'服务\']'),
             minWidth: '140',
             prop: 'service_name' },
         {
             id: 'service_type_name',
-            label: i18n.t(`m.manageCommon['类型']`),
+            label: i18n.t('m.manageCommon[\'类型\']'),
             minWidth: '80' },
         {
             id: 'priority',
-            label: i18n.t(`m.slaContent['优先级']`),
+            label: i18n.t('m.slaContent[\'优先级\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'priority_name' },
         {
             id: 'current_steps',
-            label: i18n.t(`m.newCommon['当前步骤']`),
+            label: i18n.t('m.newCommon[\'当前步骤\']'),
             minWidth: '80',
             prop: 'current_steps' },
         {
             id: 'current_processors',
-            label: i18n.t(`m.manageCommon['当前处理人']`),
+            label: i18n.t('m.manageCommon[\'当前处理人\']'),
             width: '130',
             prop: 'current_processors' },
         {
             id: 'status',
-            label: i18n.t(`m.manageCommon['状态']`),
+            label: i18n.t('m.manageCommon[\'状态\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'status' },
         {
             id: 'create_at',
-            label: i18n.t(`m.manageCommon['提单时间']`),
+            label: i18n.t('m.manageCommon[\'提单时间\']'),
             minWidth: '140',
             sortable: 'custom',
             prop: 'create_at' },
         {
             id: 'creator',
-            label: i18n.t(`m.manageCommon['提单人']`),
+            label: i18n.t('m.manageCommon[\'提单人\']'),
             minWidth: '140',
             prop: 'creator' },
         {
             id: 'operate',
-            label: i18n.t(`m.manageCommon['操作']`),
-            minWidth: '80' }
+            label: i18n.t('m.manageCommon[\'操作\']'),
+            minWidth: '80' },
     ]
     const SEARCH_FORMS = [
         {
-            name: i18n.t(`m.tickets['单号/标题']`),
-            desc: i18n.t(`m.tickets['单号/标题']`),
+            name: i18n.t('m.tickets[\'单号/标题\']'),
+            desc: i18n.t('m.tickets[\'单号/标题\']'),
             type: 'input',
             key: 'keyword',
             display: true,
             value: '',
             list: [],
-            placeholder: i18n.t('m.tickets["请选择单号/标题"]')
+            placeholder: i18n.t('m.tickets["请选择单号/标题"]'),
         },
         {
             name: i18n.t('m.tickets["服务目录"]'),
@@ -309,7 +309,7 @@
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择服务目录"]')
+            placeholder: i18n.t('m.tickets["请选择服务目录"]'),
         },
         {
             name: i18n.t('m.tickets["服务"]'),
@@ -319,7 +319,7 @@
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择服务"]')
+            placeholder: i18n.t('m.tickets["请选择服务"]'),
         },
         {
             name: i18n.t('m.tickets["提单人"]'),
@@ -329,7 +329,7 @@
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择提单人"]')
+            placeholder: i18n.t('m.tickets["请选择提单人"]'),
         },
         {
             name: i18n.t('m.tickets["处理人"]'),
@@ -339,7 +339,7 @@
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择处理人"]')
+            placeholder: i18n.t('m.tickets["请选择处理人"]'),
         },
         {
             name: i18n.t('m.tickets["状态"]'),
@@ -349,26 +349,26 @@
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择状态"]')
+            placeholder: i18n.t('m.tickets["请选择状态"]'),
         },
         {
-            name: i18n.t(`m.tickets["提单时间"]`),
+            name: i18n.t('m.tickets["提单时间"]'),
             key: 'date_update',
             type: 'datetime',
             display: true,
             value: [],
             list: [],
-            placeholder: i18n.t('m.tickets["请选择提单时间"]')
+            placeholder: i18n.t('m.tickets["请选择提单时间"]'),
         },
         {
-            name: i18n.t(`m.tickets["业务"]`),
+            name: i18n.t('m.tickets["业务"]'),
             key: 'bk_biz_id',
             type: 'select',
             display: true,
             value: '',
             list: [],
-            placeholder: i18n.t('m.tickets["请选择业务"]')
-        }
+            placeholder: i18n.t('m.tickets["请选择业务"]'),
+        },
     ]
     export default {
         name: 'MyTicket',
@@ -379,7 +379,7 @@
             ApprovalDialog,
             AdvancedSearch,
             EvaluationTicketModal,
-            ExportTicketDialog
+            ExportTicketDialog,
         },
         mixins: [ticketListMixins],
         data () {
@@ -391,7 +391,7 @@
                 approvalInfo: {
                     showAllOption: false,
                     result: true,
-                    approvalList: []
+                    approvalList: [],
                 },
                 colorHexList: [],
                 ticketList: [],
@@ -399,25 +399,25 @@
                 tabLoading: false,
                 tabCount: {
                     todo: 0,
-                    approval: 0
+                    approval: 0,
                 },
                 countLoading: false,
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 setting: {
                     fields: [],
                     selectedFields: [],
-                    size: 'medium'
+                    size: 'medium',
                 },
                 lastSearchParams: {}, // 搜索参数
                 orderKey: '-create_at', // 排序参数
                 // 批量审批选中单
                 selectedList: [],
                 // 评价
-                evaluationTicketInfo: {}
+                evaluationTicketInfo: {},
             }
         },
         computed: {
@@ -429,14 +429,14 @@
             },
             fromRouter () {
                 return `${this.$route.name}_${this.$route.params.type}`
-            }
+            },
         },
         watch: {
             '$route' () {
                 this.pagination = {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 }
                 this.lastSearchParams = {}
                 this.orderKey = '-create_at'
@@ -444,7 +444,7 @@
                     this.$refs.advancedSearch.showMore = false
                 }
                 this.initData()
-            }
+            },
         },
         created () {
             this.initData()
@@ -481,7 +481,7 @@
             },
             // 获取单据列表
             getTicketList () {
-                const type = this.$route.params.type
+                const { type } = this.$route.params
                 const searchParams = JSON.stringify(this.lastSearchParams) === '{}'
                     ? { service_id__in: this.$route.query.service_id } // 没有参数时默认将 url 参数作为查询参数
                     : this.lastSearchParams
@@ -490,9 +490,9 @@
                     page_size: this.pagination.limit,
                     page: this.pagination.current,
                     is_draft: 0,
-                    view_type: 'my_' + type,
+                    view_type: `my_${type}`,
                     ordering: this.orderKey,
-                    ...searchParams
+                    ...searchParams,
                 }).then(resp => {
                     if (resp.result) {
                         this.ticketList = resp.data.items.map(item => {
@@ -510,37 +510,41 @@
                         // 异步加载列表中的某些字段信息
                         this.__asyncReplaceTicketListAttr(this.ticketList)
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.tabLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.tabLoading = false
+                    })
             },
             // 获取单据数量（待办、审批）
             getTicketsCount () {
                 this.countLoading = true
                 this.$store.dispatch('ticket/getTicketsCount').then((res) => {
-                    const data = res.data
+                    const { data } = res
                     if (data.my_approval) {
-                        this.tabCount['approval'] = data.my_approval
+                        this.tabCount.approval = data.my_approval
                     }
                     if (data.my_todo) {
-                        this.tabCount['todo'] = data.my_todo
+                        this.tabCount.todo = data.my_todo
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取单据所有状态分类列表
             getTicketStatusTypes () {
                 const params = {
-                    source_uri: 'ticket_status'
+                    source_uri: 'ticket_status',
                 }
                 this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
                     this.searchForms.find(item => item.key === 'current_status__in').list = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取状态颜色接口
             getTypeStatus () {
@@ -548,40 +552,43 @@
                 const type = ''
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
                     this.colorHexList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             getBusinessList () {
                 this.$store.dispatch('eventType/getAppList').then((res) => {
                     this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 查询级联数据
             getServiceTree () {
                 const params = {
-                    show_deleted: true
+                    show_deleted: true,
                 }
                 this.$store.dispatch('serviceCatalog/getTreeData', params).then(res => {
                     const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                    formItem.list = res.data[0] ? res.data[0]['children'] : []
-                }).catch((res) => {
-                    errorHandler(res, this)
+                    formItem.list = res.data[0] ? res.data[0].children : []
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             getstatusColor (row) {
                 const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status)
                 return statusColor.length
-                    ? { 'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}` }
-                    : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
+                    ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
+                    : { color: '#3c96ff', border: '1px solid #3c96ff' }
             },
             // 获取服务数据
             getServiceData (val) {
                 const params = {
                     catalog_id: val,
-                    is_valid: 1
+                    is_valid: 1,
                 }
                 this.$store.dispatch('catalogService/getServices', params).then((res) => {
                     const formItem = this.searchForms.find(item => item.key === 'service_id__in')
@@ -589,12 +596,13 @@
                     res.data.forEach(item => {
                         formItem.list.push({
                             key: item.id,
-                            name: item.name
+                            name: item.name,
                         })
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             getPriorityColor (row) {
                 const priorityList = ['#A4AAB3', '#FFB848', '#FF5656']
@@ -603,9 +611,9 @@
                     priorityIndex = row.meta.priority.key > 3 ? 3 : Number(row.meta.priority.key)
                 }
                 return row.priority_name === '--' ? {
-                    'background': 'none',
-                    'color': '#424950'
-                } : { 'backgroundColor': priorityList[priorityIndex - 1] }
+                    background: 'none',
+                    color: '#424950',
+                } : { backgroundColor: priorityList[priorityIndex - 1] }
             },
             reloadCount () {
                 this.countLoading = true
@@ -620,8 +628,8 @@
                     query: {
                         from: this.fromRouter,
                         service_id: row.service_id,
-                        rc_ticket_id: row.id
-                    }
+                        rc_ticket_id: row.id,
+                    },
                 })
                 window.open(href, '_blank')
             },
@@ -629,20 +637,20 @@
                 this.$router.push({
                     name: 'MyTicket',
                     params: {
-                        type: name
-                    }
+                        type: name,
+                    },
                 })
             },
             // 优先级、提单时间、状态添加排序
             onSortChange (value) {
                 const sortKetMap = {
-                    'priority_name': 'priority_order',
-                    'status': 'current_status_order',
-                    'create_at': 'create_at'
+                    priority_name: 'priority_order',
+                    status: 'current_status_order',
+                    create_at: 'create_at',
                 }
                 let order = sortKetMap[value.prop]
                 if (value.order === 'descending') {
-                    order = '-' + order
+                    order = `-${order}`
                 }
                 this.orderKey = order
                 this.getTicketList()
@@ -662,14 +670,14 @@
                 const fieldIds = fields.map(m => m.id)
                 this.$store.commit('ticket/setSettingCache', {
                     type: this.activePanel,
-                    value: { fields: fieldIds, size }
+                    value: { fields: fieldIds, size },
                 })
             },
             onOpenApprovalDialog (id, result) {
                 this.isApprovalDialogShow = true
                 this.approvalInfo = {
-                    result: result,
-                    approvalList: [{ ticket_id: id }]
+                    result,
+                    approvalList: [{ ticket_id: id }],
                 }
             },
             onApprovalDialogHidden (result) {
@@ -677,7 +685,7 @@
                 this.approvalInfo = {
                     result: true,
                     showAllOption: false,
-                    approvalList: []
+                    approvalList: [],
                 }
                 if (result) {
                     this.initData()
@@ -689,7 +697,7 @@
                 this.approvalInfo = {
                     result: true,
                     showAllOption: true,
-                    approvalList: this.selectedList.map(item => ({ ticket_id: item.id }))
+                    approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
                 }
             },
             handleSearch (params) {
@@ -721,27 +729,28 @@
             },
             // 添加关注/取消关注
             onChangeAttention (row) {
-                const id = row.id
+                const { id } = row
                 const params = {
-                    attention: !row.hasAttention
+                    attention: !row.hasAttention,
                 }
                 let bkMessage = ''
                 this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
                     if (row.hasAttention) {
                         row.hasAttention = false
-                        bkMessage = this.$t(`m.manageCommon['取消关注成功~']`)
+                        bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']')
                     } else {
                         row.hasAttention = true
-                        bkMessage = this.$t(`m.manageCommon['添加关注成功~']`)
+                        bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']')
                     }
                     this.$bkMessage({
                         message: bkMessage,
                         theme: 'success',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 清空已选列表
             clearSelectedList () {
@@ -780,8 +789,8 @@
             },
             getRowStyle ({ row, rowIndex }) {
                 return `background-color: ${row.sla_color}`
-            }
-        }
+            },
+        },
     }
 </script>
 

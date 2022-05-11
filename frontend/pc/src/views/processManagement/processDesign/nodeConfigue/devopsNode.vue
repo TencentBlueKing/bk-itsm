@@ -137,7 +137,7 @@
         return {
             required: true,
             message: i18n.t('m.treeinfo["字段必填"]'),
-            trigger: 'blur'
+            trigger: 'blur',
         }
     }
     export default {
@@ -147,7 +147,7 @@
             commonTriggerList,
             DevopsPreview,
             NoData,
-            dealPerson
+            dealPerson,
         },
         props: {
             // 流程信息
@@ -155,21 +155,21 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 节点信息
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             state: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -178,7 +178,7 @@
                     nodeName: '',
                     businessId: '',
                     pipelineId: '',
-                    processors: []
+                    processors: [],
                 },
                 businessList: [],
                 pipelineList: [],
@@ -193,19 +193,19 @@
                 basicInfoRules: {
                     nodeName: [newRequiredRule()],
                     businessId: [newRequiredRule()],
-                    pipelineId: [newRequiredRule()]
+                    pipelineId: [newRequiredRule()],
                    
                 },
                 pipelineRules: {},
                 checkStatus: {
                     delivers: false,
-                    processors: false
+                    processors: false,
                 },
                 excludeProcessor: [],
                 processorsInfo: {
                     type: '',
-                    value: ''
-                }
+                    value: '',
+                },
             }
         },
         watch: {
@@ -221,7 +221,7 @@
                 if (!val) {
                     this.pipelineFormList = []
                 }
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -238,7 +238,7 @@
                         this.getPipelineInfo(1)
                         this.processorsInfo = {
                             type: this.configur.processors_type,
-                            value: this.configur.processors
+                            value: this.configur.processors,
                         }
                         this.getExcludeRoleTypeList()
                     }
@@ -272,7 +272,7 @@
                 this.pipelineLoading = true
                 this.basicInfo.pipelineId = ''
                 try {
-                    this.$store.dispatch('ticket/getDevopsPipelineList', { 'project_id': this.basicInfo.businessId }).then(res => {
+                    this.$store.dispatch('ticket/getDevopsPipelineList', { project_id: this.basicInfo.businessId }).then(res => {
                         this.pipelineList = res.data
                     })
                 } catch (e) {
@@ -285,8 +285,8 @@
             getPipelineInfo (init) {
                 this.pipeFormLoading = true
                 Promise.all([
-                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': this.basicInfo.businessId, 'pipeline_id': this.basicInfo.pipelineId }),
-                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': this.basicInfo.businessId, 'pipeline_id': this.basicInfo.pipelineId })
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
+                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
                 ]).then(res => {
                     this.pipelineData = {}
                     this.pipelineFormList = res[0].data.properties
@@ -296,15 +296,17 @@
                         this.pipelineRules[item.id] = [{
                             required: item.required,
                             message: i18n.t('m.treeinfo["字段必填"]'),
-                            trigger: 'blur'
+                            trigger: 'blur',
                         }]
                     })
                     this.pipelineStages = res[1].data.stages
-                }).catch(e => {
-                    console.log(e)
-                }).finally(_ => {
-                    this.pipeFormLoading = false
                 })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                    .finally(_ => {
+                        this.pipeFormLoading = false
+                    })
             },
             closeNode () {
                 this.$parent.closeConfigur()
@@ -316,57 +318,56 @@
                 }
                 Promise.all([
                     this.$refs.basicInfo.validate(),
-                    this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null
+                    this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null,
                 ]).then(res => {
                     const basicData = this.businessList.filter(item => item.project_code === this.basicInfo.businessId)[0]
                     const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0]
-                    const constants = Object.keys(this.pipelineData).map(item => {
-                        return {
-                            'value': this.pipelineData[item],
-                            'name': item,
-                            'key': item
-                        }
-                    })
+                    const constants = Object.keys(this.pipelineData).map(item => ({
+                        value: this.pipelineData[item],
+                        name: item,
+                        key: item,
+                    }))
                     const { value: processors, type: processors_type } = this.$refs.processors.getValue()
                     const params = {
-                        'extras': {
-                            'devops_info': {
-                                'username': window.username,
-                                'project_id': {
-                                    'value': basicData.projectCode,
-                                    'name': basicData.projectName,
-                                    'key': basicData.project_id
+                        extras: {
+                            devops_info: {
+                                username: window.username,
+                                project_id: {
+                                    value: basicData.projectCode,
+                                    name: basicData.projectName,
+                                    key: basicData.project_id,
                                 },
-                                'pipeline_id': {
-                                    'value': pipelineData.pipelineId,
-                                    'name': pipelineData.pipelineName,
-                                    'key': pipelineData.pipeline_id
+                                pipeline_id: {
+                                    value: pipelineData.pipelineId,
+                                    name: pipelineData.pipelineName,
+                                    key: pipelineData.pipeline_id,
                                 },
-                                'constants': constants
-                            }
+                                constants,
+                            },
                         },
-                        'processors': processors || '',
-                        'processors_type': processors_type,
-                        'is_draft': false,
-                        'is_terminable': false,
-                        'name': this.basicInfo.nodeName,
-                        'type': 'TASK-DEVOPS',
-                        'workflow': this.configur.workflow
+                        processors: processors || '',
+                        processors_type,
+                        is_draft: false,
+                        is_terminable: false,
+                        name: this.basicInfo.nodeName,
+                        type: 'TASK-DEVOPS',
+                        workflow: this.configur.workflow,
                     }
                     const stateId = this.configur.id
                     this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["保存成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["保存成功"]'),
+                            theme: 'success',
                         })
                         this.$parent.closeConfigur()
                     }, (res) => {
                         errorHandler(res, this)
-                    }).finally(() => {
                     })
+                        .finally(() => {
+                        })
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

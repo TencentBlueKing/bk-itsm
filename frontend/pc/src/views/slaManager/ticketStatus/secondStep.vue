@@ -166,8 +166,8 @@
         props: {
             statusType: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -181,26 +181,26 @@
                     hasHeader: true,
                     width: 700,
                     headerPosition: 'left',
-                    autoClose: false
+                    autoClose: false,
                 },
                 timeList: [
-                    { id: 'm', name: this.$t(`m.slaContent['分钟']`) },
-                    { id: 'h', name: this.$t(`m.slaContent['小时']`) },
-                    { id: 'd', name: this.$t(`m.slaContent['天']`) }
+                    { id: 'm', name: this.$t('m.slaContent[\'分钟\']') },
+                    { id: 'h', name: this.$t('m.slaContent[\'小时\']') },
+                    { id: 'd', name: this.$t('m.slaContent[\'天\']') },
                 ],
                 isAutoTemp: {
                     item: {},
                     info: {
                         threshold: null,
                         id: '',
-                        timeSpace: 'd'
-                    }
+                        timeSpace: 'd',
+                    },
                 },
                 statusOwnList: [],
                 dataList: [],
                 flowList: [],
                 isDropdownShow: false,
-                rules: {}
+                rules: {},
             }
         },
         async mounted () {
@@ -228,15 +228,15 @@
                     name: '启动',
                     service_type: this.statusType,
                     batch_create: true,
-                    rules: []
+                    rules: [],
                 }
                 for (let i = 0; i < 2; i++) {
                     params.rules.push({
                         condition_type: 'STOP',
                         condition: {
                             type: 'any',
-                            expressions: []
-                        }
+                            expressions: [],
+                        },
                     })
                 }
                 params.rules[1].condition_type = 'PAUSE'
@@ -247,20 +247,22 @@
                 this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
                     this.$bkMessage({
                         message: '保存成功',
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.$parent.backTab()
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             nameFilter (val) {
-                return this.$t(`m.slaContent['从']`) + `【${val}】` + this.$t(`m.slaContent['可以流转至']`)
+                return `${this.$t('m.slaContent[\'从\']')}【${val}】${this.$t('m.slaContent[\'可以流转至\']')}`
             },
             async getTypeStatus () {
                 this.isDataLoading = true
@@ -269,14 +271,16 @@
                 }
                 await this.$store.dispatch('ticketStatus/getTypeStatus', {
                     type: this.statusType,
-                    params
+                    params,
                 }).then((res) => {
                     this.statusOwnList = res.data
                     this.dataList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
             },
             initIsAutoTemp () {
                 this.isAutoTemp.info.threshold = null
@@ -300,10 +304,12 @@
                             }
                         }
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
                 await this.$store.dispatch('ticketStatus/getTypeAutoFlow', this.statusType).then((res) => {
                     const autoList = res.data
                     for (const key in autoList) {
@@ -313,11 +319,13 @@
                             }
                         }
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             selectFlowTo (itemRow, itemCol) {
                 const flag = itemRow.can_flow_to.indexOf(itemCol.id)
@@ -342,20 +350,22 @@
                     item.can_flow_to.forEach(ite => {
                         const tempTransits = {
                             from_status: item.id,
-                            to_status: ite
+                            to_status: ite,
                         }
                         transits.push(tempTransits)
                     })
                 })
                 const params = {
                     service_type: type,
-                    transits
+                    transits,
                 }
                 await this.$store.dispatch('ticketStatus/saveTypeFlow', params).then((res) => {
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
             },
             // 自动流传设置点击事件
             isAutoChange (itemRow) {
@@ -364,26 +374,28 @@
                     // 取消自动流转弹窗
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确认取消？"]`),
-                        subTitle: this.$t(`m.slaContent["确认后，将取消自动流转！"]`),
+                        title: this.$t('m.slaContent["确认取消？"]'),
+                        subTitle: this.$t('m.slaContent["确认后，将取消自动流转！"]'),
                         confirmFn: () => {
-                            const id = itemRow.id
+                            const { id } = itemRow
                             if (this.secondClick) {
                                 return
                             }
                             this.secondClick = true
                             this.$store.dispatch('ticketStatus/closeAutoFlow', id).then((res) => {
                                 this.$bkMessage({
-                                    message: this.$t(`m.manageCommon["取消成功"]`),
-                                    theme: 'success'
+                                    message: this.$t('m.manageCommon["取消成功"]'),
+                                    theme: 'success',
                                 })
                                 this.listAddFlow()
-                            }).catch((res) => {
-                                errorHandler(res, this)
-                            }).finally(() => {
-                                this.secondClick = false
                             })
-                        }
+                                .catch((res) => {
+                                    errorHandler(res, this)
+                                })
+                                .finally(() => {
+                                    this.secondClick = false
+                                })
+                        },
                     })
                 } else {
                     // 编辑自动流转弹窗
@@ -395,16 +407,18 @@
             async editRule (itemRow) {
                 this.saveTypeFlow()
                 this.getFlowList(itemRow)
-                const id = itemRow.id
+                const { id } = itemRow
                 await this.$store.dispatch('ticketStatus/getOneAutoFlow', id).then((res) => {
                     this.isAutoTemp.item = itemRow
                     this.isAutoTemp.info.threshold = res.data.threshold
                     this.isAutoTemp.info.timeSpace = res.data.threshold_unit
                     this.isAutoTemp.info.id = res.data.to_status
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
                 this.isAutoTemp.item = itemRow
                 this.autoConfigDialog.isShow = true
             },
@@ -413,7 +427,7 @@
                 itemRow.can_flow_to.forEach(item => {
                     const temp = {
                         name: '',
-                        id: item
+                        id: item,
                     }
                     for (let i = 0; i < this.statusOwnList.length; i++) {
                         if (this.statusOwnList[i].id === item) {
@@ -435,22 +449,24 @@
                 const params = {
                     to_status: this.isAutoTemp.info.id,
                     threshold: this.isAutoTemp.info.threshold,
-                    threshold_unit: this.isAutoTemp.info.timeSpace
+                    threshold_unit: this.isAutoTemp.info.timeSpace,
                 }
-                const id = this.isAutoTemp.item.id
+                const { id } = this.isAutoTemp.item
                 this.$store.dispatch('ticketStatus/setAutoFlow', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: '操作成功',
-                        theme: 'success'
+                        theme: 'success',
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.autoConfigDialog.isShow = false
-                    this.isAutoTemp.item.is_auto = true
-                    this.listAddFlow()
-                    this.initIsAutoTemp()
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.autoConfigDialog.isShow = false
+                        this.isAutoTemp.item.is_auto = true
+                        this.listAddFlow()
+                        this.initIsAutoTemp()
+                    })
             },
             cancelFn () {
                 this.autoConfigDialog.isShow = false
@@ -468,8 +484,8 @@
             timeHandler (time) {
                 this.$refs.dropdown.hide()
                 this.isAutoTemp.info.timeSpace = time.id
-            }
-        }
+            },
+        },
     }
 </script>
 

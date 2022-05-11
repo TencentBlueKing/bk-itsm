@@ -37,7 +37,7 @@ function insertText (el, name, oldValue, addText, instance) {
         return oldValue + addText
     }
     const { start, end } = recordJson
-    const scrollTop = el.scrollTop
+    const { scrollTop } = el
     instance.$nextTick(() => {
         el.selectionStart = start + addText.length
         el.selectionEnd = start + addText.length

@@ -200,7 +200,7 @@
 
     export default {
         components: {
-            addApiInfo
+            addApiInfo,
         },
         mixins: [permission],
         props: {
@@ -208,33 +208,33 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             listInfoOri: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             pathList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             projectId: String,
             firstLevelInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             customPaging: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -242,7 +242,7 @@
                 isDropdownShow: false,
                 // tag
                 titleList: [
-                    { name: this.$t(`m.systemConfig["API列表"]`) }
+                    { name: this.$t('m.systemConfig["API列表"]') },
                     // { name: '编辑分类' }
                 ],
                 checkIndex: 0,
@@ -253,35 +253,35 @@
                 allCheck: false,
                 // 查询
                 searchInfo: {
-                    key: ''
+                    key: '',
                 },
                 // 分页
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 新增服务
                 entryInfo: {
                     show: false,
                     title: '',
-                    width: 700
+                    width: 700,
                 },
                 fileVal: '',
-                typeInfo: ''
+                typeInfo: '',
             }
         },
         computed: {
             listInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.listInfoOri
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.listInfo = newVal
-                }
-            }
+                },
+            },
         },
         watch: {},
         mounted () {
@@ -294,13 +294,13 @@
                     const resourceData = {
                         public_api: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
                     return
                 }
-                this.$parent.displayInfo['level_1'] = item
+                this.$parent.displayInfo.level_1 = item
                 // 展示 单个api
                 await this.$parent.getRemoteApiDetail(item.id)
             },
@@ -308,18 +308,14 @@
                 this.$parent.getRemoteSystemData()
                 const customPaging = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0['id'] || '', customPaging, this.searchInfo)
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
             },
             systemName (id) {
-                const system = this.treeList.filter(
-                    item => {
-                        return item['id'] === id
-                    }
-                )
+                const system = this.treeList.filter(item => item.id === id)
                 if (system.length) {
-                    return system[0]['name']
+                    return system[0].name
                 }
                 return '--'
             },
@@ -335,7 +331,7 @@
                     }
                 }
                 this.typeInfo = type
-                this.entryInfo.title = type === 'ADD' ? this.$t(`m.systemConfig["新增接口"]`) : this.$t(`m.systemConfig["接入接口"]`)
+                this.entryInfo.title = type === 'ADD' ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]')
                 this.$refs.apiDropdown.hide()
                 this.entryInfo.show = !this.entryInfo.show
             },
@@ -349,9 +345,9 @@
             serchEntry () {
                 const customPaging = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0['id'] || '', customPaging, this.searchInfo)
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
             },
             clearInfo () {
                 this.searchInfo.key = ''
@@ -362,17 +358,17 @@
                 this.pagination.limit = arguments[0]
                 const customPaging = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0['id'] || '', customPaging, this.searchInfo)
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
             },
             handlePageChange (page) {
                 this.pagination.current = page
                 const customPaging = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
-                this.$parent.getTableList(this.$parent.displayInfo.level_0['id'] || '', customPaging, this.searchInfo)
+                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo)
             },
             // 全选 半选
             handleSelectAll (selection) {
@@ -394,8 +390,8 @@
                         const resourceData = {
                             public_api: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                         this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData)
                         return
@@ -403,53 +399,55 @@
                 }
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认移除服务？"]`),
-                    subTitle: this.$t(`m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]`),
+                    title: this.$t('m.systemConfig["确认移除服务？"]'),
+                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('apiRemote/delete_api', id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getRemoteSystemData()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             deleteCheck () {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认移除服务？"]`),
-                    subTitle: this.$t(`m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]`),
+                    title: this.$t('m.systemConfig["确认移除服务？"]'),
+                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
                     confirmFn: () => {
-                        const id = this.checkList.map(item => {
-                            return item.id
-                        }).join(',')
+                        const id = this.checkList.map(item => item.id).join(',')
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
-                        this.$store.dispatch('apiRemote/batch_delete_apis', { id: id }).then(res => {
+                        this.$store.dispatch('apiRemote/batch_delete_apis', { id }).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["批量删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["批量删除成功"]'),
+                                theme: 'success',
                             })
                             this.getRemoteSystemData()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             //
@@ -469,27 +467,28 @@
                     const fileType = 'json'
                     this.$store.dispatch('apiRemote/get_api_import', { fileType, data }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.systemConfig["成功导入"]`) + `${res.data.success}` + this.$t(`m.systemConfig["个API接口，"]`) + this.$t(`m.systemConfig["失败"]`) + `${res.data.failed}` + this.$t(`m.systemConfig["个"]`),
-                            theme: 'success'
+                            message: `${this.$t('m.systemConfig["成功导入"]')}${res.data.success}${this.$t('m.systemConfig["个API接口，"]')}${this.$t('m.systemConfig["失败"]')}${res.data.failed}${this.$t('m.systemConfig["个"]')}`,
+                            theme: 'success',
                         })
                         this.getRemoteSystemData()
                     }, (res) => {
                         errorHandler(res, this)
-                    }).finally(() => {
-                        this.fileVal = ''
                     })
+                        .finally(() => {
+                            this.fileVal = ''
+                        })
                 } else {
                     this.fileVal = ''
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["文件大小不能超过10MB！"]`),
-                        theme: 'error'
+                        message: this.$t('m.systemConfig["文件大小不能超过10MB！"]'),
+                        theme: 'error',
                     })
                 }
             },
             exportFlow (item, index) {
-                window.open(window.SITE_URL + `api/postman/remote_api/${item.id}/exports/`)
-            }
-        }
+                window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`)
+            },
+        },
     }
 </script>
 

@@ -28,7 +28,7 @@
 
 <script>
     export default {
-        name: 'ArrowsLeftIcon'
+        name: 'ArrowsLeftIcon',
     }
 </script>
 <style lang="scss">

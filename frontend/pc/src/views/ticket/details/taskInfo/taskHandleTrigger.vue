@@ -54,7 +54,7 @@
         name: 'taskHandleTrigger',
         components: {
             TicketTriggerDialog,
-            taskStatus
+            taskStatus,
         },
         inject: ['reloadTicket'],
         props: {
@@ -62,22 +62,22 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             showStatus: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 dropdownShow: false,
                 gettingTriggers: true,
-                triggerList: []
+                triggerList: [],
             }
         },
         mounted () {
@@ -88,15 +88,17 @@
                 const params = {
                     source_id: this.taskInfo.id,
                     source_type: 'task',
-                    operate_type: 'MANUAL'
+                    operate_type: 'MANUAL',
                 }
                 this.$store.dispatch('trigger/getTaskHandleTriggers', params).then(res => {
                     this.triggerList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.gettingTriggers = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.gettingTriggers = false
+                    })
             },
             openTriggerDialog (trigger) {
                 this.$refs.triggerDialog.openDialog(trigger)
@@ -104,8 +106,8 @@
             refreshTicket () {
                 this.$emit('close-slider')
                 this.reloadTicket()
-            }
-        }
+            },
+        },
     }
 </script>
 

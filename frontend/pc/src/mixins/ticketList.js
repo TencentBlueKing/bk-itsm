@@ -54,9 +54,10 @@ const ticketListMixins = {
                         this.$set(ticket, 'current_processors', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         // 异步获取提单人
         __getTicketsCreator (originList) {
@@ -74,9 +75,10 @@ const ticketListMixins = {
                         this.$set(ticket, 'creator', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         // 异步获取单据 can_operate
         __getTicketscanOperate (originList) {
@@ -93,11 +95,12 @@ const ticketListMixins = {
                         this.$set(ticket, 'can_operate', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
-        }
-    }
+                .catch(res => {
+                    errorHandler(res, this)
+                })
+        },
+    },
 }
 
 export default ticketListMixins

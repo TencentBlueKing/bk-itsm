@@ -192,7 +192,7 @@
     export default {
         name: 'ProjectServiceSla',
         components: {
-            secondFlow
+            secondFlow,
         },
         mixins: [commonMix],
         props: {
@@ -200,8 +200,8 @@
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -222,7 +222,7 @@
                 canvasDataLoading: false,
                 previewInfo: {
                     canClick: false,
-                    narrowSize: 0.9
+                    narrowSize: 0.9,
                 },
                 submitPending: false,
                 agreementRules: {
@@ -231,44 +231,38 @@
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
+                            validator: (v) => !!v,
+                        },
                     ],
                     end_node_id: [
                         {
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
+                            validator: (v) => !!v,
+                        },
                     ],
                     sla_id: [
                         {
                             message: '字段必填',
                             required: true,
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
-                    ]
+                            validator: (v) => !!v,
+                        },
+                    ],
                 },
                 agreeType: 'add',
                 isStartSla: true,
-                processTools: null
+                processTools: null,
             }
         },
         computed: {
             getTransitionLines () {
                 return {
                     from_state: this.agreementEditData.start_node_id,
-                    to_state: this.agreementEditData.end_node_id
+                    to_state: this.agreementEditData.end_node_id,
                 }
-            }
+            },
         },
         watch: {
             getTransitionLines (states) {
@@ -276,16 +270,17 @@
                     const params = {
                         id: this.serviceData.workflow,
                         from_state_id: states.from_state,
-                        to_state_id: states.to_state
+                        to_state_id: states.to_state,
                     }
                     this.$store.dispatch('workflowVersion/getTransitionLines', params).then(res => {
                         this.agreementEditData.lines = res.data.lines
                         this.agreementEditData.states = res.data.states
-                    }).catch(res => {
-                        errorHandler(res, this)
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
                 }
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -305,32 +300,36 @@
                     if (res.data.sla.length > 0) {
                         this.isSlaActive = true
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceLoading = false
+                    })
             },
             // 服务级别列表
             getSlaList () {
                 this.slaListLoading = true
                 const params = {
                     is_enabled: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
                     this.slaList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.slaListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.slaListLoading = false
+                    })
             },
             getWorkflowCanvasData () {
                 this.canvasDataLoading = true
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id: this.serviceData.workflow }),
-                    this.$store.dispatch('deployCommon/getLineVersion', { id: this.serviceData.workflow })
+                    this.$store.dispatch('deployCommon/getLineVersion', { id: this.serviceData.workflow }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     for (let i = 0; i < this.addList.length; i++) {
@@ -339,14 +338,13 @@
                     this.$store.commit('cdeploy/getChart', this.addList)
 
                     this.lineList = reposResp.data.items
-                    this.nodeOption = userResp.data.filter(node => {
-                        return node.name !== '' && node.type !== 'START' && node.type !== 'END'
-                    })
+                    this.nodeOption = userResp.data.filter(node => node.name !== '' && node.type !== 'START' && node.type !== 'END')
 
                     this.processTools = new ProcessTools(this.addList, this.lineList)
-                })).finally(() => {
-                    this.canvasDataLoading = false
-                })
+                }))
+                    .finally(() => {
+                        this.canvasDataLoading = false
+                    })
             },
             getPostNodes (startId) {
                 const afterNodes = this.processTools.getSlaAfterNodes(startId)
@@ -385,9 +383,9 @@
                 const isError = agree.start_node_id === agree.end_node_id
                 if (isError) {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig['添加协议失败，请重新选择正确结束节点！']`),
+                        message: this.$t('m.serviceConfig[\'添加协议失败，请重新选择正确结束节点！\']'),
                         theme: 'error',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
                 }
                 return isError
@@ -396,7 +394,7 @@
                 this.$bkInfo({
                     extCls: 'agreement-close',
                     type: 'warning',
-                    title: this.getProtocolName(agree.sla_id) ? this.$t(`m.serviceConfig["确认删除服务协议"]`) + `<${this.getProtocolName(agree.sla_id)}>` : this.$t(`m["当前服务协议配置未完成，确认要删除吗？"]`),
+                    title: this.getProtocolName(agree.sla_id) ? `${this.$t('m.serviceConfig["确认删除服务协议"]')}<${this.getProtocolName(agree.sla_id)}>` : this.$t('m["当前服务协议配置未完成，确认要删除吗？"]'),
                     confirmFn: () => {
                         const lastIndex = this.serviceData.sla.length - 1
                         if (lastIndex === agreeIndex && !this.serviceData.sla[lastIndex].end_node_id) {
@@ -404,15 +402,15 @@
                             this.isNodeClick = false
                         }
                         this.serviceData.sla.splice(agreeIndex, 1)
-                    }
+                    },
                 })
             },
             configuNode (value) {
-                const sla = this.serviceData.sla
+                const { sla } = this.serviceData
                 if (this.isStartSla) {
                     sla.push({
                         start_node_id: value.id,
-                        color: this.getRendomColor()
+                        color: this.getRendomColor(),
                     })
                 } else {
                     const len = sla.length - 1
@@ -422,7 +420,7 @@
                         this.$bkMessage({
                             message: '该节点不能作为 SLA 结束节点',
                             theme: 'error',
-                            ellipsisLine: 0
+                            ellipsisLine: 0,
                         })
                         return false
                     }
@@ -454,7 +452,7 @@
             submitFn () {
                 const {
                     can_ticket_agency, catalog_id, desc, display_type, id, is_valid, key,
-                    name, owners, sla, workflow
+                    name, owners, sla, workflow,
                 } = this.serviceData
                 const params = {
                     can_ticket_agency,
@@ -469,14 +467,14 @@
                     sla,
                     workflow,
                     admin: owners.split(','),
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 // SLA开关
                 if (this.isSlaActive) {
                     if (!params.sla.length) {
                         this.$bkMessage({
-                            message: this.$t(`m.deployPage["请添加SLA协议！"]`),
-                            theme: 'error'
+                            message: this.$t('m.deployPage["请添加SLA协议！"]'),
+                            theme: 'error',
                         })
                         return
                     }
@@ -494,15 +492,17 @@
                 this.submitPending = true
                 this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     this.goToServiceList()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.submitPending = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.submitPending = false
+                    })
             },
             goToServiceList () {
                 this.$router.push({ name: 'projectServiceList', query: { project_id: this.$route.query.project_id, catalog_id: this.$route.query.catalog_id } })
@@ -541,22 +541,23 @@
                 }
                 if (!this.serviceData.workflow) {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig['请选择流程版本']`),
-                        theme: 'error'
+                        message: this.$t('m.serviceConfig[\'请选择流程版本\']'),
+                        theme: 'error',
                     })
                     return false
                 }
                 const result = new Promise((resolve, reject) => {
-                    this.$store.dispatch(`sla/checkProcessCanUseSla`, this.serviceData.workflow).then((res) => {
+                    this.$store.dispatch('sla/checkProcessCanUseSla', this.serviceData.workflow).then((res) => {
                         resolve(res.result)
-                    }).catch(err => {
-                        errorHandler(err, this)
-                        reject(err)
                     })
+                        .catch(err => {
+                            errorHandler(err, this)
+                            reject(err)
+                        })
                 })
                 return result
-            }
-        }
+            },
+        },
     }
 </script>
 

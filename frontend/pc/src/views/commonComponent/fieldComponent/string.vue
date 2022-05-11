@@ -51,22 +51,22 @@
             item: {
                 type: Object,
                 default: () => {
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {}
@@ -80,19 +80,19 @@
                     return 50
                 }
                 return null
-            }
+            },
         },
         watch: {
             'item.val' () {
                 this.conditionField(this.item, this.fields)
-            }
+            },
         },
         mounted () {
             this.conditionField(this.item, this.fields)
             if (this.item.value && !this.item.val) {
                 this.item.val = this.item.value
             }
-        }
+        },
     }
 </script>
 

@@ -71,11 +71,11 @@
         components: {
             Navigation,
             PermissionModal,
-            permissionApply
+            permissionApply,
         },
         provide () {
             return {
-                reload: this.reload
+                reload: this.reload,
             }
         },
         mixins: [permission],
@@ -88,8 +88,8 @@
                 routerKey: +new Date(),
                 permissionData: {
                     type: 'project', // 无权限类型: project、other
-                    permission: []
-                }
+                    permission: [],
+                },
             }
         },
         computed: {
@@ -101,10 +101,10 @@
             },
             isShowView () {
                 return this.isRouterAlive && !this.loading
-            }
+            },
         },
         watch: {
-            '$route': {
+            $route: {
                 async handler () {
                     // check the page auth
                     if (!this.loading) {
@@ -114,8 +114,8 @@
                     }
                     this.clearAllTicketInterval()
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         async created () {
             bus.$on('showPermissionModal', data => {
@@ -125,7 +125,7 @@
                 this.permissinApplyShow = show
                 this.permissionData = {
                     type,
-                    permission
+                    permission,
                 }
                 if (!show) {
                     this.isRouterAlive = true
@@ -144,7 +144,7 @@
                     return
                 }
                 vm.timer = true
-                setTimeout(function () {
+                setTimeout(() => {
                     vm.$store.commit('changeClient', document.body.clientWidth)
                     vm.timer = false
                 }, 400)
@@ -157,10 +157,11 @@
             getPageFooter () {
                 this.$store.dispatch('common/getPageFooter').then(res => {
                     this.$store.commit('common/setPageFooter', res.data)
-                }).catch(res => {
-                    errorHandler(res, this)
-                    this.$store.commit('common/setPageFooter', `<div class="copyright"><div>蓝鲸智云 版权所有</div></div>`)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                        this.$store.commit('common/setPageFooter', '<div class="copyright"><div>蓝鲸智云 版权所有</div></div>')
+                    })
             },
             // 组件升级统一获取字段
             initGetInfo () {
@@ -177,30 +178,27 @@
                 return this.$store.dispatch('common/getTheWay').then((res) => {
                     this.$store.commit('common/getWayInfo', res.data)
                     const commomInfo = {
-                        'choice_state_list_dict': {},
-                        'export_fields': [],
-                        'processor_type': []
+                        choice_state_list_dict: {},
+                        export_fields: [],
+                        processor_type: [],
                     }
                     // 工单状态选择（增加全选）
-                    Object.entries(res.data.ticket_status).forEach(
-                        item => {
-                            commomInfo.choice_state_list_dict[item[0]] = [{ id: 0, key: 'all', name: '全部' }].concat(
-                                item[1].map((item, index) => {
-                                    const itemch = {}
-                                    itemch['id'] = index + 1
-                                    itemch['name'] = item['pk_value'] || item['name']
-                                    itemch['key'] = item['key']
-                                    return itemch
-                                })
-                            )
-                        }
-                    )
+                    Object.entries(res.data.ticket_status).forEach(item => {
+                        commomInfo.choice_state_list_dict[item[0]] = [{ id: 0, key: 'all', name: '全部' }].concat(item[1].map((item, index) => {
+                            const itemch = {}
+                            itemch.id = index + 1
+                            itemch.name = item.pk_value || item.name
+                            itemch.key = item.key
+                            return itemch
+                        }))
+                    })
                     commomInfo.export_fields = res.data.export_fields
                     commomInfo.processor_type = res.data.processor_type
                     this.$store.commit('getTypeWay', commomInfo)
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 加载系统配置
             loadSystemSettings () {
@@ -215,9 +213,10 @@
                         }
                     })
                     this.$store.commit('changeOpenFunction', tempObj)
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取节点配置字段信息
             loadConfigurInfo () {
@@ -232,8 +231,8 @@
                                 if (Array.isArray(value[key][i])) {
                                     listInfo.push({
                                         id: i + 1,
-                                        name: value[key][i][1] ? value[key][i][1] : this.$t(`m.deployPage["无"]`),
-                                        typeName: value[key][i][0]
+                                        name: value[key][i][1] ? value[key][i][1] : this.$t('m.deployPage["无"]'),
+                                        typeName: value[key][i][0],
                                     })
                                 } else {
                                     listInfo.push(value[key][i])
@@ -245,9 +244,10 @@
                         }
                     }
                     this.$store.commit('common/changeConfigur', globalInfo)
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取平台管理权限及运营数据权限
             getManagePermission () {
@@ -316,8 +316,8 @@
                 if (this.$store.state.deployOrder.intervalInfo.timeOut) {
                     clearInterval(this.$store.state.deployOrder.intervalInfo.timeOut)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

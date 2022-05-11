@@ -70,69 +70,69 @@
         components: {
             apiBasic,
             apiEditor,
-            apiRun
+            apiRun,
         },
         props: {
             apiDetailInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             treeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             pathList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isBuiltinIdList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             secondLevelInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 apiDetailInfoCommon: this.apiDetailInfo,
                 // tag
                 titleList: [
-                    { name: this.$t(`m.systemConfig["预览"]`) },
-                    { name: this.$t(`m.systemConfig["编辑"]`) },
-                    { name: this.$t(`m.systemConfig["运行"]`) }
+                    { name: this.$t('m.systemConfig["预览"]') },
+                    { name: this.$t('m.systemConfig["编辑"]') },
+                    { name: this.$t('m.systemConfig["运行"]') },
                 ],
-                checkIndex: 1
+                checkIndex: 1,
             }
         },
         computed: {
             backName () {
                 return this.secondLevelInfo.name
-            }
+            },
         },
         watch: {
             apiDetailInfo (newVal, oldVal) {
                 this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal))
                 this.initData()
-            }
+            },
         },
         mounted () {
             this.initData()
         },
         methods: {
             backTab () {
-                this.$parent.displayInfo['level_1'] = {}
+                this.$parent.displayInfo.level_1 = {}
             },
             changTitle (item, index) {
                 this.checkIndex = index
@@ -145,8 +145,8 @@
                                 name: '',
                                 value: '',
                                 sample: '',
-                                desc: ''
-                            }
+                                desc: '',
+                            },
                         ]
                     }
                     if (!this.apiDetailInfoCommon.req_params.length) {
@@ -156,13 +156,13 @@
                                 is_necessary: 0,
                                 sample: '',
                                 desc: '',
-                                value: ''
-                            }
+                                value: '',
+                            },
                         ]
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

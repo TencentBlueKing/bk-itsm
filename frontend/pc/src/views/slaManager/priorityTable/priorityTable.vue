@@ -132,8 +132,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -148,7 +148,7 @@
                 contentList: [],
                 typeList: [],
                 isSub: false,
-                localeCookie: false
+                localeCookie: false,
             }
         },
         mounted () {
@@ -190,8 +190,8 @@
                 this.degreeList.forEach(item => {
                     item.is_enabled = newVal.some(check => check === item.key)
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

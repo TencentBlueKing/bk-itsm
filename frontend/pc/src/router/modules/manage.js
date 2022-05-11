@@ -48,38 +48,38 @@ export default [
             {
                 path: 'public_fields',
                 name: 'publicFields',
-                component: PublicFields
+                component: PublicFields,
             },
             {
                 path: 'public_api',
                 name: 'publicAPI',
-                component: PublicAPI
+                component: PublicAPI,
             },
             {
                 path: 'task_tpl',
                 name: 'taskTpl',
-                component: TaskTpl
+                component: TaskTpl,
             },
             {
                 path: 'notify_setting',
                 name: 'notifySetting',
-                component: NotifySetting
+                component: NotifySetting,
             },
             {
                 path: 'sla_priority',
                 name: 'slaPriority',
-                component: SlaPriority
+                component: SlaPriority,
             },
             {
                 path: 'ticket_status',
                 name: 'ticketStatus',
-                component: TicketStatus
+                component: TicketStatus,
             },
             {
                 path: 'global_setting',
                 name: 'globalSetting',
-                component: GlobalSetting
-            }
+                component: GlobalSetting,
+            },
             // {
             //     path: 'basic_module',
             //     name: 'basicModule',
@@ -90,6 +90,6 @@ export default [
             //     name: 'dataDictionary',
             //     component: dataDictionary
             // }
-        ]
-    }
+        ],
+    },
 ]

@@ -27,7 +27,7 @@
 </template>
 <script>
     export default {
-        name: 'OperationData'
+        name: 'OperationData',
     }
 </script>
 <style lang="scss" scoped>

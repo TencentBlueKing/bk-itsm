@@ -31,8 +31,8 @@
     export default {
         name: 'AllTicketPage',
         components: {
-            AllTicketList
-        }
+            AllTicketList,
+        },
     }
 </script>
 <style lang="scss" scoped>

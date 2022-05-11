@@ -112,29 +112,29 @@
         {
             name: 'todo',
             id: 'myTodoTicket',
-            label: i18n.t(`m.managePage['我的待办']`)
+            label: i18n.t('m.managePage[\'我的待办\']'),
         },
         {
             name: 'approval',
             id: 'myApprovalTicket',
-            label: i18n.t(`m.home['待我审批']`)
+            label: i18n.t('m.home[\'待我审批\']'),
         },
         {
             name: 'created',
             id: 'myCreatedTicket',
-            label: i18n.t(`m.home['我的申请']`)
+            label: i18n.t('m.home[\'我的申请\']'),
         },
         {
             name: 'attention',
             id: 'myAttentionTicket',
-            label: i18n.t(`m.home['我的关注']`)
-        }
+            label: i18n.t('m.home[\'我的关注\']'),
+        },
     ]
 
     export default {
         name: 'TicketTable',
         components: {
-            ApprovalDialog
+            ApprovalDialog,
         },
         mixins: [ticketListMixins],
         data () {
@@ -155,8 +155,8 @@
                 approvalInfo: {
                     showAllOption: false,
                     result: true,
-                    approvalList: []
-                }
+                    approvalList: [],
+                },
             }
         },
         computed: {
@@ -165,7 +165,7 @@
             },
             tabLoading () {
                 return this[`${this.activePanel}ListLoading`]
-            }
+            },
         },
         created () {
             this.getData()
@@ -177,7 +177,7 @@
                     this.getToDoList(),
                     this.getCreatedList(),
                     this.getAttentionList(),
-                    this.getApprovalList()
+                    this.getApprovalList(),
                 ]).then(data => {
                     this.loading = false
                 })
@@ -190,7 +190,7 @@
                     page: 1,
                     is_draft: 0,
                     view_type: 'my_todo',
-                    ordering
+                    ordering,
                 }).then(resp => {
                     if (resp.result) {
                         this.todoList = resp.data.items
@@ -198,11 +198,13 @@
                         // 异步加载列表中的某些字段信息
                         this.__asyncReplaceTicketListAttr(this.todoList)
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.todoListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.todoListLoading = false
+                    })
             },
             // 我创建的
             getCreatedList (ordering = '-create_at') {
@@ -212,7 +214,7 @@
                     page: 1,
                     is_draft: 0,
                     view_type: 'my_created',
-                    ordering
+                    ordering,
                 }).then(resp => {
                     if (resp.result) {
                         this.createdList = resp.data.items
@@ -220,11 +222,13 @@
                         // 异步加载列表中的某些字段信息
                         this.__asyncReplaceTicketListAttr(this.createdList)
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.createdListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.createdListLoading = false
+                    })
             },
             // 我关注的
             getAttentionList (ordering = '-create_at') {
@@ -234,7 +238,7 @@
                     page: 1,
                     is_draft: 0,
                     view_type: 'my_attention',
-                    ordering
+                    ordering,
                 }).then(resp => {
                     if (resp.result) {
                         this.attentionList = resp.data.items
@@ -242,11 +246,13 @@
                         // 异步加载列表中的某些字段信息
                         this.__asyncReplaceTicketListAttr(this.attentionList)
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.attentionListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.attentionListLoading = false
+                    })
             },
             // 我审批的
             getApprovalList (ordering = '-create_at') {
@@ -256,7 +262,7 @@
                     page: 1,
                     is_draft: 0,
                     view_type: 'my_approval',
-                    ordering
+                    ordering,
                 }).then(resp => {
                     if (resp.result) {
                         this.approvalList = resp.data.items
@@ -264,11 +270,13 @@
                         // 异步加载列表中的某些字段信息
                         this.__asyncReplaceTicketListAttr(this.approvalList)
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.approvalListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.approvalListLoading = false
+                    })
             },
             onSortChange (data) {
                 const ordering = data.order ? (data.order === 'ascending' ? `-${data.prop}` : data.prop) : undefined
@@ -297,15 +305,15 @@
                 this.approvalInfo = {
                     result: true,
                     showAllOption: false,
-                    approvalList: []
+                    approvalList: [],
                 }
                 if (result) {
                     this.loading = true
                     await this.getApprovalList()
                     this.loading = false
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

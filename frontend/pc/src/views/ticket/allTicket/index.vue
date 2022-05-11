@@ -191,24 +191,24 @@
             TableContent,
             ExportTicketDialog,
             memberSelect,
-            draggable
+            draggable,
         },
         mixins: [ticketListMixins],
         props: {
             projectId: String,
-            from: String
+            from: String,
         },
         data () {
             const SEARCH_FORM = [
                 {
-                    name: this.$t(`m.tickets['单号/标题']`),
-                    desc: this.$t(`m.tickets['单号/标题']`),
+                    name: this.$t('m.tickets[\'单号/标题\']'),
+                    desc: this.$t('m.tickets[\'单号/标题\']'),
                     type: 'input',
                     key: 'keyword',
                     display: true,
                     value: '',
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择单号/标题"]')
+                    placeholder: this.$t('m.tickets["请选择单号/标题"]'),
                 },
                 {
                     name: this.$t('m.tickets["服务目录"]'),
@@ -218,7 +218,7 @@
                     display: true,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择服务目录"]')
+                    placeholder: this.$t('m.tickets["请选择服务目录"]'),
                 },
                 {
                     name: this.$t('m.tickets["服务"]'),
@@ -228,7 +228,7 @@
                     display: false,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择服务"]')
+                    placeholder: this.$t('m.tickets["请选择服务"]'),
                 },
                 {
                     name: this.$t('m.tickets["提单人"]'),
@@ -238,7 +238,7 @@
                     display: true,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择提单人"]')
+                    placeholder: this.$t('m.tickets["请选择提单人"]'),
                 },
                 {
                     name: this.$t('m.tickets["处理人"]'),
@@ -248,7 +248,7 @@
                     display: true,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择处理人"]')
+                    placeholder: this.$t('m.tickets["请选择处理人"]'),
                 },
                 {
                     name: this.$t('m.tickets["状态"]'),
@@ -258,26 +258,26 @@
                     display: true,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择状态"]')
+                    placeholder: this.$t('m.tickets["请选择状态"]'),
                 },
                 {
-                    name: this.$t(`m.tickets["提单时间"]`),
+                    name: this.$t('m.tickets["提单时间"]'),
                     key: 'date_update',
                     type: 'datetime',
                     display: true,
                     value: [],
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择提单时间"]')
+                    placeholder: this.$t('m.tickets["请选择提单时间"]'),
                 },
                 {
-                    name: this.$t(`m.tickets["业务"]`),
+                    name: this.$t('m.tickets["业务"]'),
                     key: 'bk_biz_id',
                     type: 'select',
                     display: true,
                     value: '',
                     list: [],
-                    placeholder: this.$t('m.tickets["请选择业务"]')
-                }
+                    placeholder: this.$t('m.tickets["请选择业务"]'),
+                },
             ]
             return {
                 isExportDialogShow: false,
@@ -302,7 +302,7 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 状态颜色配置list
                 colorHexList: [],
@@ -314,7 +314,7 @@
                     request: [],
                     change: [],
                     event: [],
-                    question: []
+                    question: [],
                 },
                 searchToggle: true, // 点击搜索记录搜索是否添加记录
                 showCustomTabEdit: false,
@@ -331,7 +331,7 @@
                         {
                             required: true,
                             message: this.$t('m["请输入自定义TAB名称"]'),
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             validator: val => {
@@ -340,9 +340,9 @@
                                 return !list.includes(val)
                             },
                             message: this.$t('m["该TAB名称已存在"]'),
-                            trigger: 'blur'
-                        }
-                    ]
+                            trigger: 'blur',
+                        },
+                    ],
                 },
                 customCatalog: '',
                 customTabForm: {
@@ -356,9 +356,9 @@
                         overall_current_status__in: [],
                         create_at__gte: '',
                         create_at__lte: '',
-                        bk_biz_id: ''
-                    }
-                }
+                        bk_biz_id: '',
+                    },
+                },
             }
         },
         computed: {
@@ -370,7 +370,7 @@
             },
             isInProject () {
                 return !!this.$route.query.project_id
-            }
+            },
         },
         created () {
             this.initData()
@@ -382,16 +382,17 @@
                 const curDrag = this.customList.find(item => item.name === text)
                 const params = {
                     new_order: e.newIndex - 3,
-                    tab_id: curDrag.id
+                    tab_id: curDrag.id,
                 }
                 this.$store.dispatch('project/moveProjectTab', params).then(res => {
 
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             async initData () {
                 this.loading = true
@@ -415,10 +416,9 @@
                     const node = list[i]
                     if (node.id === id) {
                         return node
-                    } else {
-                        if (node.children && node.children.length > 0) {
-                            this.getTreebyId(node.children, id)
-                        }
+                    }
+                    if (node.children && node.children.length > 0) {
+                        this.getTreebyId(node.children, id)
                     }
                 }
             },
@@ -427,7 +427,7 @@
                     const params = {
                         name: this.customTabForm.name,
                         desc: this.customTabForm.desc,
-                        conditions: this.customTabForm.conditions
+                        conditions: this.customTabForm.conditions,
                     }
                     let url = 'project/createProjectTab'
                     if (this.isEditTab) {
@@ -443,13 +443,14 @@
                         }
                     })
                     this.showCustomTabEdit = false
-                }).finally(e => {
-                    if (this.isEditTab) {
-                        this.currentTab = this.customTabForm.name
-                        this.getAllTabTicketList(this.editTabId)
-                        this.editTabId = ''
-                    }
                 })
+                    .finally(e => {
+                        if (this.isEditTab) {
+                            this.currentTab = this.customTabForm.name
+                            this.getAllTabTicketList(this.editTabId)
+                            this.editTabId = ''
+                        }
+                    })
             },
             clearTabError () {
                 this.$refs.customFrom.clearError()
@@ -465,8 +466,8 @@
                         creator__in: [],
                         current_processor: [],
                         current_status__in: [],
-                        bk_biz_id: ''
-                    }
+                        bk_biz_id: '',
+                    },
                 }
                 this.clearTabError()
             },
@@ -474,7 +475,7 @@
             getProjectTabList () {
                 this.isEditTab = false
                 const params = {
-                    project_key: this.$route.query.project_id
+                    project_key: this.$route.query.project_id,
                 }
                 this.$store.dispatch('project/getProjectTab', params).then(res => {
                     res.data.forEach(item => {
@@ -487,9 +488,10 @@
                         this.serviceList.push(ite)
                     })
                     this.checkTabNameList = this.serviceList.map(item => item.name)
-                }).catch(e => {
-                    console.log(e)
                 })
+                    .catch(e => {
+                        console.log(e)
+                    })
             },
             editProjectTab (panel) {
                 this.isEditTab = true
@@ -516,8 +518,8 @@
                         creator__in: [],
                         current_processor: [],
                         current_status__in: [],
-                        bk_biz_id: ''
-                    }
+                        bk_biz_id: '',
+                    },
                 }
                 
                 this.showCustomTabEdit = true
@@ -539,14 +541,14 @@
                                     this.getProjectTabList()
                                 }
                             })
-                        }
+                        },
                     })
                 }
             },
             changeTime (str) {
                 if (str === '') return undefined
                 const time = new Date(str)
-                return time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds()
+                return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`
             },
             // 获取所有服务类型列表
             async getServiceTypeList () {
@@ -562,21 +564,23 @@
                         this.serviceType = this.serviceList[0].key
                         this.currentTab = this.serviceList[0].name
                     }
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
-                }).finally(() => {
-                    this.isTabLoading = false
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+                    .finally(() => {
+                        this.isTabLoading = false
+                    })
             },
             // 获取所有单据列表
             getAllTicketList (type = this.serviceType) {
                 const fixParams = {
                     page_size: this.pagination.limit,
                     page: this.pagination.current,
-                    ordering: this.orderKey
+                    ordering: this.orderKey,
                 }
                 const excludeList = ['request', 'change', 'event', 'question']
                 let url = 'change/getList'
@@ -595,17 +599,17 @@
                     url = 'project/getProjectTabList'
                     fixParams.project_key = this.$route.query.project_id
                     fixParams.tab_conditions = {
-                        'keyword': this.curService.conditions.keyword || undefined,
-                        'catalog_id': Number(this.curService.conditions.catalog_id.slice(-1).join()) || undefined,
-                        'creator__in': this.curService.conditions.creator__in.join() || undefined,
-                        'current_processor': this.curService.conditions.current_processor.join() || undefined,
-                        'overall_current_status__in': this.curService.conditions.current_status__in.join() || undefined,
-                        'create_at__gte': this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[0]) : undefined,
-                        'create_at__lte': this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[1]) : undefined,
-                        'bk_biz_id': this.curService.conditions.bk_biz_id || undefined
+                        keyword: this.curService.conditions.keyword || undefined,
+                        catalog_id: Number(this.curService.conditions.catalog_id.slice(-1).join()) || undefined,
+                        creator__in: this.curService.conditions.creator__in.join() || undefined,
+                        current_processor: this.curService.conditions.current_processor.join() || undefined,
+                        overall_current_status__in: this.curService.conditions.current_status__in.join() || undefined,
+                        create_at__gte: this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[0]) : undefined,
+                        create_at__lte: this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[1]) : undefined,
+                        bk_biz_id: this.curService.conditions.bk_biz_id || undefined,
                     }
                     fixParams.extra_conditions = {
-                        'overall_current_status__in': searchParams.current_status__in
+                        overall_current_status__in: searchParams.current_status__in,
                     }
                     Object.assign(fixParams.extra_conditions, searchParams)
                     fixParams.extra_conditions.current_status__in = undefined
@@ -631,22 +635,22 @@
                     if (this.serviceType === type) {
                         this.pagination.count = res.data.count
                     }
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
-                }).finally(() => {
-                    this[`${type}Loading`] = false
-                    this.customTabLoading = false
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+                    .finally(() => {
+                        this[`${type}Loading`] = false
+                        this.customTabLoading = false
+                    })
             },
             // 获取所有tab的单据列表
             getAllTabTicketList () {
                 this.loading = true
-                const tableList = this.serviceList.map(item => {
-                    return this.getAllTicketList(item.key)
-                })
+                const tableList = this.serviceList.map(item => this.getAllTicketList(item.key))
                 Promise.all(tableList).then(data => {
                     this.loading = false
                 })
@@ -654,7 +658,7 @@
             // 查询级联数据
             getServiceTree (type) {
                 const params = {
-                    show_deleted: true
+                    show_deleted: true,
                 }
                 if (!type) {
                     params.key = this.serviceType
@@ -664,7 +668,7 @@
                 }
                 this.$store.dispatch('serviceCatalog/getTreeData', params).then(res => {
                     const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                    formItem.list = res.data[0] ? res.data[0]['children'] : []
+                    formItem.list = res.data[0] ? res.data[0].children : []
                     // const current = this.serviceList.find(item => item.key === this.serviceType)
                     // if (!this.fixedTabs.includes(current.name)) {
                     //     const list = []
@@ -677,34 +681,36 @@
                     // } else {
                     //     formItem.list = res.data[0] ? res.data[0]['children'] : []
                     // }
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             // 获取单据状态
             getGlobalStatus () {
                 const params = {
-                    source_uri: 'ticket_status'
+                    source_uri: 'ticket_status',
                 }
                 this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
                     const formItem = this.searchForms.find(item => item.key === 'current_status__in')
                     formItem.list = res.data
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             // 获取服务数据
             getServiceData (val) {
                 const params = {
                     catalog_id: val,
                     service_key: this.serviceType,
-                    is_valid: 1
+                    is_valid: 1,
                 }
                 if (this.projectId) {
                     params.project_key = this.projectId
@@ -715,17 +721,19 @@
                     res.data.forEach(item => {
                         formItem.list.push({
                             key: item.id,
-                            name: item.name
+                            name: item.name,
                         })
                     })
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
-                }).finally(() => {
-
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 获取状态颜色接口
             getTypeStatus () {
@@ -733,16 +741,18 @@
                 const type = this.serviceType
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then(res => {
                     this.colorHexList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             getBusinessList () {
                 this.$store.dispatch('eventType/getAppList').then((res) => {
                     this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 切换不同的标签卡
             changeTag (val) {
@@ -826,8 +836,8 @@
             // 评价成功回调
             evaluationSubmitSuccess () {
                 this.getAllTicketList()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

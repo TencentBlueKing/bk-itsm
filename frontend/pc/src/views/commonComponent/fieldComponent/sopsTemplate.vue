@@ -179,41 +179,41 @@
     export default {
         name: 'SOPS_TEMPLATE',
         components: {
-            NoData
+            NoData,
         },
         mixins: [mixins, commonMix],
         props: {
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             typeInfo: {
                 type: String,
                 default () {
                     return ''
-                }
+                },
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -233,11 +233,11 @@
                 loading: {
                     templateList: false,
                     sopsTaskList: false,
-                    plan: false
+                    plan: false,
                 },
                 lastEditTaskName: '',
                 rules: {},
-                previewSopsTaskUrl: ''
+                previewSopsTaskUrl: '',
             }
         },
         computed: {
@@ -254,9 +254,9 @@
                     showLabel: true,
                     showHook: true,
                     showDesc: true,
-                    formEdit: !this.disabled && !this.disabledRenderForm
+                    formEdit: !this.disabled && !this.disabledRenderForm,
                 }
-            }
+            },
         },
         created () {
             if (!this.item.sopsContent) {
@@ -264,7 +264,7 @@
                     id: '',
                     sopsTask: {
                         id: '',
-                        template_id: ''
+                        template_id: '',
                     },
                     planId: '',
                     createWay: 'template',
@@ -275,12 +275,12 @@
                             id: '',
                             bk_biz_id: '',
                             name: '',
-                            from_cmdb: true
+                            from_cmdb: true,
                         },
                         bk_biz_id: '',
-                        site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS
+                        site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS,
                     },
-                    constants: []
+                    constants: [],
                 })
             }
             this.rules.id = this.checkCommonRules('select').select
@@ -377,7 +377,7 @@
                 this.configLoading = true
                 const params = {
                     bk_biz_id: this.bkBizId,
-                    task_id: sopsTaskId
+                    task_id: sopsTaskId,
                 }
                 await this.$store.dispatch('taskFlow/getSopsTaskDetail', params).then(res => {
                     this.previewSopsTaskUrl = res.data.task_url
@@ -390,17 +390,19 @@
                     constants.sort((a, b) => a - b)
                     this.item.sopsContent.constants = constants
                     this.item.sopsContent.sopsTask.template_id = res.data.template_id
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.configLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.configLoading = false
+                    })
             },
             getTemplateDetail (bizId, tplId) {
                 this.formLoading = true
                 const params = {
                     template_id: tplId,
-                    bk_biz_id: bizId || ''
+                    bk_biz_id: bizId || '',
                 }
                 this.$store.dispatch('getTemplateDetail', params).then(res => {
                     const constants = []
@@ -424,60 +426,68 @@
                     })
                     this.item.sopsContent.constants = constants
                     this.optionalNodeIdList = res.data.optional_ids
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.formLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.formLoading = false
+                    })
             },
             // 获取templateList的数据
             async getTemplateList () {
                 this.loading.templateList = true
                 const params = {
                     bk_biz_id: this.bkBizId,
-                    with_common: true
+                    with_common: true,
                 }
                 await this.$store.dispatch('getTemplateList', params).then(res => {
                     this.templateList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading.templateList = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading.templateList = false
+                    })
             },
             // 获取标准运维任务列表
             async getSopsTaskList () {
                 this.loading.sopsTaskList = true
                 const params = {
                     bk_biz_id: this.bkBizId,
-                    is_started: this.item.sopsContent.createWay === 'started_task'
+                    is_started: this.item.sopsContent.createWay === 'started_task',
                 }
                 await this.$store.dispatch('taskFlow/getSopsTask', params).then(res => {
                     this.sopsTaskList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading.sopsTaskList = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading.sopsTaskList = false
+                    })
             },
             // 获取模板方案列表
             async getTempaltePlanList () {
-                const id = this.item.sopsContent.id
+                const { id } = this.item.sopsContent
                 const template = this.templateList.find(template => template.id === id)
 
                 this.planList = []
                 this.loading.plan = true
                 const params = {
                     bk_biz_id: template.bk_biz_id,
-                    template_id: template.id
+                    template_id: template.id,
                 }
                 await this.$store.dispatch('getTemplatePlanList', params).then(res => {
                     this.planList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading.plan = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading.plan = false
+                    })
             },
             async onplanSelect (ids) {
                 const planList = []
@@ -493,9 +503,7 @@
                             }
                         }
                     })
-                    this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => {
-                        return !planList.includes(nodeId)
-                    })
+                    this.item.sopsContent.exclude_task_nodes_id = this.optionalNodeIdList.filter(nodeId => !planList.includes(nodeId))
                 } else {
                     this.item.sopsContent.exclude_task_nodes_id = []
                 }
@@ -505,7 +513,7 @@
                     const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
                         bk_biz_id: template.bk_biz_id,
                         template_id: template.id,
-                        exclude_task_nodes_id: this.item.sopsContent.exclude_task_nodes_id
+                        exclude_task_nodes_id: this.item.sopsContent.exclude_task_nodes_id,
                     })
                     const constants = []
                     for (const key in res.data.pipeline_tree.constants) {
@@ -589,8 +597,8 @@
                 if (index > -1) {
                     this.quoteErrors.splice(index, 1)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

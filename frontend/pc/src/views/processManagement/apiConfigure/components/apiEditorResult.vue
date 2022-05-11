@@ -95,7 +95,7 @@
     export default {
         components: {
             apiRequestBody,
-            ace
+            ace,
         },
         mixins: [mixins],
         props: {
@@ -103,8 +103,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -120,11 +120,11 @@
                         name: '',
                         desc: '',
                         id: '',
-                        code: ''
+                        code: '',
                     },
                     checkout: {
-                        name: ''
-                    }
+                        name: '',
+                    },
                 },
                 bodyDetailConfig: {
                     value: '',
@@ -132,7 +132,7 @@
                     height: 300,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 responseDetailConfig: {
                     value: '',
@@ -140,54 +140,54 @@
                     height: 200,
                     readOnly: false,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 // tag
                 titleList: [
                     { name: 'JSON' },
-                    { name: 'RAW' }
+                    { name: 'RAW' },
                 ],
                 jsonTitleList: [
-                    { name: this.$t(`m.systemConfig["模板"]`) },
-                    { name: this.$t(`m.systemConfig["预览"]`) }
+                    { name: this.$t('m.systemConfig["模板"]') },
+                    { name: this.$t('m.systemConfig["预览"]') },
                 ],
                 checkIndex: 0,
                 jsonCheckIndex: 0,
                 // RAW
                 rawInfo: {
-                    value: ''
+                    value: '',
                 },
                 bodyInfo: {
-                    checkInfo: {}
-                }
+                    checkInfo: {},
+                },
             }
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.detailInfoOri
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.DetailInfo = newVal
-                }
+                },
             },
             responseTreeDataList: {
                 // getter
-                get: function () {
-                    const responseTreeDataList = this.basicInfo['responseTreeDataList'] ? [...this.basicInfo['responseTreeDataList']] : []
+                get () {
+                    const responseTreeDataList = this.basicInfo.responseTreeDataList ? [...this.basicInfo.responseTreeDataList] : []
                     responseTreeDataList.forEach(item => {
                         this.recordParent(item, '')
                     })
                     return responseTreeDataList
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$set(this.$parent.DetailInfo, 'responseTreeDataList', newVal)
-                }
-            }
+                },
+            },
         },
         watch: {},
         mounted () {
@@ -199,9 +199,9 @@
                     this.checkIndex = index
                     return
                 }
-                if (item.name === this.$t(`m.systemConfig["预览"]`) && this.jsonCheckIndex !== index) {
-                    const rootdata = await this.listToJsonschema(this.basicInfo['responseTreeDataList'])
-                    this.bodyDetailConfig.value = JSON.stringify(this.jsonschemaToJson(rootdata)['root'], null, 4)
+                if (item.name === this.$t('m.systemConfig["预览"]') && this.jsonCheckIndex !== index) {
+                    const rootdata = await this.listToJsonschema(this.basicInfo.responseTreeDataList)
+                    this.bodyDetailConfig.value = JSON.stringify(this.jsonschemaToJson(rootdata).root, null, 4)
                 }
                 this.jsonCheckIndex = index
             },
@@ -232,7 +232,7 @@
                     default: '',
                     type: 'string',
                     desc: '',
-                    parentInfo: node.parentInfo
+                    parentInfo: node.parentInfo,
                 }
                 node.parentInfo.children.splice(node.parentInfo.children.indexOf(node), 0, addnode)
             },
@@ -247,7 +247,7 @@
                     default: '',
                     type: 'string',
                     desc: '',
-                    parentInfo: this.bodyInfo.checkInfo
+                    parentInfo: this.bodyInfo.checkInfo,
                 }
                 if (!node.children || !node.children.length) {
                     this.$set(node, 'children', [])
@@ -276,20 +276,20 @@
             closeDictionary (e, id) {
                 this.dictDataTable = Object.assign({}, {
                     showDialog: !this.dictDataTable.showDialog,
-                    title: this.$t(`m.systemConfig["导入JSON"]`),
+                    title: this.$t('m.systemConfig["导入JSON"]'),
                     formInfo: {
                         name: '',
                         desc: '',
                         id: id || '',
-                        code: ''
+                        code: '',
                     },
                     checkout: {
-                        name: ''
+                        name: '',
                     },
                     width: 700,
                     headerPosition: 'left',
                     autoClose: false,
-                    precision: 0
+                    precision: 0,
                 })
             },
             // 导入JSON
@@ -297,16 +297,16 @@
                 let rootJsonschemaData = {}
                 try {
                     rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value))
-                    this.basicInfo['responseTreeDataList'] = this.jsonschemaToList(rootJsonschemaData)
+                    this.basicInfo.responseTreeDataList = this.jsonschemaToList(rootJsonschemaData)
                     this.closeDictionary()
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
-                        theme: 'error'
+                        theme: 'error',
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

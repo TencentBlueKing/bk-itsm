@@ -53,19 +53,19 @@
         { name: 'Path', key: 'path', value: '' },
         { name: 'Size', key: 'size', value: '' },
         { name: 'Created', key: 'createTime', value: '--' },
-        { name: 'Last Modified', key: 'modifiedTime', value: '' }
+        { name: 'Last Modified', key: 'modifiedTime', value: '' },
     ]
     export default {
         name: 'BuildDetailInfo',
         props: {
             buildItem: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
-                infoList: []
+                infoList: [],
             }
         },
         mounted () {
@@ -82,7 +82,7 @@
         },
         methods: {
 
-        }
+        },
     }
 </script>
 <style lang='scss' scoped>

@@ -162,55 +162,55 @@
     const COLUMN_LIST = [
         {
             id: 'id',
-            label: i18n.t(`m.manageCommon['单号']`),
+            label: i18n.t('m.manageCommon[\'单号\']'),
             width: '200',
-            disabled: true
+            disabled: true,
         },
         {
             id: 'title',
-            label: i18n.t(`m.manageCommon['标题']`),
+            label: i18n.t('m.manageCommon[\'标题\']'),
             minWidth: '180' },
         {
             id: 'service_name',
-            label: i18n.t(`m.home['服务']`),
+            label: i18n.t('m.home[\'服务\']'),
             minWidth: '140',
             prop: 'service_name' },
         {
             id: 'service_type_name',
-            label: i18n.t(`m.manageCommon['类型']`),
+            label: i18n.t('m.manageCommon[\'类型\']'),
             minWidth: '80' },
         {
             id: 'priority',
-            label: i18n.t(`m.slaContent['优先级']`),
+            label: i18n.t('m.slaContent[\'优先级\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'priority_name' },
         {
             id: 'current_steps',
-            label: i18n.t(`m.newCommon['当前步骤']`),
+            label: i18n.t('m.newCommon[\'当前步骤\']'),
             minWidth: '80',
             prop: 'current_steps' },
         {
             id: 'current_processors',
-            label: i18n.t(`m.manageCommon['当前处理人']`),
+            label: i18n.t('m.manageCommon[\'当前处理人\']'),
             width: '130',
             prop: 'current_processors' },
         {
             id: 'status',
-            label: i18n.t(`m.manageCommon['状态']`),
+            label: i18n.t('m.manageCommon[\'状态\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'status' },
         {
             id: 'create_at',
-            label: i18n.t(`m.manageCommon['提单时间']`),
+            label: i18n.t('m.manageCommon[\'提单时间\']'),
             minWidth: '140',
             sortable: 'custom',
             prop: 'create_at' },
         {
             id: 'operate',
-            label: i18n.t(`m.manageCommon['操作']`),
-            minWidth: '80' }
+            label: i18n.t('m.manageCommon[\'操作\']'),
+            minWidth: '80' },
     ]
 
     export default {
@@ -218,11 +218,11 @@
         components: {
             AdvancedSearch,
             ExportTicketDialog,
-            EvaluationTicketModal
+            EvaluationTicketModal,
         },
         mixins: [ticketListMixins],
         props: {
-            from: String
+            from: String,
         },
         data () {
             const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
@@ -231,13 +231,13 @@
                 type: 'created',
                 isExportDialogShow: false,
                 // 评价
-                evaluationTicketInfo: {}
+                evaluationTicketInfo: {},
             }
         },
         computed: {
             fromRouter () {
                 return `${this.$route.name}`
-            }
+            },
         },
         methods: {
             // 打开满意度评价
@@ -251,12 +251,12 @@
                     query: {
                         from: this.fromRouter,
                         service_id: row.service_id,
-                        rc_ticket_id: row.id
-                    }
+                        rc_ticket_id: row.id,
+                    },
                 })
                 window.open(href, '_blank')
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

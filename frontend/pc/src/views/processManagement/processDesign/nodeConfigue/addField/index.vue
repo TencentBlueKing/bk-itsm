@@ -404,38 +404,38 @@
             dataContent,
             customTableData,
             defaultValue,
-            hiddenConditions
+            hiddenConditions,
         },
         mixins: [commonMix],
         props: {
             formAlign: {
                 type: String,
-                default: 'vertical'
+                default: 'vertical',
             },
             changeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             workflow: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             state: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             // 标准运维变量
             sospInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 公共字段
             addOrigin: {
@@ -443,30 +443,30 @@
                 default () {
                     return {
                         isOther: false,
-                        addOriginInfo: {}
+                        addOriginInfo: {},
                     }
-                }
+                },
             },
             isEditPublic: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             templateStage: {
                 type: String,
-                default: ''
+                default: '',
             },
             templateInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 挂载后是否触发 changeType
             autoSelectedType: {
                 type: Boolean,
-                default: true
+                default: true,
             },
-            nodesList: Array
+            nodesList: Array,
         },
         data () {
             return {
@@ -486,8 +486,8 @@
                     regex_config: {
                         rule: {
                             expressions: [],
-                            type: 'and'
-                        }
+                            type: 'and',
+                        },
                     },
                     customRegex: '',
                     source_type: '',
@@ -499,65 +499,65 @@
                     is_tips: false,
                     tips: '',
                     show_type: false,
-                    show_conditions: {}
+                    show_conditions: {},
                 },
                 regexFieldList: [],
                 allBetweenList: [
                     {
                         id: 1,
                         available: 'INT',
-                        name: this.$t(`m.common['大于']`),
-                        typeName: '>'
+                        name: this.$t('m.common[\'大于\']'),
+                        typeName: '>',
                     },
                     {
                         id: 2,
                         available: 'INT',
-                        name: this.$t(`m.common['小于']`),
-                        typeName: '<'
+                        name: this.$t('m.common[\'小于\']'),
+                        typeName: '<',
                     },
                     {
                         id: 3,
                         available: 'INT',
-                        name: this.$t(`m.common['不大于']`),
-                        typeName: '<='
+                        name: this.$t('m.common[\'不大于\']'),
+                        typeName: '<=',
                     },
                     {
                         id: 4,
                         available: 'INT',
-                        name: this.$t(`m.common['不小于']`),
-                        typeName: '>='
+                        name: this.$t('m.common[\'不小于\']'),
+                        typeName: '>=',
                     },
                     {
                         id: 5,
                         available: 'DATE',
-                        name: this.$t(`m.common['早于']`),
-                        typeName: '<'
+                        name: this.$t('m.common[\'早于\']'),
+                        typeName: '<',
                     },
                     {
                         id: 6,
                         available: 'DATE',
-                        name: this.$t(`m.common['晚于']`),
-                        typeName: '>'
+                        name: this.$t('m.common[\'晚于\']'),
+                        typeName: '>',
                     },
                     {
                         id: 7,
                         available: 'DATE',
-                        name: this.$t(`m.common['不早于']`),
-                        typeName: '>='
+                        name: this.$t('m.common[\'不早于\']'),
+                        typeName: '>=',
                     },
                     {
                         id: 8,
                         available: 'DATE',
-                        name: this.$t(`m.common['不晚于']`),
-                        typeName: '<='
-                    }
+                        name: this.$t('m.common[\'不晚于\']'),
+                        typeName: '<=',
+                    },
                 ],
                 betweenList: [],
                 // 自定义复杂表格
                 customTableInfo: {
                     list: [
-                        { name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false }
-                    ]
+                        { name: '', display: 'input', choice: '', required: false, nameCheck: false, check: false },
+                    ],
                 },
                 // 前置节点
                 prevNodeList: [],
@@ -570,7 +570,7 @@
                     sourceList: ['SELECT', 'MULTISELECT', 'CHECKBOX', 'RADIO', 'TABLE', 'TREESELECT', 'INPUTSELECT'],
                     belongDefaultList: ['STRING', 'TEXT', 'INT', 'DATE', 'DATETIME', 'DATETIMERANGE', 'SELECT', 'MULTISELECT', 'CHECKBOX', 'RADIO', 'MEMBER', 'MEMBERS', 'INPUTSELECT', 'RICHTEXT', 'CUSTOM-FORM'],
                     multipleList: ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER'],
-                    layoutList: ['TABLE', 'CUSTOMTABLE', 'RICHTEXT', 'CUSTOM-FORM']
+                    layoutList: ['TABLE', 'CUSTOMTABLE', 'RICHTEXT', 'CUSTOM-FORM'],
                 },
                 // 校验规则
                 rules: {},
@@ -579,33 +579,33 @@
                 // 自定义类型数据
                 fieldInfo: {
                     list: [
-                        { name: '', key: '', required: false }
-                    ]
+                        { name: '', key: '', required: false },
+                    ],
                 },
                 // api接口配置信息
                 apiDetail: {},
                 apiInfo: {
                     api_info: {
-                        'remote_system_id': '',
-                        'remote_api_id': '',
-                        'req_params': {},
-                        'req_body': {},
-                        'rsp_data': ''
+                        remote_system_id: '',
+                        remote_api_id: '',
+                        req_params: {},
+                        req_body: {},
+                        rsp_data: '',
                     },
                     kv_relation: {
                         key: '',
-                        name: ''
-                    }
+                        name: '',
+                    },
                 },
                 // 数据字典数据
                 dictionaryData: {
                     list: [],
-                    check: ''
+                    check: '',
                 },
                 // prc数据
                 prcData: {
                     list: [],
-                    check: ''
+                    check: '',
                 },
                 prcTable: [],
                 // 上传文件
@@ -615,11 +615,11 @@
                 checkStatus: {
                     customStatus: false,
                     customTableStatus: false,
-                    customFormStatus: false
+                    customFormStatus: false,
                 },
                 // 任务内置字段特殊处理
                 fieldTypeList: [],
-                hiddenConditionStatus: true
+                hiddenConditionStatus: true,
             }
         },
         computed: {
@@ -631,15 +631,15 @@
             },
             isDisabled () {
                 return this.formInfo.source_type === 'API' && !this.apiInfo.api_info.remote_api_id
-            }
+            },
         },
         watch: {
             formInfo: {
                 handler (val) {
                     this.$emit('getAddFieldStatus', val.name !== '')
                 },
-                deep: true
-            }
+                deep: true,
+            },
         },
         async mounted () {
             this.isDataLoading = true
@@ -672,18 +672,18 @@
                 if ((this.changeInfo.type === 'COMPLEX-MEMBERS' || this.changeInfo.type === 'SOPS_TEMPLATE') && this.addOrigin.addOriginInfo.type === 'templateField') {
                     this.fieldTypeList = this.fieldTypeList.concat([
                         {
-                            name: this.$t(`m.common['复杂人员选择']`),
-                            typeName: 'COMPLEX-MEMBERS'
+                            name: this.$t('m.common[\'复杂人员选择\']'),
+                            typeName: 'COMPLEX-MEMBERS',
                         },
                         {
-                            name: this.$t(`m.common['标准运维模板']`),
-                            typeName: 'SOPS_TEMPLATE'
-                        }
+                            name: this.$t('m.common[\'标准运维模板\']'),
+                            typeName: 'SOPS_TEMPLATE',
+                        },
                     ])
                 }
                 // 在不同的数据源里面添加不同的desc
                 this.globalChoise.source_type.forEach(item => {
-                    const descInfo = item.typeName === 'CUSTOM' ? this.$t(`m.treeinfo['自定义数据每行的name和key都不能相同。']`) : this.$t(`m.treeinfo['接口中的数据详情']`)
+                    const descInfo = item.typeName === 'CUSTOM' ? this.$t('m.treeinfo[\'自定义数据每行的name和key都不能相同。\']') : this.$t('m.treeinfo[\'接口中的数据详情\']')
                     this.$set(item, 'desc', descInfo)
                 })
                 if (!this.nodesList) {
@@ -736,7 +736,7 @@
                                 key: item.key,
                                 required: !!item.required,
                                 nameCheck: false,
-                                keyCheck: false
+                                keyCheck: false,
                             })
                         })
                     }
@@ -766,7 +766,7 @@
                                 choice: valChoice.join('\n'),
                                 required: node.required,
                                 nameCheck: false,
-                                check: false
+                                check: false,
                             })
                         })
                     } else {
@@ -800,9 +800,10 @@
                 }
                 await this.$store.dispatch(url, params).then(res => {
                     this.frontNodesList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 操作字段关联条件
             addExpression () {
@@ -811,7 +812,7 @@
                     key: '',
                     source: 'field',
                     type: this.formInfo.type,
-                    value: ''
+                    value: '',
                 })
             },
             deleteExpression (index) {
@@ -840,7 +841,7 @@
                 }
                 if (!this.fieldInfo.list.length) {
                     this.fieldInfo.list = [
-                        { name: '', key: '', required: false, nameCheck: false, keyCheck: false }
+                        { name: '', key: '', required: false, nameCheck: false, keyCheck: false },
                     ]
                 }
                 if (this.formInfo.type === 'CUSTOM-FORM') {
@@ -853,23 +854,19 @@
             changeRegex (data) {
                 this.formInfo.customRegex = ''
                 if (data === 'ASSOCIATED_FIELD_VALIDATION') {
-                    this.regexFieldList = this.frontNodesList.filter(item => {
-                        return this.formInfo.type === 'INT' ? item.type === this.formInfo.type : item.type === 'DATE' || item.type === 'DATETIME'
-                    }).filter(item => item.id !== this.changeInfo.id)
+                    this.regexFieldList = this.frontNodesList.filter(item => this.formInfo.type === 'INT' ? item.type === this.formInfo.type : item.type === 'DATE' || item.type === 'DATETIME').filter(item => item.id !== this.changeInfo.id)
                     if (['DATE', 'DATETIME'].includes(this.formInfo.type)) {
                         this.regexFieldList.push({
                             name: '系统时间',
                             id: 'system_time',
                             key: 'system_time',
-                            source: 'system'
+                            source: 'system',
                         })
                     }
-                    this.betweenList = this.allBetweenList.filter(item => {
-                        return this.formInfo.type === 'INT' ? item.available === 'INT' : item.available === 'DATE'
-                    })
+                    this.betweenList = this.allBetweenList.filter(item => this.formInfo.type === 'INT' ? item.available === 'INT' : item.available === 'DATE')
                     this.betweenList.push({
                         name: '等于',
-                        typeName: '=='
+                        typeName: '==',
                     })
                     if (!this.formInfo.regex_config.rule.expressions.length) {
                         this.addExpression()
@@ -879,15 +876,14 @@
             getRegexList () {
                 const params = this.formInfo.type
                 this.$store.dispatch('cdeploy/regexList', params).then((res) => {
-                    this.regexList = res.data.regex_choice.map(item => {
-                        return {
-                            name: item[1] ? item[1] : this.$t(`m.treeinfo["无"]`),
-                            typeName: item[0]
-                        }
-                    })
-                }).catch(res => {
-                    errorHandler(res, this)
+                    this.regexList = res.data.regex_choice.map(item => ({
+                        name: item[1] ? item[1] : this.$t('m.treeinfo["无"]'),
+                        typeName: item[0],
+                    }))
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             onRegexFieldChange (key, expression) {
                 // system 表示系统内置条件，field 表示来源节点
@@ -905,10 +901,10 @@
                     this.formInfo.key = ''
                     const transfer = pinyin(this.formInfo.name, {
                         style: pinyin.STYLE_NORMAL,
-                        heteronym: false
+                        heteronym: false,
                     })
                     transfer.forEach(item => {
-                        this.formInfo.key = this.formInfo.key + `${item}`
+                        this.formInfo.key = `${this.formInfo.key}${item}`
                     })
                     this.formInfo.key = this.formInfo.key.toUpperCase()
                     this.formInfo.key = this.formInfo.key.replace(/\ /g, '_')
@@ -933,8 +929,8 @@
                 for (let i = 0; i < this.fileList.length; i++) {
                     if (fileName === this.fileList[i].name) {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["此文件已经上传"]`),
-                            theme: 'error'
+                            message: this.$t('m.treeinfo["此文件已经上传"]'),
+                            theme: 'error',
                         })
                         return
                     }
@@ -945,21 +941,22 @@
                     data.append('field_file', fileInfo)
                     this.$store.dispatch('cdeploy/fileUpload', { data }).then((res) => {
                         for (const key in res.data.succeed_files) {
-                            this.fileList.push({ ...res.data.succeed_files[key], key: key })
+                            this.fileList.push({ ...res.data.succeed_files[key], key })
                         }
                         this.fileVal = ''
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["上传成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["上传成功"]'),
+                            theme: 'success',
                         })
-                    }).catch(res => {
-                        errorHandler(res, this)
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
                 } else {
                     this.fileVal = ''
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["该文件大小超过100MB！"]`),
-                        theme: 'error'
+                        message: this.$t('m.treeinfo["该文件大小超过100MB！"]'),
+                        theme: 'error',
                     })
                 }
             },
@@ -978,7 +975,7 @@
                 }
                 this.secondClick = true
                 if (typeof this.changeInfo.id === 'number') {
-                    const id = this.changeInfo.id
+                    const { id } = this.changeInfo
                     let url = this.changeInfo.source === 'TABLE' ? 'cdeploy/changeNewModuleField' : 'cdeploy/changeNewField'
                     // 公共字段
                     if (this.addOrigin.isOther && this.addOrigin.addOriginInfo.updateUrl) {
@@ -997,8 +994,8 @@
                     }
                     this.$store.dispatch(url, { params, id }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["修改成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["修改成功"]'),
+                            theme: 'success',
                         })
                         this.$emit('closeShade')
 
@@ -1011,11 +1008,13 @@
                             this.$emit('getRelatedFields')
                         }
                         this.$emit('onConfirm', Object.assign({}, this.changeInfo, params))
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                        })
                 } else {
                     params.state = this.state
                     if (Object.keys(this.sospInfo).length) {
@@ -1038,8 +1037,8 @@
                     this.$store.dispatch(url, { params }).then((res) => {
                         this.addNew = res.data
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["新增成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["新增成功"]'),
+                            theme: 'success',
                         })
                         this.$emit('closeShade')
 
@@ -1059,11 +1058,13 @@
                             }
                         }
                         this.$emit('onConfirm', res.data)
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                        })
                 }
             },
             onCancelClick () {
@@ -1085,7 +1086,7 @@
                     if (this.formInfo.is_tips && !this.formInfo.tips) {
                         this.$bkMessage({
                             theme: 'warning',
-                            message: this.$t(`m.treeinfo["字段释疑为必填项"]`)
+                            message: this.$t('m.treeinfo["字段释疑为必填项"]'),
                         })
                         return
                     }
@@ -1121,14 +1122,14 @@
                     const hiddenList = this.$refs.hiddenConditions.listInfo
                     params.show_conditions = {
                         type: this.$refs.hiddenConditions.conditionType,
-                        expressions: []
+                        expressions: [],
                     }
                     hiddenList.forEach(item => {
                         params.show_conditions.expressions.push({
                             key: item.key,
                             condition: item.condition,
                             value: Array.isArray(item.value) ? item.value.join(',') : item.value,
-                            type: item.type
+                            type: item.type,
                         })
                     })
                     params.show_type = 0
@@ -1162,7 +1163,7 @@
                                 this.fieldInfo.list.forEach(item => {
                                     params.choice.push({
                                         key: item.key,
-                                        name: item.name
+                                        name: item.name,
                                     })
                                 })
                             } else if (this.formInfo.type === 'TABLE') {
@@ -1170,7 +1171,7 @@
                                     params.choice.push({
                                         key: item.key,
                                         name: item.name,
-                                        required: item.required
+                                        required: item.required,
                                     })
                                 })
                             }
@@ -1194,9 +1195,7 @@
                         this.customTableInfo.list.forEach(item => {
                             let choiceList = []
                             if (item.choice && (item.display === 'select' || item.display === 'multiselect')) {
-                                choiceList = item.choice.split('\n').filter(node => {
-                                    return node.length > 0
-                                })
+                                choiceList = item.choice.split('\n').filter(node => node.length > 0)
                             }
                             item.nameCheck = item.name.length === 0 || item.name.length > 120
                             item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'))
@@ -1206,22 +1205,20 @@
                         if (checkNameStatus || checkValueStatus) {
                             this.$bkMessage({
                                 theme: 'warning',
-                                message: this.$t(`m.treeinfo["请填写正确格式的自定义数据"]`)
+                                message: this.$t('m.treeinfo["请填写正确格式的自定义数据"]'),
                             })
                             return false
                         }
                         params.meta = {}
                         params.meta.columns = []
                         this.customTableInfo.list.forEach(item => {
-                            let choiceList = item.choice.split('\n').filter(node => {
-                                return node.length > 0
-                            })
+                            let choiceList = item.choice.split('\n').filter(node => node.length > 0)
                             choiceList = Array.from(new Set(choiceList))
                             params.meta.columns.push({
                                 name: item.name,
                                 display: item.display,
                                 choice: item.choice.length ? choiceList : [],
-                                required: item.required
+                                required: item.required,
                             })
                         })
                     }
@@ -1230,7 +1227,7 @@
                         params.source_uri = this.prcData.check
                         params.meta = {}
                         this.prcTable.forEach(prcInfo => {
-                            const prcValue = prcInfo.source_type === 'CUSTOM' ? prcInfo.value : ('${params_' + prcInfo.value_key + '}')
+                            const prcValue = prcInfo.source_type === 'CUSTOM' ? prcInfo.value : (`\${params_${prcInfo.value_key}}`)
                             params.meta[prcInfo.name] = prcValue
                         })
                     }
@@ -1289,9 +1286,7 @@
                     this.customTableInfo.list.forEach(item => {
                         let choiceList = []
                         if (item.choice && (item.display === 'select' || item.display === 'multiselect')) {
-                            choiceList = item.choice.split('\n').filter(node => {
-                                return node.length > 0
-                            })
+                            choiceList = item.choice.split('\n').filter(node => node.length > 0)
                         }
                         item.nameCheck = item.name.length === 0 || item.name.length > 120
                         item.check = (!choiceList.length && (item.display === 'select' || item.display === 'multiselect'))
@@ -1323,19 +1318,19 @@
                     if (this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check).length) {
                         this.prcTable = this.prcData.list.filter(prcInfo => prcInfo.key === this.prcData.check)[0].req_params
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取字典列表
             getSysDictList () {
                 this.$store.dispatch('datadict/list', {}).then((res) => {
-                    this.dictionaryData.list = res.data.filter(item => {
-                        return item.is_enabled
-                    })
-                }).catch((res) => {
-                    errorHandler(res, this)
+                    this.dictionaryData.list = res.data.filter(item => item.is_enabled)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取前置节点
             getPreStates () {
@@ -1344,11 +1339,12 @@
                 }
                 this.$store.dispatch('deployCommon/getPreStates', { id: this.state }).then((res) => {
                     this.prevNodeList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 

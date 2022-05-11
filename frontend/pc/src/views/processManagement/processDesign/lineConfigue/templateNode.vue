@@ -58,8 +58,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -69,13 +69,13 @@
                     { type: 'TASK', iconStyle: 'icon-api-icon' },
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' }
-                ]
+                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+                ],
             }
         },
         methods: {
 
-        }
+        },
     }
 </script>
 

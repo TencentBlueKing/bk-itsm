@@ -34,7 +34,7 @@
         name: 'MyAttentionTicket',
         components: {
             NavTitle,
-            AttentionList
-        }
+            AttentionList,
+        },
     }
 </script>

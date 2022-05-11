@@ -52,41 +52,41 @@
     export default {
         name: 'SelectTree',
         components: {
-            Tree
+            Tree,
         },
         model: {
             prop: 'value',
-            event: 'selected'
+            event: 'selected',
         },
         props: {
             list: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             value: {
                 type: [Number, String, Array],
-                default: ''
+                default: '',
             },
             placeholder: {
                 type: String,
-                default: ''
+                default: '',
             },
             loading: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             extCls: {
                 type: String,
-                default: ''
+                default: '',
             },
-            organizationLoading: Boolean
+            organizationLoading: Boolean,
         },
         data () {
             return {
                 isShowTree: false,
                 displayName: '',
                 displayList: [],
-                checked: null
+                checked: null,
             }
         },
         watch: {
@@ -98,7 +98,7 @@
             },
             loading () {
                 this.initData()
-            }
+            },
         },
         created () {
             this.initData()
@@ -138,9 +138,7 @@
             },
             openChildren (tree) {
                 this.$set(tree, 'showChildren', false)
-                this.$set(tree, 'showChildren', this.checked.route.some(item => {
-                    return String(item.id) === String(tree.id)
-                }))
+                this.$set(tree, 'showChildren', this.checked.route.some(item => String(item.id) === String(tree.id)))
                 if (!(tree.children && tree.children.length)) {
                     return
                 }
@@ -184,8 +182,8 @@
             },
             toggleChildren (item) {
                 this.$set(item, 'showChildren', !item.showChildren)
-            }
-        }
+            },
+        },
     }
 </script>
 

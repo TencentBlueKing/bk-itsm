@@ -76,27 +76,27 @@
     export default {
         name: 'logsInfo',
         components: {
-            ace
+            ace,
         },
         props: {
             logsObject: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 basicList: [
-                    { name: this.$t(`m.systemConfig["接口地址"]`), value: '', key: 'url' },
-                    { name: this.$t(`m.systemConfig["请求方法"]`), value: '', key: 'method' },
-                    { name: this.$t(`m.systemConfig["状态"]`), value: '', key: 'status_code' },
-                    { name: this.$t(`m.systemConfig["请求时间"]`), value: '', key: 'date_created' },
-                    { name: this.$t(`m.systemConfig["耗时"]`), value: '', key: 'duration' },
-                    { name: this.$t(`m.systemConfig["接口ID"]`), value: '', key: 'api_instance_id' },
-                    { name: this.$t(`m.systemConfig["单据ID"]`), value: '', key: 'ticket_id' },
-                    { name: this.$t(`m.systemConfig["节点ID"]`), value: '', key: 'state_id' }
+                    { name: this.$t('m.systemConfig["接口地址"]'), value: '', key: 'url' },
+                    { name: this.$t('m.systemConfig["请求方法"]'), value: '', key: 'method' },
+                    { name: this.$t('m.systemConfig["状态"]'), value: '', key: 'status_code' },
+                    { name: this.$t('m.systemConfig["请求时间"]'), value: '', key: 'date_created' },
+                    { name: this.$t('m.systemConfig["耗时"]'), value: '', key: 'duration' },
+                    { name: this.$t('m.systemConfig["接口ID"]'), value: '', key: 'api_instance_id' },
+                    { name: this.$t('m.systemConfig["单据ID"]'), value: '', key: 'ticket_id' },
+                    { name: this.$t('m.systemConfig["节点ID"]'), value: '', key: 'state_id' },
                 ],
                 requestResponse: {
                     response: '',
@@ -105,9 +105,9 @@
                     height: 300,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
-                isDataLoading: false
+                isDataLoading: false,
             }
         },
         mounted () {
@@ -123,13 +123,15 @@
                     }
                     this.requestResponse.request = res.data.request_message
                     this.requestResponse.response = JSON.stringify(res.data.response_message, null, 4)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
+            },
+        },
     }
 </script>
 

@@ -103,51 +103,51 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             apiDetail: {
                 type: Object,
                 default: () => {
-                }
+                },
             },
             stateList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 是否仅展示 数据
             isStatic: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             isCustom: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             // 静态展示 -- 参数值
             queryValue: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             entry: {
                 type: String,
                 default () {
                     return ''
-                }
+                },
             },
             formInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -155,31 +155,31 @@
                 // 校验
                 checkInfo: {
                     name: '',
-                    road: ''
+                    road: '',
                 },
                 sourceTypeList: [
                     {
                         id: 1,
                         key: 'CUSTOM',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'FIELDS',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
                 ],
                 paramTableInfo: {
                     value: '',
-                    placeholder: this.$t(`m.treeinfo["请选择数据来源"]`)
-                }
+                    placeholder: this.$t('m.treeinfo["请选择数据来源"]'),
+                },
             }
         },
         computed: {},
         watch: {
             apiDetail (newVal, oldVal) {
                 this.initData()
-            }
+            },
         },
         async mounted () {
             await this.changeInfo
@@ -190,41 +190,40 @@
         methods: {
             async initData () {
                 const paramTableData = await JSON.parse(JSON.stringify(this.apiDetail.req_params)) || []
-                await paramTableData.forEach(
-                    item => {
-                        item['isCheck'] = false
-                        item['isSatisfied'] = false
-                        // 定位
-                        item['el'] = null
-                        item['customValue'] = item['value'] || ''
-                        item['source_type'] = 'CUSTOM'
-                        item['value_key'] = ''
-                        // 赋值
-                        if (!this.isStatic) {
-                            // 配置信息（api字段/自动节点配置信息） 赋值
-                            if (this.changeInfo.api_info && Object.keys(this.changeInfo.api_info.req_params).length
-                                && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
-                                if (/^\$\{params_.*\}$/.test(this.changeInfo.api_info.req_params[item.name])) {
-                                    item['source_type'] = 'FIELDS'
-                                    item['value_key'] = this.changeInfo.api_info.req_params[item.name] ? JSON.parse(JSON.stringify(this.changeInfo.api_info.req_params[item.name])).replace(/^\$\{params_/, '').replace(/\}$/, '') : ''
-                                } else {
-                                    const reqParamsName = this.changeInfo.api_info.req_params[item.name]
-                                    item['source_type'] = 'CUSTOM'
-                                    item.value = reqParamsName
-                                }
+                await paramTableData.forEach(item => {
+                    item.isCheck = false
+                    item.isSatisfied = false
+                    // 定位
+                    item.el = null
+                    item.customValue = item.value || ''
+                    item.source_type = 'CUSTOM'
+                    item.value_key = ''
+                    // 赋值
+                    if (!this.isStatic) {
+                        // 配置信息（api字段/自动节点配置信息） 赋值
+                        if (this.changeInfo.api_info && Object.keys(this.changeInfo.api_info.req_params).length
+                            && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
+                            if (/^\$\{params_.*\}$/.test(this.changeInfo.api_info.req_params[item.name])) {
+                                item.source_type = 'FIELDS'
+                                item.value_key = this.changeInfo.api_info.req_params[item.name] ? JSON.parse(JSON.stringify(this.changeInfo.api_info.req_params[item.name])).replace(/^\$\{params_/, '')
+                                    .replace(/\}$/, '') : ''
+                            } else {
+                                const reqParamsName = this.changeInfo.api_info.req_params[item.name]
+                                item.source_type = 'CUSTOM'
+                                item.value = reqParamsName
                             }
-                        } else {
-                            // 静态展示（自动节点执行信息） 赋值
-                            item['value'] = this.queryValue[item.name] || ''
                         }
+                    } else {
+                        // 静态展示（自动节点执行信息） 赋值
+                        item.value = this.queryValue[item.name] || ''
                     }
-                )
+                })
                 this.paramTableData = await JSON.parse(JSON.stringify(paramTableData))
             },
             addNewItem (data) {
                 this.$emit('addNewItem', data)
-            }
-        }
+            },
+        },
     }
 </script>
 

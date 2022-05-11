@@ -96,17 +96,17 @@
             sopsNode,
             signNode,
             ApprovalNode,
-            devopsNode
+            devopsNode,
         },
         props: {
             serviceInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             flowInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -114,7 +114,7 @@
                 isShowNodeConfig: false,
                 nodeList: [],
                 lineList: [],
-                configur: {}
+                configur: {},
             }
         },
         computed: {
@@ -123,20 +123,20 @@
             },
             nodeType () {
                 const nodoTypeList = {
-                    'TASK-DEVOPS': this.$t(`m["蓝盾节点"]`),
-                    'TASK-SOPS': this.$t(`m["标准运维节点"]`),
-                    'NORMAL': this.$t(`m["手动节点"]`),
-                    'TASK': this.$t(`m["任务节点"]`),
-                    'APPROVAL': this.$t(`m["审批节点"]`),
-                    'SIGN': this.$t(`m["会签节点"]`)
+                    'TASK-DEVOPS': this.$t('m["蓝盾节点"]'),
+                    'TASK-SOPS': this.$t('m["标准运维节点"]'),
+                    NORMAL: this.$t('m["手动节点"]'),
+                    TASK: this.$t('m["任务节点"]'),
+                    APPROVAL: this.$t('m["审批节点"]'),
+                    SIGN: this.$t('m["会签节点"]'),
                 }
                 return nodoTypeList[this.configur.type]
-            }
+            },
         },
         watch: {
             isShowNodeConfig (val) {
                 this.$emit('setConfigStatus', val)
-            }
+            },
         },
         created () {
             this.$emit('setConfigStatus', this.isShowNodeConfig)
@@ -151,17 +151,18 @@
             getFlowChart () {
                 this.flowDataLoading = true
                 axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { 'workflow': this.processId }),
+                    this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
                     this.$store.dispatch('deployCommon/getChartLink', {
-                        'workflow': this.processId,
-                        'page_size': 1000
-                    })
+                        workflow: this.processId,
+                        page_size: 1000,
+                    }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.nodeList = userResp.data
                     this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.flowDataLoading = false
-                })
+                }))
+                    .finally(() => {
+                        this.flowDataLoading = false
+                    })
             },
             handleNodeClick (data) {
                 this.isShowNodeConfig = true
@@ -177,15 +178,15 @@
                 const lineInfoList = this.$refs.flowInfo.canvasData
                 const params = {
                     workflow_id: this.processId,
-                    transitions: []
+                    transitions: [],
                 }
                 lineInfoList.lines.forEach(item => {
                     params.transitions.push({
                         id: item.lineInfo.id,
                         axis: {
                             start: item.source.arrow,
-                            end: item.target.arrow
-                        }
+                            end: item.target.arrow,
+                        },
                     })
                 })
                 this.$store.dispatch('deployCommon/updateFlowLine', { params }).catch(res => {
@@ -197,8 +198,8 @@
                 const params = []
                 return this.$store.dispatch('cdeploy/submitChart', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["保存成功"]'),
+                        theme: 'success',
                     })
                 }, (res) => {
                     if (res.data && res.data.data) {
@@ -212,8 +213,8 @@
             validate () {
                 this.submitFlow()
                 return this.saveProcess()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

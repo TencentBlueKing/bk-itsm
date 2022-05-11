@@ -64,13 +64,13 @@
             fields: Array,
             form: Object,
             crtForm: [String, Number],
-            addFieldStatus: Boolean
+            addFieldStatus: Boolean,
         },
         computed: {
             deleteDisabled () {
                 const defaultField = ['impact', 'urgency', 'priority', 'current_status']
                 return this.form.is_builtin && defaultField.indexOf(this.form.key) === -1
-            }
+            },
         },
         beforeCreate () {
             const fieldComponents = registerFields()
@@ -83,8 +83,8 @@
                 if (!this.deleteDisabled) {
                     this.$emit('onFormDeleteClick', form)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

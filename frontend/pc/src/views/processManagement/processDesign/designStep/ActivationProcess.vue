@@ -247,7 +247,7 @@
             memberSelect,
             collapseTransition,
             commonTriggerList,
-            TaskConfigPanel
+            TaskConfigPanel,
         },
         mixins: [commonMix, permission],
         props: {
@@ -255,18 +255,18 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             processId: {
                 type: [String, Number],
-                required: true
+                required: true,
             },
             business: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -279,9 +279,9 @@
                     deploy_name: '',
                     revoke_config: {
                         type: 2,
-                        state: ''
+                        state: '',
                     },
-                    is_auto_approve: false
+                    is_auto_approve: false,
                 },
                 revokeStateError: false,
                 nodeListLoading: false,
@@ -297,17 +297,17 @@
                     personList: [],
                     notify_rule: '',
                     notify_freq: '',
-                    notify: ['WEIXIN', 'EMAIL']
+                    notify: ['WEIXIN', 'EMAIL'],
                 },
                 // 督办角色
                 roles: {
                     grouplist: [],
-                    supChildList: []
+                    supChildList: [],
                 },
                 notifyList: [
-                    { name: this.$t(`m.treeinfo["企业微信"]`), type: 'WEIXIN' },
-                    { name: this.$t(`m.treeinfo["邮件"]`), type: 'EMAIL' },
-                    { name: this.$t(`m.treeinfo["SMS短信"]`), type: 'SMS' }
+                    { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
+                    { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
+                    { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
                 ],
                 frequencyList: [
                     { id: 0, name: '00:00' },
@@ -333,24 +333,24 @@
                     { id: 20, name: '20:00' },
                     { id: 21, name: '21:00' },
                     { id: 22, name: '22:00' },
-                    { id: 23, name: '23:00' }
+                    { id: 23, name: '23:00' },
                 ],
                 // 父组件传值
                 parentInfo: {
                     status: 'success',
-                    index: 2
+                    index: 2,
                 },
                 // 校验
                 rules: {},
                 showMoreConfig: false,
                 qwIcon: require('../../../../images/qw.svg'),
-                emailIcon: require('../../../../images/email.svg')
+                emailIcon: require('../../../../images/email.svg'),
             }
         },
         computed: {
             openFunction () {
                 return this.$store.state.openFunction
-            }
+            },
         },
         watch: {
             'flowInfo.auth_actions': {
@@ -360,18 +360,18 @@
                     }
                 },
                 deep: true,
-                immediate: true
+                immediate: true,
             },
             'formData.revoke_config.type': {
                 handler (val) {
                     if (val === 3 && !this.nodeList.length) {
                         this.getNodeList()
                     }
-                }
+                },
             },
             'flowInfo.id' () {
                 this.initData()
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -400,7 +400,7 @@
                     const { state, type } = value.revoke_config
                     this.formData.revoke_config = {
                         state: state === 0 ? '' : state,
-                        type: type
+                        type,
                     }
                     // 通知
                     this.noticeData.can_notice = (value.notify_rule !== 'NONE')
@@ -418,38 +418,38 @@
                         this.noticeData.personList = this.noticeData.supervise_type === 'PERSON' ? value.supervisor.split(',') : ''
                     }
                     this.roleGroup()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.showMoreConfig = (this.flowInfo.extras
-                        && this.flowInfo.extras.task_settings
-                        && this.flowInfo.extras.task_settings.length)
-                        || this.noticeData.can_notice
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.showMoreConfig = (this.flowInfo.extras
+                            && this.flowInfo.extras.task_settings
+                            && this.flowInfo.extras.task_settings.length)
+                            || this.noticeData.can_notice
+                        this.isDataLoading = false
+                    })
             },
             // 获取流程节点
             getNodeList () {
                 this.nodeListLoading = true
                 this.$store.dispatch('deployCommon/getStates', { workflow: this.flowInfo.id }).then(res => {
                     this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.nodeListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.nodeListLoading = false
+                    })
             },
             // 角色分组
             roleGroup () {
                 const params = 'is_processor=true'
                 this.$store.dispatch('cdeploy/getUser', { params }).then((res) => {
                     const selectgroup = ['CMDB', 'PERSON', 'GENERAL', 'EMPTY']
-                    const grouplistorigin = res.data.filter((item) => {
-                        return selectgroup.indexOf(item.type) !== -1
-                    })
-                    this.roles.grouplist = this.business ? grouplistorigin : grouplistorigin.filter((item) => {
-                        return item.type !== 'CMDB'
-                    })
+                    const grouplistorigin = res.data.filter((item) => selectgroup.indexOf(item.type) !== -1)
+                    this.roles.grouplist = this.business ? grouplistorigin : grouplistorigin.filter((item) => item.type !== 'CMDB')
                     this.roles.grouplist.forEach(item => {
                         if (item.type === 'EMPTY') {
                             item.name = '提单人'
@@ -462,9 +462,10 @@
                     ) {
                         this.roleUserList(this.noticeData.supervise_type)
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取次级角色列表
             roleUserList (type) {
@@ -473,12 +474,13 @@
                     res.data.forEach(item => {
                         this.roles.supChildList.push({
                             id: String(item.id),
-                            name: item.name
+                            name: item.name,
                         })
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 督办选择
             changeSupChildList (value, option) {
@@ -526,13 +528,13 @@
                     is_draft: false,
                     deploy: this.formData.can_deploy,
                     deploy_name: this.formData.can_deploy ? this.formData.deploy_name : '',
-                    is_auto_approve: this.formData.is_auto_approve
+                    is_auto_approve: this.formData.is_auto_approve,
                 }
                 if (this.formData.can_withdraw) {
                     const revokeType = this.formData.revoke_config.type
                     params.revoke_config = {
                         type: revokeType,
-                        state: revokeType === 3 ? this.formData.revoke_config.state : 0
+                        state: revokeType === 3 ? this.formData.revoke_config.state : 0,
                     }
                 }
                 // 任务配置
@@ -557,8 +559,8 @@
                 // 督办人的校验
                 if (params.is_supervise_needed && params.supervise_type !== 'EMPTY' && !params.supervisor) {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["督办人为必填"]`),
-                        theme: 'warning'
+                        message: this.$t('m.treeinfo["督办人为必填"]'),
+                        theme: 'warning',
                     })
                     return
                 }
@@ -569,42 +571,43 @@
                 this.secondClick = true
                 this.$store.dispatch('cdeploy/changePartInfo', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["保存成功"]'),
+                        theme: 'success',
                     })
                     // 快捷部署成功弹窗提示是否去服务页面
                     if (this.formData.can_deploy) {
                         this.openService()
                     } else {
                         this.$router.push({
-                            name: 'ProcessHome'
+                            name: 'ProcessHome',
                         })
                     }
                 }, (res) => {
                     errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             openService () {
                 this.$bkInfo({
                     type: 'success',
                     closeIcon: false,
-                    title: this.$t(`m.treeinfo["保存成功"]`),
-                    subTitle: this.$t(`m.treeinfo["流程部署成功，是否去服务页面关联此流程"]`),
+                    title: this.$t('m.treeinfo["保存成功"]'),
+                    subTitle: this.$t('m.treeinfo["流程部署成功，是否去服务页面关联此流程"]'),
                     confirmFn: () => {
                         this.$router.push({
                             name: 'projectServiceList',
                             query: {
-                                project_id: this.$store.state.project.id
-                            }
+                                project_id: this.$store.state.project.id,
+                            },
                         })
                     },
                     cancelFn: () => {
                         this.$router.push({
-                            name: 'ProcessHome'
+                            name: 'ProcessHome',
                         })
-                    }
+                    },
                 })
             },
             previousStep () {
@@ -612,31 +615,31 @@
                     name: 'ProcessEdit',
                     params: {
                         type: 'edit',
-                        step: 'pipelineDesign'
+                        step: 'pipelineDesign',
                     },
                     query: {
-                        processId: this.processId
-                    }
+                        processId: this.processId,
+                    },
                 })
             },
             // 验证流程部署权限
             checkFlowDeployPerm () {
                 if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
+                            name: projectInfo.name,
                         }],
                         workflow: [{
                             id: this.flowInfo.id,
-                            name: this.flowInfo.name
-                        }]
+                            name: this.flowInfo.name,
+                        }],
                     }
                     this.applyForPermission(['workflow_deploy'], this.flowInfo.auth_actions, resourceData)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

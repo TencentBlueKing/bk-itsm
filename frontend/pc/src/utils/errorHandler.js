@@ -37,6 +37,6 @@ export const errorHandler = (error, instance) => {
     console.log(error)
     instance.$bkMessage({
         message: msg,
-        theme: 'error'
+        theme: 'error',
     })
 }

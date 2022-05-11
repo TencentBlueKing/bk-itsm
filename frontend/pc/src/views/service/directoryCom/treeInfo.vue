@@ -148,7 +148,7 @@
     export default {
         name: 'treeInfo',
         components: {
-            tree
+            tree,
         },
         mixins: [commonMix, permission],
         props: {
@@ -156,8 +156,8 @@
                 type: Object,
                 default () {
                     return { node: {} }
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -179,18 +179,18 @@
                         parent__id: '',
                         parent___name: '',
                         name: '',
-                        desc: ''
-                    }
+                        desc: '',
+                    },
                 },
                 // 校验规则
                 rules: {},
-                parentIds: []
+                parentIds: [],
             }
         },
         computed: {
             showMore () {
                 return this.$store.state.serviceCatalog.treeMore
-            }
+            },
         },
         mounted () {
             this.getTreeList()
@@ -202,7 +202,7 @@
                 this.isTreeLoading = true
                 this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then(res => {
                     this.treeList = res.data
                     this.getTreeParentId(res.data, this.$route.query.catalog_id)
@@ -224,11 +224,13 @@
                     if (this.$route.query.catalog_id !== 1) {
                         this.treeList[0].selected = false
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isTreeLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isTreeLoading = false
+                    })
             },
             // 获取当前目录id 和parents id
             getTreeParentId (list, id) {
@@ -254,11 +256,11 @@
             iconNode (node) {
                 this.treeInfo.node = node.node
                 this.$store.commit('serviceCatalog/changeTreeOperat', true)
-                const treeOperat = this.$refs.treeOperat
+                const { treeOperat } = this.$refs
                 if (window.innerHeight - 108 <= node.event.pageY) {
-                    treeOperat.style.top = (node.event.pageY - 240) + 'px'
+                    treeOperat.style.top = `${node.event.pageY - 240}px`
                 } else {
-                    treeOperat.style.top = (node.event.pageY - 144) + 'px'
+                    treeOperat.style.top = `${node.event.pageY - 144}px`
                 }
             },
             hidden (event) {
@@ -330,12 +332,12 @@
             // 新增目录
             openAdd (catalog) {
                 if (!this.hasPermission(['catalog_create'], this.$store.state.project.projectAuthActions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['catalog_create'], this.$store.state.project.projectAuthActions, resourceData)
                     return
@@ -346,7 +348,7 @@
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择父级目录再进行新增"]'),
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                     return
                 }
@@ -356,7 +358,7 @@
                     parent__id: catalog === 'root' ? 1 : this.treeInfo.node.id,
                     parent___name: this.treeInfo.node.name,
                     name: '',
-                    desc: ''
+                    desc: '',
                 }
             },
             toggleDialog (optType) {
@@ -380,17 +382,19 @@
                         this.$store.dispatch('serviceCatalog/create', params).then(res => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["新增目录成功"]'),
-                                theme: 'success'
+                                theme: 'success',
                             })
                             // TODO 局部刷新
                             this.getTreeList()
                             this.toggleDialog()
                             // 确认保存后清空节点数据
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.clickSecond = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.clickSecond = false
+                            })
                     } else if (this.addDirectory.optType === 'update') {
                         if (this.addDirectory.formInfo.parent__id === '') {
                             delete this.addDirectory.formInfo.parent__id
@@ -399,18 +403,20 @@
                         this.$store.dispatch('serviceCatalog/update', params).then(res => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["更新目录成功"]'),
-                                theme: 'success'
+                                theme: 'success',
                             })
                             // TODO 局部刷新
                             this.getTreeList()
                             this.toggleDialog()
                             // 确认保存后清空节点数据
                             // this.treeInfo.node = {}
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.clickSecond = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.clickSecond = false
+                            })
                     }
                 }, validator => {
 
@@ -419,12 +425,12 @@
             // 编辑目录
             openUpdate () {
                 if (!this.hasPermission(['catalog_edit'], this.$store.state.project.projectAuthActions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['catalog_edit'], this.$store.state.project.projectAuthActions, resourceData)
                     return
@@ -432,7 +438,7 @@
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择需要编辑的目录"]'),
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                     return
                 }
@@ -442,7 +448,7 @@
                     parent___name: this.treeInfo.node.parent_name,
                     id: this.treeInfo.node.id,
                     name: this.treeInfo.node.name,
-                    desc: this.treeInfo.node.desc
+                    desc: this.treeInfo.node.desc,
                 }
 
                 this.toggleDialog('update')
@@ -450,12 +456,12 @@
             // 删除
             openDelete () {
                 if (!this.hasPermission(['catalog_delete'], this.$store.state.project.projectAuthActions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['catalog_delete'], this.$store.state.project.projectAuthActions, resourceData)
                     return
@@ -463,14 +469,14 @@
                 if (!this.treeInfo.node.id) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请选择要删除的目录"]'),
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                     return
                 }
                 if (this.treeInfo.node.children && this.treeInfo.node.children.length) {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["请先删除子目录"]'),
-                        theme: 'warning'
+                        theme: 'warning',
                     })
                     return
                 }
@@ -486,16 +492,18 @@
                         this.$store.dispatch('serviceCatalog/delete', this.treeInfo.node.id).then(res => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除目录成功"]'),
-                                theme: 'success'
+                                theme: 'success',
                             })
                             this.getTreeList()
                             this.firstStatus = false
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.clickSecond = false
                         })
-                    }
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.clickSecond = false
+                            })
+                    },
                 })
             },
             onDragNode () {
@@ -507,18 +515,20 @@
                 }
                 this.clickSecond = true
                 const params = {
-                    new_order: arguments[0].currentParent.children.map(item => item.id)
+                    new_order: arguments[0].currentParent.children.map(item => item.id),
                 }
-                const id = arguments[0].dragNode.id
+                const { id } = arguments[0].dragNode
                 this.$store.dispatch('serviceCatalog/moveNode', { params, id }).then(res => {
                     // ...
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.clickSecond = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.clickSecond = false
+                    })
+            },
+        },
     }
 </script>
 

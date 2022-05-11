@@ -91,21 +91,21 @@
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             fields: {
                 type: Array,
                 required: true,
-                default: () => []
+                default: () => [],
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -114,20 +114,20 @@
                 firstInfo: this.item.val,
                 firstList: [],
                 secondInfo: '',
-                firstPlace: this.$t(`m.newCommon["请选择所属的厅委办"]`),
-                secondPlace: this.$t(`m.newCommon["请选择所属业务"]`),
-                clickChange: false
+                firstPlace: this.$t('m.newCommon["请选择所属的厅委办"]'),
+                secondPlace: this.$t('m.newCommon["请选择所属业务"]'),
+                clickChange: false,
             }
         },
         computed: {
             changeFields () {
                 return this.fields
-            }
+            },
         },
         watch: {
             'item.val' () {
                 this.changeInfo()
-            }
+            },
         },
         mounted () {
             this.changeInfo()
@@ -190,8 +190,8 @@
                         }
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

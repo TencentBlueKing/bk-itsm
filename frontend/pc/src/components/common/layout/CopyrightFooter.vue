@@ -30,9 +30,9 @@
         name: 'CopyrightFooter',
         computed: {
             ...mapState({
-                footer: state => state.common.footer
-            })
-        }
+                footer: state => state.common.footer,
+            }),
+        },
     }
 </script>
 <style lang="scss">

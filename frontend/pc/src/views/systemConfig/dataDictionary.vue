@@ -163,7 +163,7 @@
     export default {
         name: 'dataDictionary',
         components: {
-            addDataDirectory
+            addDataDirectory,
         },
         props: {},
         data () {
@@ -173,31 +173,31 @@
                 versionStatus: true,
                 // 模糊查询
                 searchInfo: {
-                    key: ''
+                    key: '',
                 },
                 // table数据和分页
                 dataList: [],
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 批量删除数据
                 checkList: [],
                 // 新增字典
                 customSettings: {
                     isShow: false,
-                    title: this.$t(`m.systemConfig["新增字典"]`),
-                    width: 700
+                    title: this.$t('m.systemConfig["新增字典"]'),
+                    width: 700,
                 },
                 // 侧边栏数据
-                slideData: {}
+                slideData: {},
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         watch: {},
         mounted () {
@@ -215,21 +215,20 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    'key__contains': this.searchInfo.key
+                    key__contains: this.searchInfo.key,
                 }
                 this.isDataLoading = true
                 this.$store.dispatch('datadict/list', params).then((res) => {
-                    this.dataList = res.data.items.map(item => {
-                        return { ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] }
-                    })
+                    this.dataList = res.data.items.map(item => ({ ...item, ownersInputValue: item.owners ? item.owners.split(',') : [] }))
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
                 }, (res) => {
                     errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -254,58 +253,62 @@
             deleteData (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认删除此数据字典？"]`),
+                    title: this.$t('m.systemConfig["确认删除此数据字典？"]'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('datadict/delete', id).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             if (this.dataList.length === 1) {
                                 this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
                             }
                             this.getList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             deleteAll () {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认删除此数据字典？"]`),
+                    title: this.$t('m.systemConfig["确认删除此数据字典？"]'),
                     confirmFn: () => {
                         const id = this.checkList.map(item => item.id).join(',')
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
-                        this.$store.dispatch('datadict/batchDelete', { id: id }).then((res) => {
+                        this.$store.dispatch('datadict/batchDelete', { id }).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getList(1)
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 新增字典
             openAddData (item) {
                 this.slideData = item
-                this.customSettings.title = item.id ? this.$t(`m.systemConfig["编辑字典"]`) : this.$t(`m.systemConfig["新增字典"]`)
+                this.customSettings.title = item.id ? this.$t('m.systemConfig["编辑字典"]') : this.$t('m.systemConfig["新增字典"]')
                 this.customSettings.isShow = true
             },
             closeAddData () {
@@ -314,8 +317,8 @@
             // 关闭版本提示信息
             closeVersion () {
                 this.versionStatus = false
-            }
-        }
+            },
+        },
     }
 </script>
 

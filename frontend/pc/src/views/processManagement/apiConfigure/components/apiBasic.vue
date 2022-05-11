@@ -168,8 +168,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -181,7 +181,7 @@
                     height: 200,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 responseDetailConfig: {
                     value: '',
@@ -189,20 +189,20 @@
                     height: 200,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 basicList: [
-                    { id: 'name', name: this.$t(`m.systemConfig["接口名称："]`), value: 'get_user_info' },
-                    { id: 'creator', name: this.$t(`m.systemConfig["创建人："]`), value: 'pitou' },
-                    { id: 'state', name: this.$t(`m.systemConfig["状态："]`), value: '草稿' },
-                    { id: 'update_time', name: this.$t(`m.systemConfig["更新时间："]`), value: '2019-05-07 10:42:42' },
-                    { id: 'path', name: this.$t(`m.systemConfig["接口路径："]`), code: 'GET', value: '/api/user/' },
-                    { id: 'desc', name: this.$t(`m.systemConfig["备注：："]`), value: 'test api' },
+                    { id: 'name', name: this.$t('m.systemConfig["接口名称："]'), value: 'get_user_info' },
+                    { id: 'creator', name: this.$t('m.systemConfig["创建人："]'), value: 'pitou' },
+                    { id: 'state', name: this.$t('m.systemConfig["状态："]'), value: '草稿' },
+                    { id: 'update_time', name: this.$t('m.systemConfig["更新时间："]'), value: '2019-05-07 10:42:42' },
+                    { id: 'path', name: this.$t('m.systemConfig["接口路径："]'), code: 'GET', value: '/api/user/' },
+                    { id: 'desc', name: this.$t('m.systemConfig["备注：："]'), value: 'test api' },
                     {
                         id: 'mock',
-                        name: this.$t(`m.systemConfig["Mock地址："]`),
-                        value: 'http://yapi.demo.qunar.com/mock/65300/api/user/'
-                    }
+                        name: this.$t('m.systemConfig["Mock地址："]'),
+                        value: 'http://yapi.demo.qunar.com/mock/65300/api/user/',
+                    },
                 ],
                 headersList: [
                     {
@@ -210,16 +210,16 @@
                         value: 'application/json',
                         is_necessary: true,
                         sample: '',
-                        desc: ''
-                    }
+                        desc: '',
+                    },
                 ],
                 queryList: [
                     {
                         name: 'aaa',
                         is_necessary: true,
                         sample: '1123',
-                        desc: ''
-                    }
+                        desc: '',
+                    },
                 ],
                 bodyList: [
                     {
@@ -228,8 +228,8 @@
                         is_necessary: false,
                         default: '',
                         desc: '',
-                        otherInfo: this.$t(`m.systemConfig["备注："]`) + 'test'
-                    }
+                        otherInfo: `${this.$t('m.systemConfig["备注："]')}test`,
+                    },
                 ],
                 resultList: [
                     {
@@ -238,43 +238,39 @@
                         is_necessary: false,
                         default: '',
                         desc: '',
-                        otherInfo: 'input: 123'
-                    }
-                ]
+                        otherInfo: 'input: 123',
+                    },
+                ],
             }
         },
         computed: {},
         watch: {
             apiDetailInfo (newVal, oldVal) {
                 this.initDate()
-            }
+            },
         },
         mounted () {
             this.initDate()
         },
         methods: {
             async bodyTableDataChange () {
-                const bodyTableData = JSON.parse(JSON.stringify(this.apiDetailInfo['bodyTableData']))
-                await bodyTableData.forEach(
-                    item => {
-                        item['children'] = []
-                    }
-                )
+                const bodyTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.bodyTableData))
+                await bodyTableData.forEach(item => {
+                    item.children = []
+                })
                 await this.recordChildren(bodyTableData)
                 this.bodyTableData = await bodyTableData
             },
             responseTableDataChange () {
-                this.responseTableData = JSON.parse(JSON.stringify(this.apiDetailInfo['responseTableData']))
-                this.responseTableData.forEach(
-                    item => {
-                        item['children'] = []
-                    }
-                )
+                this.responseTableData = JSON.parse(JSON.stringify(this.apiDetailInfo.responseTableData))
+                this.responseTableData.forEach(item => {
+                    item.children = []
+                })
                 this.recordChildren(this.responseTableData)
             },
             initDate () {
-                if (this.apiDetailInfo['bodyJsonData']) {
-                    this.bodyDetailConfig.value = JSON.stringify(this.apiDetailInfo['bodyJsonData']['root'], null, 4)
+                if (this.apiDetailInfo.bodyJsonData) {
+                    this.bodyDetailConfig.value = JSON.stringify(this.apiDetailInfo.bodyJsonData.root, null, 4)
                 }
                 this.bodyTableDataChange()
                 this.responseTableDataChange()
@@ -284,49 +280,35 @@
             },
             changeState (item) {
                 item.showChildren = !item.showChildren
-                item.children.forEach(
-                    ite => {
-                        ite['isShow'] = item.showChildren
-                    }
-                )
+                item.children.forEach(ite => {
+                    ite.isShow = item.showChildren
+                })
                 if (!item.showChildren) {
                     this.closeChildren(item)
                 }
             },
             closeChildren (item) {
-                item.children.forEach(
-                    ite => {
-                        ite['isShow'] = false
-                        if (ite.has_children) {
-                            ite['showChildren'] = false
-                            this.closeChildren(ite)
-                        }
+                item.children.forEach(ite => {
+                    ite.isShow = false
+                    if (ite.has_children) {
+                        ite.showChildren = false
+                        this.closeChildren(ite)
                     }
-                )
+                })
             },
             recordChildren (tableData) {
-                const levelList = tableData.map(
-                    item => {
-                        return item['level']
-                    }
-                )
+                const levelList = tableData.map(item => item.level)
                 const maxLevel = Math.max(...levelList)
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => {
-                        return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                    })[0].children.push(item)
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
                 }
                 for (let i = maxLevel; i > 0; i--) {
-                    tableData.filter(item => {
-                        return item.level === i
-                    }).forEach(
-                        ite => {
-                            recordChildrenStep(tableData, ite)
-                        }
-                    )
+                    tableData.filter(item => item.level === i).forEach(ite => {
+                        recordChildrenStep(tableData, ite)
+                    })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

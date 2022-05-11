@@ -107,52 +107,52 @@
     export default {
         name: 'bk-tree',
         components: {
-            CollapseTransition
+            CollapseTransition,
         },
         props: {
             data: {
                 type: Array,
-                default: () => []
+                default: () => [],
             },
             parent: {
                 type: Object,
-                default: () => null
+                default: () => null,
             },
             multiple: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             nodeKey: {
                 type: String,
-                default: 'id'
+                default: 'id',
             },
             draggable: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             dragSort: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             hasBorder: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             dragAfterExpanded: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             isDeleteRoot: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             emptyText: {
                 type: String,
                 default () {
-                    return this.$t(`m.serviceConfig["暂无数据"]`)
-                }
+                    return this.$t('m.serviceConfig["暂无数据"]')
+                },
             },
-            tpl: Function
+            tpl: Function,
         },
         data () {
             return {
@@ -162,7 +162,7 @@
                 visibleStatus: [],
                 isEmpty: false,
                 searchFlag: false,
-                isDragSort: this.dragSort
+                isDragSort: this.dragSort,
             }
         },
         watch: {
@@ -174,7 +174,7 @@
             },
             hasBorder (value) {
                 this.isBorder = !!value
-            }
+            },
         },
         mounted () {
             /**
@@ -267,15 +267,15 @@
              * 设置拖拽节点
              */
             setDragNode (id, node) {
-                window['bkTreeDrag'] = {}
-                window['bkTreeDrag'][id] = node
+                window.bkTreeDrag = {}
+                window.bkTreeDrag[id] = node
             },
 
             /**
              * 获取拖拽节点
              */
             getDragNode (id) {
-                return window['bkTreeDrag'][id]
+                return window.bkTreeDrag[id]
             },
 
             /**
@@ -315,12 +315,10 @@
                 if (node.children && node.children.length) {
                     if (node.expanded) {
                         return node.openedIcon
-                    } else {
-                        return node.closedIcon
                     }
-                } else {
-                    return node.icon
+                    return node.closedIcon
                 }
+                return node.icon
             },
 
             /**
@@ -524,7 +522,7 @@
                 } else {
                     parent.children.push(addnode)
                 }
-                this.$emit('addNode', { parentNode: parent, newNode: newNode })
+                this.$emit('addNode', { parentNode: parent, newNode })
             },
 
             /**
@@ -655,7 +653,7 @@
                 this.$emit('on-click', node)
                 const param = {
                     node,
-                    event
+                    event,
                 }
                 this.$emit('on-icon', param)
             },
@@ -675,7 +673,7 @@
                         if (node[key] === value) {
                             if (!keyValue.length || !keyValue) {
                                 const n = Object.assign({}, node)
-                                delete n['parent']
+                                delete n.parent
                                 if (!(n.children && n.children.length)) {
                                     res.push(n)
                                 }
@@ -712,9 +710,8 @@
             getNode (keyParton) {
                 if (!this.multiple) {
                     return this.nodeDataHandler({ selected: true }, this.data, keyParton)
-                } else {
-                    return this.nodeDataHandler({ checked: true }, this.data, keyParton)
                 }
+                return this.nodeDataHandler({ checked: true }, this.data, keyParton)
             },
 
             /**
@@ -727,7 +724,7 @@
                 // this.searchFlag = true
                 data = data || this.data
                 for (const node of data) {
-                    const searched = filter ? (typeof filter === 'function' ? filter(node) : node['name'].indexOf(filter) > -1) : false
+                    const searched = filter ? (typeof filter === 'function' ? filter(node) : node.name.indexOf(filter) > -1) : false
                     this.$set(node, 'searched', searched)
                     this.$set(node, 'visible', false)
                     this.$emit('toggleshow', node, filter ? searched : true)
@@ -740,8 +737,8 @@
                         this.searchNode(filter, node.children)
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

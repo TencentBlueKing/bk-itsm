@@ -41,8 +41,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -53,18 +53,18 @@
             // 基本设置
             basicInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.detailInfoOri
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.DetailInfo = newVal
-                }
-            }
+                },
+            },
         },
         methods: {
             
-        }
+        },
     }
 </script>
 

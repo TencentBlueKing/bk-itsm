@@ -33,25 +33,25 @@
         props: {
             height: {
                 type: Number,
-                default: 320
+                default: 320,
             },
             chartData: {
                 type: Object,
                 default () {
                     return {
                         labels: [],
-                        value: []
+                        value: [],
                     }
-                }
+                },
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                chartInstance: null
+                chartInstance: null,
             }
         },
         watch: {
@@ -59,7 +59,7 @@
                 if (!val) {
                     this.updateChart()
                 }
-            }
+            },
         },
         mounted () {
             this.init()
@@ -84,16 +84,16 @@
                                 '#43bdb1',
                                 '#edb073',
                                 '#d8a6ef',
-                                '#f0a9a9'
+                                '#f0a9a9',
                             ],
-                            data: value
-                        }]
+                            data: value,
+                        }],
                     },
                     options: {
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: 'right'
+                                position: 'right',
                             },
                             tooltip: {
                                 callbacks: {
@@ -101,19 +101,19 @@
                                         const total = context.dataset.data.reduce((a, c) => a + c)
                                         const percent = (context.dataPoint / total * 100).toFixed(2)
                                         return `${context.label}: ${percent}%`
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    },
+                                },
+                            },
+                        },
+                    },
                 })
             },
             updateChart () {
                 this.chartInstance.data.datasets[0].data = this.chartData.value
                 this.chartInstance.data.labels = this.chartData.labels
                 this.chartInstance.update()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

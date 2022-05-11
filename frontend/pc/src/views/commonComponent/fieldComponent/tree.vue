@@ -65,28 +65,28 @@
     export default {
         name: 'TREESELECT',
         components: {
-            exportTree
+            exportTree,
         },
         mixins: [mixins],
         props: {
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             fields: {
                 type: Array,
                 required: true,
-                default: () => []
+                default: () => [],
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -94,8 +94,8 @@
                 treeSlectInfo: {
                     show: false,
                     treeDataList: [],
-                    info: {}
-                }
+                    info: {},
+                },
             }
         },
         computed: {
@@ -107,7 +107,7 @@
                     this.treeData(tree)
                 })
                 this.conditionField(this.item, this.fields)
-            }
+            },
         },
         async mounted () {
             this.$nextTick(() => {
@@ -126,13 +126,13 @@
                 if (this.item.source_type === 'RPC') {
                     url = 'apiRemote/getRpcData'
                     params = {
-                        source_uri: this.item.source_uri
+                        source_uri: this.item.source_uri,
                     }
                 } else if (this.item.source_type === 'DATADICT') {
                     url = 'dictdata/getTreeInfo'
                     params = {
                         key: this.item.source_uri,
-                        view_type: 'tree'
+                        view_type: 'tree',
                     }
                 }
                 this.$store.dispatch(url, params).then(res => {
@@ -141,9 +141,10 @@
                     this.treeSlectInfo.treeDataList.forEach(tree => {
                         this.treeData(tree)
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             showTree () {
                 if (this.disabled) return
@@ -216,8 +217,8 @@
             toggleChildren (item) {
                 item.showChildren = !item.showChildren
                 this.treeSlectInfo.treeDataList = JSON.parse(JSON.stringify(this.treeSlectInfo.treeDataList))
-            }
-        }
+            },
+        },
     }
 </script>
 

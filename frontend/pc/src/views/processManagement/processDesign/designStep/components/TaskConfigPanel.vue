@@ -107,7 +107,7 @@
             taskId: '',
             createNodeId: '',
             dealNodeId: '',
-            others: [1, 2]
+            others: [1, 2],
         }
     }
     export default {
@@ -118,8 +118,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -127,31 +127,31 @@
                     taskId: [
                         {
                             required: true,
-                            message: this.$t(`m.taskTemplate['请选择任务模板']`),
-                            trigger: 'blur'
-                        }
+                            message: this.$t('m.taskTemplate[\'请选择任务模板\']'),
+                            trigger: 'blur',
+                        },
                     ],
                     createNodeId: [
                         {
                             required: true,
-                            message: this.$t(`m['请选择可创建任务节点']`),
-                            trigger: 'blur'
-                        }
+                            message: this.$t('m[\'请选择可创建任务节点\']'),
+                            trigger: 'blur',
+                        },
                     ],
                     dealNodeId: [
                         {
                             required: true,
-                            message: this.$t(`m['请选择可处理任务的节点']`),
-                            trigger: 'blur'
-                        }
-                    ]
+                            message: this.$t('m[\'请选择可处理任务的节点\']'),
+                            trigger: 'blur',
+                        },
+                    ],
                 },
                 taskTemplateList: [],
                 normalNodeList: [],
                 taskConditionList: [],
                 selectedDealNodeIds: [],
                 useTask: false,
-                nodeListLoading: false
+                nodeListLoading: false,
             }
         },
         computed: {
@@ -163,7 +163,7 @@
                     }
                 }
                 return []
-            }
+            },
         },
         async created () {
             this.initTaskCondition()
@@ -183,7 +183,7 @@
                                 dealNodeId: setting.execute_task_state,
                                 others: [],
                                 dealLoading: false,
-                                dealList: []
+                                dealList: [],
                             }
                             if (setting.execute_can_create) {
                                 con.others.push(1)
@@ -205,7 +205,7 @@
             getTaskTemplateList () {
                 const params = {
                     // name__icontains: '',
-                    is_draft: false
+                    is_draft: false,
                 }
                 return this.$store.dispatch('taskTemplate/getTemplateList', params).then(res => {
                     this.taskTemplateList = res.data.filter(task => {
@@ -215,20 +215,23 @@
                         }
                         return true
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取流程节点
             async getNodeList () {
                 this.nodeListLoading = true
                 return this.$store.dispatch('deployCommon/getStates', { workflow: this.workflowInfo.id }).then(res => {
                     this.normalNodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.nodeListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.nodeListLoading = false
+                    })
             },
             // 选择创建节点的回调
             getCanDealNodeList (createNodeId, item) {
@@ -238,11 +241,13 @@
                 this.$set(item, 'dealLoading', true)
                 return this.$store.dispatch('deployCommon/getOrderedStates', { id: createNodeId }).then(res => {
                     item.dealList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.$set(item, 'dealLoading', false)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.$set(item, 'dealLoading', false)
+                    })
             },
             getAllDealNodeIds () {
                 this.selectedDealNodeIds = this.taskConditionList.map(condition => condition.dealNodeId).filter(id => !!id)
@@ -281,19 +286,19 @@
                     return []
                 }
                 return this.taskConditionList.map(condition => ({
-                    'create_task_state': condition.createNodeId,
-                    'task_schema_id': condition.taskId,
-                    'execute_task_state': condition.dealNodeId,
-                    'need_task_finished': condition.others.indexOf(2) !== -1,
-                    'execute_can_create': condition.others.indexOf(1) !== -1
+                    create_task_state: condition.createNodeId,
+                    task_schema_id: condition.taskId,
+                    execute_task_state: condition.dealNodeId,
+                    need_task_finished: condition.others.indexOf(2) !== -1,
+                    execute_can_create: condition.others.indexOf(1) !== -1,
                 }))
             },
             handleUseTaskChange (val) {
                 if (val && !this.taskConditionList.length) {
                     this.onAddCondition()
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

@@ -31,8 +31,8 @@
     export default {
         name: 'ProjectTicket',
         components: {
-            AllTicketList
-        }
+            AllTicketList,
+        },
     }
 </script>
 <style lang="scss" scoped>

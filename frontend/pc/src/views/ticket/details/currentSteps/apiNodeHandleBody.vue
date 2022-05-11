@@ -124,17 +124,17 @@
         components: {
             getParam,
             postParam,
-            responseDataNode
+            responseDataNode,
         },
         props: {
             nodeInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             basicInfomation: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -148,21 +148,21 @@
                         name: this.$t('m.task["重试"]'),
                         theme: 'primary',
                         key: 'retry',
-                        notice: this.$t('m.task["将会以当前的填写的参数进行重试"]')
+                        notice: this.$t('m.task["将会以当前的填写的参数进行重试"]'),
                     },
                     {
                         name: this.$t('m.task["手动修改"]'),
                         theme: 'default',
                         key: 'hand',
-                        notice: this.$t('m.task["系统将以修改后的结果为节点的最终完成结果"]')
+                        notice: this.$t('m.task["系统将以修改后的结果为节点的最终完成结果"]'),
                     },
                     {
                         name: this.$t('m.task["忽略"]'),
                         theme: 'default',
                         key: 'ignore',
-                        notice: this.$t('m.task["执行忽略，将会以当前输出的信息为完成结果，继续后续流程"]')
-                    }
-                ]
+                        notice: this.$t('m.task["执行忽略，将会以当前输出的信息为完成结果，继续后续流程"]'),
+                    },
+                ],
             }
         },
         computed: {
@@ -179,18 +179,18 @@
             },
             operationTips () {
                 const tipsMap = {
-                    'retry': this.$t('m.newCommon["请重新修改以下参数后再重试："]'),
-                    'hand': this.$t('m.newCommon["执行手动修改，需要根据接口要求填写相应参数信息（若无参数要求，可留空或忽略）："]')
+                    retry: this.$t('m.newCommon["请重新修改以下参数后再重试："]'),
+                    hand: this.$t('m.newCommon["执行手动修改，需要根据接口要求填写相应参数信息（若无参数要求，可留空或忽略）："]'),
                 }
                 return tipsMap[this.operationType] || ''
-            }
+            },
         },
         watch: {
             reason () {
                 this.$nextTick(() => {
                     this.addTruncatedAttr()
                 })
-            }
+            },
         },
         mounted () {
             this.getNodeLog()
@@ -202,14 +202,15 @@
             getNodeLog () {
                 const params = {
                     ticket: this.basicInfomation.id,
-                    from_state_id: this.nodeInfo.state_id
+                    from_state_id: this.nodeInfo.state_id,
                 }
                 this.$store.dispatch('deployOrder/getNodeLog', { params }).then(res => {
                     const lastLog = res.data.pop()
                     this.reason = lastLog ? lastLog.message : ''
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             /**
              * 文字溢出时添加 truncated 属性
@@ -280,8 +281,8 @@
                     const verifiFailedItem = body.find(item => item.is_necessary && isEmpty(item.customValue) && !item.children.length)
                     if (verifiFailedItem) {
                         this.$bkMessage({
-                            message: verifiFailedItem.key + this.$t(`m.newCommon["为必填项！"]`),
-                            theme: 'warning'
+                            message: verifiFailedItem.key + this.$t('m.newCommon["为必填项！"]'),
+                            theme: 'warning',
                         })
                         return false
                     }
@@ -291,8 +292,8 @@
                     const verifiFailedItem = body.find(item => item.is_necessary && isEmpty(item.customValue) && !item.children.length)
                     if (verifiFailedItem) {
                         this.$bkMessage({
-                            message: verifiFailedItem.key + this.$t(`m.newCommon["为必填项！"]`),
-                            theme: 'warning'
+                            message: verifiFailedItem.key + this.$t('m.newCommon["为必填项！"]'),
+                            theme: 'warning',
                         })
                         return false
                     }
@@ -302,8 +303,8 @@
                     const verifiFailedItem = body.find(item => item.is_necessary && isEmpty(item.customValue) && !item.children.length)
                     if (verifiFailedItem) {
                         this.$bkMessage({
-                            message: verifiFailedItem.key + this.$t(`m.newCommon["为必填项！"]`),
-                            theme: 'warning'
+                            message: verifiFailedItem.key + this.$t('m.newCommon["为必填项！"]'),
+                            theme: 'warning',
                         })
                         return false
                     }
@@ -325,7 +326,7 @@
                         if (type === 'hand' || type === 'ignore') {
                             this.onIgnoreNode(this.operationType === 'hand')
                         }
-                    }
+                    },
                 })
             },
             // 节点重试
@@ -339,18 +340,19 @@
                 const inputs = this.getInputsParams(data)
                 const params = {
                     inputs,
-                    state_id: this.nodeInfo.state_id
+                    state_id: this.nodeInfo.state_id,
                 }
                 this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.basicInfomation.id }).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["提交成功"]'),
+                        theme: 'success',
                     })
                     this.$emit('updateOrderStatus')
                     this.onCancel()
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 忽略节点（手动修改输出参数/自动成功）
             onIgnoreNode (fillParam = false) {
@@ -362,18 +364,19 @@
                 const params = {
                     inputs,
                     state_id: this.nodeInfo.state_id,
-                    is_direct: !fillParam
+                    is_direct: !fillParam,
                 }
                 this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.basicInfomation.id }).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["提交成功"]'),
+                        theme: 'success',
                     })
                     this.$emit('updateOrderStatus')
                     this.onCancel()
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取输入参数对象
             getInputsParams (data) {
@@ -408,7 +411,7 @@
             getParentKeyPath (list, field, index) {
                 const parentKeyPath = []
                 if (field.parentPrimaryKey) {
-                    let parentField, parentFieldIndex
+                    let parentField; let parentFieldIndex
                     parentKeyPath.push(field.parentPrimaryKey)
                     list.slice(0, index).forEach((item, i) => {
                         if (item.primaryKey === field.parentPrimaryKey) {
@@ -421,8 +424,8 @@
                     }
                 }
                 return parentKeyPath
-            }
-        }
+            },
+        },
     }
 </script>
 

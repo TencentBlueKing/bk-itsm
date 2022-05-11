@@ -28,8 +28,8 @@ const Sideslider = (options = {
     title: 'title',
     formData: [],
     context: {
-        schemes: {}
-    }
+        schemes: {},
+    },
 }) => {
     const instance = new SidesliderConstructor({
         el: document.createElement('div'),
@@ -37,11 +37,11 @@ const Sideslider = (options = {
             isShow: false,
             title: options.title,
             formData: options.formData,
-            context: options.context
+            context: options.context,
         },
         data: {
-            isShow: false
-        }
+            isShow: false,
+        },
     })
     instance.viewmodel = instance.$mount()
     const parent = document.body

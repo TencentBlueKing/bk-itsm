@@ -47,15 +47,15 @@
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             desc: {
                 type: String,
-                default: ''
+                default: '',
             },
             showTimeDimension: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             timeDimensions: {
                 type: Array,
@@ -63,68 +63,68 @@
                     return [
                         {
                             key: 'days',
-                            name: i18n.t(`m['天']`)
+                            name: i18n.t('m[\'天\']'),
                         },
                         {
                             key: 'weeks',
-                            name: i18n.t(`m['周']`)
+                            name: i18n.t('m[\'周\']'),
                         },
                         {
                             key: 'months',
-                            name: i18n.t(`m['月']`)
+                            name: i18n.t('m[\'月\']'),
                         },
                         {
                             key: 'years',
-                            name: i18n.t(`m['年']`)
-                        }
+                            name: i18n.t('m[\'年\']'),
+                        },
                     ]
-                }
+                },
             },
             dimension: {
                 type: String,
-                default: ''
+                default: '',
             },
             min: {
                 type: Number,
-                default: 0
+                default: 0,
             },
             bgColor: {
                 type: String,
-                default: 'rgba(37,91,175,0.3)'
+                default: 'rgba(37,91,175,0.3)',
             },
             gradientColor: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             xAxisName: {
                 type: String,
-                default: ''
+                default: '',
             },
             yAxisName: {
                 type: String,
-                default: ''
+                default: '',
             },
             height: {
                 type: Number,
-                default: 320
+                default: 320,
             },
             chartData: {
                 type: Object,
                 default () {
                     return {
                         x: [],
-                        y: []
+                        y: [],
                     }
-                }
+                },
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                chartInstance: null
+                chartInstance: null,
             }
         },
         watch: {
@@ -132,7 +132,7 @@
                 if (!val) {
                     this.updateChart()
                 }
-            }
+            },
         },
         mounted () {
             this.init()
@@ -159,37 +159,37 @@
                             data: y,
                             fill: 'start',
                             backgroundColor: bgColor,
-                            borderWidth: 0
-                        }]
+                            borderWidth: 0,
+                        }],
                     },
                     options: {
                         maintainAspectRatio: false,
                         // bezierCurve: false,
                         plugins: {
                             legend: {
-                                display: false
-                            }
+                                display: false,
+                            },
                         },
                         scales: {
                             x: {
                                 gridLines: {
-                                    display: false
-                                }
+                                    display: false,
+                                },
                             },
                             y: {
                                 gridLines: {
-                                    borderDash: [5, 3]
+                                    borderDash: [5, 3],
                                 },
                                 ticks: {
-                                    precision: 0
+                                    precision: 0,
                                 },
-                                min: this.min
-                            }
+                                min: this.min,
+                            },
                         },
                         crosshair: {
-                            enabled: true
-                        }
-                    }
+                            enabled: true,
+                        },
+                    },
                 })
             },
             updateChart () {
@@ -199,8 +199,8 @@
             },
             onSelectDimension (val) {
                 this.$emit('onDimensionChange', val)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

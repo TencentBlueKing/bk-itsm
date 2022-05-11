@@ -146,28 +146,28 @@
     export default {
         name: 'changeConductor',
         components: {
-            memberInfo
+            memberInfo,
         },
         props: {
             itemInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             origin: {
                 type: String,
-                default: 'normal'
+                default: 'normal',
             },
             index: {
-                type: Number
-            }
+                type: Number,
+            },
         },
         data () {
             return {
                 precision: 0,
                 insertValue: '',
-                variableList: []
+                variableList: [],
             }
         },
         computed: {
@@ -175,13 +175,13 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         watch: {
-            triggerVariables: function (newVal) {
+            triggerVariables (newVal) {
                 this.variableList = newVal
-            }
+            },
         },
         created () {
             // 如果是单选或者多选的时候且可引用变量时，在choice添加引用变量的选项
@@ -189,7 +189,7 @@
                 if (!this.itemInfo.choice.some(node => node.key === 'VARIABLE')) {
                     this.itemInfo.choice.push({
                         key: 'VARIABLE',
-                        name: '引用变量'
+                        name: '引用变量',
                     })
                     const valueInfo = this.itemInfo.type === 'MULTISELECT' ? [] : ''
                     this.$set(this.itemInfo, 'insertValue', valueInfo)
@@ -222,9 +222,9 @@
             changeInsert (value) {
                 this.itemInfo.value = insertText(
                     this.$el.querySelector('.bk-form-textarea, .bk-form-input'),
-                    'conductorId' + this.index,
+                    `conductorId${this.index}`,
                     this.itemInfo.value,
-                    '${' + value + '}',
+                    `\${${value}}`,
                     this
                 )
                 this.itemInfo.referenceType = 'import'
@@ -237,8 +237,8 @@
                 if (value && this.origin === 'message') {
                     this.$emit('change-panel-status')
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

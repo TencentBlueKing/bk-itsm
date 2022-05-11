@@ -37,15 +37,15 @@
             const image = img500
             return {
                 show: false,
-                message: message,
-                image: image
+                message,
+                image,
             }
         },
         created () {
             setTimeout(() => {
                 this.show = true
             }, this.delay)
-        }
+        },
     }
 </script>
 

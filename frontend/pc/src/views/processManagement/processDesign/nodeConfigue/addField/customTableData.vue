@@ -70,26 +70,26 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 typeList: [
-                    { id: 'input', name: this.$t(`m.treeinfo["输入框"]`) },
-                    { id: 'select', name: this.$t(`m.treeinfo["单选框"]`) },
-                    { id: 'multiselect', name: this.$t(`m.treeinfo["多选框"]`) },
-                    { id: 'datetime', name: this.$t(`m.treeinfo["时间"]`) },
-                    { id: 'date', name: this.$t(`m.treeinfo["日期"]`) }
+                    { id: 'input', name: this.$t('m.treeinfo["输入框"]') },
+                    { id: 'select', name: this.$t('m.treeinfo["单选框"]') },
+                    { id: 'multiselect', name: this.$t('m.treeinfo["多选框"]') },
+                    { id: 'datetime', name: this.$t('m.treeinfo["时间"]') },
+                    { id: 'date', name: this.$t('m.treeinfo["日期"]') },
                 ],
                 trueStatus: true,
-                falseStatus: false
+                falseStatus: false,
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         mounted () {
             
@@ -100,7 +100,7 @@
                     name: '',
                     display: 'input',
                     choice: '',
-                    required: false
+                    required: false,
                 }
                 this.customTableInfo.list.splice(index + 1, 0, valueInfo)
             },
@@ -109,8 +109,8 @@
                     return
                 }
                 this.customTableInfo.list.splice(index, 1)
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -216,21 +216,21 @@
         components: {
             StepSubmitDialog,
             TicketTriggerDialog,
-            EvaluationTicketModal
+            EvaluationTicketModal,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             headerInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             ticketTriggerList: {
                 type: Array,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -238,9 +238,9 @@
                 hasAttention: false,
                 rotate: false,
                 isDropdownShow: false,
-                disabledText: this.$t(`m.newCommon["暂无权限或单据已结束"]`),
+                disabledText: this.$t('m.newCommon["暂无权限或单据已结束"]'),
                 ticketOperateType: '',
-                localeCookie: false
+                localeCookie: false,
             }
         },
         mounted () {
@@ -253,25 +253,26 @@
             },
             // 关注
             onAttention () {
-                const id = this.ticketInfo.id
+                const { id } = this.ticketInfo
                 const params = {
-                    attention: !this.hasAttention
+                    attention: !this.hasAttention,
                 }
-                const bkMessage = this.hasAttention ? this.$t(`m.manageCommon['取消关注成功~']`) : this.$t(`m.manageCommon['添加关注成功~']`)
+                const bkMessage = this.hasAttention ? this.$t('m.manageCommon[\'取消关注成功~\']') : this.$t('m.manageCommon[\'添加关注成功~\']')
                 this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: bkMessage,
                         theme: 'success',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
                     this.hasAttention = !this.hasAttention
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error',
-                        ellipsisLine: 0
-                    })
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                            ellipsisLine: 0,
+                        })
+                    })
             },
             // 单据操作按钮点击
             onTicketBtnClick (type, item) {
@@ -280,7 +281,7 @@
                 switch (type) {
                     case 'print':
                         const { href } = this.$router.resolve({
-                            path: `/printOrder?ticket_id=${this.ticketInfo.id}`
+                            path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
                         })
                         window.open(href, '_blank')
                         break
@@ -310,22 +311,22 @@
             // 二次确认操作
             confirmOperating (type) {
                 const infoMap = {
-                    'widthdraw': {
-                        title: this.$t(`m.newCommon["确认撤销此单据？"]`),
-                        instructions: this.$t(`m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]`),
+                    widthdraw: {
+                        title: this.$t('m.newCommon["确认撤销此单据？"]'),
+                        instructions: this.$t('m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]'),
                         dispatchAcationPath: 'deployOrder/widthdrawOrder',
-                        successText: this.$t(`m.newCommon["撤单成功"]`),
+                        successText: this.$t('m.newCommon["撤单成功"]'),
                         params: {
-                            state_id: this.ticketInfo.id
-                        }
+                            state_id: this.ticketInfo.id,
+                        },
                     },
-                    'supervise': {
-                        title: this.$t(`m.newCommon["确认督办该节点？"]`),
-                        instructions: this.$t(`m.newCommon["执行督办操作后，将发送信息至处理人。"]`),
+                    supervise: {
+                        title: this.$t('m.newCommon["确认督办该节点？"]'),
+                        instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
                         dispatchAcationPath: 'change/submitSupervise',
-                        successText: this.$t(`m.newCommon["督办成功"]`),
-                        params: {}
-                    }
+                        successText: this.$t('m.newCommon["督办成功"]'),
+                        params: {},
+                    },
                 }
                 this.$bkInfo({
                     type: 'warning',
@@ -333,25 +334,27 @@
                     subTitle: infoMap[type].instructions,
                     confirmFn: () => {
                         this.submitOperating(type, infoMap)
-                    }
+                    },
                 })
             },
             // 提交操作
             submitOperating (type, infoMap) {
                 this.isSubmitting = true
-                const id = this.ticketInfo.id
+                const { id } = this.ticketInfo
                 const { dispatchAcationPath, params, successText } = infoMap[type]
                 this.$store.dispatch(dispatchAcationPath, { params, id }).then((res) => {
                     this.$bkMessage({
                         message: successText,
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.reloadTicket()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isSubmitting = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isSubmitting = false
+                    })
             },
             // 单据手动触发器
             openTriggerDialog (trigger) {
@@ -381,20 +384,20 @@
                     this.$router.push({
                         name: 'projectTicket',
                         query: {
-                            project_id: this.$route.query.project_id
-                        }
+                            project_id: this.$route.query.project_id,
+                        },
                     })
                 } else if (from === 'created') {
                     this.$router.push({
-                        name: 'myCreatedTicket'
+                        name: 'myCreatedTicket',
                     })
                 } else {
                     this.$router.push({
-                        name: from
+                        name: from,
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

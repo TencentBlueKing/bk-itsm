@@ -38,30 +38,30 @@ export default {
                     // showChildren: !level,
                     showChildren: true,
                     checkInfo: false,
-                    key: key,
-                    type: valueJsonData['type'] || '',
-                    desc: valueJsonData['description'].toString(),
-                    default: (valueJsonData['default'] !== undefined && valueJsonData['default'].toString()) ? valueJsonData['default'] : '',
+                    key,
+                    type: valueJsonData.type || '',
+                    desc: valueJsonData.description.toString(),
+                    default: (valueJsonData.default !== undefined && valueJsonData.default.toString()) ? valueJsonData.default : '',
                     is_necessary: !level || (!!requiredList && !!requiredList.length && requiredList.indexOf(key) !== -1),
                     children: [],
-                    value: (valueJsonData['default'] !== undefined) ? valueJsonData['default'] : ''
+                    value: (valueJsonData.default !== undefined) ? valueJsonData.default : '',
                 }
-                if (valueList['type'] === 'object') {
-                    valueList['has_children'] = !!(valueJsonData['properties'] && Object.keys(valueJsonData['properties']).length)
+                if (valueList.type === 'object') {
+                    valueList.has_children = !!(valueJsonData.properties && Object.keys(valueJsonData.properties).length)
                 }
-                if (valueList['type'] === 'array') {
-                    valueList['has_children'] = valueJsonData['items']
-                    valueList['showChildren'] = true
+                if (valueList.type === 'array') {
+                    valueList.has_children = valueJsonData.items
+                    valueList.showChildren = true
                 }
                 jsonDataList.push(valueList)
                 // jsonDataList[jsonDataList.length-1]['parentInfo'] = level ? jsonDataList[jsonDataList.length-1] : ''
-                if (valueList['type'] === 'object') {
-                    for (const p in valueJsonData['properties']) {
-                        jsonToListStep(valueList['children'], p, valueJsonData['properties'][p], 1, valueJsonData['required'] || [])
+                if (valueList.type === 'object') {
+                    for (const p in valueJsonData.properties) {
+                        jsonToListStep(valueList.children, p, valueJsonData.properties[p], 1, valueJsonData.required || [])
                     }
                 }
-                if (valueList['type'] === 'array' && valueJsonData['items']) {
-                    jsonToListStep(valueList['children'], 'items', valueJsonData['items'], 1, valueJsonData['required'] || [])
+                if (valueList.type === 'array' && valueJsonData.items) {
+                    jsonToListStep(valueList.children, 'items', valueJsonData.items, 1, valueJsonData.required || [])
                 }
             }
             for (const key in jsonData) {
@@ -99,48 +99,44 @@ export default {
                 }
                 const valueList = {}
                 valueList[item.key] = {
-                    'type': item.type,
-                    'description': item.desc.toString(),
-                    'required': (item.children && item.children.length) ? item.children.filter(item => {
-                        return item['is_necessary']
-                    }).map(ite => {
-                        return ite.key
-                    }) : []
+                    type: item.type,
+                    description: item.desc.toString(),
+                    required: (item.children && item.children.length) ? item.children.filter(item => item.is_necessary).map(ite => ite.key) : [],
                 }
-                if (!valueList[item.key]['required'].length) {
-                    delete valueList[item.key]['required']
+                if (!valueList[item.key].required.length) {
+                    delete valueList[item.key].required
                 }
                 if (!level) {
-                    valueList[item.key]['$schema'] = 'http://json-schema.org/draft-04/schema#'
+                    valueList[item.key].$schema = 'http://json-schema.org/draft-04/schema#'
                 }
                 if (item.type === 'array') {
-                    if (item['children'].length) {
-                        valueList[item.key]['items'] = {}
+                    if (item.children.length) {
+                        valueList[item.key].items = {}
                     }
                     if (lastType === 'array') {
                         Object.assign(jsonDataDict, valueList[item.key])
-                        for (const j in item['children']) {
-                            listToJsonStep(jsonDataDict['items'], item['children'][j], 1, 'array')
+                        for (const j in item.children) {
+                            listToJsonStep(jsonDataDict.items, item.children[j], 1, 'array')
                         }
                     }
                     if (lastType === 'object') {
                         Object.assign(jsonDataDict, valueList)
-                        for (const j in item['children']) {
-                            listToJsonStep(jsonDataDict[item.key]['items'], item['children'][j], 1, 'array')
+                        for (const j in item.children) {
+                            listToJsonStep(jsonDataDict[item.key].items, item.children[j], 1, 'array')
                         }
                     }
                 } else if (item.type === 'object') {
-                    valueList[item.key]['properties'] = {}
+                    valueList[item.key].properties = {}
                     if (lastType === 'array') {
                         Object.assign(jsonDataDict, valueList[item.key])
-                        for (const j in item['children']) {
-                            listToJsonStep(jsonDataDict['properties'], item['children'][j], 1, 'object')
+                        for (const j in item.children) {
+                            listToJsonStep(jsonDataDict.properties, item.children[j], 1, 'object')
                         }
                     }
                     if (lastType === 'object') {
                         Object.assign(jsonDataDict, valueList)
-                        for (const j in item['children']) {
-                            listToJsonStep(jsonDataDict[item.key]['properties'], item['children'][j], 1, 'object')
+                        for (const j in item.children) {
+                            listToJsonStep(jsonDataDict[item.key].properties, item.children[j], 1, 'object')
                         }
                     }
                 } else {
@@ -156,7 +152,7 @@ export default {
                         }
                     }
                     // 根据数据 初始化默认值
-                    valueList[item.key]['default'] = item.default.toString() ? item.default : ''
+                    valueList[item.key].default = item.default.toString() ? item.default : ''
                     // 更新默认值
                     if (item.default_temp !== undefined && item.default_temp.toString()) {
                         if (item.type === 'number') {
@@ -171,7 +167,7 @@ export default {
                     }
                     // 更新默认值
                     if (isUpdate === 'update') {
-                        valueList[item.key]['default'] = item.default_temp.toString() ? item.default_temp : ''
+                        valueList[item.key].default = item.default_temp.toString() ? item.default_temp : ''
                     }
 
                     if (lastType === 'array') {
@@ -304,13 +300,13 @@ export default {
         // json --> jsonschema
         jsonToJsonschema (jsonData) {
             const jsonDataDict = {
-                'root': {
-                    '$schema': 'http://json-schema.org/draft-04/schema#',
-                    'type': 'object',
-                    'description': this.$t(`m.systemConfig["初始化数据"]`),
-                    'required': [],
-                    'properties': {}
-                }
+                root: {
+                    $schema: 'http://json-schema.org/draft-04/schema#',
+                    type: 'object',
+                    description: this.$t('m.systemConfig["初始化数据"]'),
+                    required: [],
+                    properties: {},
+                },
             }
 
             const listToJsonStep = function (lastObject, insertObject, key, item, lastType) {
@@ -322,40 +318,40 @@ export default {
                 }
                 const valueList = {}
                 valueList[key] = {
-                    'type': item.constructor.name.toLowerCase(),
-                    'description': '',
-                    'required': []
+                    type: item.constructor.name.toLowerCase(),
+                    description: '',
+                    required: [],
                 }
 
                 if (item.constructor.name.toLowerCase() === 'array') {
                     if (item.length) {
-                        valueList[key]['items'] = {}
+                        valueList[key].items = {}
                     }
                     if (lastType === 'array') {
                         Object.assign(insertObject, valueList[key])
                         for (const j in item) {
-                            listToJsonStep(insertObject, insertObject['items'], 'items', item[j], 'array')
+                            listToJsonStep(insertObject, insertObject.items, 'items', item[j], 'array')
                         }
                     }
                     if (lastType === 'object') {
                         Object.assign(insertObject, valueList)
                         for (const j in item) {
-                            listToJsonStep(insertObject[key], insertObject[key]['items'], 'items', item[j], 'array')
+                            listToJsonStep(insertObject[key], insertObject[key].items, 'items', item[j], 'array')
                         }
                     }
                 } else if (item.constructor.name.toLowerCase() === 'object') {
-                    valueList[key]['properties'] = {}
+                    valueList[key].properties = {}
                     if (lastType === 'array') {
                         Object.assign(insertObject, valueList[key])
                         for (const j in item) {
-                            listToJsonStep(insertObject, insertObject['properties'], j, item[j], 'object')
+                            listToJsonStep(insertObject, insertObject.properties, j, item[j], 'object')
                         }
                     }
                     if (lastType === 'object') {
                         Object.assign(insertObject, valueList)
                         if (Object.keys(item).length) {
                             for (const j in item) {
-                                listToJsonStep(insertObject[key], insertObject[key]['properties'], j, item[j], 'object')
+                                listToJsonStep(insertObject[key], insertObject[key].properties, j, item[j], 'object')
                             }
                         }
                     }
@@ -372,7 +368,7 @@ export default {
                             item = item.toString()
                         }
                     }
-                    valueList[key]['default'] = item
+                    valueList[key].default = item
                     if (lastType === 'array') {
                         Object.assign(insertObject, valueList[key])
                     }
@@ -382,7 +378,7 @@ export default {
                 }
             }
             for (const key in jsonData) {
-                listToJsonStep(jsonDataDict['root'], jsonDataDict['root']['properties'], key, jsonData[key], 'object')
+                listToJsonStep(jsonDataDict.root, jsonDataDict.root.properties, key, jsonData[key], 'object')
             }
             return jsonDataDict
         },
@@ -403,23 +399,23 @@ export default {
             const listData = []
             const jsonToListStep = function (listData, treeDataList, level, parentPrimaryKey, lastType, ancestorsList) {
                 for (let i = 0; i < treeDataList.length; i++) {
-                    treeDataList[i]['lastType'] = lastType
-                    treeDataList[i]['level'] = level
+                    treeDataList[i].lastType = lastType
+                    treeDataList[i].level = level
                     // treeDataList[i]['isShow'] = treeDataList[i]['isShow'] || level === levelInitial || !level
                     // treeDataList[i]['showChildren'] = !parentPrimaryKeyInitial ? false : (treeDataList[i]['showChildren'] || false)
-                    treeDataList[i]['isShow'] = true
-                    treeDataList[i]['showChildren'] = true
-                    treeDataList[i]['primaryKey'] = level + '_' + treeDataList[i]['key']
+                    treeDataList[i].isShow = true
+                    treeDataList[i].showChildren = true
+                    treeDataList[i].primaryKey = `${level}_${treeDataList[i].key}`
                     if (lastType === 'array') {
-                        treeDataList[i]['primaryKey'] += '_' + i
+                        treeDataList[i].primaryKey += `_${i}`
                     }
-                    treeDataList[i]['parentPrimaryKey'] = parentPrimaryKey
-                    treeDataList[i]['ancestorsList'] = ancestorsList
-                    const ancestorsListAdd = [...ancestorsList, treeDataList[i]['primaryKey']] // 生成唯一标识
-                    treeDataList[i]['ancestorsList_str'] = ancestorsListAdd.toString()
+                    treeDataList[i].parentPrimaryKey = parentPrimaryKey
+                    treeDataList[i].ancestorsList = ancestorsList
+                    const ancestorsListAdd = [...ancestorsList, treeDataList[i].primaryKey] // 生成唯一标识
+                    treeDataList[i].ancestorsList_str = ancestorsListAdd.toString()
                     listData.push(treeDataList[i])
                     if (treeDataList[i].children && treeDataList[i].children.length) {
-                        jsonToListStep(listData, treeDataList[i].children, level + 1, treeDataList[i]['primaryKey'], treeDataList[i]['type'], ancestorsListAdd)
+                        jsonToListStep(listData, treeDataList[i].children, level + 1, treeDataList[i].primaryKey, treeDataList[i].type, ancestorsListAdd)
                     }
                 }
             }
@@ -459,31 +455,31 @@ export default {
                     const baseItem = []
                     if (lastType === 'array') {
                         jsonDataDict.push(baseItem)
-                        for (const j in item['children']) {
-                            treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'array')
+                        for (const j in item.children) {
+                            treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item.children[j], 1, 'array')
                         }
                     }
                     if (lastType === 'object') {
                         const baseItem = {}
                         baseItem[item.key] = []
                         Object.assign(jsonDataDict, baseItem)
-                        for (const j in item['children']) {
-                            treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'array')
+                        for (const j in item.children) {
+                            treeToJsonStep(jsonDataDict[item.key], item.children[j], 1, 'array')
                         }
                     }
                 } else if (item.type === 'object') {
                     const baseItem = {}
                     if (lastType === 'array') {
                         jsonDataDict.push(baseItem)
-                        for (const j in item['children']) {
-                            treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'object')
+                        for (const j in item.children) {
+                            treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item.children[j], 1, 'object')
                         }
                     }
                     if (lastType === 'object') {
                         baseItem[item.key] = {}
                         Object.assign(jsonDataDict, baseItem)
-                        for (const j in item['children']) {
-                            treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'object')
+                        for (const j in item.children) {
+                            treeToJsonStep(jsonDataDict[item.key], item.children[j], 1, 'object')
                         }
                     }
                 } else {
@@ -536,11 +532,7 @@ export default {
                 const dataItemType = checkDataType(dataItem)
 
                 if (lastType === 'object') {
-                    const reqData = insertObject.find(
-                        ite => {
-                            return ite.key === key
-                        }
-                    )
+                    const reqData = insertObject.find(ite => ite.key === key)
                     if (!reqData) {
                         return
                     }
@@ -562,24 +554,21 @@ export default {
                         }
                     } else {
                         if (/^\$\{params_.*\}$/.test(dataItem)) {
-                            reqData['source_type'] = 'FIELDS'
-                            reqData['value_key'] = dataItem ? deepClone(dataItem).replace(/^\$\{params_/, '').replace(/\}$/, '') : ''
-                            reqData['value'] = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
+                            reqData.source_type = 'FIELDS'
+                            reqData.value_key = dataItem ? deepClone(dataItem).replace(/^\$\{params_/, '')
+                                .replace(/\}$/, '') : ''
+                            reqData.value = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
                         } else {
-                            reqData['source_type'] = 'CUSTOM'
-                            reqData['value'] = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
-                            reqData['value_key'] = ''
+                            reqData.source_type = 'CUSTOM'
+                            reqData.value = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
+                            reqData.value_key = ''
                             // 改变默认值
-                            reqData['default_temp'] = reqData['value']
+                            reqData.default_temp = reqData.value
                         }
                     }
                 } else if (lastType === 'array') {
                     if (dataItemType === 'Array') {
-                        const reqData = insertObject.find(
-                            ite => {
-                                return ite.key === key
-                            }
-                        )
+                        const reqData = insertObject.find(ite => ite.key === key)
                         if (!reqData) {
                             return
                         } // 待定？？？
@@ -599,21 +588,22 @@ export default {
                         }
                     } else {
                         if (/^\$\{params_.*\}$/.test(dataItem)) {
-                            insertObject['source_type'] = 'FIELDS'
-                            insertObject['value_key'] = dataItem ? deepClone(dataItem).replace(/^\$\{params_/, '').replace(/\}$/, '') : ''
+                            insertObject.source_type = 'FIELDS'
+                            insertObject.value_key = dataItem ? deepClone(dataItem).replace(/^\$\{params_/, '')
+                                .replace(/\}$/, '') : ''
                         } else {
-                            insertObject['source_type'] = 'CUSTOM'
-                            insertObject['value'] = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
+                            insertObject.source_type = 'CUSTOM'
+                            insertObject.value = (dataItem !== undefined && dataItem.toString()) ? deepClone(dataItem) : ''
                             // 改变默认值
-                            insertObject['default_temp'] = insertObject['value']
+                            insertObject.default_temp = insertObject.value
                         }
                     }
                 }
             }
             for (const key in jsonData) {
-                listToJsonStep(list[0]['children'], key, jsonData[key], 'object')
+                listToJsonStep(list[0].children, key, jsonData[key], 'object')
             }
             return list
-        }
-    }
+        },
+    },
 }

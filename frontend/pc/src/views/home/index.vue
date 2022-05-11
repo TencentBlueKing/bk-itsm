@@ -44,13 +44,13 @@
         components: {
             ServiceList,
             TicketTable,
-            CopyrightFooter
+            CopyrightFooter,
         },
         data () {
             return {
-                userName: window.username || '--'
+                userName: window.username || '--',
             }
-        }
+        },
     }
 </script>
 <style lang="scss" scoped>

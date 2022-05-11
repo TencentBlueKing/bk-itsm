@@ -274,7 +274,7 @@
         name: 'ProcessHome',
         components: {
             searchInfo,
-            preview
+            preview,
         },
         mixins: [commonMix, permission],
         data () {
@@ -289,57 +289,57 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 查询
                 moreSearch: [
                     {
-                        name: this.$t(`m.deployPage["流程名"]`),
-                        desc: this.$t(`m.deployPage["请输入流程名"]`),
+                        name: this.$t('m.deployPage["流程名"]'),
+                        desc: this.$t('m.deployPage["请输入流程名"]'),
                         type: 'input',
                         typeKey: 'name__icontains',
                         value: '',
                         multiSelect: false,
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.deployPage["更新人"]`),
-                        desc: this.$t(`m.deployPage["请输入更新人"]`),
+                        name: this.$t('m.deployPage["更新人"]'),
+                        desc: this.$t('m.deployPage["请输入更新人"]'),
                         type: 'member',
                         typeKey: 'updated_by__contains',
                         multiSelect: true,
                         value: [],
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.deployPage["启用状态"]`),
-                        desc: this.$t(`m.deployPage["请选择启用状态"]`),
+                        name: this.$t('m.deployPage["启用状态"]'),
+                        desc: this.$t('m.deployPage["请选择启用状态"]'),
                         type: 'select',
                         typeKey: 'is_enabled',
                         multiSelect: false,
                         value: '',
                         list: [
-                            { key: -1, name: this.$t(`m.deployPage["草稿"]`) },
-                            { key: 0, name: this.$t(`m.deployPage["关闭"]`) },
-                            { key: 1, name: this.$t(`m.deployPage["启用"]`) }
-                        ]
-                    }
+                            { key: -1, name: this.$t('m.deployPage["草稿"]') },
+                            { key: 0, name: this.$t('m.deployPage["关闭"]') },
+                            { key: 1, name: this.$t('m.deployPage["启用"]') },
+                        ],
+                    },
                 ],
                 // 导入流程文件
                 fileVal: '',
                 // 流程预览
                 processInfo: {
                     isShow: false,
-                    title: this.$t(`m.flowManager["流程预览"]`),
+                    title: this.$t('m.flowManager["流程预览"]'),
                     position: {
-                        top: 150
+                        top: 150,
                     },
                     draggable: true,
-                    loading: true
+                    loading: true,
                 },
                 previewInfo: {
                     canClick: false,
-                    narrowSize: 0.8
+                    narrowSize: 0.8,
                 },
                 addList: [],
                 lineList: [],
@@ -352,16 +352,16 @@
                     precision: 0,
                     formInfo: {
                         name: '',
-                        id: ''
-                    }
+                        id: '',
+                    },
                 },
-                rules: {}
+                rules: {},
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             // 获取列表数据
@@ -377,7 +377,7 @@
                 }
                 const params = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
                 // 过滤条件
                 this.moreSearch.forEach(item => {
@@ -401,11 +401,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -434,12 +436,12 @@
             addProcess () {
                 // 创建权限校验
                 if (!this.hasPermission(['workflow_create'])) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['workflow_create'], [], resourceData)
                 } else {
@@ -447,8 +449,8 @@
                         name: 'ProcessEdit',
                         params: {
                             type: 'new',
-                            step: 'processInfo'
-                        }
+                            step: 'processInfo',
+                        },
                     })
                 }
             },
@@ -462,11 +464,11 @@
                     name: 'ProcessEdit',
                     params: {
                         type: 'edit',
-                        step: 'processInfo'
+                        step: 'processInfo',
                     },
                     query: {
-                        processId: item.id
-                    }
+                        processId: item.id,
+                    },
                 })
             },
             // 上传文件模板
@@ -478,22 +480,24 @@
                     const fileType = 'json'
                     this.$store.dispatch('cdeploy/flowFileUpload', { fileType, data }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.deployPage["成功导入"]`) + `${res.data.success}` + this.$t(`m.deployPage["个流程，"]`) + this.$t(`m.deployPage["失败"]`) + `${res.data.failed}` + this.$t(`m.deployPage["个"]`),
-                            theme: 'success'
+                            message: `${this.$t('m.deployPage["成功导入"]')}${res.data.success}${this.$t('m.deployPage["个流程，"]')}${this.$t('m.deployPage["失败"]')}${res.data.failed}${this.$t('m.deployPage["个"]')}`,
+                            theme: 'success',
                         })
                         this.getList(1)
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.fileVal = ''
-                        e.target.value = null
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.fileVal = ''
+                            e.target.value = null
+                        })
                 } else {
                     this.fileVal = ''
                     e.target.value = null
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["文件大小不能超过10MB"]`),
-                        theme: 'error'
+                        message: this.$t('m.deployPage["文件大小不能超过10MB"]'),
+                        theme: 'error',
                     })
                 }
             },
@@ -516,21 +520,23 @@
                         return
                     }
                     this.secondClick = true
-                    const id = this.deployInfo.formInfo.id
+                    const { id } = this.deployInfo.formInfo
                     const params = {
-                        name: this.deployInfo.formInfo.name
+                        name: this.deployInfo.formInfo.name,
                     }
                     this.$store.dispatch('cdeploy/deployFlow', { params, id }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.deployPage["流程部署成功，请关联服务后使用"]`),
-                            theme: 'success'
+                            message: this.$t('m.deployPage["流程部署成功，请关联服务后使用"]'),
+                            theme: 'success',
                         })
-                    }).catch((res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
-                        this.deployInfo.isShow = false
                     })
+                        .catch((res) => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                            this.deployInfo.isShow = false
+                        })
                 }, validator => {})
             },
             // 流程预览
@@ -539,27 +545,28 @@
                 if (!this.CheckFowPermisson(item)) {
                     return
                 }
-                const id = item.id
+                const { id } = item
                 if (!id) {
                     return
                 }
                 this.processInfo.isShow = !this.processInfo.isShow
                 this.processInfo.loading = true
                 axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { 'workflow': id }),
+                    this.$store.dispatch('deployCommon/getStates', { workflow: id }),
                     this.$store.dispatch('deployCommon/getChartLink', {
-                        'workflow': id,
-                        'page_size': 1000
-                    })
+                        workflow: id,
+                        page_size: 1000,
+                    }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     for (let i = 0; i < this.addList.length; i++) {
                         this.addList[i].indexInfo = i
                     }
                     this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.processInfo.loading = false
-                })
+                }))
+                    .finally(() => {
+                        this.processInfo.loading = false
+                    })
             },
             // 导出
             onFlowExport (item) {
@@ -568,10 +575,10 @@
                     return
                 }
                 this.$bkInfo({
-                    title: this.$t(`m.deployPage["确认导出？"]`),
+                    title: this.$t('m.deployPage["确认导出？"]'),
                     confirmFn: () => {
-                        window.open(window.SITE_URL + `api/workflow/templates/${item.id}/exports/`)
-                    }
+                        window.open(`${window.SITE_URL}api/workflow/templates/${item.id}/exports/`)
+                    },
                 })
             },
             // 删除确认
@@ -582,8 +589,8 @@
                 }
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.deployPage["确认删除此流程？"]`),
-                    subTitle: this.$t(`m.deployPage["流程一旦删除，将无法还原，请谨慎操作"]`),
+                    title: this.$t('m.deployPage["确认删除此流程？"]'),
+                    subTitle: this.$t('m.deployPage["流程一旦删除，将无法还原，请谨慎操作"]'),
                     confirmFn: () => {
                         const params = item.id
                         if (this.secondClick) {
@@ -592,19 +599,21 @@
                         this.secondClick = true
                         this.$store.dispatch('cdeploy/deleteDesign', { params }).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             if (this.dataList.length === 1) {
                                 this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
                             }
                             this.getList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 关闭版本提示信息
@@ -615,12 +624,12 @@
             onProcessImportPermissonApply () {
                 // 创建权限校验
                 if (!this.hasPermission(['workflow_create'])) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['workflow_create'], [], resourceData)
                 }
@@ -633,23 +642,23 @@
             CheckFowPermisson (item, req = ['workflow_manage']) {
                 // 流程管理权限校验
                 if (!this.hasPermission(req, item.auth_actions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
+                            name: projectInfo.name,
                         }],
                         workflow: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(req, item.auth_actions, resourceData)
                     return false
                 }
                 return true
-            }
-        }
+            },
+        },
     }
 </script>
 

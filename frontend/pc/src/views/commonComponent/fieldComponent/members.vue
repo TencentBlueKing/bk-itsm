@@ -51,7 +51,7 @@
         name: 'MEMBERS',
         components: {
             memberSelect,
-            businessCard
+            businessCard,
         },
         mixins: [mixins],
         props: {
@@ -59,32 +59,32 @@
                 type: Object,
                 required: true,
                 default: () => {
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                selectedItems: []
+                selectedItems: [],
             }
         },
         watch: {
             'item.val' (val) {
                 this.selectedItems = val ? val.split(',') : []
-            }
+            },
         },
         async mounted () {
             this.selectedItems = this.item.val ? this.item.val.split(',') : []
@@ -93,8 +93,8 @@
         methods: {
             onMemberSelectChange (data) {
                 this.item.val = data.join(',')
-            }
-        }
+            },
+        },
     }
 </script>
 

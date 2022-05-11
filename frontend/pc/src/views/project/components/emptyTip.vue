@@ -57,15 +57,15 @@
         props: {
             title: {
                 type: String,
-                value: ''
+                value: '',
             },
             subTitle: {
                 type: String,
-                value: ''
+                value: '',
             },
             desc: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
                 // eg: [{
                 //     img: '',
                 //     title: '',
@@ -74,14 +74,14 @@
             },
             links: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
                 // eg: [{
                 //     text: '',
                 //     href: '',
                 //     btn: ''
                 // }]
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

@@ -140,7 +140,7 @@
         name: 'ticketStatus',
         components: {
             firstStep,
-            secondStep
+            secondStep,
         },
         mixins: [permission],
         data () {
@@ -151,7 +151,7 @@
                 dataList: [],
                 // 新增流程页面切换
                 processStatus: {
-                    addNew: false
+                    addNew: false,
                 },
                 versionStatus: true,
                 // 流程树
@@ -160,30 +160,30 @@
                         id: 1,
                         name: this.$t('m.slaContent["单据状态"]'),
                         type: 'primary',
-                        show: true
+                        show: true,
                     },
                     {
                         id: 2,
                         name: this.$t('m.slaContent["流转设置"]'),
                         type: 'normal',
-                        show: false
-                    }
+                        show: false,
+                    },
                 ],
                 // 编辑状态
                 editInfo: {
                     itemInfo: {},
-                    newNode: false
+                    newNode: false,
                 },
                 // 类型状态列表
                 treeTag: '',
                 statusType: '',
-                tagName: ''
+                tagName: '',
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             this.getTypeStatusList()
@@ -193,15 +193,15 @@
                 this.isDataLoading = true
                 this.$store.dispatch('ticketStatus/getFourTypesList').then((res) => {
                     this.dataList = res.data
-                    const temp = this.dataList.findIndex(item => {
-                        return item.id === 3
-                    })
+                    const temp = this.dataList.findIndex(item => item.id === 3)
                     this.dataList.splice(temp, 1)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 编辑工单状态
             editStatus (item) {
@@ -292,9 +292,7 @@
                         if (this.lineList[index].type === 'normal') {
                             return
                         }
-                        const temp = this.lineList.findIndex(item => {
-                            return item.show
-                        })
+                        const temp = this.lineList.findIndex(item => item.show)
                         this.lineList[temp].show = false
                         this.lineList[temp].type = 'normal'
                         this.lineList[index].type = 'primary'
@@ -313,8 +311,8 @@
             // 关闭版本提示信息
             closeVersion () {
                 this.versionStatus = false
-            }
-        }
+            },
+        },
     }
 </script>
 

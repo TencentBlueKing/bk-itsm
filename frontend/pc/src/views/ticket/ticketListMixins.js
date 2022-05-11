@@ -28,14 +28,14 @@ import i18n from '@/i18n/index.js'
 
 const SEARCH_FORMS = [
     {
-        name: i18n.t(`m.tickets['单号/标题']`),
-        desc: i18n.t(`m.tickets['单号/标题']`),
+        name: i18n.t('m.tickets[\'单号/标题\']'),
+        desc: i18n.t('m.tickets[\'单号/标题\']'),
         type: 'input',
         key: 'keyword',
         display: true,
         value: '',
         list: [],
-        placeholder: i18n.t('m.tickets["请选择单号/标题"]')
+        placeholder: i18n.t('m.tickets["请选择单号/标题"]'),
     },
     {
         name: i18n.t('m.tickets["服务目录"]'),
@@ -45,7 +45,7 @@ const SEARCH_FORMS = [
         display: true,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择服务目录"]')
+        placeholder: i18n.t('m.tickets["请选择服务目录"]'),
     },
     {
         name: i18n.t('m.tickets["服务"]'),
@@ -55,7 +55,7 @@ const SEARCH_FORMS = [
         display: false,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择服务"]')
+        placeholder: i18n.t('m.tickets["请选择服务"]'),
     },
     {
         name: i18n.t('m.tickets["提单人"]'),
@@ -65,7 +65,7 @@ const SEARCH_FORMS = [
         display: true,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择提单人"]')
+        placeholder: i18n.t('m.tickets["请选择提单人"]'),
     },
     {
         name: i18n.t('m.tickets["处理人"]'),
@@ -75,7 +75,7 @@ const SEARCH_FORMS = [
         display: true,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择处理人"]')
+        placeholder: i18n.t('m.tickets["请选择处理人"]'),
     },
     {
         name: i18n.t('m.tickets["状态"]'),
@@ -85,32 +85,32 @@ const SEARCH_FORMS = [
         display: true,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择状态"]')
+        placeholder: i18n.t('m.tickets["请选择状态"]'),
     },
     {
-        name: i18n.t(`m.tickets["提单时间"]`),
+        name: i18n.t('m.tickets["提单时间"]'),
         key: 'date_update',
         type: 'datetime',
         display: true,
         value: [],
         list: [],
-        placeholder: i18n.t('m.tickets["请选择提单时间"]')
+        placeholder: i18n.t('m.tickets["请选择提单时间"]'),
     },
     {
-        name: i18n.t(`m.tickets["业务"]`),
+        name: i18n.t('m.tickets["业务"]'),
         key: 'bk_biz_id',
         type: 'select',
         display: true,
         value: '',
         list: [],
-        placeholder: i18n.t('m.tickets["请选择业务"]')
-    }
+        placeholder: i18n.t('m.tickets["请选择业务"]'),
+    },
 ]
 
 const ticketListMixins = {
     components: {
         ColumnCurrentStep,
-        ColumnSn
+        ColumnSn,
     },
     data () {
         return {
@@ -119,7 +119,7 @@ const ticketListMixins = {
             setting: {
                 fields: [],
                 selectedFields: [],
-                size: 'medium'
+                size: 'medium',
             },
             lastSearchParams: {}, // 搜索参数
             orderKey: '-create_at', // 排序参数
@@ -127,15 +127,15 @@ const ticketListMixins = {
             pagination: {
                 current: 1,
                 count: 10,
-                limit: 10
+                limit: 10,
             },
             listLoading: false,
             searchResultList: {
                 todo: [],
                 approval: [],
                 attention: [],
-                created: []
-            }
+                created: [],
+            },
         }
     },
     computed: {
@@ -144,7 +144,7 @@ const ticketListMixins = {
         },
         currTabSettingCache () {
             return this.$store.state.ticket.settingCache[this.type]
-        }
+        },
     },
     created () {
         this.initData()
@@ -168,37 +168,40 @@ const ticketListMixins = {
         // 获取单据所有状态分类列表
         getTicketStatusTypes () {
             const params = {
-                source_uri: 'ticket_status'
+                source_uri: 'ticket_status',
             }
             this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
                 this.searchForms.find(item => item.key === 'current_status__in').list = res.data
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         getBusinessList () {
             this.$store.dispatch('eventType/getAppList').then((res) => {
                 this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         // 查询级联数据
         getServiceTree () {
             const params = {
-                show_deleted: true
+                show_deleted: true,
             }
             this.$store.dispatch('serviceCatalog/getTreeData', params).then(res => {
                 const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                formItem.list = res.data[0] ? res.data[0]['children'] : []
-            }).catch((res) => {
-                errorHandler(res, this)
+                formItem.list = res.data[0] ? res.data[0].children : []
             })
+                .catch((res) => {
+                    errorHandler(res, this)
+                })
         },
         getServiceData (val) {
             const params = {
                 catalog_id: val,
-                is_valid: 1
+                is_valid: 1,
             }
             this.$store.dispatch('catalogService/getServices', params).then((res) => {
                 const formItem = this.searchForms.find(item => item.key === 'service_id__in')
@@ -206,12 +209,13 @@ const ticketListMixins = {
                 res.data.forEach(item => {
                     formItem.list.push({
                         key: item.id,
-                        name: item.name
+                        name: item.name,
                     })
                 })
-            }).catch((res) => {
-                errorHandler(res, this)
             })
+                .catch((res) => {
+                    errorHandler(res, this)
+                })
         },
         // 获取单据列表
         getTicketList () {
@@ -223,9 +227,9 @@ const ticketListMixins = {
                 page_size: this.pagination.limit,
                 page: this.pagination.current,
                 is_draft: 0,
-                view_type: 'my_' + this.type,
+                view_type: `my_${this.type}`,
                 ordering: this.orderKey,
-                ...searchParams
+                ...searchParams,
             }).then(resp => {
                 if (resp.result) {
                     this.ticketList = resp.data.items.map(item => {
@@ -239,11 +243,13 @@ const ticketListMixins = {
                     // 异步加载列表中的某些字段信息
                     this.asyncReplaceTicketListAttr(this.ticketList)
                 }
-            }).catch((res) => {
-                errorHandler(res, this)
-            }).finally(() => {
-                this.listLoading = false
             })
+                .catch((res) => {
+                    errorHandler(res, this)
+                })
+                .finally(() => {
+                    this.listLoading = false
+                })
         },
         /**
          * 异步加载列表中的某些字段信息
@@ -274,9 +280,10 @@ const ticketListMixins = {
                         this.$set(ticket, 'current_processors', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         // 异步获取提单人
         getTicketsCreator (originList) {
@@ -294,9 +301,10 @@ const ticketListMixins = {
                         this.$set(ticket, 'creator', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         // 异步获取单据 can_operate
         getTicketscanOperate (originList) {
@@ -313,9 +321,10 @@ const ticketListMixins = {
                         this.$set(ticket, 'can_operate', replaceValue)
                     })
                 }
-            }).catch(res => {
-                errorHandler(res, this)
             })
+                .catch(res => {
+                    errorHandler(res, this)
+                })
         },
         getRowStyle ({ row, rowIndex }) {
             return `background-color: ${row.sla_color}`
@@ -327,15 +336,15 @@ const ticketListMixins = {
                 priorityIndex = row.meta.priority.key > 3 ? 3 : Number(row.meta.priority.key)
             }
             return row.priority_name === '--' ? {
-                'background': 'none',
-                'color': '#424950'
-            } : { 'backgroundColor': priorityList[priorityIndex - 1] }
+                background: 'none',
+                color: '#424950',
+            } : { backgroundColor: priorityList[priorityIndex - 1] }
         },
         getstatusColor (row) {
             const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status)
             return statusColor.length
-                ? { 'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}` }
-                : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
+                ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
+                : { color: '#3c96ff', border: '1px solid #3c96ff' }
         },
         handleSearch (params, toggle) {
             this.lastSearchParams = params
@@ -369,13 +378,13 @@ const ticketListMixins = {
         // 优先级、提单时间、状态添加排序
         onSortChange (value) {
             const sortKetMap = {
-                'priority_name': 'priority_order',
-                'status': 'current_status_order',
-                'create_at': 'create_at'
+                priority_name: 'priority_order',
+                status: 'current_status_order',
+                create_at: 'create_at',
             }
             let order = sortKetMap[value.prop]
             if (value.order === 'descending') {
-                order = '-' + order
+                order = `-${order}`
             }
             this.orderKey = order
             this.getTicketList()
@@ -395,34 +404,35 @@ const ticketListMixins = {
             const fieldIds = fields.map(m => m.id)
             this.$store.commit('ticket/setSettingCache', {
                 type: this.type,
-                value: { fields: fieldIds, size }
+                value: { fields: fieldIds, size },
             })
         },
         // 添加关注/取消关注
         onChangeAttention (row) {
-            const id = row.id
+            const { id } = row
             const params = {
-                attention: !row.hasAttention
+                attention: !row.hasAttention,
             }
             let bkMessage = ''
             this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
                 if (row.hasAttention) {
                     row.hasAttention = false
-                    bkMessage = this.$t(`m.manageCommon['取消关注成功~']`)
+                    bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']')
                 } else {
                     row.hasAttention = true
-                    bkMessage = this.$t(`m.manageCommon['添加关注成功~']`)
+                    bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']')
                 }
                 this.$bkMessage({
                     message: bkMessage,
                     theme: 'success',
-                    ellipsisLine: 0
+                    ellipsisLine: 0,
                 })
-            }).catch((res) => {
-                errorHandler(res, this)
             })
-        }
-    }
+                .catch((res) => {
+                    errorHandler(res, this)
+                })
+        },
+    },
 }
 
 export default ticketListMixins

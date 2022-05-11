@@ -31,8 +31,8 @@
     export default {
         name: 'Trigger',
         components: {
-            PublicTrigger
-        }
+            PublicTrigger,
+        },
     }
 </script>
 <style lang="scss" scoped>

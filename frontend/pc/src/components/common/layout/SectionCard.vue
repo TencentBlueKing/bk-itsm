@@ -40,26 +40,26 @@
         props: {
             label: {
                 type: String,
-                default: ''
+                default: '',
             },
             desc: {
                 type: String,
-                default: ''
+                default: '',
             },
             labelWidth: {
                 type: [String, Number],
-                default: ''
-            }
+                default: '',
+            },
         },
         computed: {
             applyLabelWidth () {
                 const w = this.labelWidth
                 if (typeof w === 'number') {
-                    return w + 'px'
+                    return `${w}px`
                 }
                 return w
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

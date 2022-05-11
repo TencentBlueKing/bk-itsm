@@ -91,8 +91,8 @@
         props: {
             statusType: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -101,12 +101,12 @@
                 formDataInfo: {
                     endStatus: {
                         info: [],
-                        endId: ''
+                        endId: '',
                     },
                     ignoreStatus: {
                         info: [],
-                        ignoreId: ''
-                    }
+                        ignoreId: '',
+                    },
                 },
                 statusList: [],
                 threeCheckboxList: [],
@@ -117,7 +117,7 @@
                 isOverNameList: [],
                 endTips: '',
                 ignoreTips: '',
-                statusLoading: false
+                statusLoading: false,
             }
         },
         async mounted () {
@@ -142,9 +142,7 @@
                 this.tempIgnore = JSON.parse(JSON.stringify(itemList))
             },
             spliceOne (item, list) {
-                const temp = list.findIndex(ite => {
-                    return ite.key === item.key
-                })
+                const temp = list.findIndex(ite => ite.key === item.key)
                 list.splice(temp, 1)
             },
             addOne (item, list) {
@@ -157,9 +155,7 @@
                     tempList.forEach(item => {
                         if (item.condition_type === 'STOP') {
                             item.condition.expressions.forEach(it => {
-                                const temp = this.threeCheckboxList.filter(ite => {
-                                    return ite.key === it.value
-                                })[0]
+                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0]
                                 if (temp && temp.id) {
                                     this.formDataInfo.endStatus.info.push(temp.id)
                                     this.spliceOne(temp, this.ignoreCheckboxList)
@@ -172,9 +168,7 @@
                         }
                         if (item.condition_type === 'PAUSE') {
                             item.condition.expressions.forEach(it => {
-                                const temp = this.threeCheckboxList.filter(ite => {
-                                    return ite.key === it.value
-                                })[0]
+                                const temp = this.threeCheckboxList.filter(ite => ite.key === it.value)[0]
                                 if (temp && temp.id) {
                                     this.formDataInfo.ignoreStatus.info.push(temp.id)
                                     this.spliceOne(temp, this.endCheckboxList)
@@ -186,18 +180,20 @@
                             }
                         }
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.statusLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.statusLoading = false
+                    })
             },
             async getTypeStatus () {
                 this.isDataLoading = true
                 const params = {}
                 await this.$store.dispatch('ticketStatus/getTypeStatus', {
                     type: this.statusType,
-                    params
+                    params,
                 }).then((res) => {
                     this.statusList = res.data
                     this.statusList.forEach(item => {
@@ -210,12 +206,14 @@
                     this.endCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
                     this.ignoreCheckboxList = JSON.parse(JSON.stringify(this.threeCheckboxList))
                     this.endTips = this.isOverNameList.join('/')
-                    this.ignoreTips = this.$t(`m.slaContent['说明： 挂起状态默认为SLA不计入统计时长的状态']`)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
+                    this.ignoreTips = this.$t('m.slaContent[\'说明： 挂起状态默认为SLA不计入统计时长的状态\']')
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             previousStep () {
                 this.$parent.changeTree(2, 'back')
@@ -228,15 +226,15 @@
                     name: '启动',
                     service_type: this.statusType,
                     batch_create: true,
-                    rules: []
+                    rules: [],
                 }
                 for (let i = 0; i < 2; i++) {
                     params.rules.push({
                         condition_type: 'STOP',
                         condition: {
                             type: 'any',
-                            expressions: []
-                        }
+                            expressions: [],
+                        },
                     })
                 }
                 params.rules[1].condition_type = 'PAUSE'
@@ -246,7 +244,7 @@
                             const temp = {
                                 name: 'current_status',
                                 value: item.key,
-                                operator: 'equal_to'
+                                operator: 'equal_to',
                             }
                             params.rules[0].condition.expressions.push(temp)
                         }
@@ -259,7 +257,7 @@
                             const temp = {
                                 name: 'current_status',
                                 value: item.key,
-                                operator: 'equal_to'
+                                operator: 'equal_to',
                             }
                             params.rules[1].condition.expressions.push(temp)
                         }
@@ -275,19 +273,21 @@
                 this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
                     this.$bkMessage({
                         message: '保存成功',
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.$parent.backTab()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             closeVersion () {
                 this.versionStatus = false
-            }
-        }
+            },
+        },
     }
 </script>
 

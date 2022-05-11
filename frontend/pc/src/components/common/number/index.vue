@@ -53,41 +53,41 @@
         props: {
             value: {
                 type: [Number, String],
-                default: 0
+                default: 0,
             },
             hideOperation: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             type: {
                 type: String,
-                default: 'int'
+                default: 'int',
             },
             exStyle: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             placeholder: {
                 type: String,
-                default: ''
+                default: '',
             },
             disabled: {
                 type: [String, Boolean],
-                default: false
+                default: false,
             },
             min: {
                 type: Number,
-                default: Number.NEGATIVE_INFINITY
+                default: Number.NEGATIVE_INFINITY,
             },
             max: {
                 type: Number,
-                default: Number.POSITIVE_INFINITY
+                default: Number.POSITIVE_INFINITY,
             },
             steps: {
                 type: Number,
-                default: 1
+                default: 1,
             },
             size: {
                 type: String,
@@ -95,14 +95,14 @@
                 validator (value) {
                     return [
                         'large',
-                        'small'
+                        'small',
                     ].indexOf(value) > -1
-                }
+                },
             },
             debounceTimer: {
                 type: Number,
-                default: 100
-            }
+                default: 100,
+            },
         },
         data () {
             return {
@@ -113,7 +113,7 @@
                 maxNumber: this.max,
                 minNumber: this.min,
                 isError: false,
-                inputDom: null
+                inputDom: null,
             }
         },
         watch: {
@@ -126,7 +126,7 @@
             value: {
                 immediate: true,
                 handler (value) {
-                    value = value + ''
+                    value = `${value}`
                     if (value === '') {
                         this.currentValue = value
                         return
@@ -139,12 +139,12 @@
                     }
 
                     this.currentValue = value
-                }
-            }
+                },
+            },
         },
         created () {
             this.debounceHandleInput = debounce(this.debounceTimer, event => {
-                const value = event.target.value
+                const { value } = event.target
                 this.inputHandler(value, event.target)
             })
         },
@@ -238,8 +238,8 @@
                 const newVal = parseInt(power * value - power * this.steps) / power
                 if (newVal < this.min) return
                 this.setCurrentValue(newVal)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

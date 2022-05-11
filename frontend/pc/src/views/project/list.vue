@@ -76,7 +76,8 @@
                             v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
                             text
                             theme="primary"
-                            :class="{ 'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
+                            :class="{
+                                'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
                             @click="onEditProject(props)">
                             {{ $t(`m['编辑']`) }}
                         </bk-button>
@@ -89,7 +90,9 @@
                                 text
                                 theme="primary"
                                 :disabled="true"
-                                :class="{ 'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
+                                :class="{
+                                    'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions)
+                                }"
                                 @click="onDeleteProject(props.row)">
                                 {{ $t(`m['删除']`) }}
                             </bk-button>
@@ -131,7 +134,7 @@
     export default {
         name: 'ProjectList',
         components: {
-            EditProjectDialog
+            EditProjectDialog,
         },
         mixins: [permission],
         data () {
@@ -149,19 +152,19 @@
                     name: '',
                     key: '',
                     desc: '',
-                    color: ''
+                    color: '',
                 },
                 pagination: {
                     current: 1,
                     count: 0,
-                    limit: 10
-                }
+                    limit: 10,
+                },
             }
         },
         computed: {
             editDialogTitle () {
                 return this.editingProject ? i18n.t('m["编辑项目"]') : i18n.t('m["新建项目"]')
-            }
+            },
         },
         created () {
             this.getProjectList()
@@ -184,7 +187,7 @@
                     const params = {
                         page_size: limit,
                         page: current,
-                        ordering: this.ordering
+                        ordering: this.ordering,
                     }
                     if (this.keyword !== '') {
                         params.name__icontains = this.keyword
@@ -215,7 +218,7 @@
                     name: '',
                     key: '',
                     desc: '',
-                    color: this.getNameColor(this.pagination.count % 3)
+                    color: this.getNameColor(this.pagination.count % 3),
                 }
                 this.editingProject = null
             },
@@ -225,8 +228,8 @@
                     const resourceData = {
                         project: [{
                             id: this.editingProject.key,
-                            name: this.editingProject.name
-                        }]
+                            name: this.editingProject.name,
+                        }],
                     }
                     this.applyForPermission(['project_edit'], this.editingProject.auth_actions, resourceData)
                     return false
@@ -267,8 +270,8 @@
                     const resourceData = {
                         project: [{
                             id: project.key,
-                            name: project.name
-                        }]
+                            name: project.name,
+                        }],
                     }
                     this.applyForPermission(['project_edit'], project.auth_actions, resourceData)
                     return false
@@ -317,8 +320,8 @@
                 } else {
                     this.$router.push({ name: 'Home' })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

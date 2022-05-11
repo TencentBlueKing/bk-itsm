@@ -28,74 +28,73 @@ export default {
                     {
                         required: true,
                         message: this.$t('m.systemConfig["编码格式为英文数字及下划线"]'),
-                        trigger: 'blur'
+                        trigger: 'blur',
                     },
                     {
                         regex: /^[a-zA-Z0-9_]+$/,
                         message: this.$t('m.systemConfig["编码格式为英文数字及下划线"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 name: [
                     {
                         required: true,
                         message: this.$t('m.systemConfig["格式为长度小于120"]'),
-                        trigger: 'blur'
+                        trigger: 'blur',
                     },
                     {
                         max: 120,
                         message: this.$t('m.systemConfig["格式为长度小于120"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 smallName: [
                     {
                         required: true,
                         message: this.$t('m.systemConfig["格式为长度不超过8个字符"]'),
-                        trigger: 'blur'
+                        trigger: 'blur',
                     },
                     {
                         max: 8,
                         message: this.$t('m.systemConfig["格式为长度不超过8个字符"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 select: [
                     {
                         required: true,
                         message: this.$t('m.treeinfo["字段必填"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 color: [
                     {
                         regex: /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/,
                         message: this.$t('m.slaContent["请输入3位或6位合法色值"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 multipleSelect: [
                     {
-                        validator: function (val) {
+                        validator (val) {
                             return val.length >= 1
                         },
                         message: this.$t('m.treeinfo["字段必填"]'),
-                        trigger: 'blur'
-                    }
+                        trigger: 'blur',
+                    },
                 ],
                 required: [
                     {
-                        validator: function (val) {
+                        validator (val) {
                             if (Array.isArray(val)) {
                                 return val.length >= 1
-                            } else {
-                                return !!val
                             }
+                            return !!val
                         },
                         message: this.$t('m.treeinfo["字段必填"]'),
-                        trigger: 'input'
-                    }
-                ]
+                        trigger: 'input',
+                    },
+                ],
             },
             keyList: {
                 name: ['name', 'dayName'],
@@ -103,14 +102,14 @@ export default {
                 select: ['select', 'dayTime', 'schedule', 'handle_time', 'value'],
                 color: ['color'],
                 multipleSelect: ['multipleSelect'],
-                required: ['required']
-            }
+                required: ['required'],
+            },
         }
     },
     computed: {
         globalChoise () {
             return this.$store.state.common.configurInfo
-        }
+        },
     },
     methods: {
         // 字段间关系校验
@@ -121,7 +120,7 @@ export default {
                     const linkRule = list[i].regex_config.rule.type
                     const relateResult = {
                         validList: [],
-                        result: ''
+                        result: '',
                     }
                     for (let j = 0; j < list[i].regex_config.rule.expressions.length; j++) {
                         // 字段和系统间的校验
@@ -161,7 +160,7 @@ export default {
             }
             return {
                 validList: allRelateList,
-                result: allRelateList.every(val => val.result)
+                result: allRelateList.every(val => val.result),
             }
         },
         /**
@@ -181,31 +180,31 @@ export default {
                 case '>':
                     result = {
                         valid: val1 > val2,
-                        tips: `"${name1}"` + (type === 'INT' ? this.$t(`m.newCommon["应大于"]`) : this.$t(`m.newCommon["应晚于"]`)) + `"${name2}"`
+                        tips: `"${name1}"${type === 'INT' ? this.$t('m.newCommon["应大于"]') : this.$t('m.newCommon["应晚于"]')}"${name2}"`,
                     }
                     break
                 case '<':
                     result = {
                         valid: val1 < val2,
-                        tips: `"${name1}"` + (type === 'INT' ? this.$t(`m.newCommon["应小于"]`) : this.$t(`m.newCommon["应早于"]`)) + `"${name2}"`
+                        tips: `"${name1}"${type === 'INT' ? this.$t('m.newCommon["应小于"]') : this.$t('m.newCommon["应早于"]')}"${name2}"`,
                     }
                     break
                 case '==':
                     result = {
                         valid: val2 === val1,
-                        tips: `"${name1}"` + this.$t(`m.newCommon["应等于"]`) + `"${name2}"`
+                        tips: `"${name1}"${this.$t('m.newCommon["应等于"]')}"${name2}"`,
                     }
                     break
                 case '<=':
                     result = {
                         valid: val1 <= val2,
-                        tips: `"${name1}"` + (type === 'INT' ? this.$t(`m.newCommon["应不大于"]`) : this.$t(`m.newCommon["应不晚于"]`)) + `"${name2}"`
+                        tips: `"${name1}"${type === 'INT' ? this.$t('m.newCommon["应不大于"]') : this.$t('m.newCommon["应不晚于"]')}"${name2}"`,
                     }
                     break
                 case '>=':
                     result = {
                         valid: val1 >= val2,
-                        tips: `"${name1}"` + (type === 'INT' ? this.$t(`m.newCommon["应不小于"]`) : this.$t(`m.newCommon["应不早于"]`)) + `"${name2}"`
+                        tips: `"${name1}"${type === 'INT' ? this.$t('m.newCommon["应不小于"]') : this.$t('m.newCommon["应不早于"]')}"${name2}"`,
                     }
                     break
                 default:
@@ -223,7 +222,7 @@ export default {
             const hours = this.addZero(d.getHours())
             const minutes = this.addZero(d.getMinutes())
             const seconds = this.addZero(d.getSeconds())
-            const gteTime = d.getFullYear() + '-' + this.addZero((d.getMonth() + 1)) + '-' + this.addZero(d.getDate()) + ' ' + hours + ':' + minutes + ':' + seconds
+            const gteTime = `${d.getFullYear()}-${this.addZero((d.getMonth() + 1))}-${this.addZero(d.getDate())} ${hours}:${minutes}:${seconds}`
             return gteTime
         },
         standardDayTime (value) {
@@ -232,11 +231,11 @@ export default {
             }
             const d = new Date(value)
             // 年月进行补0处理
-            const gteTime = d.getFullYear() + '-' + this.addZero((d.getMonth() + 1)) + '-' + this.addZero(d.getDate())
+            const gteTime = `${d.getFullYear()}-${this.addZero((d.getMonth() + 1))}-${this.addZero(d.getDate())}`
             return gteTime
         },
         addZero (value) {
-            const backValue = value >= 10 ? value : ('0' + value)
+            const backValue = value >= 10 ? value : (`0${value}`)
             return backValue
         },
         checkCommonRules (value) {
@@ -273,9 +272,7 @@ export default {
                     }
                     contentValue = tempNameList.join(',')
                 } else {
-                    contentValue = item.choice.map(node => {
-                        return node.name
-                    }).join(',')
+                    contentValue = item.choice.map(node => node.name).join(',')
                 }
                 return contentValue
             }
@@ -350,6 +347,6 @@ export default {
                 && nodeA.operations.length === nodeB.operations.length
                 && nodeA.can_operate === nodeB.can_operate
                 && nodeA.is_schedule_ready === nodeB.is_schedule_ready
-        }
-    }
+        },
+    },
 }

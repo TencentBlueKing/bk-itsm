@@ -86,21 +86,21 @@
     export default {
         name: 'taskHistory',
         components: {
-            historyDetail
+            historyDetail,
         },
         props: {
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -108,22 +108,22 @@
                 historyList: [],
                 historyDetail: {
                     isShow: false,
-                    title: this.$t(`m.task['记录详情']`),
+                    title: this.$t('m.task[\'记录详情\']'),
                     loading: false,
                     width: 660,
-                    id: ''
-                }
+                    id: '',
+                },
             }
         },
         computed: {
             taskHistoryRefresh () {
                 return this.$store.state.taskHistoryRefresh
-            }
+            },
         },
         watch: {
-            taskHistoryRefresh: function () {
+            taskHistoryRefresh () {
                 this.getHistoryList()
-            }
+            },
         },
         mounted () {
             this.getHistoryList()
@@ -132,17 +132,19 @@
             getHistoryList () {
                 // 获取单据手动触发器
                 const params = {
-                    operate_type: 'all'
+                    operate_type: 'all',
                 }
                 this.loading = true
-                const id = this.basicInfomation.id
+                const { id } = this.basicInfomation
                 this.$store.dispatch('trigger/getTicketHandleTriggers', { id, params }).then(res => {
                     this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED')
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             openDetail (task) {
                 this.historyDetail.isShow = true
@@ -161,14 +163,13 @@
                     }
                     if (val1 < val2) {
                         return (type === 'ascending' ? -1 : 1)
-                    } else if (val1 > val2) {
+                    } if (val1 > val2) {
                         return (type === 'ascending' ? 1 : -1)
-                    } else {
-                        return 0
                     }
+                    return 0
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

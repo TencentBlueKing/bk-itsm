@@ -210,7 +210,7 @@
         model: {
             // 使用model， 这儿2个属性，prop属性说，我要将msg作为该组件被使用时（此处为aa组件被父组件调用）v-model能取到的值，event说，我emit ‘cc’ 的时候，参数的值就是父组件v-model收到的值。
             prop: 'textinfoOri',
-            event: 'change'
+            event: 'change',
         },
         props: {
             // model值
@@ -228,92 +228,92 @@
                         top: '',
                         left: '',
                         bottom: '',
-                        right: ''
+                        right: '',
                     }
-                }
+                },
             },
             disabled: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             // 每级目录
             options: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 收藏样式二
             iscollectTwo: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             // 收藏项
             optionsFavorites: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isshowNumber: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             isactive: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 // 数据结构实例
                 options_eg: [{
                     key: 'zhinan',
-                    name: this.$t(`m.common["指南"]`),
+                    name: this.$t('m.common["指南"]'),
                     children: [{
                         key: 'zujian',
-                        name: this.$t(`m.common["组件"]`),
+                        name: this.$t('m.common["组件"]'),
                         children: [
                             {
                                 key: 'basic',
-                                name: 'Basic'
+                                name: 'Basic',
                             }, {
                                 key: 'form',
                                 name: 'Form',
                                 children: [{
                                     key: 'radio',
-                                    name: this.$t(`m.common["Radio 单选框"]`)
-                                }]
-                            }
-                        ]
-                    }
-                    ]
+                                    name: this.$t('m.common["Radio 单选框"]'),
+                                }],
+                            },
+                        ],
+                    },
+                    ],
                 }],
                 isCollectOpen: true,
                 // input框显示内容
                 textinfo: '',
-                placeholder: this.$t(`m.common["请选择服务目录"]`),
+                placeholder: this.$t('m.common["请选择服务目录"]'),
                 readonly: 'readonly',
                 selector: {
-                    open: false
+                    open: false,
                 },
                 selectedOptionsvalue: [],
                 selectedOptions: [],
                 styleObject: {
                     // color: 'red',
                     // fontSize: '13px'
-                    top: this.positions.top ? this.top + 'px' : null,
-                    left: this.positions.left ? this.left + 'px' : null,
-                    bottom: this.positions.bottom ? this.bottom + 'px' : null,
-                    right: this.positions.right ? this.right + 'px' : null
+                    top: this.positions.top ? `${this.top}px` : null,
+                    left: this.positions.left ? `${this.left}px` : null,
+                    bottom: this.positions.bottom ? `${this.bottom}px` : null,
+                    right: this.positions.right ? `${this.right}px` : null,
                 },
                 options2: [],
                 options3: [],
@@ -325,16 +325,16 @@
                     // position: 'fixed',
                     // color: 'red',
                     // fontSize: '13px',
-                    transform: 'translate(-26px,-38px)'
+                    transform: 'translate(-26px,-38px)',
                 },
                 // 搜索
                 searchList: [],
                 searchContent: '',
-                searchItem: {}
+                searchItem: {},
             }
         },
         computed: {
-            currentTextinfo: function () {
+            currentTextinfo () {
                 return this.textinfoOri
             },
             // 初始化 每级目录
@@ -342,7 +342,7 @@
                 const options = (this.iscollectTwo && !this.iscollect_first) ? [this.favoritesItem, ...this.options] : [...this.options]
                 if (options) {
                     options.forEach((item) => {
-                        item['isselect'] = false
+                        item.isselect = false
                     })
                 }
                 if (this.level1 !== null) {
@@ -350,25 +350,23 @@
                         this.options2 = options[this.level1].children
                     }
                     if (options[this.level1]) {
-                        options[this.level1]['isselect'] = true
+                        options[this.level1].isselect = true
                     }
                 }
                 return options
             },
             // 初始化 收藏项
             options_favorites_sign () {
-                return this.optionsFavorites.map((item) => {
-                    return item['key']
-                })
+                return this.optionsFavorites.map((item) => item.key)
             },
             favoritesItem () {
                 const favoritesItem = {
-                    'key': 'favorites',
-                    'name': this.$t(`m.common["我的收藏"]`),
-                    'children': [...this.optionsFavorites].map((item) => {
-                        item['favorites'] = true
+                    key: 'favorites',
+                    name: this.$t('m.common["我的收藏"]'),
+                    children: [...this.optionsFavorites].map((item) => {
+                        item.favorites = true
                         return item
-                    })
+                    }),
                 }
                 return favoritesItem
             },
@@ -378,14 +376,14 @@
                     // 清空
                     if (this.selectedOptionsvalue && this.selectedOptionsvalue.length) {
                         await this.reduction()
-                        return this.$t(`m.common["清空"]`)
+                        return this.$t('m.common["清空"]')
                     }
                     return '==1'
-                } else if (this.textinfoOri.length !== this.selectedOptionsvalue.length) {
+                } if (this.textinfoOri.length !== this.selectedOptionsvalue.length) {
                     // 赋值
                     await this.assignment(this.textinfoOri)
-                    return this.$t(`m.common["赋值1"]`)
-                } else if (this.textinfoOri.length === this.selectedOptionsvalue.length) {
+                    return this.$t('m.common["赋值1"]')
+                } if (this.textinfoOri.length === this.selectedOptionsvalue.length) {
                     let isChange = false
                     for (let i = 0; i < this.textinfoOri.length; i++) {
                         if (this.selectedOptionsvalue[i].id !== this.textinfoOri[i].id) {
@@ -394,13 +392,12 @@
                     }
                     if (isChange) {
                         await this.assignment(this.textinfoOri)
-                        return this.$t(`m.common["赋值2"]`)
+                        return this.$t('m.common["赋值2"]')
                     }
                     return '==2'
-                } else {
-                    return '==3'
                 }
-            }
+                return '==3'
+            },
             /* eslint-enable */
         },
         watch: {
@@ -417,9 +414,7 @@
             },
             // 后期赋值响应
             async options1 (newvalue, oldvalue) {
-                if (this.currentTextinfo && this.currentTextinfo.length && (this.textinfo !== await this.currentTextinfo.map((item) => {
-                    return item.name
-                }).join('/'))) {
+                if (this.currentTextinfo && this.currentTextinfo.length && (this.textinfo !== await this.currentTextinfo.map((item) => item.name).join('/'))) {
                     this.assignment(this.currentTextinfo)
                 }
             },
@@ -428,23 +423,19 @@
                     this.reduction()
                 } else {
                     if (this.level1 === null) {
-                        if (this.textinfo !== await newvalue.map((item) => {
-                            return item.name
-                        }).join('/')) {
+                        if (this.textinfo !== await newvalue.map((item) => item.name).join('/')) {
                             // 我要赋值---后期赋值响应'
                             this.assignment(newvalue)
                         }
                     }
                 }
             },
-            deep: true
+            deep: true,
         },
         async mounted () {
             // 初始赋值响应
             if (this.textinfoOri && this.textinfoOri.length && this.level1 === null) {
-                if (this.textinfo !== await this.selectedOptionsvalue.map((item) => {
-                    return item.name
-                }).join('/')) {
+                if (this.textinfo !== await this.selectedOptionsvalue.map((item) => item.name).join('/')) {
                     // 我要赋值---初始赋值响应'
                     this.assignment(this.textinfoOri)
                 }
@@ -454,9 +445,7 @@
             // 搜索功能
             getSearchList () {
                 const selections = this.changeList()
-                this.searchList = selections.filter(item => {
-                    return item.name && item.name.indexOf(this.searchContent) > -1
-                })
+                this.searchList = selections.filter(item => item.name && item.name.indexOf(this.searchContent) > -1)
                 // 将搜索的数据选中
             },
             changeList () {
@@ -464,13 +453,13 @@
                 const selections = []
                 const getSelections = (arr, id, name) => {
                     arr.forEach(item => {
-                        item.id = id ? id + ' / ' + item.id : String(item.id)
-                        item.name = name ? name + ' / ' + item.name : String(item.name)
+                        item.id = id ? `${id} / ${item.id}` : String(item.id)
+                        item.name = name ? `${name} / ${item.name}` : String(item.name)
                         selections.push({
                             id: item.id.split(' / '),
                             name: item.name,
                             disabled: !!item.disabled,
-                            isSelected: !!item.isSelected
+                            isSelected: !!item.isSelected,
                         })
                         if (item.children && item.children.length) {
                             getSelections(item.children, item.id, item.name)
@@ -535,12 +524,8 @@
             },
             // 执行方法体
             performFn (optionsList, level, id) {
-                const itemIndex = optionsList.findIndex((node, index) => {
-                    return String(node.id) === String(id)
-                })
-                const optionsItem = optionsList.find((node, index) => {
-                    return String(node.id) === String(id)
-                })
+                const itemIndex = optionsList.findIndex((node, index) => String(node.id) === String(id))
+                const optionsItem = optionsList.find((node, index) => String(node.id) === String(id))
                 this.selectLevel(level, itemIndex, optionsItem)
             },
             // 从外向里赋值
@@ -548,8 +533,8 @@
                 await this.options1
                 for (let i = 0; i < textinfoOri.length; i++) {
                     let indexPosition = -1
-                    this['options' + (i + 1)].map((it, ind) => {
-                        if (textinfoOri[i]['id'] === it.id) {
+                    this[`options${i + 1}`].map((it, ind) => {
+                        if (textinfoOri[i].id === it.id) {
                             indexPosition = ind
                         }
                     })
@@ -567,7 +552,7 @@
                 await this.$emit('change', this.selectedOptionsvalue)
             },
             scrollEvent ($event) {
-                this.styletranslateY['transform'] = `translate(-26px,${-$event.target.scrollTop - 32}px)`
+                this.styletranslateY.transform = `translate(-26px,${-$event.target.scrollTop - 32}px)`
             },
             // 展开/关闭 级联选择器
             async showcascader () {
@@ -610,9 +595,7 @@
                 if (!item.children || !item.children.length) {
                     this.selector.open = false
                 }
-                this.textinfo = await this.selectedOptionsvalue.map((item) => {
-                    return item.name
-                }).join('/')
+                this.textinfo = await this.selectedOptionsvalue.map((item) => item.name).join('/')
                 await this.$emit('change', this.selectedOptionsvalue)
                 await this.fnTextinfo()
             },
@@ -623,15 +606,15 @@
                     this.level2 = null
                     this.level1 = index
                     this.options1.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
                     this.options2.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
                     this.options3.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
-                    this.options1[index]['isselect'] = true
+                    this.options1[index].isselect = true
                     this.options3 = []
                     this.options2 = []
                     this.selectedOptionsvalue = []
@@ -640,21 +623,21 @@
                     this.level3 = null
                     this.level2 = index
                     this.options2.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
                     this.options3.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
-                    this.options2[index]['isselect'] = true
+                    this.options2[index].isselect = true
                     this.options3 = []
                     this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 1)
                     this.options3 = item.children || []
                 } else {
                     this.level3 = index
                     this.options3.forEach((ite) => {
-                        ite['isselect'] = false
+                        ite.isselect = false
                     })
-                    this.options3[index]['isselect'] = true
+                    this.options3[index].isselect = true
                     this.selectedOptionsvalue = this.selectedOptionsvalue.slice(0, 2)
                 }
                 this.selectedOptionsvalue.push(item)
@@ -705,21 +688,21 @@
                 this.level2 = null
                 this.level1 = null
                 this.options1.forEach((ite) => {
-                    ite['isselect'] = false
+                    ite.isselect = false
                 })
                 this.options2.forEach((ite) => {
-                    ite['isselect'] = false
+                    ite.isselect = false
                 })
                 this.options3.forEach((ite) => {
-                    ite['isselect'] = false
+                    ite.isselect = false
                 })
                 this.options3 = []
                 this.options2 = []
                 this.selectedOptionsvalue = []
-            }
+            },
         },
         create () {
-        }
+        },
     }
 </script>
 

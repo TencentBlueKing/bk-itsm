@@ -46,7 +46,7 @@
     export default {
         name: 'PermissionApply',
         components: {
-            PermissionContent
+            PermissionContent,
         },
         mixins: [permission],
         props: {
@@ -55,29 +55,29 @@
                 default () {
                     return {
                         type: 'project', // 无权限类型: project、other
-                        permission: null
+                        permission: null,
                     }
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 url: '',
                 loading: false,
                 hasClicked: false,
-                authActions: []
+                authActions: [],
             }
         },
         watch: {
-            'permissionData': {
+            permissionData: {
                 deep: true,
                 immediate: true,
                 handler (val, oldVal) {
                     if (!_.isEqual(val, oldVal)) {
                         this.loadPermissionUrl()
                     }
-                }
-            }
+                },
+            },
         },
         created () {
             if (this.permissionData.permission) {
@@ -113,8 +113,8 @@
                 } finally {
                     this.loading = false
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

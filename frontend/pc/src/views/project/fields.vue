@@ -31,8 +31,8 @@
     export default {
         name: 'FieldsPage',
         components: {
-            PublicField
-        }
+            PublicField,
+        },
     }
 </script>
 <style lang="scss" scoped>

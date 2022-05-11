@@ -64,26 +64,26 @@
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             state: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             showTabList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -91,13 +91,13 @@
                 trueStatus: true,
                 falseStatus: false,
                 dataList: [],
-                checkList: []
+                checkList: [],
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         mounted () {
             this.getTicketTables()
@@ -142,11 +142,13 @@
                             }
                         })
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 全选 半选
             handleSelectAll (selection) {
@@ -158,8 +160,8 @@
             disabledFn (item, index) {
                 const disabledStatus = this.showTabList.some(tableItem => tableItem.key === item.key)
                 return !disabledStatus
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

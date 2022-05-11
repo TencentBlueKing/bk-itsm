@@ -193,29 +193,29 @@
     export default {
         name: 'exportTree',
         components: {
-            collapseTransition
+            collapseTransition,
         },
         props: {
             isBuiltin: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             isBody: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             treeDataList: {
                 type: Array,
-                default: () => []
+                default: () => [],
             },
             treeIndex: {
                 type: Number,
-                default: () => 0
-            }
+                default: () => 0,
+            },
         },
         data () {
             return {
@@ -225,10 +225,10 @@
                     { id: 'object', name: 'object' },
                     { id: 'number', name: 'number' },
                     { id: 'boolean', name: 'boolean' },
-                    { id: 'array', name: 'array' }
+                    { id: 'array', name: 'array' },
                 ],
                 trueStatus: true,
-                falseStatus: false
+                falseStatus: false,
             }
         },
         watch: {
@@ -268,8 +268,8 @@
                 if (item.type === 'array') {
                     this.addChildLine(item)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

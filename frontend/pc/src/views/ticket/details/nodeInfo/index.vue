@@ -148,7 +148,7 @@
             sopsNodeInfo,
             signNodeInfo,
             approvalNodeInfo,
-            devopsNodeInfo
+            devopsNodeInfo,
         },
         props: {
             readOnly: Boolean,
@@ -157,46 +157,42 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 打开节点
             openNodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 说有节点信息
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             currentStepList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 basicList: [
-                    { name: this.$t(`m.newCommon["节点名称"]`), value: '', key: 'name' },
-                    { name: this.$t(`m.newCommon["处理人"]`), value: '', key: 'processors' },
-                    { name: this.$t(`m.newCommon["处理时间"]`), value: '', key: 'update_at' }
+                    { name: this.$t('m.newCommon["节点名称"]'), value: '', key: 'name' },
+                    { name: this.$t('m.newCommon["处理人"]'), value: '', key: 'processors' },
+                    { name: this.$t('m.newCommon["处理时间"]'), value: '', key: 'update_at' },
                 ],
-                openStatus: true
+                openStatus: true,
             }
         },
         computed: {
             nodeListCurren () {
-                const nodeListCurren = this.nodeList.filter(
-                    item => {
-                        return item.state_id === this.openNodeInfo.id
-                    }
-                )
+                const nodeListCurren = this.nodeList.filter(item => item.state_id === this.openNodeInfo.id)
                 if (nodeListCurren[0]) {
                     for (let i = 0; i < this.basicList.length; i++) {
                         const property = this.basicList[i]
@@ -204,26 +200,24 @@
                     }
                 }
                 return nodeListCurren
-            }
+            },
         },
         mounted () {
-            setTimeout(
-                () => {
-                    if (this.nodeList[0] && this.nodeList[0].status !== 'FINISHED'
-                        && this && !this._isDestroyed) {
-                        this.getTicketNodeInfo(this.openNodeInfo)
-                    }
-                }, 10000
-            )
+            setTimeout(() => {
+                if (this.nodeList[0] && this.nodeList[0].status !== 'FINISHED'
+                    && this && !this._isDestroyed) {
+                    this.getTicketNodeInfo(this.openNodeInfo)
+                }
+            }, 10000)
         },
         methods: {
             initInfo () {
                 this.$emit('initInfo')
             },
             getTicketNodeInfo (openNodeInfo) {
-                const id = this.basicInfomation.id
+                const { id } = this.basicInfomation
                 const params = {
-                    state_id: openNodeInfo.id
+                    state_id: openNodeInfo.id,
                 }
                 this.$store.dispatch('deployOrder/getTicketNodeInfo', { params, id }).then((res) => {
                     if (res.data.status !== 'FINISHED' && this && !this._isDestroyed && !this.basicInfomation.is_over) {
@@ -232,24 +226,24 @@
                             this.nodeInfo[0] = res.data
                         }
                         // 轮询
-                        const setTimeoutFunc = setTimeout(
-                            () => {
-                                this.getTicketNodeInfo(this.openNodeInfo)
-                            }, 10000
-                        )
+                        const setTimeoutFunc = setTimeout(() => {
+                            this.getTicketNodeInfo(this.openNodeInfo)
+                        }, 10000)
                         this.$once('hook:beforeDestroy', () => {
                             clearInterval(setTimeoutFunc)
                         })
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
             },
             closeSlider () {
                 this.$emit('closeSlider')
-            }
-        }
+            },
+        },
     }
 </script>
 

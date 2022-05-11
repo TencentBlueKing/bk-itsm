@@ -124,14 +124,14 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             canvasData: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -140,7 +140,7 @@
                 toolStatus: false,
                 valueInfo: {
                     node: {},
-                    line: {}
+                    line: {},
                 },
                 typeList: [
                     { type: 'NORMAL', iconStyle: 'icon-icon-person' },
@@ -149,20 +149,20 @@
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
-                    { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' }
+                    { type: 'SIGN', iconStyle: 'icon-sign-node-white f18' },
                 ],
                 clickList: [
-                    { type: 'NORMAL', name: this.$t(`m.treeinfo["手动节点"]`), iconStyle: 'icon-icon-artificial' },
-                    { type: 'TASK', name: this.$t(`m.treeinfo["API节点"]`), iconStyle: 'icon-api-node' },
-                    { type: 'TASK-SOPS', name: this.$t(`m.treeinfo["标准运维节点"]`), iconStyle: 'icon-task-icon' },
-                    { type: 'TASK-DEVOPS', name: this.$t(`m["蓝盾节点"]`), iconStyle: 'icon-devops-task-icon' },
-                    { type: 'SIGN', name: this.$t(`m.treeinfo['会签节点']`), iconStyle: 'icon-sign-node' },
-                    { type: 'APPROVAL', name: this.$t(`m.treeinfo['审批节点']`), iconStyle: 'icon-approval-node' },
-                    { type: 'COVERAGE', name: this.$t(`m.treeinfo["汇聚网关"]`), iconStyle: 'icon-flow-branch' },
-                    { type: 'ROUTER-P', name: this.$t(`m.treeinfo["并行网关"]`), iconStyle: 'icon-flow-convergence' },
-                    { type: 'COPY', name: this.$t(`m.treeinfo["复制节点"]`), iconStyle: 'icon-copy-new' }
+                    { type: 'NORMAL', name: this.$t('m.treeinfo["手动节点"]'), iconStyle: 'icon-icon-artificial' },
+                    { type: 'TASK', name: this.$t('m.treeinfo["API节点"]'), iconStyle: 'icon-api-node' },
+                    { type: 'TASK-SOPS', name: this.$t('m.treeinfo["标准运维节点"]'), iconStyle: 'icon-task-icon' },
+                    { type: 'TASK-DEVOPS', name: this.$t('m["蓝盾节点"]'), iconStyle: 'icon-devops-task-icon' },
+                    { type: 'SIGN', name: this.$t('m.treeinfo[\'会签节点\']'), iconStyle: 'icon-sign-node' },
+                    { type: 'APPROVAL', name: this.$t('m.treeinfo[\'审批节点\']'), iconStyle: 'icon-approval-node' },
+                    { type: 'COVERAGE', name: this.$t('m.treeinfo["汇聚网关"]'), iconStyle: 'icon-flow-branch' },
+                    { type: 'ROUTER-P', name: this.$t('m.treeinfo["并行网关"]'), iconStyle: 'icon-flow-convergence' },
+                    { type: 'COPY', name: this.$t('m.treeinfo["复制节点"]'), iconStyle: 'icon-copy-new' },
                 ],
-                currentNode: {}
+                currentNode: {},
             }
         },
         mounted () {
@@ -252,87 +252,92 @@
                         is_terminable: false,
                         axis: {
                             x: node.x + xValue,
-                            y: node.y + lineList.length * 80
+                            y: node.y + lineList.length * 80,
                         },
-                        extras: {}
+                        extras: {},
                     }
                     this.$store.dispatch('deployCommon/creatNode', { params }).then((res) => {
                         this.valueInfo.node = {
-                            id: 'node_' + res.data.id,
+                            id: `node_${res.data.id}`,
                             x: node.x + xValue,
                             y: node.y + lineList.length * 80,
                             type: value.type,
                             name: res.data.name,
                             showMore: false,
-                            nodeInfo: res.data
+                            nodeInfo: res.data,
                         }
                         this.$emit('closeShow')
                         this.$emit('updateNode', this.valueInfo, value.type)
                         this.addNewLine(node, res.data.id)
-                    }).catch(res => {
-                        this.$bkMessage({
-                            message: res.data.msg,
-                            theme: 'error'
-                        })
-                    }).finally(() => {
-                        this.clickSecond = false
-                        this.$store.commit('deployCommon/changeNodeStatus', false)
                     })
+                        .catch(res => {
+                            this.$bkMessage({
+                                message: res.data.msg,
+                                theme: 'error',
+                            })
+                        })
+                        .finally(() => {
+                            this.clickSecond = false
+                            this.$store.commit('deployCommon/changeNodeStatus', false)
+                        })
                 } else {
-                    const id = this.node.nodeInfo.id
+                    const { id } = this.node.nodeInfo
                     this.$store.dispatch('deployCommon/copyNode', id).then((res) => {
                         this.valueInfo.node = {
-                            id: 'node_' + res.data.id,
+                            id: `node_${res.data.id}`,
                             x: res.data.axis.x - 250,
                             y: res.data.axis.y + 100, // 复制后新节点的处于原节点下100px
                             type: res.data.type,
                             name: res.data.name,
                             showMore: false,
-                            nodeInfo: res.data
+                            nodeInfo: res.data,
                         }
                         this.$emit('closeShow')
                         this.$emit('updateNode', this.valueInfo, value.type)
                         // this.addNewLine(node, res.data.id)
-                    }).catch(res => {
-                        this.$bkMessage({
-                            message: res.data.msg,
-                            theme: 'error'
-                        })
-                    }).finally(() => {
-                        this.clickSecond = false
-                        this.$store.commit('deployCommon/changeNodeStatus', false)
                     })
+                        .catch(res => {
+                            this.$bkMessage({
+                                message: res.data.msg,
+                                theme: 'error',
+                            })
+                        })
+                        .finally(() => {
+                            this.clickSecond = false
+                            this.$store.commit('deployCommon/changeNodeStatus', false)
+                        })
                 }
             },
             // 新增线条
             addNewLine (fromNode, toState) {
                 const lineParams = {
                     workflow: fromNode.nodeInfo.workflow,
-                    name: this.$t(`m.treeinfo["默认"]`),
+                    name: this.$t('m.treeinfo["默认"]'),
                     axis: {
                         start: 'Right',
-                        end: 'Left'
+                        end: 'Left',
                     },
                     from_state: fromNode.nodeInfo.id,
-                    to_state: toState
+                    to_state: toState,
                 }
                 this.$store.dispatch('deployCommon/createLine', { lineParams }).then((res) => {
                     this.valueInfo.line = {
                         source: {
                             arrow: 'Right',
-                            id: fromNode.id
+                            id: fromNode.id,
                         },
                         target: {
                             arrow: 'Left',
-                            id: this.valueInfo.node.id
+                            id: this.valueInfo.node.id,
                         },
-                        lineInfo: res.data
+                        lineInfo: res.data,
                     }
                     this.$emit('fastAddNode', this.valueInfo)
                     this.$emit('updateLine', this.valueInfo.line, 'add')
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 删除线条
             clickDelete (node) {
@@ -342,8 +347,8 @@
             closeTool () {
                 this.toolStatus = true
                 localStorage.setItem('toolStatus', true)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

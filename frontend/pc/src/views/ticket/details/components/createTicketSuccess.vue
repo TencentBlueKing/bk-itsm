@@ -37,13 +37,13 @@
     export default {
         name: 'CreateTickerSuccer',
         props: {
-            routerInfo: Object
+            routerInfo: Object,
         },
         data () {
             return {
                 time: 30,
                 timer: '',
-                isStart: true
+                isStart: true,
             }
         },
         mounted () {
@@ -70,8 +70,8 @@
                 clearInterval(this.timer)
                 this.isStart = false
                 this.$emit('onBackIconClick')
-            }
-        }
+            },
+        },
     }
 </script>
 <style scoped lang="scss">

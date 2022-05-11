@@ -48,33 +48,33 @@
     export default {
         name: 'BasicCard',
         components: {
-            collapseTransition
+            collapseTransition,
         },
         props: {
             showFoldTitle: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             foldTitle: {
                 type: String,
-                default: ''
+                default: '',
             },
             firstUnfold: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             cardLabel: {
                 type: String,
-                default: ''
+                default: '',
             },
             cardDesc: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
-                showMore: true
+                showMore: true,
             }
         },
         watch: {
@@ -82,9 +82,9 @@
                 handler () {
                     this.showMore = this.firstUnfold
                 },
-                immediate: true
-            }
-        }
+                immediate: true,
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

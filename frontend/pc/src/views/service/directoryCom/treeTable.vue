@@ -241,15 +241,15 @@
     import { errorHandler } from '../../../utils/errorHandler'
     export default {
         components: {
-            draggable
+            draggable,
         },
         props: {
             treeInfo: {
                 type: Object,
                 default () {
                     return { node: {} }
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -262,7 +262,7 @@
                 secondClick: false,
                 // 模糊查询
                 searchInfo: {
-                    key: ''
+                    key: '',
                 },
                 serviceTypesMap: {},
                 // 选择
@@ -271,23 +271,23 @@
                 // 新增服务
                 entryInfo: {
                     show: false,
-                    title: this.$t(`m.serviceConfig["添加服务"]`),
+                    title: this.$t('m.serviceConfig["添加服务"]'),
                     width: 700,
                     listInfo: [],
                     pagination: {
                         current: 1,
                         count: 10,
-                        limit: 10
+                        limit: 10,
                     },
-                    checkList: []
+                    checkList: [],
                 },
-                nameInfo: ''
+                nameInfo: '',
             }
         },
         watch: {
             'treeInfo.node' () {
                 this.getTableList()
-            }
+            },
         },
         mounted () {
             this.getServiceTypes()
@@ -298,9 +298,10 @@
             getServiceTypes () {
                 this.$store.dispatch('getCustom').then((res) => {
                     this.serviceTypesMap = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取表格数据
             getTableList () {
@@ -318,7 +319,7 @@
                 const params = {
                     catalog_id: this.treeInfo.node.id,
                     name: this.searchInfo.key,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 if (!this.treeInfo.node.id) {
                     return
@@ -328,11 +329,13 @@
                     this.listInfo.forEach(item => {
                         this.$set(item, 'checkValue', false)
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isTableLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isTableLoading = false
+                    })
             },
             // 全选 半选
             handleSelectAll (value) {
@@ -358,16 +361,18 @@
                 }
                 this.secondClick = true
                 const params = {
-                    new_order: newOrderList
+                    new_order: newOrderList,
                 }
                 const id = currentNode.bounded_relations[0].bond_id
                 this.$store.dispatch('serviceCatalog/moveTableNode', { params, id }).then(res => {
                     // ...
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 模糊查询
             serchEntry () {
@@ -381,25 +386,23 @@
             deleteOne (item) {
                 const params = {
                     catalog_id: this.treeInfo.node.id,
-                    services: [item.id]
+                    services: [item.id],
                 }
                 this.deleteSubmit(params)
             },
             deleteCheck () {
-                const idList = this.checkList.map(item => {
-                    return item.id
-                })
+                const idList = this.checkList.map(item => item.id)
                 const params = {
                     catalog_id: this.treeInfo.node.id,
-                    services: idList
+                    services: idList,
                 }
                 this.deleteSubmit(params)
             },
             deleteSubmit (params) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.serviceConfig["确认移除服务？"]`),
-                    subTitle: this.$t(`m.serviceConfig["移除后，将无法在该目录下找到该服务，请谨慎操作"]`),
+                    title: this.$t('m.serviceConfig["确认移除服务？"]'),
+                    subTitle: this.$t('m.serviceConfig["移除后，将无法在该目录下找到该服务，请谨慎操作"]'),
                     confirmFn: () => {
                         if (this.secondClick) {
                             return
@@ -407,16 +410,18 @@
                         this.secondClick = true
                         this.$store.dispatch('catalogService/removeServices', params).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.serviceConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.serviceConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getTableList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 新增服务
@@ -432,10 +437,8 @@
                 // 添加服务
                 const params = {
                     catalog_id: this.treeInfo.node.id,
-                    services: this.entryInfo.checkList.map(item => {
-                        return item.id
-                    }),
-                    project_key: this.$store.state.project.id
+                    services: this.entryInfo.checkList.map(item => item.id),
+                    project_key: this.$store.state.project.id,
                 }
                 if (this.secondClick) {
                     return
@@ -444,24 +447,26 @@
                 // 批量添加服务
                 this.$store.dispatch('catalogService/addServices', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["添加成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["添加成功"]'),
+                        theme: 'success',
                     })
                     this.getTableList()
                     this.closeShade()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 调转到服务进行添加
             addEntry () {
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
-                    }
+                        project_id: this.$store.state.project.id,
+                    },
                 })
             },
             // 获取服务数据
@@ -475,7 +480,7 @@
                     page_size: this.entryInfo.pagination.limit,
                     no_classified: true,
                     is_valid: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.isDataLoading = true
                 this.$store.dispatch('serviceEntry/getList', params).then(res => {
@@ -483,11 +488,13 @@
                     // 分页
                     this.entryInfo.pagination.current = res.data.page
                     this.entryInfo.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             addPageLimitChange () {
@@ -504,8 +511,8 @@
             },
             addSelect (selection, row) {
                 this.entryInfo.checkList = selection
-            }
-        }
+            },
+        },
     }
 </script>
 

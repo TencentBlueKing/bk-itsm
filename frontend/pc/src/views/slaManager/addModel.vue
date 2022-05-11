@@ -391,12 +391,12 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             isEdit: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -406,18 +406,18 @@
                     days: [],
                     workdays: [],
                     holidays: [],
-                    id: -1
+                    id: -1,
                 },
                 oldForm: {},
                 multiSelect: true,
                 weekList: [
-                    { id: '0', name: this.$t(`m.slaContent["周一"]`) },
-                    { id: '1', name: this.$t(`m.slaContent["周二"]`) },
-                    { id: '2', name: this.$t(`m.slaContent["周三"]`) },
-                    { id: '3', name: this.$t(`m.slaContent["周四"]`) },
-                    { id: '4', name: this.$t(`m.slaContent["周五"]`) },
-                    { id: '5', name: this.$t(`m.slaContent["周六"]`) },
-                    { id: '6', name: this.$t(`m.slaContent["周日"]`) }
+                    { id: '0', name: this.$t('m.slaContent["周一"]') },
+                    { id: '1', name: this.$t('m.slaContent["周二"]') },
+                    { id: '2', name: this.$t('m.slaContent["周三"]') },
+                    { id: '3', name: this.$t('m.slaContent["周四"]') },
+                    { id: '4', name: this.$t('m.slaContent["周五"]') },
+                    { id: '5', name: this.$t('m.slaContent["周六"]') },
+                    { id: '6', name: this.$t('m.slaContent["周日"]') },
                 ],
                 // 添加时段
                 timeInfo: {
@@ -425,8 +425,8 @@
                     width: 400,
                     headerPosition: 'left',
                     autoClose: false,
-                    title: this.$t(`m.slaContent["添加时段"]`),
-                    info: {}
+                    title: this.$t('m.slaContent["添加时段"]'),
+                    info: {},
                 },
                 aaa: '',
                 // 添加时段中间数据
@@ -435,8 +435,8 @@
                     type: '',
                     info: {
                         name: '',
-                        value: ['08:00:00', '12:00:00']
-                    }
+                        value: ['08:00:00', '12:00:00'],
+                    },
                 },
                 hasFalse: false,
                 // 校验规则
@@ -448,24 +448,24 @@
                 // toolTips提示
                 bktooltipsInfo: {
                     addTime: {
-                        content: this.$t(`m.slaContent['添加时段']`),
+                        content: this.$t('m.slaContent[\'添加时段\']'),
                         showOnInit: false,
-                        placements: ['top']
+                        placements: ['top'],
                     },
                     overTime: {
-                        content: this.$t(`m.slaContent['最多只能添加三个时段']`),
+                        content: this.$t('m.slaContent[\'最多只能添加三个时段\']'),
                         showOnInit: false,
-                        placements: ['top']
-                    }
+                        placements: ['top'],
+                    },
                 },
                 formKey: 0,
-                timeItemNameTemplate: ''
+                timeItemNameTemplate: '',
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             if (this.isEdit) {
@@ -488,8 +488,8 @@
             addLine (type) {
                 const valueInfo = {}
                 const timeList = [
-                    { name: this.$t(`m.slaContent["上午"]`), value: ['08:00:00', '12:00:00'], changStatus: false },
-                    { name: this.$t(`m.slaContent["下午"]`), value: ['14:00:00', '18:00:00'], changStatus: false }
+                    { name: this.$t('m.slaContent["上午"]'), value: ['08:00:00', '12:00:00'], changStatus: false },
+                    { name: this.$t('m.slaContent["下午"]'), value: ['14:00:00', '18:00:00'], changStatus: false },
                 ]
                 if (type === 'days') {
                     valueInfo.week = []
@@ -506,7 +506,7 @@
                     valueInfo.dayName = ''
                     valueInfo.dayTime = ''
                     valueInfo.time = [
-                        { name: this.$t(`m.slaContent["全天"]`), value: ['00:00:00', '23:59:59'], changStatus: false }
+                        { name: this.$t('m.slaContent["全天"]'), value: ['00:00:00', '23:59:59'], changStatus: false },
                     ]
                 }
                 this.formInfo[type].push(valueInfo)
@@ -522,7 +522,7 @@
                     const temp = {
                         name: this.tempTime.info.name,
                         changStatus: false,
-                        value: this.tempTime.info.value
+                        value: this.tempTime.info.value,
                     }
                     // 添加时段模式
                     if (!this.tempTime.isEdit) {
@@ -538,21 +538,21 @@
                 const temp = {
                     name: '晚上',
                     changStatus: false,
-                    value: ['08:00:00', '12:00:00']
+                    value: ['08:00:00', '12:00:00'],
                 }
                 this.formInfo[type][index].time.push(temp)
             },
             // 修改时段名
             changeTimeName (timeItem, timeIndex, index, type) {
                 this.tempTime = {
-                    index: index,
-                    timeIndex: timeIndex,
-                    type: type,
+                    index,
+                    timeIndex,
+                    type,
                     info: {
                         name: timeItem.name,
-                        value: timeItem.value
+                        value: timeItem.value,
                     },
-                    isEdit: true
+                    isEdit: true,
                 }
                 this.timeInfo.show = true
             },
@@ -568,11 +568,11 @@
                             if (this.isEdit) {
                                 this.$bkInfo({
                                     type: 'warning',
-                                    title: this.$t(`m.slaContent["确认更新服务模式？"]`),
-                                    subTitle: this.$t(`m.slaContent["更新的内容将会实时应用在关联的服务协议中，请谨慎修改！"]`),
+                                    title: this.$t('m.slaContent["确认更新服务模式？"]'),
+                                    subTitle: this.$t('m.slaContent["更新的内容将会实时应用在关联的服务协议中，请谨慎修改！"]'),
                                     confirmFn: () => {
                                         this.ajaxSubmit()
-                                    }
+                                    },
                                 })
                             } else {
                                 this.ajaxSubmit()
@@ -594,7 +594,7 @@
                     workdays: [],
                     holidays: [],
                     id: copyFormInfo.id,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 // 格式化工作日数据
                 for (let i = 0; i < copyFormInfo.days.length; i++) {
@@ -602,15 +602,15 @@
                     const day = {
                         type_of_day: 'NORMAL',
                         day_of_week: copyFormInfo.days[i].week.join(','),
-                        duration: duration,
-                        id: copyFormInfo.days[i].id
+                        duration,
+                        id: copyFormInfo.days[i].id,
                     }
                     params.days.push(day)
                 }
                 if (params.days.length === 0) {
                     this.$bkMessage({
                         message: this.$t('m.slaContent["工作时间不能为空！"]'),
-                        theme: 'error'
+                        theme: 'error',
                     })
                     return
                 }
@@ -621,8 +621,8 @@
                         type_of_day: 'WORKDAY',
                         start_date: this.standardDayTime(copyFormInfo.workdays[i].dayTime[0]),
                         end_date: this.standardDayTime(copyFormInfo.workdays[i].dayTime[1]),
-                        duration: duration,
-                        id: copyFormInfo.workdays[i].id
+                        duration,
+                        id: copyFormInfo.workdays[i].id,
                     }
                     params.workdays.push(workday)
                 }
@@ -633,9 +633,9 @@
                         type_of_day: 'HOLIDAY',
                         start_date: this.standardDayTime(copyFormInfo.holidays[i].dayTime[0]),
                         end_date: this.standardDayTime(copyFormInfo.holidays[i].dayTime[1]),
-                        duration: duration,
+                        duration,
                         name: copyFormInfo.holidays[i].dayName,
-                        id: copyFormInfo.holidays[i].id
+                        id: copyFormInfo.holidays[i].id,
                     }
                     params.holidays.push(holiday)
                 }
@@ -644,7 +644,7 @@
                     this.$store.dispatch('sla/saveSchedule', params).then(res => {
                         this.$bkMessage({
                             message: this.$t('m.slaContent["提交成功！"]'),
-                            theme: 'success'
+                            theme: 'success',
                         })
                         this.submitBack()
                     }, res => {
@@ -654,7 +654,7 @@
                     this.$store.dispatch('sla/updateSchedule', params).then(res => {
                         this.$bkMessage({
                             message: this.$t('m.slaContent["修改成功！"]'),
-                            theme: 'success'
+                            theme: 'success',
                         })
                         this.submitBack()
                     }, res => {
@@ -664,14 +664,12 @@
             },
             // 提取返回数组的列表
             backObject (list) {
-                const resultList = list.map(item => {
-                    return {
-                        start_time: item.value[0],
-                        end_time: item.value[1],
-                        name: item.name,
-                        id: item.id
-                    }
-                })
+                const resultList = list.map(item => ({
+                    start_time: item.value[0],
+                    end_time: item.value[1],
+                    name: item.name,
+                    id: item.id,
+                }))
                 return resultList
             },
             // 编辑时转化格式
@@ -685,7 +683,7 @@
                         const tempDay = {
                             time: [],
                             week: [],
-                            id: item.id
+                            id: item.id,
                         }
                         tempDay.week = item.day_of_week.split(',')
                         item.duration.forEach(ite => {
@@ -693,7 +691,7 @@
                                 changStatus: false,
                                 name: ite.name,
                                 id: ite.id,
-                                value: []
+                                value: [],
                             }
                             tempDaytime.value.push(ite.start_time)
                             tempDaytime.value.push(ite.end_time)
@@ -707,10 +705,10 @@
                             {
                                 changStatus: false,
                                 name: this.$t('m.slaContent["24小时"]'),
-                                value: ['00:00:00', '23:59:59']
-                            }
+                                value: ['00:00:00', '23:59:59'],
+                            },
                         ],
-                        week: [0, 1, 2, 3, 4, 5, 6]
+                        week: [0, 1, 2, 3, 4, 5, 6],
                     }
                     this.formInfo.days.push(tempDay)
                 }
@@ -719,7 +717,7 @@
                     const tempWorkday = {
                         time: [],
                         dayTime: [],
-                        id: item.id
+                        id: item.id,
                     }
                     tempWorkday.dayTime.push(item.start_date)
                     tempWorkday.dayTime.push(item.end_date)
@@ -728,7 +726,7 @@
                             changStatus: false,
                             name: ite.name,
                             id: ite.id,
-                            value: []
+                            value: [],
                         }
                         tempWorkDaytime.value.push(ite.start_time)
                         tempWorkDaytime.value.push(ite.end_time)
@@ -742,14 +740,14 @@
                         dayName: item.name,
                         dayTime: [],
                         id: item.id,
-                        time: []
+                        time: [],
                     }
                     item.duration.forEach(ite => {
                         const tempholiDaytime = {
                             changStatus: false,
                             name: ite.name,
                             id: ite.id,
-                            value: []
+                            value: [],
                         }
                         tempholiDaytime.value.push(ite.start_time)
                         tempholiDaytime.value.push(ite.end_time)
@@ -765,11 +763,11 @@
                 if (JSON.stringify(this.formInfo) !== JSON.stringify(this.oldForm)) {
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确认返回？"]`),
+                        title: this.$t('m.slaContent["确认返回？"]'),
                         // subTitle: this.$t(`m.slaContent["数据发生更改，确认后将不保存修改的数据！"]`),
                         confirmFn: () => {
                             this.$parent.changeInfo.isShow = false
-                        }
+                        },
                     })
                 } else {
                     this.$parent.changeInfo.isShow = false
@@ -778,8 +776,8 @@
             submitBack () {
                 this.$parent.changeInfo.isShow = false
                 this.$parent.getModelList()
-            }
-        }
+            },
+        },
     }
 </script>
 

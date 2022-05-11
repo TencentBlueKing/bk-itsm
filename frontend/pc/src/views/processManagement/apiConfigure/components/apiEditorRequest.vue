@@ -133,7 +133,7 @@
     export default {
         components: {
             apiRequestBody,
-            ace
+            ace,
         },
         mixins: [mixins],
         props: {
@@ -141,8 +141,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -153,7 +153,7 @@
                     height: 200,
                     readOnly: false,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 // 导入JSON
                 dictDataTable: {
@@ -166,54 +166,54 @@
                         name: '',
                         desc: '',
                         id: '',
-                        code: ''
+                        code: '',
                     },
                     checkout: {
-                        name: ''
-                    }
+                        name: '',
+                    },
                 },
                 // tag
                 titleList: [
                     { name: 'Query' },
-                    { name: 'Body' }
+                    { name: 'Body' },
                 ],
                 checkIndex: 1,
                 necessaryList: [
-                    { id: 1, name: this.$t(`m.systemConfig["必选"]`) },
-                    { id: 0, name: this.$t(`m.systemConfig["可选"]`) }
+                    { id: 1, name: this.$t('m.systemConfig["必选"]') },
+                    { id: 0, name: this.$t('m.systemConfig["可选"]') },
                 ],
                 // body
                 bodyInfo: {
-                    checkInfo: {}
-                }
+                    checkInfo: {},
+                },
             }
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.detailInfoOri
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.DetailInfo = newVal
-                }
+                },
             },
             treeDataList: {
                 // getter
-                get: function () {
-                    const treeDataList = this.basicInfo['treeDataList'] ? [...this.basicInfo['treeDataList']] : []
+                get () {
+                    const treeDataList = this.basicInfo.treeDataList ? [...this.basicInfo.treeDataList] : []
                     treeDataList.forEach(item => {
                         this.recordParent(item, '')
                     })
                     return treeDataList
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$set(this.$parent.DetailInfo, 'treeDataList', newVal)
-                }
-            }
+                },
+            },
         },
         created () {
             if (this.basicInfo.req_params && this.basicInfo.req_params.length) {
@@ -246,7 +246,7 @@
                     name: '',
                     value: '',
                     sample: '',
-                    desc: ''
+                    desc: '',
                 }
                 oriData.splice(index + 1, 0, value)
             },
@@ -263,7 +263,7 @@
                     is_necessary: 0,
                     sample: '',
                     desc: '',
-                    value: ''
+                    value: '',
                 }
                 oriData.splice(index + 1, 0, value)
             },
@@ -288,7 +288,7 @@
                     default: '',
                     type: 'string',
                     desc: '',
-                    parentInfo: node.parentInfo
+                    parentInfo: node.parentInfo,
                 }
                 node.parentInfo.children.splice(node.parentInfo.children.indexOf(node) + 1, 0, addnode)
             },
@@ -303,7 +303,7 @@
                     default: '',
                     type: 'string',
                     desc: '',
-                    parentInfo: this.bodyInfo.checkInfo
+                    parentInfo: this.bodyInfo.checkInfo,
                 }
                 if (!node.children || !node.children.length) {
                     this.$set(node, 'children', [])
@@ -328,15 +328,15 @@
                         name: '',
                         desc: '',
                         id: id || '',
-                        code: ''
+                        code: '',
                     },
                     checkout: {
-                        name: ''
+                        name: '',
                     },
                     width: 700,
                     headerPosition: 'left',
                     autoClose: false,
-                    precision: 0
+                    precision: 0,
                 })
             },
             // 导入JSON
@@ -344,12 +344,12 @@
                 let rootJsonschemaData = {}
                 try {
                     rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value))
-                    this.basicInfo['treeDataList'] = this.jsonschemaToList(rootJsonschemaData)
+                    this.basicInfo.treeDataList = this.jsonschemaToList(rootJsonschemaData)
                     this.closeDictionary()
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
-                        theme: 'error'
+                        theme: 'error',
                     })
                 }
             },
@@ -358,8 +358,8 @@
             },
             blur (content, $editor, $fn) {
                 this.responseDetailConfig.value = content
-            }
-        }
+            },
+        },
     }
 </script>
 

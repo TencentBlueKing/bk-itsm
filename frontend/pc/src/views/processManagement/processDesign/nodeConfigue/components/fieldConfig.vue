@@ -204,7 +204,7 @@
             draggable,
             fieldPreview,
             addField,
-            inheritState
+            inheritState,
         },
         mixins: [apiFieldsWatch],
         props: {
@@ -213,31 +213,31 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 节点信息
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             templateStage: {
                 type: String,
-                default: ''
+                default: '',
             },
             templateInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             isShowTitle: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -249,18 +249,18 @@
                 changeInfo: {},
                 // 新增编辑字段
                 sliderInfo: {
-                    title: this.$t(`m.treeinfo["新增字段"]`),
+                    title: this.$t('m.treeinfo["新增字段"]'),
                     show: false,
-                    width: 700
+                    width: 700,
                 },
                 // 字段预览
                 processInfo: {
                     isShow: false,
-                    title: this.$t(`m.treeinfo["字段预览"]`),
+                    title: this.$t('m.treeinfo["字段预览"]'),
                     position: {
-                        top: 150
+                        top: 150,
                     },
-                    draggable: true
+                    draggable: true,
                 },
                 previewTab: [],
                 // 模型字段
@@ -269,26 +269,26 @@
                     isShow: false,
                     width: 700,
                     headerPosition: 'left',
-                    autoClose: false
+                    autoClose: false,
                 },
                 // 任务模板添加字段与公共字段逻辑保持一致
                 addOrigin: {
-                    isOther: false
-                }
+                    isOther: false,
+                },
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         watch: {
-            'templateInfo.id': function () {
+            'templateInfo.id' () {
                 this.initData()
             },
-            templateStage: function () {
+            templateStage () {
                 this.initData()
-            }
+            },
         },
         async mounted () {
             await this.initData()
@@ -303,7 +303,7 @@
                     this.addOrigin.addOriginInfo = {
                         type: 'templateField',
                         addUrl: 'taskTemplate/createTemplateField',
-                        updateUrl: 'taskTemplate/updateTemplateField'
+                        updateUrl: 'taskTemplate/updateTemplateField',
                     }
                 }
                 await this.getTableList()
@@ -333,10 +333,10 @@
                             }
                         })
                         if (item.type === 'COMPLEX-MEMBERS') {
-                            this.$set(item, 'typeName', this.$t(`m.newCommon['处理人']`))
+                            this.$set(item, 'typeName', this.$t('m.newCommon[\'处理人\']'))
                         }
                         if (item.type === 'SOPS_TEMPLATE') {
-                            this.$set(item, 'typeName', this.$t(`m.newCommon['流程模板']`))
+                            this.$set(item, 'typeName', this.$t('m.newCommon[\'流程模板\']'))
                         }
                         // 是否必填
                         this.globalChoise.validate_type.forEach(node => {
@@ -345,11 +345,13 @@
                             }
                         })
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 是否可以删除
             checkDeleteDisabled (item) {
@@ -441,9 +443,10 @@
                 this.$store.dispatch(url, params).then(res => {
                     this.nodesList = res.data
                     this.sliderInfo.show = true
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 新增字段
             addField () {
@@ -464,15 +467,15 @@
                     custom_regex: '',
                     is_tips: false,
                     tips: '',
-                    meta: {}
+                    meta: {},
                 }
-                this.sliderInfo.title = this.$t(`m.treeinfo["新增字段"]`)
+                this.sliderInfo.title = this.$t('m.treeinfo["新增字段"]')
                 this.getFrontNodesList()
             },
             openField (item) {
                 this.changeInfo = item
                 this.changeInfo.is_tips = item.is_tips || false
-                this.sliderInfo.title = this.$t(`m.treeinfo["编辑字段"]`)
+                this.sliderInfo.title = this.$t('m.treeinfo["编辑字段"]')
                 this.getFrontNodesList()
             },
             // 字段预览
@@ -489,21 +492,21 @@
                     this.$set(this.previewTab[i], 'showFeild', true)
                 }
                 this.processInfo.isShow = true
-                this.isNecessaryToWatch({ 'fields': this.previewTab }, 'workflow')
+                this.isNecessaryToWatch({ fields: this.previewTab }, 'workflow')
             },
             // 删除字段
             deleteTable (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.treeinfo["确认删除此字段？"]`),
-                    subTitle: this.$t(`m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]`),
+                    title: this.$t('m.treeinfo["确认删除此字段？"]'),
+                    subTitle: this.$t('m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]'),
                     confirmFn: () => {
                         let url = 'deployCommon/deleteField'
                         const patch = {
                             id: item.id,
                             params: {
-                                state_id: this.configur.id
-                            }
+                                state_id: this.configur.id,
+                            },
                         }
                         if (this.templateInfo.id) {
                             url = 'taskTemplate/deleteTemplateField'
@@ -515,16 +518,18 @@
                         this.secondClick = true
                         this.$store.dispatch(url, patch).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getTableList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 模型字段
@@ -535,30 +540,32 @@
                 const checkList = this.$refs.inheritState.checkList.filter(item => !item.is_disabled)
                 if (checkList.length) {
                     const params = {
-                        fields: checkList
+                        fields: checkList,
                     }
-                    const id = this.configur.id
+                    const { id } = this.configur
                     if (this.secondClick) {
                         return
                     }
                     this.secondClick = true
                     this.$store.dispatch('basicModule/add_fields_from_table', { params, id }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.systemConfig["添加成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.systemConfig["添加成功"]'),
+                            theme: 'success',
                         })
                         this.moduleInfo.isShow = false
                         this.getTableList()
-                    }).catch((res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
                     })
+                        .catch((res) => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                        })
                 } else {
                     this.moduleInfo.isShow = false
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

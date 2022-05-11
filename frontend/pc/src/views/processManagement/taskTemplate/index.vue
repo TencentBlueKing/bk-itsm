@@ -186,7 +186,7 @@
         name: 'taskTemplate',
         components: {
             commonStep,
-            memberSelect
+            memberSelect,
         },
         mixins: [permission],
         data () {
@@ -199,58 +199,58 @@
                 stepList: [
                     {
                         id: 1,
-                        name: this.$t(`m.taskTemplate['创建任务配置']`),
+                        name: this.$t('m.taskTemplate[\'创建任务配置\']'),
                         type: 'primary',
                         show: true,
                         is_draft: false,
                         stage: 'CREATE',
-                        signal: ''
+                        signal: '',
                     },
                     {
                         id: 2,
-                        name: this.$t(`m.taskTemplate['处理任务配置']`),
+                        name: this.$t('m.taskTemplate[\'处理任务配置\']'),
                         type: 'normal',
                         show: false,
                         is_draft: false,
                         stage: 'OPERATE',
-                        signal: ''
+                        signal: '',
                     },
                     {
                         id: 3,
-                        name: this.$t(`m.taskTemplate['总结任务配置']`),
+                        name: this.$t('m.taskTemplate[\'总结任务配置\']'),
                         type: 'normal',
                         show: false,
                         is_draft: false,
                         stage: 'CONFIRM',
-                        signal: ''
-                    }
+                        signal: '',
+                    },
                 ],
                 // 步骤组件值
                 templateInfo: {
                     itemInfo: {},
-                    newNode: false
+                    newNode: false,
                 },
                 templateList: [],
                 listLoading: false,
                 addDialogInfo: {
                     isShow: false,
-                    title: this.$t(`m.taskTemplate['新增任务模板']`),
-                    width: 500
+                    title: this.$t('m.taskTemplate[\'新增任务模板\']'),
+                    width: 500,
                 },
                 firstStepInfo: {
                     name: '',
                     ownersInputValue: [],
-                    desc: ''
+                    desc: '',
                 },
                 formRule: {
                     name: [
                         {
                             required: true,
-                            message: this.$t(`m.taskTemplate['请输入任务名称']`),
-                            trigger: 'blur'
-                        }
-                    ]
-                }
+                            message: this.$t('m.taskTemplate[\'请输入任务名称\']'),
+                            trigger: 'blur',
+                        },
+                    ],
+                },
             }
         },
         computed: {
@@ -259,7 +259,7 @@
             },
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         async mounted () {
             await this.initData()
@@ -273,24 +273,26 @@
             },
             async getTemplateList () {
                 const params = {
-                    name__icontains: this.searchKey
+                    name__icontains: this.searchKey,
                 }
                 this.listLoading = true
                 await this.$store.dispatch('taskTemplate/getTemplateList', params).then(res => {
                     this.templateList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.listLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.listLoading = false
+                    })
             },
             cloneTemplate (item) {
                 if (!this.hasPermission(['task_template_manage'], item.auth_actions)) {
                     const resourceData = {
                         task_template: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData)
                     return
@@ -303,15 +305,17 @@
                     confirmFn: () => {
                         this.$store.dispatch('taskTemplate/cloneTemplate', item.id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.taskTemplate['克隆成功']`),
-                                theme: 'success'
+                                message: this.$t('m.taskTemplate[\'克隆成功\']'),
+                                theme: 'success',
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.getTemplateList()
                         })
-                    }
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.getTemplateList()
+                            })
+                    },
                 })
             },
             deleteTemplate (item) {
@@ -319,8 +323,8 @@
                     const resourceData = {
                         task_template: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['task_template_manage'], item.auth_actions, resourceData)
                     return
@@ -335,15 +339,17 @@
                     confirmFn: () => {
                         this.$store.dispatch('taskTemplate/deleteTemplate', item.id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig['删除成功']`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig[\'删除成功\']'),
+                                theme: 'success',
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.getTemplateList()
                         })
-                    }
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.getTemplateList()
+                            })
+                    },
                 })
             },
             // 编辑列表数据
@@ -352,8 +358,8 @@
                     const resourceData = {
                         task_template: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['task_template_view'], item.auth_actions, resourceData)
                     return
@@ -408,7 +414,7 @@
             backTab () {
                 const item = {
                     id: '',
-                    is_draft: true
+                    is_draft: true,
                 }
                 this.changeStep(item)
                 this.getTemplateList()
@@ -426,22 +432,24 @@
                     component_type: 'NORMAL',
                     owners: this.firstStepInfo.ownersInputValue.join(','),
                     is_draft: true,
-                    desc: this.firstStepInfo.desc
+                    desc: this.firstStepInfo.desc,
                 }
                 await this.$store.dispatch('taskTemplate/createNewTemplate', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.taskTemplate['保存成功']`),
-                        theme: 'success'
+                        message: this.$t('m.taskTemplate[\'保存成功\']'),
+                        theme: 'success',
                     })
                     this.changeTemplateInfo(res.data)
                     this.changeStep(this.templateInfo.itemInfo)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.addDialogInfo.isShow = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.addDialogInfo.isShow = false
+                    })
+            },
+        },
     }
 </script>
 

@@ -117,18 +117,18 @@
             EmailNoticeTab,
             CommentTab,
             AllTaskTab,
-            taskHistory
+            taskHistory,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             nodeList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
-            hasNodeOptAuth: Boolean
+            hasNodeOptAuth: Boolean,
         },
         data () {
             return {
@@ -137,13 +137,13 @@
                 isShowSla: true,
                 isResponseTimeout: true,
                 isDisposeTimeout: false,
-                isNormal: false // sla正常时间内
+                isNormal: false, // sla正常时间内
             }
         },
         computed: {
             ...mapState({
-                openFunction: state => state.openFunction
-            })
+                openFunction: state => state.openFunction,
+            }),
         },
         methods: {
             handleClickShowSla () {
@@ -154,14 +154,14 @@
                 this.$router.push({
                     name: 'slaAgreement',
                     query: {
-                        project_id: this.$route.query.project_id || 0
-                    }
+                        project_id: this.$route.query.project_id || 0,
+                    },
                 })
             },
             viewProcess (val) {
                 this.$emit('viewProcess', val)
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -52,34 +52,34 @@
                 {
                     name: '操作',
                     type: 'text',
-                    key: 'column1'
+                    key: 'column1',
                 },
                 {
                     name: '关联相关内容',
                     key: 'column2',
                     scheme: 'table_text_scheme',
                     attrs: {
-                    }
+                    },
                 },
                 {
                     name: '申请期限',
                     type: 'text',
                     key: 'column3',
                     attrs: {
-                        sort: true
-                    }
-                }
-            ])
+                        sort: true,
+                    },
+                },
+            ]),
         },
         value: {
             type: Array,
-            default: () => ([])
-        }
+            default: () => ([]),
+        },
     }
     export default {
         name: 'TagTable',
         components: {
-            ViewItem: () => import('../ViewItem.vue')
+            ViewItem: () => import('../ViewItem.vue'),
         },
         mixins: [getFormMixins(tableAttrs)],
         methods: {
@@ -96,14 +96,14 @@
                 }
                 if (form && form.type) {
                     return {
-                        type: form.type
+                        type: form.type,
                     }
                 }
                 return {
-                    type: item.type
+                    type: item.type,
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss">

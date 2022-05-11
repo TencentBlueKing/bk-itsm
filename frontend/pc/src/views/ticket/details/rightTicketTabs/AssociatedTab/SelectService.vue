@@ -73,21 +73,21 @@
     export default {
         name: 'SelectService',
         components: {
-            commonCascade
+            commonCascade,
         },
         props: {
             customId: {
                 type: String,
                 default () {
                     return ''
-                }
+                },
             },
             isGetField: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -97,13 +97,13 @@
                     cascadeId: '',
                     service_id: '',
                     canAgency: false,
-                    key: ''
+                    key: '',
                 },
                 cascadeList: [],
                 billList: [],
                 billListInfo: '',
                 // 收藏
-                optionsFavorites: []
+                optionsFavorites: [],
             }
         },
         watch: {
@@ -111,7 +111,7 @@
                 if (this.isGetField) {
                     this.$emit('getFieldList')
                 }
-            }
+            },
         },
         mounted () {
             this.getBillList()
@@ -126,14 +126,15 @@
                 const params = {
                     key: this.customId === 'all' ? 'global' : this.customId,
                     show_deleted: false,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.$store.dispatch('serviceCatalog/getTreeData', params).then((res) => {
                     this.cascadeList = res.data.length ? res.data[0].children : []
                     this.$refs.commoncascader.settextinfo([this.cascadeList[0]], 'give_default')
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             getServiceList () {
                 if (!this.formData.cascadeId) {
@@ -143,7 +144,7 @@
                     catalog_id: this.formData.cascadeId,
                     service_key: this.customId === 'all' ? 'globalview' : this.customId,
                     is_valid: 1,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.isSecondLoading = true
                 this.$store.dispatch('catalogService/getServices', params).then((res) => {
@@ -163,11 +164,13 @@
                         this.formData.canAgency = ''
                         this.formData.key = ''
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isSecondLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isSecondLoading = false
+                    })
             },
             handleChange (value) {
                 this.formData.cascadeId = value[value.length - 1].id
@@ -186,50 +189,51 @@
                     return
                 }
                 const params = {
-                    service: this.customId
+                    service: this.customId,
                 }
                 this.$store.dispatch('service/getfavorites', params).then((res) => {
                     if (res.data.length) {
-                        this.optionsFavorites = res.data[0].data.filter(item => {
-                            return item.is_deleted === false
-                        })
+                        this.optionsFavorites = res.data[0].data.filter(item => item.is_deleted === false)
                     } else {
                         this.optionsFavorites = []
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             collect (favoriteslist) {
                 const favorite = {}
-                favorite['service'] = this.customId
-                favorite['data'] = favoriteslist
+                favorite.service = this.customId
+                favorite.data = favoriteslist
                 // 更新收藏分类
                 this.$store.dispatch('service/updatefavorites', favorite).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.manageCommon["收藏成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.manageCommon["收藏成功"]'),
+                        theme: 'success',
                     })
                     this.optionsFavorites = favoriteslist
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             cancelcollect (favoriteslist) {
                 const favorite = {}
-                favorite['service'] = this.customId
-                favorite['data'] = favoriteslist
+                favorite.service = this.customId
+                favorite.data = favoriteslist
                 this.$store.dispatch('service/updatefavorites', favorite).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.manageCommon["取消成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.manageCommon["取消成功"]'),
+                        theme: 'success',
                     })
                     this.optionsFavorites = favoriteslist
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 

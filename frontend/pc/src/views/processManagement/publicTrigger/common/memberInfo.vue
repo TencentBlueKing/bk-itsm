@@ -105,27 +105,27 @@
         name: 'changeConductor',
         components: {
             memberSelect,
-            exportTree
+            exportTree,
         },
         props: {
             itemInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             recipientItem: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             recipientIndex: {
                 type: Number,
                 default () {
                     return ''
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -133,9 +133,9 @@
                 roles: {
                     viewTreeDataList: [],
                     viewtree: {},
-                    viewTreeOpen: false
+                    viewTreeOpen: false,
                 },
-                variableList: []
+                variableList: [],
             }
         },
         computed: {
@@ -143,20 +143,18 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         watch: {
-            triggerVariables: function (newVal) {
+            triggerVariables (newVal) {
                 this.variableList = newVal
-            }
+            },
         },
         created () {
             // 处理人去掉（不限，提单人，派单人指定，无）
             const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY']
-            this.recipientKeyList = this.globalChoise.processor_type.filter(item => {
-                return !filterList.some(filterName => filterName === item.typeName)
-            })
+            this.recipientKeyList = this.globalChoise.processor_type.filter(item => !filterList.some(filterName => filterName === item.typeName))
             // 如果一级字段存在值，则调用二级字段列表
             if (this.recipientItem.key) {
                 this.recipientItem.secondLevelList = []
@@ -200,7 +198,7 @@
                 recipientItem.isLoading = true
                 this.$store.dispatch('deployCommon/getSecondUser', {
                     role_type: recipientItem.key,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then((res) => {
                     const valueList = res.data
                     const userList = []
@@ -208,24 +206,26 @@
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name + '(' + item.count + ')',
-                                disabled: (item.count === 0)
+                                name: `${item.name}(${item.count})`,
+                                disabled: (item.count === 0),
                             })
                         })
                     } else {
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name
+                                name: item.name,
                             })
                         })
                     }
                     recipientItem.secondLevelList = userList
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    recipientItem.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        recipientItem.isLoading = false
+                    })
             },
             // 组织架构
             getOrganization () {
@@ -240,9 +240,10 @@
                             this.openChildren(tree, 'view')
                         })
                     }
-                }).catch(res => {
-
                 })
+                    .catch(res => {
+
+                    })
             },
             recordCheckFn (tree) {
                 tree.checkInfo = false
@@ -274,9 +275,7 @@
             openChildren (tree, type) {
                 tree.showChildren = false
                 if (type === 'view') {
-                    tree.showChildren = this.roles.viewtree.route.some(item => {
-                        return String(item.id) === String(tree.id)
-                    })
+                    tree.showChildren = this.roles.viewtree.route.some(item => String(item.id) === String(tree.id))
                 }
                 if (!(tree.children && tree.children.length)) {
                     return
@@ -323,7 +322,7 @@
                     type: '',
                     value: '',
                     secondLevelList: [],
-                    isLoading: false
+                    isLoading: false,
                 })
             },
             deleteRecipient () {
@@ -331,8 +330,8 @@
                     return
                 }
                 this.itemInfo.value.splice(this.recipientIndex, 1)
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -73,8 +73,8 @@
                 markdownText: '',
                 versionList: [],
                 versionInfo: {
-                    version: ''
-                }
+                    version: '',
+                },
             }
         },
         computed: {},
@@ -97,11 +97,13 @@
                 this.loading = true
                 return this.$store.dispatch('version/version_logs').then(res => {
                     this.versionList = res.data.data
-                }).catch(res => {
-                    errorHandler(res.data.message, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch(res => {
+                        errorHandler(res.data.message, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             changeVersion (item) {
                 this.versionInfo = item
@@ -120,8 +122,8 @@
                     result += arrayStr.join('')
                 })
                 return result
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

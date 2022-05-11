@@ -29,7 +29,7 @@
         name: 'TicketTriggerDialog',
         data () {
             return {
-                triggerId: ''
+                triggerId: '',
             }
         },
         methods: {
@@ -40,24 +40,25 @@
                     subTitle: trigger.display_name,
                     confirmFn: () => {
                         this.executeTrigger(trigger)
-                    }
+                    },
                 })
             },
             executeTrigger (trigger) {
                 this.$store.dispatch('trigger/executeHandleTriggers', this.triggerId).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.$store.commit('taskHistoryRefreshFunc')
                     if (trigger.need_refresh || !trigger.can_repeat) {
                         this.$emit('init-info')
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

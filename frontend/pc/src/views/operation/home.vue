@@ -200,99 +200,99 @@
             key: 'order',
             name: 'No',
             colorMark: true,
-            width: 80
+            width: 80,
         },
         {
             key: 'service_name',
-            name: i18n.t(`m['服务名称']`),
+            name: i18n.t('m[\'服务名称\']'),
             link: true,
             handler (data) {
                 this.$router.push({ name: this.$route.query.project_id ? 'projectOperationService' : 'OperationService', params: { id: data.service_id }, query: { project_id: this.$route.query.project_id } })
-            }
+            },
         },
         {
             key: 'category',
-            name: i18n.t(`m['服务类型']`)
+            name: i18n.t('m[\'服务类型\']'),
         },
         {
             key: 'count',
-            name: i18n.t(`m['单量（占比）']`),
+            name: i18n.t('m[\'单量（占比）\']'),
             sort: true,
             align: 'right',
             format (data) {
                 return `${data.count}(${data.ratio})`
-            }
+            },
         },
         {
             key: 'creator_count',
-            name: i18n.t(`m['用户数']`),
+            name: i18n.t('m[\'用户数\']'),
             sort: true,
             align: 'right',
-            width: 100
+            width: 100,
         },
         {
             key: 'biz_count',
-            name: i18n.t(`m['业务使用数']`),
+            name: i18n.t('m[\'业务使用数\']'),
             sort: true,
             align: 'right',
-            width: 110
-        }
+            width: 110,
+        },
     ]
     const BIZ_TABLE_COLUMNS = [
         {
             key: 'order',
             name: 'No',
             colorMark: true,
-            width: 80
+            width: 80,
         },
         {
             key: 'bk_biz_name',
-            name: i18n.t(`m['业务名']`)
+            name: i18n.t('m[\'业务名\']'),
         },
         {
             key: 'service_count',
-            name: i18n.t(`m['使用服务数量']`),
+            name: i18n.t('m[\'使用服务数量\']'),
             sort: true,
-            align: 'right'
+            align: 'right',
         },
         {
             key: 'count',
-            name: i18n.t(`m['单量']`),
+            name: i18n.t('m[\'单量\']'),
             sort: true,
             align: 'right',
-            width: 120
-        }
+            width: 120,
+        },
     ]
     const CREATOR_TABLE_COLUMNS = [
         {
             key: 'order',
             name: 'No',
             colorMark: true,
-            width: 60
+            width: 60,
         },
         {
             key: 'creator',
-            name: i18n.t(`m['用户ID']`),
-            width: 120
+            name: i18n.t('m[\'用户ID\']'),
+            width: 120,
         },
         {
             key: 'organization',
-            name: i18n.t(`m['所在组织']`)
+            name: i18n.t('m[\'所在组织\']'),
         },
         {
             key: 'count',
-            name: i18n.t(`m['提单量']`),
+            name: i18n.t('m[\'提单量\']'),
             colorMark: true,
             align: 'right',
-            width: 120
-        }
+            width: 120,
+        },
     ]
 
     const STATUS_MAP = {
-        'RUNNING': '进行中',
-        'FINISHED': '已完成',
-        'REVOKED': '已撤销',
-        'TERMINATED': '已终止'
+        RUNNING: '进行中',
+        FINISHED: '已完成',
+        REVOKED: '已撤销',
+        TERMINATED: '已终止',
     }
 
     export default {
@@ -303,11 +303,12 @@
             TableChart,
             LineChart,
             BarChart,
-            PieChart
+            PieChart,
         },
         data () {
             const end = dayjs().format(FORMAT)
-            const start = dayjs().subtract(1, 'month').format(FORMAT)
+            const start = dayjs().subtract(1, 'month')
+                .format(FORMAT)
             return {
                 dateRange: [start, end],
                 isDateSelectorFixed: false,
@@ -316,30 +317,30 @@
                         count: 0,
                         service_count: 0,
                         biz_count: 0,
-                        user_count: 0
+                        user_count: 0,
                     },
                     week: {
                         ticket: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
+                            ratio: '--',
                         },
                         service: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
+                            ratio: '--',
                         },
                         biz: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
+                            ratio: '--',
                         },
                         user: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
-                        }
-                    }
+                            ratio: '--',
+                        },
+                    },
                 },
                 bizList: [],
                 bizSearchIds: undefined,
@@ -366,80 +367,87 @@
                     current: 1,
                     count: 0,
                     limit: 10,
-                    'show-limit': false
+                    'show-limit': false,
                 },
                 bizTablePagination: {
                     size: 'small',
                     current: 1,
                     count: 0,
                     limit: 10,
-                    'show-limit': false
+                    'show-limit': false,
                 },
                 shortcuts: [
                     {
-                        text: this.$t(`m['今天']`),
+                        text: this.$t('m[\'今天\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['昨天']`),
+                        text: this.$t('m[\'昨天\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'day').format(FORMAT)
+                            const start = dayjs().subtract(1, 'day')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['前天']`),
+                        text: this.$t('m[\'前天\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(2, 'day').format(FORMAT)
+                            const start = dayjs().subtract(2, 'day')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['一周前']`),
+                        text: this.$t('m[\'一周前\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'week').format(FORMAT)
+                            const start = dayjs().subtract(1, 'week')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['一个月前']`),
+                        text: this.$t('m[\'一个月前\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'month').format(FORMAT)
+                            const start = dayjs().subtract(1, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['三个月前']`),
+                        text: this.$t('m[\'三个月前\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(3, 'month').format(FORMAT)
+                            const start = dayjs().subtract(3, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['半年前']`),
+                        text: this.$t('m[\'半年前\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(6, 'month').format(FORMAT)
+                            const start = dayjs().subtract(6, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
-                        text: this.$t(`m['一年前']`),
+                        text: this.$t('m[\'一年前\']'),
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'year').format(FORMAT)
+                            const start = dayjs().subtract(1, 'year')
+                                .format(FORMAT)
                             return [start, end]
-                        }
-                    }
+                        },
+                    },
                 ],
                 loading: {
                     summary: false,
@@ -453,9 +461,9 @@
                     top10TicketOrganization: false,
                     addedTicket: false,
                     addedUser: false,
-                    addedService: false
+                    addedService: false,
                 },
-                project_key: this.$route.query.project_id || undefined
+                project_key: this.$route.query.project_id || undefined,
             }
         },
         created () {
@@ -488,15 +496,15 @@
                 this.loading.summary = true
                 try {
                     const params = {
-                        project_key: this.project_key
+                        project_key: this.project_key,
                     }
                     const resp = await Promise.all([
                         this.$store.dispatch('operation/getSummaryTotalData', params),
-                        this.$store.dispatch('operation/getSummaryWeekData', params)
+                        this.$store.dispatch('operation/getSummaryWeekData', params),
                     ])
                     this.summaryData = {
                         total: resp[0].data,
-                        week: resp[1].data
+                        week: resp[1].data,
                     }
                 } catch (e) {
                     console.error(e)
@@ -509,7 +517,7 @@
                 this.loading.bizList = true
                 try {
                     const params = {
-                        project_key: this.project_key
+                        project_key: this.project_key,
                     }
                     const resp = await this.$store.dispatch('eventType/getAppList', params)
                     this.bizList = resp.data
@@ -529,7 +537,7 @@
                         create_at__lte: this.dateRange[1],
                         page: this.serviceTablePagination.current,
                         service_name: this.serviceSearchStr,
-                        order_by: order
+                        order_by: order,
                     }
                     const resp = await this.$store.dispatch('operation/getServiceUseData', params)
                     this.serviceTablePagination.count = resp.data.count
@@ -550,7 +558,7 @@
                         create_at__lte: this.dateRange[1],
                         page: this.bizTablePagination.current,
                         biz_id: this.bizSearchIds,
-                        order_by: order
+                        order_by: order,
                     }
                     const resp = await this.$store.dispatch('operation/getBizUseData', params)
                     this.bizTablePagination.count = resp.data.count
@@ -568,12 +576,12 @@
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
-                        create_at__lte: this.dateRange[1]
+                        create_at__lte: this.dateRange[1],
                     }
                     const resp = await this.$store.dispatch('operation/getTicketClassifyData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, service_type } = item
@@ -594,12 +602,12 @@
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
-                        create_at__lte: this.dateRange[1]
+                        create_at__lte: this.dateRange[1],
                     }
                     const resp = await this.$store.dispatch('operation/getTicketStatusData', params)
                     const data = {
                         labels: [],
-                        value: []
+                        value: [],
                     }
                     resp.data.forEach(item => {
                         const { status, count } = item
@@ -622,12 +630,12 @@
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
                         timedelta: this.creatorChartDismension,
-                        resource_type: 'creator'
+                        resource_type: 'creator',
                     }
                     const resp = await this.$store.dispatch('operation/getResourceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -648,7 +656,7 @@
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
-                        create_at__lte: this.dateRange[1]
+                        create_at__lte: this.dateRange[1],
                     }
                     const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params)
                     const data = resp.data.map(item => {
@@ -675,12 +683,12 @@
                     const params = {
                         project_key: this.project_key,
                         create_at__gte: this.dateRange[0],
-                        create_at__lte: this.dateRange[1]
+                        create_at__lte: this.dateRange[1],
                     }
                     const resp = await this.$store.dispatch('operation/getTop10TicketOrganizationData', params)
                     const data = {
                         labels: [],
-                        value: []
+                        value: [],
                     }
                     resp.data.forEach(item => {
                         const { organization, count } = item
@@ -703,12 +711,12 @@
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedTicketChartDismension,
-                        resource_type: 'ticket'
+                        resource_type: 'ticket',
                     }
                     const resp = await this.$store.dispatch('operation/getResourceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -731,12 +739,12 @@
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedUserChartDismension,
-                        resource_type: 'user'
+                        resource_type: 'user',
                     }
                     const resp = await this.$store.dispatch('operation/getResourceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -759,12 +767,12 @@
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedServiceChartDismension,
-                        resource_type: 'service'
+                        resource_type: 'service',
                     }
                     const resp = await this.$store.dispatch('operation/getResourceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -804,9 +812,7 @@
             handleBizSearch (val) {
                 this.bizTablePagination.current = 1
                 if (val !== '') {
-                    const matched = this.bizList.filter(item => {
-                        return item.name.toLowerCase().includes(val)
-                    })
+                    const matched = this.bizList.filter(item => item.name.toLowerCase().includes(val))
                     if (matched.length > 0) {
                         this.bizSearchIds = matched.map(item => item.key).join(',')
                         this.getBizUseData()
@@ -851,8 +857,8 @@
             onAddedServiceDimensionChange (val) {
                 this.addedServiceChartDismension = val
                 this.getAddedServiceData()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

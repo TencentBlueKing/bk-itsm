@@ -374,14 +374,14 @@
         components: {
             NavTitle,
             searchInfo,
-            treeInfo
+            treeInfo,
             // selectTree
         },
         mixins: [permission, commonMix],
         data () {
             return {
                 treeInfo: {
-                    node: {}
+                    node: {},
                 },
                 rules: {},
                 importCatalogId: [],
@@ -393,7 +393,7 @@
                     name: '',
                     desc: '',
                     key: '',
-                    catalog_id: ''
+                    catalog_id: '',
                 },
                 dirList: [], // 服务目录
                 serviceTypeList: [], // 服务类型
@@ -411,52 +411,52 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 查询
                 moreSearch: [
                     {
-                        name: this.$t(`m.serviceConfig["服务名称"]`),
+                        name: this.$t('m.serviceConfig["服务名称"]'),
                         type: 'input',
                         typeKey: 'name',
                         value: '',
-                        placeholder: this.$t(`m.serviceConfig["请输入服务名"]`)
+                        placeholder: this.$t('m.serviceConfig["请输入服务名"]'),
                     },
                     {
-                        name: this.$t(`m.serviceConfig["类型"]`),
+                        name: this.$t('m.serviceConfig["类型"]'),
                         type: 'select',
                         typeKey: 'key',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.serviceConfig["服务级别"]`),
+                        name: this.$t('m.serviceConfig["服务级别"]'),
                         type: 'select',
                         typeKey: 'sla',
                         value: '',
-                        list: []
-                    }
+                        list: [],
+                    },
                 ],
                 addList: [],
                 lineList: [],
                 // 流程预览
                 processInfo: {
                     isShow: false,
-                    title: this.$t(`m.serviceConfig["流程预览"]`),
+                    title: this.$t('m.serviceConfig["流程预览"]'),
                     position: {
-                        top: 150
+                        top: 150,
                     },
                     draggable: true,
-                    loading: true
+                    loading: true,
                 },
                 changeFrom: {
                     name: '',
                     serviceType: '',
-                    bounded_catalogs: ''
+                    bounded_catalogs: '',
                 },
                 editValue: '',
                 tableHoverId: '',
-                isImportServiceShow: false
+                isImportServiceShow: false,
             }
         },
         watch: {
@@ -475,7 +475,7 @@
                         this.$refs.importInput.value = ''
                     })
                 }
-            }
+            },
         },
         created () {
             this.rules.name = this.checkCommonRules('name').name
@@ -522,19 +522,19 @@
                 formdata.append('project_key', this.$route.query.project_id)
                 if (this.importCatalogId.length === 0) {
                     this.isCheckImport = true
-                    this.errorName = this.$t(`m["目录"]`)
+                    this.errorName = this.$t('m["目录"]')
                     return
                 }
                 if (this.importFileNameList.length === 0) {
                     this.isCheckImport = true
-                    this.errorName = this.$t(`m["文件"]`)
+                    this.errorName = this.$t('m["文件"]')
                     return
                 }
                 this.isImportServiceShow = false
                 this.$store.dispatch('serviceEntry/importService', formdata).then(res => {
                     this.$bkMessage({
                         message: res.message,
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.importCatalogId = []
                     this.isImportServiceShow = false
@@ -546,7 +546,7 @@
                 this.isImportServiceShow = true
             },
             exportService (row) {
-                window.open(window.SITE_URL + `api/service/projects/${row.id}/export/`)
+                window.open(`${window.SITE_URL}api/service/projects/${row.id}/export/`)
             },
             handleChange (type, row) {
                 // this.editValue = row.name
@@ -584,12 +584,12 @@
                     key: curRow.key,
                     name: curRow.name,
                     project_key: curRow.project_key,
-                    desc: ''
+                    desc: '',
                 }
                 this.$store.dispatch('serviceEntry/updateService', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["修改成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["修改成功"]'),
+                        theme: 'success',
                     })
                     this.editValue = ''
                     this.closeEdit()
@@ -609,7 +609,7 @@
                     page_size: this.pagination.limit,
                     project_key: this.$store.state.project.id,
                     ordering: '-update_at',
-                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id
+                    catalog_id: this.$route.query.catalog_id || this.treeInfo.node.id,
                 }
                 this.moreSearch.forEach(item => {
                     if (item.value !== '' && item.typeKey) {
@@ -636,21 +636,24 @@
                     } else {
                         this.dataList = []
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             async getServiceDirectory () {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then(res => {
                     this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             onBasicFormSubmit () {
                 this.$refs.basicForm.validate().then(async () => {
@@ -668,25 +671,26 @@
             createService (params) {
                 this.$store.dispatch('serviceEntry/createService', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
                             type: 'new',
-                            step: 'basic'
+                            step: 'basic',
                         },
                         query: {
                             serviceId: res.data.id,
                             project_id: this.$store.state.project.id,
-                            fromCatalog: this.treeInfo.node.id
-                        }
+                            fromCatalog: this.treeInfo.node.id,
+                        },
                     })
                     this.isBasicFormEditting = false
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 服务类型
             getServiceTypes () {
@@ -694,15 +698,16 @@
                     this.serviceTypeList = res.data
                     this.serviceTypesMap = res.data
                     this.moreSearch[1].list = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 服务级别列表
             getSlaList () {
                 const params = {
                     is_enabled: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', { params }).then(res => {
                     this.slaList = res.data
@@ -710,9 +715,10 @@
                     this.moreSearch[2].list.forEach(item => {
                         this.$set(item, 'key', item.id)
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             disabledFn (item, index) {
                 return !item.bounded_catalogs[0]
@@ -720,12 +726,12 @@
             // 创建服务权限点击时校验
             onServiceCreatePermissonCheck () {
                 if (!this.hasPermission(['service_create'], this.$store.state.project.projectAuthActions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     this.applyForPermission(['service_create'], this.$store.state.project.projectAuthActions, resourceData)
                 } else {
@@ -734,12 +740,12 @@
                         name: 'projectServiceEdit',
                         params: {
                             type: 'new',
-                            step: 'basic'
+                            step: 'basic',
                         },
                         query: {
                             project_id: this.$route.query.project_id,
-                            catalog_id: this.$route.query.catalog_id
-                        }
+                            catalog_id: this.$route.query.catalog_id,
+                        },
                     })
                 }
             },
@@ -756,19 +762,19 @@
                                 name: 'projectServiceEdit',
                                 params: {
                                     type: 'edit',
-                                    step: 'basic'
+                                    step: 'basic',
                                 },
                                 query: {
                                     serviceId,
                                     project_id: this.$store.state.project.id,
-                                    catalog_id: this.$route.query.catalog_id
-                                }
+                                    catalog_id: this.$route.query.catalog_id,
+                                },
                             })
                         }
                     } catch (e) {
                         this.$bkMessage({
                             theme: 'warning',
-                            message: e.data.message
+                            message: e.data.message,
                         })
                     }
                 } else {
@@ -776,13 +782,13 @@
                         name: 'projectServiceEdit',
                         params: {
                             type: 'edit',
-                            step: 'basic'
+                            step: 'basic',
                         },
                         query: {
                             serviceId,
                             project_id: this.$store.state.project.id,
-                            catalog_id: this.$route.query.catalog_id
-                        }
+                            catalog_id: this.$route.query.catalog_id,
+                        },
                     })
                 }
             },
@@ -792,74 +798,76 @@
              * @params {Object} row 数据对象
              */
             onServicePermissonCheck (required, row) {
-                const projectInfo = this.$store.state.project.projectInfo
+                const { projectInfo } = this.$store.state.project
                 const resourceData = {
                     service: [{
                         id: row.id,
-                        name: row.name
+                        name: row.name,
                     }],
                     project: [{
                         id: projectInfo.key,
-                        name: projectInfo.name
-                    }]
+                        name: projectInfo.name,
+                    }],
                 }
                 this.applyForPermission(required, [...this.$store.state.project.projectAuthActions, ...row.auth_actions], resourceData)
             },
             deleteCheck () {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.serviceConfig["确认删除服务？"]`),
-                    subTitle: this.$t(`m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]`),
+                    title: this.$t('m.serviceConfig["确认删除服务？"]'),
+                    subTitle: this.$t('m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]'),
                     confirmFn: () => {
-                        const idArr = this.checkList.map(item => {
-                            return item.id
-                        })
+                        const idArr = this.checkList.map(item => item.id)
                         const id = idArr.join(',')
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
-                        this.$store.dispatch('serviceEntry/batchDeleteService', { id: id }).then((res) => {
+                        this.$store.dispatch('serviceEntry/batchDeleteService', { id }).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.serviceConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.serviceConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getList(1)
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 删除
             deleteOne (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.serviceConfig["确认删除服务？"]`),
-                    subTitle: this.$t(`m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]`),
+                    title: this.$t('m.serviceConfig["确认删除服务？"]'),
+                    subTitle: this.$t('m.serviceConfig["服务一旦删除，对应的服务将不可用。请谨慎操作。"]'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('serviceEntry/deleteService', id).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.serviceConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.serviceConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             if (this.dataList.length === 1) {
                                 this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
                             }
                             this.getList()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
             },
             // 简单查询
@@ -916,21 +924,22 @@
                 this.processInfo.loading = true
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
-                    this.$store.dispatch('deployCommon/getLineVersion', { id })
+                    this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     for (let i = 0; i < this.addList.length; i++) {
                         this.addList[i].indexInfo = i
                     }
                     this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.processInfo.loading = false
-                })
+                }))
+                    .finally(() => {
+                        this.processInfo.loading = false
+                    })
             },
             hiddenTree () {
                 this.isHiddenDirectory = !this.isHiddenDirectory
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

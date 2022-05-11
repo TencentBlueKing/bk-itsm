@@ -37,7 +37,7 @@ const transition = {
     'enter' (el) {
         el.dataset.oldOverflow = el.style.overflow
         if (el.scrollHeight !== 0) {
-            el.style.height = el.scrollHeight + 'px'
+            el.style.height = `${el.scrollHeight}px`
             el.style.paddingTop = el.dataset.oldPaddingTop
             el.style.paddingBottom = el.dataset.oldPaddingBottom
         } else {
@@ -60,7 +60,7 @@ const transition = {
         el.dataset.oldPaddingBottom = el.style.paddingBottom
         el.dataset.oldOverflow = el.style.overflow
 
-        el.style.height = el.scrollHeight + 'px'
+        el.style.height = `${el.scrollHeight}px`
         el.style.overflow = 'hidden'
     },
     'leave' (el) {
@@ -78,7 +78,7 @@ const transition = {
         el.style.overflow = el.dataset.oldOverflow
         el.style.paddingTop = el.dataset.oldPaddingTop
         el.style.paddingBottom = el.dataset.oldPaddingBottom
-    }
+    },
 }
 
 export default {
@@ -86,8 +86,8 @@ export default {
     functional: true,
     render (h, { children }) {
         const data = {
-            on: transition
+            on: transition,
         }
         return h('transition', data, children)
-    }
+    },
 }

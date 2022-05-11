@@ -90,18 +90,18 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             previewInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             normalColor: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -113,8 +113,8 @@
                     { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
                     { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
                     { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' }
-                ]
+                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+                ],
             }
         },
         mounted () {
@@ -138,8 +138,8 @@
                     this.$emit('submitNodeValue', node)
                 }
                 this.moveFlag = false
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

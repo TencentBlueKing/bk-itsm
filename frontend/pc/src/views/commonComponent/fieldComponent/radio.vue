@@ -49,22 +49,22 @@
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {}
@@ -72,7 +72,7 @@
         watch: {
             'item.val' () {
                 this.conditionField(this.item, this.fields)
-            }
+            },
         },
         async mounted () {
             if (this.item.value && !this.item.val) {
@@ -85,7 +85,7 @@
         },
         methods: {
 
-        }
+        },
     }
 </script>
 

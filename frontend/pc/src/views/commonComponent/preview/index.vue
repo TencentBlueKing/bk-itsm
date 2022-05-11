@@ -63,7 +63,7 @@
         connector: ['Flowchart', { stub: [10, 16], alwaysRespectStub: true, gap: 2, cornerRadius: 10 }],
         // connector: ['Bezier', { curviness: 60, stub: [0, 10], gap: 3, cornerRadius: 3, alwaysRespectStubs: true }],
         connectorOverlays: [
-            ['PlainArrow', { width: 8, length: 6, location: 1, id: 'arrow' }]
+            ['PlainArrow', { width: 8, length: 6, location: 1, id: 'arrow' }],
         ],
         paintStyle: { fill: 'rgba(0, 0, 0, 0)', stroke: '', strokeWidth: 1, radius: 6 },
         hoverPaintStyle: { fill: '#EE8F62', stroke: '#EE8F62', radius: 8 },
@@ -71,53 +71,53 @@
         hoverClass: 'template-canvas-endpoint-hover',
         isSource: true, // 端点是否可以作为拖动源
         isTarget: true, // 端点是否可以作为拖动目标
-        maxConnections: -1
+        maxConnections: -1,
     }
     const nodeOptions = {
-        grid: [5, 5]
+        grid: [5, 5],
     }
     const connectorOptions = {
         paintStyle: { fill: 'transparent', stroke: '#a9adb6', strokeWidth: 1 },
         hoverPaintStyle: { fill: 'transparent', stroke: '#3a84ff', strokeWidth: 2 },
         cssClass: 'bk-sops-connector',
         hoverClass: 'bk-sops-connector-hover',
-        detachable: true // 是否可以通过鼠标拖动连线
+        detachable: true, // 是否可以通过鼠标拖动连线
     }
     export default {
         components: {
             JsFlow,
             NodeTemplate,
-            toolPanel
+            toolPanel,
         },
         props: {
             addList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             lineList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             previewInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fullStatus: {
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             normalColor: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -126,18 +126,18 @@
                 nodeOptions,
                 canvasData: {
                     nodes: [],
-                    lines: []
+                    lines: [],
                 },
                 nodeInfo: {},
                 // 放大缩小极限
                 toolLimit: 4,
-                currentNode: {}
+                currentNode: {},
             }
         },
         computed: {
             nodeStatus () {
                 return this.$store.state.deployCommon.nodeStatus
-            }
+            },
         },
         created () {
             this.initDate()
@@ -154,34 +154,34 @@
                     const xValue = item.axis.x ? item.axis.x : (165 + index * 250)
                     const yValue = item.axis.y ? item.axis.y : (195 + (index % 2 === 1 ? 5 : 0))
                     this.canvasData.nodes.push({
-                        id: 'node_' + item.id,
+                        id: `node_${item.id}`,
                         x: xValue,
                         y: yValue,
                         type: item.type,
                         name: item.name,
                         showMore: false,
-                        nodeInfo: item
+                        nodeInfo: item,
                     })
-                    this.$set(this.nodeInfo, 'node_' + item.id, item)
+                    this.$set(this.nodeInfo, `node_${item.id}`, item)
                 })
                 this.lineList.forEach((item, index) => {
                     this.canvasData.lines.push({
                         source: {
                             arrow: item.axis.start || 'Right',
-                            id: 'node_' + item.from_state
+                            id: `node_${item.from_state}`,
                         },
                         target: {
                             arrow: item.axis.end || 'Left',
-                            id: 'node_' + item.to_state
+                            id: `node_${item.to_state}`,
                         },
                         lineInfo: item,
                         options: {
                             paintStyle: {
                                 fill: 'transparent',
                                 stroke: item.lineStatus === 'SUCCESS' ? '#2DCB56' : '#a9adb6',
-                                strokeWidth: 1
-                            }
-                        }
+                                strokeWidth: 1,
+                            },
+                        },
                     })
                 })
             },
@@ -249,11 +249,11 @@
             addLineOverlay () {
                 this.canvasData.lines.forEach(item => {
                     const value = {
-                        id: 'label_' + item.lineInfo.id,
+                        id: `label_${item.lineInfo.id}`,
                         type: 'Label',
-                        name: `<span class="bk-label-test-name">${item.lineInfo.name || this.$t(`m.treeinfo["默认"]`)}</span>`,
+                        name: `<span class="bk-label-test-name">${item.lineInfo.name || this.$t('m.treeinfo["默认"]')}</span>`,
                         cls: 'label-test',
-                        location: 0.5
+                        location: 0.5,
                     }
                     if ((item.lineInfo.name !== '默认' && item.lineInfo.name !== 'Default') && item.lineInfo.name) {
                         this.$refs.previewFlow.addLineOverlay(item, value)
@@ -304,8 +304,8 @@
                 if (node.x === this.currentNode.x && node.y === this.currentNode.y) {
                     this.$parent.openNodeContent(node)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

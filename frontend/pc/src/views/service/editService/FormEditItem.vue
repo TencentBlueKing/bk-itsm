@@ -42,17 +42,17 @@
     export default {
         name: 'FormEditItem',
         components: {
-            AddField
+            AddField,
         },
         props: {
             form: Object,
             workflowId: Number,
-            nodeId: Number
+            nodeId: Number,
         },
         data () {
             const formData = deepClone(this.form)
             return {
-                formData
+                formData,
             }
         },
         mounted () {
@@ -65,8 +65,8 @@
             getAddFieldStatus (status) {
                 // console.log(arguments)
                 this.$emit('getAddFieldStatus', status)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

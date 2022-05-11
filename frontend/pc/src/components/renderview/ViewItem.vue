@@ -56,44 +56,44 @@
         components: {
             TagText,
             TagTable,
-            RenderView: () => import('./RenderView')
+            RenderView: () => import('./RenderView'),
         },
         inject: ['getContext'],
         props: {
             scheme: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             form: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             isTop: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             topIndex: {
-                type: Number
-            }
+                type: Number,
+            },
         },
         data () {
             return {
                 crumbsList: [],
                 childrenViewConfig: {
-                    form_data: []
-                }
+                    form_data: [],
+                },
             }
         },
         computed: {
             componentType () {
-                return `Tag` + this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())
+                return `Tag${this.scheme.type.replace(/^[a-z]/, item => item.toUpperCase())}`
             },
             currentDisplatCrumbs () {
                 return this.crumbsList[this.crumbsList.length - 1] || {
                     label: '默认',
-                    form_data: []
+                    form_data: [],
                 }
-            }
+            },
         },
         created () {
             this.appendCrumbsItem(this.form.label, this.form)
@@ -109,8 +109,8 @@
              */
             appendCrumbsItem (label, formData) {
                 this.crumbsList.push({
-                    label: label,
-                    form_data: deepClone(formData)
+                    label,
+                    form_data: deepClone(formData),
                 })
                 this.updateChildViewConfig()
             },
@@ -127,10 +127,10 @@
             },
             updateChildViewConfig () {
                 this.childrenViewConfig = {
-                    form_data: deepClone(this.currentDisplatCrumbs.form_data)
+                    form_data: deepClone(this.currentDisplatCrumbs.form_data),
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

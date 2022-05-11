@@ -40,33 +40,33 @@
     export default {
         name: 'Sideslider',
         components: {
-            RenderView: () => import('../RenderView')
+            RenderView: () => import('../RenderView'),
         },
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             formData: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             context: {
                 type: Object,
                 default: () => ({
-                    schemes: {}
-                })
+                    schemes: {},
+                }),
             },
             width: {
                 type: [String, Number],
-                default: 800
-            }
+                default: 800,
+            },
         },
         data () {
             return {
-                isShow: true
+                isShow: true,
             }
-        }
+        },
     }
 </script>
 

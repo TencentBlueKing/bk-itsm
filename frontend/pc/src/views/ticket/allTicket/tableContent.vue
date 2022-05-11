@@ -152,7 +152,7 @@
         components: {
             ColumnSn,
             ColumnCurrentStep,
-            EvaluationTicketModal
+            EvaluationTicketModal,
         },
         props: {
             from: String,
@@ -160,27 +160,27 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             dataList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 状态颜色
             colorHexList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 当前服务
             // serviceType
             serviceType: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -189,9 +189,9 @@
                 setting: {
                     fields: [],
                     selectedFields: [],
-                    size: 'medium'
+                    size: 'medium',
                 },
-                ticketInfo: {}
+                ticketInfo: {},
             }
         },
         computed: {
@@ -202,8 +202,8 @@
                 return this.$store.state.openFunction
             },
             currTabSettingCache () {
-                return this.$store.state.ticket.settingCache['all_' + this.serviceType]
-            }
+                return this.$store.state.ticket.settingCache[`all_${this.serviceType}`]
+            },
         },
         watch: {
             dataList: {
@@ -214,8 +214,8 @@
                         return item
                     })
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         async mounted () {
             this.getFields()
@@ -225,17 +225,17 @@
             getFields () {
                 let defaultColumn = ['id', 'title', 'service_name', 'current_processors', 'create_at', 'creator', 'operate']
                 const allColumn = [
-                    { id: 'id', label: this.$t(`m.tickets['单号']`), width: '200', disabled: true, prop: 'sn' },
-                    { id: 'title', label: this.$t(`m.tickets['标题']`), minWidth: '180', prop: 'title' },
-                    { id: 'service_name', label: this.$t(`m.tickets['服务']`), minWidth: '140', prop: 'service_name' },
-                    { id: 'type', label: this.$t(`m.manageCommon['类型']`), minWidth: '80' },
-                    { id: 'priority', label: this.$t(`m.slaContent['优先级']`), minWidth: '100', sortable: 'custom', prop: 'priority' },
-                    { id: 'current_steps', label: this.$t(`m.newCommon['当前步骤']`), minWidth: '100', prop: 'current_steps' },
-                    { id: 'current_processors', label: this.$t(`m.tickets['当前处理人']`), minWidth: '140', prop: 'current_processors' },
-                    { id: 'status', label: this.$t(`m.manageCommon['状态']`), minWidth: '120', sortable: 'custom', prop: 'status' },
-                    { id: 'create_at', label: this.$t(`m.tickets['提单时间']`), minWidth: '160', sortable: 'custom', prop: 'create_at' },
-                    { id: 'creator', label: this.$t(`m.tickets['提单人']`), minWidth: '100', prop: 'creator' },
-                    { id: 'operate', label: this.$t(`m.manageCommon['操作']`), width: '120' }
+                    { id: 'id', label: this.$t('m.tickets[\'单号\']'), width: '200', disabled: true, prop: 'sn' },
+                    { id: 'title', label: this.$t('m.tickets[\'标题\']'), minWidth: '180', prop: 'title' },
+                    { id: 'service_name', label: this.$t('m.tickets[\'服务\']'), minWidth: '140', prop: 'service_name' },
+                    { id: 'type', label: this.$t('m.manageCommon[\'类型\']'), minWidth: '80' },
+                    { id: 'priority', label: this.$t('m.slaContent[\'优先级\']'), minWidth: '100', sortable: 'custom', prop: 'priority' },
+                    { id: 'current_steps', label: this.$t('m.newCommon[\'当前步骤\']'), minWidth: '100', prop: 'current_steps' },
+                    { id: 'current_processors', label: this.$t('m.tickets[\'当前处理人\']'), minWidth: '140', prop: 'current_processors' },
+                    { id: 'status', label: this.$t('m.manageCommon[\'状态\']'), minWidth: '120', sortable: 'custom', prop: 'status' },
+                    { id: 'create_at', label: this.$t('m.tickets[\'提单时间\']'), minWidth: '160', sortable: 'custom', prop: 'create_at' },
+                    { id: 'creator', label: this.$t('m.tickets[\'提单人\']'), minWidth: '100', prop: 'creator' },
+                    { id: 'operate', label: this.$t('m.manageCommon[\'操作\']'), width: '120' },
                 ]
                 // 表格设置有缓存，使用缓存数据
                 if (this.currTabSettingCache) {
@@ -270,16 +270,16 @@
                     priorityIndex = row.meta.priority.key > 3 ? 3 : Number(row.meta.priority.key)
                 }
                 return row.priority_name === '--' ? {
-                    'background': 'none',
-                    'color': '#424950'
-                } : { 'backgroundColor': this.priorityColors[priorityIndex - 1] }
+                    background: 'none',
+                    color: '#424950',
+                } : { backgroundColor: this.priorityColors[priorityIndex - 1] }
             },
             // 设置表格状态样式
             getstatusColor (row) {
                 const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status)
                 return statusColor.length
-                    ? { 'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}` }
-                    : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
+                    ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
+                    : { color: '#3c96ff', border: '1px solid #3c96ff' }
             },
             // 排序功能
             orderingClick (value) {
@@ -310,37 +310,38 @@
                         return
                 }
                 if (value.order === 'descending') {
-                    order = '-' + order
+                    order = `-${order}`
                 }
                 this.$emit('orderingClick', order || '-create_at')
             },
             // 添加关注/取消关注
             onChangeAttention (row) {
-                const id = row.id
+                const { id } = row
                 const params = {
-                    attention: !row.hasAttention
+                    attention: !row.hasAttention,
                 }
                 let bkMessage = ''
                 this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
                     if (row.hasAttention) {
                         row.hasAttention = false
-                        bkMessage = this.$t(`m.manageCommon['取消关注成功~']`)
+                        bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']')
                     } else {
                         row.hasAttention = true
-                        bkMessage = this.$t(`m.manageCommon['添加关注成功~']`)
+                        bkMessage = this.$t('m.manageCommon[\'添加关注成功~\']')
                     }
                     this.$bkMessage({
                         message: bkMessage,
                         theme: 'success',
-                        ellipsisLine: 0
-                    })
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
                 })
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                            ellipsisLine: 0,
+                        })
+                    })
             },
             // 评价回调
             evaluationSubmitSuccess () {
@@ -360,14 +361,14 @@
                 this.setting.selectedFields = fields
                 const fieldIds = fields.map(m => m.id)
                 this.$store.commit('ticket/setSettingCache', {
-                    type: 'all_' + this.serviceType,
-                    value: { fields: fieldIds, size }
+                    type: `all_${this.serviceType}`,
+                    value: { fields: fieldIds, size },
                 })
             },
             getRowStyle ({ row, rowIndex }) {
                 return `background-color: ${row.sla_color}`
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

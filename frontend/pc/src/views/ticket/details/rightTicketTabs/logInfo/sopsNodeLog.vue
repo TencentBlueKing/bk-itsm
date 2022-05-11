@@ -41,14 +41,14 @@
     export default {
         name: 'sopsNodeLog',
         components: {
-            getParam
+            getParam,
         },
         props: {
             sopsInfo: {
                 type: Array,
-                default: () => ({})
-            }
-        }
+                default: () => ({}),
+            },
+        },
     }
 </script>
 

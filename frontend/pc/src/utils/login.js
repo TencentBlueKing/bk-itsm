@@ -32,8 +32,8 @@ try {
     topWindow.BLUEKING = {
         corefunc: {
             open_login_dialog: openLoginDialog,
-            close_login_dialog: closeLoginDialog
-        }
+            close_login_dialog: closeLoginDialog,
+        },
     }
 }
 function openLoginDialog (src, width = 400, height = 400, method = 'get') {

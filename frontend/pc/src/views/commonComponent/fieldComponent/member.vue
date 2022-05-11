@@ -56,22 +56,22 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                selectedItems: []
+                selectedItems: [],
             }
         },
         watch: {
@@ -81,16 +81,16 @@
                 }
                 this.conditionField(this.item, this.fields)
             },
-            'selectedItems': {
+            selectedItems: {
                 handler (newval, oldval) {
                     this.item.val = this.selectedItems.join(',')
-                }
-            }
+                },
+            },
         },
         async mounted () {
             this.selectedItems = this.item.val ? [this.item.val] : []
             this.conditionField(this.item, this.fields)
-        }
+        },
     }
 </script>
 

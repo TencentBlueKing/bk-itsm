@@ -114,7 +114,7 @@
         name: 'newTask',
         components: {
             fieldInfo,
-            DealPerson
+            DealPerson,
         },
         mixins: [apiFieldsWatch, commonMix],
         props: {
@@ -122,20 +122,20 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             itemContent: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -147,11 +147,11 @@
                 showTemplateInfo: true,
                 dealPersonData: {
                     value: '',
-                    type: 'PERSON'
+                    type: 'PERSON',
                 },
                 excludeTypeList: ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION', 'IAM', 'STARTER_LEADER', 'API'],
                 formData: {
-                    template: ''
+                    template: '',
                 },
                 fieldList: [],
                 isComplexMembers: false,
@@ -159,11 +159,11 @@
                 // 校验
                 checkInfo: {
                     template: false,
-                    fields: false
+                    fields: false,
                 },
                 validatePopInfo: {
-                    content: ''
-                }
+                    content: '',
+                },
             }
         },
         created () {
@@ -184,7 +184,7 @@
                 // 通过模板渲染信息
                 this.fieldLoading = true
                 this.showField = false
-                const id = this.itemContent.id
+                const { id } = this.itemContent
                 this.$store.dispatch('taskFlow/getTaskInfo', id).then((res) => {
                     this.fieldList = res.data.fields.create_fields.filter(item => item.type !== 'COMPLEX-MEMBERS')
                     this.isComplexMembers = res.data.fields.create_fields.some(item => item.type === 'COMPLEX-MEMBERS')
@@ -195,13 +195,15 @@
                         this.$set(item, 'showFeild', true)
                         this.$set(item, 'val', item.value || '')
                     })
-                    this.isNecessaryToWatch({ 'fields': this.fieldList }, 'submit')
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit')
                     this.showField = true
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.fieldLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.fieldLoading = false
+                    })
             },
             // 选择任务模板
             selectTemplate (value) {
@@ -211,7 +213,7 @@
             getFieldList (id) {
                 const params = {
                     task_schema_id: id,
-                    stage: 'CREATE'
+                    stage: 'CREATE',
                 }
                 this.fieldLoading = true
                 this.showField = false
@@ -225,13 +227,15 @@
                         this.$set(item, 'showFeild', true)
                         this.$set(item, 'val', item.value || '')
                     })
-                    this.isNecessaryToWatch({ 'fields': this.fieldList }, 'submit')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.fieldLoading = false
-                    this.showField = true
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit')
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.fieldLoading = false
+                        this.showField = true
+                    })
             },
             closeSlider () {
                 this.$emit('closeSlider')
@@ -242,7 +246,7 @@
                     processors_type: '',
                     fields: {},
                     need_start: this.nodeInfo.can_execute_task, // 执行节点创建的任务需要立即启动
-                    state_id: this.nodeInfo.state_id
+                    state_id: this.nodeInfo.state_id,
                 }
                 // 新建参数
                 if (!this.itemContent.id) {
@@ -267,7 +271,7 @@
                                 id: sopsContent.id,
                                 template_source: sopsContent.context.project.bk_biz_id ? 'business' : 'common',
                                 bk_biz_id: (this.basicInfomation.bk_biz_id !== -1 ? this.basicInfomation.bk_biz_id : ''),
-                                constants: sopsContent.constants
+                                constants: sopsContent.constants,
                             }
                             if (sopsContent.createWay === 'task' || sopsContent.createWay === 'started_task') {
                                 params.fields[item.key].task_id = sopsContent.sopsTask.id
@@ -304,47 +308,51 @@
                             item.validList.forEach(it => {
                                 this.validatePopInfo.content += `${it.tips}、`
                             })
-                            this.validatePopInfo.content = this.validatePopInfo.content.substr(0, this.validatePopInfo.content.length - 1) + '！'
+                            this.validatePopInfo.content = `${this.validatePopInfo.content.substr(0, this.validatePopInfo.content.length - 1)}！`
                         }
                     })
                     this.$bkInfo({
                         type: 'warning',
                         title: '',
-                        subTitle: this.validatePopInfo.content
+                        subTitle: this.validatePopInfo.content,
                     })
                     this.validatePopInfo.content = ''
                     return
                 }
                 this.btnLoading = true
                 if (this.itemContent.id) {
-                    const id = this.itemContent.id
+                    const { id } = this.itemContent
                     this.$store.dispatch('taskFlow/editorTask', { params, id }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.task['编辑任务成功']`),
-                            theme: 'success'
+                            message: this.$t('m.task[\'编辑任务成功\']'),
+                            theme: 'success',
                         })
                         this.closeSlider()
                         // 刷新数据
                         this.$emit('getTaskList')
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.btnLoading = false
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.btnLoading = false
+                        })
                 } else {
                     this.$store.dispatch('taskFlow/createTask', { params }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.task['新建任务成功']`),
-                            theme: 'success'
+                            message: this.$t('m.task[\'新建任务成功\']'),
+                            theme: 'success',
                         })
                         this.closeSlider()
                         // 刷新数据
                         this.$emit('getTaskList')
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.btnLoading = false
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.btnLoading = false
+                        })
                 }
             },
             checkValue () {
@@ -354,8 +362,8 @@
                 // 字段
                 const fieldStatus = !this.$refs.fieldInfo.checkValue()
                 return personStatus || this.checkInfo.template || fieldStatus
-            }
-        }
+            },
+        },
     }
 </script>
 

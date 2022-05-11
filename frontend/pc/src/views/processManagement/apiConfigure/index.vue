@@ -72,22 +72,22 @@
         components: {
             apiTree,
             apiTable,
-            apiContent
+            apiContent,
         },
         mixins: [mixins],
         props: {
             projectId: String,
             title: {
                 type: String,
-                default: 'API'
-            }
+                default: 'API',
+            },
         },
         data () {
             return {
                 // 目前展示信息
                 displayInfo: {
                     level_0: {},
-                    level_1: {}
+                    level_1: {},
                 },
                 // API 详情
                 apiDetailInfo: {},
@@ -97,10 +97,10 @@
                 treeList: [
                     {
                         id: 0,
-                        name: this.$t(`m.systemConfig["全部系统"]`),
+                        name: this.$t('m.systemConfig["全部系统"]'),
                         code: '',
-                        check: false
-                    }
+                        check: false,
+                    },
                 ],
                 // code列表
                 codeList: [],
@@ -118,9 +118,9 @@
                         { num: 5 },
                         { num: 10 },
                         { num: 15 },
-                        { num: 20 }
-                    ]
-                }
+                        { num: 20 },
+                    ],
+                },
             }
         },
         computed: {
@@ -132,7 +132,7 @@
             },
             secondLevelInfo () {
                 return this.displayInfo.level_1
-            }
+            },
         },
         mounted () {
             this.getRemoteSystemData()
@@ -141,48 +141,42 @@
             // 获取系统
             getRemoteSystemData () {
                 const params = {
-                    project_key: this.projectId || 'public'
+                    project_key: this.projectId || 'public',
                 }
                 this.$refs.apiTree.isTreeLoading = true
                 this.$store.dispatch('apiRemote/get_remote_system', params).then(res => {
-                    this.isBuiltinIdList = res.data.map(
-                        item => {
-                            return item.system_id
-                        }
-                    )
-                    res.data.forEach(
-                        item => {
-                            item['moreShow'] = false
-                            item['check'] = item.id === this.displayInfo.level_0['id']
-                        }
-                    )
+                    this.isBuiltinIdList = res.data.map(item => item.system_id)
+                    res.data.forEach(item => {
+                        item.moreShow = false
+                        item.check = item.id === this.displayInfo.level_0.id
+                    })
                     this.treeList = [this.treeList[0], ...res.data]
                     this.getSystems()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.$refs.apiTree.isTreeLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.$refs.apiTree.isTreeLoading = false
+                    })
             },
             // 获取codeList
             async getSystems () {
                 const params = {}
                 await this.$store.dispatch('apiRemote/get_systems', params).then(res => {
                     this.allCodeList = res.data
-                    this.codeList = res.data.filter(
-                        item => {
-                            return this.isBuiltinIdList.indexOf(item.system_id) === -1
-                        }
-                    )
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
+                    this.codeList = res.data.filter(item => this.isBuiltinIdList.indexOf(item.system_id) === -1)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
             },
             // 获取API详情
             async getRemoteApiDetail (id) {
                 const params = {
-                    id: id
+                    id,
                 }
                 await this.$store.dispatch('apiRemote/get_remote_api_detail', params).then(res => {
                     this.apiDetailInfo = res.data
@@ -193,82 +187,69 @@
                     if (!this.apiDetailInfo.req_params.length) {
                         this.apiDetailInfo.req_params = []
                     } else {
-                        this.apiDetailInfo.req_params = [...this.apiDetailInfo.req_params.map(
-                            item => {
-                                item['value'] = ''
-                                return item
-                            }
-                        )]
+                        this.apiDetailInfo.req_params = [...this.apiDetailInfo.req_params.map(item => {
+                            item.value = ''
+                            return item
+                        })]
                     }
                     if (!Object.keys(this.apiDetailInfo.req_body).length || !Object.keys(this.apiDetailInfo.req_body.properties).length) {
-                        this.apiDetailInfo['treeDataList'] = [{
+                        this.apiDetailInfo.treeDataList = [{
                             has_children: false,
                             showChildren: true,
                             checkInfo: false,
                             key: 'root',
                             is_necessary: true,
                             type: 'object',
-                            desc: this.$t(`m.systemConfig["初始化数据"]`),
+                            desc: this.$t('m.systemConfig["初始化数据"]'),
                             parentInfo: '',
-                            children: []
+                            children: [],
                         }]
-                        this.apiDetailInfo['bodyJsonData'] = {
-                            'root': {}
+                        this.apiDetailInfo.bodyJsonData = {
+                            root: {},
                         }
-                        this.apiDetailInfo['bodyTableData'] = []
+                        this.apiDetailInfo.bodyTableData = []
                     } else {
-                        this.apiDetailInfo['treeDataList'] = this.jsonschemaToList(
-                            {
-                                'root': JSON.parse(JSON.stringify(this.apiDetailInfo.req_body)) // root初始 Jsonschema数据结构
-                            }
-                        )
-                        this.apiDetailInfo['bodyJsonData'] = this.jsonschemaToJson(
-                            {
-                                'root': JSON.parse(JSON.stringify(this.apiDetailInfo.req_body)) // root初始 Jsonschema数据结构
-                            }
-                        )
-                        this.apiDetailInfo['bodyTableData'] = this.treeToTableList(
-                            JSON.parse(JSON.stringify(this.apiDetailInfo['treeDataList'][0].children))
-                        )
+                        this.apiDetailInfo.treeDataList = this.jsonschemaToList({
+                            root: JSON.parse(JSON.stringify(this.apiDetailInfo.req_body)), // root初始 Jsonschema数据结构
+                        })
+                        this.apiDetailInfo.bodyJsonData = this.jsonschemaToJson({
+                            root: JSON.parse(JSON.stringify(this.apiDetailInfo.req_body)), // root初始 Jsonschema数据结构
+                        })
+                        this.apiDetailInfo.bodyTableData = this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetailInfo.treeDataList[0].children)))
                     }
                     if (!Object.keys(this.apiDetailInfo.rsp_data).length || !Object.keys(this.apiDetailInfo.rsp_data.properties).length) {
-                        this.apiDetailInfo['responseTreeDataList'] = [{
+                        this.apiDetailInfo.responseTreeDataList = [{
                             has_children: false,
                             showChildren: true,
                             checkInfo: false,
                             key: 'root',
                             is_necessary: true,
                             type: 'object',
-                            desc: this.$t(`m.systemConfig["初始化数据"]`),
+                            desc: this.$t('m.systemConfig["初始化数据"]'),
                             parentInfo: '',
-                            children: []
+                            children: [],
                         }]
-                        this.apiDetailInfo['responseJsonData'] = {
-                            'root': {}
+                        this.apiDetailInfo.responseJsonData = {
+                            root: {},
                         }
-                        this.apiDetailInfo['responseTableData'] = []
+                        this.apiDetailInfo.responseTableData = []
                     } else {
-                        this.apiDetailInfo['responseTreeDataList'] = this.jsonschemaToList(
-                            {
-                                'root': this.apiDetailInfo.rsp_data // root初始 Jsonschema数据结构
-                            }
-                        )
-                        this.apiDetailInfo['responseJsonData'] = this.jsonschemaToJson(
-                            {
-                                'root': this.apiDetailInfo.rsp_data // root初始 Jsonschema数据结构
-                            }
-                        )
-                        this.apiDetailInfo['responseTableData'] = this.treeToTableList(
-                            JSON.parse(JSON.stringify(this.apiDetailInfo['responseTreeDataList'][0].children))
-                        )
+                        this.apiDetailInfo.responseTreeDataList = this.jsonschemaToList({
+                            root: this.apiDetailInfo.rsp_data, // root初始 Jsonschema数据结构
+                        })
+                        this.apiDetailInfo.responseJsonData = this.jsonschemaToJson({
+                            root: this.apiDetailInfo.rsp_data, // root初始 Jsonschema数据结构
+                        })
+                        this.apiDetailInfo.responseTableData = this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetailInfo.responseTreeDataList[0].children)))
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取已接入api接口列表数据
             async getTableList (id, customPaging, searchInfo) {
-                await this.displayInfo['level_1']
+                await this.displayInfo.level_1
                 await this.$refs.apiTable
                 const params = {
                     remote_system: id || '',
@@ -277,53 +258,45 @@
                     page: customPaging ? customPaging.page : 1,
                     // 关键字
                     key: searchInfo ? searchInfo.key : '',
-                    project_key: this.projectId || 'public'
+                    project_key: this.projectId || 'public',
                 }
                 this.$refs.apiTable.isTableLoading = true
                 await this.$store.dispatch('apiRemote/get_remote_api', params).then(res => {
-                    this.isSelectedApiList = res.data.items.filter(
-                        ite => {
-                            return !ite.is_builtin
-                        }
-                    ).map(
-                        item => {
-                            return item.path
-                        }
-                    )
-                    this.listInfo = res.data.items.map(
-                        item => {
-                            item['check'] = false
-                            return item
-                        }
-                    )
+                    this.isSelectedApiList = res.data.items.filter(ite => !ite.is_builtin).map(item => item.path)
+                    this.listInfo = res.data.items.map(item => {
+                        item.check = false
+                        return item
+                    })
                     // 分页
                     this.$refs.apiTable.pagination.current = res.data.page
                     this.$refs.apiTable.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.$refs.apiTable.isTableLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.$refs.apiTable.isTableLoading = false
+                    })
             },
             // 根据系统code --> 获取pathList 未接入api接口
             async getChannelPathList (code) {
                 const params = {
-                    system_code: code
+                    system_code: code,
                 }
                 await this.$store.dispatch('apiRemote/get_components', params).then(res => {
-                    this.pathList = res.data.map(
-                        item => {
-                            item['func_name'] = item['name']
-                            item['name'] = item['label']
-                            return item
-                        }
-                    )
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
+                    this.pathList = res.data.map(item => {
+                        item.func_name = item.name
+                        item.name = item.label
+                        return item
+                    })
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
+            },
+        },
     }
 </script>
 

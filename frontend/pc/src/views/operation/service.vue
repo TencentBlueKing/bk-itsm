@@ -131,23 +131,23 @@
             key: 'order',
             name: 'No',
             colorMark: true,
-            width: 60
+            width: 60,
         },
         {
             key: 'creator',
-            name: '用户ID'
+            name: '用户ID',
         },
         {
             key: 'organization',
-            name: '所在组织'
+            name: '所在组织',
         },
         {
             key: 'count',
             name: '提单量',
             colorMark: true,
             align: 'right',
-            width: 120
-        }
+            width: 120,
+        },
     ]
 
     export default {
@@ -156,11 +156,12 @@
             SummaryCard,
             ChartCard,
             TableChart,
-            LineChart
+            LineChart,
         },
         data () {
             const end = dayjs().format('YYYY-MM-DD')
-            const start = dayjs().subtract(1, 'month').format('YYYY-MM-DD')
+            const start = dayjs().subtract(1, 'month')
+                .format('YYYY-MM-DD')
             const serviceId = Number(this.$route.params.id)
             return {
                 serviceId,
@@ -172,25 +173,25 @@
                     total: {
                         count: 0,
                         biz_count: 0,
-                        user_count: 0
+                        user_count: 0,
                     },
                     week: {
                         ticket: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
+                            ratio: '--',
                         },
                         biz: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
+                            ratio: '--',
                         },
                         user: {
                             this_week_count: 0,
                             last_week_count: 0,
-                            ratio: '--'
-                        }
-                    }
+                            ratio: '--',
+                        },
+                    },
                 },
                 top10CreateTicketUserData: [],
                 addedTicketData: {},
@@ -201,7 +202,7 @@
                 datePickerOptions: {
                     disabledDate (val) {
                         return dayjs(val).isAfter(dayjs(), 'day')
-                    }
+                    },
                 },
                 shortcuts: [
                     {
@@ -210,79 +211,86 @@
                             const end = dayjs().format(FORMAT)
                             const start = dayjs().format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '昨天',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'day').format(FORMAT)
+                            const start = dayjs().subtract(1, 'day')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '前天',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(2, 'day').format(FORMAT)
+                            const start = dayjs().subtract(2, 'day')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '一周前',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'week').format(FORMAT)
+                            const start = dayjs().subtract(1, 'week')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '一个月前',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'month').format(FORMAT)
+                            const start = dayjs().subtract(1, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '三个月前',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(3, 'month').format(FORMAT)
+                            const start = dayjs().subtract(3, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '半年前',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(6, 'month').format(FORMAT)
+                            const start = dayjs().subtract(6, 'month')
+                                .format(FORMAT)
                             return [start, end]
-                        }
+                        },
                     },
                     {
                         text: '一年前',
                         value () {
                             const end = dayjs().format(FORMAT)
-                            const start = dayjs().subtract(1, 'year').format(FORMAT)
+                            const start = dayjs().subtract(1, 'year')
+                                .format(FORMAT)
                             return [start, end]
-                        }
-                    }
+                        },
+                    },
                 ],
                 loading: {
                     serviceList: false,
                     summary: false,
                     addedTicket: false,
                     top10CreateTicketUser: false,
-                    biz: false
-                }
+                    biz: false,
+                },
             }
         },
         computed: {
             serviceName () {
                 const service = this.serviceList.find(item => item.id === this.serviceId)
                 return service ? service.name : '--'
-            }
+            },
         },
         created () {
             this.getServiceList()
@@ -319,11 +327,11 @@
                 try {
                     const resp = await Promise.all([
                         this.$store.dispatch('operation/getSummaryTotalData', { service_id: this.serviceId }),
-                        this.$store.dispatch('operation/getSummaryWeekData', { service_id: this.serviceId })
+                        this.$store.dispatch('operation/getSummaryWeekData', { service_id: this.serviceId }),
                     ])
                     this.summaryData = {
                         total: resp[0].data,
-                        week: resp[1].data
+                        week: resp[1].data,
                     }
                 } catch (e) {
                     console.error(e)
@@ -340,12 +348,12 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.addedTicketChartDismension,
                         resource_type: 'ticket',
-                        service_id: this.serviceId
+                        service_id: this.serviceId,
                     }
                     const resp = await this.$store.dispatch('operation/getResourceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -366,7 +374,7 @@
                     const params = {
                         create_at__gte: this.dateRange[0],
                         create_at__lte: this.dateRange[1],
-                        service_id: this.serviceId
+                        service_id: this.serviceId,
                     }
                     const resp = await this.$store.dispatch('operation/getTop10CreateTicketUserData', params)
                     const data = resp.data.map(item => {
@@ -395,12 +403,12 @@
                         create_at__lte: this.dateRange[1],
                         timedelta: this.bizChartDismension,
                         resource_type: 'biz',
-                        service_id: this.serviceId
+                        service_id: this.serviceId,
                     }
                     const resp = await this.$store.dispatch('operation/getServiceCountData', params)
                     const data = {
                         x: [],
-                        y: []
+                        y: [],
                     }
                     resp.data.forEach(item => {
                         const { count, date } = item
@@ -445,8 +453,8 @@
             onAddedServiceDimensionChange (val) {
                 this.bizChartDismension = val
                 this.getBizData()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

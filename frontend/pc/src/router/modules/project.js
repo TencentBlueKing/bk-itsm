@@ -45,18 +45,18 @@ export default [
     {
         path: '/project_list',
         name: 'ProjectList',
-        component: ProjectList
+        component: ProjectList,
     },
     
     {
         path: '/project_guide',
         name: 'ProjectGuide',
-        component: ProjectGuide
+        component: ProjectGuide,
     },
     {
         path: '/project_empty',
         name: 'ProjectEmpty',
-        component: ProjectList
+        component: ProjectList,
     },
     {
         path: '/project',
@@ -66,7 +66,7 @@ export default [
             {
                 path: 'ticket',
                 name: 'projectTicket',
-                component: ProjectTicket
+                component: ProjectTicket,
             },
             // {
             //     path: 'service',
@@ -81,7 +81,7 @@ export default [
                     {
                         path: 'list',
                         name: 'projectServiceList',
-                        component: ProjectServiceList
+                        component: ProjectServiceList,
                     },
                     {
                         path: ':type(new|edit)/:step(basic|process|setting)',
@@ -90,55 +90,55 @@ export default [
                         props: (route) => ({
                             serviceId: route.query.serviceId,
                             type: route.params.type,
-                            step: route.params.step
-                        })
+                            step: route.params.step,
+                        }),
                     },
                     {
                         path: 'sla/:id',
                         name: 'projectServiceSla',
-                        component: ProjectServiceSla
-                    }
-                ]
+                        component: ProjectServiceSla,
+                    },
+                ],
             },
             {
                 path: 'service_directory',
                 name: 'serviceDirectory',
-                component: ServiceDirectory
+                component: ServiceDirectory,
             },
             {
                 path: 'roles',
                 name: 'projectRoles',
-                component: Role
+                component: Role,
             },
             {
                 path: 'trigger',
                 name: 'projectTrigger',
-                component: Trigger
+                component: Trigger,
             },
             {
                 path: 'notice',
                 name: 'projectNotice',
-                component: Notice
+                component: Notice,
             },
             {
                 path: 'fields',
                 name: 'projectFields',
-                component: Field
+                component: Field,
             },
             {
                 path: 'api',
                 name: 'projectApi',
-                component: API
+                component: API,
             },
             {
                 path: 'sla_manage',
                 name: 'slaManage',
-                component: SlaManage
+                component: SlaManage,
             },
             {
                 path: 'sla_agreement',
                 name: 'slaAgreement',
-                component: SlaAgreement
+                component: SlaAgreement,
             },
             {
                 path: 'projectOperation',
@@ -148,15 +148,15 @@ export default [
                     {
                         path: 'home',
                         name: 'projectOperationHome',
-                        component: ProjectOperationHome
+                        component: ProjectOperationHome,
                     },
                     {
                         path: 'service',
                         name: 'projectOperationService',
-                        component: ProjectOperationService
-                    }
-                ]
-            }
-        ]
-    }
+                        component: ProjectOperationService,
+                    },
+                ],
+            },
+        ],
+    },
 ]

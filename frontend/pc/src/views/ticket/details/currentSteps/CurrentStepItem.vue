@@ -271,51 +271,51 @@
             TicketTriggerDialog,
             NodeDealDialog,
             NodeTaskList,
-            sopsAndDevopsTask
+            sopsAndDevopsTask,
         },
         mixins: [commonMix],
         inject: ['reload'],
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             nodeInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             index: {
-                type: Number
+                type: Number,
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             allFieldList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             allGroups: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             nodeTriggerList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             isLastNode: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             readOnly: {
                 type: Boolean,
-                default: false
+                default: false,
             },
-            isShowAssgin: Boolean
+            isShowAssgin: Boolean,
         },
         data () {
             return {
@@ -335,7 +335,7 @@
                 validatePopInfo: {
                     openShow: false,
                     content: '',
-                    title: this.$t(`m.newCommon["缺少必填信息"]`)
+                    title: this.$t('m.newCommon["缺少必填信息"]'),
                 },
                 // 弹窗处理信息(填写表单)
                 openFormInfo: {
@@ -345,17 +345,17 @@
                     headerPosition: 'left',
                     autoClose: false,
                     precision: 0,
-                    btnInfo: {}
+                    btnInfo: {},
                 },
                 openSubmitInfo: {
                     openShow: false,
-                    content: ''
+                    content: '',
                 },
                 slaInfo: {
                     color: '',
-                    isTimeOut: false
+                    isTimeOut: false,
                 },
-                workflow: ''
+                workflow: '',
             }
         },
         computed: {
@@ -383,12 +383,12 @@
                 }
                 return {
                     list,
-                    extend: completedStr
+                    extend: completedStr,
                 }
             },
             // 会签完成信息
             signProcessors () {
-                const tasks = this.nodeInfo.tasks
+                const { tasks } = this.nodeInfo
                 if (this.currSignProcessorInfo) {
                     return this.currSignProcessorInfo.processor
                         + this.$t('m.newCommon["(共"]')
@@ -423,7 +423,7 @@
                     return false
                 }
                 return true
-            }
+            },
         },
         created () {
             this.initData()
@@ -457,7 +457,7 @@
                     const params = {
                         bk_biz_id,
                         template_id,
-                        exclude_task_nodes_id
+                        exclude_task_nodes_id,
                     }
                     const url = template_source === 'common' ? 'taskFlow/getSopsCommonPreview' : 'taskFlow/getSopsPreview'
                     const res = await this.$store.dispatch(url, params)
@@ -479,12 +479,12 @@
                 if (this.nodeInfo.hasOwnProperty('api_info') && this.nodeInfo.type === 'TASK-DEVOPS') {
                     const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
                     const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
-                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { project_id: project_id.value, pipeline_id: pipeline_id.value }).then(res => {
                         this.pipelineList = res.data.properties
                         this.pipelineConstants = res.data.properties.map(item => {
                             const constants = {
                                 key: '',
-                                value: ''
+                                value: '',
                             }
                             const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id)
                             if (findKey) {
@@ -497,11 +497,11 @@
                             this.pipelineRules[item.id] = [{
                                 required: item.required,
                                 message: i18n.t('m.treeinfo["字段必填"]'),
-                                trigger: 'blur'
+                                trigger: 'blur',
                             }]
                         })
                     })
-                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { 'project_id': project_id.value, 'pipeline_id': pipeline_id.value }).then(res => {
+                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { project_id: project_id.value, pipeline_id: pipeline_id.value }).then(res => {
                         this.pipelineStages = res.data.stages
                     })
                 }
@@ -527,18 +527,18 @@
                 // 二次确认弹窗的样式不同
                 if (['TRANSITION', 'CLAIM', 'UNSUSPEND'].includes(this.openFormInfo.btnInfo.key)) {
                     const contentMap = {
-                        'TRANSITION': this.$t(`m.newCommon["提交后，流程将转入下一环节，当前提交的部分内容将无法修改"]`),
-                        'CLAIM': this.$t(`m.newCommon["执行认领操作后，单据将流入我的待办"]`),
-                        'UNSUSPEND': this.$t(`m.newCommon["执行恢复操作后，单据将可以继续处理"]`)
+                        TRANSITION: this.$t('m.newCommon["提交后，流程将转入下一环节，当前提交的部分内容将无法修改"]'),
+                        CLAIM: this.$t('m.newCommon["执行认领操作后，单据将流入我的待办"]'),
+                        UNSUSPEND: this.$t('m.newCommon["执行恢复操作后，单据将可以继续处理"]'),
                     }
                     this.openSubmitInfo.content = contentMap[this.openFormInfo.btnInfo.key]
                     this.$bkInfo({
                         type: 'warning',
-                        title: btn.key === 'TRANSITION' ? this.$t(`m.memberSelect["是否"]`) + this.openFormInfo.title : this.openFormInfo.title,
+                        title: btn.key === 'TRANSITION' ? this.$t('m.memberSelect["是否"]') + this.openFormInfo.title : this.openFormInfo.title,
                         subTitle: this.openSubmitInfo.content,
                         confirmFn: () => {
                             this.submitFormAjax()
-                        }
+                        },
                     })
                 } else {
                     this.openFormInfo.isShow = true
@@ -552,7 +552,7 @@
                 if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
                     const params = {
                         state_id: this.nodeInfo.state_id,
-                        terminate_message: submitFormData.terminate_message
+                        terminate_message: submitFormData.terminate_message,
                     }
                     this.submitAjax('terminableOrder', params, id)
                 }
@@ -562,9 +562,7 @@
                     this.fieldFormatting(this.nodeInfo.fields)
                     const params = {
                         state_id: this.nodeInfo.state_id,
-                        fields: this.nodeInfo.fields.filter(ite => {
-                            return !ite.is_readonly && ite.showFeild
-                        }).map(item => {
+                        fields: this.nodeInfo.fields.filter(ite => !ite.is_readonly && ite.showFeild).map(item => {
                             if (item.type === 'FILE') {
                                 item.value = item.value.toString()
                             }
@@ -573,9 +571,9 @@
                                 key: item.key,
                                 type: item.type,
                                 choice: item.choice,
-                                value: item.showFeild ? item.value : ''
+                                value: item.showFeild ? item.value : '',
                             }
-                        })
+                        }),
                     }
                     this.submitAjax('proceedOrder', params, id)
                 }
@@ -585,7 +583,7 @@
                         state_id: this.nodeInfo.state_id,
                         processors: '',
                         processors_type: '',
-                        action_type: this.openFormInfo.btnInfo.key
+                        action_type: this.openFormInfo.btnInfo.key,
                     }
                     // 挂起
                     if (this.openFormInfo.btnInfo.key === 'SUSPEND') {
@@ -605,7 +603,7 @@
                         state_id: this.nodeInfo.state_id,
                         action_type: this.openFormInfo.btnInfo.key,
                         processors: '',
-                        processors_type: ''
+                        processors_type: '',
                     }
                     // 转单
                     if (this.openFormInfo.btnInfo.key === 'DELIVER') {
@@ -626,7 +624,7 @@
                         state_id: this.nodeInfo.state_id,
                         processors: submitFormData.person.value,
                         processors_type: submitFormData.person.type,
-                        action_type: this.openFormInfo.btnInfo.key
+                        action_type: this.openFormInfo.btnInfo.key,
                     }
                     this.submitAjax('exceptionDistribute', params, id)
                 }
@@ -638,31 +636,33 @@
                 this.submitting = true
                 const valueParams = {
                     params,
-                    id
+                    id,
                 }
                 this.$store.dispatch(`deployOrder/${type}`, valueParams).then((res) => {
                     this.$bkMessage({
-                        message: this.openFormInfo.title + this.$t(`m.newCommon["成功"]`),
-                        theme: 'success'
+                        message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
+                        theme: 'success',
                     })
                     this.cancelForm()
                     this.successFn()
                     this.$emit('closeSlider')
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.submitting = false
-                    const typeList = ['TRANSITION', 'SUSPEND', 'UNSUSPEND', 'CLAIM']
-                    if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
-                        this.cancelForm()
-                    }
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.submitting = false
+                        const typeList = ['TRANSITION', 'SUSPEND', 'UNSUSPEND', 'CLAIM']
+                        if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
+                            this.cancelForm()
+                        }
+                    })
             },
             // 当前操作节点打开全屏
             openFullScreen (item) {
                 this.isFullScreen = true
                 this.$bkMessage({
-                    message: this.$t(`m.common["按 ESC 键退出全屏"]`)
+                    message: this.$t('m.common["按 ESC 键退出全屏"]'),
                 })
                 document.addEventListener('keydown', this.handlerKeyDown)
             },
@@ -711,7 +711,7 @@
                 return false
             },
             runTime () {
-                let slaTime = this.slaInfo.slaTime
+                let { slaTime } = this.slaInfo
                 if (!slaTime) {
                     slaTime = convertTimeArrToMS(this.nodeInfo.sla_timeout.map(num => Math.abs(num)))
                     this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000)
@@ -739,30 +739,32 @@
                 const stateId = this.nodeInfo.state_id
                 const valueParams = {
                     params: {
-                        state_id: stateId
+                        state_id: stateId,
                     },
-                    id: ticketId
+                    id: ticketId,
                 }
                 this.replyBtnLoading = true
                 this.$store.dispatch('deployOrder/replyAssignDeliver', valueParams).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["响应成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["响应成功"]'),
+                        theme: 'success',
                     })
                     this.cancelForm()
                     this.successFn()
                     this.$emit('closeSlider')
-                }).catch((res) => {
-                    this.$bkMessage({
-                        message: res.data.msg || this.$t(`m.newCommon["响应失败！"]`),
-                        theme: 'error',
-                        ellipsisLine: 0
-                    })
-                }).finally(() => {
-                    this.replyBtnLoading = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        this.$bkMessage({
+                            message: res.data.msg || this.$t('m.newCommon["响应失败！"]'),
+                            theme: 'error',
+                            ellipsisLine: 0,
+                        })
+                    })
+                    .finally(() => {
+                        this.replyBtnLoading = false
+                    })
+            },
+        },
     }
 </script>
 <style lang="scss">

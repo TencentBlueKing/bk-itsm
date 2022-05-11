@@ -34,7 +34,7 @@
         name: 'MyTodoTicket',
         components: {
             NavTitle,
-            ApprovalList
-        }
+            ApprovalList,
+        },
     }
 </script>

@@ -281,7 +281,7 @@
             BasicCard,
             dealPerson,
             fieldConfig,
-            commonTriggerList
+            commonTriggerList,
         },
         props: {
             // 流程信息
@@ -289,15 +289,15 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 节点信息
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -305,53 +305,53 @@
                     {
                         id: 1,
                         name: '>=',
-                        key: '>='
+                        key: '>=',
                     },
                     {
                         id: 2,
                         name: '>',
-                        key: '>'
+                        key: '>',
                     },
                     {
                         id: 3,
                         name: '=',
-                        key: '=='
+                        key: '==',
                     },
                     {
                         id: 4,
                         name: '<=',
-                        key: '<='
+                        key: '<=',
                     },
                     {
                         id: 5,
                         name: '<',
-                        key: '<'
-                    }
+                        key: '<',
+                    },
                 ],
                 finishCondition: {
                     expressions: [
                         {
                             expressions: [],
-                            type: 'and'
-                        }
+                            type: 'and',
+                        },
                     ],
-                    type: 'or'
+                    type: 'or',
                 },
                 finishConditionRule: {
                     key: [
                         {
                             required: true,
-                            message: this.$t(`m.systemConfig['请输入']`),
-                            trigger: 'blur'
-                        }
+                            message: this.$t('m.systemConfig[\'请输入\']'),
+                            trigger: 'blur',
+                        },
                     ],
                     value: [
                         {
                             required: true,
-                            message: this.$t(`m.systemConfig['请输入']`),
-                            trigger: 'blur'
-                        }
-                    ]
+                            message: this.$t('m.systemConfig[\'请输入\']'),
+                            trigger: 'blur',
+                        },
+                    ],
                 },
                 passRateExpression: {
                     key: '',
@@ -361,13 +361,13 @@
                     type: 'INT',
                     meta: {
                         code: 'PROCESS_COUNT',
-                        unit: 'INT'
+                        unit: 'INT',
                     },
                     tooltipInfo: {
                         disabled: true,
                         content: '',
-                        placements: ['top']
-                    }
+                        placements: ['top'],
+                    },
                 },
                 emptyExpression: {
                     key: '',
@@ -377,13 +377,13 @@
                     type: 'INT',
                     meta: {
                         code: '',
-                        unit: 'INT'
+                        unit: 'INT',
                     },
                     tooltipInfo: {
                         disabled: false,
-                        content: this.$t(`m.treeinfo['请先选择条件']`),
-                        placements: ['top']
-                    }
+                        content: this.$t('m.treeinfo[\'请先选择条件\']'),
+                        placements: ['top'],
+                    },
                 },
                 isShowSignSwitch: false,
                 isShowSignOptions: false,
@@ -400,7 +400,7 @@
                     is_sequential: false,
                     is_multi: true,
                     processors: [],
-                    is_allow_skip: false
+                    is_allow_skip: false,
                 },
                 nodeTagList: [],
                 allCondition: [],
@@ -410,44 +410,44 @@
                 // 单据状态
                 billStatusList: [
                     { type: 'keep', name: this.$t('m.treeinfo["延续上个节点"]') },
-                    { type: 'custom', name: this.$t('m.treeinfo["自定义"]') }
+                    { type: 'custom', name: this.$t('m.treeinfo["自定义"]') },
                 ],
                 processorsInfo: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 deliversInfo: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 checkStatus: {
                     delivers: false,
-                    processors: false
+                    processors: false,
                 },
                 nodeInfoRule: {
                     name: [
                         {
                             required: true,
-                            message: this.$t(`m.newCommon['请输入节点名称']`),
-                            trigger: 'blur'
-                        }
+                            message: this.$t('m.newCommon[\'请输入节点名称\']'),
+                            trigger: 'blur',
+                        },
                     ],
                     processors: [
                         {
-                            validator: function (val) {
+                            validator (val) {
                                 return val.length
                             },
-                            message: this.$t(`m.newCommon['请选择处理人']`),
-                            trigger: 'blur'
-                        }
-                    ]
-                }
+                            message: this.$t('m.newCommon[\'请选择处理人\']'),
+                            trigger: 'blur',
+                        },
+                    ],
+                },
             }
         },
         watch: {
-            'formInfo.processors': function () {
+            'formInfo.processors' () {
                 this.setAllTooltip()
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -489,7 +489,7 @@
                             const tooltipInfo = {
                                 disabled: true,
                                 content: '',
-                                placements: ['top']
+                                placements: ['top'],
                             }
                             return { ...expression, tooltipInfo }
                         })
@@ -509,13 +509,13 @@
                 if (this.formInfo.can_deliver) {
                     this.deliversInfo = {
                         type: this.configur.delivers_type,
-                        value: this.configur.delivers
+                        value: this.configur.delivers,
                     }
                 }
                 // 处理人
                 this.processorsInfo = {
                     type: this.configur.processors_type,
-                    value: this.configur.processors
+                    value: this.configur.processors,
                 }
                 const getNodeTagList = this.getNodeTagList()
                 this.getExcludeRoleTypeList()
@@ -526,26 +526,30 @@
             // 获取节点标签数据
             getNodeTagList () {
                 const params = {
-                    key: 'STATE_TAG_TYPE'
+                    key: 'STATE_TAG_TYPE',
                 }
                 return this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
                     this.nodeTagList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 获取等级
             getSecondLevelList () {
                 this.ticketKeyLoading = true
                 return this.$store.dispatch('ticketStatus/getOverallTicketStatuses').then(res => {
                     this.secondLevelList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.ticketKeyLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.ticketKeyLoading = false
+                    })
             },
             // 计算处理人类型需要排除的类型
             getExcludeRoleTypeList () {
@@ -584,7 +588,7 @@
                         processors_type: 'PERSON',
                         finish_condition: this.finishCondition,
                         is_multi: false,
-                        is_allow_skip: false
+                        is_allow_skip: false,
                     }
                     // 基本信息
                     params.name = this.formInfo.name
@@ -595,7 +599,7 @@
                     if (!this.isShowSignOptions) {
                         params.finish_condition = {
                             expressions: [],
-                            type: 'or'
+                            type: 'or',
                         }
                     }
                     // 处理人为空校验
@@ -629,34 +633,35 @@
                     params.extras = {
                         ticket_status: {
                             name: this.formInfo.ticket_key,
-                            type: this.formInfo.ticket_type
-                        }
+                            type: this.formInfo.ticket_type,
+                        },
                     }
                     // 字段配置
                     const fieldInfo = this.$refs.field.showTabList
-                    params.fields = fieldInfo.map(item => {
-                        return item.id
-                    })
-                    const id = this.configur.id
+                    params.fields = fieldInfo.map(item => item.id)
+                    const { id } = this.configur
                     if (this.secondClick) {
                         return
                     }
                     this.secondClick = true
                     this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["保存成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["保存成功"]'),
+                            theme: 'success',
                         })
                         this.$emit('closeConfigur', true)
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
                     })
-                }).catch((validator) => {
-                    // 防止出现Uncaught
-                    console.log(validator)
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                        })
                 })
+                    .catch((validator) => {
+                        // 防止出现Uncaught
+                        console.log(validator)
+                    })
             },
             // 取消
             closeNode () {
@@ -686,11 +691,11 @@
                     if (this.finishCondition.expressions.length === 1) {
                         this.$bkInfo({
                             type: 'warning',
-                            title: this.$t(`m.treeinfo['确定删除唯一的条件组？']`),
-                            subTitle: this.$t(`m.treeinfo['若删除，则必须所有人处理完成才结束']`),
+                            title: this.$t('m.treeinfo[\'确定删除唯一的条件组？\']'),
+                            subTitle: this.$t('m.treeinfo[\'若删除，则必须所有人处理完成才结束\']'),
                             confirmFn: () => {
                                 this.finishCondition.expressions.splice(index, 1)
-                            }
+                            },
                         })
                     } else {
                         this.finishCondition.expressions.splice(index, 1)
@@ -698,7 +703,7 @@
                 } else {
                     this.finishCondition.expressions.push({
                         expressions: [JSON.parse(JSON.stringify(this.emptyExpression))],
-                        type: 'and'
+                        type: 'and',
                     })
                 }
             },
@@ -711,11 +716,11 @@
                     if (gIndex === 0 && eIndex === 0 && expression.meta.code === 'PROCESS_COUNT') {
                         this.$bkInfo({
                             type: 'warning',
-                            title: this.$t(`m.treeinfo['确定删除“处理人数”？']`),
-                            subTitle: this.$t(`m.treeinfo['若删除该条件，则忽略处理人数，条件满足即结束']`),
+                            title: this.$t('m.treeinfo[\'确定删除“处理人数”？\']'),
+                            subTitle: this.$t('m.treeinfo[\'若删除该条件，则忽略处理人数，条件满足即结束\']'),
                             confirmFn: () => {
                                 expressionGroup.expressions.splice(eIndex, 1)
-                            }
+                            },
                         })
                     } else {
                         expressionGroup.expressions.splice(eIndex, 1)
@@ -726,28 +731,30 @@
             },
             // 获取提前结束可选条件
             async getAllConditions () {
-                const id = this.configur.id
+                const { id } = this.configur
                 this.getConditionFlag = true
                 await this.$store.dispatch('apiRemote/get_sign_conditions', id).then(res => {
                     // 会签不需要审批结果
                     const result = res.data.filter(item => item.meta.code !== 'NODE_APPROVE_RESULT')
                     this.allCondition = result
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.getConditionFlag = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.getConditionFlag = false
+                    })
             },
             // 设置条件tooltip
             giveTooltip (expression) {
                 if (!expression.key) {
                     expression.tooltipInfo.disabled = false
-                    expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择条件']`)
+                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择条件\']')
                     return
                 }
                 if (!(expression.meta.code === 'PASS_RATE' || expression.meta.code === 'REJECT_RATE') && !this.$refs.processors.getValue().value) {
                     expression.tooltipInfo.disabled = false
-                    expression.tooltipInfo.content = this.$t(`m.treeinfo['请先选择处理人']`)
+                    expression.tooltipInfo.content = this.$t('m.treeinfo[\'请先选择处理人\']')
                     return
                 }
                 expression.tooltipInfo.disabled = true
@@ -785,8 +792,8 @@
                 condition.meta.code = this.allCondition.find(one => one.key === condition.key).meta.code
                 condition.meta.unit = this.allCondition.find(one => one.key === condition.key).meta.unit || 'INT'
                 this.giveTooltip(condition)
-            }
-        }
+            },
+        },
     }
 </script>
 

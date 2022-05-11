@@ -129,21 +129,19 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             templateInfo: {
                 type: Object,
                 required: false,
-                default: () => {
-                    return {
-                        openShow: false,
-                        options: [],
-                        inheritType: 'chooseMother',
-                        currentInheritType: 'chooseChild',
-                        otherTitle: this.$t(`m.newCommon["新建母子单"]`)
-                    }
-                }
-            }
+                default: () => ({
+                    openShow: false,
+                    options: [],
+                    inheritType: 'chooseMother',
+                    currentInheritType: 'chooseChild',
+                    otherTitle: this.$t('m.newCommon["新建母子单"]'),
+                }),
+            },
         },
         data () {
             return {
@@ -159,17 +157,17 @@
                     current_status: 0,
                     processors: '',
                     sn_title: '',
-                    view_type: ''
+                    view_type: '',
                 },
                 versionStatus: true,
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 checkList: [],
                 colorHexList: [],
-                localeCookie: false
+                localeCookie: false,
             }
         },
         computed: {
@@ -182,12 +180,12 @@
             // 选择
             allCheck () {
                 return this.tabInfoList.length && this.tabInfoList.filter(ticket => !this.getItemFlag(ticket)).length && this.tabInfoList.every(item => item.check || this.getItemFlag(item))
-            }
+            },
         },
         watch: {
-            'templateInfo.inheritType': function () {
+            'templateInfo.inheritType' () {
                 this.getList()
-            }
+            },
         },
         async mounted () {
             if (this.ticketInfo.related_type === 'master') {
@@ -204,15 +202,15 @@
                 return flag1 || flag2
             },
             openNewPage (rowData) {
-                const id = rowData.id
+                const { id } = rowData
                 const { href } = this.$router.resolve({
-                    name: `commonInfo`,
+                    name: 'commonInfo',
                     params: {
-                        id: id
+                        id,
                     },
                     query: {
-                        id: `${id}`
-                    }
+                        id: `${id}`,
+                    },
                 })
                 window.open(href, '_blank')
             },
@@ -259,13 +257,13 @@
                         if (!status.is_over) {
                             return status.key
                         }
-                    }).join(',')
+                    }).join(','),
                 }
                 let resUrl = ''
                 this.getUrlInfo = ''
                 for (const key in params) {
-                    this.getUrlInfo += key + '=' + params[key]
-                    resUrl += key + '=' + params[key]
+                    this.getUrlInfo += `${key}=${params[key]}`
+                    resUrl += `${key}=${params[key]}`
                 }
                 this.isDataLoading = true
                 await this.$store.dispatch('change/getList', params).then((res) => {
@@ -282,11 +280,13 @@
                         this.$set(item, 'chooseMotherDisabled', item.related_type === 'slave')
                         this.$set(item, 'chooseChildDisabled', (item.related_type === 'master' || item.related_type === 'slave'))
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -317,17 +317,18 @@
             getstatusColor (row) {
                 const statusColor = this.colorHexList.filter(item => item.key === row.current_status)
                 return statusColor.length ? {
-                    'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}`
-                } : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
+                    color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
+                } : { color: '#3c96ff', border: '1px solid #3c96ff' }
             },
             async getTypeStatus () {
                 const params = {}
                 const type = this.ticketInfo.service_type
                 await this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
                     this.colorHexList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             clearInfo () {
                 this.searchForm.keyword = ''
@@ -339,11 +340,11 @@
             submitTemplate () {
                 const params = {}
                 if (this.templateInfo.inheritType === 'chooseChild') {
-                    params['from_ticket_ids'] = this.tabInfoList.filter(item => item.check).map(ite => ite.id)
-                    params['to_ticket_id'] = this.ticketInfo.id
+                    params.from_ticket_ids = this.tabInfoList.filter(item => item.check).map(ite => ite.id)
+                    params.to_ticket_id = this.ticketInfo.id
                 } else {
-                    params['from_ticket_ids'] = [this.ticketInfo.id]
-                    params['to_ticket_id'] = this.tabInfoList.filter(item => item.check).map(ite => ite.id)[0]
+                    params.from_ticket_ids = [this.ticketInfo.id]
+                    params.to_ticket_id = this.tabInfoList.filter(item => item.check).map(ite => ite.id)[0]
                 }
                 if (this.secondClick) {
                     return
@@ -351,17 +352,19 @@
                 this.secondClick = true
                 this.$store.dispatch('change/mergeTickets', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["关联成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["关联成功"]'),
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
-                    this.checkList = []
-                    this.closeShow()
-                    this.reloadTicket()
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                        this.checkList = []
+                        this.closeShow()
+                        this.reloadTicket()
+                    })
             },
             closeVersion () {
                 this.versionStatus = false
@@ -370,22 +373,21 @@
                 if (this.templateInfo.inheritType === 'chooseMother') {
                     return h('bk-radio', {
                         props: {
-                            disabled: true
-                        }
-                    })
-                } else {
-                    return h('bk-checkbox', {
-                        props: {
-                            value: this.allCheck,
-                            disabled: !this.tabInfoList.length || !this.tabInfoList.find(item => !this.getItemFlag(item))
+                            disabled: true,
                         },
-                        on: {
-                            change: this.handleSelectAll
-                        }
                     })
                 }
-            }
-        }
+                return h('bk-checkbox', {
+                    props: {
+                        value: this.allCheck,
+                        disabled: !this.tabInfoList.length || !this.tabInfoList.find(item => !this.getItemFlag(item)),
+                    },
+                    on: {
+                        change: this.handleSelectAll,
+                    },
+                })
+            },
+        },
     }
 </script>
 

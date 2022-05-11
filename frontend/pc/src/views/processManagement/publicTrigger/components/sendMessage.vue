@@ -68,22 +68,22 @@
     export default {
         name: 'sendMessage',
         components: {
-            changeConductor
+            changeConductor,
         },
         props: {
             itemInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 trueStatus: true,
                 falseStatus: false,
                 activeName: 'send_email_message',
-                show: true
+                show: true,
             }
         },
         computed: {
@@ -122,8 +122,8 @@
                     this.itemInfo.sub_components.splice(pIndex, 1, panel)
                     this.show = true
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

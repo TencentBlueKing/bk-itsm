@@ -92,7 +92,7 @@
         name: 'ticketComment',
         components: {
             commentItem,
-            editor
+            editor,
         },
         props: {
             commentId: [Number, String],
@@ -104,7 +104,7 @@
             isPageOver: Boolean,
             hasNodeOptAuth: Boolean,
             isShowBasicInfo: Boolean,
-            stepActiveTab: String
+            stepActiveTab: String,
         },
         data () {
             return {
@@ -118,15 +118,15 @@
                     {
                         type: 'INSIDE',
                         icon: 'bk-itsm-icon icon-suoding common-color',
-                        name: this.$t(`m['内部评论']`),
-                        docs: this.$t(`m['仅单据相关人员可发布的评论']`)
+                        name: this.$t('m[\'内部评论\']'),
+                        docs: this.$t('m[\'仅单据相关人员可发布的评论\']'),
                     },
                     {
                         type: 'PUBLIC',
                         icon: 'bk-itsm-icon icon-jiesuo common-color',
-                        name: this.$t(`m['外部评论']`),
-                        docs: this.$t(`m['发布的评论所有人可见']`)
-                    }
+                        name: this.$t('m[\'外部评论\']'),
+                        docs: this.$t('m[\'发布的评论所有人可见\']'),
+                    },
                 ],
                 // commentList: [],
                 editType: '',
@@ -137,11 +137,11 @@
                 replyCommnetId: '',
                 replyContent: {
                     creator: '',
-                    content: ''
+                    content: '',
                 },
                 commentDomHeight: '',
                 isShowCommentScroll: false,
-                basicInDomHeight: 54 // 基本信息初始高度
+                basicInDomHeight: 54, // 基本信息初始高度
             }
         },
         watch: {
@@ -149,7 +149,7 @@
                 if (val === 'allComments') {
                     this.getCommentHeight()
                 }
-            }
+            },
         },
         mounted () {
             this.commentListDom = document.querySelector('.comment-list')
@@ -202,7 +202,7 @@
                 const params = {
                     content: text,
                     users: [],
-                    remark_type: this.commentType
+                    remark_type: this.commentType,
                 }
                 if (this.editType === 'edit') {
                     params.id = this.curCommentId
@@ -225,7 +225,7 @@
                 if (!(this.hasNodeOptAuth && this.ticketInfo.updated_by.split(',').includes(window.username)) && type === 'INSIDE') {
                     this.$bkMessage({
                         message: this.$t('m["你当前无法发表内部评论"]'),
-                        theme: 'warning '
+                        theme: 'warning ',
                     })
                     return
                 }
@@ -238,9 +238,8 @@
                 const curCommentIndex = this.commentList.indexOf(this.commentList.filter(item => item.id === curComment.parent)[0])
                 if (curCommentIndex !== -1) {
                     const commentListDom = document.querySelector('.comment-list')
-                    const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex).map(item => {
-                        return item.clientHeight
-                    })
+                    const heights = Array.from(commentListDom.childNodes).slice(0, curCommentIndex)
+                        .map(item => item.clientHeight)
                     const sumHeight = heights.reduce((pre, cur) => pre + cur)
                     this.$set(this.flash, curComment.parent__id, true)
                     const timer = setTimeout(() => {
@@ -271,7 +270,7 @@
                         ticket_id: this.ticketId,
                         parent__id: this.replyCommnetId || this.commentId,
                         remark_type: this.commentType,
-                        users: []
+                        users: [],
                     }
                     if (text) {
                         try {
@@ -287,8 +286,8 @@
                         }
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style scoped lang="scss">

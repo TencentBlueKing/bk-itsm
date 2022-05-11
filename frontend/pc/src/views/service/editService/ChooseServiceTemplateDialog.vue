@@ -75,7 +75,7 @@
         props: {
             isShow: Boolean,
             createInfo: Object,
-            serviceId: [String, Number]
+            serviceId: [String, Number],
         },
         data () {
             return {
@@ -83,7 +83,7 @@
                 searchModel: false,
                 searchResultList: [],
                 recomTemplateList: [],
-                createdTemplateList: []
+                createdTemplateList: [],
             }
         },
         computed: {
@@ -95,7 +95,7 @@
                     return this.searchResultList
                 }
                 return this.createWay === 'recom' ? this.recomTemplateList : this.createdTemplateList
-            }
+            },
         },
         watch: {
             isShow (val) {
@@ -107,7 +107,7 @@
                 } else {
                     this.getAllService()
                 }
-            }
+            },
         },
         methods: {
             // 获取所有服务
@@ -117,11 +117,13 @@
                     if (resp.result) {
                         this.createdTemplateList = resp.data
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             // 获取推荐服务（原基础模型）列表
             getRecomService () {
@@ -130,9 +132,10 @@
                     this.recomTemplateList = res.data
                 }, (res) => {
                     errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             searchHandler (val) {
                 this.searchModel = val !== ''
@@ -141,7 +144,7 @@
                     .filter(item => reg.test(item.name))
                     .map(item => ({
                         ...item,
-                        name: item.name.replace(reg, '<span style="color: #3a84ff;">$1</span>')
+                        name: item.name.replace(reg, '<span style="color: #3a84ff;">$1</span>'),
                     }))
             },
             onTemplateClick (item) {
@@ -150,13 +153,13 @@
                 if (this.createWay === 'recom') {
                     params = {
                         id: this.serviceId,
-                        table_id: item.id
+                        table_id: item.id,
                     }
                     actionName = 'importFromTemplate'
                 } else {
                     params = {
                         id: this.serviceId,
-                        service_id: item.id
+                        service_id: item.id,
                     }
                     actionName = 'importFromService'
                 }
@@ -166,21 +169,23 @@
                 this.loading = true
                 this.$store.dispatch(`service/${actionName}`, params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["更新成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.systemConfig["更新成功"]'),
+                        theme: 'success',
                     })
                     this.$emit('update:isShow', false)
                     this.$emit('updateServiceSource', actionName === 'importFromTemplate' ? 'template' : 'service')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             onDialogClose (val) {
                 this.$emit('update:isShow', val)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

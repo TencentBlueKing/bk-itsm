@@ -145,30 +145,30 @@
     export default {
         name: 'NodeDealDialog',
         components: {
-            DealPerson
+            DealPerson,
         },
         mixins: [commonMix],
         props: {
             openFormInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             nodeInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             submitting: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             allGroups: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -176,7 +176,7 @@
                 formData: {
                     terminate_message: '', // 终止原因
                     suspend_message: '', // 挂起原因
-                    deliverReason: '' // 转单原因
+                    deliverReason: '', // 转单原因
                 },
                 // 校验
                 rules: {},
@@ -186,7 +186,7 @@
                     includeTypeList: [],
                     specifyIdList: [],
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 // 转单人
                 deliverInfo: {
@@ -194,22 +194,22 @@
                     includeTypeList: [], // 包含类型
                     specifyIdList: [], // 包含人员 id 列表
                     type: '',
-                    value: ''
+                    value: '',
                 },
-                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API', 'ORGANIZATION']
+                excludeAssignList: ['CMDB', 'VARIABLE', 'EMPTY', 'STARTER_LEADER', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'ASSIGN_LEADER', 'IAM', 'API', 'ORGANIZATION'],
             }
         },
         computed: {
             //  转单 or 异常分派
             type () {
                 return this.openFormInfo.btnInfo.key === 'DELIVER' ? '转单' : '分派'
-            }
+            },
         },
         watch: {
             'openFormInfo.isShow' () {
                 this.clearFormData()
                 this.initData()
-            }
+            },
         },
         methods: {
             initData () {
@@ -227,7 +227,7 @@
                     origin_assignors: originAssignors, // 原始分派人(id)
                     delivers,
                     delivers_type: deliversType,
-                    origin_delivers: originDelivers
+                    origin_delivers: originDelivers,
                 } = this.nodeInfo
 
                 const handler = isDelive ? delivers : assignors
@@ -253,7 +253,7 @@
                     const includePerson = handler.split(',').map((fullName) => fullName.replace(/\(.+\)/g, ''))
                     specifyIdList = [
                         { type: 'PERSON', list: includePerson },
-                        { type: handlerType, list: originHandler.split(',') }
+                        { type: handlerType, list: originHandler.split(',') },
                     ]
                 }
 
@@ -277,19 +277,19 @@
                     includeTypeList: [],
                     specifyIdList: [],
                     type: '',
-                    value: ''
+                    value: '',
                 }
                 this.distribution = {
                     excludeTypeList: [],
                     includeTypeList: [],
                     specifyIdList: [],
                     type: '',
-                    value: ''
+                    value: '',
                 }
                 this.formData = {
                     terminate_message: '',
                     suspend_message: '',
-                    deliverReason: ''
+                    deliverReason: '',
                 }
             },
             // 确认事件
@@ -312,8 +312,8 @@
             // 取消事件
             cancelForm () {
                 this.openFormInfo.isShow = false
-            }
-        }
+            },
+        },
     }
 </script>
 

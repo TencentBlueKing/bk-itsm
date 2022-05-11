@@ -30,26 +30,26 @@ export default [
     {
         path: '/workbench/ticket/todo',
         name: 'myTodoTicket',
-        component: MyTodoTicket
+        component: MyTodoTicket,
     },
     {
         path: '/workbench/ticket/approval',
         name: 'myApprovalTicket',
-        component: MyApprovalTicket
+        component: MyApprovalTicket,
     },
     {
         path: '/workbench/ticket/created',
         name: 'myCreatedTicket',
-        component: MyCreatedTicket
+        component: MyCreatedTicket,
     },
     {
         path: '/workbench/ticket/attention',
         name: 'myAttentionTicket',
-        component: MyAttentionTicket
+        component: MyAttentionTicket,
     },
     {
         path: '/workbench/ticket/all',
         name: 'allUserTicket',
-        component: AllTicket
-    }
+        component: AllTicket,
+    },
 ]

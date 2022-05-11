@@ -23,12 +23,12 @@
 import { deepClone } from '@/utils/util'
 
 // TODO: 现有字段渲染公共方法梳理整合
-export const formattingData = (node) => {
+// export const formattingData = (node) => {
     
-}
-export const fieldFormatting = (valueList) => {
+// }
+// export const fieldFormatting = (valueList) => {
     
-}
+// }
 
 /**
  * 获取自定义表格每个单元格的显示值
@@ -59,8 +59,8 @@ export class Field {
         this.regex_config = {
             rule: {
                 expressions: [],
-                type: 'and'
-            }
+                type: 'and',
+            },
         }
         this.customRegex = ''
         this.source_type = ''

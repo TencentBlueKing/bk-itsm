@@ -212,7 +212,7 @@
         name: 'FlowVersion',
         components: {
             searchInfo,
-            preview
+            preview,
         },
         mixins: [permission],
         data () {
@@ -227,64 +227,64 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 勾选
                 checkList: [],
                 // 查询
                 moreSearch: [
                     {
-                        name: this.$t(`m.flowManager["流程名"]`),
+                        name: this.$t('m.flowManager["流程名"]'),
                         type: 'input',
                         typeKey: 'name__contains',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.flowManager["版本号"]`),
+                        name: this.$t('m.flowManager["版本号"]'),
                         type: 'input',
                         typeKey: 'version_number__contains',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.flowManager["发布人"]`),
+                        name: this.$t('m.flowManager["发布人"]'),
                         type: 'member',
                         typeKey: 'updated_by__contains',
                         multiSelect: true,
                         value: [],
-                        list: []
-                    }
+                        list: [],
+                    },
                 ],
                 // 删除，还原
                 deleteInfo: {
                     type: '',
-                    info: {}
+                    info: {},
                 },
                 // 流程预览
                 processInfo: {
                     isShow: false,
-                    title: this.$t(`m.flowManager["流程预览"]`),
+                    title: this.$t('m.flowManager["流程预览"]'),
                     position: {
-                        top: 150
+                        top: 150,
                     },
                     draggable: true,
                     loading: true,
                     version: 'version',
-                    addList: []
+                    addList: [],
                 },
                 previewInfo: {
                     canClick: false,
-                    narrowSize: 0.8
+                    narrowSize: 0.8,
                 },
                 addList: [],
-                lineList: []
+                lineList: [],
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             this.getList()
@@ -299,7 +299,7 @@
                 this.checkList = []
                 const params = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
                 this.moreSearch.forEach(item => {
                     if (Array.isArray(item.value) ? !!item.value.length : !!item.value) {
@@ -315,11 +315,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -399,16 +401,16 @@
                     return
                 }
                 const titleMap = new Map([
-                    ['delete', this.$t(`m.flowManager["流程版本删除确认"]`)],
-                    ['restore', this.$t(`m.flowManager["流程版本还原确认"]`)],
-                    ['export', this.$t(`m.flowManager["流程版本导出确认"]`)],
-                    ['batchDelete', this.$t(`m.flowManager["流程版本批量删除确认"]`)]
+                    ['delete', this.$t('m.flowManager["流程版本删除确认"]')],
+                    ['restore', this.$t('m.flowManager["流程版本还原确认"]')],
+                    ['export', this.$t('m.flowManager["流程版本导出确认"]')],
+                    ['batchDelete', this.$t('m.flowManager["流程版本批量删除确认"]')],
                 ])
                 const contentMap = new Map([
-                    ['delete', this.$t(`m.flowManager["删除之后服务将无法关联这些流程版本"]`)],
-                    ['restore', this.$t(`m.flowManager["还原后请移步到流程设计处编辑"]`)],
-                    ['export', this.$t(`m.flowManager["确认后将导出当前版本的流程数据为JSON格式的文件"]`)],
-                    ['batchDelete', this.$t(`m.flowManager["删除之后服务将无法关联这些流程版本"]`)]
+                    ['delete', this.$t('m.flowManager["删除之后服务将无法关联这些流程版本"]')],
+                    ['restore', this.$t('m.flowManager["还原后请移步到流程设计处编辑"]')],
+                    ['export', this.$t('m.flowManager["确认后将导出当前版本的流程数据为JSON格式的文件"]')],
+                    ['batchDelete', this.$t('m.flowManager["删除之后服务将无法关联这些流程版本"]')],
                 ])
                 if (item.service_cnt && type === 'delete') {
                     return
@@ -422,7 +424,7 @@
                     subTitle: contentMap.get(type),
                     confirmFn: () => {
                         this.submitFn()
-                    }
+                    },
                 })
             },
             submitFn () {
@@ -442,22 +444,22 @@
                     return
                 }
                 this.secondClick = true
-                const idArr = this.checkList.map(item => {
-                    return item.id
-                })
+                const idArr = this.checkList.map(item => item.id)
                 const id = idArr.join(',')
-                this.$store.dispatch('workflowVersion/batchDelete', { id: id }).then(res => {
+                this.$store.dispatch('workflowVersion/batchDelete', { id }).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.flowManager["批量删除成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.flowManager["批量删除成功"]'),
+                        theme: 'success',
                     })
                     this.checkList = []
                     this.getList()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 删除
             deleteSubmit () {
@@ -467,15 +469,17 @@
                 this.secondClick = true
                 this.$store.dispatch('workflowVersion/delete', this.deleteInfo.info.id).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.flowManager["删除成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.flowManager["删除成功"]'),
+                        theme: 'success',
                     })
                     this.getList(1)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 还原
             restoreSubmit () {
@@ -485,21 +489,23 @@
                 this.secondClick = true
                 this.$store.dispatch('workflowVersion/restore', this.deleteInfo.info.id).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.flowManager["成功还原该流程，请前往【流程设计】查看"]`),
-                        theme: 'success'
+                        message: this.$t('m.flowManager["成功还原该流程，请前往【流程设计】查看"]'),
+                        theme: 'success',
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 流程预览
             onFlowPreview (item) {
                 if (!this.checkfowManagePermisson(item)) {
                     return
                 }
-                const id = item.id
+                const { id } = item
                 if (!id) {
                     return
                 }
@@ -507,16 +513,17 @@
                 this.processInfo.loading = true
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
-                    this.$store.dispatch('deployCommon/getLineVersion', { id })
+                    this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     for (let i = 0; i < this.addList.length; i++) {
                         this.addList[i].indexInfo = i
                     }
                     this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.processInfo.loading = false
-                })
+                }))
+                    .finally(() => {
+                        this.processInfo.loading = false
+                    })
             },
             // 关闭版本提示信息
             closeVersion () {
@@ -525,16 +532,16 @@
             // 流程版本管理权限校验
             checkfowManagePermisson (item) {
                 if (!this.hasPermission(['flow_version_manage'], item.auth_actions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
+                            name: projectInfo.name,
                         }],
                         flow_version: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['flow_version_manage'], item.auth_actions, resourceData)
                     return false
@@ -544,27 +551,27 @@
             // check 流程版本还原权限
             checkfowRestorePermisson (item) {
                 if (!this.hasPermission(['flow_version_restore'], item.auth_actions)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
+                            name: projectInfo.name,
                         }],
                         flow_version: [{
                             id: item.id,
-                            name: item.name
+                            name: item.name,
                         }],
                         workflow: [{
                             id: item.workflow_id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['flow_version_restore'], item.auth_actions, resourceData)
                     return false
                 }
                 return true
-            }
-        }
+            },
+        },
     }
 </script>
 

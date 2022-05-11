@@ -208,7 +208,7 @@
         { id: 20, name: '20:00' },
         { id: 21, name: '21:00' },
         { id: 22, name: '22:00' },
-        { id: 23, name: '23:00' }
+        { id: 23, name: '23:00' },
     ]
     export default {
         name: 'ServiceSettingStep',
@@ -217,17 +217,17 @@
             BasicCard,
             collapseTransition,
             commonTriggerList,
-            TaskConfigPanel
+            TaskConfigPanel,
         },
         props: {
             serviceInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             flowInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -235,22 +235,22 @@
                 showMoreConfig: false,
                 revokeWayList: [
                     { name: '不支持撤回', id: 'not_support', key: 0 },
-                    { name: this.$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`), id: 'before_flow', key: 2 },
-                    { name: this.$t(`m.treeinfo['任何节点，提单人都可撤回单据']`), id: 'all_node', key: 1 },
-                    { name: this.$t(`m.treeinfo['指定节点前可以撤回']`), id: 'specify_node', key: 3 }
+                    { name: this.$t('m.treeinfo[\'提单后，单据未被处理流转前，提单人可以撤回\']'), id: 'before_flow', key: 2 },
+                    { name: this.$t('m.treeinfo[\'任何节点，提单人都可撤回单据\']'), id: 'all_node', key: 1 },
+                    { name: this.$t('m.treeinfo[\'指定节点前可以撤回\']'), id: 'specify_node', key: 3 },
                 ],
                 displayRangeTypes: ['OPEN', 'ORGANIZATION', 'GENERAL', 'API'],
                 notifyList: [
-                    { name: this.$t(`m.treeinfo["企业微信"]`), type: 'WEIXIN' },
-                    { name: this.$t(`m.treeinfo["邮件"]`), type: 'EMAIL' },
-                    { name: this.$t(`m.treeinfo["SMS短信"]`), type: 'SMS' }
+                    { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
+                    { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
+                    { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
                 ],
                 nodeListLoading: false,
                 nodeList: [],
                 formData: {
                     visibleRange: {
                         type: 'OPEN',
-                        value: ''
+                        value: '',
                     },
                     revokeWay: 'before_flow',
                     revokeState: 0,
@@ -258,15 +258,15 @@
                     notify_rule: 'ONCE',
                     notify_freq: '',
                     notify: ['WEIXIN', 'EMAIL'],
-                    is_auto_approve: false
+                    is_auto_approve: false,
                 },
                 superviseTypes: ['PERSON', 'GENERAL', 'STARTER'],
                 supervisePerson: {
                     type: 'STARTER',
-                    value: ''
+                    value: '',
                 },
                 slaValidateMsg: [],
-                slaValidateDialogShow: false
+                slaValidateDialogShow: false,
             }
         },
         computed: {
@@ -275,14 +275,14 @@
             },
             processId () {
                 return this.serviceInfo.workflow_id
-            }
+            },
         },
         watch: {
             'formData.revokeWay' (val) {
                 if (val === 'specify_node' && !this.nodeList.length) {
                     this.getNodeList()
                 }
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -299,7 +299,7 @@
                     is_supervise_needed: isSuperviseNeeded,
                     notify_rule: notifyRule,
                     notify_freq: notifyFreq,
-                    supervise_type
+                    supervise_type,
                 } = this.serviceInfo
                 try {
                     const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type)
@@ -311,7 +311,7 @@
                 this.formData.is_auto_approve = this.flowInfo.is_auto_approve
                 this.formData.visibleRange = {
                     type: display_type,
-                    value: display_role
+                    value: display_role,
                 }
                 this.formData.otherSettings = []
                 if (canTicketAgency) {
@@ -327,7 +327,7 @@
                 }
                 this.supervisePerson = {
                     type: supervise_type === 'EMPTY' ? 'STARTER' : supervise_type,
-                    value: supervisor
+                    value: supervisor,
                 }
             },
             // 获取流程节点
@@ -335,28 +335,31 @@
                 this.nodeListLoading = true
                 this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then(res => {
                     this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.nodeListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.nodeListLoading = false
+                    })
             },
             saveAndActionService (params) {
                 return this.$store.dispatch('service/saveAndActionService', {
                     id: this.serviceInfo.id,
-                    params
+                    params,
                 }).catch(res => {
                     errorHandler(res, this)
-                }).finally(() => {
-                    this.nodeListLoading = false
                 })
+                    .finally(() => {
+                        this.nodeListLoading = false
+                    })
             },
             goToServiceList () {
                 this.$router.push({
                     name: 'projectServiceList',
                     query: {
-                        project_id: this.$store.state.project.id
-                    }
+                        project_id: this.$store.state.project.id,
+                    },
                 })
             },
             async validate () {
@@ -366,10 +369,10 @@
                         supervisor: '',
                         revoke_config: {
                             type: 0, // 默认值
-                            state: 0
+                            state: 0,
                         },
-                        is_auto_approve: this.formData.is_auto_approve
-                    }
+                        is_auto_approve: this.formData.is_auto_approve,
+                    },
                 }
                 const workflow = params.workflow_config // 之前存在流程上的参数
                 // 可见范围
@@ -390,7 +393,7 @@
                     revokeWay,
                     revokeState,
                     otherSettings,
-                    notify
+                    notify,
                 } = this.formData
                 if (revokeWay === 'not_support') {
                     workflow.is_revocable = false
@@ -400,7 +403,7 @@
                     const type = this.revokeWayList.find(item => item.id === revokeWay).key
                     workflow.revoke_config = {
                         type,
-                        state: revokeWay === 'specify_node' ? revokeState : 0
+                        state: revokeWay === 'specify_node' ? revokeState : 0,
                     }
                 }
                 // 其他设置
@@ -441,8 +444,8 @@
                     return { data: { result: false } }
                 }
                 return true
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

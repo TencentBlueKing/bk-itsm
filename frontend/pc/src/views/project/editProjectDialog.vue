@@ -78,7 +78,7 @@
         props: {
             isShow: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             title: String,
             project: {
@@ -88,11 +88,11 @@
                         name: '',
                         key: '',
                         desc: '',
-                        color: ''
+                        color: '',
                     }
-                }
+                },
             },
-            editDialogFormDisable: Boolean
+            editDialogFormDisable: Boolean,
         },
         data () {
             return {
@@ -103,53 +103,53 @@
                         {
                             required: true,
                             message: '必填项',
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             max: 50,
                             message: '不能多于50个字符',
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             validator: this.validateName,
-                            message: function (val) {
+                            message (val) {
                                 return `${val}-此项目名称已存在`
                             },
-                            trigger: 'blur'
-                        }
+                            trigger: 'blur',
+                        },
                     ],
                     key: [
                         {
                             required: true,
                             message: '必填项',
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             max: 28,
                             message: '不能多于28个字符',
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             regex: /^[a-z][a-z0-9-_]+$/,
                             message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
-                            trigger: 'blur'
+                            trigger: 'blur',
                         },
                         {
                             validator: this.validateKey,
-                            message: function (val) {
+                            message (val) {
                                 return `${val}-此项目代号已存在`
                             },
-                            trigger: 'blur'
-                        }
+                            trigger: 'blur',
+                        },
                     ],
                     desc: [
                         {
                             max: 100,
                             message: '不能多于100个字符',
-                            trigger: 'blur'
-                        }
-                    ]
-                }
+                            trigger: 'blur',
+                        },
+                    ],
+                },
             }
         },
         watch: {
@@ -157,7 +157,7 @@
                 if (val) {
                     this.projectForm = deepClone(this.project)
                 }
-            }
+            },
         },
         methods: {
             projectValidateList (list, type) {
@@ -193,7 +193,7 @@
                         }
                     }
                 })
-            }
-        }
+            },
+        },
     }
 </script>

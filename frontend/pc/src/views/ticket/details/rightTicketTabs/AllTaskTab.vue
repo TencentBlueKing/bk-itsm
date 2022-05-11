@@ -101,13 +101,13 @@
         components: {
             dealTask,
             TaskStatus,
-            taskHandleTrigger
+            taskHandleTrigger,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -116,10 +116,10 @@
                 dealTaskInfo: {
                     show: false,
                     itemContent: {},
-                    title: this.$t(`m.task['查看任务']`),
-                    type: 'SEE'
+                    title: this.$t('m.task[\'查看任务\']'),
+                    type: 'SEE',
                 },
-                taskTemplateTypes: TASK_TEMPLATE_TYPES
+                taskTemplateTypes: TASK_TEMPLATE_TYPES,
             }
         },
         mounted () {
@@ -130,15 +130,17 @@
             getTaskList () {
                 this.isListLoading = true
                 const params = {
-                    ticket_id: this.ticketInfo.id
+                    ticket_id: this.ticketInfo.id,
                 }
                 return this.$store.dispatch('taskFlow/getTaskList', params).then(res => {
                     this.taskList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isListLoading = false
+                    })
             },
             onViewTask (row) {
                 this.dealTaskInfo.show = true
@@ -147,8 +149,8 @@
             getTaskTypeName (type) {
                 const target = this.taskTemplateTypes.find(m => m.type === type)
                 return target ? target.name : type
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

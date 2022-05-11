@@ -148,44 +148,44 @@
         components: {
             memberSelect,
             RichTextEditor,
-            CodeEditor
+            CodeEditor,
         },
         props: {
             formInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fieldInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             dictionaryData: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             changeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             label: {
                 type: String,
-                default: ''
+                default: '',
             },
             checkStatus: {
                 type: Object,
                 default () {
                     return {
                     }
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -193,7 +193,7 @@
                 // 记录是否更新过数据
                 updateStatus: false,
                 typeList: ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER'],
-                precision: 0
+                precision: 0,
             }
         },
         watch: {
@@ -226,7 +226,7 @@
                 if (this.formInfo.type === 'CUSTOM-FORM') {
                     this.checkStatus.customFormStatus = false
                 }
-            }
+            },
         },
         mounted () {
             if (this.changeInfo.id) {
@@ -258,19 +258,20 @@
             },
             getDictionList (key) {
                 const params = {
-                    key
+                    key,
                 }
                 this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
                     this.selectList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             downCustomFormTempalte () {
                 const link = document.createElement('a')
                 const time = +new Date()
                 link.download = `bk_itsm_custom_form_template_${time}.json`
-                link.href = 'data:text/plain,' + JSON.stringify(CUSTOM_FORM_TEMPLATE, null, 4)
+                link.href = `data:text/plain,${JSON.stringify(CUSTOM_FORM_TEMPLATE, null, 4)}`
                 link.click()
             },
             getApiList () {
@@ -287,8 +288,8 @@
                 //         theme: 'error'
                 //     })
                 // })
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -125,7 +125,7 @@
             apiEditorRequest,
             apiEditorResult,
             apiEditorOthers,
-            ace
+            ace,
         },
         mixins: [mixins],
         props: {
@@ -133,26 +133,26 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             treeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             pathList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isBuiltinIdList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -161,22 +161,22 @@
                     width: '100%',
                     height: 300,
                     fullScreen: true,
-                    lang: 'python'
-                }
+                    lang: 'python',
+                },
             }
         },
         computed: {
             // 基本设置
             DetailInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.apiDetailInfoCommon
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.apiDetailInfoCommon = newVal
-                }
-            }
+                },
+            },
         },
         watch: {
             // apiDetailInfoCommon(newVal, oldVal){
@@ -202,40 +202,38 @@
                 this.$parent.$parent.getRemoteApiDetail(id)
             },
             async updateApi () {
-                if (this.secondClick || !this.DetailInfo['treeDataList'] || !this.DetailInfo['responseTreeDataList']) {
+                if (this.secondClick || !this.DetailInfo.treeDataList || !this.DetailInfo.responseTreeDataList) {
                     return
                 }
-                this.DetailInfo.req_headers = this.DetailInfo.req_headers.filter(item => {
-                    return !!item['name']
-                })
-                this.DetailInfo.req_params = this.DetailInfo.req_params.filter(item => {
-                    return !!item['name']
-                })
+                this.DetailInfo.req_headers = this.DetailInfo.req_headers.filter(item => !!item.name)
+                this.DetailInfo.req_params = this.DetailInfo.req_params.filter(item => !!item.name)
                 // body Jsonschema数据结构
-                const rootdata = await this.listToJsonschema(this.DetailInfo['treeDataList'])
-                this.DetailInfo['req_body'] = await rootdata['root'] // root初始 Jsonschema数据结构
+                const rootdata = await this.listToJsonschema(this.DetailInfo.treeDataList)
+                this.DetailInfo.req_body = await rootdata.root // root初始 Jsonschema数据结构
 
                 // response Jsonschema数据结构
-                const responseRootdata = await this.listToJsonschema(this.DetailInfo['responseTreeDataList'])
-                this.DetailInfo['rsp_data'] = await responseRootdata['root'] // root初始 Jsonschema数据结构
+                const responseRootdata = await this.listToJsonschema(this.DetailInfo.responseTreeDataList)
+                this.DetailInfo.rsp_data = await responseRootdata.root // root初始 Jsonschema数据结构
                 this.DetailInfo.owners = this.DetailInfo.ownersInputValue.join(',')
                 delete this.DetailInfo.ownersInputValue
-                await delete this.DetailInfo['treeDataList']
-                await delete this.DetailInfo['responseTreeDataList']
+                await delete this.DetailInfo.treeDataList
+                await delete this.DetailInfo.responseTreeDataList
 
                 const params = this.DetailInfo
                 this.secondClick = true
                 await this.$store.dispatch('apiRemote/put_remote_api', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["更新成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.systemConfig["更新成功"]'),
+                        theme: 'success',
                     })
                     this.getRemoteApiDetail(this.DetailInfo.id)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 切换接口类型，改变请求参数数据
             changeRequest (val) {
@@ -244,17 +242,17 @@
                     if (this.DetailInfo.req_params && this.DetailInfo.req_params.length && this.DetailInfo.req_params.some(item => (item.name || item.sample !== ''))) {
                         this.$bkInfo({
                             type: 'warning',
-                            title: this.$t(`m.systemConfig['此操作将清空请求参数']`),
+                            title: this.$t('m.systemConfig[\'此操作将清空请求参数\']'),
                             confirmFn: () => {
                                 this.DetailInfo.req_params = [{
                                     name: '',
                                     is_necessary: 0,
                                     sample: '',
                                     desc: '',
-                                    value: ''
+                                    value: '',
                                 }]
                                 this.$refs.apiEditorBasic.changeMethod(val)
-                            }
+                            },
                         })
                     } else {
                         this.$refs.apiEditorBasic.changeMethod(val)
@@ -263,18 +261,18 @@
                     if (this.DetailInfo.treeDataList[0].children && this.DetailInfo.treeDataList[0].children.length) {
                         this.$bkInfo({
                             type: 'warning',
-                            title: this.$t(`m.systemConfig['此操作将清空请求参数']`),
+                            title: this.$t('m.systemConfig[\'此操作将清空请求参数\']'),
                             confirmFn: () => {
                                 this.DetailInfo.treeDataList[0].children = []
                                 this.$refs.apiEditorBasic.changeMethod(val)
-                            }
+                            },
                         })
                     } else {
                         this.$refs.apiEditorBasic.changeMethod(val)
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

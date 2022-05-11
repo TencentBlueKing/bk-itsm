@@ -114,35 +114,35 @@
 
     // 任务基础信息
     const baseTaskInfoList = [
-        { key: 'component_type', name: i18n.t(`m.task['任务类型']`), value: i18n.t(`m.tickets['蓝盾任务']`) },
-        { key: 'task_schema_id', name: i18n.t(`m.task['任务模板']`), value: '' },
-        { key: 'name', name: i18n.t(`m.task['任务名称']`), value: '' },
-        { key: 'sub_pipeline_id', name: i18n.t(`m.tickets['流水线']`), value: '' },
-        { key: 'processor_users', name: i18n.t(`m.task['处理人']`), value: '' },
-        { key: 'status', name: i18n.t(`m.task['状态']`), value: '' }
+        { key: 'component_type', name: i18n.t('m.task[\'任务类型\']'), value: i18n.t('m.tickets[\'蓝盾任务\']') },
+        { key: 'task_schema_id', name: i18n.t('m.task[\'任务模板\']'), value: '' },
+        { key: 'name', name: i18n.t('m.task[\'任务名称\']'), value: '' },
+        { key: 'sub_pipeline_id', name: i18n.t('m.tickets[\'流水线\']'), value: '' },
+        { key: 'processor_users', name: i18n.t('m.task[\'处理人\']'), value: '' },
+        { key: 'status', name: i18n.t('m.task[\'状态\']'), value: '' },
     ]
     
     const executInfoList = [
-        { key: 'buildNum', name: i18n.t(`m.tickets['构建号']`), value: '' },
-        { key: 'buildNum', name: i18n.t(`m.tickets['源材料']`), value: '' },
-        { key: 'startTime', name: i18n.t(`m.tickets['开始于']`), value: '' },
-        { key: 'trigger', name: i18n.t(`m.tickets['触发方式']`), value: '' },
-        { key: 'endTime', name: i18n.t(`m.tickets['完成于']`), value: '' },
-        { key: 'executeTime', name: i18n.t(`m.systemConfig['耗时']`), value: '' },
-        { key: 'pipelineVersion', name: i18n.t(`m.tickets['编排版本号']`), value: '' }
+        { key: 'buildNum', name: i18n.t('m.tickets[\'构建号\']'), value: '' },
+        { key: 'buildNum', name: i18n.t('m.tickets[\'源材料\']'), value: '' },
+        { key: 'startTime', name: i18n.t('m.tickets[\'开始于\']'), value: '' },
+        { key: 'trigger', name: i18n.t('m.tickets[\'触发方式\']'), value: '' },
+        { key: 'endTime', name: i18n.t('m.tickets[\'完成于\']'), value: '' },
+        { key: 'executeTime', name: i18n.t('m.systemConfig[\'耗时\']'), value: '' },
+        { key: 'pipelineVersion', name: i18n.t('m.tickets[\'编排版本号\']'), value: '' },
     ]
 
     export default {
         name: 'DevopsExecutInfo',
         components: {
             taskStatus,
-            BuildDetailInfo
+            BuildDetailInfo,
         },
         props: {
             taskInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -156,7 +156,7 @@
                 buildStatusInfo: {}, // 构建状态信息
                 buildList: [],
                 outputVariableList: [], // 输出变量
-                openBuildInfo: {} // 打开的构建信息
+                openBuildInfo: {}, // 打开的构建信息
             }
         },
         computed: {
@@ -164,7 +164,7 @@
                 return this.taskInfo.status
             },
             taskInfoList () {
-                const taskStatusInfo = this.taskStatusInfo
+                const { taskStatusInfo } = this
                 const list = this.baseTaskInfoList.map(item => {
                     if (item.key === 'component_type') {
                         return item
@@ -179,7 +179,7 @@
                 return list
             },
             displayExecutInfoList () {
-                const buildStatusInfo = this.buildStatusInfo
+                const { buildStatusInfo } = this
                 this.executInfoList.forEach(item => {
                     switch (item.key) {
                         case 'startTime':
@@ -194,7 +194,7 @@
                     }
                 })
                 return this.executInfoList
-            }
+            },
         },
         created () {
         },
@@ -206,14 +206,16 @@
             // 获取任务状态信息
             getTaskStatusInfo () {
                 this.taskStatusInfoLoading = true
-                const id = this.taskInfo.id
+                const { id } = this.taskInfo
                 return this.$store.dispatch('taskFlow/getTaskStatusInfo', id).then((res) => {
                     this.taskStatusInfo = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.taskStatusInfoLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.taskStatusInfoLoading = false
+                    })
             },
             // 构建状态信息
             getDevopsBuildStatus () {
@@ -222,7 +224,7 @@
                 const params = {
                     project_id: projectId,
                     pipeline_id: pipelineId,
-                    build_id: buildId
+                    build_id: buildId,
                 }
                 this.$store.dispatch('ticket/getDevopsBuildStatus', params).then((res) => {
                     this.buildStatusInfo = res.data
@@ -231,20 +233,22 @@
                         return item
                     })
                     this.outputVariableList = Object.keys(res.data.variables).map(key => ({
-                        key: key,
-                        value: res.data.variables[key]
+                        key,
+                        value: res.data.variables[key],
                     }))
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.buildStatusLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.buildStatusLoading = false
+                    })
             },
             openBuildDetail (row) {
                 this.isShowBuildDetailDialog = true
                 this.openBuildInfo = row
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

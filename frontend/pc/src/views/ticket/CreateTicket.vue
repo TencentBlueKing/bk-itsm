@@ -179,7 +179,7 @@
             FieldInfo,
             memberSelect,
             CreateTicketDialog,
-            CreateTicketSuccess
+            CreateTicketSuccess,
         },
         mixins: [apiFieldsWatchMixin, commonMix],
         inject: ['reload'],
@@ -197,7 +197,7 @@
                 templateInfo: {},
                 templateList: [],
                 templateFormData: {
-                    name: ''
+                    name: '',
                 },
                 rules: {},
                 fieldList: [],
@@ -207,13 +207,13 @@
                 // 落地页
                 isRemindPageShow: false,
                 routerInfo: {},
-                isShowTemplateList: false
+                isShowTemplateList: false,
             }
         },
         watch: {
             '$route' () {
                 this.reload()
-            }
+            },
         },
         created () {
             this.initData()
@@ -236,8 +236,8 @@
             handleTemplateSelect () {
                 if (this.templateList.length === 0) {
                     this.$bkMessage({
-                        message: this.$t(`m['暂无模板']`),
-                        offsetY: 80
+                        message: this.$t('m[\'暂无模板\']'),
+                        offsetY: 80,
                     })
                     return
                 }
@@ -249,31 +249,35 @@
                 return this.$store.dispatch('service/getServiceDetail', this.serviceId).then((res) => {
                     this.service = res.data
                     this.favorite = res.data.favorite
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceLoading = false
+                    })
             },
             // 获取提单模板列表
             getTemplateList () {
                 this.templateListLoading = true
                 const params = {
-                    service: this.serviceId
+                    service: this.serviceId,
                 }
                 return this.$store.dispatch('change/getTemplateList', params).then((res) => {
                     this.templateList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.templateListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.templateListLoading = false
+                    })
             },
             // 获取提单字段
             getFieldList () {
                 this.fieldListLoading = true
                 const params = {
-                    service_id: this.serviceId
+                    service_id: this.serviceId,
                 }
                 return this.$store.dispatch('change/getSubmitFields', params).then(async (res) => {
                     this.fieldList = res.data
@@ -285,7 +289,7 @@
                         this.$set(item, 'val', item.value)
                         this.$set(item, 'service', this.service.key)
                     })
-                    this.isNecessaryToWatch({ 'fields': this.fieldList }, 'submit', () => {
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit', () => {
                         // TO IMPROVE 加载完成、重新赋值， isNecessaryToWatch 会去异步加载 choice 数据
                         this.fieldList.forEach(item => {
                             this.reCreateFieldList.forEach(node => {
@@ -295,11 +299,13 @@
                             })
                         })
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.fieldListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.fieldListLoading = false
+                    })
             },
             // 获取重新提单单据参数信息
             getReCreateTicketInfo () {
@@ -316,11 +322,13 @@
                             })
                         })
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.fieldListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.fieldListLoading = false
+                    })
             },
             // 创建单据
             onCreateTicket () {
@@ -345,7 +353,7 @@
                     service_type: this.service.bounded_catalogs[0],
                     fields: [],
                     creator: this.creator[0] || window.username,
-                    attention: this.remindCheck
+                    attention: this.remindCheck,
                 }
                 this.fieldList.forEach(item => {
                     // 提单环节需要传入隐藏字段，处理节点不需要
@@ -354,29 +362,31 @@
                         id: item.id,
                         key: item.key,
                         value: item.showFeild ? item.value : '',
-                        choice: item.choice
+                        choice: item.choice,
                     })
                 })
                 this.$store.dispatch('change/submit', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.common["提交成功！"]'),
-                        theme: 'success'
+                        theme: 'success',
                     })
                     this.isRemindPageShow = true
                     this.routerInfo = {
                         name: 'TicketDetail',
                         params: {
-                            type: 'readOnly'
+                            type: 'readOnly',
                         },
                         query: {
-                            id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined
-                        }
+                            id: res.data.id, from: 'created', project_id: this.$route.query.project_id || undefined,
+                        },
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.submitting = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.submitting = false
+                    })
             },
             // 修改服务
             onChangeService () {
@@ -386,7 +396,7 @@
                 const params = {
                     name: this.templateFormData.name,
                     service: this.serviceId,
-                    template: []
+                    template: [],
                 }
                 // 不能保存的字段类型
                 const excludeTypes = ['FILE', 'TABLE', 'CUSTOMTABLE']
@@ -396,7 +406,7 @@
                             id: item.id,
                             key: item.key,
                             type: item.type,
-                            value: item.val
+                            value: item.val,
                         }
                         if (templateItem.type === 'DATE') {
                             templateItem.value = this.standardDayTime(templateItem.value)
@@ -415,8 +425,8 @@
                 const params = deepClone(this.getSaveTemplateParams())
                 if (!params.template.length) {
                     this.$bkMessage({
-                        message: this.$t(`m.common["无字段可以保存"]`),
-                        theme: 'warning'
+                        message: this.$t('m.common["无字段可以保存"]'),
+                        theme: 'warning',
                     })
                     this.cancelTemplate()
                     return false
@@ -426,27 +436,29 @@
                 }
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.common["确认更新模板？"]`),
-                    subTitle: this.$t(`m.common["更新模板操作将会覆盖原先模板的信息"]`),
+                    title: this.$t('m.common["确认更新模板？"]'),
+                    subTitle: this.$t('m.common["更新模板操作将会覆盖原先模板的信息"]'),
                     confirmFn: () => {
                         this.submitting = true
                         const id = this.tempalteId
-                        const name = this.templateList.find(template => template.id === this.tempalteId).name
+                        const { name } = this.templateList.find(template => template.id === this.tempalteId)
                         params.name = name
 
                         this.$store.dispatch('change/updateTemplate', { params, id }).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.common["模板更新成功"]`),
+                                message: this.$t('m.common["模板更新成功"]'),
                                 theme: 'success',
-                                ellipsisLine: 0
+                                ellipsisLine: 0,
                             })
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.getTemplateList()
-                            this.submitting = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.getTemplateList()
+                                this.submitting = false
+                            })
+                    },
                 })
             },
             // 保存模板
@@ -454,8 +466,8 @@
                 const params = this.getSaveTemplateParams()
                 if (!params.template.length) {
                     this.$bkMessage({
-                        message: this.$t(`m.common["无字段可以保存"]`),
-                        theme: 'warning'
+                        message: this.$t('m.common["无字段可以保存"]'),
+                        theme: 'warning',
                     })
                     this.cancelTemplate()
                     return false
@@ -468,21 +480,23 @@
                     this.$store.dispatch('change/submitTemplate', params).then((res) => {
                         this.getTemplateList()
                         this.$bkMessage({
-                            message: this.$t(`m.common["保存成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.common["保存成功"]'),
+                            theme: 'success',
                         })
-                    }).catch((res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.submitting = false
-                        this.cancelTemplate()
                     })
+                        .catch((res) => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.submitting = false
+                            this.cancelTemplate()
+                        })
                 })
             },
             // 取消模板
             cancelTemplate () {
                 this.templateFormData.name = ''
-                this.$refs['templatePopover'].hideHandler()
+                this.$refs.templatePopover.hideHandler()
             },
             // 选择模板
             handleTemplateChange (id) {
@@ -500,14 +514,14 @@
                 let route
                 if (this.$route.query.from) {
                     route = {
-                        name: this.$route.query.from
+                        name: this.$route.query.from,
                     }
                 } else {
                     route = {
                         name: 'projectTicket',
                         query: {
-                            project_id: this.$store.state.project.id
-                        }
+                            project_id: this.$store.state.project.id,
+                        },
                     }
                 }
                 this.$router.push(route)
@@ -515,21 +529,22 @@
             onCollectClick () {
                 this.$store.dispatch('service/toggleServiceFavorite', {
                     id: this.serviceId,
-                    favorite: !this.favorite
+                    favorite: !this.favorite,
                 }).then((res) => {
                     if (res.result) {
                         this.favorite = !this.favorite // 修改当前数据的收藏状态
                     }
                     this.$bkMessage({
-                        message: this.favorite ? this.$t(`m.manageCommon['收藏成功']`) : this.$t(`m.manageCommon['取消成功']`),
+                        message: this.favorite ? this.$t('m.manageCommon[\'收藏成功\']') : this.$t('m.manageCommon[\'取消成功\']'),
                         theme: 'success',
-                        ellipsisLine: 0
+                        ellipsisLine: 0,
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

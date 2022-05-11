@@ -104,16 +104,16 @@
             changeConductor,
             sendMessage,
             apiCall,
-            modifyField
+            modifyField,
         },
         props: {
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
-            signal: String
+            signal: String,
         },
         data () {
             return {
@@ -127,7 +127,7 @@
             // 是否显示前台触发 radio
             isShowFrontendTrigger () {
                 return !this.onlyBackendSignals.includes(this.signal)
-            }
+            },
         },
         watch: {
             isShowFrontendTrigger: {
@@ -136,8 +136,8 @@
                         this.item.performData.runMode = 'BACKEND'
                     }
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         created () {
             this.initData()
@@ -168,7 +168,7 @@
                                             key: schemaValue.value.member_type,
                                             value: schemaValue.value.members,
                                             secondLevelList: [],
-                                            isLoading: false
+                                            isLoading: false,
                                         }
                                         valueInfo.push(itemValue)
                                     }
@@ -178,7 +178,7 @@
                                     key: '',
                                     value: '',
                                     secondLevelList: [],
-                                    isLoading: false
+                                    isLoading: false,
                                 }
                                 valueInfo.push(itemValue)
                             }
@@ -199,7 +199,7 @@
                                                             key: schemaValue.value.member_type,
                                                             value: schemaValue.value.members,
                                                             secondLevelList: [],
-                                                            isLoading: false
+                                                            isLoading: false,
                                                         }
                                                         subFieldValue.push(itemValue)
                                                     }
@@ -210,8 +210,8 @@
                                                         key: '',
                                                         value: '',
                                                         secondLevelList: [],
-                                                        isLoading: false
-                                                    }
+                                                        isLoading: false,
+                                                    },
                                                 ]
                                             }
                                         }
@@ -222,8 +222,8 @@
                         }
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

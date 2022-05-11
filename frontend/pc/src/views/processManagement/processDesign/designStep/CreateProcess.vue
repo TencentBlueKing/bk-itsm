@@ -112,20 +112,20 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             isNewFlow: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             isSaveing: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             processId: {
                 type: [String, Number],
-                required: true
-            }
+                required: true,
+            },
         },
         data () {
             return {
@@ -148,7 +148,7 @@
                     // 流程配置中使用权限中心角色
                     useIam: false,
                     flowModuleTypeDisabled: false,
-                    owners: []
+                    owners: [],
                 },
                 // 校验
                 rules: {},
@@ -156,14 +156,14 @@
                 parentInfo: {
                     status: 'success',
                     index: 0,
-                    firstStep: {}
-                }
+                    firstStep: {},
+                },
             }
         },
         watch: {
             flowInfo () {
                 this.initInfo()
-            }
+            },
         },
         mounted () {
             this.getFlowModuleTypes()
@@ -179,13 +179,14 @@
             // 基础模型类型
             getFlowModuleTypes () {
                 const params = {
-                    all: true
+                    all: true,
                 }
                 this.$store.dispatch('basicModule/get_tables', params).then(res => {
                     this.flowModuleTypes = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 通过ID获取数据
             initInfo () {
@@ -217,7 +218,7 @@
                     table: this.formInfo.flowModuleType,
                     desc: this.formInfo.desc,
                     is_biz_needed: this.formInfo.business,
-                    is_iam_used: this.formInfo.useIam
+                    is_iam_used: this.formInfo.useIam,
                 }
                 // 保存
                 this.$emit('saveFlowInfo', params, this.isNewFlow)
@@ -225,10 +226,10 @@
             },
             previousStep () {
                 this.$router.push({
-                    name: 'ProcessHome'
+                    name: 'ProcessHome',
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -26,7 +26,7 @@
         name: 'RenderViewTest',
         components: {
             RenderView,
-            CodeEditor
+            CodeEditor,
         },
         data () {
             return {
@@ -35,8 +35,8 @@
                 formData: [],
                 context: {},
                 editorConfig: {
-                    language: 'json'
-                }
+                    language: 'json',
+                },
             }
         },
         watch: {
@@ -44,8 +44,8 @@
                 handler () {
                     this.initRenderView()
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         methods: {
             /**
@@ -59,14 +59,14 @@
                     this.formData = formData
                     this.context = {
                         schemes,
-                        config
+                        config,
                     }
                 } catch (err) {
                     this.errMessage = err
                     this.formData = []
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

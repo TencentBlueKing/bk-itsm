@@ -105,20 +105,20 @@
         components: {
             collapseTransition,
             commonCascade,
-            memberSelect
+            memberSelect,
         },
         props: {
             moreSearch: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 searchWord: '',
-                showMore: false
+                showMore: false,
             }
         },
         methods: {
@@ -134,8 +134,8 @@
             clearSearch () {
                 this.$parent.clearSearch()
                 this.$parent.getList(1, true)
-            }
-        }
+            },
+        },
     }
 </script>
 

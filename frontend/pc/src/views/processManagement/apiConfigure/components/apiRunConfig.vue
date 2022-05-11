@@ -98,7 +98,7 @@
 
     export default {
         components: {
-            ace
+            ace,
         },
         mixins: [mixins],
         props: {
@@ -106,8 +106,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -119,40 +119,40 @@
                     height: 300,
                     readOnly: false,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 DetailInfo: this.apiDetailInfoCommon,
                 // url数据
                 formInfo: {
                     code: 'POST',
                     poc: 'poc：https://paas-poc.o.qcloud.com',
-                    url: '/api/user/create'
+                    url: '/api/user/create',
                 },
                 // 显示隐藏
                 showInfo: {
                     headers: false,
                     query: false,
-                    body: false
+                    body: false,
                 },
                 // headersList
                 headersList: [
                     {
                         key: 'id',
-                        value: ''
-                    }
+                        value: '',
+                    },
                 ],
                 // queryList
                 queryList: [
                     {
                         key: '',
                         is_necessary: false,
-                        value: ''
-                    }
+                        value: '',
+                    },
                 ],
                 // body
                 bodyValue: '1415',
                 secondClick: false,
-                activeName: []
+                activeName: [],
             }
         },
         async mounted () {
@@ -162,8 +162,8 @@
         },
         methods: {
             initDate () {
-                if (this.DetailInfo['bodyJsonData']) {
-                    this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo['bodyJsonData']['root'], null, 4)
+                if (this.DetailInfo.bodyJsonData) {
+                    this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo.bodyJsonData.root, null, 4)
                 }
                 if (this.DetailInfo.req_params && this.DetailInfo.req_params.length) {
                     this.DetailInfo.req_params.forEach(item => {
@@ -178,25 +178,21 @@
                 this.showInfo = {
                     headers: false,
                     query: false,
-                    body: false
+                    body: false,
                 }
                 if (this.secondClick) {
                     return
                 }
                 const params = {
                     id: this.DetailInfo.id,
-                    req_headers: this.listTojson(this.DetailInfo.req_headers.filter(item => {
-                        return !!item['name']
-                    })),
-                    req_params: this.listTojson(this.DetailInfo.req_params.filter(item => {
-                        return !!item['name']
-                    })),
+                    req_headers: this.listTojson(this.DetailInfo.req_headers.filter(item => !!item.name)),
+                    req_params: this.listTojson(this.DetailInfo.req_params.filter(item => !!item.name)),
                     req_body: JSON.parse(this.bodyDetailConfig.value),
                     sys_headers: {},
                     cookies: {},
                     variables: {},
                     map_code: this.$parent.dataProcess.value,
-                    before_req: this.$parent.reqDataProcess.value
+                    before_req: this.$parent.reqDataProcess.value,
                 }
                 this.secondClick = true
                 await this.$store.dispatch('apiRemote/run_remote_api', params).then(res => {
@@ -204,11 +200,13 @@
                     if (res.data.result) {
                         this.$parent.isSuccess = false
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             blur (content, $editor, $fn) {
                 try {
@@ -226,20 +224,18 @@
                     // })
                     return
                 }
-                this.apiDetailInfoCommon['bodyJsonschemaData'] = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value))
+                this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value))
             },
             listTojson (listdata) {
                 const jsondata = {}
                 if (listdata.length) {
-                    listdata.forEach(
-                        item => {
-                            jsondata[item.name] = item.value
-                        }
-                    )
+                    listdata.forEach(item => {
+                        jsondata[item.name] = item.value
+                    })
                 }
                 return jsondata
-            }
-        }
+            },
+        },
     }
 </script>
 

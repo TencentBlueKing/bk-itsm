@@ -123,34 +123,34 @@
         return {
             required: true,
             message: i18n.t('m.treeinfo["字段必填"]'),
-            trigger: 'blur'
+            trigger: 'blur',
         }
     }
     const defaultRules = {
         project_id: [newRequiredRule()],
-        pipeline_id: [newRequiredRule()]
+        pipeline_id: [newRequiredRule()],
     }
     export default {
         name: 'DEVOPS_TEMPLATE',
         components: {
-            DevopsPreview
+            DevopsPreview,
         },
         props: {
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -164,23 +164,23 @@
                     project_id: [{
                         required: true,
                         message: i18n.t('m.treeinfo["字段必填"]'),
-                        trigger: 'blur'
+                        trigger: 'blur',
                     }],
                     pipeline_id: [{
                         required: true,
                         message: i18n.t('m.treeinfo["字段必填"]'),
-                        trigger: 'blur'
-                    }]
+                        trigger: 'blur',
+                    }],
                 },
                 rules: {
                     project_id: [newRequiredRule()],
-                    pipeline_id: [newRequiredRule()]
+                    pipeline_id: [newRequiredRule()],
                 },
                 projectList: [], // 项目列表
                 pipelineList: [], // 流水线列表
                 pipelineStartInfo: {}, // 流水线启动信息
                 pipelineVariableList: [], // 流水线变量
-                pipelineStages: [] // 流水线阶段列表
+                pipelineStages: [], // 流水线阶段列表
             }
         },
         created () {
@@ -188,7 +188,7 @@
                 this.$set(this.item, 'devopsContent', {
                     project_id: '',
                     pipeline_id: '',
-                    variables: {}
+                    variables: {},
                 })
             }
         },
@@ -197,13 +197,13 @@
             if (this.item.value) {
                 const { pipeline_id, project_id } = this.item.value
                 this.item.devopsContent = {
-                    project_id: project_id,
-                    pipeline_id: pipeline_id,
+                    project_id,
+                    pipeline_id,
                     variables: JSON.parse(JSON.stringify({
                         ...this.item.value,
                         project_id: undefined,
-                        pipeline_id: undefined
-                    }))
+                        pipeline_id: undefined,
+                    })),
                 }
                 this.getDevopsPipelineList(project_id)
                 this.getDevopsPipelineStartInfo()
@@ -216,58 +216,65 @@
                 this.projectLoading = true
                 this.$store.dispatch('ticket/getDevopsUserProjectList', { ticket_id: this.basicInfomation.id }).then((res) => {
                     this.projectList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.projectLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.projectLoading = false
+                    })
             },
             // 流水线列表
             getDevopsPipelineList (projectId) {
                 this.pipelineLoading = true
                 this.$store.dispatch('ticket/getDevopsPipelineList', { project_id: projectId }).then((res) => {
                     this.pipelineList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.pipelineLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.pipelineLoading = false
+                    })
             },
             // 流水线启动信息
             getDevopsPipelineStartInfo () {
                 this.pipelineStartLoading = true
                 const { project_id, pipeline_id } = this.item.devopsContent
                 this.$store.dispatch('ticket/getDevopsPipelineStartInfo', {
-                    project_id: project_id,
-                    pipeline_id: pipeline_id
+                    project_id,
+                    pipeline_id,
                 }).then((res) => {
                     this.pipelineStartInfo = res.data
                     this.pipelineVariableList = res.data.properties
-                    const variables = this.item.devopsContent.variables
+                    const { variables } = this.item.devopsContent
                     res.data.properties.forEach(item => {
                         if (!variables.hasOwnProperty(item.id)) {
                             this.$set(variables, item.id, item.defaultValue || '')
                         }
                     })
                     this.resetFormRules()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.pipelineStartLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.pipelineStartLoading = false
+                    })
             },
             // 流水线详情
             getDevopsPipelineDetail () {
                 this.pipelineDetailLoading = true
                 const { project_id, pipeline_id } = this.item.devopsContent
                 this.$store.dispatch('ticket/getDevopsPipelineDetail', {
-                    project_id: project_id,
-                    pipeline_id: pipeline_id
+                    project_id,
+                    pipeline_id,
                 }).then((res) => {
                     this.pipelineStages = res.data.stages || []
-                }).finally(() => {
-                    this.pipelineDetailLoading = false
                 })
+                    .finally(() => {
+                        this.pipelineDetailLoading = false
+                    })
             },
             // 项目 change
             handleProjectChange (id) {
@@ -298,7 +305,7 @@
                 })
                 this.rules = {
                     ...defaultRules,
-                    ...requiredKeys
+                    ...requiredKeys,
                 }
             },
             validate () {
@@ -310,8 +317,8 @@
                     this.showPipelineVariable = true
                 }
                 return !!projectId && !!pipelineId && checkVariable
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

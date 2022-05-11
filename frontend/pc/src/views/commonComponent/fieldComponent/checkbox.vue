@@ -53,27 +53,27 @@
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 loading: false,
-                selects: []
+                selects: [],
             }
         },
         watch: {
@@ -85,8 +85,8 @@
                 handler () {
                     this.resetCheckboxGroupData()
                 },
-                deep: true
-            }
+                deep: true,
+            },
         },
         async created () {
             this.item.choice = await this.getFieldOptions(this.item, this.isPreview)
@@ -108,7 +108,7 @@
              * checkbox 子组件动态重新渲染后，父组件的 checkboxItems 未更新，导致实际渲染的组件和 checkboxItems 记录的不一致
              */
             resetCheckboxGroupData () {
-                const key = this.item.key
+                const { key } = this.item
                 if (this.$refs[key]) {
                     this.$refs[key].checkboxItems = []
                     this.loading = true
@@ -116,8 +116,8 @@
                         this.loading = false
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

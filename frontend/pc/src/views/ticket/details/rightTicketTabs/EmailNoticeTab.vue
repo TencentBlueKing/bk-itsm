@@ -76,30 +76,30 @@
     export default {
         name: 'EmailNoticeTab',
         components: {
-            DealPerson
+            DealPerson,
         },
         props: {
             ticketInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
-                flowStartText: this.$t(`m.newCommon["流程开始"]`),
+                flowStartText: this.$t('m.newCommon["流程开始"]'),
                 flowList: [],
                 // 关注
                 followers: {
                     comments: '',
-                    clickSecond: false
+                    clickSecond: false,
                 },
                 includeTypes: [],
                 personSelectCheckValue: {
                     type: 'PERSON',
-                    value: ''
-                }
+                    value: '',
+                },
             }
         },
         created () {
@@ -119,7 +119,7 @@
                     return
                 }
                 const params = {
-                    ticket_id: this.id
+                    ticket_id: this.id,
                 }
                 if (this.$route.query.token) {
                     params.token = this.$route.query.token
@@ -134,16 +134,17 @@
                             display: -webkit-box;
                             -webkit-line-clamp: 2;
                             -webkit-box-orient: vertical;
-                            overflow: hidden;">${item.creator_zh}${this.$t(`m.newCommon["邮件通知："]`)} ${item.group}</div>`
+                            overflow: hidden;">${item.creator_zh}${this.$t('m.newCommon["邮件通知："]')} ${item.group}</div>`
                             line.tag = item.create_at
                             if (item.message !== this.flowStartText) {
                                 this.flowList.push(line)
                             }
                         })
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 发送关注到人
             postFollowlogs () {
@@ -152,8 +153,8 @@
                 }
                 if (this.followers.comments.length > 200 || !this.followers.comments) {
                     this.$bkMessage({
-                        message: this.$t(`m.memberSelect["必填项且字数不能超过200"]`),
-                        theme: 'error'
+                        message: this.$t('m.memberSelect["必填项且字数不能超过200"]'),
+                        theme: 'error',
                     })
                     return
                 }
@@ -161,38 +162,40 @@
                 this.followers.clickSecond = true
                 const personSelectValue = this.$refs.personSelect.getValue()
                 const params = {
-                    'ticket_id': this.ticketInfo.id,
-                    'state_name': this.ticketInfo.current_state_name,
-                    'followers': personSelectValue.value,
-                    'followers_type': personSelectValue.type,
-                    'message': this.followers.comments
+                    ticket_id: this.ticketInfo.id,
+                    state_name: this.ticketInfo.current_state_name,
+                    followers: personSelectValue.value,
+                    followers_type: personSelectValue.type,
+                    message: this.followers.comments,
                 }
                 this.$store.dispatch('cdeploy/postFollowlogs', { params }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["发送成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["发送成功"]'),
+                        theme: 'success',
                     })
                     this.clearFollowlogs()
                     this.getflowList()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.followers.clickSecond = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.followers.clickSecond = false
+                    })
             },
             // 清空关注信息
             clearFollowlogs () {
                 // 关注
                 this.followers = {
                     comments: '',
-                    clickSecond: false
+                    clickSecond: false,
                 }
                 this.personSelectCheckValue = {
                     type: 'PERSON',
-                    value: ''
+                    value: '',
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

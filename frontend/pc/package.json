@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "cross-env webpack-dev-server --progress --config ./build/webpack.dev.conf.js",
     "build": "cross-env npm run build:production",
+    "lint": "eslint --fix --ext .js,.vue src",
     "build:production": "cross-env webpack --progress --config ./build/webpack.prod.conf.js",
     "build:production:sourcemap": "cross-env SOURCE_MAP=true webpack --progress --config ./build/webpack.prod.conf.js"
   },
@@ -72,6 +73,7 @@
     "cssnano": "^3.10.0",
     "eslint": "^5.15.1",
     "eslint-config-standard": "12.0.0",
+    "eslint-config-tencent": "^1.0.4",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.1.2",
     "eslint-plugin-import": "2.16.0",

@@ -84,9 +84,9 @@
         name: 'Palette',
         data () {
             return {
-                devsopDisable: window.RUN_VER
+                devsopDisable: window.RUN_VER,
             }
-        }
+        },
     }
 </script>
 <style lang="scss" scoped>

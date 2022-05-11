@@ -99,7 +99,7 @@
         name: 'OrderPreview',
         components: {
             preview,
-            NodeInfo
+            NodeInfo,
         },
         props: {
             // 单据信息
@@ -107,26 +107,26 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             currentStepList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             loadingInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -137,26 +137,26 @@
                 fullStatus: false,
                 previewInfo: {
                     canClick: true,
-                    narrowSize: 0.7
+                    narrowSize: 0.7,
                 },
                 // 右侧弹窗内容
                 nodeContent: {
                     isShow: false,
                     title: '',
                     width: 600,
-                    quick: false
+                    quick: false,
                 },
                 // 打开节点信息
                 openNodeInfo: {},
                 nodeInfo: [],
-                isNodeLoading: true
+                isNodeLoading: true,
             }
         },
         computed: {},
         watch: {
             'basicInfomation.id' () {
                 this.getFlowInfo()
-            }
+            },
         },
         mounted () {
             this.getFlowInfo()
@@ -176,7 +176,7 @@
                 const id = this.basicInfomation.flow_id
                 axios.all([
                     this.$store.dispatch('deployCommon/getNodeVersion', { id }),
-                    this.$store.dispatch('deployCommon/getLineVersion', { id })
+                    this.$store.dispatch('deployCommon/getLineVersion', { id }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     this.addList.forEach((item, index) => {
@@ -190,11 +190,13 @@
                     })
                     this.lineList = reposResp.data.items
                     this.setLineStatus()
-                })).catch((res) => {
-                    console.log(res)
-                }).finally(() => {
-                    this.isDataLoading = false
-                })
+                }))
+                    .catch((res) => {
+                        console.log(res)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             /**
              * 设置线状态
@@ -206,13 +208,13 @@
                 const startNodeId = this.addList.find(node => node.type === 'START').id
                 this.lineList.forEach(line => {
                     if (this.nodeList.find(node => Number(node.from_transition_id) === line.id)) {
-                        line['lineStatus'] = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS'
                     }
                     if (line.id === Number(this.basicInfomation.last_transition_id)) {
-                        line['lineStatus'] = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS'
                     }
                     if (line.from_state === startNodeId) {
-                        line['lineStatus'] = 'SUCCESS'
+                        line.lineStatus = 'SUCCESS'
                     }
                 })
             },
@@ -256,25 +258,27 @@
                 this.nodeContent.isShow = false
             },
             getTicketNodeInfo (node) {
-                const id = this.basicInfomation.id
+                const { id } = this.basicInfomation
                 const params = {
-                    state_id: node.nodeInfo.id
+                    state_id: node.nodeInfo.id,
                 }
                 if (this.$route.query.token) {
-                    params['token'] = this.$route.query.token
+                    params.token = this.$route.query.token
                 }
                 this.clickSecond = false
                 this.$store.dispatch('deployOrder/getTicketNodeInfo', { params, id }).then((res) => {
                     this.nodeInfo = [res.data]
                     this.nodeContent.quick = (res.data.status === 'FINISHED' || !res.data.can_operate)
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isNodeLoading = false
-                    this.clickSecond = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isNodeLoading = false
+                        this.clickSecond = false
+                    })
+            },
+        },
     }
 </script>
 

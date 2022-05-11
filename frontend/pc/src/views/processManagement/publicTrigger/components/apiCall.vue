@@ -73,22 +73,22 @@
     export default {
         name: 'apiCall',
         components: {
-            inputParams
+            inputParams,
         },
         props: {
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 apiSysList: [],
                 apiList: [],
                 apiId: '',
-                isLoading: false
+                isLoading: false,
             }
         },
         mounted () {
@@ -105,14 +105,16 @@
             },
             getRemoteSystemData () {
                 const params = {
-                    project_key: this.$route.query.project_id
+                    project_key: this.$route.query.project_id,
                 }
                 this.$store.dispatch('apiRemote/get_all_remote_system', params).then(res => {
                     this.apiSysList = res.data.filter(item => item.is_activated)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                    })
             },
             changeCode () {
                 this.getApiTableList(arguments[2].systemId)
@@ -121,15 +123,17 @@
             },
             getApiTableList (id) {
                 const params = {
-                    remote_system: id || ''
+                    remote_system: id || '',
                 }
                 this.$store.dispatch('apiRemote/get_remote_api', params).then(res => {
                     this.apiList = res.data.filter(ite => ite.is_activated)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             changeApi (value) {
                 this.isLoading = true
@@ -146,7 +150,7 @@
             getApiContent (id) {
                 this.isLoading = true
                 const params = {
-                    id
+                    id,
                 }
                 this.$store.dispatch('apiRemote/get_remote_api_detail', params).then(res => {
                     const backValue = res.data
@@ -165,13 +169,15 @@
                     setTimeout(() => {
                         this.isLoading = false
                     }, 1000)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
+            },
+        },
     }
 </script>
 

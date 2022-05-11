@@ -100,20 +100,20 @@
     export default {
         name: 'CommentTab',
         components: {
-            EvaluationTicketContent
+            EvaluationTicketContent,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
                 loading: false,
                 picked: 'One',
                 satisfactInfo: {},
-                scoreList: SCORE_LIST
+                scoreList: SCORE_LIST,
             }
         },
         mounted () {
@@ -124,20 +124,22 @@
             async getEvaluation () {
                 this.loading = true
                 const params = {
-                    id: this.ticketInfo.comment_id
+                    id: this.ticketInfo.comment_id,
                 }
                 if (this.$route.query.token) {
                     params.token = this.$route.query.token
                 }
                 await this.$store.dispatch('evaluation/getEvaluation', params).then((res) => {
                     this.satisfactInfo = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

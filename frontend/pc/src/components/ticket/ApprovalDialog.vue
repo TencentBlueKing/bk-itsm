@@ -59,16 +59,16 @@
         props: {
             isShow: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             approvalInfo: {
                 type: Object,
                 default: () => ({
                     result: true,
                     showAllOption: false,
-                    approvalList: []
-                })
-            }
+                    approvalList: [],
+                }),
+            },
         },
         data () {
             return {
@@ -77,11 +77,11 @@
                 formRules: {
                     approvalNotice: [{
                         validator: this.checkApprovalNotice,
-                        message: this.$t(`m.systemConfig['备注']`) + this.$t('m.common["为必填项，请补充完善"]'),
-                        trigger: 'blur'
+                        message: this.$t('m.systemConfig[\'备注\']') + this.$t('m.common["为必填项，请补充完善"]'),
+                        trigger: 'blur',
 
-                    }]
-                }
+                    }],
+                },
             }
         },
         methods: {
@@ -92,19 +92,22 @@
                         const data = {
                             result: this.approvalInfo.result.toString(),
                             opinion: this.formData.approvalNotice,
-                            approval_list: this.approvalInfo.approvalList
+                            approval_list: this.approvalInfo.approvalList,
                         }
                         await this.$store.dispatch('workbench/batchApproval', data).then((res) => {
                             this.$emit('cancel', true)
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.formData.approvalNotice = ''
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.formData.approvalNotice = ''
+                            })
                     }
-                }).finally(() => {
-                    this.approvalConfirmBtnLoading = false
                 })
+                    .finally(() => {
+                        this.approvalConfirmBtnLoading = false
+                    })
             },
             onApprovalCancel () {
                 this.formData.approvalNotice = ''
@@ -116,8 +119,8 @@
                     return val !== ''
                 }
                 return true
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

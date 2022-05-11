@@ -76,7 +76,7 @@
         name: 'tableFields',
         components: {
             fieldsDone,
-            fieldsRunning
+            fieldsRunning,
         },
         mixins: [apiFieldsWatch],
         props: {
@@ -84,37 +84,37 @@
                 type: Object,
                 default () {
                     return {
-                        table_fields: []
+                        table_fields: [],
                     }
-                }
+                },
             },
             firstStateFields: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 showMore: false,
                 showInfo: true,
                 fieldList: [],
-                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER']
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE', 'MULTISELECT', 'MEMBER'],
             }
         },
         computed: {
-            profile: function () {
+            profile () {
                 if (!this.basicInfomation) {
                     return
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
+                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
                 }
             },
-            openFunction: function () {
+            openFunction () {
                 return this.$store.state.openFunction
             },
             tableFields () {
@@ -128,12 +128,12 @@
                     }
                 })
                 return list
-            }
+            },
         },
         watch: {
             'basicInfomation.table_fields' (newVal) {
                 this.initData()
-            }
+            },
         },
         mouted () {
             this.initData()
@@ -162,15 +162,16 @@
                     case 'DISTRIBUTING':
                         return item.current_assignors
                     case 'DISTRIBUTING-RECEIVING':
-                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join().replace(/(^,*)|(,$)/g, ''))
+                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join()
+                            .replace(/(^,*)|(,$)/g, ''))
                     default :
                         return item.current_processors || '--'
                 }
             },
             changeShow () {
                 this.showMore = !this.showMore
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

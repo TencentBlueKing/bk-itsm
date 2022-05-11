@@ -62,20 +62,20 @@
     export default {
         name: 'EvaluationTicketModal',
         components: {
-            EvaluationTicketContent
+            EvaluationTicketContent,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
                 submitting: false,
                 loading: false,
                 isShow: false,
-                satisfactInfo: {}
+                satisfactInfo: {},
             }
         },
         watch: {
@@ -83,25 +83,27 @@
                 if (val) {
                     this.getEvaluation()
                 }
-            }
+            },
         },
         methods: {
             // 获取评论
             async getEvaluation () {
                 this.loading = true
                 const params = {
-                    id: this.ticketInfo.comment_id
+                    id: this.ticketInfo.comment_id,
                 }
                 if (this.$route.query.token) {
                     params.token = this.$route.query.token
                 }
                 await this.$store.dispatch('evaluation/getEvaluation', params).then((res) => {
                     this.satisfactInfo = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             show () {
                 this.isShow = true
@@ -117,8 +119,8 @@
             },
             onBeforeSubmit () {
                 this.submitting = true
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

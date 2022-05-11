@@ -85,28 +85,28 @@
             'CW-CASCADE': cascade,
             'CW-SOPS_TEMPLATE': sopsTemplate,
             'CW-COMPLEX-MEMBERS': complexMembers,
-            'CW-CUSTOM-FORM': customForm
+            'CW-CUSTOM-FORM': customForm,
         },
         props: {
             fields: {
                 type: Array,
                 required: true,
-                default: () => []
+                default: () => [],
             },
             isPreview: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             isFilePreview: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
 
             }
-        }
+        },
     }
 </script>
 

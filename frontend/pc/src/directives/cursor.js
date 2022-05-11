@@ -25,7 +25,7 @@ import Vue from 'vue'
 const DEFAULT_OPTIONS = {
     active: true,
     offset: [12, 0],
-    cls: 'cursor-element'
+    cls: 'cursor-element',
 }
 
 function init (el, binding) {
@@ -44,8 +44,8 @@ function init (el, binding) {
         const { pageX, pageY } = event
         const elLeft = pageX + DEFAULT_OPTIONS.offset[0]
         const elTop = pageY + DEFAULT_OPTIONS.offset[1]
-        el.element.style.left = elLeft + 'px'
-        el.element.style.top = elTop + 'px'
+        el.element.style.left = `${elLeft}px`
+        el.element.style.top = `${elTop}px`
     }
     el.mouseLeaveHandler = function (event) {
         el.element && el.element.remove()
@@ -78,5 +78,5 @@ Vue.directive('cursor', {
     },
     unbind (el) {
         destroy(el)
-    }
+    },
 })

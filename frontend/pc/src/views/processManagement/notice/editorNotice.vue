@@ -262,30 +262,30 @@
         props: {
             checkId: {
                 type: String,
-                default: ''
+                default: '',
             },
             noticeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             isShowFooter: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             isShowTitle: {
                 type: Boolean,
-                default: false
+                default: false,
             },
-            customRow: Number
+            customRow: Number,
         },
         data () {
             return {
                 secondClick: false,
                 formInfo: {
                     title: '',
-                    message: ''
+                    message: '',
                 },
                 variableList: [],
                 searchable: true,
@@ -293,14 +293,14 @@
                     id: '',
                     content: {},
                     titleId: '',
-                    titleContent: {}
+                    titleContent: {},
                 },
                 // 校验
                 checkInfo: {
                     title: false,
-                    message: false
+                    message: false,
                 },
-                rules: {}
+                rules: {},
             }
         },
         mounted () {
@@ -318,9 +318,10 @@
             getVariableList () {
                 this.$store.dispatch('noticeConfigure/getVariableList').then((res) => {
                     this.variableList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 保存
             submitNotice () {
@@ -333,28 +334,30 @@
                     return
                 }
                 const params = {
-                    content_template: this.formInfo.message
+                    content_template: this.formInfo.message,
                 }
                 if (this.checkId === 'EMAIL') {
                     params.title_template = this.formInfo.title
                 }
-                const id = this.noticeInfo.id
+                const { id } = this.noticeInfo
                 if (this.secondClick) {
                     return
                 }
                 this.secondClick = true
                 this.$store.dispatch('noticeConfigure/changeNotice', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     this.$parent.$parent.getNoticeList()
                     this.closeNotice()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             closeNotice () {
                 this.$emit('closeEditor')
@@ -370,14 +373,14 @@
                         document.querySelector('.bk-editor-notice .bk-remindway-form .bk-form-textarea'),
                         'editorNotice',
                         this.formInfo.message,
-                        '${' + value[0] + '}',
+                        `\${${value[0]}}`,
                         this
                     )
                 } else {
-                    this.formInfo.title += '${' + value[0] + '}'
+                    this.formInfo.title += `\${${value[0]}}`
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

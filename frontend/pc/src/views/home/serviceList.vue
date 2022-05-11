@@ -164,7 +164,7 @@
                 latestLoading: false,
                 collectedLoading: false,
                 allLoading: false,
-                serviceClassfyLoading: false
+                serviceClassfyLoading: false,
             }
         },
         computed: {
@@ -174,25 +174,24 @@
             serviceList () {
                 if (this.type === 'latest') {
                     return this.latestList
-                } else {
-                    const list = this.serviceClassify.map(item => ({
-                        name: item.key,
-                        label: item.name,
-                        data: []
-                    }))
-                    this.allList.forEach(service => {
-                        const group = list.find(item => item.name === service.key)
-                        group.data.push(service)
-                    })
-
-                    return list
                 }
-            }
+                const list = this.serviceClassify.map(item => ({
+                    name: item.key,
+                    label: item.name,
+                    data: [],
+                }))
+                this.allList.forEach(service => {
+                    const group = list.find(item => item.name === service.key)
+                    group.data.push(service)
+                })
+
+                return list
+            },
         },
         watch: {
             serviceList (val) {
                 this.activeClassify = val.length > 0 ? val[0].name : ''
-            }
+            },
         },
         created () {
             this.getLatestService()
@@ -208,17 +207,19 @@
                 this.latestLoading = true
                 Promise.all([
                     this.$store.dispatch('service/getServiceFavorites'),
-                    this.$store.dispatch('service/getRecentlyFavorite')
+                    this.$store.dispatch('service/getRecentlyFavorite'),
                 ]).then(data => {
                     const favoriteList = data[0].data
                     const recentlyList = data[1].data.filter(item => favoriteList.findIndex(fItem => fItem.id === item.id) === -1)
                     const len = favoriteList.length
                     this.latestList = len > 16 ? favoriteList.slice(0, 16) : favoriteList.concat(recentlyList.slice(0, 16 - len))
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.latestLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.latestLoading = false
+                    })
             },
             // 获取所有服务
             getAllService () {
@@ -227,22 +228,26 @@
                     if (resp.result) {
                         this.allList = resp.data
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.allLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.allLoading = false
+                    })
             },
             // 获取服务分类信息
             getServiceClassify () {
                 this.serviceClassfyLoading = true
                 return this.$store.dispatch('getCustom').then((res) => {
                     this.serviceClassify = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceClassfyLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceClassfyLoading = false
+                    })
             },
             onTabChange (type) {
                 this.type = type
@@ -281,16 +286,17 @@
                 const curStatus = service.favorite
                 this.$store.dispatch('service/toggleServiceFavorite', {
                     id: service.id,
-                    favorite: !curStatus
+                    favorite: !curStatus,
                 }).then((res) => {
                     if (res.result) {
                         const serviceItem = this.allList.find(item => item.id === service.id)
                         service.favorite = !curStatus // 修改当前数据的收藏状态
                         this.$set(serviceItem, 'favorite', !curStatus) // 修改当前数据对应的源数据收藏状态
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             onSelectService (service) {
                 const { id } = service
@@ -299,15 +305,15 @@
                     query: {
                         service_id: id,
                         // project_id: service.project_key, // 首页提单不需要项目ID
-                        from: 'Home'
-                    }
+                        from: 'Home',
+                    },
                 })
                 window.open(routerObj.href, '_blank')
             },
             toggleFold () {
                 this.activeFold = !this.activeFold
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

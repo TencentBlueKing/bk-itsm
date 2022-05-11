@@ -210,12 +210,12 @@
         { name: '自定义表格', icon: 'icon-apps', type: 'CUSTOMTABLE' },
         { name: '树形选择', icon: 'icon-apps', type: 'TREESELECT' },
         { name: '链接', icon: 'icon-apps', type: 'LINK' },
-        { name: '自定义表单', icon: 'icon-apps', type: 'CUSTOM-FORM' }
+        { name: '自定义表单', icon: 'icon-apps', type: 'CUSTOM-FORM' },
     ]
     const serviceFormCreateWays = [
         { name: '选择推荐服务模板', key: 'recom', icon: 'icon-apps' },
         { name: '从已有的服务复制', key: 'created', icon: 'icon-apps' },
-        { name: '自定义表单', key: 'custom', icon: 'icon-apps' }
+        { name: '自定义表单', key: 'custom', icon: 'icon-apps' },
     ]
     export default {
         name: 'ServiceFormStep',
@@ -223,23 +223,23 @@
             SelectTree,
             ServiceForm,
             ChooseServiceTemplateDialog,
-            FormEditItem
+            FormEditItem,
         },
         mixins: [commonMix],
         props: {
             type: {
                 type: String,
-                default: 'new'
+                default: 'new',
             },
             serviceId: {
                 type: [String, Number],
-                default: ''
+                default: '',
             },
             serviceInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
-            createTicketNodeId: Number
+            createTicketNodeId: Number,
         },
         data () {
             return {
@@ -263,14 +263,14 @@
                     name: '',
                     desc: '',
                     key: '',
-                    catalog_id: ''
+                    catalog_id: '',
                 },
                 rules: {},
                 dirList: [], // 服务目录
                 serviceTypeList: [], // 服务类型
                 pending: {
                     deleteField: false,
-                    saveField: false
+                    saveField: false,
                 },
                 serviceTemplateDisable: false,
                 isShowField: false,
@@ -281,36 +281,34 @@
                     move: 0,
                     startX: null,
                     maxLength: 0,
-                    canMove: false
+                    canMove: false,
                 },
                 fieldIndex: '',
                 fieldlist: [],
                 fieldsLibrarylist: fieldsLibrary,
-                servcieList: []
+                servcieList: [],
             }
         },
         computed: {
             catalogDisplayName () {
                 return this.serviceInfo.bounded_catalogs ? this.serviceInfo.bounded_catalogs.join('/') : ''
-            }
+            },
         },
         watch: {
             isBasicFormEditting: {
                 handler (val) {
                     if (val) this.getServiceDirectory()
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         created () {
             this.rules.name = this.checkCommonRules('name').name
-            this.rules.name.push(
-                {
-                    validator: this.handleRepeatServiceName,
-                    message: this.$t(`m['服务名称重复，请重新输入']`),
-                    trigger: 'blur'
-                }
-            )
+            this.rules.name.push({
+                validator: this.handleRepeatServiceName,
+                message: this.$t('m[\'服务名称重复，请重新输入\']'),
+                trigger: 'blur',
+            })
             this.rules.directory_id = this.checkCommonRules('required').required
             this.rules.key = this.checkCommonRules('required').required
             this.showFieldOption = this.type === 'edit' && !!this.serviceInfo.source
@@ -338,7 +336,7 @@
             getAllServcie () {
                 const params = {
                     project_key: this.$store.state.project.id,
-                    catalog_id: 1
+                    catalog_id: 1,
                 }
                 this.$store.dispatch('catalogService/getServices', params).then(res => {
                     this.servcieList = res.data || []
@@ -399,9 +397,10 @@
                     // const list = res.data.filter(item => item.key !== 'title' && !item.is_builtin && item.key !== 'bk_biz_id')
                     this.fieldlist = res.data
                     this.publicFields = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             filterFiled (value, fieldlist, field) {
                 if (value !== '') {
@@ -426,16 +425,17 @@
             getServiceTypes () {
                 this.$store.dispatch('getCustom').then((res) => {
                     this.serviceTypeList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取提单节点字段
             getCreateTicketNodeForm () {
                 this.formLoading = true
                 this.$store.dispatch('deployCommon/getFieldList', {
                     workflow: this.serviceInfo.workflow_id,
-                    state: this.createTicketNodeId
+                    state: this.createTicketNodeId,
                 }).then(res => {
                     res.data.forEach(item => {
                         item.checkValue = false
@@ -443,22 +443,25 @@
                         item.showFeild = true
                     })
                     this.ticketNodeForm = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.formLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.formLoading = false
+                    })
             },
             // 获取提单节点详情
             getCreateTicketNodeDetail () {
                 this.detailLoading = true
                 this.$store.dispatch('deployCommon/getOneStateInfo', {
-                    id: this.createTicketNodeId
+                    id: this.createTicketNodeId,
                 }).then(res => {
                     this.ticketNodeDetail = res.data
-                }).finally(() => {
-                    this.detailLoading = false
                 })
+                    .finally(() => {
+                        this.detailLoading = false
+                    })
             },
             onBasicFormSubmit () {
                 if (this.isSubmitting) {
@@ -482,13 +485,13 @@
                     this.isCreateService = false
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确认返回？"]`),
+                        title: this.$t('m.slaContent["确认返回？"]'),
                         confirmFn: () => {
                             this.goBackToServiceList()
                         },
                         cancelFn: () => {
                             this.isCreateService = true
-                        }
+                        },
                     })
                 } else {
                     this.isBasicFormEditting = false
@@ -499,56 +502,59 @@
                     name: 'projectServiceList',
                     query: {
                         project_id: this.$store.state.project.id,
-                        catalog_id: this.$route.query.catalog_id
-                    }
+                        catalog_id: this.$route.query.catalog_id,
+                    },
                 })
             },
             // 创建服务
             createService (params) {
                 this.$store.dispatch('serviceEntry/createService', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
                             type: 'edit',
-                            step: 'basic'
+                            step: 'basic',
                         },
                         query: {
                             serviceId: res.data.id,
-                            project_id: this.$store.state.project.id
-                        }
+                            project_id: this.$store.state.project.id,
+                        },
                     })
                     this.isBasicFormEditting = false
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 修改服务
             updateServiceInfo (params) {
                 this.$store.dispatch('serviceEntry/updateService', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["修改成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["修改成功"]'),
+                        theme: 'success',
                     })
                     this.isBasicFormEditting = false
                     this.$emit('updateServiceInfo', res.data)
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 关联目录树组件
             async getServiceDirectory () {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
                     show_deleted: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then(res => {
                     this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             async onCreateFormWayCLick (way) {
                 if (this.isBasicFormEditting) {
@@ -558,7 +564,7 @@
                         return console.warn(error)
                     }
                 }
-                const key = way.key
+                const { key } = way
                 if (key === 'recom' || key === 'created') {
                     this.isShowChooseSerTempDialog = true
                     this.currCreateFormWay = way
@@ -576,8 +582,8 @@
             dragUpdateList (targetIndex, field) {
                 if (!field) {
                     this.$bkMessage({
-                        message: this.$t(`m["请先保存字段"]`),
-                        offsetY: 80
+                        message: this.$t('m["请先保存字段"]'),
+                        offsetY: 80,
                     })
                     return
                 }
@@ -608,7 +614,7 @@
                     is_tips: false,
                     tips: '',
                     meta: {},
-                    default: ''
+                    default: '',
                 }
                 this.addField(field)
             },
@@ -616,7 +622,7 @@
             addField (field) {
                 if (this.crtForm !== '') {
                     this.$bkMessage({
-                        message: this.$t(`m["请先将字段属性关闭"]`)
+                        message: this.$t('m["请先将字段属性关闭"]'),
                     })
                     return
                 }
@@ -645,8 +651,8 @@
                 }
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.treeinfo["确认删除此字段？"]`),
-                    subTitle: this.$t(`m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]`),
+                    title: this.$t('m.treeinfo["确认删除此字段？"]'),
+                    subTitle: this.$t('m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]'),
                     confirmFn: () => {
                         if (this.pending.deleteField) {
                             return
@@ -656,22 +662,24 @@
                         const data = {
                             id: form.id,
                             params: {
-                                state_id: this.createTicketNodeId
-                            }
+                                state_id: this.createTicketNodeId,
+                            },
                         }
                         this.$store.dispatch('deployCommon/deleteField', data).then((res) => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             const index = this.ticketNodeForm.findIndex(item => item.id === form.id)
                             this.ticketNodeForm.splice(index, 1)
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.pending.deleteField = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.pending.deleteField = false
+                            })
+                    },
                 })
                 this.isShowRightEdit = false
             },
@@ -701,13 +709,14 @@
                 this.$store.dispatch('service/updateServiceSource', {
                     id: this.serviceId,
                     params: {
-                        source
-                    }
+                        source,
+                    },
                 }).then(() => {
                     this.serviceInfo.source = source
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 校验当前步骤
             async validate () {
@@ -725,7 +734,7 @@
                     // 用全量节点详情字段，传到后台接口，会抛出节点 desc 字段不能为空校验失败信息
                     const {
                         assignors, assignors_type, can_deliver, delivers, delivers_type, distribute_type, extras,
-                        is_draft, is_terminable, name, processors, processors_type, tag, type, workflow
+                        is_draft, is_terminable, name, processors, processors_type, tag, type, workflow,
                     } = this.ticketNodeDetail
                     const fields = this.ticketNodeForm.filter(item => typeof item.id === 'number').map(item => item.id)
                     const nodeDetail = {
@@ -744,15 +753,15 @@
                         tag,
                         type,
                         workflow,
-                        fields
+                        fields,
                     }
                     return this.$store.dispatch('deployCommon/updateNode', {
                         params: nodeDetail,
-                        id: this.createTicketNodeId
+                        id: this.createTicketNodeId,
                     }).then(res => {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["保存成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["保存成功"]'),
+                            theme: 'success',
                         })
                     }, (res) => {
                         errorHandler(res, this)
@@ -762,8 +771,8 @@
             },
             handleShowField () {
                 this.isShowField = !this.isShowField
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

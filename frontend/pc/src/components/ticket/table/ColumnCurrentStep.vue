@@ -51,9 +51,9 @@
         props: {
             row: {
                 type: Object,
-                default: () => ({})
-            }
-        }
+                default: () => ({}),
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

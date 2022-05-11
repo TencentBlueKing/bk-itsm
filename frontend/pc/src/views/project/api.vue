@@ -31,7 +31,7 @@
     export default {
         name: 'APIS',
         components: {
-            PublicApi
-        }
+            PublicApi,
+        },
     }
 </script>

@@ -153,7 +153,7 @@
     export default {
         name: 'responseData',
         components: {
-            exportTree
+            exportTree,
         },
         mixins: [mixins],
         props: {
@@ -161,31 +161,31 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             apiDetail: {
                 type: Object,
                 default: () => {
-                }
+                },
             },
             stateList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             remoteApiIid: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             formInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -195,10 +195,10 @@
                     processorPerson: [],
                     processorTree: {},
                     assignorPerson: [],
-                    assignorTree: {}
+                    assignorTree: {},
                 },
                 organizaInfo: {
-                    assignorShow: [false, false, false]
+                    assignorShow: [false, false, false],
                 },
                 cascaderData: [],
                 bodyTableData: [],
@@ -207,29 +207,29 @@
                 // 校验
                 checkInfo: {
                     name: '',
-                    road: ''
+                    road: '',
                 },
                 sourceTypeList: [
                     {
                         id: 1,
                         key: 'CUSTOM',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'FIELDS',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
                 ],
                 paramTableInfo: {
                     value: '',
-                    placeholder: this.$t(`m.treeinfo["请选择数据来源"]`)
+                    placeholder: this.$t('m.treeinfo["请选择数据来源"]'),
                 },
                 selectInfo: {
                     selectkeylist: [],
                     selectkey: '',
                     selectvaluelist: [],
-                    selectvalue: ''
+                    selectvalue: '',
                 },
                 isShow: false,
                 // 临时值 中转用 选中的 // 关键字字段/显示字段
@@ -238,13 +238,13 @@
                     isSelectedKey: '',
                     isSelectedValue: '',
                     settingKeyName: '',
-                    settingValueName: ''
+                    settingValueName: '',
                 },
                 isCheck: false,
                 maxLevel: 1,
                 maxLevelTree: [1, 1, 1],
                 settingKeyName: '',
-                settingValueName: ''
+                settingValueName: '',
             }
         },
         computed: {},
@@ -254,8 +254,8 @@
                     handler (newName, oldName) {
                         this.initData()
                     },
-                    deep: true
-                }
+                    deep: true,
+                },
         },
         mounted () {
             this.initData()
@@ -269,13 +269,13 @@
                     selectkeylist: [],
                     selectkey: '',
                     selectvaluelist: [],
-                    selectvalue: ''
+                    selectvalue: '',
                 }
                 this.organization = {
                     processorPerson: [],
                     processorTree: {},
                     assignorPerson: [],
-                    assignorTree: {}
+                    assignorTree: {},
                 }
                 this.maxLevel = 1
                 this.maxLevelTree = [1, 1, 1]
@@ -284,52 +284,46 @@
                 await this.changeInfo
                 // 初始化数据
                 if (!Object.keys(this.apiDetail.rsp_data).length) {
-                    this.apiDetail['responseTreeDataList'] = [{
+                    this.apiDetail.responseTreeDataList = [{
                         has_children: false,
                         showChildren: true,
                         checkInfo: false,
                         key: 'root',
                         is_necessary: true,
                         type: 'object',
-                        desc: this.$t(`m.treeinfo["初始化数据"]`),
+                        desc: this.$t('m.treeinfo["初始化数据"]'),
                         parentInfo: '',
-                        children: []
+                        children: [],
                     }]
-                    this.apiDetail['responseTableData'] = []
+                    this.apiDetail.responseTableData = []
                 } else {
-                    this.apiDetail['responseTreeDataList'] = await this.jsonschemaToList(
-                        {
-                            root: JSON.parse(JSON.stringify(this.apiDetail.rsp_data)) // root初始 Jsonschema数据结构
-                        }
-                    )
+                    this.apiDetail.responseTreeDataList = await this.jsonschemaToList({
+                        root: JSON.parse(JSON.stringify(this.apiDetail.rsp_data)), // root初始 Jsonschema数据结构
+                    })
                     // 生成table表格数据
-                    this.apiDetail['responseTableData'] = await this.treeToTableList(
-                        JSON.parse(JSON.stringify(this.apiDetail['responseTreeDataList'][0].children))
-                    )
+                    this.apiDetail.responseTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.apiDetail.responseTreeDataList[0].children)))
                 }
-                const responseTableData = await JSON.parse(JSON.stringify(this.apiDetail['responseTableData']))
+                const responseTableData = await JSON.parse(JSON.stringify(this.apiDetail.responseTableData))
                 // 构造 引用变量
-                await responseTableData.forEach(
-                    item => {
-                        item['children'] = []
-                        // 数据来源
-                        item['source_type'] = 'CUSTOM'
-                        // 值
-                        item['value'] = ''
-                        // 属性
-                        item['name'] = item['key']
-                        // 是否可选
-                        item['isSelectAbled'] = false
-                        // 是否选中
-                        item['isSelectedKey'] = false
-                        // 是否禁用可选
-                        item['isSelectedKeyDisabled'] = false
-                        // 是否选中
-                        item['isSelectedValue'] = false
-                        // 是否禁用可选
-                        item['isSelectedValueDisabled'] = !this.changeInfo.api_info
-                    }
-                )
+                await responseTableData.forEach(item => {
+                    item.children = []
+                    // 数据来源
+                    item.source_type = 'CUSTOM'
+                    // 值
+                    item.value = ''
+                    // 属性
+                    item.name = item.key
+                    // 是否可选
+                    item.isSelectAbled = false
+                    // 是否选中
+                    item.isSelectedKey = false
+                    // 是否禁用可选
+                    item.isSelectedKeyDisabled = false
+                    // 是否选中
+                    item.isSelectedValue = false
+                    // 是否禁用可选
+                    item.isSelectedValueDisabled = !this.changeInfo.api_info
+                })
                 // 多层列表数据 关联 table表格数据
                 await this.recordChildren(responseTableData)
                 // 标记父级元素 方便数据处理
@@ -337,16 +331,12 @@
                 // 标记可选 string/boolean/number // 已过滤多重列表
                 const canUseArray = await this.showSelectAbled(responseTableData)
                 // 根据标记的可选非对象数据 向上逐级寻找可用array父级并标记  生成标记可用数组路径
-                await canUseArray.forEach(
-                    async item => {
-                        await this.markCanUseArray(item)
-                    }
-                )
+                await canUseArray.forEach(async item => {
+                    await this.markCanUseArray(item)
+                })
                 this.responseTableData = await responseTableData
                 // 根据标记可用数组路径 拼接可用数组
-                const tempList = this.responseTableData.filter(
-                    item => (!item.level && item.key === 'data')
-                )
+                const tempList = this.responseTableData.filter(item => (!item.level && item.key === 'data'))
                 this.cascaderData = await this.makeArrayTree(tempList)
                 // 派单人组织架构 - tree数据
                 this.organization.assignorPerson = this.cascaderData[0] || []
@@ -354,42 +344,34 @@
                 if (this.changeInfo.api_info && this.changeInfo.api_info.remote_api_id === this.apiDetail.id) {
                     // 赋值
                     const rspData = await this.changeInfo.api_info.rsp_data.split('.')
-                    const rspDataList = await rspData.map(
-                        (item, index) => {
-                            item = index + '_' + item
-                            return item
-                        }
-                    )
-                    const lastObj = rspDataList.length + '_items_0'
+                    const rspDataList = await rspData.map((item, index) => {
+                        item = `${index}_${item}`
+                        return item
+                    })
+                    const lastObj = `${rspDataList.length}_items_0`
                     rspDataList.push(lastObj)
-                    const kvKeyAncestorsStr = rspDataList.toString() + ',' + rspDataList.length + '_' + this.changeInfo.kv_relation.key
-                    const kvNameAncestorsStr = rspDataList.toString() + ',' + rspDataList.length + '_' + this.changeInfo.kv_relation.name
+                    const kvKeyAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.key}`
+                    const kvNameAncestorsStr = `${rspDataList.toString()},${rspDataList.length}_${this.changeInfo.kv_relation.name}`
                     this.tampFormInfo.ancestorsList_str = rspDataList.toString() // 记录、标记已选中Array --> tree组件/选取数租
-                    this.responseTableData.forEach(
-                        ite => {
-                            // 关键字字段
-                            if (ite.ancestorsList_str === kvKeyAncestorsStr) {
-                                ite.isSelectedKey = true
-                                this.tampFormInfo.isSelectedKey = ite['ancestorsList_str']
-                                this.tampFormInfo.settingKeyName = ite.name
-                            }
-                            // 显示字段
-                            if (ite.ancestorsList_str === kvNameAncestorsStr) {
-                                ite.isSelectedValue = true
-                                this.tampFormInfo.isSelectedValue = ite['ancestorsList_str']
-                                this.tampFormInfo.settingValueName = ite.name
-                            }
+                    this.responseTableData.forEach(ite => {
+                        // 关键字字段
+                        if (ite.ancestorsList_str === kvKeyAncestorsStr) {
+                            ite.isSelectedKey = true
+                            this.tampFormInfo.isSelectedKey = ite.ancestorsList_str
+                            this.tampFormInfo.settingKeyName = ite.name
                         }
-                    )
+                        // 显示字段
+                        if (ite.ancestorsList_str === kvNameAncestorsStr) {
+                            ite.isSelectedValue = true
+                            this.tampFormInfo.isSelectedValue = ite.ancestorsList_str
+                            this.tampFormInfo.settingValueName = ite.name
+                        }
+                    })
                     await this.organization.assignorPerson.forEach(tree => {
                         this.treeData(tree, 'assignors')
                     })
                     // 关键字字段/显示字段 及 相应列表
-                    this.selectInfo.selectkeylist = this.responseTableData.filter(
-                        ite => {
-                            return ite.ancestorsList.join() === rspDataList.join()
-                        }
-                    )
+                    this.selectInfo.selectkeylist = this.responseTableData.filter(ite => ite.ancestorsList.join() === rspDataList.join())
                     this.selectInfo.selectkey = this.tampFormInfo.isSelectedKey
                     this.selectInfo.selectvaluelist = _.cloneDeep(this.selectInfo.selectkeylist)
                     this.selectInfo.selectvalue = this.tampFormInfo.isSelectedValue
@@ -414,7 +396,8 @@
                 tree.has_children = !!(tree.children && tree.children.length)
                 tree.showChildren = true
                 // 选中操作角色
-                if (String(this.tampFormInfo.ancestorsList_str.split(',').slice(0, -1).toString()) === String(tree.ancestorsList_str) && type === 'assignors') {
+                if (String(this.tampFormInfo.ancestorsList_str.split(',').slice(0, -1)
+                    .toString()) === String(tree.ancestorsList_str) && type === 'assignors') {
                     tree.checkInfo = true
                     this.organization.assignorTree = tree
                 }
@@ -427,25 +410,15 @@
             },
             // 多层列表数据 关联 table表格数据
             recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(
-                    item => {
-                        return item['level']
-                    }
-                )
+                const levelList = tableData.map(item => item.level)
                 this.maxLevel = Math.max(...levelList)
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => {
-                        return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                    })[0].children.push(item)
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
                 }
                 for (let i = this.maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => {
-                        return item.level === i
-                    }).forEach(
-                        ite => {
-                            recordChildrenStep(tableData, ite)
-                        }
-                    )
+                    tableData.filter(item => item.level === i).forEach(ite => {
+                        recordChildrenStep(tableData, ite)
+                    })
                 }
             },
             // 标记父级元素 方便数据处理
@@ -456,24 +429,18 @@
                     if (!item.level) {
                         item.parentInfo = ''
                     } else {
-                        item.parentInfo = tableData.filter(ite => {
-                            return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                        })[0]
+                        item.parentInfo = tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0]
                     }
                 }
                 for (let i = 0; i <= (levelInitial || maxLevelFun); i++) {
-                    tableData.filter(item => {
-                        return item.level === i
-                    }).forEach(
-                        ite => {
-                            recordParentStep(tableData, ite)
-                        }
-                    )
+                    tableData.filter(item => item.level === i).forEach(ite => {
+                        recordParentStep(tableData, ite)
+                    })
                 }
             },
             // 根据标记的可选非对象数据 向上逐级寻找可用array父级并标记  生成标记可用数组路径
             markCanUseArray (data) {
-                data['isCanUseArray'] = true
+                data.isCanUseArray = true
                 if (data.level) {
                     this.markCanUseArray(data.parentInfo)
                 }
@@ -482,83 +449,65 @@
             makeArrayTree (dataOri) {
                 const treeList = []
                 const makeArrayTreeStep = function (treeListOri, data) {
-                    data.forEach(
-                        item => {
-                            data['name'] = item['name']
-                            data['isSelect'] = false
-                            data['ancestorsList_str'] = item['ancestorsList_str']
-                            const children = item.children
-                            data.children = []
-                            treeListOri.push(data)
-                            if (children && children.length) {
-                                makeArrayTreeStep(data.children, children)
-                            }
+                    data.forEach(item => {
+                        data.name = item.name
+                        data.isSelect = false
+                        data.ancestorsList_str = item.ancestorsList_str
+                        const { children } = item
+                        data.children = []
+                        treeListOri.push(data)
+                        if (children && children.length) {
+                            makeArrayTreeStep(data.children, children)
                         }
-                    )
+                    })
                 }
                 makeArrayTreeStep(treeList, dataOri)
                 return treeList
             },
             changeState (item) {
                 item.showChildren = !item.showChildren
-                item.children.forEach(
-                    ite => {
-                        ite['isShow'] = item.showChildren
-                        // this.$set(ite, 'isShow', item.showChildren)
-                    }
-                )
+                item.children.forEach(ite => {
+                    ite.isShow = item.showChildren
+                    // this.$set(ite, 'isShow', item.showChildren)
+                })
                 if (!item.showChildren) {
                     this.closeChildren(item)
                 }
             },
             closeChildren (item) {
-                item.children.forEach(
-                    ite => {
-                        ite['isShow'] = false
-                        // this.$set(ite, 'isShow', item.showChildren)
-                        if (ite.has_children) {
-                            ite['showChildren'] = false
-                            this.closeChildren(ite)
-                        }
+                item.children.forEach(ite => {
+                    ite.isShow = false
+                    // this.$set(ite, 'isShow', item.showChildren)
+                    if (ite.has_children) {
+                        ite.showChildren = false
+                        this.closeChildren(ite)
                     }
-                )
+                })
             },
             changeType (item) {
                 // ...
             },
             // old table选中key
             selectOneKey (itemData) {
-                const isSelectedKey = itemData.isSelectedKey
-                this.responseTableData.forEach(
-                    item => {
-                        item.isSelectedKey = false
-                    }
-                )
+                const { isSelectedKey } = itemData
+                this.responseTableData.forEach(item => {
+                    item.isSelectedKey = false
+                })
                 itemData.isSelectedKey = !isSelectedKey
-                this.responseTableData.filter(
-                    item => (item.isSelectAbled)
-                ).forEach(
-                    item => {
-                        item.isSelectedKeyDisabled = false
-                        item.isSelectedValueDisabled = item.parentInfo !== itemData.parentInfo
-                    }
-                )
-                this.responseTableData.filter(
-                    item => (item.isSelectAbled && item.parentInfo !== itemData.parentInfo)
-                ).forEach(
-                    item => {
-                        item.isSelectedValue = false
-                    }
-                )
+                this.responseTableData.filter(item => (item.isSelectAbled)).forEach(item => {
+                    item.isSelectedKeyDisabled = false
+                    item.isSelectedValueDisabled = item.parentInfo !== itemData.parentInfo
+                })
+                this.responseTableData.filter(item => (item.isSelectAbled && item.parentInfo !== itemData.parentInfo)).forEach(item => {
+                    item.isSelectedValue = false
+                })
             },
             // old table选中value
             selectOneValue (itemData) {
-                const isSelectedValue = itemData.isSelectedValue
-                this.responseTableData.forEach(
-                    item => {
-                        item.isSelectedValue = false
-                    }
-                )
+                const { isSelectedValue } = itemData
+                this.responseTableData.forEach(item => {
+                    item.isSelectedValue = false
+                })
                 itemData.isSelectedValue = !isSelectedValue
             },
             // 计算祖先元素有几个是Array
@@ -585,38 +534,26 @@
                     item.type !== 'array' && item.type !== 'object' && item.level && (!item.children || !item.children.length)
                     && item.ancestorsList.indexOf('0_data') !== -1
                 ))
-                const isArrayListUp = isArrayList.filter(
-                    item => {
-                        const parentArray = this.countArrayAncestors(item)
-                        const count = parentArray.length
-                        const isabled = count === 1 && (item.parentInfo.type === 'array' || item.parentInfo.parentInfo.type === 'array') // && 后台不支持多层选值
-                        if (isabled && canUseArray.indexOf(parentArray[0]) === -1) {
-                            canUseArray.push(parentArray[0])
-                        }
-                        return isabled
+                const isArrayListUp = isArrayList.filter(item => {
+                    const parentArray = this.countArrayAncestors(item)
+                    const count = parentArray.length
+                    const isabled = count === 1 && (item.parentInfo.type === 'array' || item.parentInfo.parentInfo.type === 'array') // && 后台不支持多层选值
+                    if (isabled && canUseArray.indexOf(parentArray[0]) === -1) {
+                        canUseArray.push(parentArray[0])
                     }
-                )
-                isArrayListUp.forEach(
-                    item => {
-                        item['isSelectAbled'] = true
-                    }
-                )
+                    return isabled
+                })
+                isArrayListUp.forEach(item => {
+                    item.isSelectAbled = true
+                })
                 return canUseArray
             },
             showTree (index) {
                 if (!index) {
-                    const levelList = this.organization.assignorPerson.map(
-                        item => {
-                            return item['level']
-                        }
-                    )
+                    const levelList = this.organization.assignorPerson.map(item => item.level)
                     this.$set(this.maxLevelTree, 0, Math.max(...levelList) - 1)
                 } else {
-                    const levelList = this.selectInfo.selectkeylist.map(
-                        item => {
-                            return item['level']
-                        }
-                    )
+                    const levelList = this.selectInfo.selectkeylist.map(item => item.level)
                     this.$set(this.maxLevelTree, 1, Math.max(...levelList) - 1)
                     this.$set(this.maxLevelTree, 2, Math.max(...levelList) - 1)
                 }
@@ -664,32 +601,20 @@
                     })
                     this.selectInfo.selectkey = value.ancestorsList_str
                     this.settingKeyName = value.name
-                    this.responseTableData.forEach(
-                        item => {
-                            item.isSelectedKey = false
-                        }
-                    )
-                    this.responseTableData.filter(
-                        item => {
-                            return item.ancestorsList_str === value.ancestorsList_str
-                        }
-                    )[0]['isSelectedKey'] = true
+                    this.responseTableData.forEach(item => {
+                        item.isSelectedKey = false
+                    })
+                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedKey = true
                 } else {
                     this.selectInfo.selectvaluelist.forEach(tree => {
                         this.recordCheckFn(tree)
                     })
                     this.selectInfo.selectvalue = value.ancestorsList_str
                     this.settingValueName = value.name
-                    this.responseTableData.forEach(
-                        item => {
-                            item.isSelectedValue = false
-                        }
-                    )
-                    this.responseTableData.filter(
-                        item => {
-                            return item.ancestorsList_str === value.ancestorsList_str
-                        }
-                    )[0]['isSelectedValue'] = true
+                    this.responseTableData.forEach(item => {
+                        item.isSelectedValue = false
+                    })
+                    this.responseTableData.filter(item => item.ancestorsList_str === value.ancestorsList_str)[0].isSelectedValue = true
                 }
                 value.checkInfo = true
                 // 关闭窗口
@@ -700,8 +625,8 @@
             },
             toggleChildren () {
                 arguments[0].showChildren = !arguments[0].showChildren
-            }
-        }
+            },
+        },
     }
 </script>
 

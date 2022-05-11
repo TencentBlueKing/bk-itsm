@@ -332,7 +332,7 @@
                 createAt: '',
                 operator: '',
                 isCanPrint: true,
-                isTableLoading: false
+                isTableLoading: false,
             }
         },
         mounted () {
@@ -353,10 +353,10 @@
             getPrintInfo () {
                 this.isTableLoading = true
                 const params = {
-                    id: this.id
+                    id: this.id,
                 }
                 if (this.$route.query.token) {
-                    params['token'] = this.$route.query.token
+                    params.token = this.$route.query.token
                 }
                 this.$store.dispatch('print/getOnePrint', params).then((res) => {
                     if (res.code === 'OK') {
@@ -369,45 +369,45 @@
                         // 提单信息
                         this.createAt = res.data.state[0].create_at
                         this.operator = res.data.state[0].operator
-                        this.ticketList = res.data.state[0]['fields'] || []
+                        this.ticketList = res.data.state[0].fields || []
                         if (this.ticketList.length % 2 === 1) {
                             this.ticketList.push({
                                 type: 'STRING',
                                 name: '--',
                                 value: '--',
-                                display_value: '--'
+                                display_value: '--',
                             })
                         }
                         // 工作流
                         this.jdList = res.data.state.slice(1, res.data.state.length)
-                        this.jdList = this.jdList.map(
-                            (item) => {
-                                this.$set(item, 'table_data', [])
-                                if (!item.fields) {
-                                    item.fields = []
-                                }
-                                item.fields.map((it) => {
-                                    if (this.ticketTypeList1.indexOf(it.type) !== -1) {
-                                        item['table_data'].push(it)
-                                    }
-                                })
-                                if (item.fields.length % 2 === 1) {
-                                    item.fields.push({
-                                        type: 'STRING',
-                                        name: '--',
-                                        value: '--'
-                                    })
-                                }
-                                return item
+                        this.jdList = this.jdList.map((item) => {
+                            this.$set(item, 'table_data', [])
+                            if (!item.fields) {
+                                item.fields = []
                             }
-                        )
+                            item.fields.map((it) => {
+                                if (this.ticketTypeList1.indexOf(it.type) !== -1) {
+                                    item.table_data.push(it)
+                                }
+                            })
+                            if (item.fields.length % 2 === 1) {
+                                item.fields.push({
+                                    type: 'STRING',
+                                    name: '--',
+                                    value: '--',
+                                })
+                            }
+                            return item
+                        })
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isCanPrint = false
-                    this.isTableLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isCanPrint = false
+                        this.isTableLoading = false
+                    })
             },
             getCustomTableDisplayValue (column, value) {
                 return getCustomTableDisplayValue(column, value)
@@ -417,7 +417,7 @@
                     if (Array.isArray(value)) {
                         return value.reduce((str, item) => {
                             if (item.label) {
-                                str += item.label + ':'
+                                str += `${item.label}:`
                             }
                             str += (item.value || '--')
                             str += '\n'
@@ -429,14 +429,14 @@
                 const { form_data: fromData, schemes } = item.display_value
                 const newDisplayValue = []
                 fromData.forEach(form => {
-                    const scheme = schemes[form['scheme']]
-                    const type = scheme.type
+                    const scheme = schemes[form.scheme]
+                    const { type } = scheme
                     if (type === 'text') {
                         const val = Array.isArray(form.value) ? flatValue(form.value) : form.value
                         newDisplayValue.push({
                             type: 'text',
                             name: form.label,
-                            value: val || '--'
+                            value: val || '--',
                         })
                     }
                     if (type === 'table') {
@@ -444,20 +444,20 @@
                         newDisplayValue.push({
                             type: 'table',
                             name: form.label,
-                            columns: columns,
+                            columns,
                             value: form.value.map(oneV => {
                                 const newOne = {}
                                 Object.keys(oneV).forEach(key => {
-                                    newOne[key] = oneV[key].label ? oneV[key].label + '：' + flatValue(oneV[key].value) : flatValue(oneV[key].value)
+                                    newOne[key] = oneV[key].label ? `${oneV[key].label}：${flatValue(oneV[key].value)}` : flatValue(oneV[key].value)
                                 })
                                 return newOne
-                            })
+                            }),
                         })
                     }
                 })
                 return newDisplayValue
-            }
-        }
+            },
+        },
     }
 </script>
 

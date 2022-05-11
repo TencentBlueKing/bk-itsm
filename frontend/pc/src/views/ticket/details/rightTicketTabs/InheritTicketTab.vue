@@ -179,7 +179,7 @@
     export default {
         name: 'InheritTicketTab',
         components: {
-            InheritTicketAddDialog
+            InheritTicketAddDialog,
         },
         inject: ['reloadTicket'],
         props: {
@@ -187,8 +187,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -205,30 +205,30 @@
                     headerPosition: 'left',
                     autoClose: false,
                     precision: 0,
-                    title: this.$t('m.newCommon["绑定历史"]')
+                    title: this.$t('m.newCommon["绑定历史"]'),
                 },
                 inheritStateInfo: {
                     options: [
                         {
                             key: 'chooseMother',
-                            name: this.$t(`m.newCommon["母单"]`)
+                            name: this.$t('m.newCommon["母单"]'),
                         },
                         {
                             key: 'chooseChild',
-                            name: this.$t(`m.newCommon["子单"]`)
-                        }
+                            name: this.$t('m.newCommon["子单"]'),
+                        },
                     ],
                     inheritType: 'chooseMother',
-                    otherTitle: this.$t(`m.newCommon["新建母子单"]`)
+                    otherTitle: this.$t('m.newCommon["新建母子单"]'),
                 },
                 historyList: [],
                 unBindInfo: {
                     type: 'throwMother',
                     title: '',
-                    content: ''
+                    content: '',
                 },
                 unBindItem: '',
-                checkList: []
+                checkList: [],
             }
         },
         async mounted () {
@@ -246,7 +246,7 @@
                     },
                     cancelFn: () => {
                         this.isShowAddInheritTicket = true
-                    }
+                    },
                 })
             },
             showHistory () {
@@ -257,9 +257,7 @@
             },
             giveUnbindInfo (type, item = {}) {
                 if (type === 'batch') {
-                    this.unBindItem = this.inheritStateList.map(item => {
-                        return item.id
-                    })
+                    this.unBindItem = this.inheritStateList.map(item => item.id)
                     this.unBindInfo.type = 'throwChild'
                     this.unBindInfo.title = this.$t('m.newCommon["确认解绑子单？"]')
                     this.unBindInfo.content = this.$t('m.newCommon["解绑后，子单将不会同步母单状态及处理信息，单据的后续处理各自独立，不在影响"]')
@@ -278,12 +276,12 @@
                     subTitle: this.unBindInfo.content,
                     confirmFn: () => {
                         this.unbindFun()
-                    }
+                    },
                 })
             },
             getInheritStateList () {
                 const params = {
-                    id: this.ticketInfo.id
+                    id: this.ticketInfo.id,
                 }
                 if (this.$route.query.token) {
                     params.token = this.$route.query.token
@@ -315,11 +313,13 @@
                         }
                         return { ...item, status: tempStatusName }
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.tableLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.tableLoading = false
+                    })
             },
             // 全选 半选
             handleSelectAll (selection) {
@@ -338,28 +338,26 @@
                 this.isShowAddInheritTicket = true
             },
             checkOne (rowData) {
-                const id = rowData.id
+                const { id } = rowData
                 const { href } = this.$router.resolve({
-                    name: `commonInfo`,
+                    name: 'commonInfo',
                     params: {
-                        id: id
+                        id,
                     },
                     query: {
-                        id: `${id}`
-                    }
+                        id: `${id}`,
+                    },
                 })
                 window.open(href, '_blank')
             },
             unbindFun () {
                 const params = {}
                 if (this.unBindInfo.type === 'throwMother') {
-                    params['master_ticket_id'] = this.unBindItem.id
-                    params['slave_ticket_ids'] = [this.ticketInfo.id]
+                    params.master_ticket_id = this.unBindItem.id
+                    params.slave_ticket_ids = [this.ticketInfo.id]
                 } else {
-                    params['master_ticket_id'] = this.ticketInfo.id
-                    params['slave_ticket_ids'] = this.checkList.map(it => {
-                        return it.id
-                    })
+                    params.master_ticket_id = this.ticketInfo.id
+                    params.slave_ticket_ids = this.checkList.map(it => it.id)
                 }
                 if (this.secondClick) {
                     return
@@ -368,33 +366,36 @@
                 this.$store.dispatch('change/unBindInherit', params).then(res => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["解绑成功"]'),
-                        theme: 'success'
+                        theme: 'success',
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(res => {
-                    this.checkList = []
-                    this.secondClick = false
-                    this.getInheritStateList()
-                    this.getHistoryList()
-                    // this.reloadTicket()
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(res => {
+                        this.checkList = []
+                        this.secondClick = false
+                        this.getInheritStateList()
+                        this.getHistoryList()
+                    // this.reloadTicket()
+                    })
             },
             async getHistoryList () {
                 const params = {
                     id: this.ticketInfo.id,
-                    type: 'MASTER_SLAVE'
+                    type: 'MASTER_SLAVE',
                 }
                 await this.$store.dispatch('change/getBindHistory', params).then(res => {
                     this.historyList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             closeHistory () {
                 this.historyInfo.isShow = false
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -59,21 +59,21 @@
     export default {
         name: 'Tree',
         components: {
-            collapseTransition
+            collapseTransition,
         },
         props: {
             treeDataList: {
                 type: Array,
-                default: []
+                default: [],
             },
             treeIndex: {
                 type: Number,
-                default: 0
-            }
+                default: 0,
+            },
         },
         data () {
             return {
-                pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`
+                pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`,
             }
         },
         methods: {
@@ -84,8 +84,8 @@
             // 选中
             toggle (item) {
                 this.$emit('toggle', item)
-            }
-        }
+            },
+        },
     }
 </script>
 

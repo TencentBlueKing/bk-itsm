@@ -118,8 +118,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -127,15 +127,15 @@
                     {
                         id: 1,
                         key: 'CUSTOM',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'FIELDS',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
                 ],
-                variableList: []
+                variableList: [],
             }
         },
         computed: {
@@ -146,13 +146,13 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         watch: {
-            triggerVariables: function (newVal) {
+            triggerVariables (newVal) {
                 this.variableList = newVal
-            }
+            },
         },
         created () {
             this.initData()
@@ -164,16 +164,14 @@
             async initData () {
                 this.$set(this.itemInfo.apiContent, 'treeDataList', {})
                 this.itemInfo.apiContent.treeDataList = await this.jsonschemaToList({
-                    root: JSON.parse(JSON.stringify(this.itemInfo.apiContent.req_body))
+                    root: JSON.parse(JSON.stringify(this.itemInfo.apiContent.req_body)),
                 })
                 // 如果数据已经存在，则进行表格初始化赋值
                 if (this.itemInfo.value) {
                     this.itemInfo.apiContent.treeDataList = this.jsonValueTreeList(this.itemInfo.value, JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList)))
                 }
                 // 生成table表格数据
-                this.itemInfo.apiContent.bodyTableData = await this.treeToTableList(
-                    JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList[0].children))
-                )
+                this.itemInfo.apiContent.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(this.itemInfo.apiContent.treeDataList[0].children)))
                 const bodyTableData = JSON.parse(JSON.stringify(this.itemInfo.apiContent.bodyTableData))
                 // 加入/引用变量
                 bodyTableData.forEach(item => {
@@ -190,11 +188,7 @@
             jsonValueTreeList (jsonData, treeDataList) {
                 const listToJsonStep = function (lastObject, insertObject, key, item, lastType) {
                     if (lastType === 'object') {
-                        const reqData = insertObject.filter(
-                            ite => {
-                                return ite.key === key
-                            }
-                        )
+                        const reqData = insertObject.filter(ite => ite.key === key)
                         if (!reqData.length) {
                             return
                         }
@@ -213,15 +207,15 @@
                         } else if (item.constructor.name.toLowerCase() === 'object') {
                             if (item.ref_type) {
                                 if (item.ref_type === 'reference') {
-                                    reqData[0]['source_type'] = 'FIELDS'
-                                    reqData[0]['value_key'] = item.value
-                                    reqData[0]['value'] = item.value
+                                    reqData[0].source_type = 'FIELDS'
+                                    reqData[0].value_key = item.value
+                                    reqData[0].value = item.value
                                 } else {
-                                    reqData[0]['source_type'] = 'CUSTOM'
-                                    reqData[0]['value'] = item.value
-                                    reqData[0]['value_key'] = ''
+                                    reqData[0].source_type = 'CUSTOM'
+                                    reqData[0].value = item.value
+                                    reqData[0].value_key = ''
                                     // 改变默认值
-                                    reqData[0]['default_temp'] = reqData[0]['value']
+                                    reqData[0].default_temp = reqData[0].value
                                 }
                             } else {
                                 for (const j in item) {
@@ -230,24 +224,20 @@
                             }
                         } else {
                             if (item.ref_type === 'reference') {
-                                reqData[0]['source_type'] = 'FIELDS'
-                                reqData[0]['value_key'] = item.value
-                                reqData[0]['value'] = item.value
+                                reqData[0].source_type = 'FIELDS'
+                                reqData[0].value_key = item.value
+                                reqData[0].value = item.value
                             } else {
-                                reqData[0]['source_type'] = 'CUSTOM'
-                                reqData[0]['value'] = item.value
-                                reqData[0]['value_key'] = ''
+                                reqData[0].source_type = 'CUSTOM'
+                                reqData[0].value = item.value
+                                reqData[0].value_key = ''
                                 // 改变默认值
-                                reqData[0]['default_temp'] = reqData[0]['value']
+                                reqData[0].default_temp = reqData[0].value
                             }
                         }
                     } else if (lastType === 'array') {
                         if (item.constructor.name.toLowerCase() === 'array') {
-                            const reqData = insertObject.filter(
-                                ite => {
-                                    return ite.key === key
-                                }
-                            )
+                            const reqData = insertObject.filter(ite => ite.key === key)
                             if (!reqData.length) {
                                 return
                             } // 待定？？？
@@ -264,13 +254,13 @@
                         } else if (item.constructor.name.toLowerCase() === 'object') {
                             if (item.ref_type) {
                                 if (item.ref_type === 'reference') {
-                                    insertObject['source_type'] = 'FIELDS'
-                                    insertObject['value_key'] = item.value
+                                    insertObject.source_type = 'FIELDS'
+                                    insertObject.value_key = item.value
                                 } else {
-                                    insertObject['source_type'] = 'CUSTOM'
-                                    insertObject['value'] = item.value
+                                    insertObject.source_type = 'CUSTOM'
+                                    insertObject.value = item.value
                                     // 改变默认值
-                                    insertObject['default_temp'] = insertObject['value']
+                                    insertObject.default_temp = insertObject.value
                                 }
                             } else {
                                 for (const j in item) {
@@ -279,38 +269,30 @@
                             }
                         } else {
                             if (item.ref_type === 'reference') {
-                                insertObject['source_type'] = 'FIELDS'
-                                insertObject['value_key'] = item.value
+                                insertObject.source_type = 'FIELDS'
+                                insertObject.value_key = item.value
                             } else {
-                                insertObject['source_type'] = 'CUSTOM'
-                                insertObject['value'] = item.value
+                                insertObject.source_type = 'CUSTOM'
+                                insertObject.value = item.value
                                 // 改变默认值
-                                insertObject['default_temp'] = insertObject['value']
+                                insertObject.default_temp = insertObject.value
                             }
                         }
                     }
                 }
                 for (const key in jsonData) {
-                    listToJsonStep(treeDataList[0], treeDataList[0]['children'], key, jsonData[key], 'object', 0)
+                    listToJsonStep(treeDataList[0], treeDataList[0].children, key, jsonData[key], 'object', 0)
                 }
                 return treeDataList
             },
             recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(
-                    item => {
-                        return item['level']
-                    }
-                )
+                const levelList = tableData.map(item => item.level)
                 const maxLevel = Math.max(...levelList)
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => {
-                        return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                    })[0].children.push(item)
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
                 }
                 for (let i = maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => {
-                        return item.level === i
-                    }).forEach(ite => {
+                    tableData.filter(item => item.level === i).forEach(ite => {
                         recordChildrenStep(tableData, ite)
                     })
                 }
@@ -337,9 +319,7 @@
             },
             // 计算子元素
             countSon (itemChildren) {
-                const item = this.itemInfo.apiContent.bodyTableData.filter(ite => {
-                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString())
-                })[0]
+                const item = this.itemInfo.apiContent.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString()))[0]
                 return item.children.length === 1
             },
             // 计算所有子孙元素
@@ -373,27 +353,19 @@
             },
             // 添加 array 列表元素
             async addChildren (itemChildren) {
-                const item = this.itemInfo.apiContent.bodyTableData.filter(ite => {
-                    return (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString())
-                })[0]
+                const item = this.itemInfo.apiContent.bodyTableData.filter(ite => (ite.level === itemChildren.level - 1 && ite.primaryKey === itemChildren.parentPrimaryKey && ite.ancestorsList.toString() === itemChildren.ancestorsList.slice(0, -1).toString()))[0]
 
                 const index = this.itemInfo.apiContent.bodyTableData.indexOf(item) + 1
                 const count = await this.countChildren(item)
-                const copyItem = await this.cleanValue(item['children'][0])
+                const copyItem = await this.cleanValue(item.children[0])
                 const insertList = await this.treeToTableList(
-                    JSON.parse(JSON.stringify([...item['children'], copyItem])), item.level + 1,
+                    JSON.parse(JSON.stringify([...item.children, copyItem])), item.level + 1,
                     item.primaryKey, 'array', item.ancestorsList
                 )
-                await insertList.forEach(
-                    ite => {
-                        ite['children'] = []
-                    }
-                )
-                item.children = insertList.filter(
-                    ite => {
-                        return ite.level === item.level + 1
-                    }
-                )
+                await insertList.forEach(ite => {
+                    ite.children = []
+                })
+                item.children = insertList.filter(ite => ite.level === item.level + 1)
                 await this.recordChildren(insertList, item.level + 1)
                 this.itemInfo.apiContent.bodyTableData.splice(index, count, ...insertList)
             },
@@ -402,9 +374,7 @@
                 if (this.countSon(item)) {
                     return
                 }
-                const currentObj = this.itemInfo.apiContent.bodyTableData.filter(ite => {
-                    return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                })[0].children
+                const currentObj = this.itemInfo.apiContent.bodyTableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children
                 if (currentObj.length <= 1) {
                     return
                 }
@@ -412,8 +382,8 @@
                 const index = this.itemInfo.apiContent.bodyTableData.indexOf(item)
                 const count = await this.countChildren(item)
                 this.itemInfo.apiContent.bodyTableData.splice(index, count + 1)
-            }
-        }
+            },
+        },
     }
 </script>
 

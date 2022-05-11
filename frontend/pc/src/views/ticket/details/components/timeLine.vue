@@ -54,18 +54,18 @@
                 type: [Array, Object],
                 default () {
                     return []
-                }
+                },
             },
             parent: {
                 type: String,
-                default: 'normal'
-            }
+                default: 'normal',
+            },
         },
         data () {
             return {
 
             }
-        }
+        },
     }
 </script>
 <style lang='scss' scoped>

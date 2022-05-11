@@ -82,16 +82,16 @@
         props: {
             stages: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                isFullScreen: false
+                isFullScreen: false,
             }
         },
         methods: {
@@ -99,7 +99,7 @@
             openFullScreen () {
                 this.isFullScreen = true
                 this.$bkMessage({
-                    message: this.$t(`m.common["按 ESC 键退出全屏"]`)
+                    message: this.$t('m.common["按 ESC 键退出全屏"]'),
                 })
                 document.addEventListener('keydown', this.handlerKeyDown)
             },
@@ -147,8 +147,8 @@
                     default:
                         return true
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

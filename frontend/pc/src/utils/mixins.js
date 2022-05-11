@@ -27,12 +27,12 @@ export default {
     props: {
         fields: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         isPreview: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     data () {
 
@@ -46,9 +46,9 @@ export default {
             this.item.choice = await this.getFieldOptions(this.item, this.isPreview)
             this.options = this.item.choice
         }, 1000, {
-            'leading': true,
-            'trailing': true,
-            'maxWait': 2000
+            leading: true,
+            trailing: true,
+            maxWait: 2000,
         }),
         // 自定义表单数据处理
         async getFieldOptions (item, type) {
@@ -64,21 +64,20 @@ export default {
                         const reqParams = item.relyOn || {}
                         reqParams.id = item.id
                         await this.$store.dispatch('apiRemote/get_data', reqParams).then(res => {
-                            data = res.data.map(item => {
-                                return {
-                                    key: item['key'],
-                                    name: item['name']
-                                }
-                            })
-                        }).catch(res => {
-                            errorHandler(res, this)
+                            data = res.data.map(item => ({
+                                key: item.key,
+                                name: item.name,
+                            }))
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     } else {
                         data = []
                         item.choice.forEach(node => {
                             data.push({
                                 key: node.id,
-                                name: node.name
+                                name: node.name,
                             })
                         })
                     }
@@ -90,23 +89,22 @@ export default {
                             key: item.source_uri,
                             field_key: item.key,
                             service: item.service,
-                            current_status: item.ticket_status
+                            current_status: item.ticket_status,
                         }).then(res => {
-                            data = res.data.map(item => {
-                                return {
-                                    key: item.id,
-                                    name: item.name
-                                }
-                            })
-                        }).catch(res => {
-                            errorHandler(res, this)
+                            data = res.data.map(item => ({
+                                key: item.id,
+                                name: item.name,
+                            }))
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     } else {
                         data = []
                         item.choice.forEach(node => {
                             data.push({
                                 key: node.id,
-                                name: node.name
+                                name: node.name,
                             })
                         })
                     }
@@ -124,6 +122,6 @@ export default {
                     })
                 })
             }
-        }
-    }
+        },
+    },
 }

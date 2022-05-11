@@ -44,21 +44,21 @@
         name: 'BasicInformation',
         components: {
             // fieldsDone,
-            tableFields
+            tableFields,
         },
         props: {
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             firstStateFields: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -66,20 +66,20 @@
                 showInfo: true,
                 displayMoreIcon: true,
                 basicInfomationList: [],
-                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE']
+                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE'],
             }
         },
         computed: {
-            profile: function () {
+            profile () {
                 if (!this.basicInfomation) {
                     return
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
+                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
                 }
-            }
+            },
         },
         mounted () {
             this.tableFields()
@@ -100,7 +100,8 @@
                     case 'DISTRIBUTING':
                         return item.current_assignors
                     case 'DISTRIBUTING-RECEIVING':
-                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join().replace(/(^,*)|(,$)/g, ''))
+                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join()
+                            .replace(/(^,*)|(,$)/g, ''))
                     default :
                         return item.current_processors || '--'
                 }
@@ -116,12 +117,10 @@
                     { name: '标题', display_value: title, type: 'STRING' },
                     { name: '单号', display_value: sn, type: 'STRING' },
                     { name: '工单类型', display_value: service_type_name, type: 'STRING' },
-                    { name: '服务目录', display_value: catalog_fullname + '>' + service_name, type: 'STRING' },
-                    { name: '关联服务', display_value: service_name, type: 'STRING' }
+                    { name: '服务目录', display_value: `${catalog_fullname}>${service_name}`, type: 'STRING' },
+                    { name: '关联服务', display_value: service_name, type: 'STRING' },
                 ]
-                const fields = this.firstStateFields.map(item => {
-                    return item
-                })
+                const fields = this.firstStateFields.map(item => item)
                 fields.forEach(ite => {
                     if (!this.basicInfoType.includes(ite.type)) {
                         tlist.push(ite)
@@ -130,8 +129,8 @@
                     }
                 })
                 this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'))
-            }
-        }
+            },
+        },
     }
 </script>
 

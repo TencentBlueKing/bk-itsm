@@ -59,24 +59,23 @@
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             cardData: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         computed: {
             ratioCls () {
                 if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
                     return 'ratio-equal'
-                } else if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
+                } if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
                     return 'ratio-up'
-                } else {
-                    return 'ratio-down'
                 }
-            }
-        }
+                return 'ratio-down'
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

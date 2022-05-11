@@ -160,20 +160,20 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             modelPriority: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             changeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -182,7 +182,7 @@
                 timeList: [
                     { id: 'm', name: this.$t('m.slaContent["分钟"]') },
                     { id: 'h', name: this.$t('m.slaContent["小时"]') },
-                    { id: 'd', name: this.$t('m.slaContent["天"]') }
+                    { id: 'd', name: this.$t('m.slaContent["天"]') },
                 ],
                 priorityList: [],
                 historyPriority: [],
@@ -196,19 +196,17 @@
                             required: true,
                             trigger: 'blur',
                             type: 'string',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
-                    ]
+                            validator: (v) => !!v,
+                        },
+                    ],
                 },
-                iconOffset: 75
+                iconOffset: 75,
             }
         },
         watch: {
             modelPriority () {
                 this.initData()
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -232,7 +230,7 @@
                             scheduleCheck: false,
                             timeCheck: false,
                             isRespDropdownShow: false,
-                            isDealDropdownShow: false
+                            isDealDropdownShow: false,
                         })
                     })
                 } else {
@@ -249,7 +247,7 @@
                             scheduleCheck: false,
                             timeCheck: false,
                             isRespDropdownShow: false,
-                            isDealDropdownShow: false
+                            isDealDropdownShow: false,
                         })
                     })
                 }
@@ -271,7 +269,7 @@
                 }
             },
             timeHandler (key, time, item, index, order) {
-                this.$refs['dropdown' + index][order].hide()
+                this.$refs[`dropdown${index}`][order].hide()
                 item[key] = time.id
             },
             // 跳转到新建服务模式
@@ -296,10 +294,11 @@
                 })
                 await Promise.all(validates).then(() => {
                     valid = false
-                }).catch(() => {
-                    // 防止出现Uncaught
-                    valid = true
                 })
+                    .catch(() => {
+                        // 防止出现Uncaught
+                        valid = true
+                    })
                 return valid
             },
             clearFromError () {
@@ -309,8 +308,8 @@
                         ite.clearError()
                     })
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

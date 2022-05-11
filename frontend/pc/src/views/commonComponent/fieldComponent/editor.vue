@@ -42,28 +42,28 @@
     export default {
         name: 'RICHTEXT',
         components: {
-            RichTextEditor
+            RichTextEditor,
         },
         props: {
             item: {
                 type: Object,
                 required: true,
-                default: () => {}
+                default: () => {},
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
-        mounted: function () {
+        mounted () {
             if (this.item.value && !this.item.val) {
                 this.item.val = this.item.value
             }
-        }
+        },
     }
 </script>
 

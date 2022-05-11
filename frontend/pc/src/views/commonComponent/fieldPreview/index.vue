@@ -120,26 +120,26 @@
     export default {
         name: 'fieldPreview',
         components: {
-            RenderView
+            RenderView,
         },
         props: {
             fields: {
                 type: Array,
                 required: true,
-                default: () => []
+                default: () => [],
             },
             ticketId: {
                 type: [Number, String],
-                default: () => ''
+                default: () => '',
             },
             statedId: {
                 type: [Number, String],
-                default: () => ''
+                default: () => '',
             },
             commentId: {
                 type: String,
-                default: () => ''
-            }
+                default: () => '',
+            },
         },
         data () {
             return {
@@ -147,8 +147,8 @@
                 cloneFields: [],
                 customForm: {
                     formData: [],
-                    context: {}
-                }
+                    context: {},
+                },
             }
         },
         watch: {
@@ -156,8 +156,8 @@
                 handler () {
                     this.initFields()
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         methods: {
             initFields () {
@@ -170,14 +170,14 @@
                         this.$set(item, 'fileShow', [])
                         const temp = JSON.parse(item.value)
                         for (const key in temp) {
-                            item.fileShow.push({ ...temp[key], key: key })
+                            item.fileShow.push({ ...temp[key], key })
                         }
                     }
                 })
             },
             goToLink (url) {
                 if (url.indexOf('http') !== 0) {
-                    url = 'http://' + url
+                    url = `http://${url}`
                 }
                 window.open(url, '_blank')
             },
@@ -188,7 +188,7 @@
                 }
             },
             downFile (file, item) {
-                this.downFileUrl = window.SITE_URL + `api/ticket/fields/${item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
+                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
                 window.open(this.downFileUrl)
             },
             onBlur () {
@@ -197,8 +197,8 @@
             },
             getCustomTableDisplayValue (column, value) {
                 return getCustomTableDisplayValue(column, value)
-            }
-        }
+            },
+        },
     }
 </script>
 

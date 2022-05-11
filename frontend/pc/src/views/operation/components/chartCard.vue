@@ -55,28 +55,28 @@
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             desc: {
                 type: String,
-                default: ''
+                default: '',
             },
             showSearch: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             placeholder: {
                 type: String,
-                default: ''
+                default: '',
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                searchStr: ''
+                searchStr: '',
             }
         },
         created () {
@@ -85,8 +85,8 @@
         methods: {
             searchHandler (val) {
                 this.$emit('search', val)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

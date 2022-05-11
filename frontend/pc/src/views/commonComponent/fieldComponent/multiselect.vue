@@ -56,27 +56,27 @@
                 type: Object,
                 required: true,
                 default: () => {
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 options: [],
-                selectedItems: []
+                selectedItems: [],
             }
         },
         watch: {
@@ -88,7 +88,7 @@
                 if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
                     this.getOption()
                 }
-            }
+            },
         },
         async mounted () {
             if (this.item.value && !this.item.val) {
@@ -115,8 +115,8 @@
                         })
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

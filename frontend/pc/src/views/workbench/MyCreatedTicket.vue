@@ -34,7 +34,7 @@
         name: 'MyCreatedTicket',
         components: {
             NavTitle,
-            CreatedList
-        }
+            CreatedList,
+        },
     }
 </script>

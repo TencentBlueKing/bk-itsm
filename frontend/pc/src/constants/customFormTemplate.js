@@ -22,7 +22,7 @@
 
 export const CUSTOM_FORM_TEMPLATE = {
     config: {
-        mode: 'sideslider' // combine
+        mode: 'sideslider', // combine
     },
     schemes: {
         base_text_scheme: {
@@ -30,19 +30,19 @@ export const CUSTOM_FORM_TEMPLATE = {
             attrs: {
                 styles: {
                     label: ['border'],
-                    value: ['highlight', 'border']
+                    value: ['highlight', 'border'],
                 },
-                desc: '通用描述文字'
-            }
+                desc: '通用描述文字',
+            },
         },
         table_text_scheme: {
             type: 'text',
             attrs: {
                 styles: {
                     label: ['border'],
-                    value: ['highlight', 'border']
-                }
-            }
+                    value: ['highlight', 'border'],
+                },
+            },
         },
         base_table_scheme: {
             type: 'table',
@@ -51,25 +51,25 @@ export const CUSTOM_FORM_TEMPLATE = {
                     {
                         name: '操作',
                         type: 'text',
-                        key: 'column1'
+                        key: 'column1',
                     },
                     {
                         name: '关联相关内容',
                         key: 'column2',
                         scheme: 'table_text_scheme',
                         attrs: {
-                        }
+                        },
                     },
                     {
                         name: '申请期限',
                         type: 'text',
                         key: 'column3',
                         attrs: {
-                            sort: true
-                        }
-                    }
-                ]
-            }
+                            sort: true,
+                        },
+                    },
+                ],
+            },
         },
         sub_table_scheme: {
             type: 'table',
@@ -78,15 +78,15 @@ export const CUSTOM_FORM_TEMPLATE = {
                     {
                         name: '关联内容-类型',
                         key: 'column1',
-                        scheme: 'base_text_scheme'
+                        scheme: 'base_text_scheme',
                     },
                     {
                         name: '类型值',
                         key: 'column2',
-                        scheme: 'table_text_scheme'
-                    }
-                ]
-            }
+                        scheme: 'table_text_scheme',
+                    },
+                ],
+            },
         },
         sub2_table_scheme: {
             type: 'table',
@@ -95,11 +95,11 @@ export const CUSTOM_FORM_TEMPLATE = {
                     {
                         name: '主机',
                         key: 'column1',
-                        scheme: 'base_text_scheme'
-                    }
-                ]
-            }
-        }
+                        scheme: 'base_text_scheme',
+                    },
+                ],
+            },
+        },
     },
     form_data: [
         {
@@ -111,24 +111,24 @@ export const CUSTOM_FORM_TEMPLATE = {
                 {
                     label: '子业务1：',
                     scheme: 'base_text_scheme',
-                    value: 'test1'
+                    value: 'test1',
                 },
                 {
                     label: '子业务2：',
                     scheme: 'base_text_scheme',
-                    value: 'test2'
-                }
-            ]
+                    value: 'test2',
+                },
+            ],
         },
         {
             label: '提单人：',
             scheme: 'base_text_scheme',
-            value: ''
+            value: '',
         },
         {
             label: '提单时间：',
             scheme: 'base_text_scheme',
-            value: ''
-        }
-    ]
+            value: '',
+        },
+    ],
 }

@@ -164,26 +164,26 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             pathList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             firstLevelInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             typeInfo: {
                 type: String,
                 default () {
                     return ''
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -201,25 +201,25 @@
                         version: 'v1',
                         category: '',
                         ownersInputValue: [],
-                        desc: ''
-                    }
+                        desc: '',
+                    },
                 },
                 // 校验
                 checkInfo: {
                     name: '',
-                    road: ''
+                    road: '',
                 },
                 // 请求方式
                 typeList: [
                     { name: 'GET' },
-                    { name: 'POST' }
+                    { name: 'POST' },
                     // { name: 'DELETE' },
                     // { name: 'PUT' },
                     // { name: 'PATCH' }
                 ],
                 isDropdownShow: false,
                 // 校验
-                rules: {}
+                rules: {},
             }
         },
         computed: {
@@ -230,7 +230,7 @@
                     return false
                 }
                 return true
-            }
+            },
         },
         mounted () {
             // 校验
@@ -273,29 +273,31 @@
                     req_params: [],
                     req_headers: [],
                     rsp_data: {},
-                    req_body: {}
+                    req_body: {},
                 }
                 this.secondClick = true
                 this.$store.dispatch('apiRemote/post_remote_api', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["添加成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.systemConfig["添加成功"]'),
+                        theme: 'success',
                     })
                     this.getRemoteSystemData()
                     this.closeAdd()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             switchChange (isActivated) {
                 this.directory.formInfo.is_activated = isActivated
             },
             changeMethod (path, option) {
                 const dataItem = this.pathList.filter(item => item.path === path)[0]
-                this.directory.formInfo.type = dataItem['method']
-                this.directory.formInfo.func_name = dataItem['func_name']
+                this.directory.formInfo.type = dataItem.method
+                this.directory.formInfo.func_name = dataItem.func_name
                 this.directory.formInfo.name = dataItem.label
                 this.directory.formInfo.version = dataItem.version || 'v1'
                 this.directory.formInfo.category = dataItem.category
@@ -312,7 +314,7 @@
                     version: 'v1',
                     category: 'component',
                     ownersInputValue: [],
-                    desc: ''
+                    desc: '',
                 }
                 const dataItem = this.treeList.slice(1).filter(item => item.id === id)[0]
                 this.$parent.$parent.$parent.getChannelPathList(dataItem.code)
@@ -326,8 +328,8 @@
             requestHandler (requestway, requestwayIndex) {
                 this.directory.formInfo.type = requestway.name
                 this.$refs.requestwayDrop.hide()
-            }
-        }
+            },
+        },
     }
 </script>
 

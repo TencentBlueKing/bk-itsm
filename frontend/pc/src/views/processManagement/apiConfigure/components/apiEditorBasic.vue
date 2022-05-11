@@ -91,60 +91,60 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 分类列表
             treeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 接口列表
             pathList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 内建系统列表
             isBuiltinIdList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 // 请求方式
                 typeList: [
                     { name: 'GET' },
-                    { name: 'POST' }
+                    { name: 'POST' },
                     // { name: 'DELETE' },
                     // { name: 'PUT' },
                     // { name: 'PATCH' }
                 ],
                 // 状态
                 stateList: [
-                    { id: 0, name: this.$t(`m.systemConfig["未完成"]`) },
-                    { id: 1, name: this.$t(`m.systemConfig["已完成"]`) }
+                    { id: 0, name: this.$t('m.systemConfig["未完成"]') },
+                    { id: 1, name: this.$t('m.systemConfig["已完成"]') },
                 ],
-                isDropdownShow: false
+                isDropdownShow: false,
             }
         },
         computed: {
             // 基本设置
             basicInfo: {
                 // getter
-                get: function () {
+                get () {
                     return this.detailInfoOri
                 },
                 // setter
-                set: function (newVal) {
+                set (newVal) {
                     this.$parent.DetailInfo = newVal
-                }
-            }
+                },
+            },
         },
         watch: {},
         mounted () {
@@ -165,8 +165,8 @@
             },
             changeMethod (val) {
                 this.basicInfo.method = val
-            }
-        }
+            },
+        },
     }
 </script>
 

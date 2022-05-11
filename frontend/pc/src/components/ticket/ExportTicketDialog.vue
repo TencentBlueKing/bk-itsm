@@ -108,20 +108,20 @@
         props: {
             isShow: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             pagination: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             viewType: {
                 type: String,
-                default: ''
+                default: '',
             },
             searchParams: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -136,21 +136,21 @@
                     serviceCheckList: [],
                     serviceFieldsList: [],
                     serviceList: [],
-                    serviceId: ''
-                }
+                    serviceId: '',
+                },
             }
         },
         computed: {
             exportFieldsList () {
                 return this.$store.state.common.wayInfo.export_fields
-            }
+            },
         },
         watch: {
             isShow (val) {
                 if (val) {
                     this.initData()
                 }
-            }
+            },
         },
         methods: {
             async initData () {
@@ -163,7 +163,7 @@
                     serviceCheckList: [],
                     serviceFieldsList: [],
                     serviceList: [],
-                    serviceId: ''
+                    serviceId: '',
                 }
                 // 搜索条件中有且只有一个服务，则可以导出提单字段
                 const catalogId = this.searchParams.catalog_id
@@ -175,9 +175,7 @@
                 } else if (!isEmpty(serviceId) && serviceId.split(',').length > 1) { // 选择了多个服务，只能在这几个服务中选
                     await this.getServiceList()
                     const serviceIds = serviceId.split(',')
-                    this.exportInfo.serviceList = this.exportInfo.serviceList.filter(item => {
-                        return serviceIds.includes(String(item.id))
-                    })
+                    this.exportInfo.serviceList = this.exportInfo.serviceList.filter(item => serviceIds.includes(String(item.id)))
                 } else { // 其他，可以选择任意服务
                     this.getServiceList()
                 }
@@ -199,15 +197,17 @@
                 this.serviceListLoading = true
                 const params = {
                     catalog_id: val,
-                    is_valid: 1
+                    is_valid: 1,
                 }
                 this.$store.dispatch('catalogService/getServices', params).then((resp) => {
                     this.exportInfo.serviceList = resp.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceListLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceListLoading = false
+                    })
             },
             // 导出弹框全选变化
             checkAll () {
@@ -221,7 +221,7 @@
             },
             // 导出弹框checkbox变化
             checkOne (item) {
-                const checkList = this.exportInfo.checkList
+                const { checkList } = this.exportInfo
                 if (checkList.some(checkItem => checkItem === item.id)) {
                     this.exportInfo.checkList = checkList.filter(checkItem => checkItem !== item.id)
                 } else {
@@ -237,7 +237,7 @@
                     is_draft: 0,
                     view_type: this.viewType,
                     export_fields: this.exportInfo.checkList.toString(),
-                    ...this.searchParams
+                    ...this.searchParams,
                 }
                 
                 // 如果是通过导出选择的服务，则覆盖原本高级搜索中的服务参数
@@ -246,12 +246,12 @@
                 }
 
                 let base64ServiceFields
-                const serviceCheckList = this.exportInfo.serviceCheckList
+                const { serviceCheckList } = this.exportInfo
                 if (serviceCheckList.length) {
                     const serviceId = params.service_id__in
                     try {
                         const params = JSON.stringify({
-                            [serviceId]: serviceCheckList
+                            [serviceId]: serviceCheckList,
                         })
                         base64ServiceFields = window.btoa(params)
                     } catch (error) {
@@ -260,7 +260,7 @@
                 }
                 const { resolved } = this.$router.resolve({
                     path: `${window.SITE_URL}api/ticket/receipts/export_group_by_service/`,
-                    query: params
+                    query: params,
                 })
                 const url = resolved.fullPath + (base64ServiceFields ? `&service_fields=${base64ServiceFields}` : '')
                 console.log(url)
@@ -275,25 +275,27 @@
             getServiceFieldList (serviceId) {
                 this.exportInfo.serviceFieldLoading = true
                 const params = {
-                    service_id: serviceId
+                    service_id: serviceId,
                 }
                 return this.$store.dispatch('change/getSubmitFields', params).then(async (res) => {
                     const disabledTypes = ['TABLE', 'CUSTOMTABLE', 'FILE'] // 不能导出的字段
                     this.exportInfo.serviceFieldsList = res.data.map(field => ({
                         id: field.key,
                         name: field.name,
-                        disabled: disabledTypes.includes(field.type)
+                        disabled: disabledTypes.includes(field.type),
                     }))
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.exportInfo.serviceFieldLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.exportInfo.serviceFieldLoading = false
+                    })
             },
             onServiceChange (id) {
                 this.getServiceFieldList(id)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

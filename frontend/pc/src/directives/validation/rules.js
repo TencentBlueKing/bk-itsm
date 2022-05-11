@@ -42,12 +42,11 @@ function limit (val, limitation) {
     // 根据传入的长度判断传入的值是否符合要求
     if (val.toString().length > ~~limitation) {
         return false
-    } else {
-        return true
     }
+    return true
 }
 
 export default {
     notEmpty,
-    limit
+    limit,
 }

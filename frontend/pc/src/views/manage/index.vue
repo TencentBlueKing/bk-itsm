@@ -27,6 +27,6 @@
 </template>
 <script>
     export default {
-        name: 'ManagePage'
+        name: 'ManagePage',
     }
 </script>

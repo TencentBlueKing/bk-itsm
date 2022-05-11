@@ -192,8 +192,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -203,39 +203,39 @@
                     isShow: false,
                     searchKey: '',
                     list: [],
-                    listLoading: false
+                    listLoading: false,
                 },
                 taskConfig: {
                     createId: '',
                     handleId: '',
                     waitTask: true,
-                    execute_can_create: true
+                    execute_can_create: true,
                 },
                 taskConfigRule: {
                     createId: [
                         {
                             required: true,
-                            message: this.$t(`m.taskTemplate['请选择节点']`),
-                            trigger: 'blur'
-                        }
+                            message: this.$t('m.taskTemplate[\'请选择节点\']'),
+                            trigger: 'blur',
+                        },
                     ],
                     handleId: [
                         {
                             required: true,
-                            message: this.$t(`m.taskTemplate['请选择节点']`),
-                            trigger: 'blur'
-                        }
-                    ]
+                            message: this.$t('m.taskTemplate[\'请选择节点\']'),
+                            trigger: 'blur',
+                        },
+                    ],
                 },
                 createList: [],
                 handleList: [],
-                handleListLoading: false
+                handleListLoading: false,
             }
         },
         computed: {
-            citeList: function () {
+            citeList () {
                 return this.taskDialogInfo.list.filter(trigger => trigger.checked)
-            }
+            },
         },
         async mounted () {
             await this.initData()
@@ -263,11 +263,13 @@
             async getNodeList () {
                 await this.$store.dispatch('deployCommon/getStates', { workflow: this.workflowInfo.id }).then(res => {
                     this.createList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             // 选择创建节点的回调
             async getPostNodes () {
@@ -280,11 +282,13 @@
                 this.taskConfig.handleId = ''
                 await this.$store.dispatch('deployCommon/getOrderedStates', { id: this.taskConfig.createId }).then(res => {
                     this.handleList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.handleListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.handleListLoading = false
+                    })
             },
             // 全选函数
             selectAllFn () {
@@ -310,61 +314,61 @@
             delTask (index) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.taskTemplate['确认删除该任务？']`),
-                    subTitle: this.$t(`m.taskTemplate['一旦删除，与任务相关的触发动作将会一并删除。']`),
+                    title: this.$t('m.taskTemplate[\'确认删除该任务？\']'),
+                    subTitle: this.$t('m.taskTemplate[\'一旦删除，与任务相关的触发动作将会一并删除。\']'),
                     confirmFn: () => {
                         this.boundTaskList.splice(index, 1)
-                    }
+                    },
                 })
             },
             async getPublicTaskList () {
                 const params = {
                     name__icontains: this.taskDialogInfo.searchKey,
                     // component_type: 'NORMAL',
-                    is_draft: false
+                    is_draft: false,
                 }
                 this.taskDialogInfo.listLoading = true
                 await this.$store.dispatch('taskTemplate/getTemplateList', params).then(res => {
-                    this.taskDialogInfo.list = res.data.map(pubTask => {
-                        return {
-                            ...pubTask,
-                            checked: false
-                        }
-                    })
+                    this.taskDialogInfo.list = res.data.map(pubTask => ({
+                        ...pubTask,
+                        checked: false,
+                    }))
                     // 流程未关联业务，则不显示标准运维模板
                     if (!this.workflowInfo.is_biz_needed) {
                         this.taskDialogInfo.list = this.taskDialogInfo.list.filter(template => template.component_type !== 'SOPS')
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.taskDialogInfo.listLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.taskDialogInfo.listLoading = false
+                    })
             },
             toTaskPage () {
                 this.$router.push({ name: 'TaskTemplate' })
             },
             initDialogInfo () {
-                this.taskDialogInfo.isShow = false;
+                this.taskDialogInfo.isShow = false
                 this.taskDialogInfo.searchKey = ''
             },
             searchInfo () {
                 this.getPublicTaskList()
             },
             clearSearch () {
-                this.taskDialogInfo.searchKey = '';
+                this.taskDialogInfo.searchKey = ''
                 this.getPublicTaskList()
             },
             async checkData () {
-                let valid = true;
+                let valid = true
                 if (this.$refs.taskForm) {
                     await this.$refs.taskForm.validate().then(() => {}, () => {
                         valid = false
                     })
                 }
                 return valid
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -78,7 +78,7 @@
         name: 'Palette',
         mounted () {
             // this.$emit('registerPaletteEvent')
-        }
+        },
     }
 </script>
 <style lang="scss" scoped>

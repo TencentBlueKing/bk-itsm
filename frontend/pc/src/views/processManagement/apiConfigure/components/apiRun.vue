@@ -106,7 +106,7 @@
     export default {
         components: {
             apiRunConfig,
-            ace
+            ace,
         },
         mixins: [mixins],
         props: {
@@ -114,8 +114,8 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -125,24 +125,24 @@
                     height: 300,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 reqDataProcess: {
                     value: '',
                     width: '100%',
                     height: 300,
                     fullScreen: true,
-                    lang: 'python'
+                    lang: 'python',
                 },
                 dataProcess: {
                     value: '',
                     width: '100%',
                     height: 300,
                     fullScreen: true,
-                    lang: 'python'
+                    lang: 'python',
                 },
                 // 是否执行成功
-                isSuccess: true
+                isSuccess: true,
             }
         },
         computed: {},
@@ -163,28 +163,28 @@
             editorInitAfter (val) {
             },
             async updateApi () {
-                if (this.secondClick || !this.apiDetailInfoCommon['treeDataList'] || !this.apiDetailInfoCommon['responseTreeDataList']) {
+                if (this.secondClick || !this.apiDetailInfoCommon.treeDataList || !this.apiDetailInfoCommon.responseTreeDataList) {
                     return
                 }
                 try {
                     // 2.重置数据 参数和返回数据统一
                     const resData = JSON.parse(this.alarmDetailConfig.value)
-                    this.apiDetailInfoCommon['bodyJsonschemaData'] = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value))
-                    this.apiDetailInfoCommon['resJsonschemaData'] = this.jsonToJsonschema(resData || {})
+                    this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value))
+                    this.apiDetailInfoCommon.resJsonschemaData = this.jsonToJsonschema(resData || {})
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
-                        theme: 'error'
+                        theme: 'error',
                     })
                     return
                 }
                 // body Jsonschema数据结构
-                this.apiDetailInfoCommon['req_body'] = this.apiDetailInfoCommon['bodyJsonschemaData']['root'] // root初始 Jsonschema数据结构
+                this.apiDetailInfoCommon.req_body = this.apiDetailInfoCommon.bodyJsonschemaData.root // root初始 Jsonschema数据结构
                 // response Jsonschema数据结构
-                this.apiDetailInfoCommon['rsp_data'] = this.apiDetailInfoCommon['resJsonschemaData']['root'] // root初始 Jsonschema数据结构
+                this.apiDetailInfoCommon.rsp_data = this.apiDetailInfoCommon.resJsonschemaData.root // root初始 Jsonschema数据结构
                 // 删除多重数据
-                await delete this.apiDetailInfoCommon['treeDataList']
-                await delete this.apiDetailInfoCommon['responseTreeDataList']
+                await delete this.apiDetailInfoCommon.treeDataList
+                await delete this.apiDetailInfoCommon.responseTreeDataList
 
                 const params = this.apiDetailInfoCommon
                 if (params.req_body.required.length === 0) {
@@ -195,17 +195,19 @@
                 this.secondClick = true
                 await this.$store.dispatch('apiRemote/put_remote_api', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["更新成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.systemConfig["更新成功"]'),
+                        theme: 'success',
                     })
                     this.getRemoteApiDetail(this.apiDetailInfoCommon.id)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
+            },
+        },
     }
 </script>
 

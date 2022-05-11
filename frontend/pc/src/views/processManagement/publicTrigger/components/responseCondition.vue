@@ -67,27 +67,27 @@
     export default {
         name: 'responseCondition',
         components: {
-            responseContent
+            responseContent,
         },
         props: {
             responseWayList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             responseList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
-            signal: String
+            signal: String,
         },
         data () {
             return {
                 wayList: [],
-                apiList: []
+                apiList: [],
             }
         },
         created () {
@@ -101,9 +101,9 @@
                     performData: {
                         runMode: 'BACKEND',
                         displayName: '',
-                        repeat: 'one'
+                        repeat: 'one',
                     },
-                    isLoading: false
+                    isLoading: false,
                 })
             },
             deleteResponse (item, index) {
@@ -123,8 +123,8 @@
                 setTimeout(() => {
                     arguments[2].isLoading = false
                 }, 1000)
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -57,7 +57,7 @@
         name: 'sopsTask',
         components: {
             sopsGetParam,
-            DevopsPreview
+            DevopsPreview,
         },
         props: {
             ticketInfo: Object,
@@ -67,12 +67,12 @@
             constantDefaultValue: Object,
             pipelineList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             pipelineRules: Object,
             workflow: [Number, String],
             pipelineStages: Array,
-            pipelineConstants: Array
+            pipelineConstants: Array,
         },
         data () {
             return {
@@ -83,16 +83,16 @@
                         id: '',
                         bk_biz_id: '',
                         name: '',
-                        from_cmdb: true
+                        from_cmdb: true,
                     },
                     bk_biz_id: '',
-                    site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS
+                    site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS,
                 },
                 isHook: false,
                 isEdit: false,
                 stateList: [],
                 pipelineFormList: [],
-                pipelineData: {} // 流水线参数
+                pipelineData: {}, // 流水线参数
             }
         },
         watch: {
@@ -100,7 +100,7 @@
                 val.map(item => {
                     this.$set(this.pipelineData, item.key, item.value)
                 })
-            }
+            },
         },
         mounted () {
             this.getRelatedFields()
@@ -110,14 +110,16 @@
                 const params = {
                     workflow: this.workflow,
                     state: this.nodeInfo.state_id,
-                    field: ''
+                    field: '',
                 }
                 await this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
                     this.stateList = res.data
-                }).catch(res => {
-                    console.log(res)
-                }).finally(() => {
                 })
+                    .catch(res => {
+                        console.log(res)
+                    })
+                    .finally(() => {
+                    })
             },
             reSetSopTask () {
                 this.changeBtn = !this.changeBtn
@@ -134,12 +136,12 @@
                 const params = {
                     inputs: {},
                     is_direct: true,
-                    state_id: this.nodeInfo.state_id
+                    state_id: this.nodeInfo.state_id,
                 }
                 this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m["忽略完成"]`),
-                        theme: 'success'
+                        message: this.$t('m["忽略完成"]'),
+                        theme: 'success',
                     })
                     this.$emit('reloadTicket')
                 })
@@ -147,8 +149,8 @@
             retry (params) {
                 this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["提交成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["提交成功"]'),
+                        theme: 'success',
                     })
                     this.changeBtn = false
                     this.$emit('reloadTicket')
@@ -157,15 +159,15 @@
             submit () {
                 const params = {
                     inputs: {},
-                    state_id: this.nodeInfo.state_id
+                    state_id: this.nodeInfo.state_id,
                 }
                 if (this.nodeInfo.type === 'TASK-SOPS') {
                     if (!this.$refs.sopsGetParam.getRenderFormValidate()) return
                     const biz = {
-                        name: this.$t(`m.treeinfo["业务"]`),
+                        name: this.$t('m.treeinfo["业务"]'),
                         value: this.nodeInfo.projectId || 2,
                         key: 1,
-                        value_type: 'custom'
+                        value_type: 'custom',
                     }
                     const { exclude_task_nodes_id, template_id, template_source } = this.nodeInfo.contexts.task_params
                     const formData = this.constants.map(item => {
@@ -176,39 +178,37 @@
                             key: item.key,
                             value: this.hookedVarList[formKey] ? this.$refs.sopsGetParam.formData[formKey].slice(2, this.$refs.sopsGetParam.formData[formKey].length - 1) : this.$refs.sopsGetParam.formData[formKey],
                             value_type: vt,
-                            is_quoted: this.hookedVarList[formKey]
+                            is_quoted: this.hookedVarList[formKey],
                         }
                     })
                     params.inputs = {
-                        'bk_biz_id': biz,
+                        bk_biz_id: biz,
                         template_id,
-                        'constants': formData,
+                        constants: formData,
                         exclude_task_nodes_id,
-                        template_source
+                        template_source,
                     }
                     this.retry(params)
                 } else {
                     this.$refs.devopsVariable.validate().then(res => {
-                        const constants = Object.keys(this.$refs.devopsVariable.model).map(item => {
-                            return {
-                                'value': this.$refs.devopsVariable.model[item],
-                                'name': item,
-                                'key': item
-                            }
-                        })
+                        const constants = Object.keys(this.$refs.devopsVariable.model).map(item => ({
+                            value: this.$refs.devopsVariable.model[item],
+                            name: item,
+                            key: item,
+                        }))
                         const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id')
                         const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id')
                         params.inputs = {
-                            'username': window.username,
+                            username: window.username,
                             project_id,
                             pipeline_id,
-                            constants
+                            constants,
                         }
                         this.retry(params)
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

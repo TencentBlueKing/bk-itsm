@@ -131,13 +131,13 @@
     export default {
         name: 'AssociatedTab',
         components: {
-            AssociatedDialog
+            AssociatedDialog,
         },
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -150,10 +150,10 @@
                     headerPosition: 'left',
                     autoClose: false,
                     precision: 0,
-                    title: this.$t('m.newCommon["绑定历史"]')
+                    title: this.$t('m.newCommon["绑定历史"]'),
                 },
                 historyList: [],
-                associatedList: []
+                associatedList: [],
             }
         },
         created () {
@@ -166,7 +166,7 @@
         methods: {
             async getAssociates () {
                 const params = {
-                    id: this.ticketInfo.id
+                    id: this.ticketInfo.id,
                 }
                 this.loading = true
                 if (this.$route.query.token) {
@@ -174,11 +174,13 @@
                 }
                 await this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
                     this.associatedList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             closeSideslider () {
                 this.$bkInfo({
@@ -195,20 +197,21 @@
                     },
                     cancelFn: () => {
                         this.isShowAddAssociation = true
-                    }
+                    },
                 })
             },
             // 获取关联历史
             getAssociatesHistory () {
                 const params = {
                     id: this.ticketInfo.id,
-                    type: 'DERIVE'
+                    type: 'DERIVE',
                 }
                 this.$store.dispatch('change/getBindHistory', params).then(res => {
                     this.historyList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             openAddAssociation () {
                 this.isShowAddAssociation = true
@@ -227,8 +230,8 @@
                     name: 'TicketDetail',
                     query: {
                         id: `${rowData.id}`,
-                        from: this.$route.query.from
-                    }
+                        from: this.$route.query.from,
+                    },
                 })
                 window.open(routeUrl.href, '_blank')
             },
@@ -240,32 +243,34 @@
                     subTitle: this.$t('m.manageCommon["取消关联后，无法查看之间的关联信息"]'),
                     confirmFn: () => {
                         this.unBind(item)
-                    }
+                    },
                 })
             },
             async unBind (item) {
                 const params = {
                     from_ticket: this.ticketInfo.id,
-                    to_ticket: item.id
+                    to_ticket: item.id,
                 }
                 await this.$store.dispatch('change/unbindTicket', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.manageCommon["取消关联成功"]'),
-                        theme: 'success'
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.getAssociates()
-                    this.getAssociatesHistory()
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.getAssociates()
+                        this.getAssociatesHistory()
+                    })
             },
             submitSuccess () {
                 this.isShowAddAssociation = false
                 this.getAssociates()
                 this.getAssociatesHistory()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

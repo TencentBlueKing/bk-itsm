@@ -288,7 +288,7 @@
     export default {
         components: {
             templateNode,
-            commonTriggerList
+            commonTriggerList,
         },
         mixins: [apiFieldsWatch, commonMix],
         props: {
@@ -296,14 +296,14 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             flowInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -312,12 +312,12 @@
                 booleanList: [
                     {
                         id: '1',
-                        name: 'true'
+                        name: 'true',
                     },
                     {
                         id: '0',
-                        name: 'false'
-                    }
+                        name: 'false',
+                    },
                 ],
                 widthStatus: 0,
                 scrollTopStatus: 0,
@@ -336,10 +336,10 @@
                         {
                             type: 'and',
                             expressions: [
-                                { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: [] }
-                            ]
-                        }
-                    ]
+                                { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: [] },
+                            ],
+                        },
+                    ],
                 },
                 // 显示隐藏条件组关系
                 templateList: [],
@@ -348,7 +348,7 @@
                 // 剔除type的数组数据
                 globalTypeList: ['SELECT', 'MULTISELECT', 'RADIO', 'CHECKBOX', 'MEMBERS', 'TREESELECT'],
                 // 校验
-                rules: {}
+                rules: {},
             }
         },
         computed: {
@@ -357,15 +357,15 @@
             },
             openFunction () {
                 return this.$store.state.openFunction
-            }
+            },
         },
         watch: {
             fieldList: {
-                handler: function (newVal, oldVal) {
+                handler (newVal, oldVal) {
                     this.dealList()
                 },
-                deep: true
-            }
+                deep: true,
+            },
         },
         mounted () {
             this.initData()
@@ -397,7 +397,7 @@
                     this.widthStatus += 1
                 }
                 // 初始化赋值
-                this.lineInfo.name = this.customLine.lineValue.name === this.$t(`m.treeinfo['默认']`) ? '' : this.customLine.lineValue.name
+                this.lineInfo.name = this.customLine.lineValue.name === this.$t('m.treeinfo[\'默认\']') ? '' : this.customLine.lineValue.name
                 this.lineInfo.condition_type = this.customLine.lineValue.condition_type
                 this.lineInfo.between = this.customLine.lineValue.condition.type
                 this.lineInfo.expressions = JSON.parse(JSON.stringify(this.customLine.lineValue.condition.expressions))
@@ -429,24 +429,26 @@
             // 获取关系模板
             getBetweenTemplate () {
                 const params = {
-                    workflow: this.customLine.lineValue.workflow
+                    workflow: this.customLine.lineValue.workflow,
                 }
                 this.$store.dispatch('deployCommon/getLineTemplate', params).then((res) => {
                     this.templateList = res.data.items
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             async getRpcData (item) {
                 await this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
                     item.choice = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取字段值选项
             getFieldList () {
-                const id = this.customLine.lineValue.id
+                const { id } = this.customLine.lineValue
                 this.isDataLoading = true
                 this.$store.dispatch('deployCommon/getLineField', { id }).then((res) => {
                     this.fieldList = res.data
@@ -455,13 +457,15 @@
                             this.getRpcData(item)
                         }
                     })
-                    this.isNecessaryToWatch({ 'fields': this.fieldList }, 'workflow')
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'workflow')
                     this.dealList()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             dealList () {
                 this.lineInfo.expressions.forEach(item => {
@@ -478,7 +482,7 @@
                                     info.choice.forEach(infoChoice => {
                                         node.choiceList.push({
                                             id: infoChoice.key,
-                                            name: infoChoice.name
+                                            name: infoChoice.name,
                                         })
                                     })
                                     if (node.type === 'MULTISELECT' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT') {
@@ -512,9 +516,9 @@
                         type: 'and',
                         checkInfo: false,
                         expressions: [
-                            { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING') }
-                        ]
-                    }
+                            { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING') },
+                        ],
+                    },
                 ]
             },
             // 字段间关系
@@ -528,12 +532,10 @@
                 nodeItem.source = nodeItem.source || 'field'
                 nodeItem.type = checkItem.type
                 if (this.globalTypeList.some(item => item === nodeItem.type)) {
-                    nodeItem.choiceList = checkItem.choice.map(choice => {
-                        return {
-                            id: choice.key,
-                            name: choice.name
-                        }
-                    })
+                    nodeItem.choiceList = checkItem.choice.map(choice => ({
+                        id: choice.key,
+                        name: choice.name,
+                    }))
                     this.$set(nodeItem, 'multiSelect', !(nodeItem.type === 'SELECT' || nodeItem.type === 'RADIO'))
                 } else {
                     nodeItem.choiceList = ''
@@ -550,8 +552,8 @@
                     type: 'and',
                     checkInfo: false,
                     expressions: [
-                        { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING') }
-                    ]
+                        { condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING') },
+                    ],
                 }
                 this.lineInfo.expressions.push(value)
             },
@@ -564,7 +566,7 @@
             // 新增字段条件组
             addNode (item, index) {
                 const value = {
-                    condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING')
+                    condition: '', key: '', value: '', choiceList: '', type: 'STRING', betweenList: this.checkBetweenList('STRING'),
                 }
                 item.expressions.splice(index + 1, 0, value)
             },
@@ -578,9 +580,7 @@
             submitLine () {
                 if (this.lineInfo.condition_type === 'by_field') {
                     this.lineInfo.expressions.forEach(item => {
-                        item.checkInfo = item.expressions.some(node => {
-                            return (!node.condition || !node.key || (Array.isArray(node.value) ? !node.value.length : !node.value))
-                        })
+                        item.checkInfo = item.expressions.some(node => (!node.condition || !node.key || (Array.isArray(node.value) ? !node.value.length : !node.value)))
                     })
                     const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo)
                     if (checkStatus) {
@@ -605,18 +605,18 @@
                     condition_type: this.lineInfo.condition_type,
                     condition: {
                         expressions: [],
-                        type: this.lineInfo.between
+                        type: this.lineInfo.between,
                     },
                     from_state: this.customLine.lineValue.from_state,
                     to_state: this.customLine.lineValue.to_state,
-                    workflow: this.customLine.lineValue.workflow
+                    workflow: this.customLine.lineValue.workflow,
                 }
                 // 将choiceList的数据清空
                 this.lineInfo.expressions.forEach((item, index) => {
                     lineParams.condition.expressions.push({
                         checkInfo: item.checkInfo,
                         expressions: [],
-                        type: item.type
+                        type: item.type,
                     })
                 })
                 this.lineInfo.expressions.forEach((item, index) => {
@@ -628,22 +628,24 @@
                             source: node.source,
                             type: node.type,
                             value: this.formattingData(node),
-                            meta: node.meta
+                            meta: node.meta,
                         })
                     })
                 })
-                const id = this.customLine.lineValue.id
+                const { id } = this.customLine.lineValue
                 this.$store.dispatch('deployCommon/updateLine', { lineParams, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["配置成功！"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["配置成功！"]'),
+                        theme: 'success',
                     })
                     this.$emit('submitLine', res.data)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             closeLine () {
                 this.$emit('closeLine')
@@ -663,8 +665,8 @@
                     name: this.lineInfo.name,
                     data: {
                         expressions: this.lineInfo.expressions,
-                        type: this.lineInfo.between
-                    }
+                        type: this.lineInfo.between,
+                    },
                 }
                 if (this.lineInfo.template) {
                     params.id = this.lineInfo.template
@@ -679,16 +681,18 @@
                 const templateUrl = this.lineInfo.template ? 'deployCommon/updateLineTemplate' : 'deployCommon/submitLineTemplate'
                 this.$store.dispatch(templateUrl, { params }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功！"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["保存成功！"]'),
+                        theme: 'success',
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
+            },
+        },
     }
 </script>
 

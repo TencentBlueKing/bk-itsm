@@ -29,9 +29,7 @@ const isCrossOrigin = isCrossOriginIFrame()
 const topWindow = isCrossOrigin ? window : window.top
 
 const instance = axios.create({
-    validateStatus: status => {
-        return status >= 200 && status <= 505
-    },
+    validateStatus: status => status >= 200 && status <= 505,
     baseURL: `${window.SITE_URL}api/`,
     // `headers` are custom headers to be sent
     headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -39,7 +37,7 @@ const instance = axios.create({
     xsrfCookieName: 'bkitsm_csrftoken',
     // cookie中的csrftoken信息名称
     xsrfHeaderName: 'X-CSRFToken',
-    withCredentials: true
+    withCredentials: true,
 })
 
 if (location.hash.indexOf('token') !== -1) {
@@ -55,30 +53,28 @@ instance.interceptors.request.use(config => {
     const token = sessionStorage.getItem('itsm_token')
     if (token && config.url.indexOf('ticket/') === 0) {
         const prefix = config.url.indexOf('?') === -1 ? '?' : '&'
-        config.url += prefix + `token=${token}`
+        config.url += `${prefix}token=${token}`
     }
     return config
-}, error => {
-    return Promise.reject(error)
-})
+}, error => Promise.reject(error))
 
 instance.interceptors.response.use(response => {
     // status >= 200 && status <= 505
     if ('result' in response.data && !response.data.result && 'message' in response.data) {
         window.app.$bkMessage({
             message: response.data.message,
-            theme: 'error'
+            theme: 'error',
         })
     }
     if (!response.data || typeof response.data === 'string') {
-        const msg = window.app.$t("m.js['接口请求异常，请联系管理员']")
-        console.warn(window.app.$t("m.js['接口异常，']"), window.app.$t('m.js[\'HTTP状态码：\']'), response.status)
+        const msg = window.app.$t('m.js[\'接口请求异常，请联系管理员\']')
+        console.warn(window.app.$t('m.js[\'接口异常，\']'), window.app.$t('m.js[\'HTTP状态码：\']'), response.status)
         if (!response.data) {
             console.error(msg)
         }
         response.data = {
             code: response.status,
-            msg: msg
+            msg,
         }
     } else if (response.status > 300) {
         if (response.status !== 499) {
@@ -88,7 +84,7 @@ instance.interceptors.response.use(response => {
         switch (response.status) {
             case 401:
                 // 登录控制
-                const data = response.data
+                const { data } = response
                 if (data.has_plain) {
                     topWindow.BLUEKING.corefunc.open_login_dialog(data.login_url, data.width, data.height, response.config.method)
                 }
@@ -108,9 +104,7 @@ instance.interceptors.response.use(response => {
                     viewType = 'project'
                     isViewApply = true
                 } else {
-                    isViewApply = permissions.actions.some(item => {
-                        return ['project_view', 'operational_data_view'].includes(item.id)
-                    })
+                    isViewApply = permissions.actions.some(item => ['project_view', 'operational_data_view'].includes(item.id))
                 }
                 if (isViewApply) {
                     bus.$emit('togglePermissionApplyPage', true, viewType, permissions)
@@ -125,7 +119,7 @@ instance.interceptors.response.use(response => {
         }
         response.data = {
             code: response.status,
-            msg: msg
+            msg,
         }
     }
 
@@ -154,9 +148,7 @@ instance.interceptors.response.use(response => {
     }
 
     return response
-}, error => {
-    return Promise.reject(error)
-})
+}, error => Promise.reject(error))
 
 Vue.prototype.$http = instance
 

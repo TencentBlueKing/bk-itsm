@@ -25,7 +25,7 @@
 </template>
 <script>
     export default {
-        name: 'Service'
+        name: 'Service',
     }
 </script>
 <style lang="scss">

@@ -118,7 +118,7 @@
     export default {
         name: 'Notice',
         components: {
-            editorNotice
+            editorNotice,
         },
         mixins: [permission],
         data () {
@@ -130,69 +130,69 @@
                 remindWayList: [
                     { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
                     { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
-                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') },
                 ],
                 noticeList: [],
                 // 先写死，后续添加自定义
                 noticeTypeLIST: [
                     { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
                     { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
-                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') },
                 ],
                 userByList: [
                     { id: 'TICKET', name: '单据' },
                     { id: 'SLA', name: 'SLA' },
-                    { id: 'TASK', name: '任务' }
+                    { id: 'TASK', name: '任务' },
                 ],
                 rules: {
                     noticeType: [
                         {
                             required: true,
                             message: '必选项',
-                            trigger: 'blur'
-                        }
+                            trigger: 'blur',
+                        },
                     ],
                     noticeAction: [
                         {
                             required: true,
                             message: '必选项',
-                            trigger: 'blur'
-                        }
+                            trigger: 'blur',
+                        },
                     ],
                     noticeUserBy: [
                         {
                             required: true,
                             message: '必选项',
-                            trigger: 'blur'
-                        }
-                    ]
+                            trigger: 'blur',
+                        },
+                    ],
                 },
                 actionList: [],
                 typeList: [],
                 formData: {
                     noticeType: '',
                     noticeAction: '',
-                    noticeUserBy: ''
+                    noticeUserBy: '',
                 },
                 formInfo: {},
                 isDataLoading: false,
                 searchNotice: '',
                 customRow: 5,
-                actionLoading: false
+                actionLoading: false,
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         watch: {
             acticeTab: {
                 handler (val) {
                     this.formData.noticeType = val
                 },
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         mounted () {
             this.getNoticeList()
@@ -208,7 +208,7 @@
                     this.actionList = []
                     this.formData.noticeAction = ''
                     const parmas = {
-                        used_by: val
+                        used_by: val,
                     }
                     const res = await this.$store.dispatch('project/getAction', parmas)
                     console.log(res)
@@ -217,7 +217,7 @@
                         for (const item in list) {
                             this.actionList.push({
                                 id: item,
-                                name: list[item]
+                                name: list[item],
                             })
                         }
                         console.log(this.actionList)
@@ -232,16 +232,18 @@
                 this.isDataLoading = true
                 const params = {
                     project_key: this.$route.query.project_id,
-                    notify_type: this.acticeTab
+                    notify_type: this.acticeTab,
                 }
                 if (isSearch) params.content_template__icontains = this.searchNotice
                 this.$store.dispatch('project/getProjectNotice', { params }).then((res) => {
                     this.noticeList = res.data
-                }).catch((res) => {
-                    console.log(res)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        console.log(res)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             submitNotice () {
                 Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(res => {
@@ -249,7 +251,7 @@
                     const params = {
                         title_template: title,
                         content_template: message,
-                        project_key: this.$route.query.project_id
+                        project_key: this.$route.query.project_id,
                     }
                     const url = this.isEdit ? 'project/updateProjectNotice' : 'project/addProjectNotice'
                     if (this.isEdit) params.id = this.editNoticeId
@@ -260,17 +262,18 @@
                     this.$store.dispatch(url, params).then(res => {
                         this.$bkMessage({
                             message: res.message,
-                            theme: 'success'
+                            theme: 'success',
                         })
                         this.isShowEdit = false
                         this.getNoticeList()
                         this.clearFromData()
-                    }).catch(e => {
-                        this.$bkMessage({
-                            message: e.data.message,
-                            theme: 'error'
-                        })
                     })
+                        .catch(e => {
+                            this.$bkMessage({
+                                message: e.data.message,
+                                theme: 'error',
+                            })
+                        })
                 })
             },
             clearFromData () {
@@ -278,7 +281,7 @@
                 this.formData.noticeUserBy = ''
                 this.$refs.editorNotice.formInfo = {
                     title: '',
-                    message: ''
+                    message: '',
                 }
             },
             closeNotice () {
@@ -299,7 +302,7 @@
                 this.formData.noticeAction = row.action
                 this.$refs.editorNotice.formInfo = {
                     title: row.title_template,
-                    message: row.content_template
+                    message: row.content_template,
                 }
                 this.isEdit = true
                 this.isShowEdit = true
@@ -312,17 +315,17 @@
                         this.$store.dispatch('project/deleteProjectNotice', row.id).then(res => {
                             this.$bkMessage({
                                 message: this.$t('m["删除成功"]'),
-                                theme: 'success'
+                                theme: 'success',
                             })
                             this.getNoticeList()
                         })
-                    }
+                    },
                 })
             },
             closeEditor () {
                 this.isShowEdit = false
-            }
-        }
+            },
+        },
     }
 
 </script>

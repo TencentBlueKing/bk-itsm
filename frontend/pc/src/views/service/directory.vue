@@ -50,21 +50,21 @@
     export default {
         components: {
             treeInfo,
-            treeTable
+            treeTable,
         },
         data () {
             return {
                 // 节点信息
                 treeInfo: {
-                    node: {}
-                }
+                    node: {},
+                },
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
-        }
+            },
+        },
     }
 </script>
 

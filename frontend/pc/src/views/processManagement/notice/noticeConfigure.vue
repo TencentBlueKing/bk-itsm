@@ -92,7 +92,7 @@
     export default {
         name: 'noticeConfigure',
         components: {
-            editorNotice
+            editorNotice,
         },
         mixins: [permission],
         data () {
@@ -101,7 +101,7 @@
                 remindWayList: [
                     { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
                     { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
-                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') },
                 ],
                 checkId: 'WEIXIN',
                 noticeList: [],
@@ -109,14 +109,14 @@
                     show: false,
                     title: this.$t('m.deployPage["编辑"]'),
                     width: 700,
-                    formInfo: {}
-                }
+                    formInfo: {},
+                },
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             this.getNoticeList()
@@ -126,15 +126,17 @@
             getNoticeList () {
                 this.isDataLoading = true
                 const params = {
-                    notify_type: this.checkId
+                    notify_type: this.checkId,
                 }
                 this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
                     this.noticeList = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             changeNotice (item, index) {
                 this.checkId = item.id
@@ -160,10 +162,10 @@
                     },
                     cancelFn: () => {
                         this.noticeInfo.show = true
-                    }
+                    },
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

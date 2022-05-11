@@ -202,7 +202,7 @@
         components: {
             VersionLog,
             CreateTicketDialog,
-            EditProjectDialog
+            EditProjectDialog,
         },
         inject: ['reload'],
         mixins: [permission],
@@ -224,9 +224,9 @@
                     name: '',
                     key: '',
                     desc: '',
-                    color: ''
+                    color: '',
                 },
-                editDialogFormDisable: false
+                editDialogFormDisable: false,
             }
         },
         computed: {
@@ -234,7 +234,7 @@
                 openFunction: state => state.openFunction,
                 systemPermission: state => state.common.systemPermission,
                 projectList: state => state.project.projectList,
-                projectListLoading: state => state.project.projectListLoading
+                projectListLoading: state => state.project.projectListLoading,
             }),
             // 顶部导航项
             topNav () {
@@ -270,7 +270,7 @@
                     }
                 })
                 return list
-            }
+            },
         },
         watch: {
             '$route.fullPath' () {
@@ -285,7 +285,7 @@
                 if (val) {
                     this.getProjectList()
                 }
-            }
+            },
         },
         created () {
             this.setActive()
@@ -326,7 +326,7 @@
                                 this.sideRouters = []
                             }
                             return true
-                        } else if (this.isMatchedByPrefix(nav.prefix)) {
+                        } if (this.isMatchedByPrefix(nav.prefix)) {
                             this.activeNav = nav.id
                             this.activeSideRouter = ''
                             this.sideRouters = nav.subRouters
@@ -356,7 +356,7 @@
                         if (this.$route.path === item.path || this.isMatchedByPrefix(item.prefix)) {
                             matched = {
                                 navId,
-                                sideRouterId: item.id
+                                sideRouterId: item.id,
                             }
                         }
                     }
@@ -384,9 +384,10 @@
                     const customList = res.data
                     this.$store.commit('changeMsg', customList)
                     this.$store.commit('changeCustom', customList)
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 头部导航点击
             async handleTopNavClick (router) {
@@ -438,7 +439,7 @@
                 this.$router.push({ name: 'ProjectList' })
             },
             onLogOut () {
-                location.href = window.login_url + '?c_url=' + window.location.href
+                location.href = `${window.login_url}?c_url=${window.location.href}`
             },
             // 切换项目
             onSelectProject (val) {
@@ -458,8 +459,8 @@
                     const resourceData = {
                         project: [{
                             id: project.key,
-                            name: project.name
-                        }]
+                            name: project.name,
+                        }],
                     }
                     this.applyForPermission([perm], project.auth_actions, resourceData)
                     return false
@@ -484,8 +485,8 @@
             },
             onProjectDialogCancel () {
                 this.isEditDialogShow = false
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

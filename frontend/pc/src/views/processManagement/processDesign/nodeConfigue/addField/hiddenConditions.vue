@@ -113,39 +113,39 @@
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             state: {
                 type: [String, Number],
                 default () {
                     return ''
-                }
+                },
             },
             formInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             templateStage: {
                 type: String,
-                default: ''
+                default: '',
             },
             templateInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             addOrigin: {
                 type: Object,
                 default () {
                     return {
                         isOther: false,
-                        addOriginInfo: {}
+                        addOriginInfo: {},
                     }
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -153,13 +153,13 @@
                 listInfo: [],
                 conditionType: 'and',
                 fieldList: [],
-                checkStatus: false
+                checkStatus: false,
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         mounted () {
             this.getFrontNodesList()
@@ -185,11 +185,13 @@
                 this.$store.dispatch(url, params).then(res => {
                     this.frontNodesList = res.data
                     this.initData()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             initData () {
                 // 初始化listInfo的数据
@@ -207,7 +209,7 @@
                                     choiceList: node.choice,
                                     type: item.type,
                                     multiSelect: nodeStatus,
-                                    betweenList: betweenList
+                                    betweenList,
                                 })
                             }
                         })
@@ -222,8 +224,8 @@
                             choiceList: '',
                             type: 'STRING',
                             multiSelect: false,
-                            betweenList: this.checkBetweenList('STRING')
-                        }
+                            betweenList: this.checkBetweenList('STRING'),
+                        },
                     ]
                     this.conditionType = 'and'
                 }
@@ -241,14 +243,15 @@
                         this.getRpcData(item)
                     }
                 })
-                this.isNecessaryToWatch({ 'fields': this.fieldList }, 'workflow')
+                this.isNecessaryToWatch({ fields: this.fieldList }, 'workflow')
             },
             getRpcData (item) {
                 this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
                     item.choice = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             checkBetweenList (typeValue) {
                 const listOne = ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'TREESELECT']
@@ -272,8 +275,8 @@
                         choiceList: '',
                         type: 'STRING',
                         multiSelect: false,
-                        betweenList: this.checkBetweenList('STRING')
-                    }
+                        betweenList: this.checkBetweenList('STRING'),
+                    },
                 ]
             },
             changeName (...value) {
@@ -289,7 +292,7 @@
                     checkItem.choice.forEach(node => {
                         value[2].choiceList.push({
                             key: node.key,
-                            name: node.name
+                            name: node.name,
                         })
                     })
                     value[2].multiSelect = nodeStatus
@@ -306,7 +309,7 @@
                     choiceList: '',
                     type: 'STRING',
                     multiSelect: false,
-                    betweenList: this.checkBetweenList('STRING')
+                    betweenList: this.checkBetweenList('STRING'),
                 }
                 this.listInfo.splice(index + 1, 0, value)
             },
@@ -319,8 +322,8 @@
             checkList () {
                 this.checkStatus = this.listInfo.some(item => (!item.key || !item.condition || (Array.isArray(item.value) ? !item.value.length : !item.value)))
                 return this.checkStatus
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -60,7 +60,7 @@
         name: 'commentItem',
         props: {
             curComment: Object,
-            commentList: Array
+            commentList: Array,
         },
         data () {
             return {
@@ -68,18 +68,18 @@
                 deleteCommentDialog: false,
                 isAgree: false,
                 timeFormat: {
-                    'seconds ago': this.$t(`m['秒钟前']`),
-                    'minutes ago': this.$t(`m['分钟前']`),
-                    'minute ago': this.$t(`m['分钟前']`),
-                    'hours ago': this.$t(`m['小时前']`),
-                    'hour ago': this.$t(`m['小时前']`),
-                    'days ago': this.$t(`m['天前']`),
-                    'day ago': this.$t(`m['天前']`),
-                    'months ago': this.$t(`m['月前']`),
-                    'month ago': this.$t(`m['月前']`),
-                    'years ago': this.$t(`m['年前']`),
-                    'year ago': this.$t(`m['年前']`)
-                }
+                    'seconds ago': this.$t('m[\'秒钟前\']'),
+                    'minutes ago': this.$t('m[\'分钟前\']'),
+                    'minute ago': this.$t('m[\'分钟前\']'),
+                    'hours ago': this.$t('m[\'小时前\']'),
+                    'hour ago': this.$t('m[\'小时前\']'),
+                    'days ago': this.$t('m[\'天前\']'),
+                    'day ago': this.$t('m[\'天前\']'),
+                    'months ago': this.$t('m[\'月前\']'),
+                    'month ago': this.$t('m[\'月前\']'),
+                    'years ago': this.$t('m[\'年前\']'),
+                    'year ago': this.$t('m[\'年前\']'),
+                },
             }
         },
         computed: {
@@ -96,21 +96,23 @@
                 const time = dayjs(timestamp).fromNow()
                 // 0 to 44 seconds
                 const timeStr = time.split(' ')[1]
-                const timeType = time.split(' ').slice(1, 3).join(' ')
+                const timeType = time.split(' ').slice(1, 3)
+                    .join(' ')
                 if (timeStr === 'few') {
-                    return this.$t(`m['刚刚']`)
+                    return this.$t('m[\'刚刚\']')
                 }
                 if (time.split(' ')[0] === 'an' || time.split(' '[0] === 'a')) {
-                    return 1 + ' ' + this.timeFormat[timeType]
+                    return `${1} ${this.timeFormat[timeType]}`
                 }
-                return time.split(' ')[0] + ' ' + this.timeFormat[timeType]
-            }
+                return `${time.split(' ')[0]} ${this.timeFormat[timeType]}`
+            },
         },
         methods: {
             randomHex () {
                 let authorbgc
                 do {
-                    authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')}`
+                    authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16)
+                        .padEnd(6, '0')}`
                 }
                 while (authorbgc === '#ffffff')
                 return authorbgc
@@ -133,8 +135,8 @@
             },
             jumpTargetComment (curComment) {
                 this.$emit('jumpTargetComment', curComment)
-            }
-        }
+            },
+        },
     }
 </script>
 

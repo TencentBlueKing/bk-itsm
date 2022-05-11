@@ -227,7 +227,7 @@
         components: {
             searchInfo,
             addAgreement,
-            EmptyTip
+            EmptyTip,
         },
         mixins: [permission],
         data () {
@@ -240,37 +240,37 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 搜索
                 moreSearch: [
                     {
-                        name: this.$t(`m.slaContent["协议名称"]`),
+                        name: this.$t('m.slaContent["协议名称"]'),
                         key: 'name',
-                        placeholder: this.$t(`m.slaContent["请输入协议名称"]`),
+                        placeholder: this.$t('m.slaContent["请输入协议名称"]'),
                         type: 'input',
                         typeKey: 'name',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.deployPage["更新人"]`),
+                        name: this.$t('m.deployPage["更新人"]'),
                         type: 'member',
                         typeKey: 'updated_by',
                         multiSelect: true,
                         value: [],
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.deployPage["启用状态"]`),
+                        name: this.$t('m.deployPage["启用状态"]'),
                         type: 'select',
                         typeKey: 'is_enabled',
                         value: '',
                         list: [
-                            { key: 0, name: this.$t(`m.deployPage["关闭"]`) },
-                            { key: 1, name: this.$t(`m.deployPage["启用"]`) }
-                        ]
-                    }
+                            { key: 0, name: this.$t('m.deployPage["关闭"]') },
+                            { key: 1, name: this.$t('m.deployPage["启用"]') },
+                        ],
+                    },
                 ],
                 searchToggle: false,
                 emailNotifyEventList: [],
@@ -282,37 +282,37 @@
                 changeInfo: {
                     isShow: false,
                     is_reply_need: true,
-                    info: {}
+                    info: {},
                 },
                 emptyTip: {
-                    title: this.$t(`m['当前项目下还没有 <SLA协议>']`),
-                    subTitle: this.$t(`m['SLA（即服务级别协议）是服务支撑团队与组织机构内最终用户之间的“服务合同”。通常，SLA 是通过定义所提供的服务必须遵守的质量标准以及交付服务的时间表来建立对服务和服务质量的清晰理解；加快服务响应时间、减少等待时长、降低运营成本，一套合理且适用的 SLA 将是您实现这些目标的最佳选择。']`),
+                    title: this.$t('m[\'当前项目下还没有 <SLA协议>\']'),
+                    subTitle: this.$t('m[\'SLA（即服务级别协议）是服务支撑团队与组织机构内最终用户之间的“服务合同”。通常，SLA 是通过定义所提供的服务必须遵守的质量标准以及交付服务的时间表来建立对服务和服务质量的清晰理解；加快服务响应时间、减少等待时长、降低运营成本，一套合理且适用的 SLA 将是您实现这些目标的最佳选择。\']'),
                     desc: [
                         {
                             src: require('../../images/illustration/apply.svg'),
-                            title: this.$t(`m['设计服务模式并制定协议']`),
-                            content: this.$t(`m['通常我们会先设定团队的服务时间段，然后进一步配置在规定的服务时间段内，针对不同的服务工单紧急程度约定响应和处理时长，为的是保障用户的服务体验、提升用户满意度。']`)
+                            title: this.$t('m[\'设计服务模式并制定协议\']'),
+                            content: this.$t('m[\'通常我们会先设定团队的服务时间段，然后进一步配置在规定的服务时间段内，针对不同的服务工单紧急程度约定响应和处理时长，为的是保障用户的服务体验、提升用户满意度。\']'),
                         },
                         {
                             src: require('../../images/illustration/start-service.svg'),
-                            title: this.$t(`m['为服务配置合适的 SLA']`),
-                            content: this.$t(`m['接下来就是为不同的服务配置合适的 SLA 了，因为很多服务的处理流程中可能会需要多个不同职能团队来处理，所以我们支持在一个服务内针对不同的流程区间设置差异化的服务协议，满足对不同服务团队的SLA要求。']`)
-                        }
+                            title: this.$t('m[\'为服务配置合适的 SLA\']'),
+                            content: this.$t('m[\'接下来就是为不同的服务配置合适的 SLA 了，因为很多服务的处理流程中可能会需要多个不同职能团队来处理，所以我们支持在一个服务内针对不同的流程区间设置差异化的服务协议，满足对不同服务团队的SLA要求。\']'),
+                        },
                     ],
                     links: [
                         {
-                            text: this.$t(`m['如何设计一套合理有效的 SLA ？']`),
-                            btn: this.$t(`m['产品白皮书']`),
-                            href: 'https://bk.tencent.com/docs/document/6.0/145/6594'
-                        }
-                    ]
-                }
+                            text: this.$t('m[\'如何设计一套合理有效的 SLA ？\']'),
+                            btn: this.$t('m[\'产品白皮书\']'),
+                            href: 'https://bk.tencent.com/docs/document/6.0/145/6594',
+                        },
+                    ],
+                },
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             this.getList(1)
@@ -335,7 +335,7 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.moreSearch.forEach(item => {
                     if (Array.isArray(item.value) ? !!item.value.length : item.value !== '') {
@@ -349,11 +349,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 获取数据
             getNoticeList (checkId) {
@@ -361,17 +363,17 @@
                 const checkIdL = checkId.toLowerCase()
                 const params = {
                     notify_type: checkId,
-                    used_by: 'SLA'
+                    used_by: 'SLA',
                 }
                 this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
-                    this[checkIdL + 'NotifyEventList'] = res.data.map(item => {
-                        return { id: item.id, name: item.action_name }
-                    })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
+                    this[`${checkIdL}NotifyEventList`] = res.data.map(item => ({ id: item.id, name: item.action_name }))
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -385,24 +387,26 @@
             // 获取服务模式列表数据
             getModelList () {
                 const params = {
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }
                 this.$store.dispatch('sla/getScheduleList', params).then(res => {
                     this.modelList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取单据高亮颜色
             getTicketHighlight () {
                 this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
                     this.highlightObj = data.items[0]
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             // 单据高亮设置确认
             HighlightSettingComfirm () {
@@ -410,29 +414,31 @@
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
                         this.$bkMessage({
-                            message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
-                            theme: 'success'
+                            message: data.msg || this.$t('m.slaContent[\'成功更新单据高亮颜色\']'),
+                            theme: 'success',
                         })
                     } else {
                         this.getTicketHighlight()
                     }
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             // 获取服务优先级
             getModelPriority () {
                 const params = {
-                    dict_table__key: 'PRIORITY'
+                    dict_table__key: 'PRIORITY',
                 }
                 this.$store.dispatch('slaManagement/getPriority', { params }).then(res => {
                     this.modelPriority = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             closeVersion () {
                 this.versionStatus = false
@@ -441,17 +447,17 @@
             addAgreement (item, reqPerm) {
                 const authResources = reqPerm === 'sla_agreement_create' ? this.$store.state.project.projectAuthActions : [...this.$store.state.project.projectAuthActions, ...item.auth_actions]
                 if (!this.hasPermission([reqPerm], authResources)) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
-                        }]
+                            name: projectInfo.name,
+                        }],
                     }
                     if (item.id) {
                         resourceData.sla_agreement = [{
                             id: item.id,
-                            name: item.name
+                            name: item.name,
                         }]
                     }
                     this.applyForPermission([reqPerm], reqPerm === 'sla_agreement_create' ? [] : [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
@@ -463,7 +469,7 @@
                         this.changeInfo.is_reply_need = true
                         this.changeInfo.info = {
                             action_policies: [],
-                            policies: []
+                            policies: [],
                         }
                     }
                     this.changeInfo.isShow = true
@@ -475,40 +481,42 @@
             // 删除
             deleteAgreement (item) {
                 if (!this.hasPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const projectInfo = this.$store.state.project.projectInfo
+                    const { projectInfo } = this.$store.state.project
                     const resourceData = {
                         project: [{
                             id: projectInfo.key,
-                            name: projectInfo.name
+                            name: projectInfo.name,
                         }],
                         sla_agreement: [{
                             id: item.id,
-                            name: item.name
-                        }]
+                            name: item.name,
+                        }],
                     }
                     this.applyForPermission(['sla_agreement_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确定删除该服务协议？"]`),
+                        title: this.$t('m.slaContent["确定删除该服务协议？"]'),
                         confirmFn: () => {
-                            const id = item.id
+                            const { id } = item
                             if (this.secondClick) {
                                 return
                             }
                             this.secondClick = true
                             this.$store.dispatch('slaManagement/deleteProtocol', id).then((res) => {
                                 this.$bkMessage({
-                                    message: this.$t(`m.systemConfig["删除成功"]`),
-                                    theme: 'success'
+                                    message: this.$t('m.systemConfig["删除成功"]'),
+                                    theme: 'success',
                                 })
                                 this.getList(1)
-                            }).catch((res) => {
-                                errorHandler(res, this)
-                            }).finally(() => {
-                                this.secondClick = false
                             })
-                        }
+                                .catch((res) => {
+                                    errorHandler(res, this)
+                                })
+                                .finally(() => {
+                                    this.secondClick = false
+                                })
+                        },
                     })
                 }
             },
@@ -525,8 +533,8 @@
                     item.value = item.multiSelect ? [] : ''
                 })
                 this.getList(1)
-            }
-        }
+            },
+        },
     }
 </script>
 

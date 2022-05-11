@@ -130,26 +130,26 @@
         props: {
             historyId: {
                 type: [String, Number],
-                default: ''
+                default: '',
             },
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 loading: false,
                 historyInfo: '',
-                activeName: 'send_email_message'
+                activeName: 'send_email_message',
             }
         },
         computed: {
@@ -159,12 +159,12 @@
                     temp = this.historyInfo.fields[1].apiContent.bodyTableData.filter(item => item.isShow)
                 }
                 return temp
-            }
+            },
         },
         watch: {
-            historyId: function () {
+            historyId () {
                 this.getDetail()
-            }
+            },
         },
         async created () {
             await this.getDetail()
@@ -199,11 +199,13 @@
                             field.value = JSON.parse(JSON.stringify(field.value)).members.replace(/^(\s|,)+|(\s|,)+$/g, '')
                         }
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading = false
+                    })
             },
             giveSignalInfo () {
                 let senderName = ''
@@ -235,28 +237,26 @@
             },
             giveApiData () {
                 const params = {
-                    id: this.historyInfo.fields[0].value
+                    id: this.historyInfo.fields[0].value,
                 }
                 this.$store.dispatch('apiRemote/get_remote_api_detail', params).then(res => {
                     const backValue = res.data
                     this.historyInfo.fields.forEach(async field => {
                         if (field.key === 'api_source') {
-                            field.value = backValue.remote_system_name + '/' + backValue.name
+                            field.value = `${backValue.remote_system_name}/${backValue.name}`
                         } else {
                             this.$set(field, 'apiContent', backValue)
                             this.$set(field.apiContent, 'bodyTableData', [])
                             this.$set(field.apiContent, 'treeDataList', {})
                             field.apiContent.treeDataList = await this.jsonschemaToList({
-                                root: JSON.parse(JSON.stringify(field.apiContent.req_body))
+                                root: JSON.parse(JSON.stringify(field.apiContent.req_body)),
                             })
                             // 如果数据已经存在，则进行表格初始化赋值
                             if (field.value) {
                                 field.apiContent.treeDataList = this.jsonValueTreeList(field.value, JSON.parse(JSON.stringify(field.apiContent.treeDataList)))
                             }
                             // 生成table表格数据
-                            field.apiContent.bodyTableData = await this.treeToTableList(
-                                JSON.parse(JSON.stringify(field.apiContent.treeDataList[0].children))
-                            )
+                            field.apiContent.bodyTableData = await this.treeToTableList(JSON.parse(JSON.stringify(field.apiContent.treeDataList[0].children)))
                             const bodyTableData = JSON.parse(JSON.stringify(field.apiContent.bodyTableData))
                             // 加入/引用变量
                             bodyTableData.forEach(item => {
@@ -269,18 +269,15 @@
                             field.apiContent.bodyTableData = await bodyTableData
                         }
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             jsonValueTreeList (jsonData, treeDataList) {
                 const listToJsonStep = function (lastObject, insertObject, key, item, lastType) {
                     if (lastType === 'object') {
-                        const reqData = insertObject.filter(
-                            ite => {
-                                return ite.key === key
-                            }
-                        )
+                        const reqData = insertObject.filter(ite => ite.key === key)
                         if (!reqData.length) {
                             return
                         }
@@ -301,15 +298,11 @@
                                 listToJsonStep(reqData[0], reqData[0].children, j, item[j], 'object')
                             }
                         } else {
-                            reqData[0]['value'] = item
+                            reqData[0].value = item
                         }
                     } else if (lastType === 'array') {
                         if (item.constructor.name.toLowerCase() === 'array') {
-                            const reqData = insertObject.filter(
-                                ite => {
-                                    return ite.key === key
-                                }
-                            )
+                            const reqData = insertObject.filter(ite => ite.key === key)
                             if (!reqData.length) {
                                 return
                             }
@@ -328,31 +321,23 @@
                                 listToJsonStep(insertObject, insertObject.children, j, item[j], 'object')
                             }
                         } else {
-                            insertObject['value'] = item
+                            insertObject.value = item
                         }
                     }
                 }
                 for (const key in jsonData) {
-                    listToJsonStep(treeDataList[0], treeDataList[0]['children'], key, jsonData[key], 'object', 0)
+                    listToJsonStep(treeDataList[0], treeDataList[0].children, key, jsonData[key], 'object', 0)
                 }
                 return treeDataList
             },
             recordChildren (tableData, levelInitial) {
-                const levelList = tableData.map(
-                    item => {
-                        return item['level']
-                    }
-                )
+                const levelList = tableData.map(item => item.level)
                 const maxLevel = Math.max(...levelList)
                 const recordChildrenStep = function (tableData, item) {
-                    tableData.filter(ite => {
-                        return (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString())
-                    })[0].children.push(item)
+                    tableData.filter(ite => (ite.level === item.level - 1 && ite.primaryKey === item.parentPrimaryKey && ite.ancestorsList.toString() === item.ancestorsList.slice(0, -1).toString()))[0].children.push(item)
                 }
                 for (let i = maxLevel; i > (levelInitial || 0); i--) {
-                    tableData.filter(item => {
-                        return item.level === i
-                    }).forEach(ite => {
+                    tableData.filter(item => item.level === i).forEach(ite => {
                         recordChildrenStep(tableData, ite)
                     })
                 }
@@ -379,8 +364,8 @@
             },
             changPanel (name) {
                 this.activeName = name
-            }
-        }
+            },
+        },
     }
 </script>
 

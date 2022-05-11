@@ -102,45 +102,45 @@
             'CW-FILE': file,
             'CW-CASCADE': cascade,
             'CW-SOPS_TEMPLATE': sopsTemplate,
-            'CW-DEVOPS_TEMPLATE': devopsTemplate
+            'CW-DEVOPS_TEMPLATE': devopsTemplate,
         },
         mixins: [apiFieldsWatch, commonMix],
         props: {
             fields: {
                 type: Array,
                 required: true,
-                default: () => []
+                default: () => [],
             },
             // fields 往往指的是单节点上的字段列表，allFields 表示所有节点上的字段列表
             allFieldList: {
                 type: Array,
-                default: () => []
+                default: () => [],
             },
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             origin: {
                 type: String,
-                default: 'normal'
+                default: 'normal',
             },
             typeInfo: {
                 type: String,
                 default () {
                     return ''
-                }
+                },
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 rotate: false,
-                labelWidth: 200
+                labelWidth: 200,
             }
         },
         created () {
@@ -168,9 +168,10 @@
                 this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
                     item.choice = res.data
                     item.val = ''
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 字段值进行装换
             fieldChange () {
@@ -181,7 +182,7 @@
                 const checks = []
                 this.fields.forEach((item, index) => {
                     if (item.type === 'SOPS_TEMPLATE' || item.type === 'DEVOPS_TEMPLATE') {
-                        checks.push(this.$refs['component' + index][0].validate())
+                        checks.push(this.$refs[`component${index}`][0].validate())
                     }
                 })
                 return checks.every(check => !!check)
@@ -207,9 +208,7 @@
             // 必填校验
             requiredVerification () {
                 // 字段为空校验
-                const requireValidList = this.fields.filter(it => {
-                    return it.showFeild && it.validate_type === 'REQUIRE'
-                }).filter(it => {
+                const requireValidList = this.fields.filter(it => it.showFeild && it.validate_type === 'REQUIRE').filter(it => {
                     if (it.type === 'CUSTOMTABLE') {
                         // 自定义表格需要单独校验每一列
                         return it.meta.columns.some(column => column.required)
@@ -230,7 +229,7 @@
                                 if (it.value[0][item.key] !== '') {
                                     allEmpty1 = false
                                 } else {
-                                    msg += (item.name + ', ')
+                                    msg += (`${item.name}, `)
                                 }
                             })
                             checkValue = allEmpty1
@@ -240,14 +239,12 @@
                             break
                         case 'CUSTOMTABLE':
                             let allEmpty2 = false
-                            it.meta.columns.forEach(column => {
-                                return it.value.forEach(row => {
-                                    if (column.required && isEmpty(row[column.key])) {
-                                        msg += (column.name + ', ')
-                                        allEmpty2 = true
-                                    }
-                                })
-                            })
+                            it.meta.columns.forEach(column => it.value.forEach(row => {
+                                if (column.required && isEmpty(row[column.key])) {
+                                    msg += (`${column.name}, `)
+                                    allEmpty2 = true
+                                }
+                            }))
                             checkValue = allEmpty2
                             if (msg) {
                                 msg += this.$t('m.newCommon["为必填项！"]')
@@ -277,8 +274,8 @@
                 const allPass1 = this.requiredVerification()
                 const allPass2 = this.jointVerification()
                 return allPass1 && allPass2
-            }
-        }
+            },
+        },
     }
 </script>
 

@@ -37,18 +37,18 @@
         props: {
             status: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
-                info: ''
+                info: '',
             }
         },
         watch: {
             status () {
                 this.getStatusInfo()
-            }
+            },
         },
         created () {
             this.getStatusInfo()
@@ -56,25 +56,25 @@
         methods: {
             getStatusInfo () {
                 const statusMap = {
-                    'RUNNING': {
+                    RUNNING: {
                         cls: 'running',
                         icon: 'bk-itsm-icon icon-icon-loading',
-                        text: this.$t(`m.task["执行中"]`)
+                        text: this.$t('m.task["执行中"]'),
                     },
-                    'SUCCESS': {
+                    SUCCESS: {
                         cls: 'success',
                         icon: 'bk-icon icon-check-circle-shape',
-                        text: this.$t(`m.task["执行成功"]`)
+                        text: this.$t('m.task["执行成功"]'),
                     },
-                    'FAILED': {
+                    FAILED: {
                         cls: 'failed',
                         icon: 'bk-itsm-icon icon-itsm-icon-square-one',
-                        text: this.$t(`m.task["执行失败"]`)
-                    }
+                        text: this.$t('m.task["执行失败"]'),
+                    },
                 }
                 this.info = statusMap[this.status] || ''
-            }
-        }
+            },
+        },
     }
 </script>
 

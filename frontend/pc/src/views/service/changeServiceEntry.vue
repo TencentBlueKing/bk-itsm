@@ -151,7 +151,7 @@
         components: {
             memberSelect,
             SelectTree,
-            DealPerson
+            DealPerson,
         },
         mixins: [commonMix],
         props: {
@@ -160,29 +160,29 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 关联流程
             flowList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 服务级别
             slaList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 服务类型
             codeList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -192,18 +192,18 @@
                 displayRangeTypes: ['OPEN', 'ORGANIZATION', 'GENERAL', 'API'],
                 dealPersonValue: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 directory: {
                     place: {
                         workflow: this.$t('m.serviceConfig["请选择关联流程版本"]'),
                         sla: this.$t('m.serviceConfig["请选择服务级别"]'),
-                        key: this.$t('m.serviceConfig["请选择服务类型"]')
+                        key: this.$t('m.serviceConfig["请选择服务类型"]'),
                     },
                     formInfo: {
                         type: '',
-                        value: []
-                    }
+                        value: [],
+                    },
                 },
                 checkInfo: {
                     // 服务名称
@@ -215,16 +215,16 @@
                     // 服务类型
                     key: false,
                     admin: false,
-                    displayRange: false
+                    displayRange: false,
                 },
                 // 校验规则
-                rules: {}
+                rules: {},
             }
         },
         computed: {
             openFunction () {
                 return this.$store.state.openFunction
-            }
+            },
         },
         created () {
             this.initData()
@@ -261,7 +261,7 @@
                     display_type: displayType,
                     display_role: displayRole,
                     owners,
-                    catalog_id: catalogId
+                    catalog_id: catalogId,
                 } = this.addDirectory.formInfo
                 this.directory.formInfo = {
                     // 服务名称
@@ -285,11 +285,11 @@
                     admin: owners ? owners.split(',') : [],
                     owners: owners || '',
                     // 服务目录
-                    catalog_id: isEmpty(catalogId) ? 0 : catalogId
+                    catalog_id: isEmpty(catalogId) ? 0 : catalogId,
                 }
                 this.dealPersonValue = {
                     type: displayType || 'OPEN',
-                    value: displayRole || ''
+                    value: displayRole || '',
                 }
             },
             // 校验数据
@@ -347,16 +347,18 @@
                 this.clickSecond = true
                 this.$store.dispatch('serviceEntry/createService', formInfo).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["添加成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["添加成功"]'),
+                        theme: 'success',
                     })
                     this.$parent.$parent.toggleDialog()
                     this.$parent.$parent.getList(1)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.clickSecond = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.clickSecond = false
+                    })
             },
             // 修改服务
             changeEntry () {
@@ -368,28 +370,31 @@
                 const params = JSON.parse(JSON.stringify(this.directory.formInfo))
                 this.$store.dispatch('serviceEntry/updateService', params).then(res => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["修改成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["修改成功"]'),
+                        theme: 'success',
                     })
                     this.$parent.$parent.toggleDialog()
                     this.$parent.$parent.getList()
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.clickSecond = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.clickSecond = false
+                    })
             },
             // 关联目录树组件
             async getTreeInfo () {
                 await this.$store.dispatch('serviceCatalog/getTreeData', {
-                    show_deleted: true, project_key: this.$store.state.project.id
+                    show_deleted: true, project_key: this.$store.state.project.id,
                 }).then(res => {
                     this.dirList = (res.data[0] && res.data[0].children) ? res.data[0].children : res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

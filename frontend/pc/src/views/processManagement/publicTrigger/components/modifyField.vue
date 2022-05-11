@@ -82,15 +82,15 @@
     export default {
         name: 'modifyFields',
         components: {
-            fieldInfo
+            fieldInfo,
         },
         props: {
             fieldSchema: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -102,15 +102,15 @@
                     {
                         id: 1,
                         key: 'custom',
-                        name: this.$t(`m.treeinfo["自定义"]`)
+                        name: this.$t('m.treeinfo["自定义"]'),
                     },
                     {
                         id: 2,
                         key: 'reference',
-                        name: this.$t(`m.treeinfo["引用变量"]`)
-                    }
+                        name: this.$t('m.treeinfo["引用变量"]'),
+                    },
                 ],
-                variableList: []
+                variableList: [],
             }
         },
         computed: {
@@ -118,13 +118,13 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         watch: {
-            triggerVariables: function (newVal) {
+            triggerVariables (newVal) {
                 this.variableList = newVal
-            }
+            },
         },
         mounted () {
             this.variableList = this.triggerVariables
@@ -157,8 +157,8 @@
             },
             selectedReference () {
                 this.fieldValueItem.itemInfo[0].value = ''
-            }
-        }
+            },
+        },
     }
 </script>
 

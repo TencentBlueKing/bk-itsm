@@ -73,7 +73,7 @@
         components: {
             draggable,
             // FormEditItem,
-            FormViewItem
+            FormViewItem,
         },
         props: {
             rowIndex: Number,
@@ -82,18 +82,18 @@
             fields: Array, // 原始字段列表
             rowForms: { // 半行表单数组
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             crtForm: {
                 type: [String, Number],
-                default: ''
+                default: '',
             },
-            addFieldStatus: Boolean
+            addFieldStatus: Boolean,
         },
         data () {
             return {
                 isEdit: this.checkEdit(),
-                localForms: this.getLocalForms(this.rowForms)
+                localForms: this.getLocalForms(this.rowForms),
             }
         },
         computed: {
@@ -102,7 +102,7 @@
                     return this.rowForms.find(item => item && item.id === this.crtForm)
                 }
                 return null
-            }
+            },
         },
         watch: {
             rowForms (val) {
@@ -110,7 +110,7 @@
             },
             crtForm (val) {
                 this.isEdit = val !== '' ? this.checkEdit() : false
-            }
+            },
         },
         methods: {
             getLocalForms (forms) {
@@ -121,8 +121,8 @@
             },
             halfRowFormPut (to, from) {
                 return to.el.children.length === 0
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

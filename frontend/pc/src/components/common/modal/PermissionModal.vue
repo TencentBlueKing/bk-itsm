@@ -46,7 +46,7 @@
     export default {
         name: 'permissionModal',
         components: {
-            PermissionContent
+            PermissionContent,
         },
         data () {
             return {
@@ -54,7 +54,7 @@
                 hasClicked: false,
                 permissionData: {},
                 loading: false,
-                lock: require('../../../images/lock-radius.svg')
+                lock: require('../../../images/lock-radius.svg'),
             }
         },
         watch: {
@@ -62,7 +62,7 @@
                 if (val) {
                     this.loadPermissionUrl()
                 }
-            }
+            },
         },
         methods: {
             async loadPermissionUrl () {
@@ -97,8 +97,8 @@
             },
             onCloseDialog () {
                 this.isModalShow = false
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

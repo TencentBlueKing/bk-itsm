@@ -82,7 +82,7 @@
             BasicCard,
             basicInfo,
             fieldConfig,
-            commonTriggerList
+            commonTriggerList,
         },
         props: {
             // 流程信息
@@ -90,15 +90,15 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 节点信息
             configur: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -109,7 +109,7 @@
                 // 节点标签数据
                 nodeTagList: [],
                 // 基础信息 form
-                baseFormData: {}
+                baseFormData: {},
             }
         },
         mounted () {
@@ -122,20 +122,20 @@
             // 获取节点标签数据
             getNodeTagList () {
                 const params = {
-                    key: 'STATE_TAG_TYPE'
+                    key: 'STATE_TAG_TYPE',
                 }
                 this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
                     this.nodeTagList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             checkStringValue (value) {
-                const temp = this.stringValueList.findIndex(item => {
-                    return item === value
-                })
+                const temp = this.stringValueList.findIndex(item => item === value)
                 return temp === -1
             },
             // 确认
@@ -163,33 +163,33 @@
                 params.extras = {
                     ticket_status: {
                         name: basicInfo.ticket_key,
-                        type: basicInfo.ticket_type
-                    }
+                        type: basicInfo.ticket_type,
+                    },
                 }
                 params.can_deliver = basicInfo.can_deliver
                 params.delivers_type = basicInfo.delivers_type
                 params.delivers = basicInfo.delivers
                 // 字段配置
                 const fieldInfo = this.$refs.field.showTabList
-                params.fields = fieldInfo.map(item => {
-                    return item.id
-                })
-                const id = this.configur.id
+                params.fields = fieldInfo.map(item => item.id)
+                const { id } = this.configur
                 if (this.secondClick) {
                     return
                 }
                 this.secondClick = true
                 this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["保存成功"]'),
+                        theme: 'success',
                     })
                     this.$emit('closeConfigur', true)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 取消
             closeNode () {
@@ -211,7 +211,7 @@
                     // 先认领，后处理
                     CLAIM_THEN_PROCESS: ['DISTRIBUTE_STATE', 'DELIVER_STATE'],
                     // 先派单，后认领
-                    DISTRIBUTE_THEN_CLAIM: []
+                    DISTRIBUTE_THEN_CLAIM: [],
                 }
                 let filterList = filterMap[distributeType] || []
                 // 是否可转单 选项存在时
@@ -227,8 +227,8 @@
                     this.$refs.commonTriggerList.setFilterSignal(filterList)
                     this.$refs.commonTriggerList.getBoundTriggerList()
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

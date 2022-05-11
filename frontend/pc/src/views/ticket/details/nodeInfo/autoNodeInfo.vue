@@ -170,22 +170,22 @@
         components: {
             getParam,
             postParam,
-            ace
+            ace,
         },
         props: {
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -196,10 +196,10 @@
                     height: 200,
                     readOnly: true,
                     fullScreen: true,
-                    lang: 'json'
+                    lang: 'json',
                 },
                 isShowAce: false,
-                isFull: false
+                isFull: false,
             }
         },
         computed: {
@@ -207,8 +207,8 @@
             apiName () {
                 const remoteSystem = this.nodeInfo.api_info.remote_api_info.remote_system_name || ''
                 const remoteApi = this.nodeInfo.api_info.remote_api_info.name || ''
-                return remoteSystem + '/' + remoteApi
-            }
+                return `${remoteSystem}/${remoteApi}`
+            },
         },
         async mounted () {
             await this.nodeInfo
@@ -222,8 +222,8 @@
             },
             blur (content, $editor, $fn) {
                 this.bodyDetailConfig.value = content
-            }
-        }
+            },
+        },
     }
 </script>
 

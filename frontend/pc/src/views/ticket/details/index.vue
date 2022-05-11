@@ -124,12 +124,12 @@
             leftTicketContent,
             TicketHeader,
             SlaRecordTab,
-            RightTicketTabs
+            RightTicketTabs,
         },
         inject: ['reload'],
         provide () {
             return {
-                reloadTicket: this.reloadTicket
+                reloadTicket: this.reloadTicket,
             }
         },
         mixins: [fieldMix, commonMix, apiFieldsWatch],
@@ -158,23 +158,23 @@
                     move: 0,
                     startX: null,
                     maxLength: 0,
-                    canMove: false
+                    canMove: false,
                 },
                 // 单据详情信息
                 ticketInfo: {},
                 // 头部信息
                 headerInfo: {
-                    statusColor: ''
+                    statusColor: '',
                 },
                 // 通知链接进入，但节点已被其他人处理提示
                 isShowNoticeDialog: false,
                 noticeInfo: {
                     is_processed: false,
-                    processed_user: ''
+                    processed_user: '',
                 },
                 loading: {
                     ticketLoading: true,
-                    nodeInfoLoading: false
+                    nodeInfoLoading: false,
                 },
                 // 节点列表
                 nodeList: [],
@@ -191,30 +191,30 @@
                 threshold: [],
                 hasNodeOptAuth: false,
                 isShowAssgin: false,
-                basicStatus: true
+                basicStatus: true,
             }
         },
         computed: {
             ...mapState({
-                openFunction: state => state.openFunction
+                openFunction: state => state.openFunction,
             }),
             token () {
                 return this.$route.query.token
-            }
+            },
         },
         watch: {
             isShowSla (val) {
                 if (val) {
                     const slaCount = this.ticketInfo.sla.Length
                     const slaDom = document.querySelector('.sla-information')
-                    slaDom.style.height = (134 * slaCount) + 'px'
+                    slaDom.style.height = `${134 * slaCount}px`
                 }
             },
             commentList (val) {
                 if (val.length > 0) {
                     this.curCommentLength = val.length
                 }
-            }
+            },
         },
         async mounted () {
             await this.initData()
@@ -261,15 +261,15 @@
                 this.$router.push({
                     name: 'slaAgreement',
                     query: {
-                        project_id: this.$route.query.project_id || 0
-                    }
+                        project_id: this.$route.query.project_id || 0,
+                    },
                 })
             },
             async initComments () {
                 try {
                     this.commentLoading = true
                     // 获取root id
-                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { 'ticket_id': this.ticketId, 'show_type': '' })
+                    const rootRes = await this.$store.dispatch('ticket/getTicketAllComments', { ticket_id: this.ticketId, show_type: '' })
                     this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id
                     this.commentList = await this.getComments(1, 10)
                 } catch (e) {
@@ -285,10 +285,10 @@
                 this.commentLoading = true
                 const commentList = []
                 const commmentRes = await this.$store.dispatch('ticket/getTicketAllComments', {
-                    'ticket_id': this.ticketId,
-                    'show_type': this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
-                    page: page,
-                    page_size: page_size
+                    ticket_id: this.ticketId,
+                    show_type: this.ticketInfo.updated_by.split(',').includes(window.username) ? 'ALL' : 'PUBLIC',
+                    page,
+                    page_size,
                 })
                 commmentRes.data.items.forEach((item, index) => {
                     if (item.parent__id !== this.commentId) {
@@ -304,14 +304,14 @@
             },
             async getReplyCommet (id, index) {
                 if (id) {
-                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id })
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id })
                     this.$set(this.commentList[index], 'parent_creator', res.data.creator)
                     this.$set(this.commentList[index], 'parent_content', res.data.content)
                 }
             },
             async addTargetComment (curComment) {
                 if (this.commentId !== curComment.parent__id) {
-                    const res = await this.$store.dispatch('ticket/getReplyComment', { 'ticket_id': this.ticketId, id: curComment.parent__id })
+                    const res = await this.$store.dispatch('ticket/getReplyComment', { ticket_id: this.ticketId, id: curComment.parent__id })
                     this.commentList.push(res.data)
                     this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment)
                 }
@@ -341,7 +341,7 @@
             },
             getProtocolsList () {
                 const params = {
-                    project_id: this.ticketInfo.project_key
+                    project_id: this.ticketInfo.project_key,
                 }
                 this.$store.dispatch('slaManagement/getProtocolsList', params).then(res => {
                     const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name))
@@ -359,7 +359,7 @@
                             rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%
                             pWarningThreshold: condition[1][3] / 100 || 1,
                             rTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[2][2] / 100 : 1,
-                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100
+                            pTimeOutThreshold: condition[2].hasOwnProperty(2) ? condition[3][4] / 100 : condition[2][4] / 100,
                         }
                     })
                     this.threshold = [...slathreshold]
@@ -419,14 +419,12 @@
             startTicketTimer () {
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
                 this.$store.dispatch('deployOrder/getNodeList', params).then(async res => {
                     const newNodeList = res.data
                     const oldNodeList = this.nodeList
-                    const nodeStatusHasUpdate = newNodeList.some(node => {
-                        return !oldNodeList.find(item => this.isSameStatusNode(node, item))
-                    })
+                    const nodeStatusHasUpdate = newNodeList.some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)))
                     if (nodeStatusHasUpdate) {
                         // 节点状态有更新
                         this.nodeList = newNodeList
@@ -443,32 +441,36 @@
                 this.loading.ticketLoading = true
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
 
                 await this.$store.dispatch('change/getOrderDetails', params).then((res) => {
                     this.ticketInfo = res.data
-                }).catch((res) => {
-                    // 显示 404 页面
-                    this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]')
-                }).finally(() => {
-                    this.loading.ticketLoading = false
                 })
+                    .catch((res) => {
+                        // 显示 404 页面
+                        this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]')
+                    })
+                    .finally(() => {
+                        this.loading.ticketLoading = false
+                    })
             },
             // 获取单据节点的详情
             getNodeList () {
                 this.loading.nodeInfoLoading = true
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
                 return this.$store.dispatch('deployOrder/getNodeList', params).then((res) => {
                     this.updateNodeList(res.data)
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading.nodeInfoLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading.nodeInfoLoading = false
+                    })
             },
             // 更新节点信息
             updateNodeList (newNodeList) {
@@ -481,13 +483,11 @@
                         this.conditionField(item, this.firstStateFields)
                     })
                 }
-                copyList.forEach(
-                    item => {
-                        if (item.status === 'AUTO_SUCCESS') {
-                            item.status = 'FINISHED'
-                        }
+                copyList.forEach(item => {
+                    if (item.status === 'AUTO_SUCCESS') {
+                        item.status = 'FINISHED'
                     }
-                )
+                })
                 this.nodeList = copyList
                 this.$store.commit('deployOrder/setNodeList', this.nodeList)
                 this.initCurrentStepData()
@@ -500,18 +500,20 @@
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type }).then((res) => {
                     const item = res.data.find(m => m.key === status)
                     this.$set(this.headerInfo, 'statusColor', item ? item.color_hex : '')
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取单据手动触发器
             getTriggers () {
                 this.$store.dispatch('trigger/getTicketHandleTriggers', { id: this.ticketId }).then(res => {
                     this.nodeTriggerList = res.data.filter(trigger => trigger.signal_type === 'STATE')
                     this.ticketTriggerList = res.data.filter(trigger => trigger.signal_type === 'FLOW')
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 初始化当前步骤列表信息
             initCurrentStepData (diffNode) {
@@ -574,7 +576,7 @@
             },
             getTicketNoticeInfo () {
                 this.$store.dispatch('deployOrder/getTicketNoticeInfo', {
-                    params: { cache_key: this.$route.query.cache_key }
+                    params: { cache_key: this.$route.query.cache_key },
                 }).then(res => {
                     if (res.data && res.data.is_processed) {
                         this.noticeInfo = res.data
@@ -583,9 +585,10 @@
                         // 删除 url cache_key
                         this.onNoticeConfirm()
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 确认
             onNoticeConfirm () {
@@ -593,10 +596,10 @@
                 delete query.cache_key
                 this.$router.replace({
                     name: this.$route.name,
-                    query
+                    query,
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

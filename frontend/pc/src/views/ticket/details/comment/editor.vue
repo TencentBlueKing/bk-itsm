@@ -23,7 +23,7 @@
         props: {
             editorId: String,
             commentType: String,
-            commentTypeReply: String
+            commentTypeReply: String,
         },
         data () {
             return {
@@ -33,7 +33,7 @@
                 top: '0px',
                 showFlag: 'none',
                 list: [],
-                isInsideComment: false
+                isInsideComment: false,
             }
         },
         watch: {
@@ -65,7 +65,7 @@
                 if (val) {
                     this.isInsideComment = val === 'INSIDE' || false
                 }
-            }
+            },
         },
         mounted () {
             const editor = new E(`#${this.editorId}`)
@@ -87,7 +87,7 @@
                 'backColor',
                 'link',
                 'list',
-                'quote'
+                'quote',
             ]
             editor.create()
             this.editor = editor
@@ -98,7 +98,7 @@
         methods: {
             selectLine (item) {
                 const text = this.editor.txt.html()
-                this.editor.txt.html(text + `<span class="at-person">${item.name}<span>` + '  ')
+                this.editor.txt.html(`${text}<span class="at-person">${item.name}<span>` + '  ')
             },
             handleChangeType () {
                 if (this.commentTypeReply) {
@@ -110,15 +110,15 @@
                 if (!this.$store.state.ticket.hasTicketNodeOptAuth) {
                     this.$bkMessage({
                         message: this.$t('m["你当前无法发表内部评论"]'),
-                        theme: 'warning '
+                        theme: 'warning ',
                     })
                     return
                 }
                 this.isInsideComment = !this.isInsideComment
                 const type = this.isInsideComment ? 'INSIDE' : 'PUBLIC'
                 this.$emit('postComment', type)
-            }
-        }
+            },
+        },
     }
 </script>
 

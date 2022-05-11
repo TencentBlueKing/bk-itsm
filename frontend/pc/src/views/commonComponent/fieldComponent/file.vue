@@ -78,36 +78,36 @@
     export default {
         name: 'FILE',
         components: {
-            customUpload
+            customUpload,
         },
         props: {
             item: {
                 type: Object,
                 required: true,
                 default: () => {
-                }
+                },
             },
             idInfo: {
                 type: Object,
                 required: false,
-                default: () => null
+                default: () => null,
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             isFilePreview: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             isBuild: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -115,10 +115,10 @@
                 uploadFileList: [],
                 tempFileList: [],
                 historyList: [],
-                url: this.isFilePreview ? '' : window.SITE_URL + `api/misc/upload_file/`,
+                url: this.isFilePreview ? '' : `${window.SITE_URL}api/misc/upload_file/`,
                 // downloadUrl: window.site + `workflow/fields/`,
                 // 记录上传文件值
-                tempObj: {}
+                tempObj: {},
             }
         },
         mounted () {
@@ -128,12 +128,12 @@
         methods: {
             choiceToList () {
                 for (const key in this.item.choice) {
-                    this.tempFileList.push({ ...this.item.choice[key], key: key })
+                    this.tempFileList.push({ ...this.item.choice[key], key })
                 }
                 if (this.item.value) {
                     const tempObj = JSON.parse(this.item.value)
                     for (const key in tempObj) {
-                        this.historyList.push({ ...tempObj[key], key: key })
+                        this.historyList.push({ ...tempObj[key], key })
                     }
                     this.datas = this.historyList.concat([])
                     this.item.val = ''
@@ -142,7 +142,7 @@
                         const nodeValue = {}
                         nodeValue[node.key] = {
                             path: node.path,
-                            name: node.name
+                            name: node.name,
                         }
                         valueList.push(JSON.stringify(nodeValue))
                     })
@@ -153,14 +153,14 @@
             downloadFile (file) {
                 const tempKey = file.key
                 if (this.isBuild) {
-                    window.open(window.SITE_URL
-                        + `api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`)
+                    window.open(`${window.SITE_URL
+                    }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`)
                 } else if (this.isCurrent) {
-                    window.open(window.SITE_URL
-                        + `api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
+                    window.open(`${window.SITE_URL
+                    }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
                 } else {
-                    window.open(window.SITE_URL
-                        + `api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
+                    window.open(`${window.SITE_URL
+                    }api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`)
                 }
             },
             uploadErr (file, fileList) {
@@ -184,7 +184,7 @@
                     this.historyList.forEach(node => {
                         this.tempObj[node.key] = {
                             path: node.path,
-                            name: node.name
+                            name: node.name,
                         }
                     })
                 }
@@ -227,8 +227,8 @@
                 } else {
                     this.item.val = JSON.stringify(this.tempObj)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

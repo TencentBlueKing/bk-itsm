@@ -82,7 +82,7 @@
             'CW-RICHTEXT': editor,
             'CW-TREESELECT': tree,
             'CW-FILE': file,
-            'CW-CASCADE': cascade
+            'CW-CASCADE': cascade,
         },
         mixins: [commonMix],
         props: {
@@ -90,20 +90,20 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -113,39 +113,37 @@
                     {
                         isEdit: false,
                         name: 1,
-                        content: 'qwsqw'
+                        content: 'qwsqw',
                     },
                     {
                         isEdit: false,
                         name: 2,
-                        content: 'qw1q1qsqw'
-                    }
+                        content: 'qw1q1qsqw',
+                    },
                 ],
                 routerKey: +new Date(),
                 secondClick: false,
                 rotate: false,
-                marginTypeList: ['TABLE', 'CUSTOMTABLE', 'FILE', 'RICHTEXT']
+                marginTypeList: ['TABLE', 'CUSTOMTABLE', 'FILE', 'RICHTEXT'],
             }
         },
         computed: {
-            profile: function () {
+            profile () {
                 if (!this.basicInfomation) {
                     return
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
+                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
                 }
-            }
+            },
         },
         mounted () {
             this.$set(this.item, 'isEdit', true)
-            this.$nextTick(
-                () => {
-                    this.reloadCurPage()
-                }
-            )
+            this.$nextTick(() => {
+                this.reloadCurPage()
+            })
             this.$forceUpdate()
         },
         methods: {
@@ -157,21 +155,22 @@
                 this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
                     item.choice = res.data
                     item.val = ''
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 修改至结束状态弹窗事件
             submitTemplate () {
-                const id = this.basicInfomation.id
+                const { id } = this.basicInfomation
                 this.fieldFormatting([this.item])
                 const params = {
                     field: {
                         id: this.item.id,
                         key: this.item.key,
                         value: this.item.value,
-                        type: this.item.type
-                    }
+                        type: this.item.type,
+                    },
                 }
                 if (this.secondClick) {
                     return
@@ -179,43 +178,41 @@
                 this.secondClick = true
                 this.$store.dispatch('basicModule/edit_field', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.systemConfig["修改成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.systemConfig["修改成功"]'),
+                        theme: 'success',
                     })
                     this.reloadTicket()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
-                    this.toDone()
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                        this.toDone()
+                    })
             },
             reloadCurPage () {
                 this.routerKey = +new Date()
             },
             cancel () {
-                this.fields.forEach(
-                    ite => {
-                        ite['isEdit'] = false
-                    }
-                )
+                this.fields.forEach(ite => {
+                    ite.isEdit = false
+                })
                 this.$set(this.item, 'isEdit', false)
             },
             async save () {
                 if (this.item.key === 'current_status') {
-                    const temp = this.item.choice.filter(ite => {
-                        return ite.key === this.item.val
-                    })[0]
+                    const temp = this.item.choice.filter(ite => ite.key === this.item.val)[0]
                     if (temp.is_over === 'True') {
                         this.$bkInfo({
                             type: 'warning',
-                            title: this.$t(`m.systemConfig["确认保存？"]`),
-                            subTitle: this.$t(`m.systemConfig["状态修改为【"]`) + temp.name + this.$t(`m.systemConfig["】将导致整个单据结束"]`),
+                            title: this.$t('m.systemConfig["确认保存？"]'),
+                            subTitle: this.$t('m.systemConfig["状态修改为【"]') + temp.name + this.$t('m.systemConfig["】将导致整个单据结束"]'),
                             confirmFn: () => {
                                 this.submitTemplate()
                                 // 仅修改单据状态后刷新整个单据
                                 this.reloadTicket()
-                            }
+                            },
                         })
                     } else {
                         this.submitTemplate()
@@ -227,8 +224,8 @@
             async toDone () {
                 await this.$set(this.item, 'isEdit', false)
                 // await this.partUpdate()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

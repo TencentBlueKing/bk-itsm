@@ -36,14 +36,14 @@
                 type: String,
                 default () {
                     return this.$t('m.wiki["您没有权限访问"]')
-                }
-            }
+                },
+            },
         },
         data () {
             return {
 
             }
-        }
+        },
     }
 </script>
 <style scoped lang="scss">

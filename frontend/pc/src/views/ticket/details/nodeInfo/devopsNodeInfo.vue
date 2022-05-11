@@ -79,25 +79,25 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 taskStatus: {
-                    'FINISHED': this.$t('m.task["执行成功"]'),
-                    'RUNNING': this.$t('m.task["执行中"]'),
-                    'FAILED': this.$t('m.task["执行失败"]')
-                }
+                    FINISHED: this.$t('m.task["执行成功"]'),
+                    RUNNING: this.$t('m.task["执行中"]'),
+                    FAILED: this.$t('m.task["执行失败"]'),
+                },
             }
-        }
+        },
     }
 </script>
 

@@ -93,47 +93,47 @@
         name: 'dealPerson',
         components: {
             SelectTree,
-            memberSelect
+            memberSelect,
         },
         props: {
             value: {
                 type: Object,
                 default: () => ({
                     type: '',
-                    value: []
-                })
+                    value: [],
+                }),
             },
             // 指定人员 id 范围
             specifyIdList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             excludeRoleTypeList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             showRoleTypeList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             formType: {
                 type: String,
-                default: ''
+                default: '',
             },
             shortcut: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             requiredMsg: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -143,7 +143,7 @@
                 organizationLoading: false,
                 formData: {
                     levelOne: '',
-                    levelSecond: []
+                    levelSecond: [],
                 },
                 allUserlist: [],
                 firstLevelList: [],
@@ -151,14 +151,14 @@
                 organizationList: [],
                 frontMemberField: [],
                 secondLevelRange: {},
-                noSecondTypeList: ['EMPTY', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'STARTER_LEADER']
+                noSecondTypeList: ['EMPTY', 'OPEN', 'STARTER', 'BY_ASSIGNOR', 'STARTER_LEADER'],
             }
         },
         computed: {
             targetSpecifyIdList () {
                 const target = this.specifyIdList.find(rule => rule.type === this.formData.levelOne)
                 return target ? target.list : []
-            }
+            },
         },
         watch: {
             value: {
@@ -167,20 +167,20 @@
                         this.initData()
                     }
                 },
-                deep: true
+                deep: true,
             },
             showRoleTypeList: {
                 handler () {
                     this.initData()
                 },
-                deep: true
+                deep: true,
             },
             excludeRoleTypeList: {
                 handler () {
                     this.initData()
                 },
-                deep: true
-            }
+                deep: true,
+            },
         },
         created () {
             // 初始化默认值
@@ -202,7 +202,7 @@
                         : (this.value.value ? this.value.value.split(',').filter(val => val !== '') : [])
                     this.formData = {
                         levelOne: roleType,
-                        levelSecond: defaultSecondValue
+                        levelSecond: defaultSecondValue,
                     }
                 }
                 if (roleType) {
@@ -218,26 +218,26 @@
                 }
                 return this.$store.dispatch('deployCommon/getUser', {
                     is_processor: true,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then((res) => {
                     this.allUserlist = res.data
                     this.getFirstLevelList(res.data)
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             getFirstLevelList (data) {
                 this.firstLevelList = data.filter(item => {
                     if (this.excludeRoleTypeList.length) {
                         return !this.excludeRoleTypeList.includes(item.type)
-                    } else if (this.showRoleTypeList.length) {
+                    } if (this.showRoleTypeList.length) {
                         return this.showRoleTypeList.includes(item.type)
-                    } else {
-                        return true
                     }
+                    return true
                 }).map(item => ({
                     id: item.type,
-                    name: item.name
+                    name: item.name,
                 }))
             },
             setDeaultSecondLeve (type) {
@@ -278,7 +278,7 @@
                 }
                 const params = {
                     role_type: type,
-                    project_key: this.$store.state.project.id || this.$route.query.project.id
+                    project_key: this.$store.state.project.id || this.$route.query.project.id,
                 }
                 // 非后台管理页面需要加 shortcut 参数
                 if (this.shortcut) {
@@ -290,36 +290,35 @@
                     userList = res.data.map(item => {
                         if (type === 'GENERAL') {
                             // shortcut 下没有 count 参数
-                            const count = this.shortcut ? '' : '(' + item.count + ')'
+                            const count = this.shortcut ? '' : `(${item.count})`
                             return {
                                 id: String(item.id),
                                 name: item.name + count,
-                                disabled: (item.count === 0)
+                                disabled: (item.count === 0),
                             }
-                        } else if (type === 'API') {
+                        } if (type === 'API') {
                             return {
                                 id: item.role_key,
-                                name: item.name
+                                name: item.name,
                             }
-                        } else {
-                            return {
-                                id: String(item.id),
-                                name: item.name
-                            }
+                        }
+                        return {
+                            id: String(item.id),
+                            name: item.name,
                         }
                     })
                     // 显示指定选项
                     if (this.targetSpecifyIdList.length && type !== 'GENERAL') {
-                        userList = userList.filter(m => {
-                            return this.targetSpecifyIdList.some(id => String(id) === m.id)
-                        })
+                        userList = userList.filter(m => this.targetSpecifyIdList.some(id => String(id) === m.id))
                     }
                     this.secondLevelList = userList
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             // 组织架构
             getOrganization () {
@@ -327,11 +326,13 @@
                 this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
                     // 操作角色组织架构
                     this.organizationList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.organizationLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.organizationLoading = false
+                    })
             },
             // 获取变量列表
             getFrontNodesList () {
@@ -339,18 +340,19 @@
                 const params = {
                     workflow: this.nodeInfo.workflow,
                     state: this.nodeInfo.id,
-                    exclude_self: true
+                    exclude_self: true,
                 }
                 // 从前置节点信息中筛选 MEMBER 信息
                 return this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
-                    this.secondLevelList = res.data.filter(item =>
-                        (item.type === 'MEMBERS' && item.validate_type === 'REQUIRE')
+                    this.secondLevelList = res.data.filter(item => (item.type === 'MEMBERS' && item.validate_type === 'REQUIRE')
                         || (item.type === 'MEMBER' && item.validate_type === 'REQUIRE')).map(item => ({ id: item.key, name: item.name }))
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             // 获取前置节点列表
             getPreStates () {
@@ -359,13 +361,15 @@
                     // 排除分支节点和汇聚节点
                     this.secondLevelList = res.data.filter(node => !['ROUTER-P', 'COVERAGE'].includes(node.type)).map(node => ({
                         id: node.id,
-                        name: node.name
+                        name: node.name,
                     }))
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             // 校验 value
             verifyValue () {
@@ -387,10 +391,10 @@
                 }
                 return {
                     value: value || '',
-                    type: this.formData.levelOne
+                    type: this.formData.levelOne,
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

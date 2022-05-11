@@ -107,27 +107,27 @@
             autoNodeInfo,
             sopsNodeLog,
             fieldPreview,
-            devopsNodeLog
+            devopsNodeLog,
         },
         props: {
             show: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             logInfo: {
                 type: Object,
-                default: () => (null)
-            }
+                default: () => (null),
+            },
         },
         data () {
             return {
                 basicList: [
-                    { name: this.$t(`m.newCommon["节点名称"]`), value: '', key: 'from_state_name' },
-                    { name: this.$t(`m.newCommon["处理人"]`), value: '', key: 'operator' },
-                    { name: this.$t(`m.newCommon["处理时间"]`), value: '', key: 'operate_at' }
-                ]
+                    { name: this.$t('m.newCommon["节点名称"]'), value: '', key: 'from_state_name' },
+                    { name: this.$t('m.newCommon["处理人"]'), value: '', key: 'operator' },
+                    { name: this.$t('m.newCommon["处理时间"]'), value: '', key: 'operate_at' },
+                ],
             }
-        }
+        },
     }
 </script>
 

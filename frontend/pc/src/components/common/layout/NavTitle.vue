@@ -41,18 +41,18 @@
         props: {
             showIcon: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             titleName: {
                 type: String,
-                default: '--'
-            }
+                default: '--',
+            },
         },
         methods: {
             goBack () {
                 this.$emit('goBack')
-            }
-        }
+            },
+        },
     }
 </script>
 

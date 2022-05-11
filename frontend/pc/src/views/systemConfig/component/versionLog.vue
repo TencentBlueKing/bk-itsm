@@ -53,13 +53,13 @@
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 versionData: [],
-                isDataLoading: false
+                isDataLoading: false,
             }
         },
         mounted () {
@@ -78,13 +78,15 @@
                             item.version_to = `V${item.version_to}`
                         }
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
+            },
+        },
     }
 </script>
 

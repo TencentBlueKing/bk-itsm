@@ -106,56 +106,54 @@
         name: 'COMPLEX-MEMBERS',
         components: {
             SelectTree,
-            memberSelect
+            memberSelect,
         },
         props: {
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             checkValue: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 isLoading: false,
                 formData: {
                     levelOne: '',
-                    levelSecond: []
+                    levelSecond: [],
                 },
                 secondLevelList: [],
-                organizationList: []
+                organizationList: [],
             }
         },
         computed: {
             firstLevelList () {
                 const valueList = this.$store.state.common.configurInfo.processor_type
                 const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION']
-                const backList = valueList.filter(item => {
-                    return !filterList.some(filterName => filterName === item.typeName)
-                })
+                const backList = valueList.filter(item => !filterList.some(filterName => filterName === item.typeName))
                 return backList
-            }
+            },
         },
         mounted () {
             this.formData.levelOne = 'PERSON'
@@ -186,7 +184,7 @@
                 this.isLoading = true
                 this.$store.dispatch('deployCommon/getSecondUser', {
                     role_type: value,
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then((res) => {
                     const valueList = res.data
                     const userList = []
@@ -194,35 +192,38 @@
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name + '(' + item.count + ')',
-                                disabled: (item.count === 0)
+                                name: `${item.name}(${item.count})`,
+                                disabled: (item.count === 0),
                             })
                         })
                     } else {
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name
+                                name: item.name,
                             })
                         })
                     }
                     this.secondLevelList = userList
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             // 组织架构
             getOrganization () {
                 this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
                     // 操作角色组织架构
                     this.organizationList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 

@@ -142,21 +142,21 @@
         name: 'EvaluationTicketContent',
         components: {
             memberSelect,
-            businessCard
+            businessCard,
         },
         props: {
             satisfactInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             ticketInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             isShowSubmitBtn: {
                 type: Boolean,
-                default: true
-            }
+                default: true,
+            },
         },
         data () {
             return {
@@ -175,13 +175,13 @@
                         val: [],
                         showFeild: true,
                         desc: this.$t('m.newCommon["请输入蓝鲸用户"]'),
-                        evaluDisable: false
+                        evaluDisable: false,
                     },
                     teleCheck: false,
                     title: '',
                     content: '',
-                    inviteType: ''
-                }
+                    inviteType: '',
+                },
             }
         },
         computed: {
@@ -189,18 +189,18 @@
                 if (this.picked === 'One') {
                     return {
                         name: this.$t('m.newCommon["提交"]'),
-                        disabled: this.scoreInfo.clickSecond
+                        disabled: this.scoreInfo.clickSecond,
                     }
                 }
                 return {
                     name: this.$t('m.newCommon["发送"]'),
-                    disabled: this.scoreInfo.clickSecond || !!this.satisfactInfo.has_invited
+                    disabled: this.scoreInfo.clickSecond || !!this.satisfactInfo.has_invited,
                 }
             },
             // 是否展示短信评论
             isShowSMSComment () {
                 return this.$store.state.openFunction.SMS_COMMENT_SWITCH && window.run_site !== 'bmw'
-            }
+            },
         },
         methods: {
             // 提交
@@ -228,13 +228,13 @@
                     stars: this.scoreInfo.startInfo,
                     comments: this.scoreInfo.comments,
                     source: 'WEB',
-                    creator: window.username
+                    creator: window.username,
                 }
 
                 if (!this.scoreInfo.startInfo) {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["请进行评分"]`),
-                        theme: 'error'
+                        message: this.$t('m.newCommon["请进行评分"]'),
+                        theme: 'error',
                     })
                     this.scoreInfo.clickSecond = false
                     return
@@ -244,21 +244,23 @@
                 this.$emit('beforeSubmit')
                 this.$store.dispatch('evaluation/postEvaluation', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["评价成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["评价成功"]'),
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.$emit('submitSuccess')
-                    this.scoreInfo.clickSecond = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.$emit('submitSuccess')
+                        this.scoreInfo.clickSecond = false
+                    })
             },
             openSendPhone () {
                 if (this.scoreInfo.teleCheck || !this.scoreInfo.telephone) {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["请输入正确的手机号"]`),
-                        theme: 'error'
+                        message: this.$t('m.newCommon["请输入正确的手机号"]'),
+                        theme: 'error',
                     })
                     return
                 }
@@ -271,14 +273,14 @@
                     subTitle: this.scoreInfo.content,
                     confirmFn: () => {
                         this.sendTelephone()
-                    }
+                    },
                 })
             },
             openSendEmail () {
                 if (this.checkEmail()) {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["未找到当前用户邮箱信息或发送失败"]'),
-                        theme: 'error'
+                        theme: 'error',
                     })
                     return
                 }
@@ -291,32 +293,28 @@
                     subTitle: this.scoreInfo.content,
                     confirmFn: () => {
                         this.sendTelephone()
-                    }
+                    },
                 })
             },
             checkEmail () {
                 if (!this.scoreInfo.emailTempInfo.val.length) {
                     return true
-                } else {
-                    const params = {
-                        users: this.scoreInfo.emailTempInfo.val.join(','),
-                        properties: 'all'
-                    }
-                    this.$store.dispatch('getPersonInfo', params).then((res) => {
-                        return !res.data[0].email
-                    }).catch((res) => {
+                }
+                const params = {
+                    users: this.scoreInfo.emailTempInfo.val.join(','),
+                    properties: 'all',
+                }
+                this.$store.dispatch('getPersonInfo', params).then((res) => !res.data[0].email)
+                    .catch((res) => {
                         errorHandler(res, this)
                     })
-                }
             },
             // 邀请评价
             // 校验电话规则
             checkTelephone () {
                 const res = /^1[34578]\d{9}$/
                 const val = this.scoreInfo.telephone.trim().split(',')
-                const result = val.some((item) => {
-                    return !res.test(item)
-                })
+                const result = val.some((item) => !res.test(item))
                 this.scoreInfo.teleCheck = result
             },
             sendTelephone () {
@@ -341,17 +339,19 @@
                 this.$emit('beforeSubmit')
                 this.$store.dispatch(url, { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["发送成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["发送成功"]'),
+                        theme: 'success',
                     })
                     this.$emit('submitSuccess')
-                }).catch((res) => {
-                    errorHandler(this)
-                }).finally(() => {
-                    this.scoreInfo.clickSecond = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(this)
+                    })
+                    .finally(() => {
+                        this.scoreInfo.clickSecond = false
+                    })
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

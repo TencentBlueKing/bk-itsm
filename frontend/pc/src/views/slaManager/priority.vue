@@ -111,7 +111,7 @@
     export default {
         name: 'priority',
         components: {
-            priorityTable
+            priorityTable,
         },
         mixins: [permission],
         data () {
@@ -121,12 +121,12 @@
                 versionStatus: true,
                 secondClick: false,
                 checkType: {
-                    key: 'request'
+                    key: 'request',
                 },
                 priorityConten: {
                     editorStatus: false,
-                    info: {}
-                }
+                    info: {},
+                },
             }
         },
         computed: {
@@ -138,7 +138,7 @@
             },
             serviceTypeOptions () {
                 return this.$store.state.choice_type_list.filter(type => type.key !== this.checkType.key)
-            }
+            },
         },
         watch: {
 
@@ -150,15 +150,17 @@
             getModelList () {
                 this.isDataLoading = true
                 const params = {
-                    service_type: this.checkType.key
+                    service_type: this.checkType.key,
                 }
                 this.$store.dispatch('slaManagement/getPriorityList', { params }).then((res) => {
                     this.priorityConten.info = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             closeVersion () {
                 this.versionStatus = false
@@ -168,13 +170,13 @@
                 if (this.priorityConten.editorStatus) {
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确认退出？"]`),
-                        subTitle: this.$t(`m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]`),
+                        title: this.$t('m.slaContent["确认退出？"]'),
+                        subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
                         confirmFn: () => {
                             this.checkType.key = item.key
                             this.getModelList()
                             this.priorityConten.editorStatus = false
-                        }
+                        },
                     })
                     return
                 }
@@ -196,12 +198,12 @@
                 if (JSON.stringify(childInfo.priority_matrix) !== JSON.stringify(this.priorityConten.info.priority_matrix)) {
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.slaContent["确认退出？"]`),
-                        subTitle: this.$t(`m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]`),
+                        title: this.$t('m.slaContent["确认退出？"]'),
+                        subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
                         confirmFn: () => {
                             this.$refs.priorityTable.initDate()
                             this.priorityConten.editorStatus = false
-                        }
+                        },
                     })
                 } else {
                     this.priorityConten.editorStatus = false
@@ -232,16 +234,18 @@
                 params.service_type = [this.checkType.key, ...this.serviceTypeList]
                 this.$store.dispatch('slaManagement/submitPriority', { params }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     this.priorityConten.editorStatus = false
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
-                    this.getModelList()
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.secondClick = false
+                        this.getModelList()
+                    })
             },
             // 获取子组件的数据
             getChildInfo () {
@@ -250,7 +254,7 @@
                     childInfo = {
                         impact: this.$refs.priorityTable.scopeList,
                         urgency: this.$refs.priorityTable.degreeList,
-                        priority_matrix: this.$refs.priorityTable.contentList
+                        priority_matrix: this.$refs.priorityTable.contentList,
                     }
                 }
                 return childInfo
@@ -258,10 +262,10 @@
             // 前往数据字典页面
             gotoDataDictionary () {
                 this.$router.push({
-                    path: '/dataDictionary'
+                    path: '/dataDictionary',
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

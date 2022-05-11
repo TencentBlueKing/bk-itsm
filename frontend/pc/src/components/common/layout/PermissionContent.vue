@@ -68,18 +68,18 @@
         props: {
             permissionData: {
                 type: Object,
-                default: {}
-            }
+                default: {},
+            },
         },
         data () {
             return {
                 lock: require('../../../images/lock-radius.svg'),
                 // 返回499code 关联的实例对象取type
                 resource_label: {
-                    'task_template': this.$t(`m.common['任务模板']`),
-                    'public_api': this.$t(`m.common['公共API']`),
-                    'service': this.$t(`m.common['服务']`)
-                }
+                    task_template: this.$t('m.common[\'任务模板\']'),
+                    public_api: this.$t('m.common[\'公共API\']'),
+                    service: this.$t('m.common[\'服务\']'),
+                },
             }
         },
         methods: {
@@ -99,8 +99,8 @@
                     }
                 })
                 return data
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

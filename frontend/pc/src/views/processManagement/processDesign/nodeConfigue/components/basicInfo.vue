@@ -153,7 +153,7 @@
     export default {
         name: 'basicInfo',
         components: {
-            dealPerson
+            dealPerson,
         },
         mixins: [commonMix],
         props: {
@@ -161,26 +161,26 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeTagList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isLoading: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -191,13 +191,13 @@
                     distribute_type: '',
                     ticket_key: '',
                     ticket_type: '',
-                    can_deliver: false
+                    can_deliver: false,
                 },
                 trueStatus: true,
                 falseStatus: false,
                 assignorsInfo: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 excludeProcessor: [], // 处理人排除类型
                 assignorExclude: ['BY_ASSIGNOR', 'EMPTY', 'OPEN', 'VARIABLE', 'API'], // 派单人排除类型
@@ -205,16 +205,16 @@
                 assignorsTypeList: ['DISTRIBUTE_THEN_PROCESS', 'DISTRIBUTE_THEN_CLAIM'],
                 processorsInfo: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 deliversInfo: {
                     type: '',
-                    value: ''
+                    value: '',
                 },
                 // 单据状态
                 billStatusList: [
                     { type: 'keep', name: this.$t('m.treeinfo["延续上个节点"]') },
-                    { type: 'custom', name: this.$t('m.treeinfo["自定义"]') }
+                    { type: 'custom', name: this.$t('m.treeinfo["自定义"]') },
                 ],
                 secondLevelList: [],
                 ticketKeyLoading: false,
@@ -223,42 +223,42 @@
                 prompt: [
                     {
                         id: 'DISTRIBUTE_THEN_PROCESS',
-                        prompt: this.$t(`m.treeinfo["指该节点动作需要通过派单人分派到指定处理人或者处理角色，被分派到的处理人再进行处理。"]`)
+                        prompt: this.$t('m.treeinfo["指该节点动作需要通过派单人分派到指定处理人或者处理角色，被分派到的处理人再进行处理。"]'),
                     },
                     {
                         id: 'PROCESS',
-                        prompt: this.$t(`m.treeinfo["单据直接流入到配置好的处理人/角色处理。当有多个处理人时，任何一位处理完成即可流入下个环节。"]`)
+                        prompt: this.$t('m.treeinfo["单据直接流入到配置好的处理人/角色处理。当有多个处理人时，任何一位处理完成即可流入下个环节。"]'),
                     },
                     {
                         id: 'CLAIM_THEN_PROCESS',
-                        prompt: this.$t(`m.treeinfo["指配置好的处理人/角色人员需要主动认领任务。当处理人只有1位时，会自动认领。处理人有2人及以上时，需要主动认领至自己的待办任务中。"]`)
+                        prompt: this.$t('m.treeinfo["指配置好的处理人/角色人员需要主动认领任务。当处理人只有1位时，会自动认领。处理人有2人及以上时，需要主动认领至自己的待办任务中。"]'),
                     },
                     {
                         id: 'DISTRIBUTE_THEN_CLAIM',
-                        prompt: this.$t(`m.treeinfo["单据需要派单人进行指派到组或者多人，然后被指派对象进行主动认领。认领完成后才会到自己的待办任务列表中。"]`)
-                    }
+                        prompt: this.$t('m.treeinfo["单据需要派单人进行指派到组或者多人，然后被指派对象进行主动认领。认领完成后才会到自己的待办任务列表中。"]'),
+                    },
                 ],
                 rules: {},
                 checkStatus: {
                     name: false,
                     assignors: false,
                     processors: false,
-                    delivers: false
-                }
+                    delivers: false,
+                },
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         watch: {
             formInfo: {
                 deep: true,
                 handler (val) {
                     this.$emit('baseFormInfoChange', val)
-                }
-            }
+                },
+            },
         },
         mounted () {
             this.initData()
@@ -275,12 +275,12 @@
                     if (this.nodeInfo.is_builtin) {
                         this.sceneList = [{
                             typeName: 'PROCESS',
-                            name: this.$t(`m.treeinfo["直接处理"]`)
+                            name: this.$t('m.treeinfo["直接处理"]'),
                         }]
                     } else {
                         this.sceneList.push({
                             typeName: item.typeName,
-                            name: item.name
+                            name: item.name,
                         })
                     }
                 })
@@ -294,13 +294,13 @@
                 if (this.assignorsTypeList.some(assignor => assignor === this.formInfo.distribute_type)) {
                     this.assignorsInfo = {
                         type: this.nodeInfo.assignors_type,
-                        value: this.nodeInfo.assignors
+                        value: this.nodeInfo.assignors,
                     }
                 }
                 // 处理人
                 this.processorsInfo = {
                     type: this.nodeInfo.processors_type,
-                    value: this.nodeInfo.processors
+                    value: this.nodeInfo.processors,
                 }
                 // 单据状态
                 this.formInfo.ticket_type = this.nodeInfo.extras.ticket_status ? this.nodeInfo.extras.ticket_status.type : 'keep'
@@ -313,7 +313,7 @@
                 if (this.formInfo.can_deliver) {
                     this.deliversInfo = {
                         type: this.nodeInfo.delivers_type,
-                        value: this.nodeInfo.delivers
+                        value: this.nodeInfo.delivers,
                     }
                 }
             },
@@ -363,7 +363,7 @@
                 // 选择不同的场景，需要清空派单人数据
                 this.assignorsInfo = {
                     type: '',
-                    value: ''
+                    value: '',
                 }
             },
             // 获取二级状态数据
@@ -379,11 +379,13 @@
                 this.ticketKeyLoading = true
                 this.$store.dispatch('ticketStatus/getOverallTicketStatuses').then(res => {
                     this.secondLevelList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.ticketKeyLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.ticketKeyLoading = false
+                    })
             },
             backBasicInfo () {
                 this.checkBasic()
@@ -431,8 +433,8 @@
                 }, validator => {
                     console.error(validator)
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

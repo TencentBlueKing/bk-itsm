@@ -37,7 +37,7 @@ export default {
                         data.push({
                             key: String(node.id || node.key),
                             name: node.name,
-                            can_delete: Boolean(node.can_delete)
+                            can_delete: Boolean(node.can_delete),
                         })
                         // data.push(node)
                     })
@@ -54,21 +54,22 @@ export default {
                             key: item.source_uri,
                             field_key: item.key,
                             service: item.service,
-                            current_status: item.ticket_status
+                            current_status: item.ticket_status,
                         }).then(res => {
                             data = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 if (item.key === 'current_status') {
                                     this.$set(temp, 'isOver', ite.is_over)
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     }
                     break
                 case 'RPC':
@@ -80,9 +81,10 @@ export default {
                     }
                     await this.$store.dispatch('apiRemote/getRpcData', item).then(res => {
                         data = res.data
-                    }).catch(res => {
-                        errorHandler(res, this)
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
                     break
             }
             return data
@@ -215,6 +217,6 @@ export default {
             const timeInfo = timeValue.replace(/-/g, '/')
             const timeStampValue = new Date(timeInfo).getTime()
             return timeStampValue
-        }
-    }
+        },
+    },
 }

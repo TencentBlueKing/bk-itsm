@@ -50,41 +50,41 @@
                 type: Object,
                 required: true,
                 default: () => {
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             isCurrent: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             disabled: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
                 max: Number.MAX_SAFE_INTEGER,
-                isErrMessage: false
+                isErrMessage: false,
             }
         },
         watch: {
             'item.val' (val) {
                 this.isErrMessage = val > this.max || false
                 this.conditionField(this.item, this.fields)
-            }
+            },
         },
         mounted () {
             if (this.item.value && !this.item.val) {
                 this.item.val = this.item.value
             }
         },
-        methods: {}
+        methods: {},
     }
 </script>
 

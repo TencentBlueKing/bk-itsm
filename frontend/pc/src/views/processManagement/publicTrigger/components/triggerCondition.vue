@@ -118,20 +118,20 @@
     export default {
         name: 'triggerCondition',
         components: {
-            triggerField
+            triggerField,
         },
         props: {
             triggerRules: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 // 下拉选框
-                keyList: []
+                keyList: [],
             }
         },
         computed: {
@@ -139,8 +139,8 @@
                 return this.$store.state.common.configurInfo
             },
             ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables
-            })
+                triggerVariables: state => state.triggerVariables,
+            }),
         },
         mounted () {
             this.keyList = this.triggerVariables
@@ -155,7 +155,7 @@
                     key: '',
                     value: '',
                     conditionList: [],
-                    type: 'STRING'
+                    type: 'STRING',
                 })
             },
             deleteLine (item, node, nodeIndex) {
@@ -181,9 +181,9 @@
                             condition: '',
                             value: '',
                             conditionList: [],
-                            type: 'STRING'
-                        }
-                    ]
+                            type: 'STRING',
+                        },
+                    ],
                 })
             },
             deleteGroup (item, index) {
@@ -221,67 +221,73 @@
                     if (checkItem.source_type === 'DATADICT') {
                         this.$store.dispatch('datadict/get_data_by_key', {
                             key: checkItem.source_uri,
-                            field_key: checkItem.key
+                            field_key: checkItem.key,
                         }).then(res => {
                             node.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                node.loading = false
+                            })
                     } else if (checkItem.source_type === 'API') {
                         this.$store.dispatch('apiRemote/get_data_workflow', {
                             kv_relation: checkItem.kv_relation,
-                            api_instance_id: checkItem.api_instance_id
+                            api_instance_id: checkItem.api_instance_id,
                         }).then(res => {
                             node.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                node.loading = false
+                            })
                     } else if (checkItem.source_type === 'RPC') {
                         this.$store.dispatch('apiRemote/getRpcData', {
                             meta: checkItem.meta,
-                            source_uri: checkItem.source_uri
+                            source_uri: checkItem.source_uri,
                         }).then(res => {
                             node.options = res.data.map(ite => {
                                 const temp = {
                                     key: ite.key,
-                                    name: ite.name
+                                    name: ite.name,
                                 }
                                 return temp
                             })
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            node.loading = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                node.loading = false
+                            })
                     } else {
                         node.options = checkItem.choice.map(ite => {
                             const temp = {
                                 key: ite.key,
-                                name: ite.name
+                                name: ite.name,
                             }
                             return temp
                         })
                         node.loading = false
                     }
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

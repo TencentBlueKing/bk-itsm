@@ -181,7 +181,7 @@
         name: 'taskLibrary',
         components: {
             fieldInfo,
-            DealPerson
+            DealPerson,
         },
         mixins: [apiFieldsWatch, commonMix],
         props: {
@@ -189,21 +189,21 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             ticketId: {
                 type: Number,
                 default () {
                     return ''
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 btnLoading: false,
                 excludeTypeList: ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION', 'IAM', 'STARTER_LEADER', 'API'],
                 formData: {
-                    key: ''
+                    key: '',
                 },
                 excludeTypeList: ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION', 'IAM', 'STARTER_LEADER', 'API'],
                 libraryList: [],
@@ -212,17 +212,17 @@
                 tabLoading: false,
                 tableContent: {
                     show: false,
-                    title: this.$t(`m.task['修改任务信息']`),
+                    title: this.$t('m.task[\'修改任务信息\']'),
                     width: 660,
                     content: {},
                     formInfo: {
                         value: '',
-                        type: ''
-                    }
+                        type: '',
+                    },
                 },
                 // 输入框
                 precision: 0,
-                minWidth: 60
+                minWidth: 60,
             }
         },
         created () {
@@ -232,29 +232,33 @@
             getLibraryList () {
                 this.$store.dispatch('taskFlow/getLibraryList').then((res) => {
                     this.libraryList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 删除某个任务库
             handleDeleteOption (option) {
-                const id = option.id
+                const { id } = option
                 this.$store.dispatch('taskFlow/deleteLibrary', id).then((res) => {
                     this.libraryList = this.libraryList.filter(item => item.id !== option.id)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             selectLibrary () {
                 // 根据任务库获取列表数据
                 this.tabLoading = true
                 const id = this.formData.key
                 const params = {
-                    ticket_id: this.ticketId
+                    ticket_id: this.ticketId,
                 }
                 this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
                     this.tableList = res.data
@@ -262,11 +266,13 @@
                         this.$set(item, 'orderStatus', true)
                         this.$set(item, 'orderInfo', item.order)
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.tabLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.tabLoading = false
+                    })
             },
             // 改变处理顺序
             changeOrderStatus (value) {
@@ -291,11 +297,11 @@
             deleteLibrary (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.task['确认删除数据？']`),
-                    subTitle: this.$t(`m.task['数据如果被删除，此数据在当前任务库中不可用。']`),
+                    title: this.$t('m.task[\'确认删除数据？\']'),
+                    subTitle: this.$t('m.task[\'数据如果被删除，此数据在当前任务库中不可用。\']'),
                     confirmFn: () => {
                         this.tableList = this.tableList.filter(node => node.id !== item.id)
-                    }
+                    },
                 })
             },
             closeTaskLibrary () {
@@ -314,7 +320,7 @@
                     this.$set(item, 'showFeild', true)
                     this.$set(item, 'val', item.value || '')
                 })
-                this.isNecessaryToWatch({ 'fields': this.tableContent.content.fields }, 'submit')
+                this.isNecessaryToWatch({ fields: this.tableContent.content.fields }, 'submit')
                 // 处理人数据
                 this.tableContent.formInfo.value = item.processors
                 this.tableContent.formInfo.type = item.processors_type
@@ -346,25 +352,27 @@
                 const id = this.formData.key
                 const params = {
                     name: this.libraryList.filter(item => item.id === this.formData.key)[0].name,
-                    tasks: this.tableList
+                    tasks: this.tableList,
                 }
                 this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['更新成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'更新成功\']'),
+                        theme: 'success',
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.btnLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.btnLoading = false
+                    })
             },
             // 创建任务库
             submitLibrary () {
                 const params = {
                     batch_create: 1,
                     ticket_id: this.ticketId,
-                    tasks: []
+                    tasks: [],
                 }
                 this.tableList.forEach(node => {
                     const valueInfo = {
@@ -372,7 +380,7 @@
                         processors_type: node.processors_type,
                         task_schema_id: node.task_schema_id,
                         order: node.order,
-                        fields: {}
+                        fields: {},
                     }
                     node.fields.forEach((item, index) => {
                         valueInfo.fields[item.key] = item.value
@@ -382,19 +390,21 @@
                 this.btnLoading = true
                 this.$store.dispatch('taskFlow/createTask', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['创建任务成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'创建任务成功\']'),
+                        theme: 'success',
                     })
                     this.$emit('closeTaskLibrary')
                     // 刷新数据
                     this.$emit('getTaskList')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.btnLoading = false
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.btnLoading = false
+                    })
+            },
+        },
     }
 </script>
 

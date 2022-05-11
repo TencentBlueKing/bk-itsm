@@ -56,27 +56,27 @@
     export default {
         name: 'ConfigProcess',
         components: {
-            secondFlow
+            secondFlow,
         },
         props: {
             flowInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             isNewFlow: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             isSaveing: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             processId: {
                 type: [String, Number],
-                required: true
-            }
+                required: true,
+            },
         },
         data () {
             return {
@@ -88,7 +88,7 @@
                 lineList: [],
                 errorList: [],
                 // 配置判断
-                statusList: []
+                statusList: [],
             }
         },
         mounted () {
@@ -103,11 +103,11 @@
             getFlowChart () {
                 this.isDataLoading = true
                 axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { 'workflow': this.processId }),
+                    this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
                     this.$store.dispatch('deployCommon/getChartLink', {
-                        'workflow': this.processId,
-                        'page_size': 1000
-                    })
+                        workflow: this.processId,
+                        page_size: 1000,
+                    }),
                 ]).then(axios.spread((userResp, reposResp) => {
                     this.addList = userResp.data
                     for (let i = 0; i < this.addList.length; i++) {
@@ -116,9 +116,10 @@
                     this.$store.commit('cdeploy/getChart', this.addList)
 
                     this.lineList = reposResp.data.items
-                })).finally(() => {
-                    this.isDataLoading = false
-                })
+                }))
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 立即配置
             configurNode (item, index) {
@@ -148,18 +149,18 @@
                 const params = []
                 this.$store.dispatch('cdeploy/submitChart', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.treeinfo["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.treeinfo["保存成功"]'),
+                        theme: 'success',
                     })
                     this.$router.push({
                         name: 'ProcessEdit',
                         params: {
                             type: 'edit',
-                            step: 'processCreate'
+                            step: 'processCreate',
                         },
                         query: {
-                            processId: this.processId
-                        }
+                            processId: this.processId,
+                        },
                     })
                 }, (res) => {
                     if (res.data && res.data.data) {
@@ -167,45 +168,47 @@
                         this.$refs.flowInfo.errorNodes(this.errorList)
                     }
                     errorHandler(res, this)
-                }).finally(() => {
-                    this.secondClick = false
                 })
+                    .finally(() => {
+                        this.secondClick = false
+                    })
             },
             // 保存节点位置
             submitFlow () {
                 const lineInfoList = this.$refs.flowInfo.canvasData
                 const params = {
                     workflow_id: this.processId,
-                    transitions: []
+                    transitions: [],
                 }
                 lineInfoList.lines.forEach(item => {
                     params.transitions.push({
                         id: item.lineInfo.id,
                         axis: {
                             start: item.source.arrow,
-                            end: item.target.arrow
-                        }
+                            end: item.target.arrow,
+                        },
                     })
                 })
                 this.$store.dispatch('deployCommon/updateFlowLine', { params }).then((res) => {
                     // ...
-                }).catch(res => {
-                    console.log('error')
                 })
+                    .catch(res => {
+                        console.log('error')
+                    })
             },
             previousStep () {
                 this.$router.push({
                     name: 'ProcessEdit',
                     params: {
                         type: 'edit',
-                        step: 'processInfo'
+                        step: 'processInfo',
                     },
                     query: {
-                        processId: this.processId
-                    }
+                        processId: this.processId,
+                    },
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

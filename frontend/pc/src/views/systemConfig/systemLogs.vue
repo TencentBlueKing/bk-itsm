@@ -139,7 +139,7 @@
         name: 'SystemLogs',
         components: {
             searchInfo,
-            logsInfo
+            logsInfo,
         },
         mixins: [commonMix],
         data () {
@@ -151,22 +151,22 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 选中的数据
                 checkList: [],
                 // 查询
                 moreSearch: [
                     {
-                        name: this.$t(`m.systemConfig["接口地址"]`),
-                        placeholder: this.$t(`m.systemConfig["请输入接口地址"]`),
+                        name: this.$t('m.systemConfig["接口地址"]'),
+                        placeholder: this.$t('m.systemConfig["请输入接口地址"]'),
                         typeKey: 'name__contains',
                         type: 'input',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.systemConfig["请求方法"]`),
+                        name: this.$t('m.systemConfig["请求方法"]'),
                         type: 'select',
                         typeKey: 'method',
                         value: '',
@@ -175,11 +175,11 @@
                             { key: 'POST', name: 'POST' },
                             { key: 'PUT', name: 'PUT' },
                             { key: 'DELETE', name: 'DELETE' },
-                            { key: 'PATCH', name: 'PATCH' }
-                        ]
+                            { key: 'PATCH', name: 'PATCH' },
+                        ],
                     },
                     {
-                        name: this.$t(`m.systemConfig["状态码"]`),
+                        name: this.$t('m.systemConfig["状态码"]'),
                         type: 'select',
                         typeKey: 'status',
                         value: '',
@@ -187,43 +187,43 @@
                             { key: '20X', name: '20X' },
                             { key: '30X', name: '30X' },
                             { key: '40X', name: '40X' },
-                            { key: '50X', name: '50X' }
-                        ]
+                            { key: '50X', name: '50X' },
+                        ],
                     },
                     {
-                        name: this.$t(`m.systemConfig["接口ID"]`),
+                        name: this.$t('m.systemConfig["接口ID"]'),
                         type: 'input',
                         typeKey: 'api_instance_id',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.systemConfig["单据ID"]`),
+                        name: this.$t('m.systemConfig["单据ID"]'),
                         type: 'input',
                         typeKey: 'ticket_id',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.systemConfig["请求时间"]`),
+                        name: this.$t('m.systemConfig["请求时间"]'),
                         type: 'datetime',
                         value: '',
-                        list: []
-                    }
+                        list: [],
+                    },
                 ],
                 // 日志详情
                 customSettings: {
                     isShow: false,
-                    title: this.$t(`m.systemConfig["日志详情"]`),
+                    title: this.$t('m.systemConfig["日志详情"]'),
                     width: 700,
-                    logsObject: {}
-                }
+                    logsObject: {},
+                },
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         mounted () {
             this.getList()
@@ -238,16 +238,16 @@
                 this.checkList = []
                 const params = {
                     page: this.pagination.current,
-                    page_size: this.pagination.limit
+                    page_size: this.pagination.limit,
                 }
                 this.moreSearch.forEach(item => {
                     if (item.type === 'datetime' && item.value && item.value[0]) {
                         const d = new Date(item.value[0])
-                        const gteTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
+                        const gteTime = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
                         const lte = new Date(item.value[1])
-                        const lteTime = lte.getFullYear() + '-' + (lte.getMonth() + 1) + '-' + lte.getDate() + ' ' + lte.getHours() + ':' + lte.getMinutes() + ':' + lte.getSeconds()
-                        params['date_created__gte'] = gteTime
-                        params['date_created__lte'] = lteTime
+                        const lteTime = `${lte.getFullYear()}-${lte.getMonth() + 1}-${lte.getDate()} ${lte.getHours()}:${lte.getMinutes()}:${lte.getSeconds()}`
+                        params.date_created__gte = gteTime
+                        params.date_created__lte = lteTime
                     } else {
                         if (item.value && item.typeKey) {
                             params[item.typeKey] = Array.isArray(item.value) ? item.value.join(',') : item.value
@@ -261,11 +261,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -290,15 +292,13 @@
             },
             // 导出日志
             exportLog (item) {
-                window.open(window.SITE_URL + `api/tracker/records/${item.id}/exports/`)
+                window.open(`${window.SITE_URL}api/tracker/records/${item.id}/exports/`)
             },
             // 批量导出日志
             exportLogs () {
-                const idArr = this.checkList.map(item => {
-                    return item.id
-                })
+                const idArr = this.checkList.map(item => item.id)
                 const logs = idArr.join(',')
-                window.open(window.SITE_URL + `api/tracker/records/batch_exports/?logs=${logs}`)
+                window.open(`${window.SITE_URL}api/tracker/records/batch_exports/?logs=${logs}`)
             },
             // 简单查询
             searchContent () {
@@ -313,8 +313,8 @@
                     item.value = ''
                 })
                 this.getList(1)
-            }
-        }
+            },
+        },
     }
 </script>
 

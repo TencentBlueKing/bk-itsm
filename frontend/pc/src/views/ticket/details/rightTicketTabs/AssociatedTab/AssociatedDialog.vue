@@ -163,26 +163,26 @@
         name: 'AssociatedDialog',
         components: {
             SelectService,
-            fieldInfo
+            fieldInfo,
         },
         mixins: [apiFieldsWatch],
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
                 typeSelectRadio: [
                     {
                         key: 'associate',
-                        name: this.$t('m.manageCommon["关联到已有单据"]')
+                        name: this.$t('m.manageCommon["关联到已有单据"]'),
                     },
                     {
                         key: 'new',
-                        name: this.$t('m.manageCommon["创建新单"]')
-                    }
+                        name: this.$t('m.manageCommon["创建新单"]'),
+                    },
                 ],
                 // 表格数据
                 tabShowList: [],
@@ -191,7 +191,7 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 checkList: [],
                 colorHexList: [],
@@ -206,14 +206,14 @@
                 // 搜索信息
                 searchInfo: {
                     serviceType: [],
-                    keyword: ''
-                }
+                    keyword: '',
+                },
             }
         },
         computed: {
             serviceTypeList () {
                 return this.$store.state.choice_type_list
-            }
+            },
         },
         mounted () {
             this.getList()
@@ -225,15 +225,15 @@
                 this.fieldList = []
             },
             checkOne (rowData) {
-                const id = rowData.id
+                const { id } = rowData
                 const { href } = this.$router.resolve({
-                    name: `commonInfo`,
+                    name: 'commonInfo',
                     params: {
-                        id: id
+                        id,
                     },
                     query: {
-                        id: `${id}`
-                    }
+                        id: `${id}`,
+                    },
                 })
                 window.open(href, '_blank')
             },
@@ -248,13 +248,13 @@
                     keyword: this.searchInfo.keyword.replace(/(^\s*)|(\s*$)/g, ''),
                     access: 'true',
                     exclude_ticket_id__in: this.ticketInfo.id,
-                    project_key: this.ticketInfo.project_key
+                    project_key: this.ticketInfo.project_key,
                 }
                 let resUrl = ''
                 this.getUrlInfo = ''
                 for (const key in params) {
-                    this.getUrlInfo += key + '=' + params[key]
-                    resUrl += key + '=' + params[key]
+                    this.getUrlInfo += `${key}=${params[key]}`
+                    resUrl += `${key}=${params[key]}`
                 }
                 this.isTableLoading = true
                 this.$store.dispatch('change/getList', params).then((res) => {
@@ -265,11 +265,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isTableLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isTableLoading = false
+                    })
             },
             // 分页过滤数据
             handlePageLimitChange () {
@@ -293,17 +295,18 @@
             getstatusColor (row) {
                 const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status)
                 return statusColor.length ? {
-                    'color': statusColor[0].color_hex, 'border': `1px solid ${statusColor[0].color_hex}`
-                } : { 'color': '#3c96ff', 'border': `1px solid #3c96ff` }
+                    color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
+                } : { color: '#3c96ff', border: '1px solid #3c96ff' }
             },
             getTypeStatus () {
                 const params = {}
                 const type = ''
                 this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
                     this.colorHexList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 搜索
             serviceSearch (val) {
@@ -327,11 +330,11 @@
                     return
                 }
                 const params = {
-                    service_id: this.$refs.SelectService.formData.service_id
+                    service_id: this.$refs.SelectService.formData.service_id,
                 }
                 axios.all([
                     this.$store.dispatch('change/getSubmitFields', params),
-                    this.$store.dispatch('change/getAllFields', this.ticketInfo.id)
+                    this.$store.dispatch('change/getAllFields', this.ticketInfo.id),
                 ]).then(axios.spread((firstResp, allResp) => {
                     firstResp.data.forEach(item => {
                         this.$set(item, 'val', '')
@@ -345,12 +348,14 @@
                         })
                     })
                     this.fieldList = firstResp.data
-                    this.isNecessaryToWatch({ 'fields': this.fieldList }, 'submit')
-                })).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.showField = false
-                })
+                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit')
+                }))
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.showField = false
+                    })
             },
             // 提交函数
             setFields () {
@@ -360,7 +365,7 @@
                 const SelectServiceForm = {
                     catalog_id: this.$refs.SelectService.formData.cascadeId,
                     service_id: this.$refs.SelectService.formData.service_id,
-                    service_type: this.$refs.SelectService.formData.key
+                    service_type: this.$refs.SelectService.formData.key,
                 }
                 const formData = {}
                 formData.from_ticket_id = this.ticketInfo.id * 1
@@ -376,7 +381,7 @@
                         id: item.id,
                         key: item.key,
                         value: item.showFeild ? item.value : '',
-                        choice: item.choice
+                        choice: item.choice,
                     })
                 })
                 this.buttonDisabled = true
@@ -384,15 +389,17 @@
                     if (res.code === 'OK') {
                         this.$bkMessage({
                             message: this.$t('m.common["提交成功！"]'),
-                            theme: 'success'
+                            theme: 'success',
                         })
                         this.$emit('submitSuccess')
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.buttonDisabled = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.buttonDisabled = false
+                    })
             },
             // 关闭测弹窗
             closeOpen () {
@@ -402,21 +409,23 @@
                 const tempList = this.checkList.map(item => item.id)
                 const params = {
                     from_ticket: this.ticketInfo.id,
-                    to_tickets: tempList
+                    to_tickets: tempList,
                 }
                 this.$store.dispatch('change/bindTicket', params).then((res) => {
                     this.$bkMessage({
                         message: this.$t('m.manageCommon["关联成功"]'),
-                        theme: 'success'
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.checkList = []
-                    this.$emit('submitSuccess')
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.checkList = []
+                        this.$emit('submitSuccess')
+                    })
+            },
+        },
     }
 </script>
 

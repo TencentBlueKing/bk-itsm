@@ -84,13 +84,13 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: Home
+        component: Home,
     },
     // 工单打印
     {
         path: '/printOrder',
         name: 'PrintOrder',
-        component: printOrder
+        component: printOrder,
     },
     // 服务目录
     // {
@@ -135,8 +135,8 @@ const routes = [
                 name: 'ProcessHome',
                 component: ProcessHome,
                 meta: {
-                    admin: true
-                }
+                    admin: true,
+                },
             },
             {
                 path: ':type(new|edit)/:step/',
@@ -145,16 +145,16 @@ const routes = [
                 props: (route) => ({
                     processId: route.query.processId,
                     type: route.params.type,
-                    step: route.params.step
+                    step: route.params.step,
                 }),
                 meta: {
-                    admin: true
-                }
-            }
+                    admin: true,
+                },
+            },
         ],
         meta: {
-            admin: true
-        }
+            admin: true,
+        },
     },
     // 流程版本
     {
@@ -162,8 +162,8 @@ const routes = [
         name: 'FlowVersion',
         component: flowVersion,
         meta: {
-            admin: true
-        }
+            admin: true,
+        },
     },
     // 基础模型
     {
@@ -171,8 +171,8 @@ const routes = [
         name: 'BasicModule',
         component: basicModule,
         meta: {
-            admin: true
-        }
+            admin: true,
+        },
     },
     // 流程管理 -- 数据字典
     {
@@ -180,8 +180,8 @@ const routes = [
         name: 'DataDictionary',
         component: dataDictionary,
         meta: {
-            admin: true
-        }
+            admin: true,
+        },
     },
     // 系统配置 -- 接口日志
     {
@@ -189,25 +189,25 @@ const routes = [
         name: 'SystemLogs',
         component: systemLogs,
         meta: {
-            admin: true
-        }
+            admin: true,
+        },
     },
     // 无权限访问页面
     {
         path: '/limitAccess',
         name: 'LimitAccess',
-        component: limitAccess
+        component: limitAccess,
     },
     // 应用正在部署
     {
         path: '/exception',
         name: 'Exception',
-        component: exception
+        component: exception,
     },
     {
         path: '/customFormTest',
         name: 'CustomFormTest',
-        component: RenderViewTest
+        component: RenderViewTest,
     },
     // 工单管理
     {
@@ -218,32 +218,32 @@ const routes = [
             {
                 path: 'my/:type(todo|approval|created|attention|history)', // 我的工单
                 name: 'MyTicket',
-                component: MyTicket
+                component: MyTicket,
             },
             {
                 path: 'all', // 所有工单
                 name: 'AllTicket',
-                component: AllTicket
+                component: AllTicket,
             },
             {
                 path: 'create', // 提交工单
                 name: 'CreateTicket',
-                component: CreateTicket
+                component: CreateTicket,
             },
             {
                 path: 'detail', // 工单详情
                 name: 'TicketDetail',
-                component: TicketDetail
+                component: TicketDetail,
             },
             {
                 path: 'detail-iframe', // 工单详情-iframe
                 name: 'TicketDetailIframe',
                 component: TicketDetailIframe,
                 meta: {
-                    iframe: true
-                }
-            }
-        ]
+                    iframe: true,
+                },
+            },
+        ],
     },
     // 运营数据
     {
@@ -254,25 +254,25 @@ const routes = [
             {
                 path: '/',
                 name: 'OperationHome',
-                component: OperationHome
+                component: OperationHome,
             },
             {
                 path: 'service/:id',
                 name: 'OperationService',
-                component: OperationService
-            }
-        ]
+                component: OperationService,
+            },
+        ],
     },
     { // 重定向到新路由-兼容已使用该路由的系统
         path: '/newBill',
-        redirect: '/ticket/create'
+        redirect: '/ticket/create',
     },
-    ...routerModules
+    ...routerModules,
 ]
 
 const router = new Router({
     mode: 'hash',
-    routes: routes
+    routes,
 })
 
 router.beforeEach((to, from, next) => {

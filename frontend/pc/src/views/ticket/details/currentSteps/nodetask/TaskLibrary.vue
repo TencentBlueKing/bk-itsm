@@ -118,18 +118,18 @@
         name: 'TaskLibrary',
         components: {
             fieldInfo,
-            DealPerson
+            DealPerson,
         },
         mixins: [apiFieldsWatch],
         props: {
             ticketInfo: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             nodeInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
@@ -138,7 +138,7 @@
                 templateListLoading: false,
                 formData: {
                     templateId: '',
-                    selectedTask: ''
+                    selectedTask: '',
                 },
                 templateList: [],
                 taskList: [],
@@ -148,9 +148,9 @@
                     item: null,
                     dealPerson: {
                         type: 'PERSON',
-                        value: ''
-                    }
-                }
+                        value: '',
+                    },
+                },
             }
         },
         mounted () {
@@ -161,28 +161,32 @@
             getLibraryList () {
                 this.templateListLoading = true
                 this.$store.dispatch('taskFlow/getLibraryList', {
-                    service_id: this.ticketInfo.service_id
+                    service_id: this.ticketInfo.service_id,
                 }).then((res) => {
                     this.templateList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.templateListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.templateListLoading = false
+                    })
             },
             // 获取任务库下的任务
             getLibraryTasks (id) {
                 this.taskListLoading = true
                 const params = {
-                    task_lib_id: id
+                    task_lib_id: id,
                 }
                 this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
                     this.taskList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.taskListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.taskListLoading = false
+                    })
             },
             handleSubmitClick () {
                 if (!this.selectedTasks.length) {
@@ -191,7 +195,7 @@
                 const params = {
                     batch_create: true,
                     ticket_id: this.ticketInfo.id,
-                    tasks: []
+                    tasks: [],
                 }
                 this.selectedTasks.forEach(task => {
                     const taskParams = {
@@ -202,7 +206,7 @@
                         state_id: this.nodeInfo.state_id,
                         ticket_id: this.ticketInfo.id,
                         task_schema_id: task.task_schema_id,
-                        source: 'template'
+                        source: 'template',
                     }
                     task.fields.forEach(field => {
                         if (task.type === 'SOPS_TEMPLATE') {
@@ -210,7 +214,7 @@
                                 id: field.value.id,
                                 template_source: field.value.template_source,
                                 bk_biz_id: field.value.bk_biz_id,
-                                constants: field.value.constants
+                                constants: field.value.constants,
                             }
                             taskParams.exclude_task_nodes_id = []
                         } else if (task.type === 'DEVOPS_TEMPLATE') {
@@ -224,15 +228,17 @@
                 this.btnLoading = true
                 this.$store.dispatch('taskFlow/createTask', { params }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['新建任务成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'新建任务成功\']'),
+                        theme: 'success',
                     })
                     this.$emit('close', true)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.btnLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.btnLoading = false
+                    })
             },
             onTaskLibChange (id) {
                 this.getLibraryTasks(id)
@@ -245,11 +251,11 @@
                 console.log(selection, 'selection')
             },
             handleDeleteTaskLib (option) {
-                const id = option.id
+                const { id } = option
                 this.$store.dispatch('taskFlow/deleteLibrary', id).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.serviceConfig["删除成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.serviceConfig["删除成功"]'),
+                        theme: 'success',
                     })
                     this.getLibraryList()
                     // 删除了已选中任务库
@@ -258,26 +264,27 @@
                         this.taskList = []
                         this.selectedTasks = []
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             onTaskNameClick (row) {
                 this.viewTaskInfo.show = true
                 this.viewTaskInfo.item = row
                 this.viewTaskInfo.dealPerson = {
                     type: row.processors_type,
-                    value: row.processors
+                    value: row.processors,
                 }
                 const fields = row.fields.filter(item => item.type !== 'COMPLEX-MEMBERS')
                 fields.forEach(item => {
                     this.$set(item, 'showFeild', true)
                     this.$set(item, 'val', item.value || '')
                 })
-                this.isNecessaryToWatch({ 'fields': fields }, 'submit')
+                this.isNecessaryToWatch({ fields }, 'submit')
                 this.viewTaskInfo.item.fields = fields
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

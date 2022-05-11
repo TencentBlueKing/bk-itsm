@@ -131,7 +131,7 @@
     export default {
         name: 'addBasicModule',
         components: {
-            draggable
+            draggable,
         },
         mixins: [commonMix],
         props: {
@@ -139,14 +139,14 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             publicList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -157,18 +157,18 @@
                         id: '',
                         name: '',
                         desc: '',
-                        fields: []
-                    }
+                        fields: [],
+                    },
                 },
                 dataList: [],
                 fieldsList: [],
-                rules: {}
+                rules: {},
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -183,9 +183,7 @@
                         }
                     })
                 })
-                this.fieldsList = this.publicList.filter(item => {
-                    return (item.key !== 'title' && item.key !== 'current_status')
-                })
+                this.fieldsList = this.publicList.filter(item => (item.key !== 'title' && item.key !== 'current_status'))
                 if (this.slideData.id) {
                     this.addTableInfo.formInfo.id = this.slideData.id
                     this.addTableInfo.formInfo.name = this.slideData.name
@@ -201,9 +199,7 @@
                         })
                     })
                 } else {
-                    this.dataList = this.publicList.filter(item => {
-                        return (item.key === 'title' || item.key === 'current_status')
-                    })
+                    this.dataList = this.publicList.filter(item => (item.key === 'title' || item.key === 'current_status'))
                     this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id)
                 }
             },
@@ -215,34 +211,36 @@
                         fields: this.addTableInfo.formInfo.fields,
                         fields_order: this.addTableInfo.formInfo.fields,
                         id: this.addTableInfo.formInfo.id,
-                        name: this.addTableInfo.formInfo.name
+                        name: this.addTableInfo.formInfo.name,
                     }
                     // create or update
                     if (!this.addTableInfo.formInfo.id) {
                         this.$store.dispatch('basicModule/add_tables', { params }).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["添加成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["添加成功"]'),
+                                theme: 'success',
                             })
                             this.cancel()
                             this.$parent.$parent.getList()
-                        }).catch(res => {
-                            errorHandler(res, this)
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     } else {
                         this.$store.dispatch('basicModule/update_tables', {
                             params,
-                            id: this.addTableInfo.formInfo.id
+                            id: this.addTableInfo.formInfo.id,
                         }).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["更新成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["更新成功"]'),
+                                theme: 'success',
                             })
                             this.cancel()
                             this.$parent.$parent.getList()
-                        }).catch(res => {
-                            errorHandler(res, this)
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
                     }
                 }, validator => {
 
@@ -265,13 +263,9 @@
             },
             // 拖动结束后的数据
             updateInfo (evt) {
-                this.addTableInfo.formInfo.fields = this.dataList.map(
-                    item => {
-                        return item.id
-                    }
-                )
-            }
-        }
+                this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id)
+            },
+        },
     }
 </script>
 

@@ -99,12 +99,12 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             ticketOperateType: {
                 type: String,
-                default: 'close'
-            }
+                default: 'close',
+            },
         },
         data () {
             return {
@@ -118,21 +118,21 @@
                     autoClose: false,
                     precision: 0,
                     content: '',
-                    title: ''
+                    title: '',
                 },
                 formInfo: {
                     suspend_message: '',
                     closeState: '',
-                    close_message: ''
+                    close_message: '',
                 },
                 endList: [],
                 isDataLoading: false,
                 checkInfo: {
                     suspendFlag: false,
                     closeFlag: false,
-                    closeReasonFlag: false
+                    closeReasonFlag: false,
                 },
-                rules: {}
+                rules: {},
             }
         },
         mounted () {
@@ -143,19 +143,19 @@
         methods: {
             openCel () {
                 if (this.ticketOperateType === 'close') {
-                    this.dialogSetting.title = this.$t(`m.newCommon["关单"]`)
+                    this.dialogSetting.title = this.$t('m.newCommon["关单"]')
                 } else if (this.ticketOperateType === 'suspend') {
-                    this.dialogSetting.title = this.$t(`m.newCommon["挂起"]`)
+                    this.dialogSetting.title = this.$t('m.newCommon["挂起"]')
                 } else {
-                    this.dialogSetting.title = this.$t(`m.newCommon["是否恢复此单据？"]`)
-                    this.dialogSetting.content = this.$t(`m.newCommon["单据将恢复至【"]`) + this.ticketInfo.pre_status_display + this.$t(`m.newCommon["】"]`)
+                    this.dialogSetting.title = this.$t('m.newCommon["是否恢复此单据？"]')
+                    this.dialogSetting.content = this.$t('m.newCommon["单据将恢复至【"]') + this.ticketInfo.pre_status_display + this.$t('m.newCommon["】"]')
                     this.$bkInfo({
                         type: 'warning',
                         title: this.dialogSetting.title,
                         subTitle: this.dialogSetting.content,
                         confirmFn: () => {
                             this.submitRestore()
-                        }
+                        },
                     })
                 }
                 if (this.ticketOperateType === 'close' || this.ticketOperateType === 'suspend') {
@@ -174,11 +174,13 @@
                 const key = this.ticketInfo.current_status
                 this.$store.dispatch('deployOrder/getEndStatus', { type, key }).then((res) => {
                     this.endList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             initFormInfo () {
                 this.formInfo.suspend_message = ''
@@ -196,39 +198,43 @@
                 if (this.ticketOperateType === 'close') {
                     const params = {
                         current_status: this.formInfo.closeState,
-                        desc: this.formInfo.close_message
+                        desc: this.formInfo.close_message,
                     }
-                    const id = this.ticketInfo.id
+                    const { id } = this.ticketInfo
                     this.$store.dispatch('deployOrder/closeTickets', { id, params }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.newCommon["关单成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.newCommon["关单成功"]'),
+                            theme: 'success',
                         })
-                    }).catch((res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.dialogSetting.isShow = false
-                        this.endList.splice(0, this.endList.length)
-                        this.initFormInfo()
-                        this.$emit('submitSuccess')
                     })
+                        .catch((res) => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.dialogSetting.isShow = false
+                            this.endList.splice(0, this.endList.length)
+                            this.initFormInfo()
+                            this.$emit('submitSuccess')
+                        })
                 } else if (this.ticketOperateType === 'suspend') {
                     const params = {
-                        desc: this.formInfo.suspend_message
+                        desc: this.formInfo.suspend_message,
                     }
-                    const id = this.ticketInfo.id
+                    const { id } = this.ticketInfo
                     this.$store.dispatch('deployOrder/suspendTickets', { id, params }).then((res) => {
                         this.$bkMessage({
-                            message: this.$t(`m.newCommon["挂起成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.newCommon["挂起成功"]'),
+                            theme: 'success',
                         })
-                    }).catch((res) => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.dialogSetting.isShow = false
-                        this.initFormInfo()
-                        this.$emit('submitSuccess')
                     })
+                        .catch((res) => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.dialogSetting.isShow = false
+                            this.initFormInfo()
+                            this.$emit('submitSuccess')
+                        })
                 } else if (this.ticketOperateType === 'restore') {
                     this.submitRestore()
                 }
@@ -237,20 +243,22 @@
                 this.dialogSetting.isShow = false
             },
             submitRestore () {
-                const id = this.ticketInfo.id
+                const { id } = this.ticketInfo
                 this.$store.dispatch('deployOrder/restoreTickets', id).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.newCommon["恢复成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.newCommon["恢复成功"]'),
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.initFormInfo()
-                    this.$emit('submitSuccess')
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.initFormInfo()
+                        this.$emit('submitSuccess')
+                    })
+            },
+        },
     }
 </script>
 

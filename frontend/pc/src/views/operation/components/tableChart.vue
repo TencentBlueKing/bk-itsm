@@ -71,19 +71,19 @@
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             desc: {
                 type: String,
-                default: ''
+                default: '',
             },
             showSearchInput: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             showPagination: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             pagination: {
                 type: Object,
@@ -91,26 +91,26 @@
                     return {
                         current: 1,
                         count: 0,
-                        limit: 10
+                        limit: 10,
                     }
-                }
+                },
             },
             showTop3Color: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             columns: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             chartData: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         methods: {
             getRowOrder (index) {
@@ -146,8 +146,8 @@
                 if (typeof col.handler === 'function') {
                     col.handler.call(this, data)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

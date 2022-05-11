@@ -151,7 +151,7 @@
             autoNode,
             sopsNode,
             signNode,
-            ApprovalNode
+            ApprovalNode,
         },
         props: {
             /**
@@ -162,20 +162,20 @@
              */
             step: {
                 type: String,
-                required: true
+                required: true,
             },
             // 流程 id
             processId: {
                 type: [String, Number],
-                default: ''
+                default: '',
             },
             /**
              * 类型 new | edit
              */
             type: {
                 type: String,
-                required: true
-            }
+                required: true,
+            },
         },
         data () {
             return {
@@ -188,7 +188,7 @@
                 // 流程详情信息
                 flowInfo: {},
                 // 配置节点
-                configur: {}
+                configur: {},
             }
         },
         computed: {
@@ -216,18 +216,18 @@
                 return [
                     {
                         id: 1,
-                        name: this.$t(`m.deployPage["填写流程信息"]`),
+                        name: this.$t('m.deployPage["填写流程信息"]'),
                         step: 'processInfo',
                         type: (() => {
                             if (self.step !== 'processInfo') {
                                 return 'success'
                             }
                             return 'primary'
-                        })()
+                        })(),
                     },
                     {
                         id: 2,
-                        name: this.$t(`m.deployPage["定义与配置流程"]`),
+                        name: this.$t('m.deployPage["定义与配置流程"]'),
                         step: 'pipelineDesign',
                         type: (() => {
                             if (self.step === 'pipelineDesign') {
@@ -237,11 +237,11 @@
                                 return 'success'
                             }
                             return 'normal'
-                        })()
+                        })(),
                     },
                     {
                         id: 3,
-                        name: this.$t(`m.deployPage["流程启用设置"]`),
+                        name: this.$t('m.deployPage["流程启用设置"]'),
                         step: 'processCreate',
                         type: (() => {
                             if (self.step === 'processCreate') {
@@ -251,10 +251,10 @@
                                 return 'success'
                             }
                             return 'normal'
-                        })()
-                    }
+                        })(),
+                    },
                 ]
-            }
+            },
         },
         mounted () {
             if (!this.isNewFlow) {
@@ -267,14 +267,16 @@
             getFlowDetailInfo () {
                 this.isloading = true
                 this.$store.dispatch('design/getFlowDetail', { params: this.processId }).then((res) => {
-                    const data = res.data
+                    const { data } = res
                     this.flowInfo = data
                     this.business = data.is_biz_needed
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isloading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isloading = false
+                    })
             },
             // 全局常量信息，此处获取节点排列信息
             getArrangeInfo () {
@@ -286,8 +288,8 @@
                         for (let i = 0; i < value[key].length; i++) {
                             listInfo.push({
                                 id: i + 1,
-                                name: value[key][i][1] ? value[key][i][1] : this.$t(`m.deployPage["无"]`),
-                                typeName: value[key][i][0]
+                                name: value[key][i][1] ? value[key][i][1] : this.$t('m.deployPage["无"]'),
+                                typeName: value[key][i][0],
                             })
                         }
                         globalInfo[key] = listInfo
@@ -307,11 +309,11 @@
                     name: 'ProcessEdit',
                     params: {
                         type: 'edit',
-                        step: item.step
+                        step: item.step,
                     },
                     query: {
-                        processId: this.processId
-                    }
+                        processId: this.processId,
+                    },
                 })
             },
             // 显示配置信息
@@ -334,19 +336,19 @@
                 const id = this.processId
                 this.$store.dispatch(api, { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.deployPage["保存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.deployPage["保存成功"]'),
+                        theme: 'success',
                     })
                     if (this.isNewFlow) {
                         this.$router.push({
                             name: 'ProcessEdit',
                             params: {
                                 type: 'edit',
-                                step: 'pipelineDesign'
+                                step: 'pipelineDesign',
                             },
                             query: {
-                                processId: res.data.id
-                            }
+                                processId: res.data.id,
+                            },
                         })
                         // 获取信息
                         this.$nextTick(() => {
@@ -354,13 +356,15 @@
                         })
                         return
                     }
-                    const data = res.data
+                    const { data } = res
                     this.flowInfo = data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isSaveing = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isSaveing = false
+                    })
             },
             onBusinessChange (value) {
                 this.business = value
@@ -368,10 +372,10 @@
             // 跳转到 process 列表
             onBackProcessHome () {
                 this.$router.push({
-                    name: 'ProcessHome'
+                    name: 'ProcessHome',
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

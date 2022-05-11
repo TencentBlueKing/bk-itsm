@@ -31,8 +31,8 @@ const isCrossOrigin = isCrossOriginIFrame()
 export const topWindow = isCrossOrigin ? window : window.top
 
 export const openOtherApp = {
-    'iam': function (url) {
+    iam (url) {
         const appCode = window.iam_code || 'bk_iam'
         topWindow.BLUEKING.api.open_app_by_other(appCode, url)
-    }
+    },
 }

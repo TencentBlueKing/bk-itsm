@@ -160,60 +160,60 @@
     const COLUMN_LIST = [
         {
             id: 'id',
-            label: i18n.t(`m.manageCommon['单号']`),
+            label: i18n.t('m.manageCommon[\'单号\']'),
             width: '200',
-            disabled: true
+            disabled: true,
         },
         {
             id: 'title',
-            label: i18n.t(`m.manageCommon['标题']`),
+            label: i18n.t('m.manageCommon[\'标题\']'),
             minWidth: '180' },
         {
             id: 'service_name',
-            label: i18n.t(`m.home['服务']`),
+            label: i18n.t('m.home[\'服务\']'),
             minWidth: '140',
             prop: 'service_name' },
         {
             id: 'service_type_name',
-            label: i18n.t(`m.manageCommon['类型']`),
+            label: i18n.t('m.manageCommon[\'类型\']'),
             minWidth: '80' },
         {
             id: 'priority',
-            label: i18n.t(`m.slaContent['优先级']`),
+            label: i18n.t('m.slaContent[\'优先级\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'priority_name' },
         {
             id: 'current_steps',
-            label: i18n.t(`m.newCommon['当前步骤']`),
+            label: i18n.t('m.newCommon[\'当前步骤\']'),
             minWidth: '80',
             prop: 'current_steps' },
         {
             id: 'current_processors',
-            label: i18n.t(`m.manageCommon['当前处理人']`),
+            label: i18n.t('m.manageCommon[\'当前处理人\']'),
             width: '130',
             prop: 'current_processors' },
         {
             id: 'status',
-            label: i18n.t(`m.manageCommon['状态']`),
+            label: i18n.t('m.manageCommon[\'状态\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'status' },
         {
             id: 'create_at',
-            label: i18n.t(`m.manageCommon['提单时间']`),
+            label: i18n.t('m.manageCommon[\'提单时间\']'),
             minWidth: '140',
             sortable: 'custom',
             prop: 'create_at' },
         {
             id: 'creator',
-            label: i18n.t(`m.manageCommon['提单人']`),
+            label: i18n.t('m.manageCommon[\'提单人\']'),
             minWidth: '140',
             prop: 'creator' },
         {
             id: 'operate',
-            label: i18n.t(`m.manageCommon['操作']`),
-            minWidth: '80' }
+            label: i18n.t('m.manageCommon[\'操作\']'),
+            minWidth: '80' },
     ]
 
     export default {
@@ -221,7 +221,7 @@
         components: {
             AdvancedSearch,
             ExportTicketDialog,
-            ApprovalDialog
+            ApprovalDialog,
         },
         mixins: [ticketListMixins],
         data () {
@@ -232,12 +232,12 @@
                 approvalInfo: {
                     showAllOption: false,
                     result: true,
-                    approvalList: []
+                    approvalList: [],
                 },
                 isExportDialogShow: false,
                 isApprovalDialogShow: false,
                 // 批量审批选中单
-                selectedList: []
+                selectedList: [],
             }
         },
         methods: {
@@ -247,7 +247,7 @@
                 this.approvalInfo = {
                     result: true,
                     showAllOption: true,
-                    approvalList: this.selectedList.map(item => ({ ticket_id: item.id }))
+                    approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
                 }
             },
             // 可以选中
@@ -276,8 +276,8 @@
             onOpenApprovalDialog (id, result) {
                 this.isApprovalDialogShow = true
                 this.approvalInfo = {
-                    result: result,
-                    approvalList: [{ ticket_id: id }]
+                    result,
+                    approvalList: [{ ticket_id: id }],
                 }
             },
             onApprovalDialogHidden (result) {
@@ -285,13 +285,13 @@
                 this.approvalInfo = {
                     result: true,
                     showAllOption: false,
-                    approvalList: []
+                    approvalList: [],
                 }
                 if (result) {
                     this.initData()
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

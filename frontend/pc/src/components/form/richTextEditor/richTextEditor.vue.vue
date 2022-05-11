@@ -70,35 +70,35 @@
         name: 'RichTextEditor',
         components: {
             FullScreen,
-            Editor: Editor,
-            viewer: Viewer
+            Editor,
+            viewer: Viewer,
         },
         model: {
             prop: 'value',
-            event: 'change'
+            event: 'change',
         },
         props: {
             value: {
                 type: String,
-                default: ''
+                default: '',
             },
             options: {
                 type: Object,
-                default: () => {}
+                default: () => {},
             },
             id: {
                 type: [String, Number],
-                required: true
+                required: true,
             },
             fullTitle: {
                 type: String,
-                default: ''
+                default: '',
             },
             // 预览模式
             isPreview: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
@@ -109,17 +109,17 @@
                     hideModeSwitch: false,
                     usageStatistics: false,
                     language: 'zh-CN',
-                    plugins: [[codeSyntaxHighlight, { hljs }]]
-                }
+                    plugins: [[codeSyntaxHighlight, { hljs }]],
+                },
             }
         },
         watch: {
             'value' (val) {
                 const editor = this.$refs.toastuiEditor && this.$refs.toastuiEditor.editor
                 editor && editor.setHtml(val, true)
-            }
+            },
         },
-        mounted: function () {
+        mounted () {
             window.addEventListener('resize', this.handleScreenChange)
         },
         beforeDestroy () {
@@ -137,8 +137,8 @@
                     const rootEl = this.$refs.toastuiEditor.getRootElement()
                     const modeBarEl = rootEl.querySelector('.te-mode-switch-section')
                     modeBarEl.classList.add('cus-change-mode')
-                    modeBarEl.querySelector('.te-switch-button.markdown').innerText = this.$t(`m.common["Markdown模式"]`)
-                    modeBarEl.querySelector('.te-switch-button.wysiwyg').innerText = this.$t(`m.common["富文本模式"]`)
+                    modeBarEl.querySelector('.te-switch-button.markdown').innerText = this.$t('m.common["Markdown模式"]')
+                    modeBarEl.querySelector('.te-switch-button.wysiwyg').innerText = this.$t('m.common["富文本模式"]')
                 } catch (err) {
                     errorHandler(err)
                 }
@@ -168,8 +168,8 @@
             closeFullSreen () {
                 this.isFull = false
                 this.setHeight(250)
-            }
-        }
+            },
+        },
     }
 </script>
 

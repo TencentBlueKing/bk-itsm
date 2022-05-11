@@ -179,7 +179,7 @@
         name: 'searchInfo',
         components: {
             collapseTransition,
-            memberSelect
+            memberSelect,
         },
         mixins: [commonMix],
         props: {
@@ -187,13 +187,13 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             searchResultList: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             panel: String,
             curServcie: Object,
@@ -201,21 +201,21 @@
                 type: Boolean,
                 default () {
                     return false
-                }
+                },
             },
             isEditTab: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 isHighlightSetting: false,
                 highlightObj: {
                     reply_timeout_color: '#FFF5E3',
-                    handle_timeout_color: '#FFECEC'
+                    handle_timeout_color: '#FFECEC',
                 },
                 showMore: false,
                 searchWord: '',
@@ -228,27 +228,24 @@
                     current_status__in: this.$t('m["状态"]'),
                     create_at__gte: this.$t('m["提单时间开始"]'),
                     create_at__lte: this.$t('m["提单时间结束"]'),
-                    bk_biz_id: this.$t('m["业务"]')
-                }
+                    bk_biz_id: this.$t('m["业务"]'),
+                },
             }
         },
         computed: {
             searchResult () {
                 if (this.searchResultList[this.panel]) {
                     const result = this.searchResultList[this.panel].map(item => {
-                        const list = Object.keys(item).map(ite => {
-                            return `${this.formField[ite]}: ${item[ite]}`
-                        })
+                        const list = Object.keys(item).map(ite => `${this.formField[ite]}: ${item[ite]}`)
                         return list
                     })
                     return result
-                } else {
-                    return []
                 }
+                return []
             },
             isfilter () {
                 return this.isCustomTab
-            }
+            },
         },
         watch: {
             forms: {
@@ -256,13 +253,13 @@
                     this.searchForms = val.filter(item => item.display)
                 },
                 deep: true,
-                immediate: true
-            }
+                immediate: true,
+            },
         },
         async created () {
             await this.getCatalogList()
             this.getTicketHighlight()
-            const query = this.$route.query
+            const { query } = this.$route
             const queryList = Object.keys(query)
             const formKey = this.searchForms.map(item => item.key)
             this.searchForms.forEach(item => {
@@ -301,13 +298,13 @@
             // 过滤参数
             async getCatalogList () {
                 const params = {
-                    show_deleted: true
+                    show_deleted: true,
                 }
                 if (this.$route.query.project_id) {
                     params.project_key = this.$route.query.project_id
                 }
                 const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
-                const result = res.data[0] ? res.data[0]['children'] : []
+                const result = res.data[0] ? res.data[0].children : []
                 const formItem = this.searchForms.find(item => item.key === 'catalog_id')
                 if (this.isfilter && 'conditions' in this.curServcie) {
                     const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
@@ -320,10 +317,9 @@
                     const node = list[i]
                     if (node.id === id) {
                         return node
-                    } else {
-                        if (node.children && node.children.length > 0) {
-                            this.getTreebyId(node.children, id)
-                        }
+                    }
+                    if (node.children && node.children.length > 0) {
+                        this.getTreebyId(node.children, id)
                     }
                 }
             },
@@ -340,8 +336,8 @@
                         if (item.value[0] && item.value[1]) {
                             const gteTime = this.standardTime(item.value[0])
                             const lteTime = this.standardTime(item.value[1])
-                            params['create_at__gte'] = gteTime
-                            params['create_at__lte'] = lteTime
+                            params.create_at__gte = gteTime
+                            params.create_at__lte = lteTime
                         }
                     } else if (Array.isArray(item.value)) { // 数组
                         params[item.key] = item.value.join(',')
@@ -376,33 +372,35 @@
             getTicketHighlight () {
                 this.$store.dispatch('sla/getTicketHighlight').then(({ data }) => {
                     this.highlightObj = data.items[0]
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
             },
             highlightSettingConfirm () {
                 this.isHighlightSetting = false
                 this.$store.dispatch('sla/updateTicketHighlight', this.highlightObj).then(({ result, data }) => {
                     if (result) {
                         this.$bkMessage({
-                            message: data.msg || this.$t(`m.slaContent['成功更新单据高亮颜色']`),
-                            theme: 'success'
+                            message: data.msg || this.$t('m.slaContent[\'成功更新单据高亮颜色\']'),
+                            theme: 'success',
                         })
                         this.$emit('onChangeHighlight')
                     } else {
                         this.getTicketHighlight()
                     }
-                }).catch(res => {
-                    this.$bkMessage({
-                        message: res.data.msg,
-                        theme: 'error'
-                    })
                 })
-            }
-        }
+                    .catch(res => {
+                        this.$bkMessage({
+                            message: res.data.msg,
+                            theme: 'error',
+                        })
+                    })
+            },
+        },
     }
 </script>
 

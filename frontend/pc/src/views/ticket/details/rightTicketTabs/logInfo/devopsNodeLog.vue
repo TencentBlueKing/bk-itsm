@@ -47,9 +47,9 @@
         props: {
             nodeInfo: {
                 type: Array,
-                default: () => ({})
-            }
-        }
+                default: () => ({}),
+            },
+        },
     }
 </script>
 

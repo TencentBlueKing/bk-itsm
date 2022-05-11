@@ -38,7 +38,8 @@ module.exports = {
     },
     // https://github.com/standard/standard/blob/master/docs/RULES-en.md
     extends: [
-        'standard',
+        // 'standard',
+        'eslint-config-tencent',
         'plugin:vue/recommended'
     ],
     // required to lint *.vue files

@@ -43,27 +43,27 @@
     export default {
         name: 'CUSTOM-FORM',
         components: {
-            RenderView
+            RenderView,
         },
         mixins: [mixins],
         props: {
             item: {
                 type: Object,
                 default: () => {
-                }
+                },
             },
             fields: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 formData: [],
                 context: {},
-                errMessage: ''
+                errMessage: '',
             }
         },
         watch: {
@@ -72,9 +72,9 @@
                     this.conditionField(this.item, this.fields)
                     this.initRenderView()
                 },
-                immediate: true
+                immediate: true,
                 
-            }
+            },
         },
         mounted () {
             if (this.item.value && !this.item.val) {
@@ -91,14 +91,14 @@
                     this.formData = formData
                     this.context = {
                         schemes,
-                        config
+                        config,
                     }
                 } catch (err) {
                     this.errMessage = err
                     this.formData = []
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

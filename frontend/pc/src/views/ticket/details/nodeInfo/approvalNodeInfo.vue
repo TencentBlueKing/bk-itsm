@@ -39,20 +39,20 @@
     export default {
         name: 'approvalNodeInfo',
         components: {
-            fieldsDone
+            fieldsDone,
         },
         props: {
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
             }
-        }
+        },
     }
 </script>
 

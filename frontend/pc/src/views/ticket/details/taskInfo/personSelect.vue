@@ -96,44 +96,44 @@
         name: 'dealPerson',
         components: {
             SelectTree,
-            memberSelect
+            memberSelect,
         },
         props: {
             firstLevelList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             checkValue: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             keyType: {
                 type: String,
                 default () {
                     return ''
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 isLoading: false,
                 formData: {
                     levelOne: 'ORGANIZATION',
-                    levelSecond: []
+                    levelSecond: [],
                 },
                 secondLevelList: [],
                 organizationList: [],
-                frontMemberField: []
+                frontMemberField: [],
             }
         },
         mounted () {
@@ -187,7 +187,7 @@
                 this.$store.dispatch('deployCommon/getSecondUser', {
                     role_type: value,
                     scope: 'shortcut',
-                    project_key: this.$store.state.project.id
+                    project_key: this.$store.state.project.id,
                 }).then((res) => {
                     const valueList = res.data
                     const userList = []
@@ -195,48 +195,52 @@
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name + '(' + item.count + ')',
-                                disabled: (item.count === 0)
+                                name: `${item.name}(${item.count})`,
+                                disabled: (item.count === 0),
                             })
                         })
                     } else {
                         valueList.forEach(item => {
                             userList.push({
                                 id: String(item.id),
-                                name: item.name
+                                name: item.name,
                             })
                         })
                     }
                     this.secondLevelList = userList
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             // 组织架构
             getOrganization () {
                 this.$store.dispatch('cdeploy/getTreeInfo').then(res => {
                     // 操作角色组织架构
                     this.organizationList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取前置节点的字段信息
             getFrontNodesList () {
                 const params = {
                     workflow: this.nodeInfo.workflow,
                     state: this.nodeInfo.id,
-                    exclude_self: true
+                    exclude_self: true,
                 }
                 this.$store.dispatch('apiRemote/get_related_fields', params).then(res => {
                     this.frontMemberField = res.data.filter(item => (item.type === 'MEMBERS' && item.validate_type === 'REQUIRE') || (item.type === 'MEMBER' && item.validate_type === 'REQUIRE'))
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 

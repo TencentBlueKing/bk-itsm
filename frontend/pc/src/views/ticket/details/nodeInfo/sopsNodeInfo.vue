@@ -93,33 +93,33 @@
     export default {
         name: 'sopsNodeInfo',
         components: {
-            getParam
+            getParam,
         },
         props: {
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             // 自动节点信息
             apiInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 status: '',
-                errorLength: ''
+                errorLength: '',
             }
         },
         mounted () {
             this.status = this.nodeInfo.api_info.sops_result
             this.errorLength = this.nodeInfo.api_info.error_message ? this.nodeInfo.api_info.error_message.length : 0
-        }
+        },
     }
 </script>
 

@@ -231,7 +231,7 @@
         name: 'apiTree',
         components: {
             collapseTransition,
-            memberSelect
+            memberSelect,
         },
         mixins: [commonMix, permission],
         props: {
@@ -240,20 +240,20 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             codeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             allCodeList: {
                 type: Array,
                 default () {
                     return []
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -261,10 +261,10 @@
                 // 基本信息人员数组
                 basicPerson: {
                     // 禁用数组
-                    disabledList: []
+                    disabledList: [],
                 },
                 styletranslateY: {
-                    transform: 'translate(40px,-20px)'
+                    transform: 'translate(40px,-20px)',
                 },
                 isTreeLoading: false,
                 searchWord: '',
@@ -287,40 +287,30 @@
                         contact_information: '',
                         id: '',
                         system_id: '',
-                        is_activated: true
-                    }
+                        is_activated: true,
+                    },
                 },
                 isDropdownShow: false,
-                rules: {}
+                rules: {},
             }
         },
         computed: {
             treeList: {
                 // getter
-                get: function () {
+                get () {
                     const vm = this
-                    return this.treeListOri.filter(
-                        item => {
-                            return item.name.indexOf(vm.searchWord) !== -1
-                        }
-                    )
+                    return this.treeListOri.filter(item => item.name.indexOf(vm.searchWord) !== -1)
                 },
                 // setter
-                set: function (newVal) {
-                    newVal.forEach(
-                        item => {
-                            const ori = this.$parent.treeList.filter(
-                                ite => {
-                                    return ite.system_id === item.system_id && ite.id === item.id
-                                }
-                            )
-                            if (ori.length) {
-                                ori[0] = JSON.parse(JSON.stringify(item))
-                            }
+                set (newVal) {
+                    newVal.forEach(item => {
+                        const ori = this.$parent.treeList.filter(ite => ite.system_id === item.system_id && ite.id === item.id)
+                        if (ori.length) {
+                            ori[0] = JSON.parse(JSON.stringify(item))
                         }
-                    )
-                }
-            }
+                    })
+                },
+            },
         },
         async mounted () {
             await this.treeListOri
@@ -333,7 +323,7 @@
         },
         methods: {
             scrollEvent ($event) {
-                this.styletranslateY['transform'] = `translate(40px,${-$event.target.scrollTop - 20}px)`
+                this.styletranslateY.transform = `translate(40px,${-$event.target.scrollTop - 20}px)`
             },
             changeCode (code, option) {
                 const dataItem = this.codeList.filter(item => item.code === code)[0]
@@ -351,14 +341,14 @@
             // 显示底色
             showBackground (item, index, level) {
                 if (!level) {
-                    this.$parent.displayInfo['level_1'] = {}
-                    this.$parent.displayInfo['level_0'] = item
+                    this.$parent.displayInfo.level_1 = {}
+                    this.$parent.displayInfo.level_0 = item
                     // 展示 api列表
                     // this.$parent.showContent = false
                     this.$parent.getTableList(item.id)
                     // this.$parent.getChannelPathList(item.system_id)
                 } else {
-                    this.$parent.displayInfo['level_1'] = item
+                    this.$parent.displayInfo.level_1 = item
                     // 展示 单个api
                     // this.$parent.showContent = true
                     this.$parent.getRemoteApiDetail(item.id)
@@ -398,43 +388,47 @@
                         is_activated: this.dictDataTable.formInfo.is_activated,
                         headers: [],
                         cookies: [],
-                        variables: []
+                        variables: [],
                     }
                     if (this.dictDataTable.type === 'ADD') {
                         params.name = this.dictDataTable.formInfo.addName
                         params.code = this.dictDataTable.formInfo.addCode
                     }
                     params.project_key = !this.projectId ? 'public' : this.projectId
-                    if (this.dictDataTable.title === this.$t(`m.systemConfig["修改系统"]`)) {
-                        params['id'] = this.dictDataTable.formInfo.id
+                    if (this.dictDataTable.title === this.$t('m.systemConfig["修改系统"]')) {
+                        params.id = this.dictDataTable.formInfo.id
                         this.secondClick = true
                         this.$store.dispatch('apiRemote/put_remote_system', params).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["修改成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["修改成功"]'),
+                                theme: 'success',
                             })
                             this.getRemoteSystemData()
                             this.closeDictionary()
-                        }).catch(res => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
+                            .catch(res => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
                         return
                     }
                     this.secondClick = true
                     this.$store.dispatch('apiRemote/post_remote_system', params).then(res => {
                         this.$bkMessage({
-                            message: this.$t(`m.systemConfig["添加成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.systemConfig["添加成功"]'),
+                            theme: 'success',
                         })
                         this.getRemoteSystemData()
                         this.closeDictionary()
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.secondClick = false
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.secondClick = false
+                        })
                 }, validator => {
                     console.warn(validator)
                 })
@@ -450,8 +444,8 @@
                         resourceData = {
                             public_api: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                     }
                     if (crtPerm && !this.hasPermission(reqPerm, crtPerm)) {
@@ -461,7 +455,7 @@
                 }
                 this.dictDataTable.showDialog = true
                 this.dictDataTable.type = type
-                this.dictDataTable.title = type === 'ADD' ? this.$t(`m.systemConfig["新增系统"]`) : (item ? this.$t(`m.systemConfig["修改系统"]`) : this.$t(`m.systemConfig["接入系统"]`))
+                this.dictDataTable.title = type === 'ADD' ? this.$t('m.systemConfig["新增系统"]') : (item ? this.$t('m.systemConfig["修改系统"]') : this.$t('m.systemConfig["接入系统"]'))
                 this.dictDataTable.formInfo = {
                     addName: '',
                     addCode: '',
@@ -474,7 +468,7 @@
                     contact_information: item ? item.contact_information : '',
                     id: item ? item.id : '',
                     system_id: item ? item.system_id : '',
-                    is_activated: item ? item.is_activated : true
+                    is_activated: item ? item.is_activated : true,
                 }
                 this.$refs.dropdown.hide()
             },
@@ -491,29 +485,31 @@
             openDelete (item) {
                 this.$bkInfo({
                     type: 'warning',
-                    title: this.$t(`m.systemConfig["确认移除系统？"]`),
-                    subTitle: this.$t(`m.systemConfig["移除后，将无法使用该系统，请谨慎操作"]`),
+                    title: this.$t('m.systemConfig["确认移除系统？"]'),
+                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该系统，请谨慎操作"]'),
                     confirmFn: () => {
-                        const id = item.id
+                        const { id } = item
                         if (this.secondClick) {
                             return
                         }
                         this.secondClick = true
                         this.$store.dispatch('apiRemote/delete_remote_system', id).then(res => {
                             this.$bkMessage({
-                                message: this.$t(`m.systemConfig["删除成功"]`),
-                                theme: 'success'
+                                message: this.$t('m.systemConfig["删除成功"]'),
+                                theme: 'success',
                             })
                             this.getRemoteSystemData()
-                        }).catch((res) => {
-                            errorHandler(res, this)
-                        }).finally(() => {
-                            this.secondClick = false
                         })
-                    }
+                            .catch((res) => {
+                                errorHandler(res, this)
+                            })
+                            .finally(() => {
+                                this.secondClick = false
+                            })
+                    },
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

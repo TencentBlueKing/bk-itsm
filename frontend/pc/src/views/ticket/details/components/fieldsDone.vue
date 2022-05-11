@@ -147,51 +147,51 @@
         name: 'fieldsDone',
         components: {
             businessCard,
-            RenderView
+            RenderView,
         },
         props: {
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             fields: {
                 type: Array,
                 required: false,
-                default: () => []
+                default: () => [],
             },
             ticketId: {
                 type: [Number, String],
                 required: false,
-                default: () => ''
+                default: () => '',
             },
             statedId: {
                 type: [Number, String],
                 required: false,
-                default: () => ''
+                default: () => '',
             },
             commentId: {
                 type: String,
                 required: false,
-                default: () => ''
+                default: () => '',
             },
             item: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             origin: {
                 type: String,
                 required: false,
-                default: () => 'notLog'
+                default: () => 'notLog',
             },
             isShowName: {
                 type: Boolean,
-                default: () => true
+                default: () => true,
             },
-            basicInfoType: Array
+            basicInfoType: Array,
         },
         data () {
             return {
@@ -200,29 +200,29 @@
                 downFileUrl: '',
                 routerKey: +new Date(),
                 cursorStyle: {
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                 },
                 fileList: [],
                 customForm: {
                     formData: [],
-                    context: {}
-                }
+                    context: {},
+                },
             }
         },
         computed: {
-            profile: function () {
+            profile () {
                 if (!this.basicInfomation) {
                     return
                 }
                 return {
                     name: this.basicInfomation.profile.name,
                     phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : []
+                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
                 }
             },
             fieldType () {
                 return this.basicInfoType ? this.basicInfoType.includes(this.item.type) : []
-            }
+            },
         },
         created () {
             if (this.item.type === 'CUSTOM-FORM') {
@@ -230,7 +230,7 @@
                 const { form_data, schemes, config } = data
                 this.customForm = {
                     formData: form_data,
-                    context: { schemes, config }
+                    context: { schemes, config },
                 }
             }
         },
@@ -248,31 +248,29 @@
         methods: {
             goToLink (url) {
                 if (url.indexOf('http') !== 0) {
-                    url = 'http://' + url
+                    url = `http://${url}`
                 }
                 window.open(url, '_blank')
             },
             valToList () {
-                const value = this.item.value
+                const { value } = this.item
                 const tempObj = value ? JSON.parse(value) : {}
                 for (const key in tempObj) {
-                    this.fileList.push({ ...tempObj[key], key: key })
+                    this.fileList.push({ ...tempObj[key], key })
                 }
             },
             reloadCurPage () {
                 this.routerKey = +new Date()
             },
             edit (item) {
-                this.fields.forEach(
-                    ite => {
-                        ite['isEdit'] = false
-                    }
-                )
+                this.fields.forEach(ite => {
+                    ite.isEdit = false
+                })
                 this.$set(this.item, 'isEdit', true)
             },
             // 11.01 修改 附件上传
             downFile (file) {
-                this.downFileUrl = window.SITE_URL + `api/ticket/fields/${this.item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
+                this.downFileUrl = `${window.SITE_URL}api/ticket/fields/${this.item.id}/download_file/?unique_key=${file.key}&file_type=ticket`
                 window.open(this.downFileUrl)
             },
             // 解析字符串为数组-特定表格数据场景
@@ -293,8 +291,8 @@
             },
             getCustomTableDisplayValue (column, value) {
                 return getCustomTableDisplayValue(column, value)
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

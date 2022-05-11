@@ -41,7 +41,7 @@ export function isInArray (ele, array) {
 export function isInlineElment (node) {
     const inlineElements = ['a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'kbd', 'label', 'q', 's', 'samp', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'textarea', 'tt', 'u', 'var']
     const tag = (node.tagName).toLowerCase()
-    const display = getComputedStyle(node).display
+    const { display } = getComputedStyle(node)
 
     if ((isInArray(tag, inlineElements) && display === 'index') || display === 'inline') {
         console.warn('Binding node is displayed as inline element. To avoid some unexpected rendering error, please set binding node displayed as block element.')
@@ -112,10 +112,10 @@ export function addClass (node, className) {
         if (!node.className && classNames.length === 1) {
             node.className = className
         } else {
-            let setClass = ' ' + node.className + ' '
+            let setClass = ` ${node.className} `
             classNames.forEach((cl) => {
-                if (setClass.indexOf(' ' + cl + ' ') < 0) {
-                    setClass += cl + ' '
+                if (setClass.indexOf(` ${cl} `) < 0) {
+                    setClass += `${cl} `
                 }
             })
             const rtrim = /^\s+|\s+$/
@@ -132,9 +132,9 @@ export function addClass (node, className) {
 export function removeClass (node, className) {
     const classNames = className.split(' ')
     if (node.nodeType === 1) {
-        let setClass = ' ' + node.className + ' '
+        let setClass = ` ${node.className} `
         classNames.forEach((cl) => {
-            setClass = setClass.replace(' ' + cl + ' ', ' ')
+            setClass = setClass.replace(` ${cl} `, ' ')
         })
         const rtrim = /^\s+|\s+$/
         node.className = setClass.replace(rtrim, '')
@@ -233,31 +233,28 @@ export function converStrToArr (str, indicator) {
  */
 export function convertMStoString (time) {
     function getSeconds (sec) {
-        return `${sec}` + window.app.$t('m.js[\'秒\']')
+        return `${sec}${window.app.$t('m.js[\'秒\']')}`
     }
 
     function getMinutes (sec) {
         if (sec / 60 >= 1) {
-            return `${Math.floor(sec / 60)}` + window.app.$t('m.js[\'分\']') + `${getSeconds(sec % 60)}`
-        } else {
-            return getSeconds(sec)
+            return `${Math.floor(sec / 60)}${window.app.$t('m.js[\'分\']')}${getSeconds(sec % 60)}`
         }
+        return getSeconds(sec)
     }
 
     function getHours (sec) {
         if (sec / 3600 >= 1) {
-            return `${Math.floor(sec / 3600)}` + window.app.$t('m.js[\'小时\']') + `${getMinutes(sec % 3600)}`
-        } else {
-            return getMinutes(sec)
+            return `${Math.floor(sec / 3600)}${window.app.$t('m.js[\'小时\']')}${getMinutes(sec % 3600)}`
         }
+        return getMinutes(sec)
     }
 
     function getDays (sec) {
         if (sec / 86400 >= 1) {
-            return `${Math.floor(sec / 86400)}` + window.app.$t('m.js[\'天\']') + `${getHours(sec % 86400)}`
-        } else {
-            return getHours(sec)
+            return `${Math.floor(sec / 86400)}${window.app.$t('m.js[\'天\']')}${getHours(sec % 86400)}`
         }
+        return getHours(sec)
     }
 
     return time ? getDays(Math.floor(time / 1000)) : 0
@@ -286,12 +283,12 @@ export function convertTimeArrToMS (tArr = [0, 0, 0, 0, 0, 0]) {
 export function convertTimeArrToString (tArr = []) {
     if (!(tArr instanceof Array)) return
     const timeRule = [
-        i18n.t(`m.newCommon["年"]`),
-        i18n.t(`m.newCommon["个月"]`),
-        i18n.t(`m.newCommon["天"]`),
-        i18n.t(`m.newCommon["小时"]`),
-        i18n.t(`m.newCommon["分"]`),
-        i18n.t(`m.newCommon["秒"]`)
+        i18n.t('m.newCommon["年"]'),
+        i18n.t('m.newCommon["个月"]'),
+        i18n.t('m.newCommon["天"]'),
+        i18n.t('m.newCommon["小时"]'),
+        i18n.t('m.newCommon["分"]'),
+        i18n.t('m.newCommon["秒"]'),
     ]
     const str = tArr.reduce((str, num, index) => {
         if (num) {
@@ -319,10 +316,10 @@ export function randomColor (baseColor, count) {
     const ret = []
     // 生成 count 组颜色，色差 20 * Math.random
     for (let i = 0; i < count; i++) {
-        ret[i] = '#'
-            + Math.floor(segments[0] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)
-            + Math.floor(segments[1] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)
-            + Math.floor(segments[2] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)
+        ret[i] = `#${
+            Math.floor(segments[0] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)
+        }${Math.floor(segments[1] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)
+        }${Math.floor(segments[2] + (Math.random() < 0.5 ? -1 : 1) * Math.random() * 20).toString(16)}`
     }
     return ret
 }
@@ -346,30 +343,30 @@ export function randomInt (min, max) {
  * @param {Object} ctx 上下文对象，这里主要指当前的 Vue 组件
  */
 export function catchErrorHandler (err, ctx) {
-    const data = err.data
+    const { data } = err
     if (data) {
         if (!data.code || data.code === 404) {
             ctx.exceptionCode = {
                 code: '404',
-                msg: window.app.$t('m.js[\'当前访问的页面不存在\']')
+                msg: window.app.$t('m.js[\'当前访问的页面不存在\']'),
             }
         } else if (data.code === 403) {
             ctx.exceptionCode = {
                 code: '403',
-                msg: window.app.$t('m.js[\'Sorry，您的权限不足!\']')
+                msg: window.app.$t('m.js[\'Sorry，您的权限不足!\']'),
             }
         } else {
             console.error(err)
             ctx.bkMessageInstance = ctx.$bkMessage({
                 theme: 'error',
-                message: err.message || err.data.msg || err.statusText
+                message: err.message || err.data.msg || err.statusText,
             })
         }
     } else {
         console.error(err)
         ctx.bkMessageInstance = ctx.$bkMessage({
             theme: 'error',
-            message: err.message || err.data.msg || err.statusText
+            message: err.message || err.data.msg || err.statusText,
         })
     }
 }
@@ -398,10 +395,10 @@ export function debounce (fn, wait) {
 
 export function convertByteToSize (Byte) {
     if (Byte < 1024) {
-        return Byte + 'Byte'
+        return `${Byte}Byte`
     }
     if (Byte > 1024 && Byte < 10 * 1024) {
-        return (Byte / 1024).toFixed(2) + 'KB'
+        return `${(Byte / 1024).toFixed(2)}KB`
     }
-    return (Byte / 1024 / 1024).toFixed(2) + 'M'
+    return `${(Byte / 1024 / 1024).toFixed(2)}M`
 }

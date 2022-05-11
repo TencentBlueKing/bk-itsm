@@ -212,7 +212,7 @@
         name: 'addTrigger',
         components: {
             triggerCondition,
-            responseCondition
+            responseCondition,
         },
         mixins: [commonMix],
         props: {
@@ -221,14 +221,14 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             originInfoToTrigger: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -240,7 +240,7 @@
                     signal: '',
                     moduleType: '',
                     moduleTypeDisabled: false,
-                    variableLoading: false
+                    variableLoading: false,
                 },
                 triggerEventList: [],
                 // icon数据
@@ -248,13 +248,13 @@
                     { key: 'icon-icon-notice-new', name: '', typeName: 'message' },
                     { key: 'icon-icon-user-new', name: '', typeName: 'user' },
                     { key: 'icon-icon-status-new', name: '', typeName: 'status' },
-                    { key: 'icon-icon-api-new', name: '', typeName: 'api' }
+                    { key: 'icon-icon-api-new', name: '', typeName: 'api' },
                 ],
                 iconInfo: {
                     status: false,
                     key: 'icon-icon-notice-new',
                     name: '',
-                    typeName: ''
+                    typeName: '',
                 },
                 // 响应事件list
                 responseWayList: [],
@@ -276,11 +276,11 @@
                                         condition: '',
                                         value: '',
                                         conditionList: [],
-                                        type: 'STRING'
-                                    }
-                                ]
-                            }
-                        ]
+                                        type: 'STRING',
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     responseList: [{
                         way: '',
@@ -288,28 +288,28 @@
                         performData: {
                             runMode: 'BACKEND',
                             displayName: '',
-                            repeat: 'one'
+                            repeat: 'one',
                         },
-                        isLoading: false
-                    }]
+                        isLoading: false,
+                    }],
                 },
                 // 保存返回的数据
                 backInfo: {
                     responseList: [],
-                    triggerInfo: {}
+                    triggerInfo: {},
                 },
                 btnLoading: false,
                 triggerAllRules: [],
                 // 校验规则
                 rules: {},
                 // 公共触发器可关联基础模型
-                moduleTypes: []
+                moduleTypes: [],
             }
         },
         computed: {
             globalChoise () {
                 return this.$store.state.common.configurInfo
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -347,12 +347,12 @@
                     const valueObj = {
                         key,
                         name: this.globalChoise.trigger_categories[key],
-                        children: []
+                        children: [],
                     }
                     for (const itemKey in this.globalChoise.trigger_signals[key]) {
                         valueObj.children.push({
                             key: itemKey,
-                            name: this.globalChoise.trigger_signals[key][itemKey]
+                            name: this.globalChoise.trigger_signals[key][itemKey],
                         })
                     }
                     this.triggerEventList.push(valueObj)
@@ -361,9 +361,9 @@
                 if (this.originInfoToTrigger.id) {
                     // 保留整个触发器内使用的流程信息
                     const id = this.originInfoToTrigger.sender
-                    const type = this.originInfoToTrigger.type
+                    const { type } = this.originInfoToTrigger
                     const params = {
-                        workflow: this.originInfoToTrigger.id
+                        workflow: this.originInfoToTrigger.id,
                     }
                     if (type === 'task_schemas') {
                         params.stage = this.originInfoToTrigger.stage
@@ -380,9 +380,7 @@
                     this.triggerEventList = this.triggerEventList.filter(item => item.key === this.originInfoToTrigger.filter)
                     // if (this.originInfoToTrigger.filter === 'TASK') {
                     // 任务来源时区分三种状态
-                    this.triggerEventList[0].children = this.triggerEventList[0].children.filter(child => {
-                        return this.originInfoToTrigger.signal.indexOf(child.key) !== -1
-                    })
+                    this.triggerEventList[0].children = this.triggerEventList[0].children.filter(child => this.originInfoToTrigger.signal.indexOf(child.key) !== -1)
                     // }
                     if (this.triggerEventList.length === 1 && this.triggerEventList[0].children.length === 1) {
                         this.formData.signal = this.triggerEventList[0].children[0].key
@@ -402,13 +400,14 @@
             // 基础模型类型
             getModuleTypes () {
                 const params = {
-                    all: true
+                    all: true,
                 }
                 this.$store.dispatch('basicModule/get_tables', params).then(res => {
                     this.moduleTypes = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取数据，初始化渲染
             async getData () {
@@ -449,7 +448,7 @@
             conditionValue (itemInfo) {
                 const triggerRule = {
                     type: '',
-                    list: []
+                    list: [],
                 }
                 for (const key in itemInfo) {
                     triggerRule.type = key
@@ -466,7 +465,7 @@
                                     meta: ruleKeyItem.meta,
                                     value: multiKey.some(multi => multi === ruleKeyItem.field_type) ? ruleKeyItem.value.split(',') : ruleKeyItem.value,
                                     conditionList: [],
-                                    type: ruleKeyItem.field_type
+                                    type: ruleKeyItem.field_type,
                                 }
                                 ruleKeyInfo.conditionList = this.globalChoise.trigger_methods[ruleKeyItem.field_type.toLowerCase()]
                                 ruleItem.itemList.push(ruleKeyInfo)
@@ -480,7 +479,7 @@
             async responseValue (itemInfo, valueItem) {
                 // 通过action_schemas的值去获取响应事件的内容
                 const params = {
-                    id__in: itemInfo.join(',')
+                    id__in: itemInfo.join(','),
                 }
                 await this.$store.dispatch('trigger/getResponseListById', params).then((res) => {
                     const resBack = res.data
@@ -495,9 +494,9 @@
                             performData: {
                                 runMode: 'BACKEND',
                                 displayName: '',
-                                repeat: 'one'
+                                repeat: 'one',
                             },
-                            isLoading: false
+                            isLoading: false,
                         }
                         // 响应事件内容
                         responseItem.way = item.component_type
@@ -552,28 +551,28 @@
                         valueItem.responseList.push(responseItem)
                     })
                     this.rulesList.push(valueItem)
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 初始化时，获取modify_field的choice
             async getResponseFields (fieldKey) {
                 const params = {
                     source_uri: fieldKey.source_uri,
                     trigger_source_id: this.originInfoToTrigger.id,
-                    trigger_source_type: 'workflow'
+                    trigger_source_type: 'workflow',
                 }
                 await this.$store.dispatch('apiRemote/getRpcData', params).then(res => {
-                    fieldKey.choice = res.data.map(field => {
-                        return {
-                            ...field,
-                            showFeild: true,
-                            value: ''
-                        }
-                    })
-                }).catch(res => {
-                    errorHandler(res, this)
+                    fieldKey.choice = res.data.map(field => ({
+                        ...field,
+                        showFeild: true,
+                        value: '',
+                    }))
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 更换icon
             handleClick () {
@@ -632,7 +631,7 @@
                             is_enabled: this.formData.is_enabled,
                             icon: this.iconInfo.typeName,
                             desc: this.formData.desc,
-                            project_key: this.$store.state.project.id
+                            project_key: this.$store.state.project.id,
                         }
                         if (this.originInfoToTrigger.id) {
                             params.source_type = this.originInfoToTrigger.source
@@ -738,43 +737,49 @@
                     // 响应条件
                     const value = this.responseParams()
                     this.createRespond(value)
-                }).catch(res => {
-                    errorHandler(res, this)
-                    this.btnLoading = false
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                        this.btnLoading = false
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 修改一个触发器
             putTrigger (params) {
                 this.btnLoading = true
-                const id = this.triggerInfo.id
+                const { id } = this.triggerInfo
                 this.$store.dispatch('trigger/putTriggerRule', { params, id }).then((res) => {
                     this.backInfo.triggerInfo = res.data
                     // 响应条件
                     const value = this.responseParams()
                     this.createRespond(value)
-                }).catch(res => {
-                    errorHandler(res, this)
-                    this.btnLoading = false
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                        this.btnLoading = false
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 创建多个触发器规则（响应条件）
             createRespond (value) {
                 const params = value
-                const id = this.originInfoToTrigger.id
+                const { id } = this.originInfoToTrigger
                 this.$store.dispatch('trigger/createRespond', { id, params }).then((res) => {
                     this.backInfo.responseList = res.data
                     // 触发条件
                     this.createTriggerCondition()
-                }).catch(res => {
-                    errorHandler(res, this)
-                    this.btnLoading = false
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                        this.btnLoading = false
+                    })
+                    .finally(() => {
+
+                    })
             },
             responseParams () {
                 const params = []
@@ -802,19 +807,19 @@
                                 if (field.type === 'SUBCOMPONENT') {
                                     const subContent = {
                                         key: field.key,
-                                        sub_components: []
+                                        sub_components: [],
                                     }
                                     field.sub_components.forEach(subItem => {
                                         if (subItem.checked) {
                                             const subInfo = {
                                                 key: subItem.key,
-                                                params: []
+                                                params: [],
                                             }
                                             subItem.field_schema.forEach(subField => {
                                                 const paramsContent = {
                                                     key: subField.key,
                                                     value: this.formattingValue(subField),
-                                                    ref_type: subField.referenceType
+                                                    ref_type: subField.referenceType,
                                                 }
                                                 subInfo.params.push(paramsContent)
                                             })
@@ -826,7 +831,7 @@
                                     const paramsContent = {
                                         key: field.key,
                                         value: this.formattingValue(field),
-                                        ref_type: field.referenceType
+                                        ref_type: field.referenceType,
                                     }
                                     paramsItem.params.push(paramsContent)
                                 }
@@ -844,16 +849,14 @@
                     if (field.key === 'api_source') {
                         valueList.push({
                             key: field.key,
-                            value: field.apiId
+                            value: field.apiId,
                         })
                     } else {
                         const valueInfo = {
                             key: field.key,
-                            value: {}
+                            value: {},
                         }
-                        valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(
-                            item => (!item.level)
-                        ))
+                        valueInfo.value = this.treeToJson(field.apiContent.bodyTableData.filter(item => (!item.level)))
                         // 使用递归来取值
                         // const checkInfo = (arr, parentKey) => {
                         //     arr.forEach(itemArr => {
@@ -891,31 +894,31 @@
                         const baseItem = []
                         if (lastType === 'array') {
                             jsonDataDict.push(baseItem)
-                            for (const j in item['children']) {
-                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'array')
+                            for (const j in item.children) {
+                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item.children[j], 1, 'array')
                             }
                         }
                         if (lastType === 'object') {
                             const baseItem = {}
                             baseItem[item.key] = []
                             Object.assign(jsonDataDict, baseItem)
-                            for (const j in item['children']) {
-                                treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'array')
+                            for (const j in item.children) {
+                                treeToJsonStep(jsonDataDict[item.key], item.children[j], 1, 'array')
                             }
                         }
                     } else if (item.type === 'object') {
                         const baseItem = {}
                         if (lastType === 'array') {
                             jsonDataDict.push(baseItem)
-                            for (const j in item['children']) {
-                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'object')
+                            for (const j in item.children) {
+                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item.children[j], 1, 'object')
                             }
                         }
                         if (lastType === 'object') {
                             baseItem[item.key] = {}
                             Object.assign(jsonDataDict, baseItem)
-                            for (const j in item['children']) {
-                                treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'object')
+                            for (const j in item.children) {
+                                treeToJsonStep(jsonDataDict[item.key], item.children[j], 1, 'object')
                             }
                         }
                     } else {
@@ -926,7 +929,7 @@
                             const baseItem = {
                                 is_leaf: ((item.type !== 'object') && (item.type !== 'array')),
                                 ref_type: item.source_type === 'CUSTOM' ? 'custom' : 'reference',
-                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key
+                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key,
                             }
                             // item.source_type === 'CUSTOM' ? item.value
                             //     : `\$\{params\_${item.value_key}\}`
@@ -937,7 +940,7 @@
                             baseItem[item.key] = {
                                 is_leaf: ((item.type !== 'object') && (item.type !== 'array')),
                                 ref_type: item.source_type === 'CUSTOM' ? 'custom' : 'reference',
-                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key
+                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key,
                             }
                             // item.source_type === 'CUSTOM' ? item.value
                             //     : `\$\{params\_${item.value_key}\}`
@@ -960,8 +963,8 @@
                             ref_type: receiver.key === 'VARIABLE' ? 'reference' : 'custom',
                             value: {
                                 member_type: receiver.key,
-                                members: Array.isArray(receiver.value) ? receiver.value.join(',') : receiver.value
-                            }
+                                members: Array.isArray(receiver.value) ? receiver.value.join(',') : receiver.value,
+                            },
                         }
                         backValue.push(valueInfo)
                     })
@@ -980,19 +983,21 @@
             // 创建触发条件
             createTriggerCondition () {
                 const params = this.conditionParams()
-                const id = this.backInfo.triggerInfo.id
+                const { id } = this.backInfo.triggerInfo
                 this.$store.dispatch('trigger/batchTriggerCondition', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.triggerInfo.id ? this.$t(`m.common['保存成功']`) : this.$t(`m.trigger['创建成功']`),
-                        theme: 'success'
+                        message: this.triggerInfo.id ? this.$t('m.common[\'保存成功\']') : this.$t('m.trigger[\'创建成功\']'),
+                        theme: 'success',
                     })
                     this.closeTrigger()
                     this.$emit('getList')
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.btnLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.btnLoading = false
+                    })
             },
             conditionParams () {
                 const params = []
@@ -1002,7 +1007,7 @@
                         condition: {},
                         name: item.name,
                         by_condition: item.triggerStatus,
-                        action_schemas: []
+                        action_schemas: [],
                     }
                     // 把id带上则视为更新触发条件
                     if (item.triggerRules.id) {
@@ -1020,7 +1025,7 @@
                                     value: Array.isArray(ruleItem.value) ? ruleItem.value.join(',') : ruleItem.value,
                                     field_type: ruleItem.type,
                                     operator: ruleItem.condition,
-                                    type: 'custom'
+                                    type: 'custom',
                                 }
                                 ruleInfo[rule.type].push(ruleItemInfo)
                             })
@@ -1042,15 +1047,17 @@
             // 获取触发条件
             async getTriggerRules () {
                 const params = {
-                    trigger_id: this.triggerInfo.id
+                    trigger_id: this.triggerInfo.id,
                 }
                 await this.$store.dispatch('trigger/getTriggerRules', params).then((res) => {
                     this.triggerAllRules = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             // 获取响应事件列表
             async getResponseList () {
@@ -1068,9 +1075,10 @@
                             })
                         })
                     }
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             // 选择基础模型后，添加触发器变量
             giveTableVariables (id) {
@@ -1078,16 +1086,18 @@
                 this.$store.dispatch('basicModule/get_trigger_tables', id).then((res) => {
                     const tempVariables = res.data.fields
                     tempVariables.forEach(field => {
-                        field.name += this.$t(`m.trigger['（基础模型）']`)
+                        field.name += this.$t('m.trigger[\'（基础模型）\']')
                     })
                     this.$store.commit('trigger/changeTriggerVariables', this.globalChoise.ticket_variables.concat(tempVariables))
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.formData.variableLoading = false
                 })
-            }
-        }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.formData.variableLoading = false
+                    })
+            },
+        },
     }
 </script>
 

@@ -41,8 +41,8 @@
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {}
@@ -56,8 +56,8 @@
             },
             onResetPosition () {
                 this.$emit('onResetPosition')
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

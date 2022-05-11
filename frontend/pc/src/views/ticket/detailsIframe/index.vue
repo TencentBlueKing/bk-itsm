@@ -61,20 +61,20 @@
         name: 'TicketDetailsIframe',
         components: {
             NoTicketContent,
-            leftTicketContent
+            leftTicketContent,
         },
         mixins: [fieldMix],
         inject: ['reload'],
         provide () {
             return {
-                reloadTicket: this.reloadTicket
+                reloadTicket: this.reloadTicket,
             }
         },
         data () {
             return {
                 loading: {
                     ticketLoading: true,
-                    nodeInfoLoading: false
+                    nodeInfoLoading: false,
                 },
                 ticketId: this.$route.query.id,
                 ticketErrorMessage: '',
@@ -83,23 +83,23 @@
                 ticketTimer: null, // 单据详情轮询器
                 noticeInfo: {
                     is_processed: false,
-                    processed_user: ''
+                    processed_user: '',
                 },
                 ticketInfo: {},
                 nodeTriggerList: [],
                 firstStateFields: [],
                 nodeList: [],
                 isShowComment: false,
-                hasNodeOptAuth: false
+                hasNodeOptAuth: false,
             }
         },
         computed: {
             ...mapState({
-                openFunction: state => state.openFunction
+                openFunction: state => state.openFunction,
             }),
             token () {
                 return this.$route.query.token
-            }
+            },
         },
         created () {
 
@@ -173,21 +173,23 @@
                 this.loading.ticketLoading = true
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
 
                 await this.$store.dispatch('change/getOrderDetails', params).then((res) => {
                     this.ticketInfo = res.data
-                }).catch((res) => {
-                    // 显示 404 页面
-                    this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]')
-                }).finally(() => {
-                    this.loading.ticketLoading = false
                 })
+                    .catch((res) => {
+                        // 显示 404 页面
+                        this.ticketErrorMessage = res.data.code === 'OBJECT_NOT_EXIST' ? this.$t('m.wiki["单据不存在或已被撤销"]') : this.$t('m.wiki["您没有权限访问"]')
+                    })
+                    .finally(() => {
+                        this.loading.ticketLoading = false
+                    })
             },
             getTicketNoticeInfo () {
                 this.$store.dispatch('deployOrder/getTicketNoticeInfo', {
-                    params: { cache_key: this.$route.query.cache_key }
+                    params: { cache_key: this.$route.query.cache_key },
                 }).then(res => {
                     if (res.data && res.data.is_processed) {
                         this.noticeInfo = res.data
@@ -196,24 +198,27 @@
                         // 删除 url cache_key
                         this.onNoticeConfirm()
                     }
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 获取单据节点的详情
             getNodeList () {
                 this.loading.nodeInfoLoading = true
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
                 return this.$store.dispatch('deployOrder/getNodeList', params).then((res) => {
                     this.updateNodeList(res.data)
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.loading.nodeInfoLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.loading.nodeInfoLoading = false
+                    })
             },
             // 更新节点信息
             updateNodeList (newNodeList) {
@@ -226,13 +231,11 @@
                         this.conditionField(item, this.firstStateFields)
                     })
                 }
-                copyList.forEach(
-                    item => {
-                        if (item.status === 'AUTO_SUCCESS') {
-                            item.status = 'FINISHED'
-                        }
+                copyList.forEach(item => {
+                    if (item.status === 'AUTO_SUCCESS') {
+                        item.status = 'FINISHED'
                     }
-                )
+                })
                 this.nodeList = copyList
                 this.initCurrentStepData()
             },
@@ -240,14 +243,12 @@
             startTicketTimer () {
                 const params = {
                     id: this.ticketId,
-                    token: this.token || undefined
+                    token: this.token || undefined,
                 }
                 this.$store.dispatch('deployOrder/getNodeList', params).then(async res => {
                     const newNodeList = res.data
                     const oldNodeList = this.nodeList
-                    const nodeStatusHasUpdate = newNodeList.some(node => {
-                        return !oldNodeList.find(item => this.isSameStatusNode(node, item))
-                    })
+                    const nodeStatusHasUpdate = newNodeList.some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)))
                     if (nodeStatusHasUpdate) {
                         // 节点状态有更新
                         this.nodeList = newNodeList
@@ -266,9 +267,10 @@
             getTriggers () {
                 this.$store.dispatch('trigger/getTicketHandleTriggers', { id: this.ticketId }).then(res => {
                     this.nodeTriggerList = res.data.filter(trigger => trigger.signal_type === 'STATE')
-                }).catch((res) => {
-                    errorHandler(res, this)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
             },
             // 确认
             onNoticeConfirm () {
@@ -276,7 +278,7 @@
                 delete query.cache_key
                 this.$router.replace({
                     name: this.$route.name,
-                    query
+                    query,
                 })
             },
             clearTicketTimer () {
@@ -286,8 +288,8 @@
             // 重新加载
             reloadTicket () {
                 this.reload()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

@@ -71,42 +71,44 @@
         props: {
             taskList: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             ticketInfo: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         data () {
             return {
                 templateListLoading: false,
                 type: 'new',
                 formData: {
-                    name: ''
+                    name: '',
                 },
                 rules: { name: [
                     {
                         required: true,
-                        message: this.$t(`m.task['任务库名称']`) + this.$t('m.newCommon["为必填项！"]'),
-                        trigger: 'blur'
-                    }
+                        message: this.$t('m.task[\'任务库名称\']') + this.$t('m.newCommon["为必填项！"]'),
+                        trigger: 'blur',
+                    },
                 ] },
-                templateList: []
+                templateList: [],
             }
         },
         methods: {
             getLibraryList () {
                 this.templateListLoading = true
                 this.$store.dispatch('taskFlow/getLibraryList', {
-                    service_id: this.ticketInfo.service_id
+                    service_id: this.ticketInfo.service_id,
                 }).then((res) => {
                     this.templateList = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.templateListLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.templateListLoading = false
+                    })
             },
             onSwitchType (type) {
                 this.type = type
@@ -122,8 +124,8 @@
                 }
                 if (!this.taskList.length) {
                     this.$bkMessage({
-                        message: this.$t(`m.tickets['没有任务可以存入任务库']`),
-                        theme: 'error'
+                        message: this.$t('m.tickets[\'没有任务可以存入任务库\']'),
+                        theme: 'error',
                     })
                     return false
                 }
@@ -137,40 +139,42 @@
                 const params = {
                     name: this.formData.name,
                     service_id: this.ticketInfo.service_id,
-                    tasks: this.taskList.map(item => item.id)
+                    tasks: this.taskList.map(item => item.id),
                 }
                 this.$store.dispatch('taskFlow/creatLibrary', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['任务库创建成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'任务库创建成功\']'),
+                        theme: 'success',
                     })
                     this.$emit('close')
                     this.resetForm()
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             updataLibrary () {
                 const params = {
-                    tasks: this.taskList.map(item => item.id)
+                    tasks: this.taskList.map(item => item.id),
                 }
                 const id = this.formData.name
                 this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.task['更新成功']`),
-                        theme: 'success'
+                        message: this.$t('m.task[\'更新成功\']'),
+                        theme: 'success',
                     })
                     this.$emit('close')
                     this.resetForm()
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
             },
             resetForm () {
                 this.formData.name = ''
                 this.type = 'new'
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

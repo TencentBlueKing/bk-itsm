@@ -177,38 +177,38 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             emailNotifyEventList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             weixinNotifyEventList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             modelPriority: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             changeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             hasCheckBox: {
                 type: Boolean,
                 default () {
                     return false
-                }
-            }
+                },
+            },
         },
         data () {
             return {
@@ -220,21 +220,21 @@
                     { id: '%', name: '%' },
                     { id: 'm', name: this.$t('m.slaContent["分钟"]') },
                     { id: 'h', name: this.$t('m.slaContent["小时"]') },
-                    { id: 'd', name: this.$t('m.slaContent["天"]') }
+                    { id: 'd', name: this.$t('m.slaContent["天"]') },
                 ],
                 receiversOptionList: [
                     {
                         id: 'PROCESSORS',
-                        name: this.$t('m.slaContent["处理人"]')
+                        name: this.$t('m.slaContent["处理人"]'),
                     },
                     {
                         id: 'HISTORY_HANDLER',
-                        name: this.$t('m.slaContent["历史处理人"]')
+                        name: this.$t('m.slaContent["历史处理人"]'),
                     },
                     {
                         id: 'ADMIN',
-                        name: this.$t('m.slaContent["服务管理员"]')
-                    }
+                        name: this.$t('m.slaContent["服务管理员"]'),
+                    },
                 ],
                 historyPriority: [],
                 oldNotifyTypeList: [],
@@ -248,11 +248,9 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
-                    ]
+                            validator: (v) => !!v,
+                        },
+                    ],
                 },
                 notifyTypeRules: {
                     email_notify: [
@@ -261,10 +259,8 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
+                            validator: (v) => !!v,
+                        },
                     ],
                     weixin_notify: [
                         {
@@ -272,13 +268,11 @@
                             required: true,
                             type: 'string',
                             trigger: 'blur',
-                            validator: (v) => {
-                                return !!v
-                            }
-                        }
-                    ]
+                            validator: (v) => !!v,
+                        },
+                    ],
                 },
-                iconOffset: 75
+                iconOffset: 75,
             }
         },
         watch: {
@@ -286,7 +280,7 @@
                 if (!this.changeInfo.info.id) {
                     this.priorityList = JSON.parse(JSON.stringify(this.modelPriority))
                 }
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -321,7 +315,7 @@
                                     weixin_notify: weixinNotify && weixinNotify.notify_template,
                                     notify_rule: policie.actions[0].config.notify_rule,
                                     notify_freq: policie.actions[0].config.notify_freq,
-                                    freq_unit: policie.actions[0].config.freq_unit
+                                    freq_unit: policie.actions[0].config.freq_unit,
                                 }
                             }
                         })
@@ -336,7 +330,7 @@
                 this.isDropdownShow = false
             },
             timeHandler (time, item, index) {
-                this.$refs['dropdown' + index][0].hide()
+                this.$refs[`dropdown${index}`][0].hide()
                 item.freq_unit = time.id
             },
             // 跳转到新建服务模式
@@ -347,8 +341,8 @@
                 if (notifyFreq <= 0) {
                     this.priorityList[index].notify_freq = 10
                     this.$bkMessage({
-                        message: this.$t(`m.slaContent["不可设置小于等于0的数字"]`),
-                        theme: 'warning'
+                        message: this.$t('m.slaContent["不可设置小于等于0的数字"]'),
+                        theme: 'warning',
                     })
                 }
             },
@@ -359,8 +353,8 @@
                 if (notifyTypeList.length === 0) {
                     this.priorityList[index].notify_type_list = [...this.oldNotifyTypeList[index]]
                     this.$bkMessage({
-                        message: this.$t(`m.slaContent["至少选择一项提醒方式"]`),
-                        theme: 'warning'
+                        message: this.$t('m.slaContent["至少选择一项提醒方式"]'),
+                        theme: 'warning',
                     })
                 }
             },
@@ -380,13 +374,14 @@
                 })
                 await Promise.all(validates).then(() => {
                     valid = false
-                }).catch(() => {
-                    // 防止出现Uncaught
-                    valid = true
                 })
+                    .catch(() => {
+                        // 防止出现Uncaught
+                        valid = true
+                    })
                 return valid
-            }
-        }
+            },
+        },
     }
 </script>
 

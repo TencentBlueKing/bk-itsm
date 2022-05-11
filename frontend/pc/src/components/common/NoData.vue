@@ -34,14 +34,14 @@
         name: 'NoData',
         props: {
             text: {
-                type: String
-            }
+                type: String,
+            },
         },
         data () {
             return {
-                imgUrl: require('@/images/box.png')
+                imgUrl: require('@/images/box.png'),
             }
-        }
+        },
     }
 </script>
 

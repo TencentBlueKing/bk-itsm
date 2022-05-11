@@ -251,14 +251,14 @@
     export default {
         name: 'attachmentStorage',
         components: {
-            versionLog
+            versionLog,
         },
         mixins: [permission],
         data () {
             return {
-                clearStorageTime: localStorage.getItem('clearStorageTime') || this.$t(`m.home["暂无"]`),
+                clearStorageTime: localStorage.getItem('clearStorageTime') || this.$t('m.home["暂无"]'),
                 // placeholder: "请填写以 ''/'' 结尾的绝对目录.",
-                placeholder: this.$t(`m.home["请填写路径"]`),
+                placeholder: this.$t('m.home["请填写路径"]'),
                 issending: false,
                 downUrl: (`${window.STATIC_URL}`) + 'help/itsm_nfs.tar.gz',
                 rowVersionList: [],
@@ -266,9 +266,9 @@
                 formerVersion: '',
                 updatedVersion: '',
                 versionLogData: {
-                    title: this.$t(`m.home["升级记录"]`),
+                    title: this.$t('m.home["升级记录"]'),
                     show: false,
-                    width: 700
+                    width: 700,
                 },
                 // 开关功能对照表
                 switchKeyMap: {
@@ -281,7 +281,7 @@
                     TASK_SWITCH: 'task',
                     FIRST_STATE_SWITCH: 'basic',
                     TABLE_FIELDS_SWITCH: 'module',
-                    SMS_COMMENT_SWITCH: 'smsComment'
+                    SMS_COMMENT_SWITCH: 'smsComment',
                 },
                 // 开关功能总体信息
                 moduleInfo: {
@@ -289,71 +289,71 @@
                         id: '',
                         title: this.$t('m.home["提单信息展示开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     module: {
                         id: '',
                         title: this.$t('m.home["基础信息展示开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     systemPath: {
                         id: '',
                         formerValue: '',
                         nowValue: '',
-                        changing: false
+                        changing: false,
                     },
                     preview: {
                         id: '',
                         title: this.$t('m.home["流程预览功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     sla: {
                         id: '',
                         title: this.$t('m.home["SLA功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     inherit: {
                         id: '',
                         title: this.$t('m.home["母子单功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     wiki: {
                         id: '',
                         title: this.$t('m.home["知识库功能开关："]'),
                         open: false,
-                        isAvailable: false
+                        isAvailable: false,
                     },
                     task: {
                         id: '',
                         title: this.$t('m.home["任务功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     trigger: {
                         id: '',
                         title: this.$t('m.home["触发器功能开关："]'),
                         open: false,
-                        isAvailable: true
+                        isAvailable: true,
                     },
                     smsComment: {
                         id: '',
                         title: this.$t('m.home["短信评论开关："]'),
                         open: false,
-                        isAvailable: true
-                    }
+                        isAvailable: true,
+                    },
                 },
                 // 获取开关状态按钮禁用
-                isAllStatusGetting: false
+                isAllStatusGetting: false,
             }
         },
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
         },
         watch: {},
         async created () {
@@ -377,11 +377,13 @@
                         }
                     })
                     this.$store.commit('changeOpenFunction', tempObj)
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isAllStatusGetting = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isAllStatusGetting = false
+                    })
             },
             cancelPath () {
                 this.moduleInfo.systemPath.changing = false
@@ -395,11 +397,11 @@
                 if (this.isAllStatusGetting) {
                     return
                 }
-                const id = this.moduleInfo[type].id
+                const { id } = this.moduleInfo[type]
                 const params = {
-                    'type': 'FUNCTION',
-                    'key': Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
-                    'value': openStatus ? 'on' : 'off'
+                    type: 'FUNCTION',
+                    key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
+                    value: openStatus ? 'on' : 'off',
                 }
                 if (type === 'systemPath') {
                     params.value = this.moduleInfo.systemPath.nowValue
@@ -408,18 +410,20 @@
                 this.isAllStatusGetting = true
                 await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.home["更新成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.home["更新成功"]'),
+                        theme: 'success',
                     })
                     this.getEnableStatusAndStorage()
-                }).catch((res) => {
-                    errorHandler(res, this)
-                    this.getEnableStatusAndStorage()
-                    this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue
-                }).finally(() => {
-                    this.moduleInfo.systemPath.changing = false
-                    this.isAllStatusGetting = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                        this.getEnableStatusAndStorage()
+                        this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue
+                    })
+                    .finally(() => {
+                        this.moduleInfo.systemPath.changing = false
+                        this.isAllStatusGetting = false
+                    })
             },
             // 一键清除 缓存
             handleClear () {
@@ -434,18 +438,20 @@
                 this.issending = true
                 this.$store.dispatch('attachmentStorage/clearStorage', {}).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.home["清除缓存成功"]`),
-                        theme: 'success'
+                        message: this.$t('m.home["清除缓存成功"]'),
+                        theme: 'success',
                     })
                     this.clearStorageTime = new Date().toLocaleString('zh', { hour12: false })
                     window.localStorage.setItem('clearStorageTime', this.clearStorageTime)
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    setTimeout(() => {
-                        this.issending = false
-                    }, 10000)
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        setTimeout(() => {
+                            this.issending = false
+                        }, 10000)
+                    })
             },
             seeLog () {
                 this.versionLogData.show = true
@@ -456,31 +462,35 @@
                     this.updatedVersion = this.rowVersionList[0].version
                     this.rowVersionList.forEach(item => {
                         const ite = {
-                            name: `V${item.version}`
+                            name: `V${item.version}`,
                         }
                         this.versionList.push(ite)
                     })
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+
+                    })
             },
             async onKeyUpdate () {
                 const params = {
                     version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
-                    version_to: this.updatedVersion
+                    version_to: this.updatedVersion,
                 }
                 await this.$store.dispatch('version/oneKeymigrate', params).then((res) => {
                     this.$bkMessage({
-                        message: this.$t(`m.home["提交成功，后台执行升级中"]`),
-                        theme: 'success'
+                        message: this.$t('m.home["提交成功，后台执行升级中"]'),
+                        theme: 'success',
                     })
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.formerVersion = ''
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.formerVersion = ''
+                    })
             },
             handleChangeSystemPath () {
                 if (!this.hasPermission(['global_settings_manage'])) {
@@ -488,8 +498,8 @@
                     return
                 }
                 this.moduleInfo.systemPath.changing = true
-            }
-        }
+            },
+        },
     }
 </script>
 

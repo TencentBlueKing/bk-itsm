@@ -73,20 +73,20 @@
         name: 'signNodeInfo',
         components: {
             timeLine,
-            fieldsDone
+            fieldsDone,
         },
         props: {
             nodeInfo: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 logs: {},
-                getLogFlag: false
+                getLogFlag: false,
             }
         },
         async mounted () {
@@ -104,11 +104,11 @@
                     }
                 })
                 const tempLog = {
-                    message: waitProcessors.length + this.$t(`m.newCommon['人待处理']`),
+                    message: waitProcessors.length + this.$t('m.newCommon[\'人待处理\']'),
                     operate_at: this.getFormatDate(),
-                    tag: 'processors'
+                    tag: 'processors',
                 }
-                tempLog.message += waitProcessors.length ? this.$t(`m.newCommon['：']`) + waitProcessors.join(',') : ''
+                tempLog.message += waitProcessors.length ? this.$t('m.newCommon[\'：\']') + waitProcessors.join(',') : ''
                 this.logs.unshift(tempLog)
                 this.getLogFlag = false
             },
@@ -117,20 +117,20 @@
                 let month = date.getMonth() + 1
                 let strDate = date.getDate()
                 if (month >= 1 && month <= 9) {
-                    month = '0' + month
+                    month = `0${month}`
                 }
                 if (strDate >= 0 && strDate <= 9) {
-                    strDate = '0' + strDate
+                    strDate = `0${strDate}`
                 }
-                const currentDate = date.getFullYear() + '-' + month + '-' + strDate
-                    + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+                const currentDate = `${date.getFullYear()}-${month}-${strDate
+                } ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
                 return currentDate
             },
             async getLogs () {
                 const params = {
                     ticket: this.nodeInfo.ticket_id,
                     status: this.nodeInfo.id,
-                    type: 'SIGN'
+                    type: 'SIGN',
                 }
                 await this.$store.dispatch('apiRemote/get_sign_logs', params).then(res => {
                     res.data.forEach(item => {
@@ -138,11 +138,12 @@
                     })
                     this.logs = res.data
                     this.logs.reverse()
-                }).catch(res => {
-                    errorHandler(res, this)
                 })
-            }
-        }
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+            },
+        },
     }
 </script>
 

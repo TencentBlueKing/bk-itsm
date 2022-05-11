@@ -41,22 +41,22 @@
         props: {
             isFull: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             title: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         watch: {
             isFull (val) {
                 if (val) {
                     this.$bkMessage({
-                        message: this.$t(`m.common["按 ESC 键退出全屏"]`)
+                        message: this.$t('m.common["按 ESC 键退出全屏"]'),
                     })
                     document.addEventListener('keydown', this.handlerKeyDown)
                 }
-            }
+            },
         },
         methods: {
             onClose () {
@@ -67,8 +67,8 @@
                     this.onClose()
                     document.removeEventListener('keydown', this.handlerKeyDown)
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

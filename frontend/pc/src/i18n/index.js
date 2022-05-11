@@ -37,8 +37,8 @@ const i18n = new VueI18n({
         // 中文语言包
         'zh-cn': Object.assign(lang.zhCN, zhI18n),
         // 英文语言包
-        'en': Object.assign(lang.enUS, enI18n)
-    }
+        en: Object.assign(lang.enUS, enI18n),
+    },
 })
 
 export default i18n

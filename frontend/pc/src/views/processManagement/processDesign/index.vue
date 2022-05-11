@@ -25,6 +25,6 @@
 </template>
 <script>
     export default {
-        name: 'layoutContent'
+        name: 'layoutContent',
     }
 </script>

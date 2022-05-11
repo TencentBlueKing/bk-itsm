@@ -110,12 +110,12 @@
         props: {
             row: {
                 type: Object,
-                default: () => ({})
+                default: () => ({}),
             },
             from: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -124,13 +124,13 @@
                 children: [],
                 associates: [], // 关联单
                 inheritLoading: false,
-                associateLoading: false
+                associateLoading: false,
             }
         },
         computed: {
             openFunction () {
                 return this.$store.state.openFunction
-            }
+            },
         },
         methods: {
             // 获取母子单
@@ -140,7 +140,7 @@
                 }
                 this.inheritLoading = true
                 const params = {
-                    id: this.row.id
+                    id: this.row.id,
                 }
                 this.$store.dispatch('change/getInheritState', params).then(res => {
                     if (res.data.related_type === 'slave') {
@@ -148,11 +148,13 @@
                     } else {
                         this.children = res.data.master_slave_tickets
                     }
-                }).catch(res => {
-                    errorHandler(res)
-                }).finally(() => {
-                    this.inheritLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res)
+                    })
+                    .finally(() => {
+                        this.inheritLoading = false
+                    })
             },
             // 获取关联单
             getAssociatedTickets () {
@@ -161,18 +163,20 @@
                 }
                 this.associateLoading = true
                 const params = {
-                    id: this.row.id
+                    id: this.row.id,
                 }
                 this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
                     this.associates = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.associateLoading = false
                 })
-            }
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.associateLoading = false
+                    })
+            },
 
-        }
+        },
     }
 </script>
 <style lang='scss' scoped>

@@ -30,7 +30,7 @@ function parseType (type) {
     if (typeof type !== 'string') {
         return {
             el: 'input',
-            type: 'text'
+            type: 'text',
         }
     }
 
@@ -38,7 +38,7 @@ function parseType (type) {
 
     return {
         el: $type[0],
-        type: $type[1]
+        type: $type[1],
     }
 }
 
@@ -48,7 +48,7 @@ function parseType (type) {
 function parseRule (rule) {
     if (typeof rule !== 'string') {
         return {
-            rule: 'not_empty'
+            rule: 'not_empty',
         }
     }
 
@@ -56,7 +56,7 @@ function parseRule (rule) {
 
     return {
         rule: $rule[0],
-        ext: $rule[1]
+        ext: $rule[1],
     }
 }
 
@@ -77,13 +77,13 @@ function ErrorHandler (el, valid) {
 
 const install = Vue => {
     Vue.directive('bk-validation', {
-        inserted: function (el) {
+        inserted (el) {
             // el.focus()
         },
         update (el, binding) {
             const {
                 value,
-                oldValue
+                oldValue,
             } = binding
 
             // 避免不必要的更新
@@ -103,7 +103,7 @@ const install = Vue => {
             }
 
             ErrorHandler(el, result)
-        }
+        },
     })
 }
 

@@ -104,21 +104,21 @@
             NavTitle,
             ServiceFormStep,
             ServiceProcessStep,
-            ServiceSettingStep
+            ServiceSettingStep,
         },
         props: {
             type: {
                 type: String,
-                default: 'new'
+                default: 'new',
             },
             step: {
                 type: String,
-                default: 'basic'
+                default: 'basic',
             },
             serviceId: {
                 type: [String, Number],
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
@@ -127,7 +127,7 @@
                 isSubmitting: false,
                 serviceInfo: {},
                 flowInfo: {},
-                isShowNodeConfig: false // 编辑节点配置
+                isShowNodeConfig: false, // 编辑节点配置
             }
         },
         computed: {
@@ -137,13 +137,13 @@
                 return index + 1
             },
             prevStepBtnName () {
-                return this.currStep === 1 ? this.$t(`m['返回']`) : this.$t('m.treeinfo["上一步"]')
+                return this.currStep === 1 ? this.$t('m[\'返回\']') : this.$t('m.treeinfo["上一步"]')
             },
             nextStepBtnName () {
-                return this.currStep < 3 ? this.$t(`m.common['下一步']`) : this.$t('m.newCommon["提交"]')
+                return this.currStep < 3 ? this.$t('m.common[\'下一步\']') : this.$t('m.newCommon["提交"]')
             },
             stepList () {
-                let status1, status2, status3
+                let status1; let status2; let status3
                 if (this.type !== 'new') { // 创建成功
                     status1 = 'done'
                     status2 = 'done'
@@ -152,20 +152,20 @@
                     status3 = 'done'
                 }
                 const list = [
-                    { title: this.$t(`m.tickets['服务表单']`), icon: 1, status: status1 },
-                    { title: this.$t(`m.tickets['服务流程']`), icon: 2, status: status2 },
-                    { title: this.$t(`m.taskTemplate['高级配置']`), icon: 3, status: status3 }
+                    { title: this.$t('m.tickets[\'服务表单\']'), icon: 1, status: status1 },
+                    { title: this.$t('m.tickets[\'服务流程\']'), icon: 2, status: status2 },
+                    { title: this.$t('m.taskTemplate[\'高级配置\']'), icon: 3, status: status3 },
                 ]
                 list[this.currStep - 1].status = undefined
                 return list
-            }
+            },
         },
         watch: {
             '$route' (to, from) {
                 if (to.params.type !== from.params.type) {
                     this.initData()
                 }
-            }
+            },
         },
         mounted () {
             this.initData()
@@ -182,22 +182,26 @@
                 this.serviceLoading = true
                 return this.$store.dispatch('service/getServiceDetail', this.serviceId).then((res) => {
                     this.serviceInfo = res.data
-                }).catch((res) => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.serviceLoading = false
                 })
+                    .catch((res) => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.serviceLoading = false
+                    })
             },
             // 获取流程详情
             getFlowDetailInfo () {
                 this.flowInfoLoading = true
                 this.$store.dispatch('design/getFlowDetail', { params: this.serviceInfo.workflow_id }).then((res) => {
                     this.flowInfo = res.data
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.flowInfoLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.flowInfoLoading = false
+                    })
             },
             // 更新服务信息
             updateServiceInfo (data) {
@@ -211,8 +215,8 @@
                     name: 'projectServiceList',
                     query: {
                         project_id: this.$store.state.project.id,
-                        catalog_id: this.$route.query.catalog_id
-                    }
+                        catalog_id: this.$route.query.catalog_id,
+                    },
                 })
             },
             onStepChange (index) {
@@ -224,12 +228,12 @@
                     name: 'projectServiceEdit',
                     params: {
                         type: 'edit',
-                        step: step[index - 1]
+                        step: step[index - 1],
                     },
                     query: {
                         serviceId: this.serviceId,
-                        project_id: this.$store.state.project.id
-                    }
+                        project_id: this.$store.state.project.id,
+                    },
                 })
             },
             // 上一步
@@ -239,19 +243,19 @@
                         name: 'projectServiceList',
                         query: {
                             project_id: this.$store.state.project.id,
-                            ...this.$route.query
-                        }
+                            ...this.$route.query,
+                        },
                     })
                 } else {
                     this.$router.push({
                         name: 'projectServiceEdit',
                         params: {
                             type: 'edit',
-                            step: this.currStep === 2 ? 'basic' : 'process'
+                            step: this.currStep === 2 ? 'basic' : 'process',
                         },
                         query: {
-                            ...this.$route.query
-                        }
+                            ...this.$route.query,
+                        },
                     })
                 }
             },
@@ -259,9 +263,9 @@
             onNextStepClick () {
                 this.isSubmitting = true
                 const stepRefMap = {
-                    'basic': 'serviceFormStep',
-                    'process': 'serviceProcessStep',
-                    'setting': 'serviceSettingStep'
+                    basic: 'serviceFormStep',
+                    process: 'serviceProcessStep',
+                    setting: 'serviceSettingStep',
                 }
                 const refName = stepRefMap[this.step]
                 this.$refs[refName].validate().then((res = {}) => {
@@ -278,30 +282,31 @@
                             name: 'projectServiceEdit',
                             params: {
                                 type: 'edit',
-                                step: nextStep
+                                step: nextStep,
                             },
                             query: {
-                                ...this.$route.query
-                            }
+                                ...this.$route.query,
+                            },
                         })
                     } else {
                         this.$bkMessage({
-                            message: this.$t(`m.treeinfo["保存成功"]`),
-                            theme: 'success'
+                            message: this.$t('m.treeinfo["保存成功"]'),
+                            theme: 'success',
                         })
                         this.$router.push({
                             name: 'projectServiceList',
                             query: {
                                 project_id: this.$store.state.project.id,
-                                catalog_id: this.$route.query.catalog_id
-                            }
+                                catalog_id: this.$route.query.catalog_id,
+                            },
                         })
                     }
-                }).finally(() => {
-                    this.isSubmitting = false
                 })
-            }
-        }
+                    .finally(() => {
+                        this.isSubmitting = false
+                    })
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

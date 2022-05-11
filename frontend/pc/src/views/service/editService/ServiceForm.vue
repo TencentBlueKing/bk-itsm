@@ -94,24 +94,24 @@
             draggable,
             HalfRowForm,
             // FormEditItem,
-            FormViewItem
+            FormViewItem,
         },
         props: {
             serviceInfo: Object,
             nodeId: Number,
             forms: Array,
             crtForm: [String, Number],
-            addFieldStatus: Boolean
+            addFieldStatus: Boolean,
         },
         data () {
             return {
-                formList: this.transFieldsToDraggable(this.forms)
+                formList: this.transFieldsToDraggable(this.forms),
             }
         },
         watch: {
             forms (val) {
                 this.formList = this.transFieldsToDraggable(val)
-            }
+            },
         },
         mounted () {
         },
@@ -190,7 +190,7 @@
                         is_tips: false,
                         tips: '',
                         meta: {},
-                        default: ''
+                        default: '',
                     }
                     this.$emit('onAddFormClick', targetIndex, field)
                 }
@@ -234,7 +234,7 @@
                         is_tips: false,
                         tips: '',
                         meta: {},
-                        default: ''
+                        default: '',
                     }
                     if (rowForms[0] === undefined) {
                         field.meta.layout_position = 'left'
@@ -282,8 +282,8 @@
                     }
                 }
                 this.$emit('saveField', Object.assign({}, originForm, form))
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang='scss' scoped>

@@ -33,41 +33,41 @@
         props: {
             title: {
                 type: String,
-                default: ''
+                default: '',
             },
             desc: {
                 type: String,
-                default: ''
+                default: '',
             },
             xAxisName: {
                 type: String,
-                default: ''
+                default: '',
             },
             yAxisName: {
                 type: String,
-                default: ''
+                default: '',
             },
             height: {
                 type: Number,
-                default: 320
+                default: 320,
             },
             chartData: {
                 type: Object,
                 default () {
                     return {
                         x: [],
-                        y: []
+                        y: [],
                     }
-                }
+                },
             },
             loading: {
                 type: Boolean,
-                default: false
-            }
+                default: false,
+            },
         },
         data () {
             return {
-                chartInstance: null
+                chartInstance: null,
             }
         },
         watch: {
@@ -75,7 +75,7 @@
                 if (!val) {
                     this.updateChart()
                 }
-            }
+            },
         },
         mounted () {
             this.init()
@@ -91,40 +91,40 @@
                         datasets: [{
                             data: y,
                             backgroundColor: '#4b78c1',
-                            maxBarThickness: 24
-                        }]
+                            maxBarThickness: 24,
+                        }],
                     },
                     options: {
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                display: false
-                            }
+                                display: false,
+                            },
                         },
                         scales: {
                             x: {
                                 gridLines: {
-                                    display: false
-                                }
+                                    display: false,
+                                },
                             },
                             y: {
                                 gridLines: {
-                                    borderDash: [5, 3]
-                                }
-                            }
+                                    borderDash: [5, 3],
+                                },
+                            },
                         },
                         interaction: {
-                            mode: 'nearest'
-                        }
-                    }
+                            mode: 'nearest',
+                        },
+                    },
                 })
             },
             updateChart () {
                 this.chartInstance.data.datasets[0].data = this.chartData.y
                 this.chartInstance.data.labels = this.chartData.x
                 this.chartInstance.update()
-            }
-        }
+            },
+        },
     }
 </script>
 <style lang="scss" scoped>

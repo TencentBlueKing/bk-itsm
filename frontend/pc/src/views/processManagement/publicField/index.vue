@@ -223,15 +223,15 @@
         components: {
             addField,
             searchInfo,
-            EmptyTip
+            EmptyTip,
         },
         mixins: [commonMix, permission],
         props: {
             projectId: String,
             title: {
                 type: String,
-                default: i18n.t(`m['字段']`)
-            }
+                default: i18n.t('m[\'字段\']'),
+            },
         },
         data () {
             return {
@@ -243,48 +243,48 @@
                 pagination: {
                     current: 1,
                     count: 10,
-                    limit: 10
+                    limit: 10,
                 },
                 // 查询
                 moreSearch: [
                     {
-                        name: this.$t(`m.publicField["字段名"]`),
-                        placeholder: this.$t(`m.publicField["请输入字段名"]`),
+                        name: this.$t('m.publicField["字段名"]'),
+                        placeholder: this.$t('m.publicField["请输入字段名"]'),
                         typeKey: 'name__contains',
                         type: 'input',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.publicField["唯一标识"]`),
+                        name: this.$t('m.publicField["唯一标识"]'),
                         typeKey: 'key',
                         type: 'input',
                         value: '',
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.publicField["字段类型"]`),
+                        name: this.$t('m.publicField["字段类型"]'),
                         type: 'select',
                         multiSelect: true,
                         typeKey: 'type__in',
                         value: [],
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.publicField["更新人"]`),
+                        name: this.$t('m.publicField["更新人"]'),
                         type: 'member',
                         multiSelect: true,
                         typeKey: 'updated_by__in',
                         value: [],
-                        list: []
+                        list: [],
                     },
                     {
-                        name: this.$t(`m.publicField["更新时间"]`),
+                        name: this.$t('m.publicField["更新时间"]'),
                         typeKey: 'date_update',
                         type: 'datetime',
                         value: '',
-                        list: []
-                    }
+                        list: [],
+                    },
                 ],
                 searchToggle: false,
                 listInfo: [],
@@ -292,9 +292,9 @@
                 workflow: 0,
                 stateId: 0,
                 sliderInfo: {
-                    title: this.$t(`m.deployPage["新增字段"]`),
+                    title: this.$t('m.deployPage["新增字段"]'),
                     show: false,
-                    width: 700
+                    width: 700,
                 },
                 changeInfo: {},
                 addOrigin: {
@@ -302,39 +302,39 @@
                     addOriginInfo: {
                         type: 'publicField',
                         addUrl: 'publicField/add_template_fields',
-                        updateUrl: 'publicField/update_template_fields'
-                    }
+                        updateUrl: 'publicField/update_template_fields',
+                    },
                 },
                 fieldsList: [],
                 isEditPublic: true,
                 emptyTip: {
-                    title: this.$t(`m['当前项目下还没有 <字段> 元素']`),
-                    subTitle: this.$t(`m['「字段」是服务表单设计的必要元素之一，将一些常用的字段沉淀下来提供给不同的服务引用，对后续的统一管理维护可以起到很大的帮助！']`),
+                    title: this.$t('m[\'当前项目下还没有 <字段> 元素\']'),
+                    subTitle: this.$t('m[\'「字段」是服务表单设计的必要元素之一，将一些常用的字段沉淀下来提供给不同的服务引用，对后续的统一管理维护可以起到很大的帮助！\']'),
                     desc: [
                         {
                             src: require('../../../images/illustration/field.svg'),
-                            title: this.$t(`m['设计字段的数据结构']`),
-                            content: this.$t(`m['在创建字段时，需要根据字段含义配置字段名、填写方式（如文本框、选择器）、是否必填、校验规则、用户提示等等，尽可能的贴合服务场景进行友好的用户体验设计。']`)
+                            title: this.$t('m[\'设计字段的数据结构\']'),
+                            content: this.$t('m[\'在创建字段时，需要根据字段含义配置字段名、填写方式（如文本框、选择器）、是否必填、校验规则、用户提示等等，尽可能的贴合服务场景进行友好的用户体验设计。\']'),
                         },
                         {
                             src: require('../../../images/illustration/use-field.svg'),
-                            title: this.$t(`m['在服务表单中使用它']`),
-                            content: this.$t(`m['在设计服务的填写表单时，可以从已经沉淀的字段元素列表中挑选符合场景的字段，从而达到相同含义的字段可以跨服务间进行统一的配置，提高管理效率。']`)
-                        }
+                            title: this.$t('m[\'在服务表单中使用它\']'),
+                            content: this.$t('m[\'在设计服务的填写表单时，可以从已经沉淀的字段元素列表中挑选符合场景的字段，从而达到相同含义的字段可以跨服务间进行统一的配置，提高管理效率。\']'),
+                        },
                     ],
                     links: [
                         {
-                            text: this.$t(`m['了解更多关于服务的设计流程和细节']`),
-                            btn: this.$t(`m['产品文档']`),
-                            href: 'https://bk.tencent.com/docs/document/6.0/145/6600'
+                            text: this.$t('m[\'了解更多关于服务的设计流程和细节\']'),
+                            btn: this.$t('m[\'产品文档\']'),
+                            href: 'https://bk.tencent.com/docs/document/6.0/145/6600',
                         },
                         {
-                            text: this.$t(`m['如何按分类结构化的管理你的诸多服务？']`),
-                            btn: this.$t(`m['产品文档']`),
-                            href: 'https://bk.tencent.com/docs/document/6.0/145/6608'
-                        }
-                    ]
-                }
+                            text: this.$t('m[\'如何按分类结构化的管理你的诸多服务？\']'),
+                            btn: this.$t('m[\'产品文档\']'),
+                            href: 'https://bk.tencent.com/docs/document/6.0/145/6608',
+                        },
+                    ],
+                },
             }
         },
         computed: {
@@ -355,7 +355,7 @@
             },
             curPermission () {
                 return this.projectId ? this.$store.state.project.projectAuthActions : []
-            }
+            },
         },
         mounted () {
             this.getList()
@@ -369,7 +369,7 @@
                 const params = {
                     page: this.pagination.current,
                     page_size: this.pagination.limit,
-                    ordering: this.ordering
+                    ordering: this.ordering,
                 }
                 params.project_key = this.projectId || 'public'
                 // 过滤条件
@@ -378,8 +378,8 @@
                         if (item.value && item.value[0]) {
                             const gteTime = this.standardTime(item.value[0])
                             const lteTime = this.standardTime(item.value[1])
-                            params['update_at__gte'] = gteTime
-                            params['update_at__lte'] = lteTime
+                            params.update_at__gte = gteTime
+                            params.update_at__lte = lteTime
                         }
                     } else {
                         if (item.type === 'input') {
@@ -398,11 +398,13 @@
                     // 分页
                     this.pagination.current = res.data.page
                     this.pagination.count = res.data.count
-                }).catch(res => {
-                    errorHandler(res, this)
-                }).finally(() => {
-                    this.isDataLoading = false
                 })
+                    .catch(res => {
+                        errorHandler(res, this)
+                    })
+                    .finally(() => {
+                        this.isDataLoading = false
+                    })
             },
             // 分页过滤数据
             handleSortChange (data) {
@@ -428,12 +430,10 @@
             },
             searchMore () {
                 // 类型
-                this.moreSearch[2].list = this.globalChoise.field_type.map(item => {
-                    return {
-                        key: item.typeName,
-                        name: item.name
-                    }
-                })
+                this.moreSearch[2].list = this.globalChoise.field_type.map(item => ({
+                    key: item.typeName,
+                    name: item.name,
+                }))
                 this.$refs.searchInfo.searchMore()
             },
             // 清空搜索表单
@@ -448,52 +448,54 @@
                 if (!this.hasPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     let resourceData = null
                     if (this.projectId) {
-                        const projectInfo = this.$store.state.project.projectInfo
+                        const { projectInfo } = this.$store.state.project
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
-                                name: projectInfo.name
+                                name: projectInfo.name,
                             }],
                             field: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                     } else {
                         resourceData = {
                             public_field: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                     }
                     this.applyForPermission(this.deleteFieldPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
                 } else {
                     this.$bkInfo({
                         type: 'warning',
-                        title: this.$t(`m.treeinfo["确认删除此字段？"]`),
-                        subTitle: this.$t(`m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]`),
+                        title: this.$t('m.treeinfo["确认删除此字段？"]'),
+                        subTitle: this.$t('m.treeinfo["字段一旦删除，此字段将不在可用。请谨慎操作。"]'),
                         confirmFn: () => {
-                            const id = item.id
+                            const { id } = item
                             if (this.secondClick) {
                                 return
                             }
                             this.secondClick = true
                             this.$store.dispatch('publicField/delet_template_fields', { id }).then((res) => {
                                 this.$bkMessage({
-                                    message: this.$t(`m.systemConfig["删除成功"]`),
-                                    theme: 'success'
+                                    message: this.$t('m.systemConfig["删除成功"]'),
+                                    theme: 'success',
                                 })
                                 if (this.dataList.length === 1) {
                                     this.pagination.current = this.pagination.current === 1 ? 1 : this.pagination.current - 1
                                 }
                                 this.getList()
-                            }).catch((res) => {
-                                errorHandler(res, this)
-                            }).finally(() => {
-                                this.secondClick = false
                             })
-                        }
+                                .catch((res) => {
+                                    errorHandler(res, this)
+                                })
+                                .finally(() => {
+                                    this.secondClick = false
+                                })
+                        },
                     })
                 }
             },
@@ -502,12 +504,12 @@
                 if (!this.hasPermission(this.createFieldPerm, this.curPermission)) {
                     let resourceData = {}
                     if (this.projectId) {
-                        const projectInfo = this.$store.state.project.projectInfo
+                        const { projectInfo } = this.$store.state.project
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
-                                name: projectInfo.name
-                            }]
+                                name: projectInfo.name,
+                            }],
                         }
                     }
                     this.applyForPermission(this.createFieldPerm, this.curPermission, resourceData)
@@ -531,11 +533,11 @@
                     is_tips: false,
                     tips: '',
                     meta: {
-                        code: ''
-                    }
+                        code: '',
+                    },
                 }
                 this.changeInfo.project_key = this.projectId || 'public'
-                this.sliderInfo.title = this.$t(`m.deployPage["新增字段"]`)
+                this.sliderInfo.title = this.$t('m.deployPage["新增字段"]')
                 this.sliderInfo.show = true
             },
             closeShade () {
@@ -546,23 +548,23 @@
                 if (!this.hasPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     let resourceData = null
                     if (this.projectId) {
-                        const projectInfo = this.$store.state.project.projectInfo
+                        const { projectInfo } = this.$store.state.project
                         resourceData = {
                             project: [{
                                 id: projectInfo.key,
-                                name: projectInfo.name
+                                name: projectInfo.name,
                             }],
                             field: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                     } else {
                         resourceData = {
                             public_field: [{
                                 id: item.id,
-                                name: item.name
-                            }]
+                                name: item.name,
+                            }],
                         }
                     }
                     this.applyForPermission(reqPerm, [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData)
@@ -570,7 +572,7 @@
                 }
                 this.changeInfo = item
                 this.changeInfo.is_tips = item.is_tips || false
-                this.sliderInfo.title = this.$t(`m.treeinfo["编辑字段"]`)
+                this.sliderInfo.title = this.$t('m.treeinfo["编辑字段"]')
                 this.sliderInfo.show = true
             },
             // 关闭前验证字段表单
@@ -583,10 +585,10 @@
                     },
                     cancelFn: () => {
                         this.sliderInfo.show = true
-                    }
+                    },
                 })
-            }
-        }
+            },
+        },
     }
 </script>
 

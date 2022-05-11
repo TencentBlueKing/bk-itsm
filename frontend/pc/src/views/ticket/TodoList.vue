@@ -56,12 +56,16 @@
                 prop="remind_btn"
                 width="30">
                 <template slot-scope="{ row }">
-                    <bk-popover :content="!row.hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
+                    <bk-popover
+                        :content="!row.hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
                         :interactive="false"
                         placement="top">
                         <div class="attention-icon">
                             <i class="bk-itsm-icon icon-rate" @click="onChangeAttention(row)"></i>
-                            <i class="bk-itsm-icon icon-favorite" :class="{ 'is-attention': row.hasAttention }" @click="onChangeAttention(row)"></i>
+                            <i class="bk-itsm-icon icon-favorite"
+                                :class="{ 'is-attention': row.hasAttention }"
+                                @click="onChangeAttention(row)">
+                            </i>
                         </div>
                     </bk-popover>
                 </template>
@@ -78,7 +82,8 @@
                     <!-- 单号 -->
                     <column-sn v-if="field.id === 'id'" :from="from" :row="props.row"></column-sn>
                     <!-- 当前步骤 -->
-                    <column-current-step v-else-if="field.id === 'current_steps'" :row="props.row"></column-current-step>
+                    <column-current-step v-else-if="field.id === 'current_steps'" :row="props.row">
+                    </column-current-step>
                     <!-- 状态 -->
                     <span v-else-if="field.id === 'status'"
                         :title="props.row.current_status_display"
@@ -132,80 +137,80 @@
     const COLUMN_LIST = [
         {
             id: 'id',
-            label: i18n.t(`m.manageCommon['单号']`),
+            label: i18n.t('m.manageCommon[\'单号\']'),
             width: '200',
-            disabled: true
+            disabled: true,
         },
         {
             id: 'title',
-            label: i18n.t(`m.manageCommon['标题']`),
+            label: i18n.t('m.manageCommon[\'标题\']'),
             minWidth: '180' },
         {
             id: 'service_name',
-            label: i18n.t(`m.home['服务']`),
+            label: i18n.t('m.home[\'服务\']'),
             minWidth: '140',
             prop: 'service_name' },
         {
             id: 'service_type_name',
-            label: i18n.t(`m.manageCommon['类型']`),
+            label: i18n.t('m.manageCommon[\'类型\']'),
             minWidth: '80' },
         {
             id: 'priority',
-            label: i18n.t(`m.slaContent['优先级']`),
+            label: i18n.t('m.slaContent[\'优先级\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'priority_name' },
         {
             id: 'current_steps',
-            label: i18n.t(`m.newCommon['当前步骤']`),
+            label: i18n.t('m.newCommon[\'当前步骤\']'),
             minWidth: '80',
             prop: 'current_steps' },
         {
             id: 'current_processors',
-            label: i18n.t(`m.manageCommon['当前处理人']`),
+            label: i18n.t('m.manageCommon[\'当前处理人\']'),
             width: '130',
             prop: 'current_processors' },
         {
             id: 'status',
-            label: i18n.t(`m.manageCommon['状态']`),
+            label: i18n.t('m.manageCommon[\'状态\']'),
             minWidth: '120',
             sortable: 'custom',
             prop: 'status' },
         {
             id: 'create_at',
-            label: i18n.t(`m.manageCommon['提单时间']`),
+            label: i18n.t('m.manageCommon[\'提单时间\']'),
             minWidth: '140',
             sortable: 'custom',
             prop: 'create_at' },
         {
             id: 'creator',
-            label: i18n.t(`m.manageCommon['提单人']`),
+            label: i18n.t('m.manageCommon[\'提单人\']'),
             minWidth: '140',
             prop: 'creator' },
         {
             id: 'operate',
-            label: i18n.t(`m.manageCommon['操作']`),
-            minWidth: '80' }
+            label: i18n.t('m.manageCommon[\'操作\']'),
+            minWidth: '80' },
     ]
 
     export default {
         name: 'TodoList',
         components: {
             AdvancedSearch,
-            ExportTicketDialog
+            ExportTicketDialog,
         },
         mixins: [ticketListMixins],
         props: {
-            from: String
+            from: String,
         },
         data () {
             const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority')
             return {
                 columnList,
                 type: 'todo',
-                isExportDialogShow: false
+                isExportDialogShow: false,
             }
-        }
+        },
     }
 </script>
 <style lang="scss" scoped>

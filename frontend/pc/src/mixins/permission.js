@@ -29,7 +29,7 @@ const permission = {
          * @param { Array } curPermission 当前拥有的权限（针对单个实例）
          */
         getAllAppPermission (curPermission) {
-            const systemPermission = this.$store.state.common.systemPermission
+            const { systemPermission } = this.$store.state.common
             return [...systemPermission, ...curPermission]
         },
         /**
@@ -50,9 +50,8 @@ const permission = {
                 }
                 if (permActionData.relate_actions.length > 0) {
                     return this.hasPermission(permActionData.relate_actions, curPermission)
-                } else {
-                    return true
                 }
+                return true
             })
         },
         /**
@@ -69,13 +68,12 @@ const permission = {
             const data = {
                 system_id: systemId,
                 system_name: systemName,
-                actions: actionsData
+                actions: actionsData,
             }
             if (ret) {
                 return data
-            } else {
-                this.triggerPermisionModal(data)
             }
+            this.triggerPermisionModal(data)
         },
         /**
          * 组装 actions 数据，权限之间可能有相互依赖关系需要递归处理
@@ -106,13 +104,13 @@ const permission = {
                             system_name: systemName,
                             type: resourceMap.id,
                             type_name: resourceMap.name,
-                            instances: [instances]
+                            instances: [instances],
                         })
                     })
                     actionsData.push({
                         id: permActionData.id,
                         name: permActionData.name,
-                        related_resource_types: relateResources
+                        related_resource_types: relateResources,
                     })
                 }
                 // 该权限依赖其他权限
@@ -153,7 +151,7 @@ const permission = {
                     type: resourceMap.id,
                     type_name: resourceMap.name,
                     id: item.id,
-                    name: item.name
+                    name: item.name,
                 })
             })
             return data
@@ -168,15 +166,15 @@ const permission = {
         // 页面权限验证
         checkPagePermission () {
             const authMap = {
-                'OperationHome': 'operational_data_view',
-                'OperationService': 'operational_data_view',
+                OperationHome: 'operational_data_view',
+                OperationService: 'operational_data_view',
                 // 'publicFields': 'public_field_view',
                 // 'publicAPI': 'public_api_view',
                 // 'taskTpl': 'task_template_view',
-                'notifySetting': 'notification_view',
-                'slaPriority': 'sla_priority_view',
-                'ticketStatus': 'ticket_state_view',
-                'globalSetting': 'global_settings_view'
+                notifySetting: 'notification_view',
+                slaPriority: 'sla_priority_view',
+                ticketStatus: 'ticket_state_view',
+                globalSetting: 'global_settings_view',
             }
             const actionId = authMap[this.$route.name]
 
@@ -186,8 +184,8 @@ const permission = {
             }
 
             return { verified: true, data: null }
-        }
-    }
+        },
+    },
 }
 
 export default permission

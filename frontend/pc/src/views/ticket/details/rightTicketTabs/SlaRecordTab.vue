@@ -74,9 +74,9 @@
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
-            threshold: Array
+            threshold: Array,
         },
         data () {
             return {
@@ -89,28 +89,28 @@
                     {},
                     {
                         textColor: '#3A84FF',
-                        backgroundColor: '#E1ECFF'
+                        backgroundColor: '#E1ECFF',
                     },
                     {
                         textColor: '#2DCB56',
-                        backgroundColor: '#DCFFE2'
+                        backgroundColor: '#DCFFE2',
                     },
                     {
                         textColor: '#63656E',
-                        backgroundColor: '#DCDEE5'
+                        backgroundColor: '#DCDEE5',
                     },
                     {
                         textColor: '#63656E',
-                        backgroundColor: '#DCDEE5'
+                        backgroundColor: '#DCDEE5',
                     },
                     {
                         textColor: '#EA3536',
-                        backgroundColor: '#FEDDDC'
-                    }
+                        backgroundColor: '#FEDDDC',
+                    },
                 ],
                 taskStatusList: ['', this.$t('m.newCommon["未开启"]'), this.$t('m.newCommon["计时中"]'), this.$t('m.newCommon["暂停中"]'), this.$t('m.newCommon["已结束"]'), this.$t('m.newCommon["已超时"]')],
                 responseCost: '',
-                processCost: ''
+                processCost: '',
             }
         },
         watch: {
@@ -123,7 +123,7 @@
                 if (this.basicInfomation.hasOwnProperty('id')) {
                     this.loading = true
                     const params = {
-                        id: this.basicInfomation.id
+                        id: this.basicInfomation.id,
                     }
                     this.$store.dispatch('change/getReceiptsSlaTask', params).then(res => {
                         this.slaList = res.data
@@ -131,19 +131,24 @@
                             this.$set(item, 'sla_responseTime', [0, 0, 0, 0, 0, 0])
                             this.$set(item, 'sla_processTime', [0, 0, 0, 0, 0, 0])
                         })
-                    }).catch(res => {
-                        errorHandler(res, this)
-                    }).finally(() => {
-                        this.loading = false
-                        this.changeTimeoutStatus()
                     })
+                        .catch(res => {
+                            errorHandler(res, this)
+                        })
+                        .finally(() => {
+                            this.loading = false
+                            this.changeTimeoutStatus()
+                        })
                 }
             },
             changeTimeoutStatus () {
                 this.slaList.forEach((item, index) => {
                     if (item.task_status === 2) {
                         // 当前时间
-                        const curTime = convertTimeArrToMS(new Date().toLocaleDateString().split('/').concat(new Date().toTimeString().split(' ')[0].split(':')))
+                        const curTime = convertTimeArrToMS(new Date().toLocaleDateString()
+                            .split('/')
+                            .concat(new Date().toTimeString()
+                                .split(' ')[0].split(':')))
                         // 响应倒计时
                         const Rtime = convertTimeArrToMS(item.reply_deadline.split(' ')[0].split('-').concat(item.reply_deadline.split(' ')[1].split(':')))
                         // 处理倒计时
@@ -167,11 +172,11 @@
                 this.$router.push({
                     name: 'projectServiceSla',
                     params: {
-                        id: this.basicInfomation.service_id
+                        id: this.basicInfomation.service_id,
                     },
                     query: {
-                        project_id: this.$route.query.project_id
-                    }
+                        project_id: this.$route.query.project_id,
+                    },
                 })
             },
             runTime (responseCost, processCost, index, name) {
@@ -226,8 +231,8 @@
                 const beginTimestamp = new Date(beginTime)
                 const nowTimestamp = new Date()
                 return Math.round((nowTimestamp - beginTimestamp) / 1000)
-            }
-        }
+            },
+        },
     }
 </script>
 

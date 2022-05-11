@@ -43,12 +43,12 @@ export class ProcessTools {
             }
             for (let i = 0; i < self.allLine.length; i++) {
                 const line = self.allLine[i]
-                if (line['from_state'] === begin) {
-                    if (path.includes(line['to_state'])) {
+                if (line.from_state === begin) {
+                    if (path.includes(line.to_state)) {
                         continue
                     }
-                    path.push(line['to_state'])
-                    getPath(line['to_state'], last, path)
+                    path.push(line.to_state)
+                    getPath(line.to_state, last, path)
                     path.pop()
                 }
             }
@@ -69,10 +69,8 @@ export class ProcessTools {
                 })
             }
         })
-        return this.allNode.filter(node => {
-            return nodes.includes(node.id)
-            && node.name !== '' && node.type !== 'START' && node.type !== 'END'
-        })
+        return this.allNode.filter(node => nodes.includes(node.id)
+            && node.name !== '' && node.type !== 'START' && node.type !== 'END')
     }
     /**
      * 获取某个节点 sla 可选结束节点
@@ -85,9 +83,7 @@ export class ProcessTools {
         const afterNodes = self.getAfterNodes(startNode)
         return afterNodes.filter(node => {
             // 包含开始节点或结束节点的所有路径
-            const throughPath = self.allPath.filter(path => {
-                return path.includes(startNode) || path.includes(node.id)
-            })
+            const throughPath = self.allPath.filter(path => path.includes(startNode) || path.includes(node.id))
             return throughPath.every(n => n.includes(startNode) && n.includes(node.id))
         })
     }

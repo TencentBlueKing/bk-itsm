@@ -41,27 +41,27 @@
     export default {
         name: 'RenderView',
         components: {
-            ViewItem
+            ViewItem,
         },
         props: {
             formData: {
                 type: Array,
-                default: () => ([])
+                default: () => ([]),
             },
             context: {
                 type: Object,
-                default: () => ({})
-            }
+                default: () => ({}),
+            },
         },
         provide () {
             return {
-                getContext: () => this.context
+                getContext: () => this.context,
             }
         },
         data () {
             return {
                 isRootRenderView: null,
-                value: {}
+                value: {},
             }
         },
         created () {
@@ -85,8 +85,8 @@
                     }
                 }
                 this.isRootRenderView = !findParent
-            }
-        }
+            },
+        },
     }
 </script>
 

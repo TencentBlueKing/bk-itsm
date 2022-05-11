@@ -70,34 +70,34 @@
         components: {
             task,
             taskHistory,
-            slaRecord
+            slaRecord,
         },
         props: {
             basicInfomation: {
                 type: Object,
                 default () {
                     return {}
-                }
+                },
             },
             nodeList: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             openFunction: {
                 type: Object,
                 default () {
                     return {}
-                }
-            }
+                },
+            },
         },
         data () {
             return {
                 checkInfo: '',
                 showArticle: '',
                 showTask: '',
-                showHistory: ''
+                showHistory: '',
             }
         },
         mounted () {
@@ -116,8 +116,8 @@
         methods: {
             updateCurrentStep () {
                 this.$emit('updateCurrentStep')
-            }
-        }
+            },
+        },
     }
 </script>
 

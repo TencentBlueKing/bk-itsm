@@ -25,44 +25,44 @@ module.exports = {
     props: {
         value: {
             type: String,
-            default: ''
+            default: '',
         },
         width: {
             type: [Number, String],
-            default: 500
+            default: 500,
         },
         height: {
             type: [Number, String],
-            default: 300
+            default: 300,
         },
         lang: {
             type: String,
-            default: 'text'
+            default: 'text',
         },
         theme: {
             type: String,
-            default: 'monokai'
+            default: 'monokai',
         },
         readOnly: {
             type: Boolean,
-            default: false
+            default: false,
         },
         fullScreen: {
             type: Boolean,
-            default: false
+            default: false,
         },
         hasError: {
             type: Boolean,
-            default: false
+            default: false,
         },
         fontSize: {
             type: Number,
-            default: 14
-        }
+            default: 14,
+        },
     },
     data () {
         return {
-            $editor: null
+            $editor: null,
         }
     },
     watch: {
@@ -80,7 +80,7 @@ module.exports = {
         fullScreen () {
             this.$el.classList.toggle('ace-full-screen')
             this.$editor.resize()
-        }
+        },
     },
     methods: {
         calcSize (size) {
@@ -88,7 +88,7 @@ module.exports = {
             if (_size.match(/^\d*$/)) return `${size}px`
             if (_size.match(/^[0-9]?%$/)) return _size
             return '100%'
-        }
+        },
     },
     mounted () {
         this.$editor = this.$ace.edit(this.$el)
@@ -97,7 +97,7 @@ module.exports = {
             lang = 'javascript',
             theme = 'monokai',
             readOnly,
-            fontSize
+            fontSize,
         } = this
         const session = $editor.getSession()
         this.$editor.setFontSize(fontSize)
@@ -105,7 +105,7 @@ module.exports = {
         this.$emit('init', $editor)
         session.setMode(`ace/mode/${lang}`) // 配置语言
         $editor.setTheme(`ace/theme/${theme}`) // 配置主题
-        $editor.setTheme(`ace/theme/textmate`) // 配置主题
+        $editor.setTheme('ace/theme/textmate') // 配置主题
         session.setUseWrapMode(true) // 自动换行
         $editor.setValue(this.value, 1) // 设置默认内容
         $editor.setReadOnly(readOnly) // 设置是否为只读模式
@@ -129,5 +129,5 @@ module.exports = {
                 this.$emit('change-annotation', annotations)
             }
         })
-    }
+    },
 }

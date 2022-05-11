@@ -31,7 +31,7 @@
     export default {
         name: 'Fields',
         components: {
-            PublicFields
-        }
+            PublicFields,
+        },
     }
 </script>

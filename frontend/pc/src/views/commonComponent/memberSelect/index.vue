@@ -45,11 +45,11 @@
     export default {
         name: 'MemberSelector',
         components: {
-            BkUserSelector
+            BkUserSelector,
         },
         model: {
             prop: 'value',
-            event: 'change'
+            event: 'change',
         },
         props: {
             /**
@@ -60,44 +60,44 @@
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             placeholder: {
                 type: String,
-                default: i18n.t(`m.newCommon["请选择"]`)
+                default: i18n.t('m.newCommon["请选择"]'),
             },
             disabled: {
                 type: Boolean,
-                default: false
+                default: false,
             },
             // 多选
             multiple: {
                 type: Boolean,
-                default: true
+                default: true,
             },
             value: {
                 type: Array,
                 default () {
                     return []
-                }
+                },
             },
             // 外部设置的 class name
             extCls: {
                 type: String,
-                default: ''
-            }
+                default: '',
+            },
         },
         data () {
             return {
                 customUserList: [],
-                users: []
+                users: [],
             }
         },
         computed: {
             api () {
                 const host = window.BK_USER_MANAGE_HOST || location.origin
                 return `${host}/api/c/compapi/v2/usermanage/fs_list_users/`
-            }
+            },
         },
         created () {
             if (this.specifyIdList.length) {
@@ -108,7 +108,7 @@
             // 查询指定 id 用户信息
             getUserInfo (userIds) {
                 return new Promise((resolve, reject) => {
-                    jsonp(this.api + `?app_code=bk-magicbox&exact_lookups=${userIds.join(',')}&page_size=100&page=1`, null, (err, res) => {
+                    jsonp(`${this.api}?app_code=bk-magicbox&exact_lookups=${userIds.join(',')}&page_size=100&page=1`, null, (err, res) => {
                         if (err) {
                             reject(err)
                         } else {
@@ -119,9 +119,8 @@
             },
             // 通过指定用户 id 获取自定义备选列表数据
             getCustomUserListByspecifyIdList () {
-                const ids = this.specifyIdList.map(id => { // 去除人员id中的（）
-                    return id.replace(/\(.*\)$/, '')
-                })
+                const ids = this.specifyIdList.map(id =>  // 去除人员id中的（）
+                    id.replace(/\(.*\)$/, ''))
                 this.getUserInfo(ids).then(results => {
                     this.customUserList = results
                 })
@@ -134,13 +133,13 @@
                 })
                 return Promise.resolve({
                     next: true,
-                    results: results
+                    results,
                 })
             },
             onChange (value) {
                 this.$emit('change', value)
-            }
-        }
+            },
+        },
     }
 </script>
 

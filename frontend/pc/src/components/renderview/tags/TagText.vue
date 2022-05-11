@@ -49,12 +49,12 @@
     const textAttrs = {
         styles: {
             type: Object,
-            default: () => ({})
+            default: () => ({}),
         },
         value: {
             type: [String, Array],
-            default: ''
-        }
+            default: '',
+        },
     }
     export default {
         name: 'TagText',
@@ -65,7 +65,7 @@
         computed: {
             hasChildren () {
                 return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length
-            }
+            },
         },
         methods: {
             onClick () {
@@ -74,9 +74,7 @@
                 }
                 let title = ''
                 if (Array.isArray(this.value)) {
-                    title = this.value.map(item => {
-                        return (item.label || '') + item.value
-                    }).join(',')
+                    title = this.value.map(item => (item.label || '') + item.value).join(',')
                 } else {
                     title = (this.label || '') + this.value
                 }
@@ -88,11 +86,11 @@
                     Sideslider({
                         title,
                         formData: this.form.children,
-                        context: context
+                        context,
                     })
                 }
-            }
-        }
+            },
+        },
     }
 </script>
 

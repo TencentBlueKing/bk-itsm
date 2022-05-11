@@ -29,5 +29,5 @@ export default [
     ...common, // 公共路由
     ...workbench, // 我的工作台
     ...project, // 项目
-    ...manage // 平台管理
+    ...manage, // 平台管理
 ]

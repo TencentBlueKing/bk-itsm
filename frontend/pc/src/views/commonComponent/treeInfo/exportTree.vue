@@ -60,21 +60,21 @@
     export default {
         name: 'exportTree',
         components: {
-            collapseTransition
+            collapseTransition,
         },
         props: {
             treeDataList: {
                 type: Array,
-                default: []
+                default: [],
             },
             treeIndex: {
                 type: Number,
-                default: 0
-            }
+                default: 0,
+            },
         },
         data () {
             return {
-                pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`
+                pLeft: `padding-left:${15 * (this.treeIndex + 1)}px; padding-right: 10px;`,
             }
         },
         methods: {
@@ -92,8 +92,8 @@
             // 组件内调用组件，需要抛出数据两次
             selectItem (item) {
                 this.$emit('selectItem', item)
-            }
-        }
+            },
+        },
     }
 </script>
 
