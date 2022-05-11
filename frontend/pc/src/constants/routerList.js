@@ -170,6 +170,12 @@ const ROUTE_LIST = [
                         id: 'projectNotice',
                         icon: 'bk-itsm-icon icon-icon-notice-new',
                         path: '/project/notice'
+                    },
+                    {
+                        name: i18n.t(`m["设置"]`),
+                        id: 'projectSettings',
+                        icon: 'bk-itsm-icon icon-pc_setting',
+                        path: '/project/settings'
                     }
                 ]
             }

@@ -23,7 +23,7 @@
 <template>
     <div class="mt20 mb20">
         <div
-            v-if="openFunction.TRIGGER_SWITCH && origin !== 'workflow' && origin !== 'transition'"
+            v-if="(projectSwitch.TRIGGER_SWITCH || openFunction.TRIGGER_SWITCH) && origin !== 'workflow' && origin !== 'transition'"
             class="more-configuration" data-test-id="trigger-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
             <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
             <i v-else class="bk-icon icon-up-shape"></i>
@@ -237,6 +237,9 @@
             },
             openFunction () {
                 return this.$store.state.openFunction
+            },
+            projectSwitch: function () {
+                return this.$store.state.project.projectSwitch
             },
             // 当前分类下的所有信号
             allSignal () {

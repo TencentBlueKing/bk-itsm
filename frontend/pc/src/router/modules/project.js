@@ -33,6 +33,7 @@ const Field = () => import('../../views/project/fields.vue')
 const Role = () => import('../../views/project/role.vue')
 const Trigger = () => import('../../views/project/trigger.vue')
 const Notice = () => import('../../views/project/notice.vue')
+const Settings = () => import('../../views/project/settings.vue')
 const API = () => import('../../views/project/api.vue')
 const SlaManage = () => import('../../views/slaManager/slaManager.vue')
 const SlaAgreement = () => import('../../views/slaManager/agreement.vue')
@@ -119,6 +120,11 @@ export default [
                 path: 'notice',
                 name: 'projectNotice',
                 component: Notice
+            },
+            {
+                path: 'settings',
+                name: 'projectSettings',
+                component: Settings
             },
             {
                 path: 'fields',
