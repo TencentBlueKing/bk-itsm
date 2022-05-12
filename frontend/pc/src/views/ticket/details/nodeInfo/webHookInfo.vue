@@ -71,7 +71,7 @@
                     <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['参数值']`)">
                         <template slot-scope="props">
-                            <span>{{props.row.value || '--'}}</span>
+                            <span>{{ convertValue(props.row.value) }}</span>
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t(`m.treeinfo['路径']`)" prop="ref_path"></bk-table-column>
@@ -167,6 +167,14 @@
         },
         mounted () {
             this.status = this.nodeInfo.status
+        },
+        methods: {
+            convertValue (value) {
+                if (value === null) {
+                    return '--'
+                }
+                return JSON.stringify(value)
+            }
         }
     }
 </script>
