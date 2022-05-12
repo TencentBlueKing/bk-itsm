@@ -263,6 +263,9 @@ class HttpsMiddleware(MiddlewareMixin):
             if request.path.startswith("/openapi/"):
                 return None
 
+            if request.path.startswith("/api/iam/resources/v1"):
+                return None
+
         # 如果发现不是woa过来的域名
         if (
             settings.WEIXIN_APP_EXTERNAL_HOST
