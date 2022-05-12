@@ -59,12 +59,14 @@ def transform_single_username(username, user_dict=None):
     """
 
     if not username:
-        return ''
+        return ""
 
     if not user_dict:
         user_dict = get_bk_users(format="dict", users=[username])
 
-    return user_dict.get(username) if user_dict.get(username) else '{}()'.format(username)
+    return (
+        user_dict.get(username) if user_dict.get(username) else "{}()".format(username)
+    )
 
 
 def transform_username(users, user_dict=None):
@@ -77,22 +79,22 @@ def transform_username(users, user_dict=None):
 
     # 空字符串直接返回
     if not users:
-        return ''
+        return ""
 
     if isinstance(users, str):
-        users = [user for user in users.split(',') if user]
+        users = [user for user in users.split(",") if user]
 
     if not user_dict:
-        user_dict = get_bk_users(format='dict', users=users)
+        user_dict = get_bk_users(format="dict", users=users)
 
     ret_data = []
     for user in users:
         if user_dict.get(user):
             ret_data.append(user_dict.get(user))
         else:
-            ret_data.append('%s' % user)
+            ret_data.append("%s" % user)
 
-    return ','.join(ret_data)
+    return ",".join(ret_data)
 
 
 def get_days(begin, end):
@@ -109,9 +111,14 @@ def get_month_list(begin, end):
     """根据日期返回列表"""
     begin_year, begin_month = begin.year, begin.month
     end_year, end_month = end.year, end.month
-    months = (int(end_year) - int(begin_year)) * 12 + (int(end_month) - int(begin_month))
+    months = (int(end_year) - int(begin_year)) * 12 + (
+        int(end_month) - int(begin_month)
+    )
     begin_year_month = datetime.datetime.strptime(begin.strftime("%Y-%m"), "%Y-%m")
-    return [(begin_year_month + relativedelta(months=index)).strftime("%Y-%m") for index in range(months)]
+    return [
+        (begin_year_month + relativedelta(months=index)).strftime("%Y-%m")
+        for index in range(months)
+    ]
 
 
 def get_choice_route(choice, item_id):
@@ -119,7 +126,8 @@ def get_choice_route(choice, item_id):
         return []
 
     choice_dict = {
-        str(item['id']): item.get('route', []) + [{'id': item['id'], 'name': item['name']}]
+        str(item["id"]): item.get("route", [])
+        + [{"id": item["id"], "name": item["name"]}]
         for c in choice
         for item in walk(c)
     }
@@ -135,7 +143,9 @@ def get_field_value(field):
         if field.type in JSON_HANDLE_FIELDS:
             return json.loads(field._value)
     except Exception as e:
-        logger.warning('convert field value exception: {0}; value: {1}'.format(e, field._value))
+        logger.warning(
+            "convert field value exception: {0}; value: {1}".format(e, field._value)
+        )
         try:
             return ast.literal_eval(field._value)
         except Exception:
@@ -151,11 +161,14 @@ def set_field_value(field, v):
         else:
             field._value = v
     except Exception as e:
-        logger.warning('convert field value exception: {0}; value: {1}'.format(e, field._value))
+        logger.warning(
+            "convert field value exception: {0}; value: {1}".format(e, field._value)
+        )
 
 
 def get_field_display_value(field):
     """获取字段的显示值"""
+
     if not field._value:
         return ""
 
@@ -167,7 +180,9 @@ def get_field_display_value(field):
                     return "{}->{}".format(choice["name"], item["name"])
 
     if field.type in ["SELECT", "RADIO"]:
-        return {str(choice["key"]): choice["name"] for choice in field.choice}.get(field._value, field._value)
+        return {str(choice["key"]): choice["name"] for choice in field.choice}.get(
+            field._value, field._value
+        )
 
     if field.type in ["MULTISELECT", "CHECKBOX", "MEMBERS"]:
         choice = {str(choice["key"]): str(choice["name"]) for choice in field.choice}
@@ -178,8 +193,8 @@ def get_field_display_value(field):
         return "->".join([item["name"] for item in route]) or field._value
 
     if field.type == "INPUTSELECT":
-        choice = {str(choice["name"]): str(choice["key"]) for choice in field.choice}
-        return ",".join(choice.keys())
+        choice = {str(choice["key"]): str(choice["name"]) for choice in field.choice}
+        return choice.get(field._value)
 
     # if field.type in JSON_HANDLE_FIELDS:
     #     return field.value
@@ -215,7 +230,7 @@ def find_json_file(path):
     """查找目录中以json文件"""
     file_path = []
     for p in os.listdir(path):
-        if p.endswith('.json'):
+        if p.endswith(".json"):
             file_path.append(os.path.join(path, p))
             continue
         if os.path.isdir(os.path.join(path, p)):
