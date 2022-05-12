@@ -113,6 +113,8 @@ class Action(TriggerBaseModel):
 
     objects = ActionManagers()
 
+    temporary_params = None
+
     class Meta:
         verbose_name = _("响应动作表")
         verbose_name_plural = _("响应动作表")
@@ -169,6 +171,13 @@ class Action(TriggerBaseModel):
     @property
     def component_obj(self):
         self.context.update(self.outputs if self.outputs else EMPTY_DICT)
+        import json
+
+        print(json.dumps(self.action_schema.params))
+        if self.temporary_params is not None:
+            return self.action_schema.component_class(
+                self.context, self.temporary_params, self.id, self.count_down
+            )
         return self.action_schema.component_class(
             self.context, self.action_schema.params, self.id, self.count_down
         )
