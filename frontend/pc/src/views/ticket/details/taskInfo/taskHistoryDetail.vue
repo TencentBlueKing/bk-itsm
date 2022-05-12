@@ -424,6 +424,7 @@
                     }
                     /deep/.bk-tab-label-item{
                         min-width: 130px;
+                        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
                     }
                     /deep/ .bk-tab-border-card{
                         width: 100%;
