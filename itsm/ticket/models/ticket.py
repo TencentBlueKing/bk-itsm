@@ -151,6 +151,8 @@ from itsm.component.constants.trigger import (
     LEAVE_STATE,
     THROUGH_TRANSITION,
     SOURCE_TICKET,
+    GLOBAL_LEAVE_STATE,
+    GLOBAL_ENTER_STATE,
 )
 from common.shortuuid import uuid as _uu
 from itsm.component.utils.client_backend_query import (
@@ -3457,8 +3459,8 @@ class Ticket(Model, BaseTicket):
             context={"dst_state": status.id, "operator": self.creator},
         )
 
-        # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        # 全局 进入节点 触发器
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 提单节点给提单人发送关注通知邮件, 非提单节点给处理人发送单据待办通知邮件
         context = {}
@@ -3531,7 +3533,7 @@ class Ticket(Model, BaseTicket):
             self.start_sla(state_id)
 
         # 全局 进入节点 触发球
-        self.send_trigger_signal(ENTER_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_ENTER_STATE, sender=self.flow.workflow_id)
 
         # 发送进入节点的信号
         self.send_trigger_signal(
@@ -3729,7 +3731,7 @@ class Ticket(Model, BaseTicket):
         self.send_trigger_signal(LEAVE_STATE, state_id)
 
         # 全局触发器
-        self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+        self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_in_state(self, state_id, fields, operator, source):
         """节点内动作
@@ -3768,7 +3770,7 @@ class Ticket(Model, BaseTicket):
                 LEAVE_STATE, state_id, context={"operator": operator}
             )
             # 全局触发器
-            self.send_trigger_signal(LEAVE_STATE, sender=self.flow.workflow_id)
+            self.send_trigger_signal(GLOBAL_LEAVE_STATE, sender=self.flow.workflow_id)
 
     def do_after_create(self, fields, from_ticket_id=None, source=WEB):
         # 创建关联关系
