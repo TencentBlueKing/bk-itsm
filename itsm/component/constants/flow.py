@@ -324,6 +324,7 @@ SOURCE_CHOICES = [
     ("API", "接口数据"),
     ("DATADICT", "数据字典"),
     ("RPC", "系统数据"),
+    ("CUSTOM_API", "自定义API"),
 ]
 
 LAYOUT_CHOICES = [

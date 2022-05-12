@@ -22,12 +22,14 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
+import jmespath
+import requests
 from django.utils.translation import ugettext as _
 from mako.template import Template
 
 from common.log import logger
 from itsm.component.constants import GENERAL_NOTICE
+from itsm.component.exceptions import GetCustomApiDataError
 from itsm.component.utils.misc import transform_single_username
 from itsm.iadmin.contants import ACTION_CHOICES_DICT
 from itsm.iadmin.models import CustomNotice
@@ -126,3 +128,67 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
             )
         )
         return None
+
+
+def get_custom_api_data(config, kv_relation):
+    """
+    config:
+    {
+        "method": "get post patch delete put",
+        "url": "http:// or  https://",
+        "query_params": {"key": "value"},
+        "headers": {},
+        "body": {},
+        "ref_path":"data"
+    }
+
+    kv_relations : {
+                  "key": "bk_biz_id",
+                  "name": "bk_biz_name"
+                }
+    """
+
+    method = config.get("method", "GET")
+    url = config.get("url")
+    query_params = config.get("query_params", {})
+    headers = config.get("headers", {})
+    body = config.get("body", {})
+    ref_path = config.get("ref_path", "")
+
+    try:
+        response = requests.request(
+            method,
+            url,
+            data=body,
+            params=query_params,
+            headers=headers,
+            timeout=10,
+            verify=False,
+        )
+    except Exception as e:
+        raise GetCustomApiDataError("请求错误，error={}".format(e))
+
+    try:
+        resp_data = response.json()
+    except Exception as e:
+        raise GetCustomApiDataError("请求失败，返回内容非Json，error={}".format(e))
+
+    data = jmespath.search(ref_path, resp_data)
+
+    if data is None:
+        raise GetCustomApiDataError("请求失败，data 为None，请检查路径")
+
+    if not isinstance(data, list):
+        raise GetCustomApiDataError("请求失败，data 非 list，请检查路径")
+
+    kv_data = []
+
+    try:
+        for item in data:
+            kv_data.append(
+                {"key": item[kv_relation["key"]], "name": item[kv_relation["name"]]}
+            )
+
+    except KeyError as e:
+        raise GetCustomApiDataError("kv_relation配置不正确，error={}".format(e))
+    return kv_data
