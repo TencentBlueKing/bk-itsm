@@ -23,6 +23,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import copy
+import json
 import logging
 
 import jmespath
@@ -147,7 +148,7 @@ class WebHookService(ItsmBaseService):
     def update_variables(self, resp, ticket_id, state_id, variables):
         resp = {"resp": resp}
         for variable in variables:
-            value = jmespath.search(variable["ref_path"], resp)
+            value = json.dumps(jmespath.search(variable["ref_path"], resp))
             if TicketGlobalVariable.objects.filter(
                 ticket_id=ticket_id, key=variable["key"]
             ).exists():
