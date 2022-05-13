@@ -88,7 +88,8 @@ def get_third_party_notify_type():
             )
         )
         if not settings.OPEN_VOICE_NOTICE:
-            notify_type_list.remove("VOICE")
+            if "VOICE" in notify_type_list:
+                notify_type_list.remove("VOICE")
         return notify_type_list
     except Notify.DoesNotExist:
         return []
