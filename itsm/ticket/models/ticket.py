@@ -446,6 +446,31 @@ class Status(Model):
         self.contexts.update(**kwargs)
         self.save()
 
+    def run_auto_approve(self, state_id):
+        from itsm.pipeline_plugins.components.collections.tasks import auto_approve
+
+        if not state_id:
+            return
+
+        msg = "检测到当前处理人包含提单人，系统自动过单"
+        callback_data = {
+            "fields": self.ticket.get_approve_fields(state_id, msg),
+            "ticket_id": self.ticket.id,
+            "source": "SYS",
+            "operator": self.ticket.creator,
+            "state_id": state_id,
+        }
+        logger.info(
+            "检测到当前单据开启了自动过单，即将准备自动过单, ticket_id={}, state_id={}, callback_data={}".format(
+                self.ticket.id, state_id, callback_data
+            )
+        )
+        activity_id = self.ticket.activity_for_state(state_id)
+        auto_approve.apply_async(
+            (self.id, self.ticket.creator, activity_id, callback_data),
+            countdown=settings.AUTO_APPROVE_TIME,
+        )  # 20秒之后自动回调
+
     def set_next_action(self, operator="system", **kwargs):
         """
         设置节点的操作动作和状态
@@ -483,9 +508,18 @@ class Status(Model):
                 )
                 if set(finished_processor_list) & set(new_processor_list):
                     raise DeliverOperateError("不允许向已经处理的人转单")
+
                 self.set_processors(
                     kwargs.get("processors_type", "PERSON"), kwargs.get("processors")
                 )
+                if (
+                    self.ticket.creator in new_processor_list
+                    and self.ticket.flow.is_auto_approve
+                ):
+                    # 提单人异常分派给自己的情况，并且开启了自动过单
+
+                    if "state_id" in kwargs:
+                        self.run_auto_approve(kwargs.get("state_id"))
 
             if action_type in [CLAIM_OPERATE, DISTRIBUTE_OPERATE]:
                 # 操作流状态机：派单->认领->处理
@@ -4631,6 +4665,36 @@ class Ticket(Model, BaseTicket):
         resume_at = datetime.now()
         for task in self._sla_tasks.filter(task_status=SLA_PAUSED):
             task.resume(resume_at)
+
+    def get_approve_fields(self, state_id, msg):
+        node_fields = TicketField.objects.filter(state_id=state_id, ticket_id=self.id)
+        fields = []
+        remarked = False
+        for field in node_fields:
+            if field.meta.get("code") == APPROVE_RESULT:
+                fields.append(
+                    {
+                        "id": field.id,
+                        "key": field.key,
+                        "type": field.type,
+                        "choice": field.choice,
+                        "value": "true",
+                    }
+                )
+            else:
+                if not remarked:
+                    fields.append(
+                        {
+                            "id": field.id,
+                            "key": field.key,
+                            "type": field.type,
+                            "choice": field.choice,
+                            "value": msg,
+                        }
+                    )
+                    remarked = True
+
+        return fields
 
 
 class TicketOrganization(Model):
