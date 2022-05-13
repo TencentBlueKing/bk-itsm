@@ -131,6 +131,7 @@
                 <bk-button :theme="'primary'"
                     data-test-id="devops-button-submit"
                     :title="$t(`m.treeinfo['确定']`)"
+                    :loading="secondClick"
                     class="mr10"
                     @click="submit">
                     {{$t(`m.treeinfo['确定']`)}}
@@ -197,6 +198,7 @@
         data () {
             return {
                 isLoading: false,
+                secondClick: false,
                 isDropdownShow: false,
                 curEq: 'GET',
                 requestOptions: ['GET', 'POST'],
@@ -426,6 +428,8 @@
                         this.errorTip = ![body_params.content, query_params].every(item => item.every(ite => ite.key !== '' && ite.value !== ''))
                     }
                     if (this.errorTip) return
+                    if (this.secondClick) return
+                    this.secondClick = true
                     const stateId = this.configur.id
                     this.$store.dispatch('cdeploy/putWebHook', { params, stateId }).then((res) => {
                         this.$bkMessage({
@@ -436,6 +440,7 @@
                     }, e => {
                         console.log(e)
                     }).finally(() => {
+                        this.secondClick = false
                     })
                 })
             }

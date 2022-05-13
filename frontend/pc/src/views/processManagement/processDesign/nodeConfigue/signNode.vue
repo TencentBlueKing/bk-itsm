@@ -165,7 +165,6 @@
             <bk-button :theme="'default'"
                 data-test-id="signNode-button-close"
                 :title="$t(`m.treeinfo['取消']`)"
-                :loading="secondClick"
                 class="mr10"
                 @click="closeNode">
                 {{$t(`m.treeinfo['取消']`)}}

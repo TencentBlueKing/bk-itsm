@@ -145,6 +145,7 @@
                     <bk-button :theme="'primary'"
                         data-test-id="sopsNode-button-submit"
                         :title="$t(`m.treeinfo['确定']`)"
+                        :loading="secondClick"
                         class="mr10"
                         @click="submit">
                         {{$t(`m.treeinfo['确定']`)}}
@@ -205,6 +206,7 @@
         },
         data () {
             return {
+                secondClick: false,
                 quoteVars: [],
                 hookedVarList: {},
                 constantDefaultValue: {},
@@ -582,6 +584,10 @@
                 } else {
                     this.renderFormValidate = true
                 }
+                if (this.secondClick) {
+                    return
+                }
+                this.secondClick = true
                 this.$refs.basicsForm.validate().then(_ => {
                     if (this.renderFormValidate) {
                         const formData = []
@@ -637,6 +643,7 @@
                         }, (res) => {
                             errorHandler(res, this)
                         }).finally(() => {
+                            this.secondClick = false
                         })
                     }
                 })
