@@ -99,7 +99,7 @@ class ItsmApprovalService(ItsmSignService):
         if self.is_auto_approve(ticket, node_status):
             msg = "检测到当前处理人包含提单人，系统自动过单"
             callback_data = {
-                "fields": ticket.get_approve_fields(ticket_id, state_id, msg),
+                "fields": ticket.get_approve_fields(state_id, msg),
                 "ticket_id": ticket_id,
                 "source": "SYS",
                 "operator": ticket.creator,
