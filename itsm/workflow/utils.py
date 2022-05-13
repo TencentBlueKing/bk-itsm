@@ -22,12 +22,16 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
-
+from django.conf import settings
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from common.log import logger
-from itsm.component.constants import NOTIFY_TYPE_MAPPING, NOTIFY_TYPE_CHOICES, BUILTIN_NOTIFY_TYPE
+from itsm.component.constants import (
+    NOTIFY_TYPE_MAPPING,
+    NOTIFY_TYPE_CHOICES,
+    BUILTIN_NOTIFY_TYPE,
+)
 from itsm.component.esb.esbclient import client_backend
 
 
@@ -58,9 +62,16 @@ def init_notify_type_choice():
 
 def get_notify_type_choice():
     from itsm.workflow.models import Notify
+
     """获取通知类型"""
     try:
-        notify_type_choice = list(Notify.objects.all().values_list("type", "name"))
+        if settings.OPEN_VOICE_NOTICE:
+            notify_type_choice = list(Notify.objects.all().values_list("type", "name"))
+        else:
+            notify_type_choice = list(
+                Notify.objects.filter(~Q(type="VOICE")).values_list("type", "name")
+            )
+
         return notify_type_choice
     except Notify.DoesNotExist:
         return NOTIFY_TYPE_CHOICES
@@ -68,10 +79,17 @@ def get_notify_type_choice():
 
 def get_third_party_notify_type():
     from itsm.workflow.models import Notify
+
     """获取第三方通知类型"""
     try:
-        notify_type_list = list(Notify.objects.exclude(type__in=BUILTIN_NOTIFY_TYPE).values_list(
-            "type", flat=True))
+        notify_type_list = list(
+            Notify.objects.exclude(type__in=BUILTIN_NOTIFY_TYPE).values_list(
+                "type", flat=True
+            )
+        )
+        if not settings.OPEN_VOICE_NOTICE:
+            if "VOICE" in notify_type_list:
+                notify_type_list.remove("VOICE")
         return notify_type_list
     except Notify.DoesNotExist:
         return []

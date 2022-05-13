@@ -864,3 +864,8 @@ try:
     AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
 except Exception:
     AUTO_APPROVE_TIME = 20
+
+
+OPEN_VOICE_NOTICE = (
+    True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
+)

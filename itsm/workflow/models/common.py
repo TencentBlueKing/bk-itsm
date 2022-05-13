@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import jsonfield
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -63,6 +64,10 @@ class Notify(models.Model):
     def init_builtin_notify(cls, *args, **kwargs):
         notify_type_choice = init_notify_type_choice()
         for notify_type, notify_name in notify_type_choice:
+            if not settings.OPEN_VOICE_NOTICE:
+                if notify_type == "VOICE":
+                    continue
+
             if not cls.objects.filter(type=notify_type).exists():
                 cls.objects.create(name="{}通知".format(notify_name), type=notify_type)
 
