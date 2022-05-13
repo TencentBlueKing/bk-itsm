@@ -117,6 +117,6 @@ opentelemetry-instrumentation-requests==0.25b2
 
 pyCryptodome==3.14.1
 
-Jinja2==3.0.1
+Jinja2==2.11.1
 jmespath==0.10.0
 requests_toolbelt==0.9.1
