@@ -127,6 +127,7 @@
                     :state-list="stateList"
                     :fields="fieldList"
                     :context="context"
+                    :init-form-date="initFormDate"
                     :constants="constants"
                     :hooked-var-list="hookedVarList"
                     :constant-default-value="constantDefaultValue"
@@ -307,7 +308,8 @@
                 processorsInfo: {
                     type: '',
                     value: ''
-                }
+                },
+                initFormDate: {}
             }
         },
         computed: {
@@ -470,11 +472,12 @@
                 try {
                     this.sopsFormLoading = true
                     const isCommon = this.basicsFormData.processType === 'common'
-                    const res = !isCommon ? await this.$store.dispatch('taskFlow/getSopsPreview', {
+                    const res = await this.$store.dispatch('taskFlow/getSopsPreview', {
                         bk_biz_id: template.bk_biz_id,
                         template_id: template.id,
                         exclude_task_nodes_id: this.excludeTaskNodesId
-                    }) : deepClone(this.constants)
+                    })
+                    this.initFormDate = deepClone(res.data.pipeline_tree.constants)
                     const constants = []
                     if (!isCommon) {
                         for (const key in res.data.pipeline_tree.constants) {
@@ -494,6 +497,9 @@
             },
             onChangeHook (key, value) {
                 this.hookedVarList[key] = value
+                const cur = this.constants.find(item => item.key === key)
+                const init = this.initFormDate[key]
+                this.$set(cur, 'value', init.value)
             },
             processingVariables (vars) {
                 const constants = vars
@@ -664,6 +670,7 @@
             display: none;
         }
         /deep/ .common-section-card-body {
+            width: 100%;
             padding: 20px;
         }
         /deep/ .bk-form-width {
