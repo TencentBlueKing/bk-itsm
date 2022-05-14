@@ -70,8 +70,7 @@
                     :model-list="modelList"
                     :model-priority="testPriority1"
                     :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
+                    :notify-event-list="notifyEventList"
                     :change-info="changeInfo">
                 </event-remind>
             </div>
@@ -81,8 +80,7 @@
                     ref="eventRemind3"
                     :model-list="modelList"
                     :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
+                    :notify-event-list="notifyEventList"
                     :model-priority="testPriority3"
                     :change-info="changeInfo">
                 </event-remind>
@@ -133,16 +131,10 @@
                     return []
                 }
             },
-            emailNotifyEventList: {
-                type: Array,
+            notifyEventList: {
+                type: Object,
                 default () {
-                    return []
-                }
-            },
-            weixinNotifyEventList: {
-                type: Array,
-                default () {
-                    return []
+                    return {}
                 }
             },
             modelPriority: {

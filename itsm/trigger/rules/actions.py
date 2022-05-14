@@ -86,14 +86,5 @@ class ResponseActions(BaseActions):
             )
         )
         if action_count == 0:
-            obj = Action.objects.create(
-                signal=self.trigger.signal,
-                sender=self.trigger.sender,
-                context=self.context,
-                source_type=source_type,
-                source_id=source_id,
-                schema_id=action.id,
-                rule_id=rule.id,
-                trigger_id=self.trigger.id,
-            )
-            return obj
+            return True
+        return False

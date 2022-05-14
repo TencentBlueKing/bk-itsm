@@ -92,7 +92,7 @@
                 <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
                     <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
                         <bk-checkbox-group v-model="formData.notify">
-                            <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
+                            <!-- <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
                                 {{ $t(`m.treeinfo["企业微信"]`) }}
                             </bk-checkbox>
                             <bk-checkbox :value="'EMAIL'" :ext-cls="'mr40'">
@@ -100,6 +100,9 @@
                             </bk-checkbox>
                             <bk-checkbox :value="'SMS'">
                                 {{ $t('m.treeinfo["手机短信"]') }}
+                            </bk-checkbox> -->
+                            <bk-checkbox v-for="item in noticeType" :key="item.id" :value="item.typeName" :ext-cls="'mr40'">
+                                {{ item.name }}
                             </bk-checkbox>
                         </bk-checkbox-group>
                     </bk-form-item>
@@ -184,6 +187,7 @@
     import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList.vue'
     import TaskConfigPanel from './TaskConfigPanel.vue'
     import { errorHandler } from '../../../utils/errorHandler'
+    import { mapState } from 'vuex'
     const frequencyList = [
         { id: 0, name: '00:00' },
         { id: 1, name: '01:00' },
@@ -240,11 +244,11 @@
                     { name: this.$t(`m.treeinfo['指定节点前可以撤回']`), id: 'specify_node', key: 3 }
                 ],
                 displayRangeTypes: ['OPEN', 'ORGANIZATION', 'GENERAL', 'API'],
-                notifyList: [
-                    { name: this.$t(`m.treeinfo["企业微信"]`), type: 'WEIXIN' },
-                    { name: this.$t(`m.treeinfo["邮件"]`), type: 'EMAIL' },
-                    { name: this.$t(`m.treeinfo["SMS短信"]`), type: 'SMS' }
-                ],
+                // notifyList: [
+                //     { name: this.$t(`m.treeinfo["企业微信"]`), type: 'WEIXIN' },
+                //     { name: this.$t(`m.treeinfo["邮件"]`), type: 'EMAIL' },
+                //     { name: this.$t(`m.treeinfo["SMS短信"]`), type: 'SMS' }
+                // ],
                 nodeListLoading: false,
                 nodeList: [],
                 formData: {
@@ -275,7 +279,10 @@
             },
             processId () {
                 return this.serviceInfo.workflow_id
-            }
+            },
+            ...mapState({
+                noticeType: state => state.common.configurInfo.notify_type
+            })
         },
         watch: {
             'formData.revokeWay' (val) {
@@ -415,7 +422,10 @@
                     }
                 }
                 // 通知方式
-                workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item))
+                workflow.notify = this.noticeType.filter(notifyItem => notify.some(item => notifyItem.typeName === item))
+                workflow.notify.forEach(item => {
+                    item.type = item.typeName
+                })
                 workflow.notify_freq = 0
                 workflow.notify_rule = 'ONCE'
 

@@ -23,8 +23,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import datetime
-
 from celery import task
 from celery.schedules import crontab
 from celery.task import periodic_task
@@ -34,7 +32,6 @@ from itsm.component.constants import CACHE_10MIN, CACHE_5MIN
 from itsm.component.esb.esbclient import client_backend
 from itsm.component.utils.lock import share_lock
 from itsm.component.exceptions import ComponentCallError
-from requests_tracker.models import Record
 
 adapter_api = settings.ADAPTER_API
 
@@ -117,11 +114,4 @@ def update_user_departments(cache_key, username, id_only):
 
 @periodic_task(run_every=crontab(minute=0, hour="0,1,2,3,4"))
 def delete_tracker_record():
-    now = datetime.datetime.now()
-    last_month_time = now - datetime.timedelta(days=30)
-    # 一次删除一千条日志
-    records = Record.objects.filter(date_created__lt=last_month_time).order_by(
-        "date_created"
-    )
-    for record in records[0:1000]:
-        record.delete()
+    pass

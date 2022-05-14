@@ -57,8 +57,6 @@ urlpatterns = [
     url(r"^gateway/", include("itsm.gateway.urls")),
     # "杂种"模块，没有model，且不知道放哪里合适，就放到这个模块吧！
     url(r"^misc/", include("itsm.misc.urls")),
-    # API请求日志模块
-    url(r"^tracker/", include("requests_tracker.urls")),
     # 单据状态模块
     url(r"^ticket_status/", include("itsm.ticket_status.urls")),
     # Trigger Module

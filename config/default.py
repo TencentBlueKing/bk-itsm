@@ -91,7 +91,6 @@ INSTALLED_APPS += (
     "corsheaders",
     "django_filters",
     # "autofixture",
-    "requests_tracker",
     # wiki
     "django.contrib.humanize.apps.HumanizeConfig",
     "django_nyt.apps.DjangoNytConfig",
@@ -860,3 +859,14 @@ def redirect_func(request):
 
 
 BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
+
+try:
+    # 自动过单时间，默认为20
+    AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
+except Exception:
+    AUTO_APPROVE_TIME = 20
+
+
+OPEN_VOICE_NOTICE = (
+    True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
+)

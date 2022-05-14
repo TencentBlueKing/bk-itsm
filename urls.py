@@ -30,7 +30,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views import static
 
-
 # 公共URL配置
 urlpatterns = [
     # Django后台数据库管理®
@@ -42,6 +41,7 @@ urlpatterns = [
     url(r"^api/", include("itsm.api.v1")),
     # 对外开放的接口
     url(r"^openapi/", include("itsm.api.open_v1")),
+    url(r"^openapi/v2/", include("itsm.api.open_v2")),
     # 监控，普罗米修斯相关的接口
     url(r"^monitor/", include("itsm.monitor.urls")),
     # 各种入口：微信/wiki/首页等

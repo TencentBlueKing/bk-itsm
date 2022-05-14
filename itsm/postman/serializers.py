@@ -36,7 +36,8 @@ from itsm.component.constants import (
     LEN_SHORT,
     LEN_X_LONG,
     TASK_STATE,
-    LEN_XX_LONG, PUBLIC_PROJECT_PROJECT_KEY,
+    LEN_XX_LONG,
+    PUBLIC_PROJECT_PROJECT_KEY,
 )
 from itsm.component.drf.serializers import DynamicFieldsModelSerializer
 from itsm.component.exceptions import ParamError
@@ -48,11 +49,17 @@ from itsm.workflow.models import Field, State
 class RemoteSystemSerializer(serializers.ModelSerializer):
     """API系统序列化"""
 
-    name = serializers.CharField(max_length=LEN_NORMAL, required=True, error_messages={'blank': _('名称不能为空')})
-    code = serializers.CharField(max_length=LEN_NORMAL, required=True, error_messages={'blank': _('编码不能为空')})
+    name = serializers.CharField(
+        max_length=LEN_NORMAL, required=True, error_messages={"blank": _("名称不能为空")}
+    )
+    code = serializers.CharField(
+        max_length=LEN_NORMAL, required=True, error_messages={"blank": _("编码不能为空")}
+    )
     system_id = serializers.IntegerField(required=False)
     desc = serializers.CharField(max_length=LEN_LONG, required=False, allow_blank=True)
-    owners = serializers.CharField(max_length=LEN_NORMAL, required=False, allow_blank=True)
+    owners = serializers.CharField(
+        max_length=LEN_NORMAL, required=False, allow_blank=True
+    )
 
     is_activated = serializers.BooleanField(required=True)
     headers = serializers.JSONField(required=True)
@@ -63,61 +70,75 @@ class RemoteSystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = RemoteSystem
         fields = (
-            'id',
-            'name',
-            'system_id',
-            'domain',
-            'code',
-            'desc',
-            'owners',
-            'is_builtin',
-            'is_activated',
-            'headers',
-            'cookies',
-            'variables',
-            'create_at',
-            'update_at',
-            'creator',
-            'updated_by',
-            'contact_information',
-            "project_key"
+            "id",
+            "name",
+            "system_id",
+            "domain",
+            "code",
+            "desc",
+            "owners",
+            "is_builtin",
+            "is_activated",
+            "headers",
+            "cookies",
+            "variables",
+            "create_at",
+            "update_at",
+            "creator",
+            "updated_by",
+            "contact_information",
+            "project_key",
         )
-        read_only_fields = ('creator', 'updated_by')
+        read_only_fields = ("creator", "updated_by")
 
     def to_internal_value(self, data):
         # 新增系统时,system_id为空
-        if not data.get('system_id'):
-            data.pop('system_id')
+        if not data.get("system_id"):
+            data.pop("system_id")
 
         data = super(RemoteSystemSerializer, self).to_internal_value(data)
         return data
 
     def to_representation(self, instance):
         data = super(RemoteSystemSerializer, self).to_representation(instance)
-        data['can_edit'] = True
+        data["can_edit"] = True
         return data
 
     # ====================================== validate ========================
     def validate_code(self, value):
         if self.instance:
-            if RemoteSystem.objects.filter(code=value).exclude(id=self.instance.id).exists():
-                raise ParamError(_('该系统已经存在，请重新选择'))
+            if (
+                RemoteSystem.objects.filter(code=value)
+                .exclude(id=self.instance.id)
+                .exists()
+            ):
+                raise ParamError(_("该系统已经存在，请重新选择"))
         else:
             if RemoteSystem.objects.filter(code=value).exists():
-                raise ParamError(_('该系统已经存在，请重新选择'))
+                raise ParamError(_("该系统已经存在，请重新选择"))
         return value
 
 
 class RemoteApiSerializer(DynamicFieldsModelSerializer):
     """API序列化"""
 
-    name = serializers.CharField(required=True, error_messages={'blank': _('名称不能为空')}, max_length=LEN_NORMAL)
-    path = serializers.CharField(required=True, error_messages={'blank': _('路径不能为空')}, max_length=LEN_X_LONG)
+    name = serializers.CharField(
+        required=True, error_messages={"blank": _("名称不能为空")}, max_length=LEN_NORMAL
+    )
+    path = serializers.CharField(
+        required=True, error_messages={"blank": _("路径不能为空")}, max_length=LEN_X_LONG
+    )
     version = serializers.CharField(required=False, max_length=LEN_SHORT)
-    func_name = serializers.CharField(required=True, error_messages={'blank': _('调用函数不能为空')}, max_length=LEN_NORMAL)
-    method = serializers.ChoiceField(choices=[('GET', 'GET'), ('POST', 'POST')], default='GET')
+    func_name = serializers.CharField(
+        required=True, error_messages={"blank": _("调用函数不能为空")}, max_length=LEN_NORMAL
+    )
+    method = serializers.ChoiceField(
+        choices=[("GET", "GET"), ("POST", "POST")], default="GET"
+    )
     desc = serializers.CharField(max_length=LEN_LONG, required=False, allow_blank=True)
-    owners = serializers.CharField(required=False, max_length=LEN_XX_LONG, allow_blank=True)
+    owners = serializers.CharField(
+        required=False, max_length=LEN_XX_LONG, allow_blank=True
+    )
 
     is_activated = serializers.BooleanField(required=True)
     req_headers = serializers.JSONField(required=True)
@@ -130,30 +151,30 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = RemoteApi
         fields = (
-            'id',
-            'remote_system',
-            'remote_system_name',
-            'name',
-            'owners',
-            'path',
-            'version',
-            'method',
-            'func_name',
-            'desc',
-            'is_activated',
-            'req_headers',
-            'req_params',
-            'req_body',
-            'rsp_data',
-            'map_code',
-            'before_req',
-            'create_at',
-            'update_at',
-            'creator',
-            'updated_by',
-            'is_builtin',
+            "id",
+            "remote_system",
+            "remote_system_name",
+            "name",
+            "owners",
+            "path",
+            "version",
+            "method",
+            "func_name",
+            "desc",
+            "is_activated",
+            "req_headers",
+            "req_params",
+            "req_body",
+            "rsp_data",
+            "map_code",
+            "before_req",
+            "create_at",
+            "update_at",
+            "creator",
+            "updated_by",
+            "is_builtin",
         )
-        read_only_fields = ('creator', 'updated_by')
+        read_only_fields = ("creator", "updated_by")
 
     def to_internal_value(self, data):
         data = super(RemoteApiSerializer, self).to_internal_value(data)
@@ -163,26 +184,32 @@ class RemoteApiSerializer(DynamicFieldsModelSerializer):
 
     def to_representation(self, instance):
         data = super(RemoteApiSerializer, self).to_representation(instance)
-        api_instance_ids = instance.api_instances.values_list('id', flat=True)
+        api_instance_ids = instance.api_instances.values_list("id", flat=True)
         field_count = Field.objects.filter(api_instance_id__in=api_instance_ids).count()
-        state_count = State.objects.filter(type=TASK_STATE, api_instance_id__in=api_instance_ids).count()
+        state_count = State.objects.filter(
+            type=TASK_STATE, api_instance_id__in=api_instance_ids
+        ).count()
 
-        data['count'] = field_count + state_count
+        data["count"] = field_count + state_count
         data["owners"] = normal_name(data.get("owners"))
         if instance.remote_system.project_key == PUBLIC_PROJECT_PROJECT_KEY:
             return self.update_auth_actions(instance, data)
-        
+
         data["auth_actions"] = []
         return data
 
     # ====================================== validate ========================
     def validate_name(self, value):
         if self.instance:
-            if RemoteApi.objects.filter(name=value).exclude(id=self.instance.id).exists():
-                raise ParamError(_('该接口名称已存在，请重新输入'))
+            if (
+                RemoteApi.objects.filter(name=value)
+                .exclude(id=self.instance.id)
+                .exists()
+            ):
+                raise ParamError(_("该接口名称已存在，请重新输入"))
         else:
             if RemoteApi.objects.filter(name=value).exists():
-                raise ParamError(_('该接口名称已存在，请重新输入'))
+                raise ParamError(_("该接口名称已存在，请重新输入"))
         return value
 
 
@@ -201,25 +228,27 @@ class ApiInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = RemoteApiInstance
         fields = (
-            'id',
-            'remote_system_id',
-            'remote_api_id',
-            'req_params',
-            'req_body',
-            'rsp_data',
-            'map_code',
-            'before_req',
-            'succeed_conditions',
-            'end_conditions',
-            'need_poll',
-            'remote_api_info',
+            "id",
+            "remote_system_id",
+            "remote_api_id",
+            "req_params",
+            "req_body",
+            "rsp_data",
+            "map_code",
+            "before_req",
+            "succeed_conditions",
+            "end_conditions",
+            "need_poll",
+            "remote_api_info",
             "map_code",
             "before_req",
         )
 
     def to_representation(self, instance):
         data = super(ApiInstanceSerializer, self).to_representation(instance)
-        data['remote_api_info'].update(system_info=instance.remote_api.remote_system.data_to_dict())
+        data["remote_api_info"].update(
+            system_info=instance.remote_api.remote_system.data_to_dict()
+        )
         return data
 
 
@@ -231,39 +260,45 @@ class TaskStateApiInfoSerializer(ApiInstanceSerializer):
     class Meta:
         model = RemoteApiInstance
         fields = (
-            'id',
-            'remote_system_id',
-            'remote_api_id',
-            'req_params',
-            'req_body',
-            'rsp_data',
-            'succeed_conditions',
-            'end_conditions',
-            'need_poll',
-            'remote_api_info',
+            "id",
+            "remote_system_id",
+            "remote_api_id",
+            "req_params",
+            "req_body",
+            "rsp_data",
+            "succeed_conditions",
+            "end_conditions",
+            "need_poll",
+            "remote_api_info",
         )
 
     def to_representation(self, instance):
         from itsm.ticket.serializers import TicketGlobalVariableSerializer
-        from requests_tracker.models import Record
 
-        status = self.context['status']
+        status = self.context["status"]
         data = super(TaskStateApiInfoSerializer, self).to_representation(instance)
         data.update(
-            output_variables=TicketGlobalVariableSerializer(status.global_variables, many=True).data,
-            response=Record.get_last_response(status.ticket_id, status.state_id, status.api_instance_id),
+            output_variables=TicketGlobalVariableSerializer(
+                status.global_variables, many=True
+            ).data,
+            response={},
         )
 
         params = {
-            'params_%s' % field['key']: field['value'] for field in status.ticket.get_output_fields(need_display=True)
+            "params_%s" % field["key"]: field["value"]
+            for field in status.ticket.get_output_fields(need_display=True)
         }
         try:
-            req_body_data = json.loads(Template(json.dumps(data['req_body'])).render(**params))
-            req_params = json.loads(Template(json.dumps(data['req_params'])).render(**params))
+            req_body_data = json.loads(
+                Template(json.dumps(data["req_body"])).render(**params)
+            )
+            req_params = json.loads(
+                Template(json.dumps(data["req_params"])).render(**params)
+            )
         except Exception:
             req_body_data = {}
             req_params = {}
-        data['req_body'] = req_body_data
-        data['req_params'] = req_params
-        data['method'] = instance.remote_api.method
+        data["req_body"] = req_body_data
+        data["req_params"] = req_params
+        data["method"] = instance.remote_api.method
         return data

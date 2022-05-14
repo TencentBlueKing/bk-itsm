@@ -205,7 +205,9 @@
                                 width="960"
                                 :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
                                 theme="primary"
-                                :mask-close="false">
+                                :auto-close="false"
+                                :mask-close="false"
+                                @confirm="validateContent">
                                 <data-content ref="dataContent"
                                     :form-info="formInfo"
                                     :workflow="workflow"
@@ -655,6 +657,14 @@
             }
         },
         methods: {
+            validateContent () {
+                const result = this.checkField()
+                if (result) {
+                    this.openDataSource()
+                } else {
+                    this.isShowDataSource = false
+                }
+            },
             openDataSource () {
                 this.isShowDataSource = true
             },
@@ -1266,7 +1276,7 @@
                     // 判断key，name的值
                     this.fieldInfo.list.forEach(item => {
                         item.nameCheck = item.name.length > 120 || item.name.length === 0
-                        item.keyCheck = !(/^[a-zA-Z0-9_]+$/.test(item.key))
+                        item.keyCheck = !(/[a-zA-Z0-9]+$/.test(item.key))
                     })
                     // 判断重复的key和name
                     this.fieldInfo.list.forEach((item, index) => {
