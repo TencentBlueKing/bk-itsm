@@ -54,6 +54,14 @@ def event_dispatcher(
         logger.info(
             "[handlers->event_dispatcher] 正在执行触发器 -> name={}".format(trigger.name)
         )
+        if not trigger.is_enabled:
+            logger.info(
+                "[handlers->event_dispatcher] 检测到当前触发器未开启，跳过执行 -> name={}".format(
+                    trigger.name
+                )
+            )
+            continue
+
         rule_manager = TriggerRuleManager(trigger, source_type, source_id, context)
         rule_manager.run()
 
