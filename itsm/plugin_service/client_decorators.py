@@ -42,7 +42,7 @@ def json_response_decoder(func):
         if response.status_code != 200:
             message = (
                 f"{func.__name__} gets error status code [{response.status_code}], "
-                f"request with params: {args} and kwargs: {kwargs}. "
+                f"request with params: {args} and kwargs: {kwargs}. response content: {response.json()} "
             )
             logger.error(message + f"response content: {response.content}")
             return {"result": False, "data": None, "message": message}

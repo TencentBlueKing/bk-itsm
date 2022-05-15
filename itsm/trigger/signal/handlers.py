@@ -45,7 +45,7 @@ def event_dispatcher(
     # first 根据sender的内容获取 trigger rules
     triggers = Trigger.objects.filter(**sender)
     logger.info(
-        "[handlers->event_dispatcher] s收到一个触发器事件, source_type={}, sender={}, trigger_num={}".format(
+        "[handlers->event_dispatcher] 收到一个触发器事件, source_type={}, sender={}, trigger_num={}".format(
             source_type, sender, len(triggers)
         )
     )
