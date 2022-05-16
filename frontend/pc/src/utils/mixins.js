@@ -116,7 +116,7 @@ export default {
             if (this.item.related_fields.be_relied) {
                 this.item.related_fields.be_relied.forEach((fieldKey) => {
                     this.fields.forEach((field) => {
-                        if (field.key == fieldKey) {
+                        if (field.key === fieldKey) {
                             this.$set(field.relyOn, this.item.key, this.item.val);
                         }
                     });

@@ -25,7 +25,7 @@ import { checkDataType } from './getDataType';
 import i18n from '@/i18n/index.js';
 
 export function isVNode(node) {
-    return typeof node === 'object' && node.hasOwnProperty('componentOptions');
+    return typeof node === 'object' && Object.prototype.hasOwnProperty.call(node, 'componentOptions');
 }
 
 export function isInArray(ele, array) {
@@ -168,8 +168,8 @@ export function findValByKeyValue(arr, oldKey, oldValue, key) {
     let result;
 
     for (const obj of arr) {
-        for (const _key in obj) {
-            if (_key === oldKey && obj[_key] === oldValue) {
+        for (const objKey in obj) {
+            if (objKey === oldKey && obj[objKey] === oldValue) {
                 result = obj[key];
 
                 break;
@@ -191,15 +191,14 @@ export function findIndexByKeyValue(arr, oldKey, oldValue) {
     let result;
 
     arr.some((v, i) => {
-        for (const _key in v) {
-            if (_key === oldKey && v[_key] === oldValue) {
+        for (const objKey in v) {
+            if (objKey === oldKey && v[objKey] === oldValue) {
                 result = i;
-
                 break;
             }
         }
+        return false;
     });
-
     return result;
 }
 
@@ -373,6 +372,7 @@ export function catchErrorHandler(err, ctx) {
 /**
  * 匹配 html 字符串中 a 标签是否有 target 属性，没有则加上 target="_blank"
  */
+/* eslint-disable */
 export function appendTargetAttrToHtml(html) {
     return html.replace(/\<a (.*?)\>/g, (matchStr) => {
         const targetReg = /target\=[\'\"](.*?)[\'\"]/g;
@@ -382,6 +382,7 @@ export function appendTargetAttrToHtml(html) {
             : matchStr.replace(/.$/, ' target="_blank">');
     });
 }
+/* eslint-disable */
 
 export function debounce(fn, wait) {
     let timeout = null;

@@ -128,7 +128,7 @@ export default {
                             if (list[i].regex_config.rule.expressions[j].key === 'system_time') {
                                 const val1 = new Date(list[i].val).getTime();
                                 const val2 = new Date().getTime();
-                                const result = this._checkExpressionResult(
+                                const result = this.checkExpressionResult(
                                     { name: list[i].name, val: val1, key: list[i].key },
                                     { name: this.$t('m.common["系统时间"]'), val: val2 },
                                     list[i].regex_config.rule.expressions[j].condition,
@@ -140,10 +140,11 @@ export default {
                         }
                         // 字段与字段间的校验
                         for (let k = 0; k < allList.length; k++) {
-                            if (list[i].regex_config.rule.expressions[j].key === allList[k].key && allList[k].showFeild) {
+                            if (list[i].regex_config.rule.expressions[j].key === allList[k].key
+                                    && allList[k].showFeild) {
                                 const val1 = list[i].type === 'INT' ? list[i].val : new Date(list[i].val).getTime();
                                 const val2 = allList[k].type === 'INT' ? allList[k].val : new Date(allList[k].val).getTime();
-                                const result = this._checkExpressionResult(
+                                const result = this.checkExpressionResult(
                                     { name: list[i].name, val: val1, key: list[i].key },
                                     { name: allList[k].name, val: val2 },
                                     list[i].regex_config.rule.expressions[j].condition,
@@ -170,7 +171,7 @@ export default {
          * @param {String} condition 条件
          * @param {String} type 字段类型
          */
-        _checkExpressionResult(left, right, condition, type) {
+        checkExpressionResult(left, right, condition, type) {
             let result = {};
             const val1 = left.val;
             const val2 = right.val;

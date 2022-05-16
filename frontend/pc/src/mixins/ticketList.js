@@ -25,21 +25,21 @@ import { deepClone } from '@/utils/util';
 
 const ticketListMixins = {
     methods: {
-    /**
+        /**
          * 异步加载列表中的某些字段信息
          * @param {Array} originList 单据列表
-         * @param {Array} exclude 排除字段（不需要去加载的字段）
          */
-        __asyncReplaceTicketListAttr(originList, exclude = []) {
+        //  @param {Array} exclude 排除字段（不需要去加载的字段）
+        asyncReplaceTicketListAttr(originList) {
             if (originList.length === 0) {
                 return;
             }
-            this.__getTicketsProcessors(originList);
-            this.__getTicketsCreator(originList);
-            this.__getTicketscanOperate(originList);
+            this.getTicketsProcessors(originList);
+            this.getTicketsCreator(originList);
+            this.getTicketscanOperate(originList);
         },
         // 异步获取单据处理人
-        __getTicketsProcessors(originList) {
+        getTicketsProcessors(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 this.$set(ticket, 'current_processors', '加载中...');
@@ -48,7 +48,7 @@ const ticketListMixins = {
             this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
                     originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id)
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
                             ? res.data[ticket.id]
                             : copyList[index].current_processors;
                         this.$set(ticket, 'current_processors', replaceValue);
@@ -60,7 +60,7 @@ const ticketListMixins = {
                 });
         },
         // 异步获取提单人
-        __getTicketsCreator(originList) {
+        getTicketsCreator(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 this.$set(ticket, 'creator', '加载中...');
@@ -69,7 +69,7 @@ const ticketListMixins = {
             this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
                     originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(copyList[index].creator)
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, copyList[index].creator)
                             ? res.data[copyList[index].creator]
                             : copyList[index].creator;
                         this.$set(ticket, 'creator', replaceValue);
@@ -81,7 +81,7 @@ const ticketListMixins = {
                 });
         },
         // 异步获取单据 can_operate
-        __getTicketscanOperate(originList) {
+        getTicketscanOperate(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 // 开始是都不能操作
@@ -90,8 +90,9 @@ const ticketListMixins = {
             const ids = copyList.map(ticket => ticket.id);
             this.$store.dispatch('ticket/getTicketscanOperate', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
-                    originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id) ? res.data[ticket.id] : false;
+                    originList.forEach((ticket) => {
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
+                            ? res.data[ticket.id] : false;
                         this.$set(ticket, 'can_operate', replaceValue);
                     });
                 }

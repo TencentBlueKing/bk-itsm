@@ -41,13 +41,16 @@ export default {
                     key,
                     type: valueJsonData.type || '',
                     desc: valueJsonData.description.toString(),
-                    default: (valueJsonData.default !== undefined && valueJsonData.default.toString()) ? valueJsonData.default : '',
-                    is_necessary: !level || (!!requiredList && !!requiredList.length && requiredList.indexOf(key) !== -1),
+                    default: (valueJsonData.default !== undefined
+                        && valueJsonData.default.toString()) ? valueJsonData.default : '',
+                    is_necessary: !level
+                        || (!!requiredList && !!requiredList.length && requiredList.indexOf(key) !== -1),
                     children: [],
                     value: (valueJsonData.default !== undefined) ? valueJsonData.default : '',
                 };
                 if (valueList.type === 'object') {
-                    valueList.has_children = !!(valueJsonData.properties && Object.keys(valueJsonData.properties).length);
+                    valueList.has_children = !!(valueJsonData.properties
+                        && Object.keys(valueJsonData.properties).length);
                 }
                 if (valueList.type === 'array') {
                     valueList.has_children = valueJsonData.items;
@@ -57,7 +60,13 @@ export default {
                 // jsonDataList[jsonDataList.length-1]['parentInfo'] = level ? jsonDataList[jsonDataList.length-1] : ''
                 if (valueList.type === 'object') {
                     for (const p in valueJsonData.properties) {
-                        jsonToListStep(valueList.children, p, valueJsonData.properties[p], 1, valueJsonData.required || []);
+                        jsonToListStep(
+                            valueList.children,
+                            p,
+                            valueJsonData.properties[p],
+                            1,
+                            valueJsonData.required || []
+                        );
                     }
                 }
                 if (valueList.type === 'array' && valueJsonData.items) {
@@ -101,7 +110,8 @@ export default {
                 valueList[item.key] = {
                     type: item.type,
                     description: item.desc.toString(),
-                    required: (item.children && item.children.length) ? item.children.filter(item => item.is_necessary).map(ite => ite.key) : [],
+                    required: (item.children && item.children.length)
+                        ? item.children.filter(item => item.is_necessary).map(ite => ite.key) : [],
                 };
                 if (!valueList[item.key].required.length) {
                     delete valueList[item.key].required;
@@ -401,8 +411,6 @@ export default {
                 for (let i = 0; i < treeDataList.length; i++) {
                     treeDataList[i].lastType = lastType;
                     treeDataList[i].level = level;
-                    // treeDataList[i]['isShow'] = treeDataList[i]['isShow'] || level === levelInitial || !level
-                    // treeDataList[i]['showChildren'] = !parentPrimaryKeyInitial ? false : (treeDataList[i]['showChildren'] || false)
                     treeDataList[i].isShow = true;
                     treeDataList[i].showChildren = true;
                     treeDataList[i].primaryKey = `${level}_${treeDataList[i].key}`;
@@ -415,12 +423,26 @@ export default {
                     treeDataList[i].ancestorsList_str = ancestorsListAdd.toString();
                     listData.push(treeDataList[i]);
                     if (treeDataList[i].children && treeDataList[i].children.length) {
-                        jsonToListStep(listData, treeDataList[i].children, level + 1, treeDataList[i].primaryKey, treeDataList[i].type, ancestorsListAdd);
+                        jsonToListStep(
+                            listData,
+                            treeDataList[i].children,
+                            level + 1,
+                            treeDataList[i].primaryKey,
+                            treeDataList[i].type,
+                            ancestorsListAdd
+                        );
                     }
                 }
             };
 
-            jsonToListStep(listData, treeDataList, levelInitial || 0, parentPrimaryKeyInitial || '', lastTypeInitial || 'object', ((ancestorsListInitial && ancestorsListInitial.length) ? ancestorsListInitial : []));
+            jsonToListStep(
+                listData,
+                treeDataList,
+                levelInitial || 0,
+                parentPrimaryKeyInitial || '',
+                lastTypeInitial || 'object',
+                ((ancestorsListInitial && ancestorsListInitial.length) ? ancestorsListInitial : [])
+            );
             return listData;
         },
         // list --> jsonschema
@@ -488,13 +510,13 @@ export default {
                     }
                     if (lastType === 'array') {
                         const baseItem = item.source_type === 'CUSTOM' ? item.value
-                            : `\$\{params\_${item.value_key}\}`;
+                            : `\${parmas_${item.value_key}}`;
                         jsonDataDict.push(baseItem);
                     }
                     if (lastType === 'object') {
                         const baseItem = {};
                         baseItem[item.key] = item.source_type === 'CUSTOM' ? item.value
-                            : `\$\{params\_${item.value_key}\}`;
+                            : `\${parmas_${item.value_key}}`;
                         Object.assign(jsonDataDict, baseItem);
                     }
                 }

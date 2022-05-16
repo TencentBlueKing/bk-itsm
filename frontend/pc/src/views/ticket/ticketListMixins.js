@@ -274,7 +274,7 @@ const ticketListMixins = {
             this.$store.dispatch('ticket/getTicketsProcessors', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
                     originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id)
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
                             ? res.data[ticket.id]
                             : copyList[index].current_processors;
                         this.$set(ticket, 'current_processors', replaceValue);
@@ -295,7 +295,7 @@ const ticketListMixins = {
             this.$store.dispatch('ticket/getTicketsCreator', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
                     originList.forEach((ticket, index) => {
-                        const replaceValue = res.data.hasOwnProperty(copyList[index].creator)
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, copyList[index].creator)
                             ? res.data[copyList[index].creator]
                             : copyList[index].creator;
                         this.$set(ticket, 'creator', replaceValue);
@@ -317,7 +317,8 @@ const ticketListMixins = {
             this.$store.dispatch('ticket/getTicketscanOperate', { ids: ids.toString() }).then((res) => {
                 if (res.result && res.data) {
                     originList.forEach((ticket) => {
-                        const replaceValue = res.data.hasOwnProperty(ticket.id) ? res.data[ticket.id] : false;
+                        const replaceValue = Object.prototype.hasOwnProperty.call(res.data, ticket.id)
+                            ? res.data[ticket.id] : false;
                         this.$set(ticket, 'can_operate', replaceValue);
                     });
                 }
@@ -341,7 +342,8 @@ const ticketListMixins = {
             } : { backgroundColor: priorityList[priorityIndex - 1] };
         },
         getstatusColor(row) {
-            const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status);
+            const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type
+                && item.key === row.current_status);
             return statusColor.length
                 ? { color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}` }
                 : { color: '#3c96ff', border: '1px solid #3c96ff' };

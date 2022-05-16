@@ -84,9 +84,9 @@ module.exports = {
     },
     methods: {
         calcSize(size) {
-            const _size = size.toString();
-            if (_size.match(/^\d*$/)) return `${size}px`;
-            if (_size.match(/^[0-9]?%$/)) return _size;
+            const newSize = size.toString();
+            if (newSize.match(/^\d*$/)) return `${size}px`;
+            if (newSize.match(/^[0-9]?%$/)) return newSize;
             return '100%';
         },
     },

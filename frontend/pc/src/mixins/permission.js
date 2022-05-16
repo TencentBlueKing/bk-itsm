@@ -64,7 +64,15 @@ const permission = {
             const { actions, resources, system } = this.$store.state.common.permissionMeta;
             const bkitsm = system[0];
             const { id: systemId, name: systemName } = bkitsm;
-            const actionsData = this.assembleActionsData(reqPermission, curPermission, resourceData, actions, resources, systemId, systemName);
+            const actionsData = this.assembleActionsData(
+                reqPermission,
+                curPermission,
+                resourceData,
+                actions,
+                resources,
+                systemId,
+                systemName
+            );
             const data = {
                 system_id: systemId,
                 system_name: systemName,

@@ -61,6 +61,8 @@ module.exports = {
     },
     // add your custom rules here
     rules: {
+        'no-restricted-syntax': 'off',
+        'no-param-reassign': 'off',
         // https://eslint.org/docs/rules/brace-style
         // 'brace-style': ['error', '1tbs', {'allowSingleLine': false}],
 

@@ -82,21 +82,29 @@ instance.interceptors.response.use((response) => {
             console.warn(window.app.$t('m.js["请求信息："]'), response);
         }
         switch (response.status) {
-            case 401:
+            case 401: {
                 // 登录控制
                 const { data } = response;
                 if (data.has_plain) {
-                    topWindow.BLUEKING.corefunc.open_login_dialog(data.login_url, data.width, data.height, response.config.method);
+                    topWindow.BLUEKING.corefunc.open_login_dialog(
+                        data.login_url,
+                        data.width,
+                        data.height,
+                        response.config.method
+                    );
                 }
                 break;
-            case 403:
+            }
+            case 403: {
                 // 权限控制
                 bus.$emit('api-error:user-permission-denied');
                 break;
-            case 502:
+            }
+            case 502: {
                 bus.$emit('api-error:application-deployed');
                 break;
-            case 499:
+            }
+            case 499: {
                 const permissions = response.data.permission;
                 let isViewApply = false;
                 let viewType = 'other';
@@ -112,6 +120,7 @@ instance.interceptors.response.use((response) => {
                     bus.$emit('showPermissionModal', permissions);
                 }
                 break;
+            }
         }
         let msg = response.statusText;
         if (response.data && response.data.message) {

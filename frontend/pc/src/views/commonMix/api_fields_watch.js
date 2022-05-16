@@ -175,7 +175,8 @@ export default {
                 return;
             }
             // 3.当前节点是否有需要监听的 被引用字段 -- 和当前节点的api字段有关联
-            const CurrentrelyOnFields = CurrentreBeReliedFields.filter(ite => relyOnFieldsKeyList.indexOf(ite.key) !== -1);
+            const CurrentrelyOnFields = CurrentreBeReliedFields
+                .filter(ite => relyOnFieldsKeyList.indexOf(ite.key) !== -1);
             if (!CurrentrelyOnFields.length) {
                 return;
             }
@@ -186,14 +187,16 @@ export default {
             CurrentrelyOnFields.forEach((ite) => {
                 vm.$watch(
                     () => ite.val,
-                    (newVal, oldVal) => {
+                    () => {
                         // 关联字段 赋值
                         if (ite.val) {
                             // 相关api字段
-                            const rca = CurrentApiFields.filter(item_ => item_.related_fields.rely_on.indexOf(ite.key) !== -1);
+                            const rca = CurrentApiFields
+                                .filter(item_ => item_.related_fields.rely_on.indexOf(ite.key) !== -1);
                             rca.forEach(async (itemRelate) => {
                                 // api字段相关依赖
-                                const relateCurrentreBeRelied = CurrentrelyOnFields.filter(itemRe => itemRelate.related_fields.rely_on.indexOf(itemRe.key) !== -1);
+                                const relateCurrentreBeRelied = CurrentrelyOnFields
+                                    .filter(itemRe => itemRelate.related_fields.rely_on.indexOf(itemRe.key) !== -1);
                                 // 在当前节点的依赖字段 是否全部填充 / isALlFill
                                 const isALlFill = relateCurrentreBeRelied.every(itemRely => itemRely.val);
                                 // 是否全部填充 / 非必填 ？
@@ -234,8 +237,7 @@ export default {
             const keyList = changeFields.map(itemfiter => itemfiter.key);
             if (item.related_fields && item.related_fields.rely_on) {
                 item.related_fields.rely_on.forEach((itefinal) => {
-                    const relateobj = changeFields.filter( // CurrentrelyOnFields
-                        itemFi => itemFi.key === itefinal)[0];
+                    const relateobj = changeFields.filter(itemFi => itemFi.key === itefinal)[0];
                     if (keyList.indexOf(itefinal) !== -1) {
                         params[itefinal] = relateobj ? (relateobj.val || '') : '';
                     }

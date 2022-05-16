@@ -20,27 +20,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
  */
 
-import Vue from 'vue';
 import Rules from './rules';
 
 /**
  *  解析type
  */
-function parseType(type) {
-    if (typeof type !== 'string') {
-        return {
-            el: 'input',
-            type: 'text',
-        };
-    }
+// function parseType(type) {
+//     if (typeof type !== 'string') {
+//         return {
+//             el: 'input',
+//             type: 'text',
+//         };
+//     }
 
-    const $type = type.split(':');
+//     const $type = type.split(':');
 
-    return {
-        el: $type[0],
-        type: $type[1],
-    };
-}
+//     return {
+//         el: $type[0],
+//         type: $type[1],
+//     };
+// }
 
 /**
  *  解析rule
@@ -77,7 +76,7 @@ function ErrorHandler(el, valid) {
 
 const install = (Vue) => {
     Vue.directive('bk-validation', {
-        inserted(el) {
+        inserted() {
             // el.focus()
         },
         update(el, binding) {
@@ -89,7 +88,7 @@ const install = (Vue) => {
             // 避免不必要的更新
             if (value.val === oldValue.val) return;
 
-            const parsedType = parseType(value.type);
+            // const parsedType = parseType(value.type);
             const parsedRule = parseRule(value.rule);
             let result;
 

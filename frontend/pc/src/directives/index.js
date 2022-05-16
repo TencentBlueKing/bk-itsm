@@ -40,9 +40,9 @@ Vue.directive('clickOut', {
         };
         await document.addEventListener('click', documentHandler);
     },
-    inserted(el, binding, vnode) {
+    inserted() {
     },
-    async update(el, binding, vnode, oldVnode) {
+    async update(el, binding) {
         let cascaderFunction = '';
         const documentHandler = await async function (e) {
             if (!el.contains(e.target)) {
@@ -69,13 +69,13 @@ Vue.directive('focus', {
 });
 // 添加自定义锚点 自动滚动到锚点 ??
 Vue.directive('anchor', {
-    bind(el, binding, vnode) {
+    bind(el, binding) {
     // 自定义属性：
         binding.value.el = el;
     },
-    update(el, binding, vnode, oldVnode) {
+    update() {
     },
-    componentUpdated(el, binding, vnode, oldVnode) {
+    componentUpdated() {
     },
 });
 // 记录光标 index, 配合 u utils 方法使用
@@ -83,7 +83,7 @@ Vue.directive('cursorIndex', {
     bind: (el, binding) => {
         const dom = el.querySelector('textarea,input');
         if (dom) {
-            const handlerFocus = (e) => {
+            const handlerFocus = () => {
                 sessionStorage.removeItem('cursorIndex');
             };
             const handlerBlur = (e) => {

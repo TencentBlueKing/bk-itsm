@@ -96,6 +96,7 @@ export default {
         // 关联数据展示的逻辑处理
         conditionField(item, list) {
             for (let i = 0; i < list.length; i++) {
+                // eslint-disable-next-line
                 if (list[i].show_type || (!list[i].hasOwnProperty('show_conditions') && (!list[i].hasOwnProperty('show_result') || list[i].show_result))) {
                     list[i].showFeild = true;
                     continue;
@@ -104,13 +105,18 @@ export default {
                 if (list[i].show_conditions.expressions && list[i].show_conditions.expressions.length) {
                     for (let j = 0; j < list[i].show_conditions.expressions.length; j++) {
                         // 当当前操作的字段内存在自己配置自己的情况，则忽略配置条件
-                        if (item.key === list[i].show_conditions.expressions[j].key && item.key === list[i].key && list[i].value === null) {
+                        if (item.key === list[i].show_conditions.expressions[j].key
+                            && item.key === list[i].key
+                            && list[i].value === null) {
                             list[i].showFeild = true;
                         } else {
                             // 当前节点的类型和expressions的数据一样时，进行处理
                             if (item.key === list[i].show_conditions.expressions[j].key) {
                                 if (list[i].show_conditions.expressions.length === 1) {
-                                    list[i].showFeild = this.conditionSwitch(item, list[i].show_conditions.expressions[j]);
+                                    list[i].showFeild = this.conditionSwitch(
+                                        item,
+                                        list[i].show_conditions.expressions[j]
+                                    );
                                 } else {
                                     // 区分条件组‘and’和‘or’的判断逻辑
                                     if (list[i].show_conditions.type === 'and') {
@@ -119,7 +125,10 @@ export default {
                                         for (let z = 0; z < list[i].show_conditions.expressions.length; z++) {
                                             for (let s = 0; s < list.length; s++) {
                                                 if (list[i].show_conditions.expressions[z].key === list[s].key) {
-                                                    const valueStatus = this.conditionSwitch(list[s], list[i].show_conditions.expressions[z]);
+                                                    const valueStatus = this.conditionSwitch(
+                                                        list[s],
+                                                        list[i].show_conditions.expressions[z]
+                                                    );
                                                     statusList.push(valueStatus);
                                                 }
                                             }
@@ -132,7 +141,10 @@ export default {
                                         for (let z = 0; z < list[i].show_conditions.expressions.length; z++) {
                                             for (let s = 0; s < list.length; s++) {
                                                 if (list[i].show_conditions.expressions[z].key === list[s].key) {
-                                                    const valueStatus = this.conditionSwitch(list[s], list[i].show_conditions.expressions[z]);
+                                                    const valueStatus = this.conditionSwitch(
+                                                        list[s],
+                                                        list[i].show_conditions.expressions[z]
+                                                    );
                                                     statusList.push(valueStatus);
                                                 }
                                             }
@@ -151,7 +163,7 @@ export default {
             let statusInfo = false;
             const typeList = ['CHECKBOX', 'MEMBERS', 'MULTISELECT', 'TREESELECT'];
             switch (value.condition) {
-                case '==':
+                case '==': {
                     if (typeList.some(type => type === item.type)) {
                         const valList = value.value.split(',');
                         const statusList = valList.map(val => item.val.indexOf(val) === -1);
@@ -160,55 +172,65 @@ export default {
                         statusInfo = (item.val === value.value || Number(item.val) === Number(value.value));
                     }
                     break;
-                case '!=':
+                }
+                case '!=': {
                     if (typeList.some(type => type === item.type)) {
                         const valList = value.value.split(',');
                         const statusList = valList.map(val => item.val.indexOf(val) === -1);
-                        statusInfo = statusList.some(status => !!status) ? statusList.some(status => !!status) : item.val.length !== value.value.length;
+                        statusInfo = statusList.some(status => !!status)
+                            ? statusList.some(status => !!status) : item.val.length !== value.value.length;
                     } else {
                         statusInfo = (item.val !== value.value && Number(item.val) !== Number(value.value));
                     }
                     break;
-                case '>':
+                }
+                case '>': {
                     if (item.type === 'DATE' || item.type === 'DATETIME') {
                         statusInfo = this.timeStamp(item.val) > this.timeStamp(value.value);
                     } else {
                         statusInfo = Number(item.val) > Number(value.value);
                     }
                     break;
-                case '<':
+                }
+                case '<': {
                     if (item.type === 'DATE' || item.type === 'DATETIME') {
                         statusInfo = this.timeStamp(item.val) < this.timeStamp(value.value);
                     } else {
                         statusInfo = Number(item.val) < Number(value.value);
                     }
                     break;
-                case '>=':
+                }
+                case '>=': {
                     if (item.type === 'DATE' || item.type === 'DATETIME') {
                         statusInfo = this.timeStamp(item.val) >= this.timeStamp(value.value);
                     } else {
                         statusInfo = Number(item.val) >= Number(value.value);
                     }
                     break;
-                case '<=':
+                }
+                case '<=': {
                     if (item.type === 'DATE' || item.type === 'DATETIME') {
                         statusInfo = this.timeStamp(item.val) <= this.timeStamp(value.value);
                     } else {
                         statusInfo = Number(item.val) <= Number(value.value);
                     }
                     break;
-                case 'issuperset':
+                }
+                case 'issuperset': {
                     const issupersetList = value.value.split(',');
                     const statusList = issupersetList.map(val => item.val.indexOf(val) === -1);
                     statusInfo = statusList.every(status => !status);
                     break;
-                case 'notissuperset':
+                }
+                case 'notissuperset': {
                     const valnoList = value.value.split(',');
                     const statusnoList = valnoList.map(val => item.val.indexOf(val) === -1);
                     statusInfo = !statusnoList.every(status => !status);
                     break;
-                default:
+                }
+                default: {
                     statusInfo = true;
+                }
             }
             return statusInfo;
         },

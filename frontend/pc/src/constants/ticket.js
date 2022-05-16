@@ -23,6 +23,7 @@
 import i18n from '../i18n/index';
 
 // 满意度评价等级表
+/* eslint-disable */
 export const SCORE_LIST = (() => window.run_site === 'bmw'
     ? [
         { id: 1, name: i18n.t('m.newCommon["1分(非常不满意)"]'), type: 'scoreRadio' },
@@ -39,3 +40,4 @@ export const SCORE_LIST = (() => window.run_site === 'bmw'
         { id: 4, name: i18n.t('m.newCommon["4分(满意)"]'), type: 'scoreRadio' },
         { id: 5, name: i18n.t('m.newCommon["5分(非常满意)"]'), type: 'scoreRadio' },
     ])();
+/* eslint-disable */
