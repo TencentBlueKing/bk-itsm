@@ -228,15 +228,14 @@ class BkPluginService(ItsmBaseService):
 
         state = resp.get("state")
         data.set_outputs("is_schedule", False)
-
-        if state == self.POLL:
+        if state in [self.POLL, self.CALLBACK]:
             # 定时任务额外处理
             data.set_outputs("is_schedule", True)
             data.set_outputs("trace_id", resp.get("trace_id"))
             data.set_outputs("plugin_code", plugin_code)
             data.set_outputs("version", version)
             # 退出
-        if state == self.SUCCESS:
+        elif state == self.SUCCESS:
             current_node.create_action_log(
                 "system",
                 "蓝鲸插件任务【%s】执行成功" % current_node.name,
@@ -245,11 +244,14 @@ class BkPluginService(ItsmBaseService):
                 fields=[],
             )
             # 成功，全局变量渲染，根据路径，渲染outputs
-            self.update_variables(resp, ticket_id, state_id, variables)
-        if state == self.CALLBACK:
-            # callback
-            pass
-        if state == self.FAILED:
+            variable_output = self.update_variables(
+                resp, ticket_id, state_id, variables
+            )
+            # 设置状态
+            self.update_info(current_node, variables=variable_output)
+            current_node.set_status(status=FINISHED)
+
+        elif state == self.FAILED:
             # 失败, 退出
             err_message = "bk_plugin_info 执行失败，state == 5， message = {}".format(
                 resp.get("message")
@@ -263,12 +265,10 @@ class BkPluginService(ItsmBaseService):
                 processors,
             )
             return False
-        variable_output = {}
-        # 设置状态
-        self.update_info(current_node, variables=variable_output)
-        current_node.set_status(status=FINISHED)
+
         for field in ticket.get_output_fields(state_id):
             data.set_outputs("params_%s" % field["key"], field["value"])
+
         return True
 
     def schedule(self, data, parent_data, callback_data=None):
@@ -326,7 +326,7 @@ class BkPluginService(ItsmBaseService):
 
         state = resp.get("state")
 
-        if state == self.POLL:
+        if state in [self.POLL, self.CALLBACK]:
             return True
         elif state == self.FAILED:
             err_message = "蓝鲸插件节点 执行失败，state == 5， message = {}".format(
