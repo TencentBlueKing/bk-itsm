@@ -86,7 +86,7 @@ mock==3.0.5
 
 # excel
 xlrd==1.2.0
-typing_extensions==3.6.5
+typing-extensions==3.7.4.3
 
 anyjson==0.3.3
 
