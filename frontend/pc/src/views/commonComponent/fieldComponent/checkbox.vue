@@ -21,27 +21,27 @@
   -->
 
 <template>
-    <div v-if="item.showFeild && !loading">
-        <bk-form-item :label="item.name"
-            :required="item.validate_type === 'REQUIRE'"
-            :desc="item.tips"
-            :ext-cls="'bk-line-height'"
-            desc-type="icon">
-            <bk-checkbox-group :ref="item.key" :value="selects" @change="selected">
-                <bk-checkbox
-                    v-for="checkbox in item.choice"
-                    :value="checkbox.key"
-                    :key="checkbox.key"
-                    :disabled="disabled"
-                    :ext-cls="'mr20'">{{ checkbox.name }}
-                </bk-checkbox>
-            </bk-checkbox-group>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild && !loading">
+    <bk-form-item :label="item.name"
+      :required="item.validate_type === 'REQUIRE'"
+      :desc="item.tips"
+      :ext-cls="'bk-line-height'"
+      desc-type="icon">
+      <bk-checkbox-group :ref="item.key" :value="selects" @change="selected">
+        <bk-checkbox
+          v-for="checkbox in item.choice"
+          :value="checkbox.key"
+          :key="checkbox.key"
+          :disabled="disabled"
+          :ext-cls="'mr20'">{{ checkbox.name }}
+        </bk-checkbox>
+      </bk-checkbox-group>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>

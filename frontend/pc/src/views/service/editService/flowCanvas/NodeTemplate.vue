@@ -21,98 +21,98 @@
   -->
 
 <template>
-    <div
-        class="bk-flow-location"
-        :class="{ 'bk-error-flow': (node.nodeInfo && node.nodeInfo.errorInfo) }"
-        @mousedown="moveDoneFn(node)"
-        @mousemove="moveFn"
-        @mouseup="onNodeClick(node, $event)"
-        @contextmenu.prevent="rightClickNode(node, $event)"
-        @mouseout="hoverNode(node)"
-        v-bk-clickoutside="closeNode"
-        v-bk-tooltips="{
-            placement: 'auto',
-            content: node.name,
-            theme: 'light'
-        }">
-        <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
-            {{ $t(`m.treeinfo['开始']`) }}
-        </div>
-        <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode">
-            {{ $t('m.treeinfo["结束"]') }}
-        </div>
-        <!-- 手动节点 -->
-        <template v-for="(item, index) in typeList">
-            <template v-if="node.type === item.type">
-                <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)">
-                    <span class="common-auto-icon"
-                        :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
-                        @click.stop="openconfigu">
-                        <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
-                        <span v-else style="font-size: 11px; font-weight: bold;">API</span>
-                    </span>
-                    <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
-                    <i class="bk-itsm-icon icon-edit-bold"></i>
-                    <span class="bk-node-delete"
-                        v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
-                        @click.stop="clickDelete(node)"
-                        @mouseup.stop
-                        @mousedown.stop>×</span>
-                    <div class="bk-toop-info" v-if="!toolStatus && (node.nodeInfo && node.nodeInfo.is_builtin)">
-                        <p><span>{{$t(`m.treeinfo['单击：']`)}}</span>{{$t(`m.treeinfo['快速配置节点']`)}}</p>
-                        <p><span>{{$t(`m.treeinfo['右键：']`)}}</span>{{$t(`m.treeinfo['调出快速添加节点菜单']`)}}</p>
-                        <i class="bk-icon icon-close" @click.stop="closeTool"></i>
-                        <i class="bk-squrae"></i>
-                    </div>
-                </div>
-            </template>
-        </template>
-        <!-- 网关节点 -->
-        <div v-if="node.type === 'ROUTER-P'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-convergence"></i>
-            <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
-        </div>
-        <!-- 汇聚节点 -->
-        <div v-if="node.type === 'COVERAGE'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-branch"></i>
-            <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
-        </div>
-        <!-- 更多操作 -->
-        <div class="bk-flow-fast" v-show="node.showMore && node.type !== 'START' && node.type !== 'END'">
-            <div class="bk-engine-node">
-                <ul>
-                    <li v-for="(item, index) in clickList"
-                        :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }`"
-                        class="tool"
-                        :key="index"
-                        @click.stop="addNormal(node, item)" :title="item.name">
-                        <i class="bk-itsm-icon"
-                            :class="[
-                                item.iconStyle,
-                                { 'bk-font-style': [
-                                    'icon-icon-artificial',
-                                    'icon-api-node',
-                                    'icon-task-icon',
-                                    'con-copy-new',
-                                    'icon-sign-node',
-                                    'icon-approval-node',
-                                    'icon-devops-task-icon'
-                                ].includes(item.iconStyle) }
-                            ]">
-                        </i>
-                    </li>
-                </ul>
-            </div>
-            <div class="bk-engine-word">
-                <span class="bk-canvas-span bk-engine-configur"
-                    :class="{ 'bk-engine-builtin': (node.type === 'ROUTER-P' || node.type === 'COVERAGE') }"
-                    @click.stop="openconfigu">{{ $t('m.treeinfo["配置"]') }}</span>
-                <span class="bk-canvas-span bk-engine-delete"
-                    :class="{ 'bk-engine-builtin': (node.nodeInfo && node.nodeInfo.is_builtin) }"
-                    @click.stop="clickDelete(node)">{{ $t('m.treeinfo["删除"]') }}</span>
-            </div>
-        </div>
+  <div
+    class="bk-flow-location"
+    :class="{ 'bk-error-flow': (node.nodeInfo && node.nodeInfo.errorInfo) }"
+    @mousedown="moveDoneFn(node)"
+    @mousemove="moveFn"
+    @mouseup="onNodeClick(node, $event)"
+    @contextmenu.prevent="rightClickNode(node, $event)"
+    @mouseout="hoverNode(node)"
+    v-bk-clickoutside="closeNode"
+    v-bk-tooltips="{
+      placement: 'auto',
+      content: node.name,
+      theme: 'light'
+    }">
+    <div v-if="node.type === 'START'" class="startpoint" data-test-id="startNode">
+      {{ $t(`m.treeinfo['开始']`) }}
     </div>
+    <div v-if="node.type === 'END'" class="endpoint" data-test-id="endNode">
+      {{ $t('m.treeinfo["结束"]') }}
+    </div>
+    <!-- 手动节点 -->
+    <template v-for="(item, index) in typeList">
+      <template v-if="node.type === item.type">
+        <div class="common-node" :key="index" :data-test-id="`nodeTemplate-common-node-${index}-${item.type}`" @click="clickNode(node, $event)">
+          <span class="common-auto-icon"
+            :class="{ 'bk-is-draft': (node.nodeInfo && node.nodeInfo.is_draft) }"
+            @click.stop="openconfigu">
+            <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
+            <span v-else style="font-size: 11px; font-weight: bold;">API</span>
+          </span>
+          <span class="bk-more-word" :title="(node.name || $t(`m.treeinfo['新增节点']`))">{{node.name || $t(`m.treeinfo['新增节点']`)}}</span>
+          <i class="bk-itsm-icon icon-edit-bold"></i>
+          <span class="bk-node-delete"
+            v-if="!(node.nodeInfo && node.nodeInfo.is_builtin)"
+            @click.stop="clickDelete(node)"
+            @mouseup.stop
+            @mousedown.stop>×</span>
+          <div class="bk-toop-info" v-if="!toolStatus && (node.nodeInfo && node.nodeInfo.is_builtin)">
+            <p><span>{{$t(`m.treeinfo['单击：']`)}}</span>{{$t(`m.treeinfo['快速配置节点']`)}}</p>
+            <p><span>{{$t(`m.treeinfo['右键：']`)}}</span>{{$t(`m.treeinfo['调出快速添加节点菜单']`)}}</p>
+            <i class="bk-icon icon-close" @click.stop="closeTool"></i>
+            <i class="bk-squrae"></i>
+          </div>
+        </div>
+      </template>
+    </template>
+    <!-- 网关节点 -->
+    <div v-if="node.type === 'ROUTER-P'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-convergence"></i>
+      <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
+    </div>
+    <!-- 汇聚节点 -->
+    <div v-if="node.type === 'COVERAGE'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-branch"></i>
+      <span class="bk-node-delete" @click.stop="clickDelete(node)">×</span>
+    </div>
+    <!-- 更多操作 -->
+    <div class="bk-flow-fast" v-show="node.showMore && node.type !== 'START' && node.type !== 'END'">
+      <div class="bk-engine-node">
+        <ul>
+          <li v-for="(item, index) in clickList"
+            :data-test-id="`nodeTemplate-li-addNodeTemplate${ index }`"
+            class="tool"
+            :key="index"
+            @click.stop="addNormal(node, item)" :title="item.name">
+            <i class="bk-itsm-icon"
+              :class="[
+                item.iconStyle,
+                { 'bk-font-style': [
+                  'icon-icon-artificial',
+                  'icon-api-node',
+                  'icon-task-icon',
+                  'con-copy-new',
+                  'icon-sign-node',
+                  'icon-approval-node',
+                  'icon-devops-task-icon'
+                ].includes(item.iconStyle) }
+              ]">
+            </i>
+          </li>
+        </ul>
+      </div>
+      <div class="bk-engine-word">
+        <span class="bk-canvas-span bk-engine-configur"
+          :class="{ 'bk-engine-builtin': (node.type === 'ROUTER-P' || node.type === 'COVERAGE') }"
+          @click.stop="openconfigu">{{ $t('m.treeinfo["配置"]') }}</span>
+        <span class="bk-canvas-span bk-engine-delete"
+          :class="{ 'bk-engine-builtin': (node.nodeInfo && node.nodeInfo.is_builtin) }"
+          @click.stop="clickDelete(node)">{{ $t('m.treeinfo["删除"]') }}</span>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
     import { deepClone } from '@/utils/util.js';

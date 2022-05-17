@@ -21,106 +21,106 @@
   -->
 
 <template>
-    <div class="bk-add-dictionary">
-        <bk-form
-            :label-width="150"
-            :model="addTableInfo.formInfo"
-            form-type="vertical"
-            :rules="rules"
-            ref="addForm">
-            <bk-form-item
-                :label="$t(`m.systemConfig['名称']`)"
-                :required="true"
-                :property="'name'">
-                <bk-input maxlength="120"
-                    type="text"
-                    :placeholder="$t(`m.systemConfig['请输入名称']`)"
-                    v-model.trim="addTableInfo.formInfo.name">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['描述']`)">
-                <bk-input type="textarea"
-                    :rows="5"
-                    :maxlength="255"
-                    :placeholder="$t(`m.systemConfig['请输入描述']`)"
-                    v-model.trim="addTableInfo.formInfo.desc">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.basicModule['公共字段']`)">
-                <bk-select v-model="addTableInfo.formInfo.fields"
-                    :placeholder="$t(`m.basicModule['请选择']`)"
-                    :clearable="false"
-                    multiple
-                    searchable
-                    :font-size="'medium'"
-                    @selected="typeSelected">
-                    <bk-option v-for="option in fieldsList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-        </bk-form>
-        <!-- 表格拖拽 -->
-        <!-- <draggable element="tbody" v-model="moduleRelateFields" @end="updateInfo"></draggable> -->
-        <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
-            <table class="bk-draggable-table">
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
-                        <th style="max-width: 120px;">{{ $t('m.publicField["唯一标识"]') }}</th>
-                        <th style="max-width: 120px;">{{ $t('m.publicField["字段类型"]') }}</th>
-                    </tr>
-                </thead>
-                <draggable element="tbody" v-model="dataList" @end="updateInfo">
-                    <template v-if="dataList.length">
-                        <tr v-for="(item, index) in dataList" :key="index">
-                            <td class="move-handler-content">
-                                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{index + 1}}</span>
-                            </td>
-                            <td>
-                                <span>{{ item.name }}</span>
-                            </td>
-                            <td style="max-width: 120px;">
-                                <span>{{ item.key }}</span>
-                            </td>
-                            <td style="max-width: 120px;">
-                                <span>{{ item.typeName }}</span>
-                            </td>
-                        </tr>
-                    </template>
-                    <template v-else>
-                        <tr v-cloak>
-                            <td colspan="10" class="bk-none-content">
-                                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-                                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
-                            </td>
-                        </tr>
-                    </template>
-                </draggable>
-            </table>
-        </div>
-        <!-- button -->
-        <div class="mt15">
-            <bk-button
-                theme="primary"
-                :title="$t(`m.systemConfig['保存']`)"
-                class="mr10"
-                @click="save">
-                {{ $t(`m.systemConfig['保存']`) }}
-            </bk-button>
-            <bk-button
-                theme="default"
-                :title="$t(`m.systemConfig['取消']`)"
-                @click="cancel">
-                {{ $t('m.systemConfig["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="bk-add-dictionary">
+    <bk-form
+      :label-width="150"
+      :model="addTableInfo.formInfo"
+      form-type="vertical"
+      :rules="rules"
+      ref="addForm">
+      <bk-form-item
+        :label="$t(`m.systemConfig['名称']`)"
+        :required="true"
+        :property="'name'">
+        <bk-input maxlength="120"
+          type="text"
+          :placeholder="$t(`m.systemConfig['请输入名称']`)"
+          v-model.trim="addTableInfo.formInfo.name">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['描述']`)">
+        <bk-input type="textarea"
+          :rows="5"
+          :maxlength="255"
+          :placeholder="$t(`m.systemConfig['请输入描述']`)"
+          v-model.trim="addTableInfo.formInfo.desc">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.basicModule['公共字段']`)">
+        <bk-select v-model="addTableInfo.formInfo.fields"
+          :placeholder="$t(`m.basicModule['请选择']`)"
+          :clearable="false"
+          multiple
+          searchable
+          :font-size="'medium'"
+          @selected="typeSelected">
+          <bk-option v-for="option in fieldsList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+    </bk-form>
+    <!-- 表格拖拽 -->
+    <!-- <draggable element="tbody" v-model="moduleRelateFields" @end="updateInfo"></draggable> -->
+    <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
+      <table class="bk-draggable-table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
+            <th style="max-width: 120px;">{{ $t('m.publicField["唯一标识"]') }}</th>
+            <th style="max-width: 120px;">{{ $t('m.publicField["字段类型"]') }}</th>
+          </tr>
+        </thead>
+        <draggable element="tbody" v-model="dataList" @end="updateInfo">
+          <template v-if="dataList.length">
+            <tr v-for="(item, index) in dataList" :key="index">
+              <td class="move-handler-content">
+                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{index + 1}}</span>
+              </td>
+              <td>
+                <span>{{ item.name }}</span>
+              </td>
+              <td style="max-width: 120px;">
+                <span>{{ item.key }}</span>
+              </td>
+              <td style="max-width: 120px;">
+                <span>{{ item.typeName }}</span>
+              </td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-cloak>
+              <td colspan="10" class="bk-none-content">
+                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
+                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
+              </td>
+            </tr>
+          </template>
+        </draggable>
+      </table>
     </div>
+    <!-- button -->
+    <div class="mt15">
+      <bk-button
+        theme="primary"
+        :title="$t(`m.systemConfig['保存']`)"
+        class="mr10"
+        @click="save">
+        {{ $t(`m.systemConfig['保存']`) }}
+      </bk-button>
+      <bk-button
+        theme="default"
+        :title="$t(`m.systemConfig['取消']`)"
+        @click="cancel">
+        {{ $t('m.systemConfig["取消"]') }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

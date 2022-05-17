@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <span
-        :class="extCls"
-        :title="statusMap[status].name"
-        class="bk-status-color-info">
-        <template v-if="type === 'text'">
-            <span :class="['status-text', statusMap[status].cls]">{{ statusMap[status].name }}</span>
-        </template>
-        <span v-else-if="type === 'block'" :class="['status-block', statusMap[status].cls]">
-            <i v-if="statusIcon === 'loading'" class="bk-itsm-icon icon-icon-loading"></i>
-            <i v-else-if="statusIcon === 'success'" class="bk-itsm-icon icon-icon-finish"></i>
-            <i v-else-if="statusIcon === 'failed'" class="bk-itsm-icon icon-itsm-icon-delete-fill"></i>
-            <span :class="['status-text', statusMap[status].cls]">{{ statusMap[status].name }}</span>
-        </span>
-        <template v-else>
-            <i v-if="['RUNNING', 'WAITING_FOR_BACKEND'].includes(status)" class="bk-itsm-icon icon-icon-loading"></i>
-            <span v-else class="status-dot" :class="statusMap[status].cls"></span>
-            {{ statusMap[status].name }}
-        </template>
+  <span
+    :class="extCls"
+    :title="statusMap[status].name"
+    class="bk-status-color-info">
+    <template v-if="type === 'text'">
+      <span :class="['status-text', statusMap[status].cls]">{{ statusMap[status].name }}</span>
+    </template>
+    <span v-else-if="type === 'block'" :class="['status-block', statusMap[status].cls]">
+      <i v-if="statusIcon === 'loading'" class="bk-itsm-icon icon-icon-loading"></i>
+      <i v-else-if="statusIcon === 'success'" class="bk-itsm-icon icon-icon-finish"></i>
+      <i v-else-if="statusIcon === 'failed'" class="bk-itsm-icon icon-itsm-icon-delete-fill"></i>
+      <span :class="['status-text', statusMap[status].cls]">{{ statusMap[status].name }}</span>
     </span>
+    <template v-else>
+      <i v-if="['RUNNING', 'WAITING_FOR_BACKEND'].includes(status)" class="bk-itsm-icon icon-icon-loading"></i>
+      <span v-else class="status-dot" :class="statusMap[status].cls"></span>
+      {{ statusMap[status].name }}
+    </template>
+  </span>
 </template>
 
 <script>

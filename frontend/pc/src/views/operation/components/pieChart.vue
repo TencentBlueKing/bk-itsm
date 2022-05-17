@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="pie-chart-wrap" ref="pieChartWrap">
-        <canvas class="pie-chart" style="width: 100%;" :height="height"></canvas>
-    </div>
+  <div class="pie-chart-wrap" ref="pieChartWrap">
+    <canvas class="pie-chart" style="width: 100%;" :height="height"></canvas>
+  </div>
 </template>
 <script>
     import Chart from '@blueking/bkcharts';

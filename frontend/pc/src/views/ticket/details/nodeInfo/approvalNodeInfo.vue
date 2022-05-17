@@ -21,16 +21,16 @@
   -->
 
 <template>
-    <div class="bk-approval-node-content">
-        <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
-        <template v-for="(ite, inde) in nodeInfo.fields">
-            <fields-done
-                :key="inde"
-                :item="ite"
-                :origin="'notLog'">
-            </fields-done>
-        </template>
-    </div>
+  <div class="bk-approval-node-content">
+    <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
+    <template v-for="(ite, inde) in nodeInfo.fields">
+      <fields-done
+        :key="inde"
+        :item="ite"
+        :origin="'notLog'">
+      </fields-done>
+    </template>
+  </div>
 </template>
 
 <script>

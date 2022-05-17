@@ -27,29 +27,29 @@ import MyAttentionTicket from '../../views/workbench/MyAttentionTicket.vue';
 import AllTicket from '../../views/workbench/AllTicket.vue';
 
 export default [
-    {
-        path: '/workbench/ticket/todo',
-        name: 'myTodoTicket',
-        component: MyTodoTicket,
-    },
-    {
-        path: '/workbench/ticket/approval',
-        name: 'myApprovalTicket',
-        component: MyApprovalTicket,
-    },
-    {
-        path: '/workbench/ticket/created',
-        name: 'myCreatedTicket',
-        component: MyCreatedTicket,
-    },
-    {
-        path: '/workbench/ticket/attention',
-        name: 'myAttentionTicket',
-        component: MyAttentionTicket,
-    },
-    {
-        path: '/workbench/ticket/all',
-        name: 'allUserTicket',
-        component: AllTicket,
-    },
+  {
+    path: '/workbench/ticket/todo',
+    name: 'myTodoTicket',
+    component: MyTodoTicket,
+  },
+  {
+    path: '/workbench/ticket/approval',
+    name: 'myApprovalTicket',
+    component: MyApprovalTicket,
+  },
+  {
+    path: '/workbench/ticket/created',
+    name: 'myCreatedTicket',
+    component: MyCreatedTicket,
+  },
+  {
+    path: '/workbench/ticket/attention',
+    name: 'myAttentionTicket',
+    component: MyAttentionTicket,
+  },
+  {
+    path: '/workbench/ticket/all',
+    name: 'allUserTicket',
+    component: AllTicket,
+  },
 ];

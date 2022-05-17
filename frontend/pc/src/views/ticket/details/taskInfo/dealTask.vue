@@ -21,257 +21,257 @@
   -->
 
 <template>
-    <div class="deal-task">
-        <!-- 基础信息 -->
-        <div class="base-info">
-            <h3 class="setion-title">{{ $t(`m.task['任务信息']`) }}</h3>
-            <ul class="basic-list">
-                <li
-                    class="basic-item"
-                    v-for="(item, index) in taskInfoList"
-                    :key="index"
-                >
-                    <span class="basic-name">{{ item.name }}：</span>
-                    <span class="basic-value">
-                        <template v-if="item.key !== 'status'">
-                            {{ item.value }}
-                        </template>
-                        <template v-else>
-                            <task-status
-                                :status="taskInfo[item.key]"
-                                type="text"
-                            ></task-status>
-                        </template>
-                    </span>
-                </li>
-            </ul>
-        </div>
-        <!-- 标准运维执行基础信息 -->
-        <div class="base-info mt30" v-if="isShowSopsExecInfo">
-            <h3 class="setion-title">{{ $t(`m.task['标准运维信息']`) }}</h3>
-            <ul
-                class="basic-list"
-                v-bkloading="{ isLoading: taskStatusInfoLoading }"
-            >
-                <li
-                    class="basic-item"
-                    v-for="(item, index) in sopsBaseList"
-                    :key="index"
-                >
-                    <span class="basic-name">{{ item.name }}：</span>
-                    <span class="basic-value">
-                        <template v-if="item.key === 'task_name'">
-                            <a
-                                :href="taskStatusInfo.sops_task_url"
-                                target="_blank"
-                                style="color: #3a84ff"
-                            >
-                                {{ taskStatusInfo[item.key] || "--" }}
-                            </a>
-                        </template>
-                        <template v-else-if="item.key === 'state'">
-                            <span
-                                :class="
-                                    getSopsStatusInfo(taskStatusInfo.state)
-                                        .color
-                                "
-                            >
-                                {{
-                                    getSopsStatusInfo(taskStatusInfo.state).name
-                                }}
-                            </span>
-                            <i
-                                v-if="taskStatusInfo[item.key] !== 'FINISHED'"
-                                class="bk-icon left-icon icon-refresh"
-                                style="
+  <div class="deal-task">
+    <!-- 基础信息 -->
+    <div class="base-info">
+      <h3 class="setion-title">{{ $t(`m.task['任务信息']`) }}</h3>
+      <ul class="basic-list">
+        <li
+          class="basic-item"
+          v-for="(item, index) in taskInfoList"
+          :key="index"
+        >
+          <span class="basic-name">{{ item.name }}：</span>
+          <span class="basic-value">
+            <template v-if="item.key !== 'status'">
+              {{ item.value }}
+            </template>
+            <template v-else>
+              <task-status
+                :status="taskInfo[item.key]"
+                type="text"
+              ></task-status>
+            </template>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <!-- 标准运维执行基础信息 -->
+    <div class="base-info mt30" v-if="isShowSopsExecInfo">
+      <h3 class="setion-title">{{ $t(`m.task['标准运维信息']`) }}</h3>
+      <ul
+        class="basic-list"
+        v-bkloading="{ isLoading: taskStatusInfoLoading }"
+      >
+        <li
+          class="basic-item"
+          v-for="(item, index) in sopsBaseList"
+          :key="index"
+        >
+          <span class="basic-name">{{ item.name }}：</span>
+          <span class="basic-value">
+            <template v-if="item.key === 'task_name'">
+              <a
+                :href="taskStatusInfo.sops_task_url"
+                target="_blank"
+                style="color: #3a84ff"
+              >
+                {{ taskStatusInfo[item.key] || "--" }}
+              </a>
+            </template>
+            <template v-else-if="item.key === 'state'">
+              <span
+                :class="
+                  getSopsStatusInfo(taskStatusInfo.state)
+                    .color
+                "
+              >
+                {{
+                  getSopsStatusInfo(taskStatusInfo.state).name
+                }}
+              </span>
+              <i
+                v-if="taskStatusInfo[item.key] !== 'FINISHED'"
+                class="bk-icon left-icon icon-refresh"
+                style="
                                     margin-left: 5px;
                                     cursor: pointer;
                                     font-size: 16px;
                                     color: #3a84ff;
                                 "
-                                @click="getTaskStatusInfo"
-                            ></i>
-                        </template>
-                        <template v-else>
-                            {{ taskStatusInfo[item.key] || "--" }}
-                        </template>
-                    </span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- 创建任务-基础字段信息-->
-        <div class="field-info">
-            <field-preview class="mb30" :fields="createFields"></field-preview>
-        </div>
-        <!-- 创建任务-特殊字段信息:标准运维/蓝盾... -->
-        <div class="bk-field-info">
-            <field-info
-                v-if="createTaskTemplateFields.length"
-                :fields="createTaskTemplateFields"
-                :basic-infomation="basicInfomation"
-                :disabled="true"
-                :type-info="dealType"
-            ></field-info>
-        </div>
-
-        <!-- 处理字段信息 -->
-        <div
-            class="base-info"
-            v-if="
-                taskInfo.status !== 'NEW' &&
-                    taskInfo.status !== 'WAITING_FOR_OPERATE'
-            "
-        >
-            <h3 class="setion-title">{{ $t(`m.task['处理信息']`) }}</h3>
-            <!-- 已处理 -->
-            <template
-                v-if="
-                    taskInfo.status === 'WAITING_FOR_CONFIRM' ||
-                        taskInfo.status === 'FINISHED'
-                "
-            >
-                <ul class="basic-list">
-                    <li class="basic-item">
-                        <span class="basic-name">
-                            {{ $t(`m.task['处理人：']`) }}
-                        </span>
-                        <span
-                            class="basic-value"
-                            :title="
-                                taskDetail.executor ||
-                                    taskDetail.processor_users
-                            "
-                        >
-                            {{
-                                taskDetail.executor ||
-                                    taskDetail.processor_users
-                            }}
-                        </span>
-                    </li>
-                    <li class="basic-item">
-                        <span class="basic-name">
-                            {{ $t(`m.task['处理时间：']`) }}
-                        </span>
-                        <span class="basic-value" :title="taskDetail.start_at">
-                            {{ taskDetail.start_at || "--" }}
-                        </span>
-                    </li>
-                </ul>
-                <field-preview :fields="dealFields"></field-preview>
+                @click="getTaskStatusInfo"
+              ></i>
             </template>
-            <!-- 未处理 -->
             <template v-else>
-                <div
-                    class="bk-field-info mb30"
-                    v-bkloading="{ isLoading: taskDetailLoading }"
-                >
-                    <!-- 查看的时候禁用表单,总结的时候也需要禁用表单 -->
-                    <field-info
-                        v-if="!taskDetailLoading"
-                        ref="fieldInfo"
-                        :fields="dealFields"
-                        :disabled="
-                            dealType === 'SEE' ||
-                                taskInfo.status === 'WAITING_FOR_CONFIRM' ||
-                                taskInfo.status === 'FINISHED'
-                        "
-                    ></field-info>
-                </div>
+              {{ taskStatusInfo[item.key] || "--" }}
             </template>
-        </div>
-
-        <!-- 总结信息 -->
-        <div
-            class="base-info mt30"
-            v-if="
-                (taskInfo.status === 'WAITING_FOR_CONFIRM' ||
-                    taskInfo.status === 'FINISHED') &&
-                    taskType !== 'DEVOPS'
-            "
-        >
-            <h3 class="setion-title">{{ $t(`m.task['总结信息']`) }}</h3>
-            <!-- 已总结 -->
-            <template v-if="taskInfo.status === 'FINISHED'">
-                <div class="bk-task-basic mb30">
-                    <field-preview :fields="confirmList"></field-preview>
-                    <ul class="basic-list">
-                        <li class="basic-item">
-                            <span class="basic-name">
-                                {{ $t(`m.task['总结人：']`) }}
-                            </span>
-                            <span
-                                class="basic-value"
-                                :title="
-                                    taskDetail.confirmer ||
-                                        taskDetail.processor_users
-                                "
-                            >
-                                {{
-                                    taskDetail.confirmer ||
-                                        taskDetail.processor_users
-                                }}
-                            </span>
-                        </li>
-                        <li class="basic-item">
-                            <span class="basic-name">
-                                {{ $t(`m.task['总结时间：']`) }}
-                            </span>
-                            <span
-                                class="basic-value"
-                                :title="taskDetail.end_at"
-                            >
-                                {{ taskDetail.end_at || "--" }}
-                            </span>
-                        </li>
-                    </ul>
-                    <div class="bk-field-info">
-                        <field-info
-                            v-if="confirmTaskTemplateFields.length"
-                            :fields="confirmTaskTemplateFields"
-                            :disabled="true"
-                        ></field-info>
-                    </div>
-                </div>
-            </template>
-            <!-- 未总结 -->
-            <template v-else>
-                <div
-                    class="bk-field-info mb30"
-                    v-bkloading="{ isLoading: taskDetailLoading }"
-                >
-                    <!-- 查看的时候禁用表单 -->
-                    <field-info
-                        v-if="!taskDetailLoading"
-                        ref="fieldInfo"
-                        :fields="confirmFields"
-                        :disabled="dealType === 'SEE'"
-                    ></field-info>
-                </div>
-            </template>
-        </div>
-        <div class="bk-submit-task" v-if="dealType !== 'SEE'">
-            <!-- 查看的时候隐藏确认按钮 -->
-            <bk-button
-                :theme="'primary'"
-                :title="confirmText"
-                :disabled="btnLoading || taskDetailLoading"
-                class="mr10"
-                @click="submitDeal"
-            >
-                {{ confirmText }}
-            </bk-button>
-            <bk-button
-                v-if="dealType === 'OPERATE' || dealType === 'CONFIRM'"
-                :theme="'default'"
-                :disabled="btnLoading"
-                :title="$t(`m.task['取消']`)"
-                @click="closeSideslider"
-            >
-                {{ $t(`m.task['取消']`) }}
-            </bk-button>
-        </div>
+          </span>
+        </li>
+      </ul>
     </div>
+
+    <!-- 创建任务-基础字段信息-->
+    <div class="field-info">
+      <field-preview class="mb30" :fields="createFields"></field-preview>
+    </div>
+    <!-- 创建任务-特殊字段信息:标准运维/蓝盾... -->
+    <div class="bk-field-info">
+      <field-info
+        v-if="createTaskTemplateFields.length"
+        :fields="createTaskTemplateFields"
+        :basic-infomation="basicInfomation"
+        :disabled="true"
+        :type-info="dealType"
+      ></field-info>
+    </div>
+
+    <!-- 处理字段信息 -->
+    <div
+      class="base-info"
+      v-if="
+        taskInfo.status !== 'NEW' &&
+          taskInfo.status !== 'WAITING_FOR_OPERATE'
+      "
+    >
+      <h3 class="setion-title">{{ $t(`m.task['处理信息']`) }}</h3>
+      <!-- 已处理 -->
+      <template
+        v-if="
+          taskInfo.status === 'WAITING_FOR_CONFIRM' ||
+            taskInfo.status === 'FINISHED'
+        "
+      >
+        <ul class="basic-list">
+          <li class="basic-item">
+            <span class="basic-name">
+              {{ $t(`m.task['处理人：']`) }}
+            </span>
+            <span
+              class="basic-value"
+              :title="
+                taskDetail.executor ||
+                  taskDetail.processor_users
+              "
+            >
+              {{
+                taskDetail.executor ||
+                  taskDetail.processor_users
+              }}
+            </span>
+          </li>
+          <li class="basic-item">
+            <span class="basic-name">
+              {{ $t(`m.task['处理时间：']`) }}
+            </span>
+            <span class="basic-value" :title="taskDetail.start_at">
+              {{ taskDetail.start_at || "--" }}
+            </span>
+          </li>
+        </ul>
+        <field-preview :fields="dealFields"></field-preview>
+      </template>
+      <!-- 未处理 -->
+      <template v-else>
+        <div
+          class="bk-field-info mb30"
+          v-bkloading="{ isLoading: taskDetailLoading }"
+        >
+          <!-- 查看的时候禁用表单,总结的时候也需要禁用表单 -->
+          <field-info
+            v-if="!taskDetailLoading"
+            ref="fieldInfo"
+            :fields="dealFields"
+            :disabled="
+              dealType === 'SEE' ||
+                taskInfo.status === 'WAITING_FOR_CONFIRM' ||
+                taskInfo.status === 'FINISHED'
+            "
+          ></field-info>
+        </div>
+      </template>
+    </div>
+
+    <!-- 总结信息 -->
+    <div
+      class="base-info mt30"
+      v-if="
+        (taskInfo.status === 'WAITING_FOR_CONFIRM' ||
+          taskInfo.status === 'FINISHED') &&
+          taskType !== 'DEVOPS'
+      "
+    >
+      <h3 class="setion-title">{{ $t(`m.task['总结信息']`) }}</h3>
+      <!-- 已总结 -->
+      <template v-if="taskInfo.status === 'FINISHED'">
+        <div class="bk-task-basic mb30">
+          <field-preview :fields="confirmList"></field-preview>
+          <ul class="basic-list">
+            <li class="basic-item">
+              <span class="basic-name">
+                {{ $t(`m.task['总结人：']`) }}
+              </span>
+              <span
+                class="basic-value"
+                :title="
+                  taskDetail.confirmer ||
+                    taskDetail.processor_users
+                "
+              >
+                {{
+                  taskDetail.confirmer ||
+                    taskDetail.processor_users
+                }}
+              </span>
+            </li>
+            <li class="basic-item">
+              <span class="basic-name">
+                {{ $t(`m.task['总结时间：']`) }}
+              </span>
+              <span
+                class="basic-value"
+                :title="taskDetail.end_at"
+              >
+                {{ taskDetail.end_at || "--" }}
+              </span>
+            </li>
+          </ul>
+          <div class="bk-field-info">
+            <field-info
+              v-if="confirmTaskTemplateFields.length"
+              :fields="confirmTaskTemplateFields"
+              :disabled="true"
+            ></field-info>
+          </div>
+        </div>
+      </template>
+      <!-- 未总结 -->
+      <template v-else>
+        <div
+          class="bk-field-info mb30"
+          v-bkloading="{ isLoading: taskDetailLoading }"
+        >
+          <!-- 查看的时候禁用表单 -->
+          <field-info
+            v-if="!taskDetailLoading"
+            ref="fieldInfo"
+            :fields="confirmFields"
+            :disabled="dealType === 'SEE'"
+          ></field-info>
+        </div>
+      </template>
+    </div>
+    <div class="bk-submit-task" v-if="dealType !== 'SEE'">
+      <!-- 查看的时候隐藏确认按钮 -->
+      <bk-button
+        :theme="'primary'"
+        :title="confirmText"
+        :disabled="btnLoading || taskDetailLoading"
+        class="mr10"
+        @click="submitDeal"
+      >
+        {{ confirmText }}
+      </bk-button>
+      <bk-button
+        v-if="dealType === 'OPERATE' || dealType === 'CONFIRM'"
+        :theme="'default'"
+        :disabled="btnLoading"
+        :title="$t(`m.task['取消']`)"
+        @click="closeSideslider"
+      >
+        {{ $t(`m.task['取消']`) }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

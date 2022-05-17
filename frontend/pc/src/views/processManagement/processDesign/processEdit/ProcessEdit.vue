@@ -21,113 +21,113 @@
   -->
 
 <template>
-    <div class="process-edit" v-bkloading="{ isLoading: isloading }">
-        <!-- title -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p
-                v-if="!isShowNodeConfig"
-                class="bk-come-back"
-                @click="onBackProcessHome">
-                <arrows-left-icon></arrows-left-icon>
-                <template v-if="isNewFlow"> {{ $t('m.deployPage["新增设计流程"]') }} </template>
-                <template v-else> {{ flowInfo.name }} </template>
-            </p>
-            <p v-else class="bk-come-back" @click="closeConfigur">
-                <arrows-left-icon></arrows-left-icon>
-                <span>{{ $t('m.deployPage["配置节点"]') }}</span>
-            </p>
-        </div>
-        <!-- 流程步骤 -->
-        <div class="bk-itsm-tree">
-            <div class="bk-tree-content">
-                <div class="bk-tree-first" v-for="(item, index) in lineList" :key="item.id">
-                    <div class="bk-tree-shadow" @click="onChangeStep(item, index)">
-                        <span
-                            class="bk-tree-step"
-                            :class="{
-                                'bk-tree-primary': item.type === 'primary',
-                                'bk-tree-success': item.type === 'success',
-                                'bk-tree-error': item.type === 'error' }">
-                            <i
-                                v-if="item.type === 'success'"
-                                class="bk-icon icon-check-1">
-                            </i>
-                            <i
-                                v-if="item.type === 'error'"
-                                class="bk-icon icon-close"
-                                style="font-size: 18px;">
-                            </i>
-                            <span
-                                v-if="item.type !== 'success' && item.type !== 'error'">
-                                {{item.id}}
-                            </span>
-                        </span>
-                        <span
-                            class="bk-tree-normal bk-tree-cursor"
-                            :class="{ 'bk-tree-info': item.type !== 'normal' }">{{item.name}}</span>
-                    </div>
-                    <span class="bk-tree-line" v-if="item.id !== lineList.length"></span>
-                </div>
-            </div>
-        </div>
-        <div v-if="!isShowNodeConfig" class="bk-design-step">
-            <create-process
-                v-if="step === 'processInfo'"
-                :is-saveing="isSaveing"
-                :is-new-flow="isNewFlow"
-                :process-id="processId"
-                :flow-info="flowInfo"
-                @saveFlowInfo="saveFlowInfo"
-                @onBusinessChange="onBusinessChange">
-            </create-process>
-            <config-process
-                v-if="step === 'pipelineDesign'"
-                :flow-info="flowInfo"
-                :process-id="processId"
-                :is-new-flow="isNewFlow">
-            </config-process>
-            <activation-process
-                v-if="step === 'processCreate'"
-                :flow-info="flowInfo"
-                :process-id="processId"
-                :is-new-flow="isNewFlow"
-                :business="business">
-            </activation-process>
-        </div>
-        <!-- 流程节点配置 -->
-        <div v-else class="node-config-wrap">
-            <basic-node
-                v-if="configur.id && configur.type === 'NORMAL'"
-                :flow-info="flowInfo"
-                :configur="configur"
-                @closeConfigur="closeConfigur">
-            </basic-node>
-            <autoNode
-                v-if="configur.id && configur.type === 'TASK'"
-                :flow-info="flowInfo"
-                :configur="configur"
-                @closeConfigur="closeConfigur">
-            </autoNode>
-            <sopsNode
-                v-if="configur.id && configur.type === 'TASK-SOPS'"
-                :flow-info="flowInfo"
-                :configur="configur"
-                @closeConfigur="closeConfigur">
-            </sopsNode>
-            <signNode
-                v-if="configur.id && configur.type === 'SIGN'"
-                :flow-info="flowInfo"
-                :configur="configur"
-                @closeConfigur="closeConfigur">
-            </signNode>
-            <approval-node
-                v-if="configur.id && configur.type === 'APPROVAL'"
-                :flow-info="flowInfo"
-                :configur="configur"
-                @closeConfigur="closeConfigur">
-            </approval-node>
-        </div>
+  <div class="process-edit" v-bkloading="{ isLoading: isloading }">
+    <!-- title -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p
+        v-if="!isShowNodeConfig"
+        class="bk-come-back"
+        @click="onBackProcessHome">
+        <arrows-left-icon></arrows-left-icon>
+        <template v-if="isNewFlow"> {{ $t('m.deployPage["新增设计流程"]') }} </template>
+        <template v-else> {{ flowInfo.name }} </template>
+      </p>
+      <p v-else class="bk-come-back" @click="closeConfigur">
+        <arrows-left-icon></arrows-left-icon>
+        <span>{{ $t('m.deployPage["配置节点"]') }}</span>
+      </p>
     </div>
+    <!-- 流程步骤 -->
+    <div class="bk-itsm-tree">
+      <div class="bk-tree-content">
+        <div class="bk-tree-first" v-for="(item, index) in lineList" :key="item.id">
+          <div class="bk-tree-shadow" @click="onChangeStep(item, index)">
+            <span
+              class="bk-tree-step"
+              :class="{
+                'bk-tree-primary': item.type === 'primary',
+                'bk-tree-success': item.type === 'success',
+                'bk-tree-error': item.type === 'error' }">
+              <i
+                v-if="item.type === 'success'"
+                class="bk-icon icon-check-1">
+              </i>
+              <i
+                v-if="item.type === 'error'"
+                class="bk-icon icon-close"
+                style="font-size: 18px;">
+              </i>
+              <span
+                v-if="item.type !== 'success' && item.type !== 'error'">
+                {{item.id}}
+              </span>
+            </span>
+            <span
+              class="bk-tree-normal bk-tree-cursor"
+              :class="{ 'bk-tree-info': item.type !== 'normal' }">{{item.name}}</span>
+          </div>
+          <span class="bk-tree-line" v-if="item.id !== lineList.length"></span>
+        </div>
+      </div>
+    </div>
+    <div v-if="!isShowNodeConfig" class="bk-design-step">
+      <create-process
+        v-if="step === 'processInfo'"
+        :is-saveing="isSaveing"
+        :is-new-flow="isNewFlow"
+        :process-id="processId"
+        :flow-info="flowInfo"
+        @saveFlowInfo="saveFlowInfo"
+        @onBusinessChange="onBusinessChange">
+      </create-process>
+      <config-process
+        v-if="step === 'pipelineDesign'"
+        :flow-info="flowInfo"
+        :process-id="processId"
+        :is-new-flow="isNewFlow">
+      </config-process>
+      <activation-process
+        v-if="step === 'processCreate'"
+        :flow-info="flowInfo"
+        :process-id="processId"
+        :is-new-flow="isNewFlow"
+        :business="business">
+      </activation-process>
+    </div>
+    <!-- 流程节点配置 -->
+    <div v-else class="node-config-wrap">
+      <basic-node
+        v-if="configur.id && configur.type === 'NORMAL'"
+        :flow-info="flowInfo"
+        :configur="configur"
+        @closeConfigur="closeConfigur">
+      </basic-node>
+      <autoNode
+        v-if="configur.id && configur.type === 'TASK'"
+        :flow-info="flowInfo"
+        :configur="configur"
+        @closeConfigur="closeConfigur">
+      </autoNode>
+      <sopsNode
+        v-if="configur.id && configur.type === 'TASK-SOPS'"
+        :flow-info="flowInfo"
+        :configur="configur"
+        @closeConfigur="closeConfigur">
+      </sopsNode>
+      <signNode
+        v-if="configur.id && configur.type === 'SIGN'"
+        :flow-info="flowInfo"
+        :configur="configur"
+        @closeConfigur="closeConfigur">
+      </signNode>
+      <approval-node
+        v-if="configur.id && configur.type === 'APPROVAL'"
+        :flow-info="flowInfo"
+        :configur="configur"
+        @closeConfigur="closeConfigur">
+      </approval-node>
+    </div>
+  </div>
 </template>
 
 <script>

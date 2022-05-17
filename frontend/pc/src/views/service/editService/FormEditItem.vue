@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div ref="formEditItem" class="form-edit-item">
-        <add-field
-            ref="addField"
-            form-align="horizontal"
-            :change-info="formData"
-            :workflow="workflowId"
-            :state="nodeId"
-            :auto-selected-type="false"
-            @onConfirm="onConfirmClick"
-            @getAddFieldStatus="getAddFieldStatus"
-            @onCancel="$emit('onEditCancel')">
-        </add-field>
-    </div>
+  <div ref="formEditItem" class="form-edit-item">
+    <add-field
+      ref="addField"
+      form-align="horizontal"
+      :change-info="formData"
+      :workflow="workflowId"
+      :state="nodeId"
+      :auto-selected-type="false"
+      @onConfirm="onConfirmClick"
+      @getAddFieldStatus="getAddFieldStatus"
+      @onCancel="$emit('onEditCancel')">
+    </add-field>
+  </div>
 </template>
 <script>
     import AddField from '../../processManagement/processDesign/nodeConfigue/addField';

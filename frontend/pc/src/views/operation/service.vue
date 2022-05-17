@@ -21,100 +21,100 @@
   -->
 
 <template>
-    <div class="operation-service">
-        <div class="section-nav">
-            <div class="service-wrap">
-                <i class="bk-icon icon-arrows-left back-icon" @click="$router.push({ name: $route.query.project_id ? 'projectOperationHome' : 'OperationHome', query: $route.query.project_id ? { project_id: $route.query.project_id } : '' })"></i>
-                <bk-select
-                    class="service-selector"
-                    :value="serviceId"
-                    :searchable="true"
-                    :clearable="false"
-                    @toggle="onServicePanelToggle"
-                    @selected="onServiceChange">
-                    <div slot="trigger" class="selected-service" :class="{ 'panel-open': isServicePanelShow }">
-                        <span class="service-name">{{ serviceName }}</span>
-                        <i class="bk-icon icon-down-shape trigger-icon"></i>
-                    </div>
-                    <bk-option v-for="option in serviceList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-        </div>
-        <div class="section-content">
-            <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
-                <bk-date-picker
-                    type="daterange"
-                    :clearable="false"
-                    :shortcuts="shortcuts"
-                    :options="datePickerOptions"
-                    :value="dateRange"
-                    @change="onSelectDate">
-                </bk-date-picker>
-            </div>
-            <div class="summary-data statistics-section" v-bkloading="{ isLoading: loading.summary, opacity: 1 }">
-                <summary-card
-                    :title="$t(`m.operation['单据总数']`)"
-                    :card-data="{ total: summaryData.total.count, week: summaryData.week.ticket }">
-                    <i class="bk-icon icon-order-shape" slot="icon"></i>
-                </summary-card>
-                <summary-card
-                    :title="$t(`m.operation['业务总数']`)"
-                    :card-data="{ total: summaryData.total.biz_count, week: summaryData.week.biz }">
-                    <i class="bk-icon icon-folder-open-shape" slot="icon"></i>
-                </summary-card>
-                <summary-card
-                    :title="$t(`m.operation['用户总数']`)"
-                    :card-data="{ total: summaryData.total.user_count, week: summaryData.week.user }">
-                    <i class="bk-icon icon-user-shape" slot="icon"></i>
-                </summary-card>
-            </div>
-            <div class="service-statistics statistics-section">
-                <h4>{{ $t(`m.operation['统计指标']`) }}</h4>
-                <div class="charts-wrap">
-                    <chart-card
-                        style="width: 100%;"
-                        :title="$t(`m.operation['新增单量']`)"
-                        :loading="loading.addedTicket">
-                        <line-chart
-                            :gradient-color="['rgba(37, 91, 175, 0)', 'rgba(37, 91, 175, 0.3)']"
-                            :loading="loading.addedTicket"
-                            :y-axis-name="$t(`m.operation['单量（条）']`)"
-                            :chart-data="addedTicketData"
-                            :dimension="addedTicketChartDismension"
-                            @onDimensionChange="onAddedTicketDimensionChange">
-                        </line-chart>
-                    </chart-card>
-                    <chart-card
-                        style="width: 31%; height: 410px;"
-                        :title="$t(`m.operation['Top 10 提单用户']`)"
-                        :loading="loading.top10CreateTicketUser">
-                        <table-chart
-                            :loading="loading.top10CreateTicketUser"
-                            :columns="creatorTableColumns"
-                            :chart-data="top10CreateTicketUserData">
-                        </table-chart>
-                    </chart-card>
-                    <chart-card
-                        style="width: 68%; height: 410px;"
-                        :title="$t(`m.operation['业务数量']`)"
-                        :loading="loading.biz">
-                        <line-chart
-                            :gradient-color="['rgba(19, 143, 203, 0)', 'rgba(23, 142, 207, 0.3)']"
-                            :loading="loading.biz"
-                            :y-axis-name="$t(`m.operation['人数（人）']`)"
-                            :chart-data="bizData"
-                            :dimension="bizChartDismension"
-                            @onDimensionChange="onAddedServiceDimensionChange">
-                        </line-chart>
-                    </chart-card>
-                </div>
-            </div>
-        </div>
+  <div class="operation-service">
+    <div class="section-nav">
+      <div class="service-wrap">
+        <i class="bk-icon icon-arrows-left back-icon" @click="$router.push({ name: $route.query.project_id ? 'projectOperationHome' : 'OperationHome', query: $route.query.project_id ? { project_id: $route.query.project_id } : '' })"></i>
+        <bk-select
+          class="service-selector"
+          :value="serviceId"
+          :searchable="true"
+          :clearable="false"
+          @toggle="onServicePanelToggle"
+          @selected="onServiceChange">
+          <div slot="trigger" class="selected-service" :class="{ 'panel-open': isServicePanelShow }">
+            <span class="service-name">{{ serviceName }}</span>
+            <i class="bk-icon icon-down-shape trigger-icon"></i>
+          </div>
+          <bk-option v-for="option in serviceList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
     </div>
+    <div class="section-content">
+      <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
+        <bk-date-picker
+          type="daterange"
+          :clearable="false"
+          :shortcuts="shortcuts"
+          :options="datePickerOptions"
+          :value="dateRange"
+          @change="onSelectDate">
+        </bk-date-picker>
+      </div>
+      <div class="summary-data statistics-section" v-bkloading="{ isLoading: loading.summary, opacity: 1 }">
+        <summary-card
+          :title="$t(`m.operation['单据总数']`)"
+          :card-data="{ total: summaryData.total.count, week: summaryData.week.ticket }">
+          <i class="bk-icon icon-order-shape" slot="icon"></i>
+        </summary-card>
+        <summary-card
+          :title="$t(`m.operation['业务总数']`)"
+          :card-data="{ total: summaryData.total.biz_count, week: summaryData.week.biz }">
+          <i class="bk-icon icon-folder-open-shape" slot="icon"></i>
+        </summary-card>
+        <summary-card
+          :title="$t(`m.operation['用户总数']`)"
+          :card-data="{ total: summaryData.total.user_count, week: summaryData.week.user }">
+          <i class="bk-icon icon-user-shape" slot="icon"></i>
+        </summary-card>
+      </div>
+      <div class="service-statistics statistics-section">
+        <h4>{{ $t(`m.operation['统计指标']`) }}</h4>
+        <div class="charts-wrap">
+          <chart-card
+            style="width: 100%;"
+            :title="$t(`m.operation['新增单量']`)"
+            :loading="loading.addedTicket">
+            <line-chart
+              :gradient-color="['rgba(37, 91, 175, 0)', 'rgba(37, 91, 175, 0.3)']"
+              :loading="loading.addedTicket"
+              :y-axis-name="$t(`m.operation['单量（条）']`)"
+              :chart-data="addedTicketData"
+              :dimension="addedTicketChartDismension"
+              @onDimensionChange="onAddedTicketDimensionChange">
+            </line-chart>
+          </chart-card>
+          <chart-card
+            style="width: 31%; height: 410px;"
+            :title="$t(`m.operation['Top 10 提单用户']`)"
+            :loading="loading.top10CreateTicketUser">
+            <table-chart
+              :loading="loading.top10CreateTicketUser"
+              :columns="creatorTableColumns"
+              :chart-data="top10CreateTicketUserData">
+            </table-chart>
+          </chart-card>
+          <chart-card
+            style="width: 68%; height: 410px;"
+            :title="$t(`m.operation['业务数量']`)"
+            :loading="loading.biz">
+            <line-chart
+              :gradient-color="['rgba(19, 143, 203, 0)', 'rgba(23, 142, 207, 0.3)']"
+              :loading="loading.biz"
+              :y-axis-name="$t(`m.operation['人数（人）']`)"
+              :chart-data="bizData"
+              :dimension="bizChartDismension"
+              @onDimensionChange="onAddedServiceDimensionChange">
+            </line-chart>
+          </chart-card>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
     import dayjs from 'dayjs';

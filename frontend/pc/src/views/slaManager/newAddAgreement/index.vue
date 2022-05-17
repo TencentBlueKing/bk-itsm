@@ -21,98 +21,98 @@
   -->
 
 <template>
-    <div class="bk-add-agreement">
-        <!-- title -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back" @click="closeAgreement(false)">
-                <i class="bk-icon icon-arrows-left"></i>
-                {{ changeInfo.info.id ? changeInfo.info.name : $t('m.slaContent["新建服务协议"]') }}
-            </p>
-        </div>
-        <!-- content -->
-        <div class="bk-add-content">
-            <div class="bk-content-group" style="width: 400px;">
-                <p class="bk-group-title">{{ $t('m.slaContent["基本信息"]') }}</p>
-                <bk-form
-                    :label-width="250"
-                    form-type="vertical"
-                    :model="formInfo"
-                    :rules="nameRules"
-                    ref="dynamicForm">
-                    <bk-form-item
-                        :label="$t(`m.slaContent['服务协议名称']`)"
-                        :required="true"
-                        error-display-type="normal"
-                        style="width: 540px;"
-                        :property="'name'">
-                        <bk-input v-model.trim="formInfo.name"
-                            :maxlength="120"
-                            :show-word-limit="true"
-                            :placeholder="$t(`m.slaContent['请输入服务协议名称']`)"
-                            :disabled="changeInfo.info.is_builtin">
-                        </bk-input>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m["服务承诺设定"]') }}</p>
-                <priority-configur
-                    ref="priorityConfigur"
-                    :model-list="modelList"
-                    :model-priority="modelPriority"
-                    :change-info="changeInfo">
-                </priority-configur>
-            </div>
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m["预警提醒"]') }}</p>
-                <event-remind
-                    ref="eventRemind1"
-                    :model-list="modelList"
-                    :model-priority="testPriority1"
-                    :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
-                    :change-info="changeInfo">
-                </event-remind>
-            </div>
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m["超时提醒"]') }}</p>
-                <event-remind
-                    ref="eventRemind3"
-                    :model-list="modelList"
-                    :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
-                    :model-priority="testPriority3"
-                    :change-info="changeInfo">
-                </event-remind>
-            </div>
-            <div>
-                <p class="bk-group-title">
-                    <span data-test-id="sla_span_isUseAgreement" style="margin-right: 15px;">{{ $t('m.slaContent["是否启用该协议"]') }}</span>
-                    <bk-switcher v-model="formInfo.agreementStatus" size="small" theme="primary"></bk-switcher>
-                </p>
-            </div>
-        </div>
-        <div class="bk-priority-btn">
-            <bk-button
-                data-test-id="sla_button_submitAgreement"
-                theme="primary"
-                :title="$t(`m.slaContent['提交']`)"
-                class="mr10"
-                :loading="secondClick"
-                @click="submitInfo">{{ $t(`m.slaContent['提交']`) }}
-            </bk-button>
-            <bk-button
-                data-test-id="sla_button_closeAgreement"
-                theme="default"
-                :title="$t(`m.eventdeploy['取消']`)"
-                class="mr10"
-                :loading="secondClick"
-                @click="closeAgreement(false)">{{ $t('m.eventdeploy["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="bk-add-agreement">
+    <!-- title -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back" @click="closeAgreement(false)">
+        <i class="bk-icon icon-arrows-left"></i>
+        {{ changeInfo.info.id ? changeInfo.info.name : $t('m.slaContent["新建服务协议"]') }}
+      </p>
     </div>
+    <!-- content -->
+    <div class="bk-add-content">
+      <div class="bk-content-group" style="width: 400px;">
+        <p class="bk-group-title">{{ $t('m.slaContent["基本信息"]') }}</p>
+        <bk-form
+          :label-width="250"
+          form-type="vertical"
+          :model="formInfo"
+          :rules="nameRules"
+          ref="dynamicForm">
+          <bk-form-item
+            :label="$t(`m.slaContent['服务协议名称']`)"
+            :required="true"
+            error-display-type="normal"
+            style="width: 540px;"
+            :property="'name'">
+            <bk-input v-model.trim="formInfo.name"
+              :maxlength="120"
+              :show-word-limit="true"
+              :placeholder="$t(`m.slaContent['请输入服务协议名称']`)"
+              :disabled="changeInfo.info.is_builtin">
+            </bk-input>
+          </bk-form-item>
+        </bk-form>
+      </div>
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m["服务承诺设定"]') }}</p>
+        <priority-configur
+          ref="priorityConfigur"
+          :model-list="modelList"
+          :model-priority="modelPriority"
+          :change-info="changeInfo">
+        </priority-configur>
+      </div>
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m["预警提醒"]') }}</p>
+        <event-remind
+          ref="eventRemind1"
+          :model-list="modelList"
+          :model-priority="testPriority1"
+          :has-check-box="changeInfo.is_reply_need"
+          :email-notify-event-list="emailNotifyEventList"
+          :weixin-notify-event-list="weixinNotifyEventList"
+          :change-info="changeInfo">
+        </event-remind>
+      </div>
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m["超时提醒"]') }}</p>
+        <event-remind
+          ref="eventRemind3"
+          :model-list="modelList"
+          :has-check-box="changeInfo.is_reply_need"
+          :email-notify-event-list="emailNotifyEventList"
+          :weixin-notify-event-list="weixinNotifyEventList"
+          :model-priority="testPriority3"
+          :change-info="changeInfo">
+        </event-remind>
+      </div>
+      <div>
+        <p class="bk-group-title">
+          <span data-test-id="sla_span_isUseAgreement" style="margin-right: 15px;">{{ $t('m.slaContent["是否启用该协议"]') }}</span>
+          <bk-switcher v-model="formInfo.agreementStatus" size="small" theme="primary"></bk-switcher>
+        </p>
+      </div>
+    </div>
+    <div class="bk-priority-btn">
+      <bk-button
+        data-test-id="sla_button_submitAgreement"
+        theme="primary"
+        :title="$t(`m.slaContent['提交']`)"
+        class="mr10"
+        :loading="secondClick"
+        @click="submitInfo">{{ $t(`m.slaContent['提交']`) }}
+      </bk-button>
+      <bk-button
+        data-test-id="sla_button_closeAgreement"
+        theme="default"
+        :title="$t(`m.eventdeploy['取消']`)"
+        class="mr10"
+        :loading="secondClick"
+        @click="closeAgreement(false)">{{ $t('m.eventdeploy["取消"]') }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

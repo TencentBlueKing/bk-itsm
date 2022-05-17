@@ -21,83 +21,83 @@
   -->
 
 <template>
-    <div class="task-form">
-        <div class="use-task-config">
-            <span class="mr5">{{ $t(`m.trigger['是否启用']`) }}</span>
-            <bk-switcher v-model="useTask" @change="handleUseTaskChange"></bk-switcher>
-        </div>
-        <template v-if="useTask">
-            <bk-form v-for="(oneCondition, index) in taskConditionList"
-                :key="index" :model="oneCondition"
-                :rules="taskConfigRule"
-                class="mt10"
-                form-type="vertical"
-                ref="taskForms">
-                <div class="task-condition clearfix">
-                    <div class="condition-item">
-                        <bk-form-item :label="$t(`m.taskTemplate['任务模板']`)" :required="true" :property="'taskId'">
-                            <bk-select v-model="oneCondition.taskId"
-                                :placeholder="$t(`m.basicModule['请选择']`) + $t(`m.taskTemplate['任务模板']`)"
-                                :ext-cls="'bk-form-width'"
-                                searchable
-                                clearable>
-                                <bk-option v-for="node in taskTemplateList"
-                                    :key="node.id"
-                                    :id="node.id"
-                                    :name="node.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                    </div>
-                    <div class="condition-item">
-                        <bk-form-item :label="$t(`m.tickets['可创建任务节点']`)" :required="true" :property="'createNodeId'">
-                            <bk-select v-model="oneCondition.createNodeId"
-                                :placeholder="$t(`m.tickets['请选择可创建任务节点']`)"
-                                :ext-cls="'bk-form-width'"
-                                :loading="nodeListLoading"
-                                searchable
-                                clearable
-                                @change="getCanDealNodeList($event, oneCondition)">
-                                <bk-option v-for="node in normalNodeList"
-                                    :key="node.id"
-                                    :id="node.id"
-                                    :name="node.name"
-                                    :disabled="node.disabled">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                    </div>
-                    <div class="condition-item">
-                        <bk-form-item :label="$t(`m.tickets['可处理任务的节点']`)" :required="true" :property="'dealNodeId'">
-                            <bk-select v-model="oneCondition.dealNodeId"
-                                :placeholder="$t(`m.tickets['请选择可处理任务的节点']`)"
-                                :ext-cls="'bk-form-width'"
-                                :loading="oneCondition.dealLoading"
-                                searchable
-                                clearable
-                                @change="handleDealNodeChange">
-                                <bk-option v-for="node in oneCondition.dealList"
-                                    :key="node.id"
-                                    :id="node.id"
-                                    :name="node.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                    </div>
-                    <div class="condition-checkbox">
-                        <bk-checkbox-group v-model="oneCondition.others">
-                            <p><bk-checkbox :value="1">{{ $t(`m.taskTemplate['处理任务的节点也可以创建任务']`) }}</bk-checkbox></p>
-                            <p class="mt10"><bk-checkbox :value="2">{{ $t(`m.taskTemplate['下一个节点流转是否必须等待任务处理完成']`) }}</bk-checkbox></p>
-                        </bk-checkbox-group>
-                    </div>
-                    <div class="row-operating">
-                        <span @click="onAddCondition">+</span>
-                        <span @click="onDelCondition(index)">-</span>
-                    </div>
-                </div>
-            </bk-form>
-        </template>
+  <div class="task-form">
+    <div class="use-task-config">
+      <span class="mr5">{{ $t(`m.trigger['是否启用']`) }}</span>
+      <bk-switcher v-model="useTask" @change="handleUseTaskChange"></bk-switcher>
     </div>
+    <template v-if="useTask">
+      <bk-form v-for="(oneCondition, index) in taskConditionList"
+        :key="index" :model="oneCondition"
+        :rules="taskConfigRule"
+        class="mt10"
+        form-type="vertical"
+        ref="taskForms">
+        <div class="task-condition clearfix">
+          <div class="condition-item">
+            <bk-form-item :label="$t(`m.taskTemplate['任务模板']`)" :required="true" :property="'taskId'">
+              <bk-select v-model="oneCondition.taskId"
+                :placeholder="$t(`m.basicModule['请选择']`) + $t(`m.taskTemplate['任务模板']`)"
+                :ext-cls="'bk-form-width'"
+                searchable
+                clearable>
+                <bk-option v-for="node in taskTemplateList"
+                  :key="node.id"
+                  :id="node.id"
+                  :name="node.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+          </div>
+          <div class="condition-item">
+            <bk-form-item :label="$t(`m.tickets['可创建任务节点']`)" :required="true" :property="'createNodeId'">
+              <bk-select v-model="oneCondition.createNodeId"
+                :placeholder="$t(`m.tickets['请选择可创建任务节点']`)"
+                :ext-cls="'bk-form-width'"
+                :loading="nodeListLoading"
+                searchable
+                clearable
+                @change="getCanDealNodeList($event, oneCondition)">
+                <bk-option v-for="node in normalNodeList"
+                  :key="node.id"
+                  :id="node.id"
+                  :name="node.name"
+                  :disabled="node.disabled">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+          </div>
+          <div class="condition-item">
+            <bk-form-item :label="$t(`m.tickets['可处理任务的节点']`)" :required="true" :property="'dealNodeId'">
+              <bk-select v-model="oneCondition.dealNodeId"
+                :placeholder="$t(`m.tickets['请选择可处理任务的节点']`)"
+                :ext-cls="'bk-form-width'"
+                :loading="oneCondition.dealLoading"
+                searchable
+                clearable
+                @change="handleDealNodeChange">
+                <bk-option v-for="node in oneCondition.dealList"
+                  :key="node.id"
+                  :id="node.id"
+                  :name="node.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+          </div>
+          <div class="condition-checkbox">
+            <bk-checkbox-group v-model="oneCondition.others">
+              <p><bk-checkbox :value="1">{{ $t(`m.taskTemplate['处理任务的节点也可以创建任务']`) }}</bk-checkbox></p>
+              <p class="mt10"><bk-checkbox :value="2">{{ $t(`m.taskTemplate['下一个节点流转是否必须等待任务处理完成']`) }}</bk-checkbox></p>
+            </bk-checkbox-group>
+          </div>
+          <div class="row-operating">
+            <span @click="onAddCondition">+</span>
+            <span @click="onDelCondition(index)">-</span>
+          </div>
+        </div>
+      </bk-form>
+    </template>
+  </div>
 </template>
 
 <script>

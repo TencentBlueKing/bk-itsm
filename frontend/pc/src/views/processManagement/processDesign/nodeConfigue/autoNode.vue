@@ -21,153 +21,153 @@
   -->
 
 <template>
-    <div class="bk-basic-node">
-        <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form data-test-id="service-form-autoNode" :label-width="150" :model="formInfo" form-type="vertical">
-                <bk-form-item data-test-id="autoNode-input-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
-                    <bk-input :ext-cls="'bk-form-width'"
-                        v-model="formInfo.name"
-                        maxlength="120">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item data-test-id="autoNode-select-apiInterface" :label="$t(`m.treeinfo['API接口']`)" :required="true">
-                    <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                        v-model="formInfo.api_info.remote_system_id"
-                        :clearable="false"
-                        :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
-                        searchable
-                        @selected="changeCode">
-                        <bk-option v-for="option in apiSysList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                    <template v-if="formInfo.api_info.remote_system_id">
-                        <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                            v-model="formInfo.api_info.remote_api_id"
-                            :loading="isLoading"
-                            :clearable="false"
-                            searchable
-                            @selected="changeMethod">
-                            <bk-option v-for="option in apiList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </template>
-                </bk-form-item>
-                <bk-form-item data-test-id="autoNode-select-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
-                    <div @click="checkStatus.processors = false">
-                        <deal-person
-                            ref="processors"
-                            :value="processorsInfo"
-                            :node-info="configur"
-                            :exclude-role-type-list="excludeRoleTypeList">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </bk-form>
-        </basic-card>
-        <template v-if="formInfo.api_info.remote_api_id">
-            <basic-card
-                v-bkloading="{ isLoading: isLoading }"
-                :card-label="$t(`m.treeinfo['输入参数']`)"
-                :card-desc="$t(`m.treeinfo['调用该API需要传递的参数信息']`)">
-                <!-- get/query/参数 -->
-                <div class="bk-param"
-                    v-if="apiDetail.req_params && apiDetail.req_params.length && apiDetail.req_params[0].name">
-                    <get-param
-                        ref="getParam"
-                        @addNewItem="addNewItem"
-                        :change-info="configur"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </get-param>
-                </div>
-                <!-- post/body/参数 -->
-                <div class="bk-param"
-                    v-if="apiDetail.req_body && Object.keys(apiDetail.req_body).length && apiDetail.req_body.properties && Object.keys(apiDetail.req_body.properties).length ">
-                    <post-param
-                        @addNewItem="addNewItem"
-                        ref="postParam"
-                        :change-info="configur"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </post-param>
-                </div>
-            </basic-card>
+  <div class="bk-basic-node">
+    <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
+      <bk-form data-test-id="service-form-autoNode" :label-width="150" :model="formInfo" form-type="vertical">
+        <bk-form-item data-test-id="autoNode-input-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true">
+          <bk-input :ext-cls="'bk-form-width'"
+            v-model="formInfo.name"
+            maxlength="120">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item data-test-id="autoNode-select-apiInterface" :label="$t(`m.treeinfo['API接口']`)" :required="true">
+          <bk-select :ext-cls="'bk-form-width bk-form-display'"
+            v-model="formInfo.api_info.remote_system_id"
+            :clearable="false"
+            :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
+            searchable
+            @selected="changeCode">
+            <bk-option v-for="option in apiSysList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <template v-if="formInfo.api_info.remote_system_id">
+            <bk-select :ext-cls="'bk-form-width bk-form-display'"
+              v-model="formInfo.api_info.remote_api_id"
+              :loading="isLoading"
+              :clearable="false"
+              searchable
+              @selected="changeMethod">
+              <bk-option v-for="option in apiList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </template>
+        </bk-form-item>
+        <bk-form-item data-test-id="autoNode-select-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+          <div @click="checkStatus.processors = false">
+            <deal-person
+              ref="processors"
+              :value="processorsInfo"
+              :node-info="configur"
+              :exclude-role-type-list="excludeRoleTypeList">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </bk-form>
+    </basic-card>
+    <template v-if="formInfo.api_info.remote_api_id">
+      <basic-card
+        v-bkloading="{ isLoading: isLoading }"
+        :card-label="$t(`m.treeinfo['输入参数']`)"
+        :card-desc="$t(`m.treeinfo['调用该API需要传递的参数信息']`)">
+        <!-- get/query/参数 -->
+        <div class="bk-param"
+          v-if="apiDetail.req_params && apiDetail.req_params.length && apiDetail.req_params[0].name">
+          <get-param
+            ref="getParam"
+            @addNewItem="addNewItem"
+            :change-info="configur"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </get-param>
+        </div>
+        <!-- post/body/参数 -->
+        <div class="bk-param"
+          v-if="apiDetail.req_body && Object.keys(apiDetail.req_body).length && apiDetail.req_body.properties && Object.keys(apiDetail.req_body.properties).length ">
+          <post-param
+            @addNewItem="addNewItem"
+            ref="postParam"
+            :change-info="configur"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </post-param>
+        </div>
+      </basic-card>
 
-            <basic-card
+      <basic-card
 
-                v-bkloading="{ isLoading: isLoading }"
-                :card-label="$t(`m.treeinfo['返回数据']`)"
-                :card-desc="$t(`m.treeinfo['调用成功后API将会返回的参数信息']`)">
-                <!-- 返回数据/选取全局变量 -->
-                <div class="bk-param">
-                    <response-data-node
-                        ref="responseDataNode"
-                        v-if="apiDetail.rsp_data && Object.keys(apiDetail.rsp_data).length && apiDetail.rsp_data.properties && Object.keys(apiDetail.rsp_data.properties).length"
-                        :change-info="configur"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </response-data-node>
-                </div>
-            </basic-card>
+        v-bkloading="{ isLoading: isLoading }"
+        :card-label="$t(`m.treeinfo['返回数据']`)"
+        :card-desc="$t(`m.treeinfo['调用成功后API将会返回的参数信息']`)">
+        <!-- 返回数据/选取全局变量 -->
+        <div class="bk-param">
+          <response-data-node
+            ref="responseDataNode"
+            v-if="apiDetail.rsp_data && Object.keys(apiDetail.rsp_data).length && apiDetail.rsp_data.properties && Object.keys(apiDetail.rsp_data.properties).length"
+            :change-info="configur"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </response-data-node>
+        </div>
+      </basic-card>
 
-            <basic-card
-                v-bkloading="{ isLoading: isLoading }"
-                :card-label="$t(`m.treeinfo['轮询配置']`)"
-                :card-desc="$t(`m.treeinfo['当出现异常时，设置重试及结束的条件']`)">
-                <nodeCondition
-                    :form-info="formInfo"
-                    :line-info="lineInfo">
-                </nodeCondition>
-            </basic-card>
-        </template>
-        <basic-card>
-            <bk-sideslider
-                :is-show.sync="sliderInfo.show"
-                :title="sliderInfo.title"
-                :width="sliderInfo.width">
-                <div class="p20" slot="content" v-if="sliderInfo.show">
-                    <add-field
-                        @getRelatedFields="getRelatedFields"
-                        :change-info="changeInfo"
-                        :sosp-info="showTabData"
-                        :workflow="flowInfo.id"
-                        :state="configur.id"
-                        @closeShade="closeShade">
-                    </add-field>
-                </div>
-            </bk-sideslider>
-            <common-trigger-list
-                :origin="'state'"
-                :node-type="configur.type"
-                :source-id="flowInfo.id"
-                :sender="configur.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
-            <div class="mt20" style="font-size: 0">
-                <bk-button :theme="'primary'"
-                    data-test-id="autoNode-button-submit"
-                    :title="$t(`m.treeinfo['确定']`)"
-                    :disabled="!formInfo.api_info.remote_api_id"
-                    class="mr10"
-                    @click="submitNode">
-                    {{$t(`m.treeinfo['确定']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="autoNode-button-close"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    class="mr10"
-                    @click="closeNode">
-                    {{$t(`m.treeinfo['取消']`)}}
-                </bk-button>
-            </div>
-        </basic-card>
-    </div>
+      <basic-card
+        v-bkloading="{ isLoading: isLoading }"
+        :card-label="$t(`m.treeinfo['轮询配置']`)"
+        :card-desc="$t(`m.treeinfo['当出现异常时，设置重试及结束的条件']`)">
+        <nodeCondition
+          :form-info="formInfo"
+          :line-info="lineInfo">
+        </nodeCondition>
+      </basic-card>
+    </template>
+    <basic-card>
+      <bk-sideslider
+        :is-show.sync="sliderInfo.show"
+        :title="sliderInfo.title"
+        :width="sliderInfo.width">
+        <div class="p20" slot="content" v-if="sliderInfo.show">
+          <add-field
+            @getRelatedFields="getRelatedFields"
+            :change-info="changeInfo"
+            :sosp-info="showTabData"
+            :workflow="flowInfo.id"
+            :state="configur.id"
+            @closeShade="closeShade">
+          </add-field>
+        </div>
+      </bk-sideslider>
+      <common-trigger-list
+        :origin="'state'"
+        :node-type="configur.type"
+        :source-id="flowInfo.id"
+        :sender="configur.id"
+        :table="flowInfo.table">
+      </common-trigger-list>
+      <div class="mt20" style="font-size: 0">
+        <bk-button :theme="'primary'"
+          data-test-id="autoNode-button-submit"
+          :title="$t(`m.treeinfo['确定']`)"
+          :disabled="!formInfo.api_info.remote_api_id"
+          class="mr10"
+          @click="submitNode">
+          {{$t(`m.treeinfo['确定']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="autoNode-button-close"
+          :title="$t(`m.treeinfo['取消']`)"
+          class="mr10"
+          @click="closeNode">
+          {{$t(`m.treeinfo['取消']`)}}
+        </bk-button>
+      </div>
+    </basic-card>
+  </div>
 </template>
 <script>
     import getParam from './addField/getParam.vue';

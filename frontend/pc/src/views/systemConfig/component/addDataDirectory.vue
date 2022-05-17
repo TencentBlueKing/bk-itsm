@@ -21,154 +21,154 @@
   -->
 
 <template>
-    <div class="bk-add-dictionary">
-        <bk-form
-            :label-width="200"
-            form-type="vertical"
-            :model="addTableInfo.formInfo"
-            :rules="rules"
-            ref="dynamicForm">
-            <bk-form-item
-                :label="$t(`m.systemConfig['编码']`)"
-                :required="true"
-                :property="'key'">
-                <bk-input v-model.trim="addTableInfo.formInfo.key"
-                    :placeholder="$t(`m.systemConfig['请输入编码']`)"
-                    :disabled="addTableInfo.formInfo.id !== '' && addTableInfo.formInfo.id !== undefined">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.user['负责人：']`)">
-                <member-select v-model="addTableInfo.formInfo.ownersInputValue"></member-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['名称']`)"
-                :required="true"
-                :property="'name'">
-                <bk-input v-model.trim="addTableInfo.formInfo.name"
-                    maxlength="120"
-                    :placeholder="$t(`m.systemConfig['请输入名称']`)">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['描述']`)">
-                <bk-input type="textarea"
-                    v-model.trim="addTableInfo.formInfo.desc"
-                    :placeholder="$t(`m.systemConfig['请输入描述']`)">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['启用状态']`)">
-                <bk-switcher v-model="addTableInfo.formInfo.is_enabled" size="small"></bk-switcher>
-            </bk-form-item>
-        </bk-form>
-        <!-- button -->
-        <div class="bk-add-btn" v-if="addTableInfo.formInfo.id">
-            <bk-button theme="default"
-                :title="$t(`m.systemConfig['添加']`)"
-                icon="plus"
-                class="plus-cus"
-                :disabled="!addTableInfo.formInfo.id"
-                @click="addDictionary">
-                {{ $t('m.systemConfig["添加"]') }}
-            </bk-button>
-        </div>
-        <bk-table
-            class="mb15"
-            v-if="addTableInfo.formInfo.id"
-            v-bkloading="{ isLoading: isDataLoading }"
-            :data="dataList"
-            :size="'small'"
-            :pagination="pagination"
-            @page-change="handlePageChange"
-            @page-limit-change="handlePageLimitChange">
-            <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['名字']`)" prop="name"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['父级']`)" prop="parent_name"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['编码']`)" prop="key"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['排序']`)" prop="order"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="120">
-                <template slot-scope="props">
-                    <bk-button theme="primary" text @click="openDataDialog(props.row)">
-                        {{ $t('m.systemConfig["编辑"]') }}
-                    </bk-button>
-                    <bk-button v-if="!props.row.is_builtin"
-                        theme="primary"
-                        text
-                        @click="openDelete(props.row)">
-                        {{ $t('m.systemConfig["删除"]') }}
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <!-- button -->
-        <div>
-            <bk-button :theme="'primary'" :title="$t(`m.systemConfig['保存']`)" class="mr10" @click="save">
-                {{$t(`m.systemConfig['保存']`)}}
-            </bk-button>
-            <bk-button :theme="'default'" :title="$t(`m.systemConfig['取消']`)" class="mr10" @click="cancel">
-                {{$t(`m.systemConfig['取消']`)}}
-            </bk-button>
-        </div>
-        <!-- 新增字典字段 -->
-        <bk-dialog
-            v-model="dictDataTable.isShow"
-            :render-directive="'if'"
-            :width="dictDataTable.width"
-            :header-position="dictDataTable.headerPosition"
-            :loading="secondClick"
-            :auto-close="dictDataTable.autoClose"
-            :mask-close="dictDataTable.autoClose"
-            @confirm="submitDictionary">
-            <p slot="header">
-                {{ dictDataTable.formInfo.id
-                    ? $t('m.systemConfig["编辑字典数据"]') : $t('m.systemConfig["新增字典数据"]') }}
-            </p>
-            <div class="bk-add-project bk-add-module">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="dictDataTable.formInfo"
-                    :rules="rules"
-                    ref="dialogForm">
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['父级：']`)">
-                        <select-tree
-                            v-model="dictDataTable.formInfo.parent"
-                            :list="dictDataTable.treeDataList"
-                            @change="onParentChange">
-                        </select-tree>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['编码：']`)"
-                        :required="true"
-                        :property="'key'">
-                        <bk-input v-model.trim="dictDataTable.formInfo.key"
-                            :placeholder="$t(`m.systemConfig['请输入编码，格式为英文数字及下划线']`)"
-                            :disabled="dictDataTable.formInfo.id !== '' && dictDataTable.formInfo.id !== undefined">
-                        </bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['名称：']`)"
-                        :required="true"
-                        :property="'name'">
-                        <bk-input v-model.trim="dictDataTable.formInfo.name"
-                            :placeholder="$t(`m.systemConfig['请输入中文名称']`)">
-                        </bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['排序：']`)"
-                        :required="true">
-                        <bk-input :clearable="true"
-                            type="number"
-                            :min="0"
-                            :precision="dictDataTable.precision"
-                            v-model="dictDataTable.formInfo.order">
-                        </bk-input>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </bk-dialog>
+  <div class="bk-add-dictionary">
+    <bk-form
+      :label-width="200"
+      form-type="vertical"
+      :model="addTableInfo.formInfo"
+      :rules="rules"
+      ref="dynamicForm">
+      <bk-form-item
+        :label="$t(`m.systemConfig['编码']`)"
+        :required="true"
+        :property="'key'">
+        <bk-input v-model.trim="addTableInfo.formInfo.key"
+          :placeholder="$t(`m.systemConfig['请输入编码']`)"
+          :disabled="addTableInfo.formInfo.id !== '' && addTableInfo.formInfo.id !== undefined">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.user['负责人：']`)">
+        <member-select v-model="addTableInfo.formInfo.ownersInputValue"></member-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['名称']`)"
+        :required="true"
+        :property="'name'">
+        <bk-input v-model.trim="addTableInfo.formInfo.name"
+          maxlength="120"
+          :placeholder="$t(`m.systemConfig['请输入名称']`)">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['描述']`)">
+        <bk-input type="textarea"
+          v-model.trim="addTableInfo.formInfo.desc"
+          :placeholder="$t(`m.systemConfig['请输入描述']`)">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['启用状态']`)">
+        <bk-switcher v-model="addTableInfo.formInfo.is_enabled" size="small"></bk-switcher>
+      </bk-form-item>
+    </bk-form>
+    <!-- button -->
+    <div class="bk-add-btn" v-if="addTableInfo.formInfo.id">
+      <bk-button theme="default"
+        :title="$t(`m.systemConfig['添加']`)"
+        icon="plus"
+        class="plus-cus"
+        :disabled="!addTableInfo.formInfo.id"
+        @click="addDictionary">
+        {{ $t('m.systemConfig["添加"]') }}
+      </bk-button>
     </div>
+    <bk-table
+      class="mb15"
+      v-if="addTableInfo.formInfo.id"
+      v-bkloading="{ isLoading: isDataLoading }"
+      :data="dataList"
+      :size="'small'"
+      :pagination="pagination"
+      @page-change="handlePageChange"
+      @page-limit-change="handlePageLimitChange">
+      <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['名字']`)" prop="name"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['父级']`)" prop="parent_name"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['编码']`)" prop="key"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['排序']`)" prop="order"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="120">
+        <template slot-scope="props">
+          <bk-button theme="primary" text @click="openDataDialog(props.row)">
+            {{ $t('m.systemConfig["编辑"]') }}
+          </bk-button>
+          <bk-button v-if="!props.row.is_builtin"
+            theme="primary"
+            text
+            @click="openDelete(props.row)">
+            {{ $t('m.systemConfig["删除"]') }}
+          </bk-button>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <!-- button -->
+    <div>
+      <bk-button :theme="'primary'" :title="$t(`m.systemConfig['保存']`)" class="mr10" @click="save">
+        {{$t(`m.systemConfig['保存']`)}}
+      </bk-button>
+      <bk-button :theme="'default'" :title="$t(`m.systemConfig['取消']`)" class="mr10" @click="cancel">
+        {{$t(`m.systemConfig['取消']`)}}
+      </bk-button>
+    </div>
+    <!-- 新增字典字段 -->
+    <bk-dialog
+      v-model="dictDataTable.isShow"
+      :render-directive="'if'"
+      :width="dictDataTable.width"
+      :header-position="dictDataTable.headerPosition"
+      :loading="secondClick"
+      :auto-close="dictDataTable.autoClose"
+      :mask-close="dictDataTable.autoClose"
+      @confirm="submitDictionary">
+      <p slot="header">
+        {{ dictDataTable.formInfo.id
+          ? $t('m.systemConfig["编辑字典数据"]') : $t('m.systemConfig["新增字典数据"]') }}
+      </p>
+      <div class="bk-add-project bk-add-module">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="dictDataTable.formInfo"
+          :rules="rules"
+          ref="dialogForm">
+          <bk-form-item
+            :label="$t(`m.systemConfig['父级：']`)">
+            <select-tree
+              v-model="dictDataTable.formInfo.parent"
+              :list="dictDataTable.treeDataList"
+              @change="onParentChange">
+            </select-tree>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['编码：']`)"
+            :required="true"
+            :property="'key'">
+            <bk-input v-model.trim="dictDataTable.formInfo.key"
+              :placeholder="$t(`m.systemConfig['请输入编码，格式为英文数字及下划线']`)"
+              :disabled="dictDataTable.formInfo.id !== '' && dictDataTable.formInfo.id !== undefined">
+            </bk-input>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['名称：']`)"
+            :required="true"
+            :property="'name'">
+            <bk-input v-model.trim="dictDataTable.formInfo.name"
+              :placeholder="$t(`m.systemConfig['请输入中文名称']`)">
+            </bk-input>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['排序：']`)"
+            :required="true">
+            <bk-input :clearable="true"
+              type="number"
+              :min="0"
+              :precision="dictDataTable.precision"
+              v-model="dictDataTable.formInfo.order">
+            </bk-input>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

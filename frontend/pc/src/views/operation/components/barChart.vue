@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="bar-chart-wrap" ref="barChartWrap">
-        <canvas class="bar-chart" :height="height"></canvas>
-    </div>
+  <div class="bar-chart-wrap" ref="barChartWrap">
+    <canvas class="bar-chart" :height="height"></canvas>
+  </div>
 </template>
 <script>
     import Chart from '@blueking/bkcharts';

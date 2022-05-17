@@ -21,69 +21,69 @@
   -->
 
 <template>
-    <div class="wang-editor-template">
-        <ul v-show="isShowSelect" class="select-pattern">
-            <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
-                <i :class="item.icon"></i>
-                <span>{{ item.name}}</span>
-                <p>{{ item.docs }}</p>
-            </li>
-        </ul>
-        <!-- 回复评论 -->
-        <div v-if="isReplyComment" class="reply-comment">
-            <div class="reply-title">
-                <i class="bk-itsm-icon icon-yinyong"></i>
-                <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
-                <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
-            </div>
-            <div class="reply-content">
-                <div v-html="replyContent.content"></div>
-            </div>
-        </div>
-        <editor
-            v-if="isShowEditor"
-            ref="editorAdd"
-            :editor-id="'editor1'"
-            :comment-type="commentType"
-            @postComment="postComment"
-            @changebuttonStatus="changebuttonStatus">
-        </editor>
-        <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
-        <bk-divider></bk-divider>
-        <div>{{ $t('m["全部评论"]') }}</div>
-        <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list" :style="isShowEditor ? isReplyComment ? 'height: calc(100vh - 820px)': 'height: calc(100vh - 729px)' : 'height: calc(100vh - 647px)'">
-            <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
-                <comment-item
-                    :comment-list="commentList"
-                    :cur-comment="item"
-                    @replyComment="replyComment"
-                    @refreshComment="refreshComment"
-                    @jumpTargetComment="jumpTargetComment"
-                    @editComment="editComment">
-                </comment-item>
-            </li>
-            <li class="page-over">
-                <div v-bkloading="{ isLoading: moreLoading }"></div>
-                <span v-if="isPageOver">{{ $t('m["评论已经加载完了"]') }}</span>
-            </li>
-        </ul>
-        <div v-if="commentList.length === 0" class="no-comment">
-            <img :src="imgUrl">
-            <p>{{ $t('m["当前暂无评论，快去评论吧！"]') }}</p>
-        </div>
-        <bk-dialog
-            v-model="isEdit"
-            :title="editType === 'edit' ? $t(`m['编辑评论']`) : $t(`m['回复评论']`)"
-            width="800"
-            theme="primary"
-            :mask-close="false"
-            @confirm="submitEdit">
-            <editor ref="editorEdit"
-                :editor-id="'editor2'"
-                :comment-type-reply="commentType">
-            </editor>
-        </bk-dialog>
+  <div class="wang-editor-template">
+    <ul v-show="isShowSelect" class="select-pattern">
+      <li v-for="(item, index) in selectPatternList" :key="index" @click="postComment(item.type)">
+        <i :class="item.icon"></i>
+        <span>{{ item.name}}</span>
+        <p>{{ item.docs }}</p>
+      </li>
+    </ul>
+    <!-- 回复评论 -->
+    <div v-if="isReplyComment" class="reply-comment">
+      <div class="reply-title">
+        <i class="bk-itsm-icon icon-yinyong"></i>
+        <span class="quote-creator">{{ $t('m["回复"]') }} {{ replyContent.creator }} {{ $t('m["的评论"]') }} :</span>
+        <span class="repeal-reply" @click="repealReply">{{ $t('m["取消回复"]') }}</span>
+      </div>
+      <div class="reply-content">
+        <div v-html="replyContent.content"></div>
+      </div>
     </div>
+    <editor
+      v-if="isShowEditor"
+      ref="editorAdd"
+      :editor-id="'editor1'"
+      :comment-type="commentType"
+      @postComment="postComment"
+      @changebuttonStatus="changebuttonStatus">
+    </editor>
+    <bk-button v-show="isShowEditor" class="submit" :theme="'primary'" @click="submit">{{ isEditEditor ? $t('m["发布"]') : $t('m["返回"]') }}</bk-button>
+    <bk-divider></bk-divider>
+    <div>{{ $t('m["全部评论"]') }}</div>
+    <ul v-bkloading="{ isLoading: commentLoading }" v-show="commentList.length !== 0" class="comment-list" :style="isShowEditor ? isReplyComment ? 'height: calc(100vh - 820px)': 'height: calc(100vh - 729px)' : 'height: calc(100vh - 647px)'">
+      <li v-for="(item, index) in commentList" :key="index" :class="[{ 'twinkling': flash[item.id] }]">
+        <comment-item
+          :comment-list="commentList"
+          :cur-comment="item"
+          @replyComment="replyComment"
+          @refreshComment="refreshComment"
+          @jumpTargetComment="jumpTargetComment"
+          @editComment="editComment">
+        </comment-item>
+      </li>
+      <li class="page-over">
+        <div v-bkloading="{ isLoading: moreLoading }"></div>
+        <span v-if="isPageOver">{{ $t('m["评论已经加载完了"]') }}</span>
+      </li>
+    </ul>
+    <div v-if="commentList.length === 0" class="no-comment">
+      <img :src="imgUrl">
+      <p>{{ $t('m["当前暂无评论，快去评论吧！"]') }}</p>
+    </div>
+    <bk-dialog
+      v-model="isEdit"
+      :title="editType === 'edit' ? $t(`m['编辑评论']`) : $t(`m['回复评论']`)"
+      width="800"
+      theme="primary"
+      :mask-close="false"
+      @confirm="submitEdit">
+      <editor ref="editorEdit"
+        :editor-id="'editor2'"
+        :comment-type-reply="commentType">
+      </editor>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import editor from './editor.vue';

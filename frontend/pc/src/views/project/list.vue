@@ -21,109 +21,109 @@
   -->
 
 <template>
-    <div class="project-list-page">
-        <i class="bk-icon icon-close-line-2 back-icon" @click="handleGoBack"></i>
-        <div class="action-wrap">
-            <bk-button
-                v-cursor="{ active: !hasPermission(['project_create']) }"
-                :class="[{
-                    'btn-permission-disable': !hasPermission(['project_create'])
-                }]"
-                theme="primary"
-                @click="onCreateProject">
-                {{ $t('m["新建"]') }}
-            </bk-button>
-            <bk-input
-                right-icon="bk-icon icon-search"
-                style="width: 530px;"
-                :placeholder="$t(`m['请输入项目名称']`)"
-                v-model="keyword"
-                @enter="onSearchProject"
-                @clear="onSearchProject">
-            </bk-input>
-        </div>
-        <div class="project-table">
-            <bk-table
-                v-bkloading="{ isLoading: listLoading }"
-                :data="list"
-                :pagination="pagination"
-                @sort-change="handleSortChange"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
-                <bk-table-column prop="name" :label="$t(`m['项目名称']`)">
-                    <template slot-scope="props">
-                        <div class="name-wrap">
-                            <span
-                                class="prefix-icon"
-                                :style="{ background: props.row.color || '#90a1ff' }">
-                                {{ props.row.name[0].toUpperCase() }}
-                            </span>
-                            <span class="text">{{ props.row.name }}</span>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column prop="key" :label="$t(`m['项目代号']`)"></bk-table-column>
-                <bk-table-column prop="desc" :label="$t(`m['项目说明']`)">
-                    <template slot-scope="props">
-                        {{ props.row.desc || '--' }}
-                    </template>
-                </bk-table-column>
-                <bk-table-column prop="creator" :label="$t(`m['创建人']`)"></bk-table-column>
-                <bk-table-column :sortable="true" prop="create_at" :label="$t(`m['创建时间']`)"></bk-table-column>
-                <bk-table-column :label="$t(`m['操作']`)">
-                    <template slot-scope="props">
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
-                            text
-                            theme="primary"
-                            :class="{
-                                'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
-                            @click="onEditProject(props)">
-                            {{ $t(`m['编辑']`) }}
-                        </bk-button>
-                        <div
-                            :style="{ display: 'inline-block' }"
-                            v-bk-tooltips.right="$t(`m['该项目不允许删除']`)">
-                            <!-- 删除按钮暂时禁用 -->
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :disabled="true"
-                                :class="{
-                                    'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions)
-                                }"
-                                @click="onDeleteProject(props.row)">
-                                {{ $t(`m['删除']`) }}
-                            </bk-button>
-                        </div>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <edit-project-dialog
-            :title="editDialogTitle"
-            :is-show="isEditDialogShow"
-            :project="projectForm"
-            @confirm="onProjectDialogConfirm"
-            @cancel="onProjectDialogCancel">
-        </edit-project-dialog>
-        <bk-dialog
-            v-model="isDeleteDialogShow"
-            header-position="center"
-            render-directive="if"
-            :title="$t(`m['确认删除项目？']`)"
-            :width="400"
-            :auto-close="false"
-            :mask-close="false"
-            :loading="deleteProjectPending"
-            @confirm="onDeleteProjectConfirm"
-            @cancel="editingProject = null">
-            <div v-if="editingProject" class="delete-tips">
-                {{$t(`m['确认删除']`)}}{{$t(`m['“']`)}}{{editingProject.name}}{{$t(`m['”']`)}}{{$t(`m['，']`)}}{{$t(`m['一旦删除将不可回复，请谨慎操作。']`)}}
-            </div>
-        </bk-dialog>
+  <div class="project-list-page">
+    <i class="bk-icon icon-close-line-2 back-icon" @click="handleGoBack"></i>
+    <div class="action-wrap">
+      <bk-button
+        v-cursor="{ active: !hasPermission(['project_create']) }"
+        :class="[{
+          'btn-permission-disable': !hasPermission(['project_create'])
+        }]"
+        theme="primary"
+        @click="onCreateProject">
+        {{ $t('m["新建"]') }}
+      </bk-button>
+      <bk-input
+        right-icon="bk-icon icon-search"
+        style="width: 530px;"
+        :placeholder="$t(`m['请输入项目名称']`)"
+        v-model="keyword"
+        @enter="onSearchProject"
+        @clear="onSearchProject">
+      </bk-input>
     </div>
+    <div class="project-table">
+      <bk-table
+        v-bkloading="{ isLoading: listLoading }"
+        :data="list"
+        :pagination="pagination"
+        @sort-change="handleSortChange"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange">
+        <bk-table-column prop="name" :label="$t(`m['项目名称']`)">
+          <template slot-scope="props">
+            <div class="name-wrap">
+              <span
+                class="prefix-icon"
+                :style="{ background: props.row.color || '#90a1ff' }">
+                {{ props.row.name[0].toUpperCase() }}
+              </span>
+              <span class="text">{{ props.row.name }}</span>
+            </div>
+          </template>
+        </bk-table-column>
+        <bk-table-column prop="key" :label="$t(`m['项目代号']`)"></bk-table-column>
+        <bk-table-column prop="desc" :label="$t(`m['项目说明']`)">
+          <template slot-scope="props">
+            {{ props.row.desc || '--' }}
+          </template>
+        </bk-table-column>
+        <bk-table-column prop="creator" :label="$t(`m['创建人']`)"></bk-table-column>
+        <bk-table-column :sortable="true" prop="create_at" :label="$t(`m['创建时间']`)"></bk-table-column>
+        <bk-table-column :label="$t(`m['操作']`)">
+          <template slot-scope="props">
+            <bk-button
+              v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
+              text
+              theme="primary"
+              :class="{
+                'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions) }"
+              @click="onEditProject(props)">
+              {{ $t(`m['编辑']`) }}
+            </bk-button>
+            <div
+              :style="{ display: 'inline-block' }"
+              v-bk-tooltips.right="$t(`m['该项目不允许删除']`)">
+              <!-- 删除按钮暂时禁用 -->
+              <bk-button
+                v-cursor="{ active: !hasPermission(['project_edit'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :disabled="true"
+                :class="{
+                  'btn-permission-disable': !hasPermission(['project_edit'], props.row.auth_actions)
+                }"
+                @click="onDeleteProject(props.row)">
+                {{ $t(`m['删除']`) }}
+              </bk-button>
+            </div>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <edit-project-dialog
+      :title="editDialogTitle"
+      :is-show="isEditDialogShow"
+      :project="projectForm"
+      @confirm="onProjectDialogConfirm"
+      @cancel="onProjectDialogCancel">
+    </edit-project-dialog>
+    <bk-dialog
+      v-model="isDeleteDialogShow"
+      header-position="center"
+      render-directive="if"
+      :title="$t(`m['确认删除项目？']`)"
+      :width="400"
+      :auto-close="false"
+      :mask-close="false"
+      :loading="deleteProjectPending"
+      @confirm="onDeleteProjectConfirm"
+      @cancel="editingProject = null">
+      <div v-if="editingProject" class="delete-tips">
+        {{$t(`m['确认删除']`)}}{{$t(`m['“']`)}}{{editingProject.name}}{{$t(`m['”']`)}}{{$t(`m['，']`)}}{{$t(`m['一旦删除将不可回复，请谨慎操作。']`)}}
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import i18n from '@/i18n/index.js';

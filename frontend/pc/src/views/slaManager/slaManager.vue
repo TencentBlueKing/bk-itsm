@@ -21,96 +21,96 @@
   -->
 
 <template>
-    <div class="bk-itsm-service" v-bkloading="{ isLoading: isDataLoading }">
-        <template v-if="!changeInfo.isShow">
-            <!-- title -->
-            <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-                <p class="bk-come-back">
-                    {{ $t('m.slaContent["服务模式"]') }}
-                </p>
-            </div>
-            <div class="itsm-page-content">
-                <empty-tip
-                    v-if="!isDataLoading && modelList.length === 0"
-                    :title="emptyTip.title"
-                    :sub-title="emptyTip.subTitle"
-                    :desc="emptyTip.desc"
-                    :links="emptyTip.links">
-                    <template slot="btns">
-                        <bk-button
-                            data-test-id="slaPattern_button_createPermission"
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
-                            theme="primary"
-                            :class="{
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
-                            }"
-                            @click="addModelInfo">
-                            {{ $t('m["立即创建"]') }}
-                        </bk-button>
-                    </template>
-                </empty-tip>
-                <template v-else>
-                    <!-- 提示信息 -->
-                    <div class="bk-itsm-version" v-if="versionStatus">
-                        <i class="bk-icon icon-info-circle"></i>
-                        <span>{{ $t('m.slaContent["服务模式：通过对工作日节假日的配置，工作时段以及工作时间的设置，来设定不同的服务模式。服务模式将会应用到服务级别协议中，最终体现在对不同优先级服务的受理时效上。"]') }}</span>
-                        <i class="bk-icon icon-close" @click="closeVersion"></i>
-                    </div>
-                    <!-- 新增 -->
-                    <div class="bk-sla-add">
-                        <bk-button
-                            data-test-id="slaPattern_button_create"
-                            v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
-                            theme="primary"
-                            :title="$t(`m.eventdeploy['新增']`)"
-                            icon="plus"
-                            :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
-                            }]"
-                            @click="addModelInfo">
-                            {{ $t('m.eventdeploy["新增"]') }}
-                        </bk-button>
-                    </div>
-                    <!-- 列表数据 -->
-                    <ul class="bk-sla-list" v-if="modelList.length">
-                        <li v-for="(item, index) in modelList" :key="index" @click="changeLineInfo(item, index)"
-                            style="cursor: pointer">
-                            <div class="bk-sla-content">
-                                <div class="bk-content-info">
-                                    <p class="bk-info-name" :title="item.name">{{item.name}}</p>
-                                    <p v-if="item.days[0] && item.days[0].day_of_week">
-                                        <span v-for="(day, dIndex) in splitItem(item)" :key="String(item.id) + String(dIndex)">{{numToDay(day)}}
-                                        </span>
-                                        <span v-for="(it,i) in item.days[0].duration" :key="i">
-                                            {{it.start_time}}-{{it.end_time}}
-                                        </span>
-                                    </p>
-                                    <p v-else>
-                                        <span>
-                                            {{$t('m.slaContent["周一至周日 全天"]')}}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="bk-sla-operat">
-                                    <i class="bk-icon icon-delete" data-test-id="slaPattern-i-deleteModel1" v-if="!item.is_builtin"
-                                        @click.stop="deleteModel(item, index)"></i>
-                                    <i class="bk-icon icon-delete bk-icon-disabled builtin" data-test-id="slaPattern-i-deleteModel2" v-else
-                                        @click.stop="deleteModel(item, index)"
-                                        v-bk-tooltips="bktooltipsInfo"></i>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </template>
-            </div>
-        </template>
+  <div class="bk-itsm-service" v-bkloading="{ isLoading: isDataLoading }">
+    <template v-if="!changeInfo.isShow">
+      <!-- title -->
+      <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+        <p class="bk-come-back">
+          {{ $t('m.slaContent["服务模式"]') }}
+        </p>
+      </div>
+      <div class="itsm-page-content">
+        <empty-tip
+          v-if="!isDataLoading && modelList.length === 0"
+          :title="emptyTip.title"
+          :sub-title="emptyTip.subTitle"
+          :desc="emptyTip.desc"
+          :links="emptyTip.links">
+          <template slot="btns">
+            <bk-button
+              data-test-id="slaPattern_button_createPermission"
+              v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
+              theme="primary"
+              :class="{
+                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
+              }"
+              @click="addModelInfo">
+              {{ $t('m["立即创建"]') }}
+            </bk-button>
+          </template>
+        </empty-tip>
         <template v-else>
-            <add-model
-                :change-info="changeInfo"
-                :is-edit="isEdit">
-            </add-model>
+          <!-- 提示信息 -->
+          <div class="bk-itsm-version" v-if="versionStatus">
+            <i class="bk-icon icon-info-circle"></i>
+            <span>{{ $t('m.slaContent["服务模式：通过对工作日节假日的配置，工作时段以及工作时间的设置，来设定不同的服务模式。服务模式将会应用到服务级别协议中，最终体现在对不同优先级服务的受理时效上。"]') }}</span>
+            <i class="bk-icon icon-close" @click="closeVersion"></i>
+          </div>
+          <!-- 新增 -->
+          <div class="bk-sla-add">
+            <bk-button
+              data-test-id="slaPattern_button_create"
+              v-cursor="{ active: !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions) }"
+              theme="primary"
+              :title="$t(`m.eventdeploy['新增']`)"
+              icon="plus"
+              :class="['mr10', 'plus-cus', {
+                'btn-permission-disable': !hasPermission(['sla_calendar_create'], $store.state.project.projectAuthActions)
+              }]"
+              @click="addModelInfo">
+              {{ $t('m.eventdeploy["新增"]') }}
+            </bk-button>
+          </div>
+          <!-- 列表数据 -->
+          <ul class="bk-sla-list" v-if="modelList.length">
+            <li v-for="(item, index) in modelList" :key="index" @click="changeLineInfo(item, index)"
+              style="cursor: pointer">
+              <div class="bk-sla-content">
+                <div class="bk-content-info">
+                  <p class="bk-info-name" :title="item.name">{{item.name}}</p>
+                  <p v-if="item.days[0] && item.days[0].day_of_week">
+                    <span v-for="(day, dIndex) in splitItem(item)" :key="String(item.id) + String(dIndex)">{{numToDay(day)}}
+                    </span>
+                    <span v-for="(it,i) in item.days[0].duration" :key="i">
+                      {{it.start_time}}-{{it.end_time}}
+                    </span>
+                  </p>
+                  <p v-else>
+                    <span>
+                      {{$t('m.slaContent["周一至周日 全天"]')}}
+                    </span>
+                  </p>
+                </div>
+                <div class="bk-sla-operat">
+                  <i class="bk-icon icon-delete" data-test-id="slaPattern-i-deleteModel1" v-if="!item.is_builtin"
+                    @click.stop="deleteModel(item, index)"></i>
+                  <i class="bk-icon icon-delete bk-icon-disabled builtin" data-test-id="slaPattern-i-deleteModel2" v-else
+                    @click.stop="deleteModel(item, index)"
+                    v-bk-tooltips="bktooltipsInfo"></i>
+                </div>
+              </div>
+            </li>
+          </ul>
         </template>
-    </div>
+      </div>
+    </template>
+    <template v-else>
+      <add-model
+        :change-info="changeInfo"
+        :is-edit="isEdit">
+      </add-model>
+    </template>
+  </div>
 </template>
 
 <script>

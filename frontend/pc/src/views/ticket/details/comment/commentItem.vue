@@ -1,56 +1,56 @@
 <template>
-    <div class="comment">
-        <div class="comment-info">
-            <i class="author bk-itsm-icon icon-itsm-icon-my"></i>
-            <!-- <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div> -->
-            <p>
-                <span class="user-name">{{ curComment.creator}}  </span>
-                <span class="issue-time">{{ $t('m["发布于"]') }} {{ createTime }}</span>
-                <i v-if="curComment.remark_type === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
-            <div
-                v-if="curComment.update_log.length"
-                v-bk-tooltips="{
-                    placement: 'top-start',
-                    content: curComment.update_log
-                }"
-                class="edited">
-                <span>{{ $t('m["已被编辑"]') }}</span>
-            </div>
-            <div class="reply-praise">
-                <i class="bk-itsm-icon icon-xiaoxi" title="回复" @click="$emit('replyComment', curComment)"></i>
-                <!-- <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i> -->
-            </div>
-        </div>
-        <div class="comment-content">
-            <div v-html="curComment.content"></div>
-            <div
-                v-if="curComment.hasOwnProperty('parent_creator')"
-                class="comment-reply"
-                @click="jumpTargetComment(curComment)">
-                <div class="comment-message">
-                    <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
-                    <div v-html="curComment.parent_content"></div>
-                </div>
-            </div>
-        </div>
-        <div class="operation">
-            <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>
-            <i class="line"></i>
-            <span @click="handleDeleteDialogShow(true)">{{ $t('m["删除"]') }}</span>
-        </div>
-        <bk-dialog
-            ext-cls="delete-dialog"
-            width="400"
-            :show-footer="false"
-            v-model="deleteCommentDialog">
-            <i class="bk-itsm-icon icon-info-fail"></i>
-            <div class="delete-tip">{{ $t('m["确认删除该条评论？"]') }}</div>
-            <div class="delete-option">
-                <bk-button :theme="'primary'" @click="deleteComment(curComment.id)">{{ $t('m["确定"]') }}</bk-button>
-                <bk-button @click="handleDeleteDialogShow(false)">{{ $t('m["取消"]') }}</bk-button>
-            </div>
-        </bk-dialog>
+  <div class="comment">
+    <div class="comment-info">
+      <i class="author bk-itsm-icon icon-itsm-icon-my"></i>
+      <!-- <div class="author" :style="{ background: randomHex() }">{{ avatar(curComment.creator) }}</div> -->
+      <p>
+        <span class="user-name">{{ curComment.creator}}  </span>
+        <span class="issue-time">{{ $t('m["发布于"]') }} {{ createTime }}</span>
+        <i v-if="curComment.remark_type === 'INSIDE'" class="tip bk-itsm-icon icon-icon-no-permissions"> {{ $t('m["仅内部可见"]') }}</i></p>
+      <div
+        v-if="curComment.update_log.length"
+        v-bk-tooltips="{
+          placement: 'top-start',
+          content: curComment.update_log
+        }"
+        class="edited">
+        <span>{{ $t('m["已被编辑"]') }}</span>
+      </div>
+      <div class="reply-praise">
+        <i class="bk-itsm-icon icon-xiaoxi" title="回复" @click="$emit('replyComment', curComment)"></i>
+        <!-- <i class="bk-itsm-icon icon-itsm-icon-smeil" title="暂不支持" @click="endorse"></i> -->
+      </div>
     </div>
+    <div class="comment-content">
+      <div v-html="curComment.content"></div>
+      <div
+        v-if="curComment.hasOwnProperty('parent_creator')"
+        class="comment-reply"
+        @click="jumpTargetComment(curComment)">
+        <div class="comment-message">
+          <span><i class="bk-itsm-icon icon-yinyong"></i>{{ $t('m["回复"]') }} {{ curComment.parent_creator }} {{ $t('m["的评论"]') }} :</span>
+          <div v-html="curComment.parent_content"></div>
+        </div>
+      </div>
+    </div>
+    <div class="operation">
+      <span @click="$emit('editComment', curComment, 'edit')">{{ $t('m["编辑"]') }}</span>
+      <i class="line"></i>
+      <span @click="handleDeleteDialogShow(true)">{{ $t('m["删除"]') }}</span>
+    </div>
+    <bk-dialog
+      ext-cls="delete-dialog"
+      width="400"
+      :show-footer="false"
+      v-model="deleteCommentDialog">
+      <i class="bk-itsm-icon icon-info-fail"></i>
+      <div class="delete-tip">{{ $t('m["确认删除该条评论？"]') }}</div>
+      <div class="delete-option">
+        <bk-button :theme="'primary'" @click="deleteComment(curComment.id)">{{ $t('m["确定"]') }}</bk-button>
+        <bk-button @click="handleDeleteDialogShow(false)">{{ $t('m["取消"]') }}</bk-button>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

@@ -21,74 +21,74 @@
   -->
 
 <template>
-    <div class="bk-api-run-config">
-        <bk-input v-model="DetailInfo.path" :disabled="trueStatus">
-            <template slot="prepend">
-                <bk-dropdown-menu class="group-text"
-                    ref="requestwayDrop"
-                    slot="append"
-                    :font-size="'normal'"
-                    :disabled="trueStatus">
-                    <bk-button type="primary" slot="dropdown-trigger">
-                        <span> {{ DetailInfo.method }} </span>
-                        <i :class="['bk-icon icon-angle-down']"></i>
-                    </bk-button>
-                </bk-dropdown-menu>
-            </template>
-            <template slot="append">
-                <bk-button style="border: none; height: 30px; border-radius: 0;"
-                    data-test-id="apiDetail_button_sendRequset"
-                    :theme="'primary'"
-                    :title="$t(`m.systemConfig['发送']`)"
-                    @click="testUrl">
-                    {{$t(`m.systemConfig['发送']`)}}
-                </bk-button>
-            </template>
-        </bk-input>
-        <div class="mt20 bk-run-configure">
-            <bk-collapse v-model="activeName">
-                <bk-collapse-item name="1" :ext-cls="'bk-border-line'">
-                    Query
-                    <template slot="content" v-if="DetailInfo.req_params && DetailInfo.req_params.length">
-                        <ul class="mb10">
-                            <li v-for="(item, index) in DetailInfo.req_params" :key="index" class="bk-run-content">
-                                <bk-input style="width: 130px; margin-right: 10px;"
-                                    class="bk-run-input"
-                                    :disabled="trueStatus"
-                                    v-model="item.name">
-                                </bk-input>
-                                <bk-checkbox
-                                    :true-value="trueStatus"
-                                    :false-value="falseStatus"
-                                    v-model="item.is_necessary">
-                                </bk-checkbox>
-                                <span>=</span>
-                                <bk-input style="width: calc(100% - 185px); float: right;"
-                                    class="bk-run-input"
-                                    v-model="item.value">
-                                </bk-input>
-                            </li>
-                        </ul>
-                    </template>
-                </bk-collapse-item>
-                <bk-collapse-item name="2">
-                    Body
-                    <div slot="content" class="mb10">
-                        <ace
-                            :value="bodyDetailConfig.value"
-                            :width="bodyDetailConfig.width"
-                            :height="bodyDetailConfig.height"
-                            :read-only="bodyDetailConfig.readOnly"
-                            :lang="bodyDetailConfig.lang"
-                            :full-screen="bodyDetailConfig.fullScreen"
-                            :theme="'textmate'"
-                            @blur="blur">
-                        </ace>
-                    </div>
-                </bk-collapse-item>
-            </bk-collapse>
-        </div>
+  <div class="bk-api-run-config">
+    <bk-input v-model="DetailInfo.path" :disabled="trueStatus">
+      <template slot="prepend">
+        <bk-dropdown-menu class="group-text"
+          ref="requestwayDrop"
+          slot="append"
+          :font-size="'normal'"
+          :disabled="trueStatus">
+          <bk-button type="primary" slot="dropdown-trigger">
+            <span> {{ DetailInfo.method }} </span>
+            <i :class="['bk-icon icon-angle-down']"></i>
+          </bk-button>
+        </bk-dropdown-menu>
+      </template>
+      <template slot="append">
+        <bk-button style="border: none; height: 30px; border-radius: 0;"
+          data-test-id="apiDetail_button_sendRequset"
+          :theme="'primary'"
+          :title="$t(`m.systemConfig['发送']`)"
+          @click="testUrl">
+          {{$t(`m.systemConfig['发送']`)}}
+        </bk-button>
+      </template>
+    </bk-input>
+    <div class="mt20 bk-run-configure">
+      <bk-collapse v-model="activeName">
+        <bk-collapse-item name="1" :ext-cls="'bk-border-line'">
+          Query
+          <template slot="content" v-if="DetailInfo.req_params && DetailInfo.req_params.length">
+            <ul class="mb10">
+              <li v-for="(item, index) in DetailInfo.req_params" :key="index" class="bk-run-content">
+                <bk-input style="width: 130px; margin-right: 10px;"
+                  class="bk-run-input"
+                  :disabled="trueStatus"
+                  v-model="item.name">
+                </bk-input>
+                <bk-checkbox
+                  :true-value="trueStatus"
+                  :false-value="falseStatus"
+                  v-model="item.is_necessary">
+                </bk-checkbox>
+                <span>=</span>
+                <bk-input style="width: calc(100% - 185px); float: right;"
+                  class="bk-run-input"
+                  v-model="item.value">
+                </bk-input>
+              </li>
+            </ul>
+          </template>
+        </bk-collapse-item>
+        <bk-collapse-item name="2">
+          Body
+          <div slot="content" class="mb10">
+            <ace
+              :value="bodyDetailConfig.value"
+              :width="bodyDetailConfig.width"
+              :height="bodyDetailConfig.height"
+              :read-only="bodyDetailConfig.readOnly"
+              :lang="bodyDetailConfig.lang"
+              :full-screen="bodyDetailConfig.fullScreen"
+              :theme="'textmate'"
+              @blur="blur">
+            </ace>
+          </div>
+        </bk-collapse-item>
+      </bk-collapse>
     </div>
+  </div>
 </template>
 
 <script>

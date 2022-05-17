@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div class="bk-get-param">
-        <bk-table
-            v-if="isStatic"
-            :data="sopsTableInfo"
-            :ext-cls="'bk-editor-table'">
-            <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
-                <template slot-scope="props">
-                    <span>{{props.row.value || '--'}}</span>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <!-- <bk-table :ext-cls="'bk-editor-table'"
+  <div class="bk-get-param">
+    <bk-table
+      v-if="isStatic"
+      :data="sopsTableInfo"
+      :ext-cls="'bk-editor-table'">
+      <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="400">
+        <template slot-scope="props">
+          <span>{{props.row.value || '--'}}</span>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <!-- <bk-table :ext-cls="'bk-editor-table'"
             :data="paramTableShow"
             :size="'small'">
             <bk-table-column :label="$t(`m.treeinfo['字段名']`)" prop="name"></bk-table-column>
@@ -87,61 +87,61 @@
                 </template>
             </bk-table-column>
         </bk-table> -->
-        <div class="sops-form">
-            <render-form
-                ref="renderForm"
-                :form-option="formOptions"
-                :constants="constants"
-                :context="context"
-                :key="renderKey"
-                v-model="formData"
-                :hooked="hookedVarList"
-                @configLoadingChange="configLoading = $event">
-                <template slot="tagHook" slot-scope="{ scheme }">
-                    <div class="hook-area">
-                        <bk-checkbox
-                            :disabled="disabled || disabledRenderForm"
-                            :value="!!hookedVarList[scheme.tag_code]"
-                            @change="onHookChange($event, scheme)">
-                            {{ $t(`m.tickets["引用变量"]`) }}
-                        </bk-checkbox>
-                        <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
-                            <bk-select
-                                :disabled="disabled || disabledRenderForm"
-                                :clearable="false"
-                                :value="formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
-                                @selected="onSelectVar($event, scheme)">
-                                <bk-option
-                                    v-for="varItem in stateList"
-                                    :key="varItem.key"
-                                    :id="varItem.key"
-                                    :name="varItem.name">
-                                    {{ varItem.name }}
-                                </bk-option>
-                            </bk-select>
-                        </div>
-                    </div>
-                </template>
-            </render-form>
-        </div>
-        <div class="bk-add-slider" v-if="sliderInfo.show && isStatic === false">
-            <bk-sideslider
-                :is-show.sync="sliderInfo.show"
-                :title="sliderInfo.title"
-                :width="sliderInfo.width">
-                <div class="p20" slot="content">
-                    <add-field
-                        :change-info="changeInfo"
-                        :sosp-info="showTabData"
-                        :workflow="flowInfo.id"
-                        :state="configur.id"
-                        @closeShade="closeShade"
-                        @getRelatedFields="getRelatedFields">
-                    </add-field>
-                </div>
-            </bk-sideslider>
-        </div>
+    <div class="sops-form">
+      <render-form
+        ref="renderForm"
+        :form-option="formOptions"
+        :constants="constants"
+        :context="context"
+        :key="renderKey"
+        v-model="formData"
+        :hooked="hookedVarList"
+        @configLoadingChange="configLoading = $event">
+        <template slot="tagHook" slot-scope="{ scheme }">
+          <div class="hook-area">
+            <bk-checkbox
+              :disabled="disabled || disabledRenderForm"
+              :value="!!hookedVarList[scheme.tag_code]"
+              @change="onHookChange($event, scheme)">
+              {{ $t(`m.tickets["引用变量"]`) }}
+            </bk-checkbox>
+            <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
+              <bk-select
+                :disabled="disabled || disabledRenderForm"
+                :clearable="false"
+                :value="formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
+                @selected="onSelectVar($event, scheme)">
+                <bk-option
+                  v-for="varItem in stateList"
+                  :key="varItem.key"
+                  :id="varItem.key"
+                  :name="varItem.name">
+                  {{ varItem.name }}
+                </bk-option>
+              </bk-select>
+            </div>
+          </div>
+        </template>
+      </render-form>
     </div>
+    <div class="bk-add-slider" v-if="sliderInfo.show && isStatic === false">
+      <bk-sideslider
+        :is-show.sync="sliderInfo.show"
+        :title="sliderInfo.title"
+        :width="sliderInfo.width">
+        <div class="p20" slot="content">
+          <add-field
+            :change-info="changeInfo"
+            :sosp-info="showTabData"
+            :workflow="flowInfo.id"
+            :state="configur.id"
+            @closeShade="closeShade"
+            @getRelatedFields="getRelatedFields">
+          </add-field>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 
 <script>

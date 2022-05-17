@@ -21,370 +21,370 @@
   -->
 
 <template>
-    <div class="bk-add-field" v-bkloading="{ isLoading: isDataLoading }">
-        <bk-form
-            class="bk-add-field bk-form-vertical"
-            :label-width="200"
-            :form-type="formAlign"
-            :model="formInfo"
-            :rules="rules"
-            ref="fieldForm">
-            <template v-if="Object.keys(sospInfo).length">
-                <bk-form-item
-                    :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
-                    :label="$t(`m.treeinfo['前置节点']`)"
-                    :required="true"
-                    :property="'prevId'"
-                    :error-display-type="'normal'"
-                    :ext-cls="'bk-mt0-item'">
-                    <bk-select v-model="formInfo.prevId"
-                        searchable>
-                        <bk-option v-for="option in prevNodeList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-            </template>
-            <bk-form-item
-                data-test-id="field-input-fieldName"
-                :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
-                :label="$t(`m.treeinfo['字段名']`)"
-                :required="true"
-                :property="'name'"
-                :error-display-type="'normal'"
-                :ext-cls="'bk-halfline-item bk-halfline-margin'">
-                <bk-input maxlength="120"
-                    v-model="formInfo.name"
-                    @change="fieldNameChange"
-                    :disabled="changeInfo.source === 'TABLE' && formInfo.key !== 'bk_biz_id'"
-                    :placeholder="$t(`m.treeinfo['请输入字段显示名']`)"
-                    @input="putKey">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
-                :label="$t(`m.treeinfo['唯一标识']`)"
-                :required="true"
-                :property="'key'"
-                :error-display-type="'normal'"
-                :ext-cls="'bk-halfline-item'">
-                <bk-input
-                    v-model="formInfo.key"
-                    :placeholder="$t(`m.treeinfo['请输入唯一标识']`)"
-                    :disabled="typeof changeInfo.id === 'number' || changeInfo.is_builtin || changeInfo.source === 'TABLE'">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                data-test-id="field-select-fieldType"
-                :label="$t(`m.treeinfo['字段类型']`)"
-                :required="true"
-                :property="'type'"
-                :error-display-type="'normal'"
-                :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
-                <bk-select v-model="formInfo.type"
-                    :clearable="false"
-                    :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
-                    searchable
-                    @selected="changeType">
-                    <bk-option v-for="option in fieldTypeList"
-                        :key="option.typeName"
-                        :id="option.typeName"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.treeinfo['校验方式']`)"
-                :required="true"
-                :error-display-type="'normal'"
-                :ext-cls="'bk-halfline-item bk-mt20-item'">
-                <bk-select v-model="formInfo.regex"
-                    :clearable="false"
-                    :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
-                    searchable
-                    @selected="changeRegex">
-                    <bk-option v-for="option in regexList"
-                        :key="option.typeName"
-                        :id="option.typeName"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <div class="bk-form-item bk-relate-conditions" style="width: 100%"
-                v-if="formInfo.regex === 'ASSOCIATED_FIELD_VALIDATION' && !isEditPublic">
-                <div class="bk-form-content" style="margin-left: 0">
-                    <p class="bk-form-p">{{$t(`m.newCommon["字段间关系"]`)}}</p>
-                    <bk-radio-group v-model="formInfo.regex_config.rule.type">
-                        <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
-                        <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
-                    </bk-radio-group>
-                </div>
-                <div class="bk-between-form"
-                    v-for="(expression, index) in formInfo.regex_config.rule.expressions"
-                    :key="index">
-                    <p class="current-field">{{$t(`m.newCommon["当前字段"]`)}}</p>
-                    <bk-select style="width: 120px"
-                        :ext-cls="'field-valid-select'"
-                        v-model="expression.condition"
-                        :clearable="false">
-                        <bk-option v-for="option in betweenList"
-                            :key="option.id"
-                            :id="option.typeName"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                    <bk-select style="width: 210px"
-                        :ext-cls="'field-valid-select'"
-                        v-model="expression.key"
-                        :clearable="false"
-                        @change="onRegexFieldChange($event, expression)">
-                        <bk-option v-for="option in regexFieldList"
-                            :key="option.id"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                    <div class="bk-between-operate">
-                        <i class="bk-itsm-icon icon-flow-add" @click="addExpression()"></i>
-                        <i class="bk-itsm-icon icon-flow-reduce"
-                            :class="{ 'bk-no-delete': formInfo.regex_config.rule.expressions.length === 1 }"
-                            @click="deleteExpression(index)"></i>
-                    </div>
-                </div>
-            </div>
-            <template v-if="formInfo.regex === 'CUSTOM'">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['正则规则']`)"
-                    :required="true"
-                    :property="'key'"
-                    :error-display-type="'normal'"
-                    :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
-                    <bk-input
-                        v-model="formInfo.customRegex"
-                        :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-                        :placeholder="$t(`m.treeinfo['请输入正则规则']`)">
-                    </bk-input>
-                </bk-form-item>
-            </template>
-        </bk-form>
-        <bk-form
-            :label-width="200"
-            class="bk-form-vertical"
-            :form-type="formAlign"
-            :model="formInfo"
-            ref="dataForm">
-            <template v-if="showType.sourceList.some(type => type === formInfo.type)">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['数据源']`)"
-                    :required="true"
-                    :ext-cls="'bk-mt20-item'">
-                    <data-source ref="dataSource"
-                        :form-info="formInfo"
-                        :prc-data="prcData"
-                        :change-info="assignValue"
-                        :api-info="apiInfo.api_info"
-                        :dictionary-data="dictionaryData"
-                        @changeApiInfo="changeApiInfo"
-                        @getRpcData="getRpcData">
-                    </data-source>
-                </bk-form-item>
-                <template v-if="(formInfo.source_type !== 'DATADICT' && formInfo.source_type !== 'RPC') || (formInfo.source_type === 'RPC' && prcTable.length)">
-                    <template v-for="(node, nodeIndex) in globalChoise.source_type">
-                        <bk-form-item
-                            v-if="node.typeName === formInfo.source_type"
-                            :key="nodeIndex"
-                            :label="node.name"
-                            :desc="node.desc"
-                            :required="true"
-                            :ext-cls="'bk-mt20-item'">
-                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
-                            <bk-dialog
-                                v-model="isShowDataSource"
-                                width="960"
-                                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
-                                theme="primary"
-                                :mask-close="false">
-                                <data-content ref="dataContent"
-                                    :form-info="formInfo"
-                                    :workflow="workflow"
-                                    :state="state"
-                                    :change-info="assignValue"
-                                    :api-detail="apiDetail"
-                                    :api-info="apiInfo.api_info"
-                                    :kv-relation="apiInfo.kv_relation"
-                                    :prc-table="prcTable"
-                                    :field-info="fieldInfo">
-                                </data-content>
-                            </bk-dialog>
-                        </bk-form-item>
-                    </template>
-                </template>
-            </template>
-            <template v-if="formInfo.type === 'CUSTOMTABLE'">
-                <bk-form-item
-                    data-test-id="field_form_custom"
-                    :label="$t(`m.treeinfo['自定义数据']`)"
-                    :required="true"
-                    :ext-cls="'bk-mt20-item'">
-                    <div @click="checkStatus.customTableStatus = false">
-                        <custom-table-data :custom-table-info="customTableInfo"></custom-table-data>
-                        <p class="bk-field-error" v-if="checkStatus.customTableStatus">{{ $t('m.treeinfo["请填写正确格式的自定义数据"]') }}</p>
-                    </div>
-                    <div class="bk-form-disabled" v-if="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"></div>
-                </bk-form-item>
-            </template>
-            <template v-if="formInfo.type === 'FILE'">
-                <bk-form-item :ext-cls="'bk-input-position bk-mt20-item'"
-                    :label="$t(`m.treeinfo['上传附件模板']`)">
-                    <bk-button :theme="'default'" :title="$t(`m.treeinfo['点击上传']`)">
-                        {{$t(`m.treeinfo['点击上传']`)}}
-                    </bk-button>
-                    <input type="file" :value="fileVal" class="bk-input-file" @change="handleFile">
-                    <ul class="bk-file-list">
-                        <li v-for="(item, index) in fileList" :key="index">
-                            <span class="bk-file-success">
-                                <i class="bk-icon icon-check-1"></i>
-                            </span>
-                            <span>{{item.name}}</span>
-                            <span class="bk-file-delete" @click="deleteFile(item, index)">×</span>
-                        </li>
-                    </ul>
-                    <div class="bk-form-disabled" v-if="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"></div>
-                </bk-form-item>
-            </template>
-            <template v-if="showType.belongDefaultList.some(belong => formInfo.type === belong)">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['默认值']`)"
-                    :ext-cls="'bk-mt20-item'">
-                    <default-value
-                        :form-info="formInfo"
-                        :field-info="fieldInfo"
-                        :dictionary-data="dictionaryData"
-                        :change-info="changeInfo"
-                        :api-info="apiInfo"
-                        :check-status="checkStatus"
-                        :label="$t(`m.treeinfo['默认值']`)">
-                    </default-value>
-                </bk-form-item>
-            </template>
-            <!-- 公共字段不需要填写布局和填写规则 -->
-            <template v-if="!(addOrigin.isOther && addOrigin.addOriginInfo.type === 'publicField')">
-                <bk-form-item :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'"
-                    :label="$t(`m.treeinfo['布局要求']`)"
-                    :required="true">
-                    <bk-radio-group v-model="formInfo.layout">
-                        <template v-for="(layout, layoutIndex) in globalChoise.layout_type">
-                            <bk-radio :ext-cls="'mr20'"
-                                :key="layoutIndex"
-                                :value="layout.typeName"
-                                :disabled="showType.layoutList.some(node => node === formInfo.type)">
-                                {{layout.name}}
-                            </bk-radio>
-                        </template>
-                    </bk-radio-group>
-                </bk-form-item>
-                <bk-form-item :ext-cls="'bk-halfline-item bk-mt20-item'"
-                    :label="$t(`m.treeinfo['字段必填']`)"
-                    :required="true">
-                    <bk-radio-group v-model="formInfo.validate">
-                        <template v-for="(validate, validateIndex) in globalChoise.validate_type">
-                            <bk-radio :ext-cls="'mr20'"
-                                :key="validateIndex"
-                                :value="validate.typeName"
-                                :disabled="changeInfo.key === 'title' || changeInfo.is_builtin || formInfo.key === 'bk_biz_id'">
-                                {{validate.name}}
-                            </bk-radio>
-                        </template>
-                    </bk-radio-group>
-                </bk-form-item>
-            </template>
-            <bk-form-item :ext-cls="'bk-tanble-height bk-mt20-item'"
-                :label="$t(`m.treeinfo['填写说明']`)">
-                <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
-                <textarea
-                    class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin field-input-tips"
-                    :placeholder="$t(`m.treeinfo['请输入字段填写说明']`)"
-                    :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-                    v-model.trim="formInfo.desc">
-                </textarea>
-                <p class="field-tips-checkbox" style="margin-left: 335px;">
-                    <bk-checkbox
-                        :true-value="trueStatus"
-                        :false-value="falseStatus"
-                        :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-                        v-model="formInfo.is_tips">
-                        {{ $t('m.treeinfo["添加额外提示说明"]') }}
-                    </bk-checkbox>
-                </p>
-            </bk-form-item>
-            <template v-if="formInfo.is_tips">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['字段释疑']`)"
-                    :required="true"
-                    :ext-cls="'bk-mt20-item'">
-                    <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
-                    <textarea :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-                        class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin"
-                        :placeholder="$t(`m.treeinfo['请输入，用于鼠标经过提示']`)"
-                        v-model.trim="formInfo.tips">
-                    </textarea>
-                    <p class="bk-label-tips">
-                        <span v-bk-tooltips.top="(formInfo.tips || $t(`m.treeinfo['字段释疑填填看哦']`))">
-                            {{ $t('m.treeinfo["效果预览"]') }}
-                        </span>
-                    </p>
-                    <div class="bk-form-disabled" v-if="changeInfo.source === 'TABLE' || changeInfo.is_builtin"></div>
-                </bk-form-item>
-            </template>
-            <!-- 公共字段不需要填写条件隐藏' -->
-            <template v-if="!(addOrigin.isOther && addOrigin.addOriginInfo.type === 'publicField') && (changeInfo.meta && changeInfo.meta.code !== 'APPROVE_RESULT')">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['是否设置字段隐藏条件']`)"
-                    :ext-cls="'bk-mt20-item'">
-                    <bk-switcher v-model="formInfo.show_type"
-                        size="small"
-                        :disabled="changeInfo.key === 'title'">
-                    </bk-switcher>
-                </bk-form-item>
-                <template v-if="formInfo.show_type">
-                    <bk-form-item
-                        :label="$t(`m.treeinfo['隐藏条件']`)"
-                        :desc="$t(`m.treeinfo['字段默认为显示。当满足以下配置条件时，该字段将会被隐藏。']`)"
-                        :ext-cls="'bk-mt20-item'">
-                        <hidden-conditions
-                            ref="hiddenConditions"
-                            :template-info="templateInfo"
-                            :template-stage="templateStage"
-                            :add-origin="addOrigin"
-                            :workflow="workflow"
-                            :state="state"
-                            :form-info="formInfo">
-                        </hidden-conditions>
-                    </bk-form-item>
-                </template>
-            </template>
-        </bk-form>
-        <div class="operate-btns mt20">
-            <bk-button :theme="'primary'"
-                data-test-id="field_button_submit"
-                :title="$t(`m.treeinfo['提交']`)"
-                :loading="secondClick"
-                class="mr10"
-                @click="checkInfo">
-                {{$t(`m.treeinfo['提交']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="field_button_cancel"
-                :title="$t(`m.treeinfo['取消']`)"
-                :disabled="secondClick"
-                class="mr10"
-                @click="onCancelClick">
-                {{$t(`m.treeinfo['取消']`)}}
-            </bk-button>
+  <div class="bk-add-field" v-bkloading="{ isLoading: isDataLoading }">
+    <bk-form
+      class="bk-add-field bk-form-vertical"
+      :label-width="200"
+      :form-type="formAlign"
+      :model="formInfo"
+      :rules="rules"
+      ref="fieldForm">
+      <template v-if="Object.keys(sospInfo).length">
+        <bk-form-item
+          :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
+          :label="$t(`m.treeinfo['前置节点']`)"
+          :required="true"
+          :property="'prevId'"
+          :error-display-type="'normal'"
+          :ext-cls="'bk-mt0-item'">
+          <bk-select v-model="formInfo.prevId"
+            searchable>
+            <bk-option v-for="option in prevNodeList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+      </template>
+      <bk-form-item
+        data-test-id="field-input-fieldName"
+        :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
+        :label="$t(`m.treeinfo['字段名']`)"
+        :required="true"
+        :property="'name'"
+        :error-display-type="'normal'"
+        :ext-cls="'bk-halfline-item bk-halfline-margin'">
+        <bk-input maxlength="120"
+          v-model="formInfo.name"
+          @change="fieldNameChange"
+          :disabled="changeInfo.source === 'TABLE' && formInfo.key !== 'bk_biz_id'"
+          :placeholder="$t(`m.treeinfo['请输入字段显示名']`)"
+          @input="putKey">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :style="{ marginTop: formAlign === 'vertical' ? 0 : '20px' }"
+        :label="$t(`m.treeinfo['唯一标识']`)"
+        :required="true"
+        :property="'key'"
+        :error-display-type="'normal'"
+        :ext-cls="'bk-halfline-item'">
+        <bk-input
+          v-model="formInfo.key"
+          :placeholder="$t(`m.treeinfo['请输入唯一标识']`)"
+          :disabled="typeof changeInfo.id === 'number' || changeInfo.is_builtin || changeInfo.source === 'TABLE'">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        data-test-id="field-select-fieldType"
+        :label="$t(`m.treeinfo['字段类型']`)"
+        :required="true"
+        :property="'type'"
+        :error-display-type="'normal'"
+        :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
+        <bk-select v-model="formInfo.type"
+          :clearable="false"
+          :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+          searchable
+          @selected="changeType">
+          <bk-option v-for="option in fieldTypeList"
+            :key="option.typeName"
+            :id="option.typeName"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.treeinfo['校验方式']`)"
+        :required="true"
+        :error-display-type="'normal'"
+        :ext-cls="'bk-halfline-item bk-mt20-item'">
+        <bk-select v-model="formInfo.regex"
+          :clearable="false"
+          :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+          searchable
+          @selected="changeRegex">
+          <bk-option v-for="option in regexList"
+            :key="option.typeName"
+            :id="option.typeName"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <div class="bk-form-item bk-relate-conditions" style="width: 100%"
+        v-if="formInfo.regex === 'ASSOCIATED_FIELD_VALIDATION' && !isEditPublic">
+        <div class="bk-form-content" style="margin-left: 0">
+          <p class="bk-form-p">{{$t(`m.newCommon["字段间关系"]`)}}</p>
+          <bk-radio-group v-model="formInfo.regex_config.rule.type">
+            <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
+            <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
+          </bk-radio-group>
         </div>
+        <div class="bk-between-form"
+          v-for="(expression, index) in formInfo.regex_config.rule.expressions"
+          :key="index">
+          <p class="current-field">{{$t(`m.newCommon["当前字段"]`)}}</p>
+          <bk-select style="width: 120px"
+            :ext-cls="'field-valid-select'"
+            v-model="expression.condition"
+            :clearable="false">
+            <bk-option v-for="option in betweenList"
+              :key="option.id"
+              :id="option.typeName"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <bk-select style="width: 210px"
+            :ext-cls="'field-valid-select'"
+            v-model="expression.key"
+            :clearable="false"
+            @change="onRegexFieldChange($event, expression)">
+            <bk-option v-for="option in regexFieldList"
+              :key="option.id"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <div class="bk-between-operate">
+            <i class="bk-itsm-icon icon-flow-add" @click="addExpression()"></i>
+            <i class="bk-itsm-icon icon-flow-reduce"
+              :class="{ 'bk-no-delete': formInfo.regex_config.rule.expressions.length === 1 }"
+              @click="deleteExpression(index)"></i>
+          </div>
+        </div>
+      </div>
+      <template v-if="formInfo.regex === 'CUSTOM'">
+        <bk-form-item
+          :label="$t(`m.treeinfo['正则规则']`)"
+          :required="true"
+          :property="'key'"
+          :error-display-type="'normal'"
+          :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'">
+          <bk-input
+            v-model="formInfo.customRegex"
+            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+            :placeholder="$t(`m.treeinfo['请输入正则规则']`)">
+          </bk-input>
+        </bk-form-item>
+      </template>
+    </bk-form>
+    <bk-form
+      :label-width="200"
+      class="bk-form-vertical"
+      :form-type="formAlign"
+      :model="formInfo"
+      ref="dataForm">
+      <template v-if="showType.sourceList.some(type => type === formInfo.type)">
+        <bk-form-item
+          :label="$t(`m.treeinfo['数据源']`)"
+          :required="true"
+          :ext-cls="'bk-mt20-item'">
+          <data-source ref="dataSource"
+            :form-info="formInfo"
+            :prc-data="prcData"
+            :change-info="assignValue"
+            :api-info="apiInfo.api_info"
+            :dictionary-data="dictionaryData"
+            @changeApiInfo="changeApiInfo"
+            @getRpcData="getRpcData">
+          </data-source>
+        </bk-form-item>
+        <template v-if="(formInfo.source_type !== 'DATADICT' && formInfo.source_type !== 'RPC') || (formInfo.source_type === 'RPC' && prcTable.length)">
+          <template v-for="(node, nodeIndex) in globalChoise.source_type">
+            <bk-form-item
+              v-if="node.typeName === formInfo.source_type"
+              :key="nodeIndex"
+              :label="node.name"
+              :desc="node.desc"
+              :required="true"
+              :ext-cls="'bk-mt20-item'">
+              <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+              <bk-dialog
+                v-model="isShowDataSource"
+                width="960"
+                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
+                theme="primary"
+                :mask-close="false">
+                <data-content ref="dataContent"
+                  :form-info="formInfo"
+                  :workflow="workflow"
+                  :state="state"
+                  :change-info="assignValue"
+                  :api-detail="apiDetail"
+                  :api-info="apiInfo.api_info"
+                  :kv-relation="apiInfo.kv_relation"
+                  :prc-table="prcTable"
+                  :field-info="fieldInfo">
+                </data-content>
+              </bk-dialog>
+            </bk-form-item>
+          </template>
+        </template>
+      </template>
+      <template v-if="formInfo.type === 'CUSTOMTABLE'">
+        <bk-form-item
+          data-test-id="field_form_custom"
+          :label="$t(`m.treeinfo['自定义数据']`)"
+          :required="true"
+          :ext-cls="'bk-mt20-item'">
+          <div @click="checkStatus.customTableStatus = false">
+            <custom-table-data :custom-table-info="customTableInfo"></custom-table-data>
+            <p class="bk-field-error" v-if="checkStatus.customTableStatus">{{ $t('m.treeinfo["请填写正确格式的自定义数据"]') }}</p>
+          </div>
+          <div class="bk-form-disabled" v-if="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"></div>
+        </bk-form-item>
+      </template>
+      <template v-if="formInfo.type === 'FILE'">
+        <bk-form-item :ext-cls="'bk-input-position bk-mt20-item'"
+          :label="$t(`m.treeinfo['上传附件模板']`)">
+          <bk-button :theme="'default'" :title="$t(`m.treeinfo['点击上传']`)">
+            {{$t(`m.treeinfo['点击上传']`)}}
+          </bk-button>
+          <input type="file" :value="fileVal" class="bk-input-file" @change="handleFile">
+          <ul class="bk-file-list">
+            <li v-for="(item, index) in fileList" :key="index">
+              <span class="bk-file-success">
+                <i class="bk-icon icon-check-1"></i>
+              </span>
+              <span>{{item.name}}</span>
+              <span class="bk-file-delete" @click="deleteFile(item, index)">×</span>
+            </li>
+          </ul>
+          <div class="bk-form-disabled" v-if="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"></div>
+        </bk-form-item>
+      </template>
+      <template v-if="showType.belongDefaultList.some(belong => formInfo.type === belong)">
+        <bk-form-item
+          :label="$t(`m.treeinfo['默认值']`)"
+          :ext-cls="'bk-mt20-item'">
+          <default-value
+            :form-info="formInfo"
+            :field-info="fieldInfo"
+            :dictionary-data="dictionaryData"
+            :change-info="changeInfo"
+            :api-info="apiInfo"
+            :check-status="checkStatus"
+            :label="$t(`m.treeinfo['默认值']`)">
+          </default-value>
+        </bk-form-item>
+      </template>
+      <!-- 公共字段不需要填写布局和填写规则 -->
+      <template v-if="!(addOrigin.isOther && addOrigin.addOriginInfo.type === 'publicField')">
+        <bk-form-item :ext-cls="'bk-halfline-item bk-halfline-margin bk-mt20-item'"
+          :label="$t(`m.treeinfo['布局要求']`)"
+          :required="true">
+          <bk-radio-group v-model="formInfo.layout">
+            <template v-for="(layout, layoutIndex) in globalChoise.layout_type">
+              <bk-radio :ext-cls="'mr20'"
+                :key="layoutIndex"
+                :value="layout.typeName"
+                :disabled="showType.layoutList.some(node => node === formInfo.type)">
+                {{layout.name}}
+              </bk-radio>
+            </template>
+          </bk-radio-group>
+        </bk-form-item>
+        <bk-form-item :ext-cls="'bk-halfline-item bk-mt20-item'"
+          :label="$t(`m.treeinfo['字段必填']`)"
+          :required="true">
+          <bk-radio-group v-model="formInfo.validate">
+            <template v-for="(validate, validateIndex) in globalChoise.validate_type">
+              <bk-radio :ext-cls="'mr20'"
+                :key="validateIndex"
+                :value="validate.typeName"
+                :disabled="changeInfo.key === 'title' || changeInfo.is_builtin || formInfo.key === 'bk_biz_id'">
+                {{validate.name}}
+              </bk-radio>
+            </template>
+          </bk-radio-group>
+        </bk-form-item>
+      </template>
+      <bk-form-item :ext-cls="'bk-tanble-height bk-mt20-item'"
+        :label="$t(`m.treeinfo['填写说明']`)">
+        <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
+        <textarea
+          class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin field-input-tips"
+          :placeholder="$t(`m.treeinfo['请输入字段填写说明']`)"
+          :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+          v-model.trim="formInfo.desc">
+                </textarea>
+        <p class="field-tips-checkbox" style="margin-left: 335px;">
+          <bk-checkbox
+            :true-value="trueStatus"
+            :false-value="falseStatus"
+            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+            v-model="formInfo.is_tips">
+            {{ $t('m.treeinfo["添加额外提示说明"]') }}
+          </bk-checkbox>
+        </p>
+      </bk-form-item>
+      <template v-if="formInfo.is_tips">
+        <bk-form-item
+          :label="$t(`m.treeinfo['字段释疑']`)"
+          :required="true"
+          :ext-cls="'bk-mt20-item'">
+          <!-- 禁用：formInfo.isModule && formInfo.key!== 'bk_biz_id' -->
+          <textarea :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+            class="bk-form-textarea bk-textarea-tanble bk-halfline-item bk-halfline-margin"
+            :placeholder="$t(`m.treeinfo['请输入，用于鼠标经过提示']`)"
+            v-model.trim="formInfo.tips">
+                    </textarea>
+          <p class="bk-label-tips">
+            <span v-bk-tooltips.top="(formInfo.tips || $t(`m.treeinfo['字段释疑填填看哦']`))">
+              {{ $t('m.treeinfo["效果预览"]') }}
+            </span>
+          </p>
+          <div class="bk-form-disabled" v-if="changeInfo.source === 'TABLE' || changeInfo.is_builtin"></div>
+        </bk-form-item>
+      </template>
+      <!-- 公共字段不需要填写条件隐藏' -->
+      <template v-if="!(addOrigin.isOther && addOrigin.addOriginInfo.type === 'publicField') && (changeInfo.meta && changeInfo.meta.code !== 'APPROVE_RESULT')">
+        <bk-form-item
+          :label="$t(`m.treeinfo['是否设置字段隐藏条件']`)"
+          :ext-cls="'bk-mt20-item'">
+          <bk-switcher v-model="formInfo.show_type"
+            size="small"
+            :disabled="changeInfo.key === 'title'">
+          </bk-switcher>
+        </bk-form-item>
+        <template v-if="formInfo.show_type">
+          <bk-form-item
+            :label="$t(`m.treeinfo['隐藏条件']`)"
+            :desc="$t(`m.treeinfo['字段默认为显示。当满足以下配置条件时，该字段将会被隐藏。']`)"
+            :ext-cls="'bk-mt20-item'">
+            <hidden-conditions
+              ref="hiddenConditions"
+              :template-info="templateInfo"
+              :template-stage="templateStage"
+              :add-origin="addOrigin"
+              :workflow="workflow"
+              :state="state"
+              :form-info="formInfo">
+            </hidden-conditions>
+          </bk-form-item>
+        </template>
+      </template>
+    </bk-form>
+    <div class="operate-btns mt20">
+      <bk-button :theme="'primary'"
+        data-test-id="field_button_submit"
+        :title="$t(`m.treeinfo['提交']`)"
+        :loading="secondClick"
+        class="mr10"
+        @click="checkInfo">
+        {{$t(`m.treeinfo['提交']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        data-test-id="field_button_cancel"
+        :title="$t(`m.treeinfo['取消']`)"
+        :disabled="secondClick"
+        class="mr10"
+        @click="onCancelClick">
+        {{$t(`m.treeinfo['取消']`)}}
+      </bk-button>
     </div>
+  </div>
 </template>
 <script>
     import commonMix from '../../../../commonMix/common.js';

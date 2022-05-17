@@ -21,50 +21,50 @@
   -->
 
 <template>
-    <div class="bk-api-call">
-        <template v-for="(itemInfo, index) in item.wayInfo.field_schema">
-            <bk-form-item :ext-cls="'bk-field-schema mb20'"
-                :label="itemInfo.name"
-                :required="itemInfo.required"
-                :key="index"
-                :desc="itemInfo.tips">
-                <template v-if="itemInfo.key === 'api_source'">
-                    <bk-select :ext-cls="'bk-form-display'"
-                        v-model="itemInfo.systemId"
-                        :clearable="false"
-                        :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
-                        searchable
-                        @selected="changeCode(...arguments, itemInfo)">
-                        <bk-option v-for="option in apiSysList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                    <template v-if="itemInfo.systemId">
-                        <bk-select :ext-cls="'bk-form-display'"
-                            v-model="itemInfo.apiId"
-                            :clearable="false"
-                            searchable
-                            @selected="changeApi(...arguments, itemInfo)">
-                            <bk-option v-for="option in apiList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </template>
-                </template>
-                <template v-if="itemInfo.type === 'API_INFO' && apiId">
-                    <div style="min-height: 100px;" v-bkloading="{ isLoading: isLoading }">
-                        <input-params v-if="!isLoading"
-                            :item-info="itemInfo">
-                        </input-params>
-                    </div>
-                </template>
-            </bk-form-item>
+  <div class="bk-api-call">
+    <template v-for="(itemInfo, index) in item.wayInfo.field_schema">
+      <bk-form-item :ext-cls="'bk-field-schema mb20'"
+        :label="itemInfo.name"
+        :required="itemInfo.required"
+        :key="index"
+        :desc="itemInfo.tips">
+        <template v-if="itemInfo.key === 'api_source'">
+          <bk-select :ext-cls="'bk-form-display'"
+            v-model="itemInfo.systemId"
+            :clearable="false"
+            :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
+            searchable
+            @selected="changeCode(...arguments, itemInfo)">
+            <bk-option v-for="option in apiSysList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <template v-if="itemInfo.systemId">
+            <bk-select :ext-cls="'bk-form-display'"
+              v-model="itemInfo.apiId"
+              :clearable="false"
+              searchable
+              @selected="changeApi(...arguments, itemInfo)">
+              <bk-option v-for="option in apiList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </template>
         </template>
-    </div>
+        <template v-if="itemInfo.type === 'API_INFO' && apiId">
+          <div style="min-height: 100px;" v-bkloading="{ isLoading: isLoading }">
+            <input-params v-if="!isLoading"
+              :item-info="itemInfo">
+            </input-params>
+          </div>
+        </template>
+      </bk-form-item>
+    </template>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../../../utils/errorHandler';

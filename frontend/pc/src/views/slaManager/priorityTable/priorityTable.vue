@@ -21,106 +21,106 @@
   -->
 
 <template>
-    <div class="bk-priority-table">
-        <!-- 影响范围 -->
-        <div class="bk-priority-scope">
-            <p class="bk-scope-title" :class="{ 'bk-scope-title-en': localeCookie }">{{ $t('m.slaContent["优先级"]') }}</p>
-            <div class="bk-scope-list" :class="{ 'bk-min-height': !scopeList.length }">
-                <span class="bk-scope-info" :class="{ 'bk-scope-info-en': localeCookie }">
-                    {{ $t('m.slaContent["影响范围"]') }}
-                </span>
-                <bk-checkbox-group v-model="scopCheckList" @change="changeScopeCheck">
-                    <ul class="bk-scope-ul" :class="{ 'bk-scope-ul-en': localeCookie }">
-                        <li v-for="(item, index) in scopeList"
-                            :key="index"
-                            :class="{ 'bk-scope-none': index === scopeList.length - 1, 'bk-editor-el': priorityConten.editorStatus }"
-                            :style="{
-                                background: 'rgba(220, 222, 229, ' + (index * 0.15 + 0.1) + ')'
-                            }">
-                            <div class="bk-form-content bk-check-info"
-                                v-if="priorityConten.editorStatus">
-                                <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ item.name }}</bk-checkbox>
-                            </div>
-                            <span class="bk-normal-word" v-else>{{ item.name }}</span>
-                        </li>
-                    </ul>
-                </bk-checkbox-group>
-            </div>
-        </div>
-        <!-- 紧急程度 -->
-        <div class="bk-priority-degree">
-            <p class="bk-priority-info">{{ $t('m.slaContent["紧急程度"]') }}</p>
-            <bk-checkbox-group v-model="degreeCheckList" @change="changeDegreeCheck">
-                <ul class="bk-degree-ul"
-                    :class="{ 'bk-degree-ul-en': localeCookie }"
-                    style="font-weight: bold; min-height: 43px;">
-                    <li v-for="(item, index) in degreeList"
-                        :key="index"
-                        :style="{
-                            width: (100 / degreeList.length) + '%',
-                            background: 'rgba(220, 222, 229, ' + (index * 0.15 + 0.1) + ')'
-                        }"
-                        :class="{ 'bk-scope-none': index === degreeList.length - 1, 'bk-editor-el': priorityConten.editorStatus }">
-                        <div class="bk-form-content" v-if="priorityConten.editorStatus">
-                            <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ $t(`m["${ item.name }"]`)}}</bk-checkbox>
-                        </div>
-                        <span class="bk-normal-word" v-else>{{ $t(`m["${ item.name }"]`)}}</span>
-                    </li>
-                </ul>
-            </bk-checkbox-group>
-            <ul class="bk-degree-line" v-if="contentList.length">
-                <li v-for="(scopeItem, scopeIndex) in scopeList" :key="scopeIndex">
-                    <ul class="bk-degree-ul"
-                        :class="{ 'bk-scope-none': scopeIndex === scopeList.length - 1, 'bk-degree-other-en': localeCookie }">
-                        <li v-for="(degreeItem, degreeIndex) in degreeList"
-                            :key="degreeIndex"
-                            :style="{
-                                width: (100 / degreeList.length) + '%'
-                            }"
-                            :class="{ 'bk-scope-none': degreeIndex === degreeList.length - 1, 'bk-editor-style': priorityConten.editorStatus }">
-                            <div v-for="contentItem in contentList" :key="contentItem.id">
-                                <template v-if="contentItem.impact === scopeItem.key && contentItem.urgency === degreeItem.key">
-                                    <div class="bk-form-content" v-if="priorityConten.editorStatus" :class="{ 'bk-border-error': scopeItem.is_enabled && degreeItem.is_enabled && !contentItem.priority && isSub }">
-                                        <bk-select v-model="contentItem.priority"
-                                            :clearable="false"
-                                            searchable
-                                            :font-size="'medium'">
-                                            <bk-option v-for="option in typeList"
-                                                :key="option.key"
-                                                :id="option.key"
-                                                :name="option.name">
-                                                <span
-                                                    :style="'display: inline-block; margin-right: 10px; width: 8px; height: 8px;background-color: ' + typeColorList[option.key]"
-                                                ></span>
-                                                <span>{{ option.name }}</span>
-                                            </bk-option>
-                                        </bk-select>
-                                        <span class="in-select-icon" :style="'background-color: ' + typeColorList[contentItem.priority]"></span>
-                                    </div>
-                                    <span class="select-icon-father" v-else>
-                                        <span class="in-select-icon" :style="'background-color: ' + typeColorList[contentItem.priority]"></span>
-                                        {{typeList.filter(typeNode => typeNode.key === contentItem.priority).length ? typeList.filter(typeNode => typeNode.key === contentItem.priority)[0].name : '--'}}
-                                    </span>
-                                    <!-- 禁用面板 -->
-                                    <div class="bk-disabled-li" v-if="!degreeItem.is_enabled || !scopeItem.is_enabled"></div>
-                                </template>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            <template v-else>
-                <div class="bk-result">
-                    <img src="../../../images/box.png">
-                    <div class="bk-page-info">
-                        <p class="bk-p-black">
-                            {{ $t('m.deployPage["暂无数据"]') }}
-                        </p>
-                    </div>
-                </div>
-            </template>
-        </div>
+  <div class="bk-priority-table">
+    <!-- 影响范围 -->
+    <div class="bk-priority-scope">
+      <p class="bk-scope-title" :class="{ 'bk-scope-title-en': localeCookie }">{{ $t('m.slaContent["优先级"]') }}</p>
+      <div class="bk-scope-list" :class="{ 'bk-min-height': !scopeList.length }">
+        <span class="bk-scope-info" :class="{ 'bk-scope-info-en': localeCookie }">
+          {{ $t('m.slaContent["影响范围"]') }}
+        </span>
+        <bk-checkbox-group v-model="scopCheckList" @change="changeScopeCheck">
+          <ul class="bk-scope-ul" :class="{ 'bk-scope-ul-en': localeCookie }">
+            <li v-for="(item, index) in scopeList"
+              :key="index"
+              :class="{ 'bk-scope-none': index === scopeList.length - 1, 'bk-editor-el': priorityConten.editorStatus }"
+              :style="{
+                background: 'rgba(220, 222, 229, ' + (index * 0.15 + 0.1) + ')'
+              }">
+              <div class="bk-form-content bk-check-info"
+                v-if="priorityConten.editorStatus">
+                <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ item.name }}</bk-checkbox>
+              </div>
+              <span class="bk-normal-word" v-else>{{ item.name }}</span>
+            </li>
+          </ul>
+        </bk-checkbox-group>
+      </div>
     </div>
+    <!-- 紧急程度 -->
+    <div class="bk-priority-degree">
+      <p class="bk-priority-info">{{ $t('m.slaContent["紧急程度"]') }}</p>
+      <bk-checkbox-group v-model="degreeCheckList" @change="changeDegreeCheck">
+        <ul class="bk-degree-ul"
+          :class="{ 'bk-degree-ul-en': localeCookie }"
+          style="font-weight: bold; min-height: 43px;">
+          <li v-for="(item, index) in degreeList"
+            :key="index"
+            :style="{
+              width: (100 / degreeList.length) + '%',
+              background: 'rgba(220, 222, 229, ' + (index * 0.15 + 0.1) + ')'
+            }"
+            :class="{ 'bk-scope-none': index === degreeList.length - 1, 'bk-editor-el': priorityConten.editorStatus }">
+            <div class="bk-form-content" v-if="priorityConten.editorStatus">
+              <bk-checkbox :ext-cls="'cus-ellipsis'" :value="item.key" :title="item.name">{{ $t(`m["${ item.name }"]`)}}</bk-checkbox>
+            </div>
+            <span class="bk-normal-word" v-else>{{ $t(`m["${ item.name }"]`)}}</span>
+          </li>
+        </ul>
+      </bk-checkbox-group>
+      <ul class="bk-degree-line" v-if="contentList.length">
+        <li v-for="(scopeItem, scopeIndex) in scopeList" :key="scopeIndex">
+          <ul class="bk-degree-ul"
+            :class="{ 'bk-scope-none': scopeIndex === scopeList.length - 1, 'bk-degree-other-en': localeCookie }">
+            <li v-for="(degreeItem, degreeIndex) in degreeList"
+              :key="degreeIndex"
+              :style="{
+                width: (100 / degreeList.length) + '%'
+              }"
+              :class="{ 'bk-scope-none': degreeIndex === degreeList.length - 1, 'bk-editor-style': priorityConten.editorStatus }">
+              <div v-for="contentItem in contentList" :key="contentItem.id">
+                <template v-if="contentItem.impact === scopeItem.key && contentItem.urgency === degreeItem.key">
+                  <div class="bk-form-content" v-if="priorityConten.editorStatus" :class="{ 'bk-border-error': scopeItem.is_enabled && degreeItem.is_enabled && !contentItem.priority && isSub }">
+                    <bk-select v-model="contentItem.priority"
+                      :clearable="false"
+                      searchable
+                      :font-size="'medium'">
+                      <bk-option v-for="option in typeList"
+                        :key="option.key"
+                        :id="option.key"
+                        :name="option.name">
+                        <span
+                          :style="'display: inline-block; margin-right: 10px; width: 8px; height: 8px;background-color: ' + typeColorList[option.key]"
+                        ></span>
+                        <span>{{ option.name }}</span>
+                      </bk-option>
+                    </bk-select>
+                    <span class="in-select-icon" :style="'background-color: ' + typeColorList[contentItem.priority]"></span>
+                  </div>
+                  <span class="select-icon-father" v-else>
+                    <span class="in-select-icon" :style="'background-color: ' + typeColorList[contentItem.priority]"></span>
+                    {{typeList.filter(typeNode => typeNode.key === contentItem.priority).length ? typeList.filter(typeNode => typeNode.key === contentItem.priority)[0].name : '--'}}
+                  </span>
+                  <!-- 禁用面板 -->
+                  <div class="bk-disabled-li" v-if="!degreeItem.is_enabled || !scopeItem.is_enabled"></div>
+                </template>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <template v-else>
+        <div class="bk-result">
+          <img src="../../../images/box.png">
+          <div class="bk-page-info">
+            <p class="bk-p-black">
+              {{ $t('m.deployPage["暂无数据"]') }}
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script>

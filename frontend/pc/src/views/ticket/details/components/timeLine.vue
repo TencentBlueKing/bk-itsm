@@ -21,30 +21,30 @@
   -->
 
 <template>
-    <div class="bk-timeline-contain">
-        <div class="bk-timeline-contain-va">
-            <template v-for="(item, index) in lineList">
-                <li :key="index" :class="{ 'bk-timeline-item': true, 'content-va-sign': parent === 'sign' }">
-                    <div :class="{ 'bk-timeline-item-head-va': true, 'head-va-sign': parent === 'sign', 'head-va-sign-first': parent === 'sign' && !index }">
-                        <div class="bk-timeline-item-head">
-                            <header>
-                                <slot name="header" v-bind:item="item">
-                                </slot>
-                            </header>
-                        </div>
-                    </div>
-                    <div class="bk-timeline-item-content-va">
-                        <div class="bk-timeline-item-content">
-                            <main>
-                                <slot name="content" v-bind:item="item">
-                                </slot>
-                            </main>
-                        </div>
-                    </div>
-                </li>
-            </template>
-        </div>
+  <div class="bk-timeline-contain">
+    <div class="bk-timeline-contain-va">
+      <template v-for="(item, index) in lineList">
+        <li :key="index" :class="{ 'bk-timeline-item': true, 'content-va-sign': parent === 'sign' }">
+          <div :class="{ 'bk-timeline-item-head-va': true, 'head-va-sign': parent === 'sign', 'head-va-sign-first': parent === 'sign' && !index }">
+            <div class="bk-timeline-item-head">
+              <header>
+                <slot name="header" v-bind:item="item">
+                </slot>
+              </header>
+            </div>
+          </div>
+          <div class="bk-timeline-item-content-va">
+            <div class="bk-timeline-item-content">
+              <main>
+                <slot name="content" v-bind:item="item">
+                </slot>
+              </main>
+            </div>
+          </div>
+        </li>
+      </template>
     </div>
+  </div>
 </template>
 <script>
     export default {

@@ -21,71 +21,71 @@
   -->
 
 <template>
-    <div class="bk-deal-person">
-        <!-- 一级处理人 -->
-        <div class="bk-form-width">
-            <bk-select v-model="formData.levelOne"
-                :clearable="false"
-                searchable
-                @selected="getSecondLevelList">
-                <bk-option v-for="option in firstLevelList"
-                    :key="option.typeName"
-                    :id="option.typeName"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </div>
-        <!-- 二级处理人 -->
-        <template v-if="formData.levelOne !== 'ORGANIZATION'">
-            <div class="bk-form-width" v-if="formData.levelOne === 'VARIABLE'">
-                <bk-select v-model="formData.levelSecond"
-                    :loading="isLoading"
-                    show-select-all
-                    multiple
-                    searchable>
-                    <bk-option v-for="option in frontMemberField"
-                        :key="option.id"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-            <div class="bk-form-width" v-else-if="formData.levelOne === 'PERSON'">
-                <member-select v-model="formData.levelSecond">
-                </member-select>
-            </div>
-            <div class="bk-form-width" v-else-if="formData.levelOne === 'CMDB'">
-                <bk-select v-model="formData.levelSecond"
-                    :loading="isLoading"
-                    show-select-all
-                    searchable>
-                    <bk-option v-for="option in secondLevelList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-            <div class="bk-form-width" v-else-if="formData.levelOne === 'GENERAL'">
-                <bk-select v-model="formData.levelSecond"
-                    :loading="isLoading"
-                    searchable>
-                    <bk-option v-for="option in secondLevelList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-        </template>
-        <!-- 组织架构 -->
-        <div class="bk-form-width" v-if="formData.levelOne === 'ORGANIZATION'">
-            <select-tree
-                v-model="formData.levelSecond"
-                :list="organizationList">
-            </select-tree>
-        </div>
+  <div class="bk-deal-person">
+    <!-- 一级处理人 -->
+    <div class="bk-form-width">
+      <bk-select v-model="formData.levelOne"
+        :clearable="false"
+        searchable
+        @selected="getSecondLevelList">
+        <bk-option v-for="option in firstLevelList"
+          :key="option.typeName"
+          :id="option.typeName"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
     </div>
+    <!-- 二级处理人 -->
+    <template v-if="formData.levelOne !== 'ORGANIZATION'">
+      <div class="bk-form-width" v-if="formData.levelOne === 'VARIABLE'">
+        <bk-select v-model="formData.levelSecond"
+          :loading="isLoading"
+          show-select-all
+          multiple
+          searchable>
+          <bk-option v-for="option in frontMemberField"
+            :key="option.id"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
+      <div class="bk-form-width" v-else-if="formData.levelOne === 'PERSON'">
+        <member-select v-model="formData.levelSecond">
+        </member-select>
+      </div>
+      <div class="bk-form-width" v-else-if="formData.levelOne === 'CMDB'">
+        <bk-select v-model="formData.levelSecond"
+          :loading="isLoading"
+          show-select-all
+          searchable>
+          <bk-option v-for="option in secondLevelList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
+      <div class="bk-form-width" v-else-if="formData.levelOne === 'GENERAL'">
+        <bk-select v-model="formData.levelSecond"
+          :loading="isLoading"
+          searchable>
+          <bk-option v-for="option in secondLevelList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
+    </template>
+    <!-- 组织架构 -->
+    <div class="bk-form-width" v-if="formData.levelOne === 'ORGANIZATION'">
+      <select-tree
+        v-model="formData.levelSecond"
+        :list="organizationList">
+      </select-tree>
+    </div>
+  </div>
 </template>
 <script>
     import memberSelect from '../../commonComponent/memberSelect';

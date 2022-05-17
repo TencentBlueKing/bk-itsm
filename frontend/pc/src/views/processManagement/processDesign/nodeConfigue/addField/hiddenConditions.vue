@@ -21,85 +21,85 @@
   -->
 
 <template>
-    <div class="bk-hidden-conditions" @click="checkStatus = false" v-bkloading="{ isLoading: isLoading }">
-        <div class="bk-form-content" style="margin-left: 0">
-            <p class="bk-form-p">{{$t(`m.treeinfo['条件组间关系']`)}}</p>
-            <bk-radio-group v-model="conditionType">
-                <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
-                <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
-            </bk-radio-group>
-        </div>
-        <p class="bk-error-msg" v-if="checkStatus">{{$t(`m.treeinfo['关系名称，关系表达式，关系值不能为空']`)}}</p>
-        <i class="bk-icon icon-close"
-            @click="clearCondition"></i>
-        <div class="bk-between-form"
-            :class="{ 'mt20': nodeIndex }"
-            v-for="(node, nodeIndex) in listInfo"
-            :key="nodeIndex">
-            <bk-select style="width: 182px; float: left; margin-right: 10px;"
-                v-model="node.key"
-                searchable
-                @selected="changeName(...arguments, node)">
-                <bk-option v-for="option in fieldList"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <bk-select style="width: 120px; float: left; margin-right: 10px;"
-                v-model="node.condition"
-                searchable>
-                <bk-option v-for="option in node.betweenList"
-                    :key="option.typeName"
-                    :id="option.typeName"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <!-- 判断父元素的类型 来觉得第三个框的样式 -->
-            <template
-                v-if="node.type === 'SELECT' || node.type === 'MULTISELECT' || node.type === 'RADIO' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT'">
-                <template v-if="node.choiceList.length">
-                    <bk-select :ext-cls="'bk-form-style'"
-                        v-model="node.value"
-                        searchable
-                        :multiple="node.multiSelect">
-                        <bk-option v-for="option in node.choiceList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </template>
-                <template v-else>
-                    <bk-input :ext-cls="'bk-form-style'"
-                        :type="node.type === 'INT' ? 'number' : 'text'"
-                        :placeholder="$t(`m.treeinfo['请输入关系值']`)"
-                        v-model="node.value">
-                    </bk-input>
-                </template>
-            </template>
-            <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
-                <bk-date-picker
-                    :ext-cls="'bk-form-style'"
-                    :type="node.type === 'DATETIME' ? 'datetime' : 'date'"
-                    v-model="node.value">
-                </bk-date-picker>
-            </template>
-            <template v-else>
-                <bk-input :ext-cls="'bk-form-style'"
-                    :type="node.type === 'INT' ? 'number' : 'text'"
-                    :placeholder="$t(`m.treeinfo['请输入关系值']`)"
-                    v-model="node.value">
-                </bk-input>
-            </template>
-            <div class="bk-between-operat">
-                <i class="bk-itsm-icon icon-flow-add" @click="addNode(node, nodeIndex)"></i>
-                <i class="bk-itsm-icon icon-flow-reduce"
-                    :class="{ 'bk-no-delete': listInfo.length === 1 }"
-                    @click="deleteNode(node, nodeIndex)"></i>
-            </div>
-        </div>
+  <div class="bk-hidden-conditions" @click="checkStatus = false" v-bkloading="{ isLoading: isLoading }">
+    <div class="bk-form-content" style="margin-left: 0">
+      <p class="bk-form-p">{{$t(`m.treeinfo['条件组间关系']`)}}</p>
+      <bk-radio-group v-model="conditionType">
+        <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
+        <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
+      </bk-radio-group>
     </div>
+    <p class="bk-error-msg" v-if="checkStatus">{{$t(`m.treeinfo['关系名称，关系表达式，关系值不能为空']`)}}</p>
+    <i class="bk-icon icon-close"
+      @click="clearCondition"></i>
+    <div class="bk-between-form"
+      :class="{ 'mt20': nodeIndex }"
+      v-for="(node, nodeIndex) in listInfo"
+      :key="nodeIndex">
+      <bk-select style="width: 182px; float: left; margin-right: 10px;"
+        v-model="node.key"
+        searchable
+        @selected="changeName(...arguments, node)">
+        <bk-option v-for="option in fieldList"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <bk-select style="width: 120px; float: left; margin-right: 10px;"
+        v-model="node.condition"
+        searchable>
+        <bk-option v-for="option in node.betweenList"
+          :key="option.typeName"
+          :id="option.typeName"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <!-- 判断父元素的类型 来觉得第三个框的样式 -->
+      <template
+        v-if="node.type === 'SELECT' || node.type === 'MULTISELECT' || node.type === 'RADIO' || node.type === 'CHECKBOX' || node.type === 'MEMBERS' || node.type === 'TREESELECT'">
+        <template v-if="node.choiceList.length">
+          <bk-select :ext-cls="'bk-form-style'"
+            v-model="node.value"
+            searchable
+            :multiple="node.multiSelect">
+            <bk-option v-for="option in node.choiceList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </template>
+        <template v-else>
+          <bk-input :ext-cls="'bk-form-style'"
+            :type="node.type === 'INT' ? 'number' : 'text'"
+            :placeholder="$t(`m.treeinfo['请输入关系值']`)"
+            v-model="node.value">
+          </bk-input>
+        </template>
+      </template>
+      <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
+        <bk-date-picker
+          :ext-cls="'bk-form-style'"
+          :type="node.type === 'DATETIME' ? 'datetime' : 'date'"
+          v-model="node.value">
+        </bk-date-picker>
+      </template>
+      <template v-else>
+        <bk-input :ext-cls="'bk-form-style'"
+          :type="node.type === 'INT' ? 'number' : 'text'"
+          :placeholder="$t(`m.treeinfo['请输入关系值']`)"
+          v-model="node.value">
+        </bk-input>
+      </template>
+      <div class="bk-between-operat">
+        <i class="bk-itsm-icon icon-flow-add" @click="addNode(node, nodeIndex)"></i>
+        <i class="bk-itsm-icon icon-flow-reduce"
+          :class="{ 'bk-no-delete': listInfo.length === 1 }"
+          @click="deleteNode(node, nodeIndex)"></i>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../../../../utils/errorHandler.js';

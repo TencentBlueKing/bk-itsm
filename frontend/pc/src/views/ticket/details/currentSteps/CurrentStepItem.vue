@@ -21,309 +21,309 @@
   -->
 
 <template>
-    <div :class="['bk-content-node', `state_id_${nodeInfo.state_id}`]">
-        <!-- 线条 -->
-        <div class="bk-content-line" v-if="!isLastNode"></div>
-        <!-- 圆圈 -->
-        <!-- <div class="bk-node-circle"></div> -->
-        <!-- content -->
-        <div :class="['bk-node-info', { 'full-screen': isFullScreen }]">
-            <div class="bk-node-header">
-                <!-- sla 时间 -->
-                <p
-                    class="sla-time-info"
-                    v-if="nodeInfo.sla_task_status === 2"
-                    :style="{
-                        background: slaInfo.isTimeOut ? '#ffeded' : '#fafbfd'
-                    }">
-                    <span class="bk-operation-timeout" :style="'color: ' + slaInfo.color">
-                        <i
-                            :class="[
-                                'bk-itsm-icon',
-                                slaInfo.isTimeOut
-                                    ? 'icon-itsm-icon-mark-eight'
-                                    : 'icon-clock-new'
-                            ]"></i>
-                        <span style="margin-left: 8px">
-                            {{
-                                slaInfo.isTimeOut
-                                    ? $t('m.newCommon["超时："]')
-                                    : $t('m.newCommon["剩余："]')
-                            }}{{ nodeInfo.sla_timeout }}
-                        </span>
-                        <span style="margin-left: 5px">
-                            {{ $t('m.newCommon["计划完成时间："]')
-                            }}{{ nodeInfo.sla_deadline || "--" }}
-                        </span>
-                    </span>
-                </p>
-                <p class="bk-node-title">
-                    <!-- 折叠 icon -->
-                    <!-- <template v-if="hasNodeOptAuth">
+  <div :class="['bk-content-node', `state_id_${nodeInfo.state_id}`]">
+    <!-- 线条 -->
+    <div class="bk-content-line" v-if="!isLastNode"></div>
+    <!-- 圆圈 -->
+    <!-- <div class="bk-node-circle"></div> -->
+    <!-- content -->
+    <div :class="['bk-node-info', { 'full-screen': isFullScreen }]">
+      <div class="bk-node-header">
+        <!-- sla 时间 -->
+        <p
+          class="sla-time-info"
+          v-if="nodeInfo.sla_task_status === 2"
+          :style="{
+            background: slaInfo.isTimeOut ? '#ffeded' : '#fafbfd'
+          }">
+          <span class="bk-operation-timeout" :style="'color: ' + slaInfo.color">
+            <i
+              :class="[
+                'bk-itsm-icon',
+                slaInfo.isTimeOut
+                  ? 'icon-itsm-icon-mark-eight'
+                  : 'icon-clock-new'
+              ]"></i>
+            <span style="margin-left: 8px">
+              {{
+                slaInfo.isTimeOut
+                  ? $t('m.newCommon["超时："]')
+                  : $t('m.newCommon["剩余："]')
+              }}{{ nodeInfo.sla_timeout }}
+            </span>
+            <span style="margin-left: 5px">
+              {{ $t('m.newCommon["计划完成时间："]')
+              }}{{ nodeInfo.sla_deadline || "--" }}
+            </span>
+          </span>
+        </p>
+        <p class="bk-node-title">
+          <!-- 折叠 icon -->
+          <!-- <template v-if="hasNodeOptAuth">
                         <i v-if="unfold" class="bk-icon icon-down-shape icon-default"></i>
                         <i v-else class="bk-icon icon-right-shape icon-default"></i>
                     </template> -->
-                    <!-- 无权限提示 icon -->
-                    <!-- <i v-else
+          <!-- 无权限提示 icon -->
+          <!-- <i v-else
                         class="bk-itsm-icon icon-icon-no-permissions"
                         style="margin-left: 5px;"
                         v-bk-tooltips.top="$t(`m.newCommon['您暂无权限处理']`)">
                     </i> -->
-                    <!-- <span class="node-name">{{ nodeInfo.name }}</span> -->
-                    <span class="node-name">
-                        {{
-                            nodeAutoPass()
-                                ? `(${nodeInfo.name})` + $t(`m['审批节点已自动处理']`)
-                                : nodeInfo.name
-                        }}
-                    </span>
-                    <!-- 当前节点处理人 -->
+          <!-- <span class="node-name">{{ nodeInfo.name }}</span> -->
+          <span class="node-name">
+            {{
+              nodeAutoPass()
+                ? `(${nodeInfo.name})` + $t(`m['审批节点已自动处理']`)
+                : nodeInfo.name
+            }}
+          </span>
+          <!-- 当前节点处理人 -->
+          <span
+            :ref="'processorsSpan' + index"
+            class="node-title-processor"
+            v-bk-tooltips="{
+              allowHtml: true,
+              theme: 'light',
+              content: '#processor-tips-content',
+              placement: 'top',
+              duration: 300
+            }">
+            {{ $t(`m.newCommon['处理人：']`)
+            }}{{
+              !!currSignProcessorInfo ? signProcessors : nodeInfo.processors
+            }}
+          </span>
+          <!-- 会签人员信息 -->
+          <bk-popover placement="top" theme="light" trigger="click">
+            <span v-if="nodeInfo.type === 'SIGN'" class="bk-processor-check">
+              {{
+                nodeInfo.is_sequential
+                  ? $t(`m.newCommon['点击查看']`)
+                  : $t(`m.newCommon['查看会签顺序']`)
+              }}
+            </span>
+            <div class="bk-processor-content" slot="content">
+              <div
+                v-for="(processor, pIndex) in nodeInfo.tasks"
+                :key="pIndex"
+                class="bk-processor-one">
+                <div v-if="nodeInfo.is_sequential && pIndex" class="bk-arrow">
+                  <i class="bk-itsm-icon icon-arrow-long arrow-cus"></i>
+                </div>
+                <div class="bk-processor-span">
+                  <span class="mr5 ml5">
+                    {{ processor.processor }}
+                  </span>
+                  <span>
+                    <i
+                      v-if="processor.status === 'FINISHED'"
+                      class="bk-itsm-icon icon-icon-finish icon-icon-finish-cus"></i>
                     <span
-                        :ref="'processorsSpan' + index"
-                        class="node-title-processor"
-                        v-bk-tooltips="{
-                            allowHtml: true,
-                            theme: 'light',
-                            content: '#processor-tips-content',
-                            placement: 'top',
-                            duration: 300
-                        }">
-                        {{ $t(`m.newCommon['处理人：']`)
-                        }}{{
-                            !!currSignProcessorInfo ? signProcessors : nodeInfo.processors
-                        }}
+                      v-if="
+                        nodeInfo.is_sequential &&
+                          processor.status === 'WAIT' &&
+                          ((nodeInfo.tasks[pIndex - 1] &&
+                          nodeInfo.tasks[pIndex - 1].status === 'FINISHED') ||
+                          !pIndex)
+                      "
+                      class="loading">
+                      <i
+                        class="bk-itsm-icon icon-icon-loading icon-icon-loading-cus"></i>
                     </span>
-                    <!-- 会签人员信息 -->
-                    <bk-popover placement="top" theme="light" trigger="click">
-                        <span v-if="nodeInfo.type === 'SIGN'" class="bk-processor-check">
-                            {{
-                                nodeInfo.is_sequential
-                                    ? $t(`m.newCommon['点击查看']`)
-                                    : $t(`m.newCommon['查看会签顺序']`)
-                            }}
-                        </span>
-                        <div class="bk-processor-content" slot="content">
-                            <div
-                                v-for="(processor, pIndex) in nodeInfo.tasks"
-                                :key="pIndex"
-                                class="bk-processor-one">
-                                <div v-if="nodeInfo.is_sequential && pIndex" class="bk-arrow">
-                                    <i class="bk-itsm-icon icon-arrow-long arrow-cus"></i>
-                                </div>
-                                <div class="bk-processor-span">
-                                    <span class="mr5 ml5">
-                                        {{ processor.processor }}
-                                    </span>
-                                    <span>
-                                        <i
-                                            v-if="processor.status === 'FINISHED'"
-                                            class="bk-itsm-icon icon-icon-finish icon-icon-finish-cus"></i>
-                                        <span
-                                            v-if="
-                                                nodeInfo.is_sequential &&
-                                                    processor.status === 'WAIT' &&
-                                                    ((nodeInfo.tasks[pIndex - 1] &&
-                                                    nodeInfo.tasks[pIndex - 1].status === 'FINISHED') ||
-                                                    !pIndex)
-                                            "
-                                            class="loading">
-                                            <i
-                                                class="bk-itsm-icon icon-icon-loading icon-icon-loading-cus"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </bk-popover>
-                    <!-- 状态 icon, API 节点和标准运维节点才显示 -->
-                    <task-status :status="nodeInfo.status"></task-status>
-                </p>
-            </div>
-            <collapse-transition v-if="!readOnly">
-                <div class="bk-node-form" v-show="unfold">
-                    <!-- 禁用遮罩 -->
-                    <div
-                        class="bk-node-disabled"
-                        v-if="nodeInfo.status === 'SUSPEND'"></div>
-                    <div class="bk-form bk-form-vertical" v-if="hasNodeOptAuth">
-                        <!-- 节点任务 -->
-                        <node-task-list
-                            v-if="nodeInfo.can_create_task || nodeInfo.can_execute_task"
-                            :node-info="nodeInfo"
-                            :ticket-info="ticketInfo"
-                            @updateCurrentStep="successFn"></node-task-list>
-                        <sops-and-devops-task
-                            v-if="
-                                nodeInfo.status === 'FAILED' &&
-                                    (nodeInfo.type === 'TASK-SOPS' ||
-                                    nodeInfo.type === 'TASK-DEVOPS')
-                            "
-                            :constants="constants"
-                            :hooked-var-list="hookedVarList"
-                            :node-info="nodeInfo"
-                            :pipeline-list="pipelineList"
-                            :constant-default-value="constantDefaultValue"
-                            :ticket-info="ticketInfo"
-                            :workflow="workflow"
-                            :pipeline-constants="pipelineConstants"
-                            :pipeline-stages="pipelineStages"
-                            :pipeline-rules="pipelineRules"
-                            @reloadTicket="reloadTicket"
-                            @onChangeHook="onChangeHook"></sops-and-devops-task>
-                        <!-- api 节点处理 -->
-                        <api-node-handle-body
-                            v-if="nodeInfo.type === 'TASK'"
-                            :node-info="nodeInfo"
-                            :basic-infomation="ticketInfo"
-                            @updateOrderStatus="successFn">
-                            <!-- 节点触发器 -->
-                            <template
-                                #button-extend
-                                v-if="triggers && triggers.length && nodeInfo.can_operate">
-                                <bk-dropdown-menu
-                                    ref="dropdown"
-                                    class="bk-node-trigger"
-                                    :align="'right'"
-                                    :font-size="'medium'"
-                                    @show="isDropdownShow = true"
-                                    @hide="isDropdownShow = false">
-                                    <bk-button
-                                        class="node-trigger-btn"
-                                        slot="dropdown-trigger"
-                                        style="width: auto">
-                                        <span>
-                                            {{ $t('m.newCommon["更多操作"]') }}
-                                        </span>
-                                        <i
-                                            :class="[
-                                                'bk-icon icon-angle-down',
-                                                { 'icon-flip': isDropdownShow }
-                                            ]"></i>
-                                    </bk-button>
-                                    <ul class="bk-dropdown-list" slot="dropdown-content">
-                                        <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
-                                            <a
-                                                href="javascript:;"
-                                                @click="openTriggerDialog(trigger)">
-                                                {{ trigger.display_name }}
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </bk-dropdown-menu>
-                            </template>
-                        </api-node-handle-body>
-                        <div v-else-if="currSignProcessorInfo" class="bk-area-show-back">
-                            <!-- 静态展示 -->
-                            <template v-for="(ite, fIndex) in currSignProcessorInfo.fields">
-                                <fields-done
-                                    :key="fIndex"
-                                    :item="ite"
-                                    origin="log"></fields-done>
-                            </template>
-                        </div>
-                        <!-- 字段列表 -->
-                        <field-info
-                            v-else
-                            ref="fieldInfo"
-                            :fields="nodeInfo.fields"
-                            :all-field-list="allFieldList"></field-info>
-                    </div>
-                    <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
-                        <!-- 响应后才能处理 -->
-                        <template v-if="isShowDealBtns">
-                            <template v-for="(btn, btnIndex) in nodeInfo.operations">
-                                <bk-button
-                                    class="mr10"
-                                    v-if="ignoreOperations.indexOf(btn.key) === -1"
-                                    :key="btn.key"
-                                    :theme="btnIndex === 0 ? 'primary' : 'default'"
-                                    :title="btn.name"
-                                    :disabled="!btn.can_operate || !nodeInfo.is_schedule_ready"
-                                    :loading="isBtnLoading(nodeInfo) || submitting"
-                                    @click="clickBtn(btn)">
-                                    <template v-if="!nodeInfo.is_schedule_ready">
-                                        <span
-                                            v-bk-tooltips.top="
-                                                '请将任务列表中的任务全部处理完成之后再进行处理提交'
-                                            ">
-                                            {{ btn.name }}
-                                        </span>
-                                    </template>
-                                    <template v-else>
-                                        {{ btn.name }}
-                                    </template>
-                                </bk-button>
-                            </template>
-                        </template>
-                        <!-- 节点触发器 -->
-                        <bk-dropdown-menu
-                            v-if="triggers && triggers.length && nodeInfo.can_operate"
-                            ref="dropdown"
-                            class="bk-node-trigger"
-                            :align="'right'"
-                            :font-size="'medium'"
-                            @show="isDropdownShow = true"
-                            @hide="isDropdownShow = false">
-                            <bk-button
-                                class="node-trigger-btn"
-                                slot="dropdown-trigger"
-                                style="width: auto">
-                                <span>{{ $t('m.newCommon["更多操作"]') }}</span>
-                                <i
-                                    :class="[
-                                        'bk-icon icon-angle-down',
-                                        { 'icon-flip': isDropdownShow }
-                                    ]"></i>
-                            </bk-button>
-                            <ul class="bk-dropdown-list" slot="dropdown-content">
-                                <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
-                                    <a href="javascript:;" @click="openTriggerDialog(trigger)">
-                                        {{ trigger.display_name }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </bk-dropdown-menu>
-                    </div>
+                  </span>
                 </div>
-            </collapse-transition>
-            <bk-button
-                v-if="isShowAssgin && nodeInfo.type === 'APPROVAL'"
-                style="margin-left: 14px"
-                @click="
-                    clickBtn({
-                        can_operate: true,
-                        key: 'EXCEPTION_DISTRIBUTE',
-                        name: '异常分派'
-                    })
-                ">
-                异常分派
-            </bk-button>
-        </div>
-        <!-- 处理人 tips 内容 -->
-        <div id="processor-tips-content" class="bk-processor-content">
-            <div
-                class="bk-processor-one"
-                v-for="name in tipsProcessorsInfo.list"
-                :key="name">
-                <div class="bk-processor-span">{{ name }}</div>
+              </div>
             </div>
-            <div v-if="tipsProcessorsInfo.extend" class="bk-processor-one">
-                <div class="bk-processor-span" style="background: none">
-                    {{ tipsProcessorsInfo.extend }}
-                </div>
+          </bk-popover>
+          <!-- 状态 icon, API 节点和标准运维节点才显示 -->
+          <task-status :status="nodeInfo.status"></task-status>
+        </p>
+      </div>
+      <collapse-transition v-if="!readOnly">
+        <div class="bk-node-form" v-show="unfold">
+          <!-- 禁用遮罩 -->
+          <div
+            class="bk-node-disabled"
+            v-if="nodeInfo.status === 'SUSPEND'"></div>
+          <div class="bk-form bk-form-vertical" v-if="hasNodeOptAuth">
+            <!-- 节点任务 -->
+            <node-task-list
+              v-if="nodeInfo.can_create_task || nodeInfo.can_execute_task"
+              :node-info="nodeInfo"
+              :ticket-info="ticketInfo"
+              @updateCurrentStep="successFn"></node-task-list>
+            <sops-and-devops-task
+              v-if="
+                nodeInfo.status === 'FAILED' &&
+                  (nodeInfo.type === 'TASK-SOPS' ||
+                  nodeInfo.type === 'TASK-DEVOPS')
+              "
+              :constants="constants"
+              :hooked-var-list="hookedVarList"
+              :node-info="nodeInfo"
+              :pipeline-list="pipelineList"
+              :constant-default-value="constantDefaultValue"
+              :ticket-info="ticketInfo"
+              :workflow="workflow"
+              :pipeline-constants="pipelineConstants"
+              :pipeline-stages="pipelineStages"
+              :pipeline-rules="pipelineRules"
+              @reloadTicket="reloadTicket"
+              @onChangeHook="onChangeHook"></sops-and-devops-task>
+            <!-- api 节点处理 -->
+            <api-node-handle-body
+              v-if="nodeInfo.type === 'TASK'"
+              :node-info="nodeInfo"
+              :basic-infomation="ticketInfo"
+              @updateOrderStatus="successFn">
+              <!-- 节点触发器 -->
+              <template
+                #button-extend
+                v-if="triggers && triggers.length && nodeInfo.can_operate">
+                <bk-dropdown-menu
+                  ref="dropdown"
+                  class="bk-node-trigger"
+                  :align="'right'"
+                  :font-size="'medium'"
+                  @show="isDropdownShow = true"
+                  @hide="isDropdownShow = false">
+                  <bk-button
+                    class="node-trigger-btn"
+                    slot="dropdown-trigger"
+                    style="width: auto">
+                    <span>
+                      {{ $t('m.newCommon["更多操作"]') }}
+                    </span>
+                    <i
+                      :class="[
+                        'bk-icon icon-angle-down',
+                        { 'icon-flip': isDropdownShow }
+                      ]"></i>
+                  </bk-button>
+                  <ul class="bk-dropdown-list" slot="dropdown-content">
+                    <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
+                      <a
+                        href="javascript:;"
+                        @click="openTriggerDialog(trigger)">
+                        {{ trigger.display_name }}
+                      </a>
+                    </li>
+                  </ul>
+                </bk-dropdown-menu>
+              </template>
+            </api-node-handle-body>
+            <div v-else-if="currSignProcessorInfo" class="bk-area-show-back">
+              <!-- 静态展示 -->
+              <template v-for="(ite, fIndex) in currSignProcessorInfo.fields">
+                <fields-done
+                  :key="fIndex"
+                  :item="ite"
+                  origin="log"></fields-done>
+              </template>
             </div>
+            <!-- 字段列表 -->
+            <field-info
+              v-else
+              ref="fieldInfo"
+              :fields="nodeInfo.fields"
+              :all-field-list="allFieldList"></field-info>
+          </div>
+          <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
+            <!-- 响应后才能处理 -->
+            <template v-if="isShowDealBtns">
+              <template v-for="(btn, btnIndex) in nodeInfo.operations">
+                <bk-button
+                  class="mr10"
+                  v-if="ignoreOperations.indexOf(btn.key) === -1"
+                  :key="btn.key"
+                  :theme="btnIndex === 0 ? 'primary' : 'default'"
+                  :title="btn.name"
+                  :disabled="!btn.can_operate || !nodeInfo.is_schedule_ready"
+                  :loading="isBtnLoading(nodeInfo) || submitting"
+                  @click="clickBtn(btn)">
+                  <template v-if="!nodeInfo.is_schedule_ready">
+                    <span
+                      v-bk-tooltips.top="
+                        '请将任务列表中的任务全部处理完成之后再进行处理提交'
+                      ">
+                      {{ btn.name }}
+                    </span>
+                  </template>
+                  <template v-else>
+                    {{ btn.name }}
+                  </template>
+                </bk-button>
+              </template>
+            </template>
+            <!-- 节点触发器 -->
+            <bk-dropdown-menu
+              v-if="triggers && triggers.length && nodeInfo.can_operate"
+              ref="dropdown"
+              class="bk-node-trigger"
+              :align="'right'"
+              :font-size="'medium'"
+              @show="isDropdownShow = true"
+              @hide="isDropdownShow = false">
+              <bk-button
+                class="node-trigger-btn"
+                slot="dropdown-trigger"
+                style="width: auto">
+                <span>{{ $t('m.newCommon["更多操作"]') }}</span>
+                <i
+                  :class="[
+                    'bk-icon icon-angle-down',
+                    { 'icon-flip': isDropdownShow }
+                  ]"></i>
+              </bk-button>
+              <ul class="bk-dropdown-list" slot="dropdown-content">
+                <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
+                  <a href="javascript:;" @click="openTriggerDialog(trigger)">
+                    {{ trigger.display_name }}
+                  </a>
+                </li>
+              </ul>
+            </bk-dropdown-menu>
+          </div>
         </div>
-        <ticket-trigger-dialog
-            ref="triggerDialog"
-            @init-info="successFn"></ticket-trigger-dialog>
-        <node-deal-dialog
-            :node-info="nodeInfo"
-            :submitting="submitting"
-            :open-form-info="openFormInfo"
-            :all-groups="allGroups"
-            :ticket-info="ticketInfo"
-            @submitFormAjax="submitFormAjax"></node-deal-dialog>
+      </collapse-transition>
+      <bk-button
+        v-if="isShowAssgin && nodeInfo.type === 'APPROVAL'"
+        style="margin-left: 14px"
+        @click="
+          clickBtn({
+            can_operate: true,
+            key: 'EXCEPTION_DISTRIBUTE',
+            name: '异常分派'
+          })
+        ">
+        异常分派
+      </bk-button>
     </div>
+    <!-- 处理人 tips 内容 -->
+    <div id="processor-tips-content" class="bk-processor-content">
+      <div
+        class="bk-processor-one"
+        v-for="name in tipsProcessorsInfo.list"
+        :key="name">
+        <div class="bk-processor-span">{{ name }}</div>
+      </div>
+      <div v-if="tipsProcessorsInfo.extend" class="bk-processor-one">
+        <div class="bk-processor-span" style="background: none">
+          {{ tipsProcessorsInfo.extend }}
+        </div>
+      </div>
+    </div>
+    <ticket-trigger-dialog
+      ref="triggerDialog"
+      @init-info="successFn"></ticket-trigger-dialog>
+    <node-deal-dialog
+      :node-info="nodeInfo"
+      :submitting="submitting"
+      :open-form-info="openFormInfo"
+      :all-groups="allGroups"
+      :ticket-info="ticketInfo"
+      @submitFormAjax="submitFormAjax"></node-deal-dialog>
+  </div>
 </template>
 
 <script>

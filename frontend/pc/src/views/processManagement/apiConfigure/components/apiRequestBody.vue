@@ -21,170 +21,170 @@
   -->
 
 <template>
-    <div class="bk-request-body">
-        <ul class="child-node" v-if="!treeIndex">
-            <li class="vue-tree-item">
-                <div :class="['tree-node',{ 'down': true,'set-frist-pLeft': true,'active': true }]">
-                    <!-- 业务需求 -->
-                    <div class="bk-tree-body-form">
-                        <div class="bk-body-content">
-                            <div class="bk-content-left-body" style="padding-right: 5px;">
-                                <i class="bk-icon" style="
+  <div class="bk-request-body">
+    <ul class="child-node" v-if="!treeIndex">
+      <li class="vue-tree-item">
+        <div :class="['tree-node',{ 'down': true,'set-frist-pLeft': true,'active': true }]">
+          <!-- 业务需求 -->
+          <div class="bk-tree-body-form">
+            <div class="bk-body-content">
+              <div class="bk-content-left-body" style="padding-right: 5px;">
+                <i class="bk-icon" style="
                                 float: left;
                                 width: 24px;
                                 height: 32px;
                                 line-height: 32px;"></i>
-                                <div style="float: left;
+                <div style="float: left;
                                 width: calc(100% - 100px);
                                 margin-right: 3px;">
-                                    {{$t(`m.systemConfig['属性']`)}}
-                                </div>
-                                <div style="float: left;
+                  {{$t(`m.systemConfig['属性']`)}}
+                </div>
+                <div style="float: left;
                                 margin-left: 5px;
                                 width: 65px;">
-                                    {{$t(`m.systemConfig['是否必须']`)}}
-                                </div>
-                            </div>
-                            <div class="bk-content-right-body">
-                                <div class="bk-value-type">
-                                    {{$t(`m.systemConfig['类型']`)}}
-                                </div>
-                                <div class="bk-desc" :class="{ 'bk-big-desc': !isBody }">
-                                    {{$t(`m.systemConfig['备注']`)}}
-                                </div>
-                                <div class="bk-value-default" v-if="isBody">
-                                    {{$t(`m.systemConfig['默认值']`)}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  {{$t(`m.systemConfig['是否必须']`)}}
                 </div>
-            </li>
-        </ul>
-        <ul class="child-node">
-            <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
-                <div
-                    :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
-                    @click="toggle(item)">
-                    <!-- 业务需求 -->
-                    <div class="bk-tree-body-form">
-                        <div class="bk-body-content">
-                            <div class="bk-content-left-body" :style="pLeft">
-                                <i v-if="!item.showChildren && item.type === 'object'"
-                                    class="bk-icon icon-right-shape"
-                                    :class="{ 'bk-padding': !item.has_children }"
-                                    @click.stop="item.showChildren = true"></i>
-                                <i v-else-if="item.type === 'object'"
-                                    class="bk-icon icon-down-shape"
-                                    :class="{ 'bk-padding': !item.has_children }"
-                                    @click.stop="item.showChildren = false"></i>
-                                <i class="bk-icon" v-else style="
+              </div>
+              <div class="bk-content-right-body">
+                <div class="bk-value-type">
+                  {{$t(`m.systemConfig['类型']`)}}
+                </div>
+                <div class="bk-desc" :class="{ 'bk-big-desc': !isBody }">
+                  {{$t(`m.systemConfig['备注']`)}}
+                </div>
+                <div class="bk-value-default" v-if="isBody">
+                  {{$t(`m.systemConfig['默认值']`)}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ul class="child-node">
+      <li class="vue-tree-item" v-for="(item, index) in treeDataList" :key="index">
+        <div
+          :class="['tree-node',{ 'down': item.showChildren,'set-frist-pLeft': treeIndex + 1 === 1,'active': item.checkInfo }]"
+          @click="toggle(item)">
+          <!-- 业务需求 -->
+          <div class="bk-tree-body-form">
+            <div class="bk-body-content">
+              <div class="bk-content-left-body" :style="pLeft">
+                <i v-if="!item.showChildren && item.type === 'object'"
+                  class="bk-icon icon-right-shape"
+                  :class="{ 'bk-padding': !item.has_children }"
+                  @click.stop="item.showChildren = true"></i>
+                <i v-else-if="item.type === 'object'"
+                  class="bk-icon icon-down-shape"
+                  :class="{ 'bk-padding': !item.has_children }"
+                  @click.stop="item.showChildren = false"></i>
+                <i class="bk-icon" v-else style="
                                     float: left;
                                     width: 24px;
                                     height: 36px;
                                     line-height: 36px;"></i>
-                                <div class="bk-body-input">
-                                    <bk-input
-                                        :clearable="false"
-                                        :disabled="(!item.parentInfo && item.key === 'root') || item.parentInfo.type === 'array' || isBuiltin"
-                                        :placeholder="$t(`m.systemConfig['请输入']`)"
-                                        v-model="item.key">
-                                    </bk-input>
-                                </div>
-                                <div class="bk-body-check">
-                                    <bk-checkbox
-                                        :disabled="(!item.parentInfo && item.key === 'root') || item.parentInfo.type === 'array' || isBuiltin"
-                                        :true-value="trueStatus"
-                                        :false-value="falseStatus"
-                                        v-model="item.is_necessary">
-                                    </bk-checkbox>
-                                </div>
-                            </div>
-                            <div class="bk-content-right-body">
-                                <div class="bk-value-type">
-                                    <bk-select v-model="item.type"
-                                        :clearable="false"
-                                        :font-size="'medium'"
-                                        :disabled="!item.parentInfo && item.key === 'root' || isBuiltin"
-                                        @selected="changeType(item)">
-                                        <bk-option v-for="option in treeTypeList"
-                                            :key="option.id"
-                                            :id="option.id"
-                                            :name="option.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </div>
-                                <div class="bk-desc" :class="{ 'bk-big-desc': !isBody }">
-                                    <bk-input
-                                        :clearable="false"
-                                        :disabled="!item.parentInfo && item.key === 'root' || isBuiltin"
-                                        :placeholder="$t(`m.systemConfig['备注']`)"
-                                        v-model="item.desc">
-                                    </bk-input>
-                                </div>
-                                <div class="bk-value-default" v-if="isBody">
-                                    <template v-if="item.type === 'boolean'">
-                                        <bk-radio-group v-model="item.default">
-                                            <bk-radio :value="trueStatus" class="mr10">true</bk-radio>
-                                            <bk-radio :value="falseStatus">false</bk-radio>
-                                        </bk-radio-group>
-                                    </template>
-                                    <template v-else>
-                                        <bk-input
-                                            :type="item.type === 'INT' ? 'number' : 'text'"
-                                            v-model="item.default"
-                                            :placeholder="$t(`m.systemConfig['请输入默认值']`)"
-                                            :disabled="item.type !== 'string' && item.type !== 'number' && item.type !== 'boolean'">
-                                        </bk-input>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bk-design-add" v-if="!isBuiltin">
-                            <span class="bk-add-node">
-                                <i class="bk-itsm-icon icon-flow-add"></i>
-                                <div class="bk-add-other"
-                                    v-if="item.parentInfo.type === 'object' || item.type === 'object'">
-                                    <ul>
-                                        <li v-if="item.parentInfo && item.parentInfo.type === 'object'"
-                                            data-test-id="apiDetail_li_addBortherNode"
-                                            :title="$t(`m.systemConfig['兄弟节点']`)" @click.stop="addBrotherLine(item)">
-                                            <span>{{ $t('m.systemConfig["兄弟节点"]') }}</span>
-                                        </li>
-                                        <li v-if="item.type === 'object' || (item.type === 'array' && (!item.children || !item.children.length))"
-                                            data-test-id="apiDetail_li_deleteBortherNode"
-                                            :title="$t(`m.systemConfig['子节点']`)" @click.stop="addChildLine(item)">
-                                            <span>{{ $t('m.systemConfig["子节点"]') }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </span>
-                            <span v-if="item.parentInfo.type === 'object'" class="bk-reduce-node"
-                                @click.stop="deleteLine(item)">
-                                <i class="bk-itsm-icon icon-flow-reduce"></i>
-                            </span>
-                        </div>
-                    </div>
+                <div class="bk-body-input">
+                  <bk-input
+                    :clearable="false"
+                    :disabled="(!item.parentInfo && item.key === 'root') || item.parentInfo.type === 'array' || isBuiltin"
+                    :placeholder="$t(`m.systemConfig['请输入']`)"
+                    v-model="item.key">
+                  </bk-input>
                 </div>
-                <collapse-transition>
-                    <template v-if="item.children && item.showChildren">
-                        <exportTree
-                            :is-body="isBody"
-                            :is-builtin="isBuiltin"
-                            :tree-data-list="item.children"
-                            :tree-index="treeIndex + 1"
-                            @selectItem="selectItem"
-                            @toggle="toggle"
-                            @toggleChildren="toggleChildren"
-                            @addBrotherLine="addBrotherLine"
-                            @addChildLine="addChildLine"
-                            @deleteLine="deleteLine">
-                        </exportTree>
-                    </template>
-                </collapse-transition>
-            </li>
-        </ul>
-    </div>
+                <div class="bk-body-check">
+                  <bk-checkbox
+                    :disabled="(!item.parentInfo && item.key === 'root') || item.parentInfo.type === 'array' || isBuiltin"
+                    :true-value="trueStatus"
+                    :false-value="falseStatus"
+                    v-model="item.is_necessary">
+                  </bk-checkbox>
+                </div>
+              </div>
+              <div class="bk-content-right-body">
+                <div class="bk-value-type">
+                  <bk-select v-model="item.type"
+                    :clearable="false"
+                    :font-size="'medium'"
+                    :disabled="!item.parentInfo && item.key === 'root' || isBuiltin"
+                    @selected="changeType(item)">
+                    <bk-option v-for="option in treeTypeList"
+                      :key="option.id"
+                      :id="option.id"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
+                </div>
+                <div class="bk-desc" :class="{ 'bk-big-desc': !isBody }">
+                  <bk-input
+                    :clearable="false"
+                    :disabled="!item.parentInfo && item.key === 'root' || isBuiltin"
+                    :placeholder="$t(`m.systemConfig['备注']`)"
+                    v-model="item.desc">
+                  </bk-input>
+                </div>
+                <div class="bk-value-default" v-if="isBody">
+                  <template v-if="item.type === 'boolean'">
+                    <bk-radio-group v-model="item.default">
+                      <bk-radio :value="trueStatus" class="mr10">true</bk-radio>
+                      <bk-radio :value="falseStatus">false</bk-radio>
+                    </bk-radio-group>
+                  </template>
+                  <template v-else>
+                    <bk-input
+                      :type="item.type === 'INT' ? 'number' : 'text'"
+                      v-model="item.default"
+                      :placeholder="$t(`m.systemConfig['请输入默认值']`)"
+                      :disabled="item.type !== 'string' && item.type !== 'number' && item.type !== 'boolean'">
+                    </bk-input>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div class="bk-design-add" v-if="!isBuiltin">
+              <span class="bk-add-node">
+                <i class="bk-itsm-icon icon-flow-add"></i>
+                <div class="bk-add-other"
+                  v-if="item.parentInfo.type === 'object' || item.type === 'object'">
+                  <ul>
+                    <li v-if="item.parentInfo && item.parentInfo.type === 'object'"
+                      data-test-id="apiDetail_li_addBortherNode"
+                      :title="$t(`m.systemConfig['兄弟节点']`)" @click.stop="addBrotherLine(item)">
+                      <span>{{ $t('m.systemConfig["兄弟节点"]') }}</span>
+                    </li>
+                    <li v-if="item.type === 'object' || (item.type === 'array' && (!item.children || !item.children.length))"
+                      data-test-id="apiDetail_li_deleteBortherNode"
+                      :title="$t(`m.systemConfig['子节点']`)" @click.stop="addChildLine(item)">
+                      <span>{{ $t('m.systemConfig["子节点"]') }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </span>
+              <span v-if="item.parentInfo.type === 'object'" class="bk-reduce-node"
+                @click.stop="deleteLine(item)">
+                <i class="bk-itsm-icon icon-flow-reduce"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <collapse-transition>
+          <template v-if="item.children && item.showChildren">
+            <exportTree
+              :is-body="isBody"
+              :is-builtin="isBuiltin"
+              :tree-data-list="item.children"
+              :tree-index="treeIndex + 1"
+              @selectItem="selectItem"
+              @toggle="toggle"
+              @toggleChildren="toggleChildren"
+              @addBrotherLine="addBrotherLine"
+              @addChildLine="addChildLine"
+              @deleteLine="deleteLine">
+            </exportTree>
+          </template>
+        </collapse-transition>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>

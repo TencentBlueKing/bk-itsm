@@ -21,59 +21,59 @@
   -->
 
 <template>
-    <div :class="[!isShowNodeConfig ? 'process-step' : 'process-step-node-conf']" v-bkloading="{ isLoading: flowDataLoading }">
-        <template v-if="!flowDataLoading">
-            <second-flow
-                v-if="!isShowNodeConfig"
-                ref="flowInfo"
-                :add-list="nodeList"
-                :line-list="lineList"
-                :flow-info="flowInfo"
-                @handleNodeClick="handleNodeClick">
-            </second-flow>
-            <div v-else>
-                <div class="node-type">{{ nodeType }}
-                    <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
-                </div>
-                <basic-node
-                    v-if="configur.type === 'NORMAL'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </basic-node>
-                <autoNode
-                    v-if="configur.type === 'TASK'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </autoNode>
-                <sopsNode
-                    v-if="configur.type === 'TASK-SOPS'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </sopsNode>
-                <devopsNode
-                    v-if="configur.type === 'TASK-DEVOPS'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </devopsNode>
-                <signNode
-                    v-if="configur.type === 'SIGN'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </signNode>
-                <approval-node
-                    v-if="configur.type === 'APPROVAL'"
-                    :flow-info="flowInfo"
-                    :configur="configur"
-                    @closeConfigur="closeConfigur">
-                </approval-node>
-            </div>
-        </template>
-    </div>
+  <div :class="[!isShowNodeConfig ? 'process-step' : 'process-step-node-conf']" v-bkloading="{ isLoading: flowDataLoading }">
+    <template v-if="!flowDataLoading">
+      <second-flow
+        v-if="!isShowNodeConfig"
+        ref="flowInfo"
+        :add-list="nodeList"
+        :line-list="lineList"
+        :flow-info="flowInfo"
+        @handleNodeClick="handleNodeClick">
+      </second-flow>
+      <div v-else>
+        <div class="node-type">{{ nodeType }}
+          <i class="bk-itsm-icon icon-itsm-icon-three-one close-node-conf" @click="closeConfigur"></i>
+        </div>
+        <basic-node
+          v-if="configur.type === 'NORMAL'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </basic-node>
+        <autoNode
+          v-if="configur.type === 'TASK'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </autoNode>
+        <sopsNode
+          v-if="configur.type === 'TASK-SOPS'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </sopsNode>
+        <devopsNode
+          v-if="configur.type === 'TASK-DEVOPS'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </devopsNode>
+        <signNode
+          v-if="configur.type === 'SIGN'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </signNode>
+        <approval-node
+          v-if="configur.type === 'APPROVAL'"
+          :flow-info="flowInfo"
+          :configur="configur"
+          @closeConfigur="closeConfigur">
+        </approval-node>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>

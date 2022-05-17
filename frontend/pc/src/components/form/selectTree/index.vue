@@ -21,29 +21,29 @@
   -->
 
 <template>
+  <div
+    v-bkloading="{ isLoading: loading }"
+    v-bk-clickoutside="closeTree"
+    class="bk-search-tree"
+    :class="extCls">
     <div
-        v-bkloading="{ isLoading: loading }"
-        v-bk-clickoutside="closeTree"
-        class="bk-search-tree"
-        :class="extCls">
-        <div
-            class="bk-search-tree-wrapper"
-            @click.stop="showTree('view')">
-            <span :class="{ 'bk-color-tree': displayName }">
-                {{ displayName || $t(`m.serviceConfig["请选择"]`)}}
-            </span>
-            <i v-if="organizationLoading" class="bk-select-angle bk-itsm-icon icon-icon-loading"></i>
-        </div>
-        <transition name="common-fade">
-            <div class="bk-search-tree-content" v-show="isShowTree">
-                <tree
-                    :tree-data-list="displayList"
-                    @toggle="toggleInfo"
-                    @toggleChildren="toggleChildren(...arguments,'view')">
-                </tree>
-            </div>
-        </transition>
+      class="bk-search-tree-wrapper"
+      @click.stop="showTree('view')">
+      <span :class="{ 'bk-color-tree': displayName }">
+        {{ displayName || $t(`m.serviceConfig["请选择"]`)}}
+      </span>
+      <i v-if="organizationLoading" class="bk-select-angle bk-itsm-icon icon-icon-loading"></i>
     </div>
+    <transition name="common-fade">
+      <div class="bk-search-tree-content" v-show="isShowTree">
+        <tree
+          :tree-data-list="displayList"
+          @toggle="toggleInfo"
+          @toggleChildren="toggleChildren(...arguments,'view')">
+        </tree>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script>

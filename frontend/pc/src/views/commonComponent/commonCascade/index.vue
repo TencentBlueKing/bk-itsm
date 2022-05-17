@@ -21,187 +21,187 @@
   -->
 
 <template>
-    <div ref="cascader"
-        class="bk-itsm-cascader"
-        :class="{ visible: selector['open'] }"
-        v-bk-clickoutside="closeHidden">
-        <div @click="showcascader"
-            class="bk-cascader bk-cascader-input bk-selector"
-            :class="{ open: selector['open'] }">
-            <input class="placeholder disabled"
-                :class="{ fill: textinfo,focus: selector['open'] }"
-                type="text"
-                :placeholder="placeholder"
-                :disabled="disabled"
-                :readonly="readonly"
-                v-model="textinfo">
-            <i class="bk-icon icon-angle-down bk-selector-icon" v-if="isactive"></i>
-            <i class="bk-icon icon-circle-2-1 bk-selector-icon" v-else
-                style="animation: bk-icon-button-loading 0.8s infinite linear;"></i>
-        </div>
-        <!-- 基础步骤 -->
-        <div class="bk-search-input"
-            :class="{
-                'bk-search-input-one': (searchContent === ''),
-                'bk-search-input-two': (searchContent === '' && options2.length),
-                'bk-search-input-three': (searchContent === '' && options3.length)
-            }">
-            <input
-                class="bk-cascade-search-input"
-                ref="searchInput"
-                type="text"
-                placeholder="请搜索"
-                v-model="searchContent">
-        </div>
-        <div class="bk-cascader bk-cascader-select" :style="styleObject" v-if="searchContent === ''">
-            <ul class="bk-select bk-select-one" @scroll="scrollEvent">
-                <li v-for="(item, index) in options1" :key="index" @scroll="scrollEvent">
-                    <!-- eslint-disable vue/camelcase -->
-                    <span @click="selectLevel(1,index,item)" class="bk-info-left"
-                        :class="{ signcolor: item['isselect'],bkCollect: index === 0 && iscollectTwo && isshowNumber }">
-                        <span>{{item.name}}</span>
-                        <span v-if="index === 0 && iscollectTwo && isshowNumber"
-                            style="margin-left: -8px;">
-                            {{'（' + (item.children && item.children.length ? item.children.length : 0) + '）'}}
-                        </span>
-                    </span>
-                    <!-- eslint-enable -->
-                    <span @click="selectLevel(1,index,item)" class="bk-info-right iconinfo"
-                        v-if="item.children && item.children.length">
-                        <i class="bk-icon icon-angle-right"></i>
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect"
-                        :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
-                        v-else-if="iscollectTwo && item.key !== 'favorites'">
-                        <i @click.stop.prevent="collect_s(item)"
-                            v-if="options_favorites_sign.indexOf(item.key) === -1"
-                            class="bk-icon icon-star"
-                            :title="$t(`m.common['添加收藏']`)">
-                        </i>
-                        <img @click.stop.prevent="collect_s(item)"
-                            v-else
-                            src="@/images/evaluate/starfill.svg"
-                            alt="starblank"
-                            :title="$t(`m.common['取消收藏']`)" />
-                        <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
-                            <span class="bk-tooltips-arrows"></span>
-                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
-                                {{ $t('m.common["添加收藏"]') }}
-                            </span>
-                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
-                        </span> -->
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect" v-else>
-                        <span class="bk-tip-info bk-change" :style="styletranslateY">
-                        </span>
-                    </span>
-                </li>
-                <div v-if="!options1 || !options1.length" style="height: 100%;text-align: center;padding-top:20px;">
-                    {{ $t('m.common["无数据"]') }}
-                </div>
-            </ul>
-            <ul class="bk-select bk-select-two" v-if="options2 && options2.length">
-                <li v-for="(item, index) in options2" :key="index">
-                    <span @click="selectLevel(2,index,item)" class="bk-info-left" :class="{ signcolor: item['isselect'] }">{{item.name}}</span>
-                    <span @click="selectLevel(2,index,item)" class="bk-info-right iconinfo"
-                        v-if="item.children && item.children.length">
-                        <i class="bk-icon icon-angle-right"></i>
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect"
-                        :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
-                        v-else-if="iscollectTwo && !item.favorites">
-                        <i @click.stop.prevent="collect_s(item)"
-                            v-if="options_favorites_sign.indexOf(item.key) === -1"
-                            class="bk-icon icon-star"
-                            :title="$t(`m.common['添加收藏']`)">
-                        </i>
-                        <img @click.stop.prevent="cancelcollect_s(item)"
-                            v-else
-                            src="@/images/evaluate/starfill.svg"
-                            alt="starblank"
-                            :title="$t(`m.common['取消收藏']`)" />
-                        <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
-                            <span class="bk-tooltips-arrows"></span>
-                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
-                                {{ $t('m.common["添加收藏"]') }}
-                            </span>
-                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
-                        </span> -->
-                    </span>
-                    <span @click="cancelcollect_s(item, index)" class="bk-text-danger bk-info-right collect"
-                        v-else-if="item.favorites">
-                        <i class="bk-icon icon-close" v-if="true" style="font-size: 14px;"></i>
-                        <span class="bk-tip-info bk-change" :style="styletranslateY">
-                            <span class="bk-tooltips-arrows"></span>
-                            <span>{{ $t('m.common["取消收藏"]') }}</span>
-                        </span>
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect" v-else>
-                        <span class="bk-tip-info bk-change" :style="styletranslateY">
-                        </span>
-                    </span>
-                </li>
-            </ul>
-            <ul class="bk-select bk-select-three" v-if="options3 && options3.length">
-                <li v-for="(item, index) in options3" :key="index">
-                    <span @click="selectLevel(3,index,item)" class="bk-info-left" :class="{ signcolor: item['isselect'] }">{{item.name}}</span>
-                    <span @click="selectLevel(3,index,item)" class="bk-info-right iconinfo"
-                        v-if="item.children && item.children.length">
-                        <i class="bk-icon icon-angle-right"></i>
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect"
-                        :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
-                        v-else-if="iscollectTwo">
-                        <i @click.stop.prevent="collect_s(item)"
-                            v-if="options_favorites_sign.indexOf(item.key) === -1"
-                            class="bk-icon icon-star"
-                            :title="$t(`m.common['添加收藏']`)">
-                        </i>
-                        <img @click.stop.prevent="collect_s(item)"
-                            v-else
-                            src="@/images/evaluate/starfill.svg"
-                            alt="starblank"
-                            :title="$t(`m.common['取消收藏']`)" />
-                        <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
-                            <span class="bk-tooltips-arrows"></span>
-                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
-                                {{ $t('m.common["添加收藏"]') }}
-                            </span>
-                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
-                        </span> -->
-                    </span>
-                    <span class="bk-text-danger bk-info-right collect" v-else>
-                        <span class="bk-tip-info bk-change" :style="styletranslateY">
-                        </span>
-                    </span>
-                </li>
-            </ul>
-        </div>
-        <!-- 查询 -->
-        <div class="bk-cascade-panel" v-if="searchContent !== ''">
-            <ul class="bk-cascade-panel-ul" style="width: 100%">
-                <li class="bk-option"
-                    v-for="(item, index) in searchList"
-                    :key="index"
-                    @click.prevent.stop="handleSelectItem(item, index)"
-                    :class="{
-                        'is-selected': item.isSelected,
-                        'is-disabled': item.disabled
-                    }">
-                    <div class="bk-option-content">
-                        <slot>
-                            <div class="bk-option-content-default" :title="item.name">
-                                <span class="bk-option-name">{{ item.name }}</span>
-                            </div>
-                        </slot>
-                    </div>
-                </li>
-                <li class="bk-option-none" v-if="!searchList.length">
-                    <span>暂无数据</span>
-                </li>
-            </ul>
-        </div>
+  <div ref="cascader"
+    class="bk-itsm-cascader"
+    :class="{ visible: selector['open'] }"
+    v-bk-clickoutside="closeHidden">
+    <div @click="showcascader"
+      class="bk-cascader bk-cascader-input bk-selector"
+      :class="{ open: selector['open'] }">
+      <input class="placeholder disabled"
+        :class="{ fill: textinfo,focus: selector['open'] }"
+        type="text"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        v-model="textinfo">
+      <i class="bk-icon icon-angle-down bk-selector-icon" v-if="isactive"></i>
+      <i class="bk-icon icon-circle-2-1 bk-selector-icon" v-else
+        style="animation: bk-icon-button-loading 0.8s infinite linear;"></i>
     </div>
+    <!-- 基础步骤 -->
+    <div class="bk-search-input"
+      :class="{
+        'bk-search-input-one': (searchContent === ''),
+        'bk-search-input-two': (searchContent === '' && options2.length),
+        'bk-search-input-three': (searchContent === '' && options3.length)
+      }">
+      <input
+        class="bk-cascade-search-input"
+        ref="searchInput"
+        type="text"
+        placeholder="请搜索"
+        v-model="searchContent">
+    </div>
+    <div class="bk-cascader bk-cascader-select" :style="styleObject" v-if="searchContent === ''">
+      <ul class="bk-select bk-select-one" @scroll="scrollEvent">
+        <li v-for="(item, index) in options1" :key="index" @scroll="scrollEvent">
+          <!-- eslint-disable vue/camelcase -->
+          <span @click="selectLevel(1,index,item)" class="bk-info-left"
+            :class="{ signcolor: item['isselect'],bkCollect: index === 0 && iscollectTwo && isshowNumber }">
+            <span>{{item.name}}</span>
+            <span v-if="index === 0 && iscollectTwo && isshowNumber"
+              style="margin-left: -8px;">
+              {{'（' + (item.children && item.children.length ? item.children.length : 0) + '）'}}
+            </span>
+          </span>
+          <!-- eslint-enable -->
+          <span @click="selectLevel(1,index,item)" class="bk-info-right iconinfo"
+            v-if="item.children && item.children.length">
+            <i class="bk-icon icon-angle-right"></i>
+          </span>
+          <span class="bk-text-danger bk-info-right collect"
+            :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
+            v-else-if="iscollectTwo && item.key !== 'favorites'">
+            <i @click.stop.prevent="collect_s(item)"
+              v-if="options_favorites_sign.indexOf(item.key) === -1"
+              class="bk-icon icon-star"
+              :title="$t(`m.common['添加收藏']`)">
+            </i>
+            <img @click.stop.prevent="collect_s(item)"
+              v-else
+              src="@/images/evaluate/starfill.svg"
+              alt="starblank"
+              :title="$t(`m.common['取消收藏']`)" />
+            <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
+                            <span class="bk-tooltips-arrows"></span>
+                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
+                                {{ $t('m.common["添加收藏"]') }}
+                            </span>
+                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
+                        </span> -->
+          </span>
+          <span class="bk-text-danger bk-info-right collect" v-else>
+            <span class="bk-tip-info bk-change" :style="styletranslateY">
+            </span>
+          </span>
+        </li>
+        <div v-if="!options1 || !options1.length" style="height: 100%;text-align: center;padding-top:20px;">
+          {{ $t('m.common["无数据"]') }}
+        </div>
+      </ul>
+      <ul class="bk-select bk-select-two" v-if="options2 && options2.length">
+        <li v-for="(item, index) in options2" :key="index">
+          <span @click="selectLevel(2,index,item)" class="bk-info-left" :class="{ signcolor: item['isselect'] }">{{item.name}}</span>
+          <span @click="selectLevel(2,index,item)" class="bk-info-right iconinfo"
+            v-if="item.children && item.children.length">
+            <i class="bk-icon icon-angle-right"></i>
+          </span>
+          <span class="bk-text-danger bk-info-right collect"
+            :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
+            v-else-if="iscollectTwo && !item.favorites">
+            <i @click.stop.prevent="collect_s(item)"
+              v-if="options_favorites_sign.indexOf(item.key) === -1"
+              class="bk-icon icon-star"
+              :title="$t(`m.common['添加收藏']`)">
+            </i>
+            <img @click.stop.prevent="cancelcollect_s(item)"
+              v-else
+              src="@/images/evaluate/starfill.svg"
+              alt="starblank"
+              :title="$t(`m.common['取消收藏']`)" />
+            <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
+                            <span class="bk-tooltips-arrows"></span>
+                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
+                                {{ $t('m.common["添加收藏"]') }}
+                            </span>
+                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
+                        </span> -->
+          </span>
+          <span @click="cancelcollect_s(item, index)" class="bk-text-danger bk-info-right collect"
+            v-else-if="item.favorites">
+            <i class="bk-icon icon-close" v-if="true" style="font-size: 14px;"></i>
+            <span class="bk-tip-info bk-change" :style="styletranslateY">
+              <span class="bk-tooltips-arrows"></span>
+              <span>{{ $t('m.common["取消收藏"]') }}</span>
+            </span>
+          </span>
+          <span class="bk-text-danger bk-info-right collect" v-else>
+            <span class="bk-tip-info bk-change" :style="styletranslateY">
+            </span>
+          </span>
+        </li>
+      </ul>
+      <ul class="bk-select bk-select-three" v-if="options3 && options3.length">
+        <li v-for="(item, index) in options3" :key="index">
+          <span @click="selectLevel(3,index,item)" class="bk-info-left" :class="{ signcolor: item['isselect'] }">{{item.name}}</span>
+          <span @click="selectLevel(3,index,item)" class="bk-info-right iconinfo"
+            v-if="item.children && item.children.length">
+            <i class="bk-icon icon-angle-right"></i>
+          </span>
+          <span class="bk-text-danger bk-info-right collect"
+            :class="{ signcolor: options_favorites_sign.indexOf(item.key) !== -1 }"
+            v-else-if="iscollectTwo">
+            <i @click.stop.prevent="collect_s(item)"
+              v-if="options_favorites_sign.indexOf(item.key) === -1"
+              class="bk-icon icon-star"
+              :title="$t(`m.common['添加收藏']`)">
+            </i>
+            <img @click.stop.prevent="collect_s(item)"
+              v-else
+              src="@/images/evaluate/starfill.svg"
+              alt="starblank"
+              :title="$t(`m.common['取消收藏']`)" />
+            <!-- <span class="bk-tip-info bk-change" :style="styletranslateY">
+                            <span class="bk-tooltips-arrows"></span>
+                            <span v-if="options_favorites_sign.indexOf(item.key) === -1">
+                                {{ $t('m.common["添加收藏"]') }}
+                            </span>
+                            <span v-else>{{ $t('m.common["取消收藏"]') }}</span>
+                        </span> -->
+          </span>
+          <span class="bk-text-danger bk-info-right collect" v-else>
+            <span class="bk-tip-info bk-change" :style="styletranslateY">
+            </span>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <!-- 查询 -->
+    <div class="bk-cascade-panel" v-if="searchContent !== ''">
+      <ul class="bk-cascade-panel-ul" style="width: 100%">
+        <li class="bk-option"
+          v-for="(item, index) in searchList"
+          :key="index"
+          @click.prevent.stop="handleSelectItem(item, index)"
+          :class="{
+            'is-selected': item.isSelected,
+            'is-disabled': item.disabled
+          }">
+          <div class="bk-option-content">
+            <slot>
+              <div class="bk-option-content-default" :title="item.name">
+                <span class="bk-option-name">{{ item.name }}</span>
+              </div>
+            </slot>
+          </div>
+        </li>
+        <li class="bk-option-none" v-if="!searchList.length">
+          <span>暂无数据</span>
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>

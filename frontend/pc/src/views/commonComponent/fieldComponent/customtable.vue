@@ -21,82 +21,82 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-table
-                :data="item.val"
-                :size="'small'">
-                <template v-for="columnItem in item.meta.columns">
-                    <bk-table-column :label="columnItem.name" :key="columnItem.key">
-                        <template slot-scope="props">
-                            <template v-if="columnItem.display === 'input'">
-                                <bk-input
-                                    :clearable="true"
-                                    v-model="props.row[columnItem.key]"
-                                    :disabled="disabled"></bk-input>
-                            </template>
-                            <template v-if="columnItem.display === 'select'">
-                                <bk-select
-                                    searchable
-                                    v-model="props.row[columnItem.key]"
-                                    :font-size="'medium'"
-                                    :popover-min-width="180"
-                                    :disabled="disabled">
-                                    <bk-option v-for="option in columnItem.choice"
-                                        :key="option.key"
-                                        :id="option.key"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </template>
-                            <template v-if="columnItem.display === 'multiselect'">
-                                <bk-select searchable
-                                    multiple
-                                    :popover-min-width="180"
-                                    :font-size="'medium'"
-                                    :disabled="disabled"
-                                    show-select-all
-                                    v-model="props.row[columnItem.key]">
-                                    <bk-option v-for="option in columnItem.choice"
-                                        :key="option.key"
-                                        :id="option.key"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </template>
-                            <template v-if="columnItem.display === 'date'">
-                                <bk-date-picker v-model="props.row[columnItem.key]"
-                                    :transfer="true"
-                                    :disabled="disabled">
-                                </bk-date-picker>
-                            </template>
-                            <template v-if="columnItem.display === 'datetime'">
-                                <bk-date-picker v-model="props.row[columnItem.key]"
-                                    :transfer="true"
-                                    :disabled="disabled"
-                                    :type="'datetime'">
-                                </bk-date-picker>
-                            </template>
-                        </template>
-                    </bk-table-column>
-                </template>
-                <bk-table-column :label="$t(`m.user['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" text @click="addOne" :disabled="disabled">
-                            {{ $t('m.newCommon["添加"]') }}
-                        </bk-button>
-                        <bk-button theme="primary" text @click="deleteOne(props)" :disabled="disabled">
-                            {{ $t('m.newCommon["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-table
+        :data="item.val"
+        :size="'small'">
+        <template v-for="columnItem in item.meta.columns">
+          <bk-table-column :label="columnItem.name" :key="columnItem.key">
+            <template slot-scope="props">
+              <template v-if="columnItem.display === 'input'">
+                <bk-input
+                  :clearable="true"
+                  v-model="props.row[columnItem.key]"
+                  :disabled="disabled"></bk-input>
+              </template>
+              <template v-if="columnItem.display === 'select'">
+                <bk-select
+                  searchable
+                  v-model="props.row[columnItem.key]"
+                  :font-size="'medium'"
+                  :popover-min-width="180"
+                  :disabled="disabled">
+                  <bk-option v-for="option in columnItem.choice"
+                    :key="option.key"
+                    :id="option.key"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </template>
+              <template v-if="columnItem.display === 'multiselect'">
+                <bk-select searchable
+                  multiple
+                  :popover-min-width="180"
+                  :font-size="'medium'"
+                  :disabled="disabled"
+                  show-select-all
+                  v-model="props.row[columnItem.key]">
+                  <bk-option v-for="option in columnItem.choice"
+                    :key="option.key"
+                    :id="option.key"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </template>
+              <template v-if="columnItem.display === 'date'">
+                <bk-date-picker v-model="props.row[columnItem.key]"
+                  :transfer="true"
+                  :disabled="disabled">
+                </bk-date-picker>
+              </template>
+              <template v-if="columnItem.display === 'datetime'">
+                <bk-date-picker v-model="props.row[columnItem.key]"
+                  :transfer="true"
+                  :disabled="disabled"
+                  :type="'datetime'">
+                </bk-date-picker>
+              </template>
+            </template>
+          </bk-table-column>
         </template>
-    </div>
+        <bk-table-column :label="$t(`m.user['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button theme="primary" text @click="addOne" :disabled="disabled">
+              {{ $t('m.newCommon["添加"]') }}
+            </bk-button>
+            <bk-button theme="primary" text @click="deleteOne(props)" :disabled="disabled">
+              {{ $t('m.newCommon["删除"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

@@ -21,152 +21,152 @@
   -->
 
 <template>
-    <div class="bk-search-info">
-        <div class="operate-wrapper-item">
-            <div class="filter-content">
-                <div class="slot-content">
-                    <slot></slot>
-                </div>
-                <bk-input
-                    data-test-id="search_input_enter"
-                    :clearable="true"
-                    :right-icon="'bk-icon icon-search'"
-                    :placeholder="searchForms[0].desc"
-                    v-model="searchForms[0].value"
-                    @enter="onSearchClick"
-                    @clear="onClearClick">
-                </bk-input>
-                <bk-button
-                    data-test-id="search_button_conditions"
-                    :title="$t(`m.deployPage['更多筛选条件']`)"
-                    icon=" bk-itsm-icon icon-search-more"
-                    class="ml10 filter-btn"
-                    @click="onShowSearchMore">
-                </bk-button>
-                <i data-test-id="ticket_button_highlightSetting" style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
-            </div>
+  <div class="bk-search-info">
+    <div class="operate-wrapper-item">
+      <div class="filter-content">
+        <div class="slot-content">
+          <slot></slot>
         </div>
-        <!-- 高级搜索 -->
-        <collapse-transition>
-            <div class="bk-filter" v-if="showMore">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    ref="dynamicForm">
-                    <template>
-                        <div class="bk-filter-line"
-                            v-for="(item, index) in searchForms"
-                            :key="index">
-                            <bk-form-item :label="item.name" v-if="item.type === 'input'">
-                                <bk-input v-model="item.value"
-                                    :placeholder="item.placeholder"
-                                    @change="onFormChange($event, item)">
-                                </bk-input>
-                            </bk-form-item>
-                            <bk-form-item :label="item.name" v-if="item.type === 'select'">
-                                <bk-select
-                                    searchable
-                                    :placeholder="item.placeholder"
-                                    :show-select-all="item.multiSelect"
-                                    :multiple="item.multiSelect"
-                                    v-model="item.value"
-                                    @change="onFormChange($event, item)">
-                                    <bk-option v-for="option in item.list"
-                                        :key="option.key"
-                                        :id="option.key"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </bk-form-item>
-                            <bk-form-item :label="item.name" v-if="item.type === 'datetime'">
-                                <bk-date-picker
-                                    style="width: 100%;"
-                                    v-model="item.value"
-                                    :placeholder="item.placeholder"
-                                    :type="'datetimerange'"
-                                    @change="onFormChange($event, item)">
-                                </bk-date-picker>
-                            </bk-form-item>
-                            <!-- 级联类型 -->
-                            <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
-                                <bk-cascade
-                                    style="width: 100%;"
-                                    v-model="item.value"
-                                    :list="item.list"
-                                    :check-any-level="true"
-                                    clearable
-                                    @change="onFormChange($event, item)"
-                                    :ext-popover-cls="'custom-cls'">
-                                </bk-cascade>
-                            </bk-form-item>
-                            <!-- 人员 -->
-                            <bk-form-item :label="item.name" v-if="item.type === 'member'">
-                                <member-select
-                                    v-model="item.value"
-                                    :multiple="false"
-                                    :placeholder="item.placeholder"
-                                    @change="onFormChange($event, item)"></member-select>
-                            </bk-form-item>
-                        </div>
-                    </template>
-                </bk-form>
-                <!-- 查询清空 -->
-                <div class="bk-filter-btn">
-                    <bk-button theme="primary"
-                        data-test-id="highlight_button_search"
-                        :title="$t(`m.deployPage['查询']`)"
-                        @click="onSearchClick">
-                        {{ $t('m.deployPage["查询"]') }}
-                    </bk-button>
-                    <bk-button theme="default"
-                        data-test-id="highlight_button_clear"
-                        :title="$t(`m.deployPage['清空']`)"
-                        @click="onClearClick">
-                        {{ $t('m.deployPage["清空"]') }}
-                    </bk-button>
-                </div>
-            </div>
-        </collapse-transition>
-        <div class="search-result" v-if="searchResult.length !== 0">
-            <ul>
-                <li v-for="(result, index) in searchResult" :key="index">
-                    <bk-popover placement="bottom" theme="light">
-                        <span class="search-reult-content" @click="onSearchResult(index)">{{ result[0] }}</span>
-                        <div slot="content">
-                            <template v-for="(item, index1) in result">
-                                <p :key="index1">{{ item }}</p>
-                            </template>
-                        </div>
-                    </bk-popover>
-                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
-                </li>
-            </ul>
-        </div>
-        <!-- 单据高亮设置 -->
-        <bk-dialog
-            v-model="isHighlightSetting"
-            width="560"
-            :draggable="false"
-            @confirm="highlightSettingConfirm">
-            <p slot="header" style="text-align: left;">
-                {{$t(`m.slaContent["单据高亮设置"]`)}}
-            </p>
-            <div class="bk-highlight-setting">
-                <div class="bk-itsm-version">
-                    <i class="bk-icon icon-info-circle"></i>
-                    <span>{{ $t('m.slaContent["对特殊单据，如预警单和超时单设置颜色高亮提醒。"]') }}</span>
-                </div>
-                <div class="bk-color-box">
-                    <span>{{ $t('m.slaContent["预警单据背景颜色"]') }} :</span>
-                    <bk-color-picker v-model="highlightObj.reply_timeout_color"></bk-color-picker>
-                </div>
-                <div class="bk-color-box">
-                    <span>{{ $t('m.slaContent["超时单据背景颜色"]') }} :</span>
-                    <bk-color-picker v-model="highlightObj.handle_timeout_color"></bk-color-picker>
-                </div>
-            </div>
-        </bk-dialog>
+        <bk-input
+          data-test-id="search_input_enter"
+          :clearable="true"
+          :right-icon="'bk-icon icon-search'"
+          :placeholder="searchForms[0].desc"
+          v-model="searchForms[0].value"
+          @enter="onSearchClick"
+          @clear="onClearClick">
+        </bk-input>
+        <bk-button
+          data-test-id="search_button_conditions"
+          :title="$t(`m.deployPage['更多筛选条件']`)"
+          icon=" bk-itsm-icon icon-search-more"
+          class="ml10 filter-btn"
+          @click="onShowSearchMore">
+        </bk-button>
+        <i data-test-id="ticket_button_highlightSetting" style="margin:0 10px;cursor: pointer;color:#3A84FF" class="bk-icon icon-cog-shape" @click="isHighlightSetting = true"></i>
+      </div>
     </div>
+    <!-- 高级搜索 -->
+    <collapse-transition>
+      <div class="bk-filter" v-if="showMore">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          ref="dynamicForm">
+          <template>
+            <div class="bk-filter-line"
+              v-for="(item, index) in searchForms"
+              :key="index">
+              <bk-form-item :label="item.name" v-if="item.type === 'input'">
+                <bk-input v-model="item.value"
+                  :placeholder="item.placeholder"
+                  @change="onFormChange($event, item)">
+                </bk-input>
+              </bk-form-item>
+              <bk-form-item :label="item.name" v-if="item.type === 'select'">
+                <bk-select
+                  searchable
+                  :placeholder="item.placeholder"
+                  :show-select-all="item.multiSelect"
+                  :multiple="item.multiSelect"
+                  v-model="item.value"
+                  @change="onFormChange($event, item)">
+                  <bk-option v-for="option in item.list"
+                    :key="option.key"
+                    :id="option.key"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </bk-form-item>
+              <bk-form-item :label="item.name" v-if="item.type === 'datetime'">
+                <bk-date-picker
+                  style="width: 100%;"
+                  v-model="item.value"
+                  :placeholder="item.placeholder"
+                  :type="'datetimerange'"
+                  @change="onFormChange($event, item)">
+                </bk-date-picker>
+              </bk-form-item>
+              <!-- 级联类型 -->
+              <bk-form-item :label="item.name" v-if="item.type === 'cascade'">
+                <bk-cascade
+                  style="width: 100%;"
+                  v-model="item.value"
+                  :list="item.list"
+                  :check-any-level="true"
+                  clearable
+                  @change="onFormChange($event, item)"
+                  :ext-popover-cls="'custom-cls'">
+                </bk-cascade>
+              </bk-form-item>
+              <!-- 人员 -->
+              <bk-form-item :label="item.name" v-if="item.type === 'member'">
+                <member-select
+                  v-model="item.value"
+                  :multiple="false"
+                  :placeholder="item.placeholder"
+                  @change="onFormChange($event, item)"></member-select>
+              </bk-form-item>
+            </div>
+          </template>
+        </bk-form>
+        <!-- 查询清空 -->
+        <div class="bk-filter-btn">
+          <bk-button theme="primary"
+            data-test-id="highlight_button_search"
+            :title="$t(`m.deployPage['查询']`)"
+            @click="onSearchClick">
+            {{ $t('m.deployPage["查询"]') }}
+          </bk-button>
+          <bk-button theme="default"
+            data-test-id="highlight_button_clear"
+            :title="$t(`m.deployPage['清空']`)"
+            @click="onClearClick">
+            {{ $t('m.deployPage["清空"]') }}
+          </bk-button>
+        </div>
+      </div>
+    </collapse-transition>
+    <div class="search-result" v-if="searchResult.length !== 0">
+      <ul>
+        <li v-for="(result, index) in searchResult" :key="index">
+          <bk-popover placement="bottom" theme="light">
+            <span class="search-reult-content" @click="onSearchResult(index)">{{ result[0] }}</span>
+            <div slot="content">
+              <template v-for="(item, index1) in result">
+                <p :key="index1">{{ item }}</p>
+              </template>
+            </div>
+          </bk-popover>
+          <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="$emit('deteleSearchResult', panel, index)"></i>
+        </li>
+      </ul>
+    </div>
+    <!-- 单据高亮设置 -->
+    <bk-dialog
+      v-model="isHighlightSetting"
+      width="560"
+      :draggable="false"
+      @confirm="highlightSettingConfirm">
+      <p slot="header" style="text-align: left;">
+        {{$t(`m.slaContent["单据高亮设置"]`)}}
+      </p>
+      <div class="bk-highlight-setting">
+        <div class="bk-itsm-version">
+          <i class="bk-icon icon-info-circle"></i>
+          <span>{{ $t('m.slaContent["对特殊单据，如预警单和超时单设置颜色高亮提醒。"]') }}</span>
+        </div>
+        <div class="bk-color-box">
+          <span>{{ $t('m.slaContent["预警单据背景颜色"]') }} :</span>
+          <bk-color-picker v-model="highlightObj.reply_timeout_color"></bk-color-picker>
+        </div>
+        <div class="bk-color-box">
+          <span>{{ $t('m.slaContent["超时单据背景颜色"]') }} :</span>
+          <bk-color-picker v-model="highlightObj.handle_timeout_color"></bk-color-picker>
+        </div>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

@@ -21,121 +21,121 @@
   -->
 
 <template>
-    <div class="bk-tree-table-directory">
-        <div class="bk-table-search">
-            <div class="bk-search-word">
-                <span>{{nameInfo}}</span>
-            </div>
-            <div class="bk-form-content" v-if="treeInfo.node.level">
-                <bk-button :theme="'primary'"
-                    data-test-id="serviceCatalogue_button_create"
-                    :title="$t(`m.managePage['新增']`)"
-                    icon="plus"
-                    class="mr10 plus-cus"
-                    @click="openShade">
-                    {{$t(`m.managePage['新增']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="serviceCatalogue_button_batchDelete"
-                    :title="$t(`m.serviceConfig['批量移除']`)"
-                    class="mr10"
-                    :disabled="!checkList.length"
-                    @click="deleteCheck">
-                    {{$t(`m.serviceConfig['批量移除']`)}}
-                </bk-button>
-                <div class="bk-search-input">
-                    <bk-input
-                        data-test-id="serviceCatalogue_input_searchKey"
-                        :placeholder="$t(`m.serviceConfig['请输入关键字']`)"
-                        :clearable="true"
-                        :right-icon="'bk-icon icon-search'"
-                        v-model="searchInfo.key"
-                        @enter="serchEntry"
-                        @clear="clearInfo">
-                    </bk-input>
+  <div class="bk-tree-table-directory">
+    <div class="bk-table-search">
+      <div class="bk-search-word">
+        <span>{{nameInfo}}</span>
+      </div>
+      <div class="bk-form-content" v-if="treeInfo.node.level">
+        <bk-button :theme="'primary'"
+          data-test-id="serviceCatalogue_button_create"
+          :title="$t(`m.managePage['新增']`)"
+          icon="plus"
+          class="mr10 plus-cus"
+          @click="openShade">
+          {{$t(`m.managePage['新增']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="serviceCatalogue_button_batchDelete"
+          :title="$t(`m.serviceConfig['批量移除']`)"
+          class="mr10"
+          :disabled="!checkList.length"
+          @click="deleteCheck">
+          {{$t(`m.serviceConfig['批量移除']`)}}
+        </bk-button>
+        <div class="bk-search-input">
+          <bk-input
+            data-test-id="serviceCatalogue_input_searchKey"
+            :placeholder="$t(`m.serviceConfig['请输入关键字']`)"
+            :clearable="true"
+            :right-icon="'bk-icon icon-search'"
+            v-model="searchInfo.key"
+            @enter="serchEntry"
+            @clear="clearInfo">
+          </bk-input>
+        </div>
+      </div>
+    </div>
+    <!-- 表格拖拽 -->
+    <!-- <draggable tag="tbody" v-model="listInfo" @end="updateInfo" handle=".move-handler-content"></draggable> -->
+    <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isTableLoading }">
+      <table data-test-id="serviceCatalogue_table_drag" class="bk-draggable-table">
+        <thead>
+          <tr>
+            <th v-if="listInfo.length">
+              <bk-checkbox
+                data-test-id="directiory-checkbox-check"
+                :true-value="trueStatus"
+                :false-value="falseStatus"
+                v-model="allCheck"
+                @change="handleSelectAll">
+              </bk-checkbox>
+            </th>
+            <th>No.</th>
+            <th style="min-width: 130px; max-width: 300px">{{ $t('m.serviceConfig["服务名称"]') }}</th>
+            <th style="min-width: 100px; max-width: 300px">{{ $t('m.serviceConfig["服务类型"]') }}</th>
+            <th style="min-width: 100px;">{{ $t('m.deployPage["状态"]') }}</th>
+            <th style="max-width: 250px">{{ $t('m.serviceConfig["服务说明"]') }}</th>
+            <th style="min-width: 100px;">{{ $t('m.serviceConfig["操作"]') }}</th>
+          </tr>
+        </thead>
+        <draggable tag="tbody" v-model="listInfo" @end="updateInfo" handle=".move-handler-content">
+          <template v-if="listInfo.length">
+            <tr v-for="(item, index) in listInfo" :key="index"
+              :class="{ 'move-handler-content': !searchInfo.key }">
+              <td>
+                <!-- <i class="bk-icon icon-move-new move-handler" v-if="!searchInfo.key"></i> -->
+                <bk-checkbox
+                  data-test-id="service_checkbox_check"
+                  :true-value="trueStatus"
+                  :false-value="falseStatus"
+                  v-model="item.checkValue"
+                  @change="handleSelect(item, index)">
+                </bk-checkbox>
+              </td>
+              <td><span>{{index + 1}}</span></td>
+              <td style="min-width: 130px; max-width: 300px" :title="item.name">
+                <span>{{item.name || '--'}}</span>
+              </td>
+              <td style="min-width: 100px; max-width: 300px">
+                <span v-for="node in serviceTypesMap"
+                  v-if="item.key === node.key"
+                  :key="node.key"
+                  :title="node.name">
+                  {{node.name || '--'}}
+                </span>
+              </td>
+              <td>
+                <span class="bk-status-color" :class="{ 'bk-status-gray': !item.is_valid }"></span>
+                <span style="margin-left: 5px;"
+                  :title="item.is_valid ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`)">
+                  {{item.is_valid ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`)}}
+                </span>
+              </td>
+              <td style="min-width: 120px;" :title="item.desc">
+                <div class="bk-overflow-line">
+                  <span :title="item.desc">{{item.desc || '--'}}</span>
                 </div>
-            </div>
-        </div>
-        <!-- 表格拖拽 -->
-        <!-- <draggable tag="tbody" v-model="listInfo" @end="updateInfo" handle=".move-handler-content"></draggable> -->
-        <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isTableLoading }">
-            <table data-test-id="serviceCatalogue_table_drag" class="bk-draggable-table">
-                <thead>
-                    <tr>
-                        <th v-if="listInfo.length">
-                            <bk-checkbox
-                                data-test-id="directiory-checkbox-check"
-                                :true-value="trueStatus"
-                                :false-value="falseStatus"
-                                v-model="allCheck"
-                                @change="handleSelectAll">
-                            </bk-checkbox>
-                        </th>
-                        <th>No.</th>
-                        <th style="min-width: 130px; max-width: 300px">{{ $t('m.serviceConfig["服务名称"]') }}</th>
-                        <th style="min-width: 100px; max-width: 300px">{{ $t('m.serviceConfig["服务类型"]') }}</th>
-                        <th style="min-width: 100px;">{{ $t('m.deployPage["状态"]') }}</th>
-                        <th style="max-width: 250px">{{ $t('m.serviceConfig["服务说明"]') }}</th>
-                        <th style="min-width: 100px;">{{ $t('m.serviceConfig["操作"]') }}</th>
-                    </tr>
-                </thead>
-                <draggable tag="tbody" v-model="listInfo" @end="updateInfo" handle=".move-handler-content">
-                    <template v-if="listInfo.length">
-                        <tr v-for="(item, index) in listInfo" :key="index"
-                            :class="{ 'move-handler-content': !searchInfo.key }">
-                            <td>
-                                <!-- <i class="bk-icon icon-move-new move-handler" v-if="!searchInfo.key"></i> -->
-                                <bk-checkbox
-                                    data-test-id="service_checkbox_check"
-                                    :true-value="trueStatus"
-                                    :false-value="falseStatus"
-                                    v-model="item.checkValue"
-                                    @change="handleSelect(item, index)">
-                                </bk-checkbox>
-                            </td>
-                            <td><span>{{index + 1}}</span></td>
-                            <td style="min-width: 130px; max-width: 300px" :title="item.name">
-                                <span>{{item.name || '--'}}</span>
-                            </td>
-                            <td style="min-width: 100px; max-width: 300px">
-                                <span v-for="node in serviceTypesMap"
-                                    v-if="item.key === node.key"
-                                    :key="node.key"
-                                    :title="node.name">
-                                    {{node.name || '--'}}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="bk-status-color" :class="{ 'bk-status-gray': !item.is_valid }"></span>
-                                <span style="margin-left: 5px;"
-                                    :title="item.is_valid ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`)">
-                                    {{item.is_valid ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`)}}
-                                </span>
-                            </td>
-                            <td style="min-width: 120px;" :title="item.desc">
-                                <div class="bk-overflow-line">
-                                    <span :title="item.desc">{{item.desc || '--'}}</span>
-                                </div>
-                            </td>
-                            <td style="min-width: 100px;">
-                                <bk-button data-test-id="serviceCatalogue_button_deleteService" theme="primary" text @click="deleteOne(item)">
-                                    {{ $t('m.serviceConfig["移除"]') }}
-                                </bk-button>
-                            </td>
-                        </tr>
-                    </template>
-                    <template v-else>
-                        <tr v-cloak>
-                            <td colspan="10" class="bk-none-content">
-                                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-                                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
-                            </td>
-                        </tr>
-                    </template>
-                </draggable>
-            </table>
-        </div>
-        <!-- <bk-table
+              </td>
+              <td style="min-width: 100px;">
+                <bk-button data-test-id="serviceCatalogue_button_deleteService" theme="primary" text @click="deleteOne(item)">
+                  {{ $t('m.serviceConfig["移除"]') }}
+                </bk-button>
+              </td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-cloak>
+              <td colspan="10" class="bk-none-content">
+                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
+                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
+              </td>
+            </tr>
+          </template>
+        </draggable>
+      </table>
+    </div>
+    <!-- <bk-table
             v-bkloading="{ isLoading: isTableLoading }"
             :data="listInfo"
             :size="'small'"
@@ -175,66 +175,66 @@
                 </template>
             </bk-table-column>
         </bk-table> -->
-        <!-- 新增服务 -->
-        <bk-sideslider
-            :is-show.sync="entryInfo.show"
-            :title="entryInfo.title"
-            :width="entryInfo.width"
-            :quick-close="true">
-            <div slot="content" style="padding: 20px" v-if="entryInfo.show">
-                <bk-table
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="entryInfo.listInfo"
-                    :size="'small'"
-                    :pagination="entryInfo.pagination"
-                    @page-change="addPageChange"
-                    @page-limit-change="addPageLimitChange"
-                    @select-all="addSelectAll"
-                    @select="addSelect">
-                    <bk-table-column type="selection" width="60" align="center"></bk-table-column>
-                    <bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="180"></bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务类型']`)">
-                        <template slot-scope="props">
-                            <span v-for="node in serviceTypesMap"
-                                v-if="props.row.key === node.key"
-                                :key="node.key">
-                                {{node.name || '--'}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-                <div class="mt20">
-                    <bk-button
-                        data-test-id="serviceCatalogue_button_serviceCreate"
-                        theme="primary"
-                        :title="$t(`m.serviceConfig['新增']`)"
-                        v-if="!entryInfo.listInfo.length"
-                        @click="addEntry">
-                        {{ $t('m.serviceConfig["新增"]') }}
-                    </bk-button>
-                    <bk-button
-                        data-test-id="serviceCatalogue_button_serviceConfirm"
-                        theme="primary"
-                        :title="$t(`m.serviceConfig['确认']`)"
-                        :disabled="!entryInfo.checkList.length"
-                        :loading="secondClick"
-                        v-else
-                        @click="submitEntry">
-                        {{ $t('m.serviceConfig["确认"]') }}
-                    </bk-button>
-                    <bk-button
-                        data-test-id="serviceCatalogue_button_serviceCancel"
-                        theme="default"
-                        :title="$t(`m.serviceConfig['取消']`)"
-                        :loading="secondClick"
-                        @click="closeShade">
-                        {{ $t('m.serviceConfig["取消"]') }}
-                    </bk-button>
-                </div>
-            </div>
-        </bk-sideslider>
-    </div>
+    <!-- 新增服务 -->
+    <bk-sideslider
+      :is-show.sync="entryInfo.show"
+      :title="entryInfo.title"
+      :width="entryInfo.width"
+      :quick-close="true">
+      <div slot="content" style="padding: 20px" v-if="entryInfo.show">
+        <bk-table
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="entryInfo.listInfo"
+          :size="'small'"
+          :pagination="entryInfo.pagination"
+          @page-change="addPageChange"
+          @page-limit-change="addPageLimitChange"
+          @select-all="addSelectAll"
+          @select="addSelect">
+          <bk-table-column type="selection" width="60" align="center"></bk-table-column>
+          <bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="180"></bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['服务类型']`)">
+            <template slot-scope="props">
+              <span v-for="node in serviceTypesMap"
+                v-if="props.row.key === node.key"
+                :key="node.key">
+                {{node.name || '--'}}
+              </span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+        <div class="mt20">
+          <bk-button
+            data-test-id="serviceCatalogue_button_serviceCreate"
+            theme="primary"
+            :title="$t(`m.serviceConfig['新增']`)"
+            v-if="!entryInfo.listInfo.length"
+            @click="addEntry">
+            {{ $t('m.serviceConfig["新增"]') }}
+          </bk-button>
+          <bk-button
+            data-test-id="serviceCatalogue_button_serviceConfirm"
+            theme="primary"
+            :title="$t(`m.serviceConfig['确认']`)"
+            :disabled="!entryInfo.checkList.length"
+            :loading="secondClick"
+            v-else
+            @click="submitEntry">
+            {{ $t('m.serviceConfig["确认"]') }}
+          </bk-button>
+          <bk-button
+            data-test-id="serviceCatalogue_button_serviceCancel"
+            theme="default"
+            :title="$t(`m.serviceConfig['取消']`)"
+            :loading="secondClick"
+            @click="closeShade">
+            {{ $t('m.serviceConfig["取消"]') }}
+          </bk-button>
+        </div>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 <script>
     import draggable from 'vuedraggable';

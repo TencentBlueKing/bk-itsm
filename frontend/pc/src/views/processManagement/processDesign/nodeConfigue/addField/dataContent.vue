@@ -21,104 +21,104 @@
   -->
 
 <template>
-    <div class="bk-data-content" @click="closeError">
-        <template v-if="formInfo.source_type === 'CUSTOM'">
-            <div class="bk-custom-line"
-                :class="{ 'mb20': itemIndex !== fieldInfo.list.length - 1 }"
-                v-for="(item, itemIndex) in fieldInfo.list"
-                :key="itemIndex">
-                <div class="bk-costom-form">
-                    <bk-input :maxlength="120"
-                        :ext-cls="'bk-custom-input'"
-                        :clearable="true"
-                        :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
-                        v-model="item.name"
-                        :placeholder="$t(`m.treeinfo['请输入选项名']`)"
-                        @blur="putChar(item, itemIndex)">
-                    </bk-input>
-                    <template v-if="formInfo.type === 'TABLE'">
-                        <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
-                            :true-value="trueStatus"
-                            :false-value="falseStatus"
-                            v-model="item.required">
-                            {{ $t(`m.treeinfo['必填']`) }}
-                        </bk-checkbox>
-                    </template>
-                    <bk-input :ext-cls="'bk-custom-input'"
-                        :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
-                        v-model="item.key"
-                        :placeholder="$t(`m.treeinfo['请输入选项ID']`)">
-                    </bk-input>
-                    <div class="bk-custom-icon">
-                        <i class="bk-itsm-icon icon-flow-add" :class="{ 'bk-no-delete': (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT') }" @click="addDataLine(item, itemIndex)"></i>
-                        <i class="bk-itsm-icon icon-flow-reduce"
-                            :class="{ 'bk-no-delete': fieldInfo.list.length === 1 || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT') }"
-                            @click="deleteDataLine(item, itemIndex)"></i>
-                    </div>
+  <div class="bk-data-content" @click="closeError">
+    <template v-if="formInfo.source_type === 'CUSTOM'">
+      <div class="bk-custom-line"
+        :class="{ 'mb20': itemIndex !== fieldInfo.list.length - 1 }"
+        v-for="(item, itemIndex) in fieldInfo.list"
+        :key="itemIndex">
+        <div class="bk-costom-form">
+          <bk-input :maxlength="120"
+            :ext-cls="'bk-custom-input'"
+            :clearable="true"
+            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE') && formInfo.key !== 'bk_biz_id'"
+            v-model="item.name"
+            :placeholder="$t(`m.treeinfo['请输入选项名']`)"
+            @blur="putChar(item, itemIndex)">
+          </bk-input>
+          <template v-if="formInfo.type === 'TABLE'">
+            <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
+              :true-value="trueStatus"
+              :false-value="falseStatus"
+              v-model="item.required">
+              {{ $t(`m.treeinfo['必填']`) }}
+            </bk-checkbox>
+          </template>
+          <bk-input :ext-cls="'bk-custom-input'"
+            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+            v-model="item.key"
+            :placeholder="$t(`m.treeinfo['请输入选项ID']`)">
+          </bk-input>
+          <div class="bk-custom-icon">
+            <i class="bk-itsm-icon icon-flow-add" :class="{ 'bk-no-delete': (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT') }" @click="addDataLine(item, itemIndex)"></i>
+            <i class="bk-itsm-icon icon-flow-reduce"
+              :class="{ 'bk-no-delete': fieldInfo.list.length === 1 || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT') }"
+              @click="deleteDataLine(item, itemIndex)"></i>
+          </div>
 
-                </div>
-                <div class="bk-field-error-tip">
-                    <p class="bk-field-error" v-if="item.nameCheck">{{ $t('m.deployPage["名称不能为空且不能重复"]') }}</p>
-                    <template v-else>
-                        <p class="bk-field-error" v-if="item.keyCheck">{{ $t('m.deployPage["名称ID为英文数字及下划线且不能重复"]') }}</p>
-                    </template>
-                </div>
-            </div>
-        </template>
-        <template v-if="formInfo.source_type === 'API'">
-            <div class="bk-api-param" v-if="apiInfo.remote_system_id && apiInfo.remote_api_id">
-                <!-- get/query/参数 -->
-                <div class="bk-param"
-                    v-if="apiDetail.req_params && apiDetail.req_params.length && apiDetail.req_params[0].name">
-                    <get-param
-                        ref="getParam"
-                        :entry="'addField'"
-                        :form-info="formInfo"
-                        :change-info="changeInfo"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </get-param>
-                </div>
-                <!-- post/body/参数 -->
-                <div class="bk-param"
-                    v-if="apiDetail.req_body && Object.keys(apiDetail.req_body).length && apiDetail.req_body.properties && Object.keys(apiDetail.req_body.properties).length ">
-                    <post-param
-                        ref="postParam"
-                        :entry="'addField'"
-                        :form-info="formInfo"
-                        :change-info="changeInfo"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </post-param>
-                </div>
-                <!-- 返回数据/可选数组Tree -->
-                <div class="bk-param"
-                    v-if="apiDetail.rsp_data && Object.keys(apiDetail.rsp_data).length && apiDetail.rsp_data.properties && Object.keys(apiDetail.rsp_data.properties).length">
-                    <response-data
-                        ref="responseData"
-                        :remote-api-iid="apiInfo.remote_api_id"
-                        :change-info="changeInfo"
-                        :form-info="formInfo"
-                        :state-list="stateList"
-                        :api-detail="apiDetail">
-                    </response-data>
-                </div>
-            </div>
-        </template>
-        <template v-if="formInfo.source_type === 'RPC'">
-            <div class="bk-api-param" v-if="prcTable.length">
-                <div class="bk-param">
-                    <get-rpc-param
-                        ref="getRpcParam"
-                        :form-info="formInfo"
-                        :change-info="changeInfo"
-                        :state-list="stateList"
-                        :prc-table="prcTable">
-                    </get-rpc-param>
-                </div>
-            </div>
-        </template>
-    </div>
+        </div>
+        <div class="bk-field-error-tip">
+          <p class="bk-field-error" v-if="item.nameCheck">{{ $t('m.deployPage["名称不能为空且不能重复"]') }}</p>
+          <template v-else>
+            <p class="bk-field-error" v-if="item.keyCheck">{{ $t('m.deployPage["名称ID为英文数字及下划线且不能重复"]') }}</p>
+          </template>
+        </div>
+      </div>
+    </template>
+    <template v-if="formInfo.source_type === 'API'">
+      <div class="bk-api-param" v-if="apiInfo.remote_system_id && apiInfo.remote_api_id">
+        <!-- get/query/参数 -->
+        <div class="bk-param"
+          v-if="apiDetail.req_params && apiDetail.req_params.length && apiDetail.req_params[0].name">
+          <get-param
+            ref="getParam"
+            :entry="'addField'"
+            :form-info="formInfo"
+            :change-info="changeInfo"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </get-param>
+        </div>
+        <!-- post/body/参数 -->
+        <div class="bk-param"
+          v-if="apiDetail.req_body && Object.keys(apiDetail.req_body).length && apiDetail.req_body.properties && Object.keys(apiDetail.req_body.properties).length ">
+          <post-param
+            ref="postParam"
+            :entry="'addField'"
+            :form-info="formInfo"
+            :change-info="changeInfo"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </post-param>
+        </div>
+        <!-- 返回数据/可选数组Tree -->
+        <div class="bk-param"
+          v-if="apiDetail.rsp_data && Object.keys(apiDetail.rsp_data).length && apiDetail.rsp_data.properties && Object.keys(apiDetail.rsp_data.properties).length">
+          <response-data
+            ref="responseData"
+            :remote-api-iid="apiInfo.remote_api_id"
+            :change-info="changeInfo"
+            :form-info="formInfo"
+            :state-list="stateList"
+            :api-detail="apiDetail">
+          </response-data>
+        </div>
+      </div>
+    </template>
+    <template v-if="formInfo.source_type === 'RPC'">
+      <div class="bk-api-param" v-if="prcTable.length">
+        <div class="bk-param">
+          <get-rpc-param
+            ref="getRpcParam"
+            :form-info="formInfo"
+            :change-info="changeInfo"
+            :state-list="stateList"
+            :prc-table="prcTable">
+          </get-rpc-param>
+        </div>
+      </div>
+    </template>
+  </div>
 </template>
 <script>
     import pinyin from 'pinyin';

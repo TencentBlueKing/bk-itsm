@@ -21,37 +21,37 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-select searchable
-                v-model="firstInfo"
-                :font-size="'medium'"
-                :class="{ 'bk-form-two': firstShow }"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                :placeholder="item.choice[0] ? item.choice[0].desc : firstPlace"
-                @selected="itemSelect">
-                <bk-option v-for="option in item.choice"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <template v-if="firstShow">
-                <bk-select searchable
-                    v-model="secondInfo"
-                    :class="{ 'bk-form-two-other': firstShow }"
-                    :disabled="(item.is_readonly && !isCurrent) || disabled"
-                    :font-size="'medium'"
-                    :placeholder="firstList[0] ? firstList[0].desc : secondPlace"
-                    @selected="changeFrist">
-                    <bk-option v-for="option in firstList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </template>
-            <!-- <div class="bk-form-content">
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-select searchable
+        v-model="firstInfo"
+        :font-size="'medium'"
+        :class="{ 'bk-form-two': firstShow }"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        :placeholder="item.choice[0] ? item.choice[0].desc : firstPlace"
+        @selected="itemSelect">
+        <bk-option v-for="option in item.choice"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <template v-if="firstShow">
+        <bk-select searchable
+          v-model="secondInfo"
+          :class="{ 'bk-form-two-other': firstShow }"
+          :disabled="(item.is_readonly && !isCurrent) || disabled"
+          :font-size="'medium'"
+          :placeholder="firstList[0] ? firstList[0].desc : secondPlace"
+          @selected="changeFrist">
+          <bk-option v-for="option in firstList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </template>
+      <!-- <div class="bk-form-content">
                 <bk-selector
                     style="position: relative;"
                     :class="{'bk-form-two': firstShow}"
@@ -76,12 +76,12 @@
                     :placeholder="firstList[0] ? firstList[0].desc : secondPlace">
                 </bk-selector>
             </div> -->
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-        </template>
-    </div>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

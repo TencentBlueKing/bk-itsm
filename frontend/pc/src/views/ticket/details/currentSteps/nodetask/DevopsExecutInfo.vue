@@ -21,92 +21,92 @@
   -->
 
 <template>
-    <div class="devops-execut-info">
-        <!-- v-if="status === 'RUNNING'" -->
-        <div class="running-info" v-if="status === 'RUNNING'" v-bkloading="{ isLoading: taskStatusInfoLoading }">
-            <i class="bk-itsm-icon icon-icon-loading"></i>
-            <p class="run-info">{{ $t(`m.tickets['任务正在执行中，请稍等']`) }}</p>
-            <p class="run-time">
-                <span class="time-block">
-                    {{ $t(`m.tickets['已耗时：']`) }}
-                    {{ convertMStoString(taskStatusInfo.elapsed_time * 1000) }}
-                </span>
-            </p>
-        </div>
-        <!-- 执行成功/执行失败 -->
-        <div class="execut-info" v-else>
-            <!-- 任务信息 -->
-            <div class="base-info">
-                <h3 class="setion-title">{{$t(`m.task['任务信息']`)}}</h3>
-                <ul class="basic-list" v-bkloading="{ isLoading: taskStatusInfoLoading }">
-                    <li class="basic-item" v-for="(item, index) in taskInfoList" :key="index">
-                        <span class="basic-name">{{ item.name }}：</span>
-                        <span class="basic-value">
-                            <template v-if="item.key !== 'status'">
-                                {{ item.value }}
-                            </template>
-                            <template v-else>
-                                <task-status :status="taskInfo[item.key]" type="text"></task-status>
-                            </template>
-                        </span>
-                    </li>
-                </ul>
-            </div>
-            <!-- 执行情况 -->
-            <div class="base-info mt30">
-                <h3 class="setion-title">{{ $t(`m.tickets['执行情况']`) }}</h3>
-                <ul class="basic-list" v-bkloading="{ isLoading: buildStatusLoading }">
-                    <li class="basic-item" v-for="(item, index) in displayExecutInfoList" :key="index">
-                        <span class="basic-name">{{ item.name }}：</span>
-                        <span class="basic-value">
-                            {{ item.value }}
-                        </span>
-                    </li>
-                </ul>
-            </div>
-            <!-- 构件列表 -->
-            <div class="base-info mt30">
-                <h3 class="setion-title">{{ $t(`m.tickets['构件列表']`) }}</h3>
-                <bk-table
-                    v-bkloading="{ isLoading: buildStatusLoading }"
-                    :data="buildList">
-                    <bk-table-column label="构建名称" prop="name">
-                        <template slot-scope="props">
-                            <span class="link-ui" @click.stop="openBuildDetail(props.row)">{{ props.row.name }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column label="路径" prop="path"></bk-table-column>
-                    <bk-table-column label="文件大小" prop="size"></bk-table-column>
-                    <bk-table-column label="仓库类型" prop="artifactoryType"></bk-table-column>
-                </bk-table>
-            </div>
-            <!-- 输出变量 -->
-            <div class="base-info mt30">
-                <h3 class="setion-title">{{ $t(`m.tickets['输出变量']`) }}</h3>
-                <bk-table
-                    v-bkloading="{ isLoading: buildStatusLoading }"
-                    :data="outputVariableList">
-                    <bk-table-column :label="$t(`m.tickets['变量']`)" prop="key" width="180"></bk-table-column>
-                    <bk-table-column :label="$t(`m.tickets['值']`)" prop="value"></bk-table-column>
-                </bk-table>
-            </div>
-        </div>
-        <bk-sideslider
-            :is-show.sync="isShowBuildDetailDialog"
-            :width="800"
-            :quick-close="true"
-            :title="openBuildInfo.name">
-            <div slot="header">
-                {{ $t(`m.tickets['构建详情']`) }} 【{{ openBuildInfo.name }}】
-            </div>
-            <div slot="content">
-                <build-detail-info
-                    v-if="isShowBuildDetailDialog"
-                    :build-item="openBuildInfo">
-                </build-detail-info>
-            </div>
-        </bk-sideslider>
+  <div class="devops-execut-info">
+    <!-- v-if="status === 'RUNNING'" -->
+    <div class="running-info" v-if="status === 'RUNNING'" v-bkloading="{ isLoading: taskStatusInfoLoading }">
+      <i class="bk-itsm-icon icon-icon-loading"></i>
+      <p class="run-info">{{ $t(`m.tickets['任务正在执行中，请稍等']`) }}</p>
+      <p class="run-time">
+        <span class="time-block">
+          {{ $t(`m.tickets['已耗时：']`) }}
+          {{ convertMStoString(taskStatusInfo.elapsed_time * 1000) }}
+        </span>
+      </p>
     </div>
+    <!-- 执行成功/执行失败 -->
+    <div class="execut-info" v-else>
+      <!-- 任务信息 -->
+      <div class="base-info">
+        <h3 class="setion-title">{{$t(`m.task['任务信息']`)}}</h3>
+        <ul class="basic-list" v-bkloading="{ isLoading: taskStatusInfoLoading }">
+          <li class="basic-item" v-for="(item, index) in taskInfoList" :key="index">
+            <span class="basic-name">{{ item.name }}：</span>
+            <span class="basic-value">
+              <template v-if="item.key !== 'status'">
+                {{ item.value }}
+              </template>
+              <template v-else>
+                <task-status :status="taskInfo[item.key]" type="text"></task-status>
+              </template>
+            </span>
+          </li>
+        </ul>
+      </div>
+      <!-- 执行情况 -->
+      <div class="base-info mt30">
+        <h3 class="setion-title">{{ $t(`m.tickets['执行情况']`) }}</h3>
+        <ul class="basic-list" v-bkloading="{ isLoading: buildStatusLoading }">
+          <li class="basic-item" v-for="(item, index) in displayExecutInfoList" :key="index">
+            <span class="basic-name">{{ item.name }}：</span>
+            <span class="basic-value">
+              {{ item.value }}
+            </span>
+          </li>
+        </ul>
+      </div>
+      <!-- 构件列表 -->
+      <div class="base-info mt30">
+        <h3 class="setion-title">{{ $t(`m.tickets['构件列表']`) }}</h3>
+        <bk-table
+          v-bkloading="{ isLoading: buildStatusLoading }"
+          :data="buildList">
+          <bk-table-column label="构建名称" prop="name">
+            <template slot-scope="props">
+              <span class="link-ui" @click.stop="openBuildDetail(props.row)">{{ props.row.name }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column label="路径" prop="path"></bk-table-column>
+          <bk-table-column label="文件大小" prop="size"></bk-table-column>
+          <bk-table-column label="仓库类型" prop="artifactoryType"></bk-table-column>
+        </bk-table>
+      </div>
+      <!-- 输出变量 -->
+      <div class="base-info mt30">
+        <h3 class="setion-title">{{ $t(`m.tickets['输出变量']`) }}</h3>
+        <bk-table
+          v-bkloading="{ isLoading: buildStatusLoading }"
+          :data="outputVariableList">
+          <bk-table-column :label="$t(`m.tickets['变量']`)" prop="key" width="180"></bk-table-column>
+          <bk-table-column :label="$t(`m.tickets['值']`)" prop="value"></bk-table-column>
+        </bk-table>
+      </div>
+    </div>
+    <bk-sideslider
+      :is-show.sync="isShowBuildDetailDialog"
+      :width="800"
+      :quick-close="true"
+      :title="openBuildInfo.name">
+      <div slot="header">
+        {{ $t(`m.tickets['构建详情']`) }} 【{{ openBuildInfo.name }}】
+      </div>
+      <div slot="content">
+        <build-detail-info
+          v-if="isShowBuildDetailDialog"
+          :build-item="openBuildInfo">
+        </build-detail-info>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

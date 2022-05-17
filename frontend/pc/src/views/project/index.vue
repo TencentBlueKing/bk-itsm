@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="project-page" v-bkloading="{ isLoading: projectDetailLoading }">
-        <router-view v-if="$store.state.project.id && !projectDetailLoading"></router-view>
-    </div>
+  <div class="project-page" v-bkloading="{ isLoading: projectDetailLoading }">
+    <router-view v-if="$store.state.project.id && !projectDetailLoading"></router-view>
+  </div>
 </template>
 <script>
     import { mapState } from 'vuex';

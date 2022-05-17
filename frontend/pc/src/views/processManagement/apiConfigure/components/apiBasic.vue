@@ -21,141 +21,141 @@
   -->
 
 <template>
-    <div class="bk-api-basic">
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["基本信息"]') }}</h1>
-            </div>
-            <ul class="bk-basic-form">
-                <li>
-                    <span class="bk-info-title">{{ $t('m.systemConfig["接口名称："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.name || '--'}}</span>
-                </li>
-                <li>
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <span class="bk-info-title">{{ $t('m.systemConfig["创 建 人："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.creator || '--'}}</span>
-                </li>
-                <li>
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <span class="bk-info-title">{{ $t('m.user["负 责 人："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.owners || '--'}}</span>
-                </li>
-                <li>
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <span class="bk-info-title">{{ $t('m.systemConfig["状  态："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.is_activated ? $t(`m.systemConfig["启用"]`) : $t(`m.systemConfig["关闭"]`)}}</span>
-                </li>
-                <li>
-                    <span class="bk-info-title">{{ $t('m.systemConfig["更新时间："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.create_at}}</span>
-                </li>
-                <li>
-                    <span class="bk-info-title">{{ $t('m.systemConfig["接口路径："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.path}}</span>
-                </li>
-                <li>
-                    <!-- eslint-disable-next-line no-irregular-whitespace -->
-                    <span class="bk-info-title">{{ $t('m.systemConfig["备  注："]') }}</span>
-                    <span class="bk-info-content">{{apiDetailInfo.desc}}</span>
-                </li>
-            </ul>
-        </div>
-        <div class="bk-basic-item" style="padding: 0">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求参数"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <p class="bk-basic-p">Query：</p>
-                <bk-table
-                    :data="apiDetailInfo.req_params"
-                    :size="'small'">
-                    <bk-table-column :label="$t(`m.systemConfig['参数名称']`)" prop="name"></bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['必选']`)">
-                        <template slot-scope="props">
-                            <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['示例']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.sample">{{props.row.sample || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['备注']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-            <div class="bk-basic-content">
-                <p class="bk-basic-p">Body：</p>
-                <bk-table
-                    :data="bodyTableData"
-                    :size="'small'">
-                    <bk-table-column :label="$t(`m.systemConfig['名称']`)">
-                        <template slot-scope="props">
-                            <div class="bk-more">
-                                <span :style="{ paddingLeft: 20 * props.row.level + 'px' }"></span>
-                                <span class="bk-icon tree-expanded-icon icon-right-shape"
-                                    v-if="props.row.has_children && !props.row.showChildren"></span>
-                                <span class="bk-icon tree-expanded-icon icon-down-shape"
-                                    v-else-if="props.row.has_children && props.row.showChildren"></span>
-                                <span class="bk-icon bk-more-icon" v-else> </span>
-                                <span>{{props.row.key || '--'}}</span>
-                            </div>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['类型']`)" prop="type"></bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['必选']`)">
-                        <template slot-scope="props">
-                            <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['备注']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-        </div>
-        <div class="bk-basic-item" style="padding: 0">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <bk-table
-                    :data="responseTableData"
-                    :size="'small'">
-                    <bk-table-column :label="$t(`m.systemConfig['名称']`)">
-                        <template slot-scope="props">
-                            <div class="bk-more">
-                                <span :style="{ paddingLeft: 20 * props.row.level + 'px' }"></span>
-                                <span class="bk-icon tree-expanded-icon icon-right-shape"
-                                    v-if="props.row.has_children && !props.row.showChildren"></span>
-                                <span class="bk-icon tree-expanded-icon icon-down-shape"
-                                    v-else-if="props.row.has_children && props.row.showChildren"></span>
-                                <span class="bk-icon bk-more-icon" v-else> </span>
-                                <span>{{props.row.key || '--'}}</span>
-                            </div>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['类型']`)" prop="type"></bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['必选']`)">
-                        <template slot-scope="props">
-                            <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.systemConfig['备注']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-        </div>
+  <div class="bk-api-basic">
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["基本信息"]') }}</h1>
+      </div>
+      <ul class="bk-basic-form">
+        <li>
+          <span class="bk-info-title">{{ $t('m.systemConfig["接口名称："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.name || '--'}}</span>
+        </li>
+        <li>
+          <!-- eslint-disable-next-line no-irregular-whitespace -->
+          <span class="bk-info-title">{{ $t('m.systemConfig["创 建 人："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.creator || '--'}}</span>
+        </li>
+        <li>
+          <!-- eslint-disable-next-line no-irregular-whitespace -->
+          <span class="bk-info-title">{{ $t('m.user["负 责 人："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.owners || '--'}}</span>
+        </li>
+        <li>
+          <!-- eslint-disable-next-line no-irregular-whitespace -->
+          <span class="bk-info-title">{{ $t('m.systemConfig["状  态："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.is_activated ? $t(`m.systemConfig["启用"]`) : $t(`m.systemConfig["关闭"]`)}}</span>
+        </li>
+        <li>
+          <span class="bk-info-title">{{ $t('m.systemConfig["更新时间："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.create_at}}</span>
+        </li>
+        <li>
+          <span class="bk-info-title">{{ $t('m.systemConfig["接口路径："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.path}}</span>
+        </li>
+        <li>
+          <!-- eslint-disable-next-line no-irregular-whitespace -->
+          <span class="bk-info-title">{{ $t('m.systemConfig["备  注："]') }}</span>
+          <span class="bk-info-content">{{apiDetailInfo.desc}}</span>
+        </li>
+      </ul>
     </div>
+    <div class="bk-basic-item" style="padding: 0">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求参数"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <p class="bk-basic-p">Query：</p>
+        <bk-table
+          :data="apiDetailInfo.req_params"
+          :size="'small'">
+          <bk-table-column :label="$t(`m.systemConfig['参数名称']`)" prop="name"></bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['必选']`)">
+            <template slot-scope="props">
+              <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['示例']`)">
+            <template slot-scope="props">
+              <span :title="props.row.sample">{{props.row.sample || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['备注']`)">
+            <template slot-scope="props">
+              <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
+      <div class="bk-basic-content">
+        <p class="bk-basic-p">Body：</p>
+        <bk-table
+          :data="bodyTableData"
+          :size="'small'">
+          <bk-table-column :label="$t(`m.systemConfig['名称']`)">
+            <template slot-scope="props">
+              <div class="bk-more">
+                <span :style="{ paddingLeft: 20 * props.row.level + 'px' }"></span>
+                <span class="bk-icon tree-expanded-icon icon-right-shape"
+                  v-if="props.row.has_children && !props.row.showChildren"></span>
+                <span class="bk-icon tree-expanded-icon icon-down-shape"
+                  v-else-if="props.row.has_children && props.row.showChildren"></span>
+                <span class="bk-icon bk-more-icon" v-else> </span>
+                <span>{{props.row.key || '--'}}</span>
+              </div>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['类型']`)" prop="type"></bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['必选']`)">
+            <template slot-scope="props">
+              <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['备注']`)">
+            <template slot-scope="props">
+              <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
+    </div>
+    <div class="bk-basic-item" style="padding: 0">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <bk-table
+          :data="responseTableData"
+          :size="'small'">
+          <bk-table-column :label="$t(`m.systemConfig['名称']`)">
+            <template slot-scope="props">
+              <div class="bk-more">
+                <span :style="{ paddingLeft: 20 * props.row.level + 'px' }"></span>
+                <span class="bk-icon tree-expanded-icon icon-right-shape"
+                  v-if="props.row.has_children && !props.row.showChildren"></span>
+                <span class="bk-icon tree-expanded-icon icon-down-shape"
+                  v-else-if="props.row.has_children && props.row.showChildren"></span>
+                <span class="bk-icon bk-more-icon" v-else> </span>
+                <span>{{props.row.key || '--'}}</span>
+              </div>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['类型']`)" prop="type"></bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['必选']`)">
+            <template slot-scope="props">
+              <span>{{props.row.is_necessary ? $t('m.systemConfig["是"]') : $t('m.systemConfig["否"]')}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.systemConfig['备注']`)">
+            <template slot-scope="props">
+              <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -21,22 +21,22 @@
   -->
 
 <template>
-    <div class="line-chart" ref="lineChartWrap">
-        <div v-if="showTimeDimension" class="time-dimension-selector">
-            <bk-select
-                :clearable="false"
-                :value="dimension"
-                @selected="onSelectDimension">
-                <bk-option
-                    v-for="item in timeDimensions"
-                    :key="item.key"
-                    :id="item.key"
-                    :name="item.name">
-                </bk-option>
-            </bk-select>
-        </div>
-        <canvas class="line-chart" :height="height"></canvas>
+  <div class="line-chart" ref="lineChartWrap">
+    <div v-if="showTimeDimension" class="time-dimension-selector">
+      <bk-select
+        :clearable="false"
+        :value="dimension"
+        @selected="onSelectDimension">
+        <bk-option
+          v-for="item in timeDimensions"
+          :key="item.key"
+          :id="item.key"
+          :name="item.name">
+        </bk-option>
+      </bk-select>
     </div>
+    <canvas class="line-chart" :height="height"></canvas>
+  </div>
 </template>
 <script>
     import Chart from '@blueking/bkcharts';

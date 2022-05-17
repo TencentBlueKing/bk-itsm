@@ -21,21 +21,21 @@
   -->
 
 <template>
-    <div class="bk-fields-running">
-        <div class="bk-field-contain" :key="routerKey">
-            <component
-                ref="temp"
-                :is="'CW-' + item.type"
-                :item="item"
-                :fields="fields"
-                :is-current="true"></component>
-        </div>
-        <div class="bk-save-cancel" :class="{ 'bk-save-margin': marginTypeList.some(type => type === item.type) }">
-            <span class="bk-save-cancel-item" @click="save(item)">{{$t(`m.systemConfig["保存"]`)}}</span>
-            <span class="bk-save-cancel-split">|</span>
-            <span class="bk-save-cancel-item" @click="cancel(item)">{{$t(`m.wiki['取消']`)}}</span>
-        </div>
+  <div class="bk-fields-running">
+    <div class="bk-field-contain" :key="routerKey">
+      <component
+        ref="temp"
+        :is="'CW-' + item.type"
+        :item="item"
+        :fields="fields"
+        :is-current="true"></component>
     </div>
+    <div class="bk-save-cancel" :class="{ 'bk-save-margin': marginTypeList.some(type => type === item.type) }">
+      <span class="bk-save-cancel-item" @click="save(item)">{{$t(`m.systemConfig["保存"]`)}}</span>
+      <span class="bk-save-cancel-split">|</span>
+      <span class="bk-save-cancel-item" @click="cancel(item)">{{$t(`m.wiki['取消']`)}}</span>
+    </div>
+  </div>
 </template>
 <script>
     import commonMix from '../../../commonMix/common.js';

@@ -21,24 +21,24 @@
   -->
 
 <template>
-    <bk-dialog
-        width="768"
-        ext-cls="permission-dialog"
-        :z-index="2010"
-        :mask-close="false"
-        :header-position="'left'"
-        :title="''"
-        :value="isModalShow"
-        @cancel="onCloseDialog">
-        <permission-content :permission-data="permissionData">
-        </permission-content>
-        <div class="permission-footer" slot="footer">
-            <div class="button-group">
-                <bk-button theme="primary" :loading="loading" @click="goToApply">{{hasClicked ? $t(`m.common['已申请']`) : $t(`m.common['去申请']`)}}</bk-button>
-                <bk-button theme="default" @click="onCloseDialog">{{$t(`m['取消']`)}}</bk-button>
-            </div>
-        </div>
-    </bk-dialog>
+  <bk-dialog
+    width="768"
+    ext-cls="permission-dialog"
+    :z-index="2010"
+    :mask-close="false"
+    :header-position="'left'"
+    :title="''"
+    :value="isModalShow"
+    @cancel="onCloseDialog">
+    <permission-content :permission-data="permissionData">
+    </permission-content>
+    <div class="permission-footer" slot="footer">
+      <div class="button-group">
+        <bk-button theme="primary" :loading="loading" @click="goToApply">{{hasClicked ? $t(`m.common['已申请']`) : $t(`m.common['去申请']`)}}</bk-button>
+        <bk-button theme="default" @click="onCloseDialog">{{$t(`m['取消']`)}}</bk-button>
+      </div>
+    </div>
+  </bk-dialog>
 </template>
 <script>
     import { errorHandler } from '@/utils/errorHandler.js';

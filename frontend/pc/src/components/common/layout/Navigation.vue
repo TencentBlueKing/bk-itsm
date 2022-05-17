@@ -21,171 +21,171 @@
   -->
 
 <template>
-    <bk-navigation
-        navigation-type="top-bottom"
-        theme-color="#ffffff"
-        :default-open="isSideOpen"
-        :side-title="appName"
-        :need-menu="sideRouters.length > 0"
-        @toggle-click="isSideOpen = $event">
-        <template slot="side-icon">
-            <i class="bk-itsm-icon icon-itsm-logo logo-icon" style="font-size: 20px;"></i>
-        </template>
-        <template slot="header">
-            <div class="nav-header">
-                <bk-button
-                    data-test-id="navigation-button-createTicket"
-                    theme="primary"
-                    icon="plus"
-                    size="small"
-                    class="create-bill-btn"
-                    @click="isCreateTicketDialogShow = true">
-                    {{ $t(`m.navigation["提单"]`) }}
-                </bk-button>
-                <ul class="nav-list">
-                    <li
-                        v-for="router in topNav"
-                        :key="router.id"
-                        :class="['nav-item', { active: router.id === activeNav }]">
-                        <router-link :to="router.path" :data-test-id="`navigation-router-navRouter-${router.id}`" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
-                    </li>
-                </ul>
-            </div>
-            <div class="quick-entry">
-                <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
-                    <div class="right-question-icon">
-                        <svg class="bk-icon" style="margin-top: 2px; width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32,4C16.5,4,4,16.5,4,32c0,3.6,0.7,7.1,2,10.4V56c0,1.1,0.9,2,2,2h13.6C36,63.7,52.3,56.8,58,42.4S56.8,11.7,42.4,6C39.1,4.7,35.6,4,32,4z M31.3,45.1c-1.7,0-3-1.3-3-3s1.3-3,3-3c1.7,0,3,1.3,3,3S33,45.1,31.3,45.1z M36.7,31.7c-2.3,1.3-3,2.2-3,3.9v0.9H29v-1c-0.2-2.8,0.7-4.4,3.2-5.8c2.3-1.4,3-2.2,3-3.8s-1.3-2.8-3.3-2.8c-1.8-0.1-3.3,1.2-3.5,3c0,0.1,0,0.1,0,0.2h-4.8c0.1-4.4,3.1-7.4,8.5-7.4c5,0,8.3,2.8,8.3,6.9C40.5,28.4,39.2,30.3,36.7,31.7z"></path>
-                        </svg>
-                    </div>
-                    <template slot="content">
-                        <ul class="nav-operate-list">
-                            <li class="operate-item">
-                                <a :href="bkDocUrl" target="_blank">{{ $t(`m.wiki["产品文档"]`) }}</a>
-                            </li>
-                            <li class="operate-item">
-                                <div @click="isVersionLogShow = true">{{ $t(`m.wiki["版本日志"]`) }}</div>
-                            </li>
-                            <li class="operate-item">
-                                <a href="https://bk.tencent.com/s-mart/community" target="_blank">{{ $t(`m.wiki["问题反馈"]`) }}</a>
-                            </li>
-                        </ul>
-                    </template>
-                </bk-popover>
-                <bk-popover data-test-id="navigation-popover-user" theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
-                    <div class="user-name">
-                        <span>{{ userName }}</span>
-                        <i class="bk-icon icon-down-shape"></i>
-                    </div>
-                    <template slot="content">
-                        <ul class="nav-operate-list">
-                            <li class="operate-item">
-                                <span @click="onGoToProjectList">{{ $t(`m["项目管理"]`) }}</span>
-                            </li>
-                            <li class="operate-item">
-                                <span data-test-id="navigation-span-logout" @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
-                            </li>
-                        </ul>
-                    </template>
-                </bk-popover>
-            </div>
-        </template>
-        <template slot="menu">
-            <bk-select
-                data-test-id="navigation-select-projectList"
-                v-if="activeNav === 'project'"
-                :value="selectedProject"
-                class="project-select"
-                ext-popover-cls="project-select-popover"
-                :loading="projectListLoading"
-                :clearable="false"
-                :searchable="true"
-                @selected="onSelectProject">
-                <bk-option
-                    v-for="item in projectList"
-                    :key="item.key"
-                    :id="item.key"
-                    :disabled="!hasPermission(['project_view'], item.auth_actions)"
-                    :name="item.name">
-                    <div
-                        v-cursor="{ active: !hasPermission(['project_view'], item.auth_actions) }"
-                        :class="['project-item', { 'text-permission-disable': !hasPermission(['project_view'], item.auth_actions) }]"
-                        @click="applyForProjectViewPerm(item, 'project_view')">
-                        {{ item.name }}
-                    </div>
-                </bk-option>
-                <div slot="extension" class="project-select-extension">
-                    <div
-                        data-test-id="navigation-div-createProject"
-                        v-cursor="{ active: !hasPermission(['project_create']) }"
-                        :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create']) }]"
-                        @click="handleCreateProject">
-                        <i class="bk-icon icon-plus-circle"></i>
-                        {{ $t(`m['新建项目']`) }}
-                    </div>
-                    <div
-                        data-test-id="navigation-div-manageProject"
-                        class="action-item"
-                        @click="goToProjectManage">
-                        <i class="bk-icon icon-apps"></i>
-                        {{ $t(`m['项目管理']`) }}
-                    </div>
-                </div>
-            </bk-select>
-            <bk-navigation-menu
-                item-active-bg-color="#e1ecff"
-                item-active-color="#3a84ff"
-                item-default-color="#979ba5"
-                item-default-icon-color="#979ba5"
-                item-active-icon-color="#3a84ff"
-                :toggle-active="true"
-                :default-active="activeSideRouter">
-                <template v-for="router in sideNav">
-                    <div
-                        v-if="Array.isArray(router.subRouters) && router.subRouters.length > 0"
-                        class="nav-group-wrap"
-                        :key="router.id">
-                        <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
-                        <bk-navigation-menu-item
-                            v-for="item in router.subRouters"
-                            :data-test-id="`navigation-menu-${item.id}`"
-                            :key="item.id"
-                            :id="item.id"
-                            :disabled="item.disabled"
-                            :icon="item.icon"
-                            @click="handleSideRouterClick(item)">
-                            {{ item.name }}
-                        </bk-navigation-menu-item>
-                    </div>
-                    <bk-navigation-menu-item
-                        :data-test-id="`navigation-menu-platformRouter-${router.id}`"
-                        v-else
-                        :key="router.id"
-                        :id="router.id"
-                        :has-child="false"
-                        :icon="router.icon"
-                        :disabled="router.disabled"
-                        @click="handleSideRouterClick(router)">
-                        {{ router.name }}
-                    </bk-navigation-menu-item>
-                </template>
-
-            </bk-navigation-menu>
-        </template>
-        <div class="page-container">
-            <slot></slot>
-            <version-log v-if="isVersionLogShow" @close="isVersionLogShow = false"></version-log>
-            <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
-            <edit-project-dialog
-                :title="$t(`m['新建项目']`)"
-                :is-show="isEditDialogShow"
-                :project="projectForm"
-                :edit-dialog-form-disable="editDialogFormDisable"
-                @confirm="onProjectDialogConfirm"
-                @cancel="onProjectDialogCancel">
-            </edit-project-dialog>
+  <bk-navigation
+    navigation-type="top-bottom"
+    theme-color="#ffffff"
+    :default-open="isSideOpen"
+    :side-title="appName"
+    :need-menu="sideRouters.length > 0"
+    @toggle-click="isSideOpen = $event">
+    <template slot="side-icon">
+      <i class="bk-itsm-icon icon-itsm-logo logo-icon" style="font-size: 20px;"></i>
+    </template>
+    <template slot="header">
+      <div class="nav-header">
+        <bk-button
+          data-test-id="navigation-button-createTicket"
+          theme="primary"
+          icon="plus"
+          size="small"
+          class="create-bill-btn"
+          @click="isCreateTicketDialogShow = true">
+          {{ $t(`m.navigation["提单"]`) }}
+        </bk-button>
+        <ul class="nav-list">
+          <li
+            v-for="router in topNav"
+            :key="router.id"
+            :class="['nav-item', { active: router.id === activeNav }]">
+            <router-link :to="router.path" :data-test-id="`navigation-router-navRouter-${router.id}`" event="" @click.native.prevent="handleTopNavClick(router, $event)">{{ router.name }}</router-link>
+          </li>
+        </ul>
+      </div>
+      <div class="quick-entry">
+        <bk-popover theme="navigation-popover" :arrow="false" offset="0, 2" :tippy-options="{ animateFill: false, hideOnClick: false }">
+          <div class="right-question-icon">
+            <svg class="bk-icon" style="margin-top: 2px; width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32,4C16.5,4,4,16.5,4,32c0,3.6,0.7,7.1,2,10.4V56c0,1.1,0.9,2,2,2h13.6C36,63.7,52.3,56.8,58,42.4S56.8,11.7,42.4,6C39.1,4.7,35.6,4,32,4z M31.3,45.1c-1.7,0-3-1.3-3-3s1.3-3,3-3c1.7,0,3,1.3,3,3S33,45.1,31.3,45.1z M36.7,31.7c-2.3,1.3-3,2.2-3,3.9v0.9H29v-1c-0.2-2.8,0.7-4.4,3.2-5.8c2.3-1.4,3-2.2,3-3.8s-1.3-2.8-3.3-2.8c-1.8-0.1-3.3,1.2-3.5,3c0,0.1,0,0.1,0,0.2h-4.8c0.1-4.4,3.1-7.4,8.5-7.4c5,0,8.3,2.8,8.3,6.9C40.5,28.4,39.2,30.3,36.7,31.7z"></path>
+            </svg>
+          </div>
+          <template slot="content">
+            <ul class="nav-operate-list">
+              <li class="operate-item">
+                <a :href="bkDocUrl" target="_blank">{{ $t(`m.wiki["产品文档"]`) }}</a>
+              </li>
+              <li class="operate-item">
+                <div @click="isVersionLogShow = true">{{ $t(`m.wiki["版本日志"]`) }}</div>
+              </li>
+              <li class="operate-item">
+                <a href="https://bk.tencent.com/s-mart/community" target="_blank">{{ $t(`m.wiki["问题反馈"]`) }}</a>
+              </li>
+            </ul>
+          </template>
+        </bk-popover>
+        <bk-popover data-test-id="navigation-popover-user" theme="navigation-popover" :arrow="false" offset="0, 7" :tippy-options="{ animateFill: false, hideOnClick: false }">
+          <div class="user-name">
+            <span>{{ userName }}</span>
+            <i class="bk-icon icon-down-shape"></i>
+          </div>
+          <template slot="content">
+            <ul class="nav-operate-list">
+              <li class="operate-item">
+                <span @click="onGoToProjectList">{{ $t(`m["项目管理"]`) }}</span>
+              </li>
+              <li class="operate-item">
+                <span data-test-id="navigation-span-logout" @click="onLogOut">{{ $t(`m.wiki["退出"]`) }}</span>
+              </li>
+            </ul>
+          </template>
+        </bk-popover>
+      </div>
+    </template>
+    <template slot="menu">
+      <bk-select
+        data-test-id="navigation-select-projectList"
+        v-if="activeNav === 'project'"
+        :value="selectedProject"
+        class="project-select"
+        ext-popover-cls="project-select-popover"
+        :loading="projectListLoading"
+        :clearable="false"
+        :searchable="true"
+        @selected="onSelectProject">
+        <bk-option
+          v-for="item in projectList"
+          :key="item.key"
+          :id="item.key"
+          :disabled="!hasPermission(['project_view'], item.auth_actions)"
+          :name="item.name">
+          <div
+            v-cursor="{ active: !hasPermission(['project_view'], item.auth_actions) }"
+            :class="['project-item', { 'text-permission-disable': !hasPermission(['project_view'], item.auth_actions) }]"
+            @click="applyForProjectViewPerm(item, 'project_view')">
+            {{ item.name }}
+          </div>
+        </bk-option>
+        <div slot="extension" class="project-select-extension">
+          <div
+            data-test-id="navigation-div-createProject"
+            v-cursor="{ active: !hasPermission(['project_create']) }"
+            :class="['action-item', { 'text-permission-disable': !hasPermission(['project_create']) }]"
+            @click="handleCreateProject">
+            <i class="bk-icon icon-plus-circle"></i>
+            {{ $t(`m['新建项目']`) }}
+          </div>
+          <div
+            data-test-id="navigation-div-manageProject"
+            class="action-item"
+            @click="goToProjectManage">
+            <i class="bk-icon icon-apps"></i>
+            {{ $t(`m['项目管理']`) }}
+          </div>
         </div>
-    </bk-navigation>
+      </bk-select>
+      <bk-navigation-menu
+        item-active-bg-color="#e1ecff"
+        item-active-color="#3a84ff"
+        item-default-color="#979ba5"
+        item-default-icon-color="#979ba5"
+        item-active-icon-color="#3a84ff"
+        :toggle-active="true"
+        :default-active="activeSideRouter">
+        <template v-for="router in sideNav">
+          <div
+            v-if="Array.isArray(router.subRouters) && router.subRouters.length > 0"
+            class="nav-group-wrap"
+            :key="router.id">
+            <div class="group-name">{{ !isSideOpen && $store.state.language === 'en' ? router.abbrName : router.name }}</div>
+            <bk-navigation-menu-item
+              v-for="item in router.subRouters"
+              :data-test-id="`navigation-menu-${item.id}`"
+              :key="item.id"
+              :id="item.id"
+              :disabled="item.disabled"
+              :icon="item.icon"
+              @click="handleSideRouterClick(item)">
+              {{ item.name }}
+            </bk-navigation-menu-item>
+          </div>
+          <bk-navigation-menu-item
+            :data-test-id="`navigation-menu-platformRouter-${router.id}`"
+            v-else
+            :key="router.id"
+            :id="router.id"
+            :has-child="false"
+            :icon="router.icon"
+            :disabled="router.disabled"
+            @click="handleSideRouterClick(router)">
+            {{ router.name }}
+          </bk-navigation-menu-item>
+        </template>
+
+      </bk-navigation-menu>
+    </template>
+    <div class="page-container">
+      <slot></slot>
+      <version-log v-if="isVersionLogShow" @close="isVersionLogShow = false"></version-log>
+      <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
+      <edit-project-dialog
+        :title="$t(`m['新建项目']`)"
+        :is-show="isEditDialogShow"
+        :project="projectForm"
+        :edit-dialog-form-disable="editDialogFormDisable"
+        @confirm="onProjectDialogConfirm"
+        @cancel="onProjectDialogCancel">
+      </edit-project-dialog>
+    </div>
+  </bk-navigation>
 </template>
 <script>
     import { mapState } from 'vuex';

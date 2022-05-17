@@ -21,129 +21,129 @@
   -->
 
 <template>
-    <div class="bk-basic-info" v-bkloading="{ isLoading: isLoading }">
-        <bk-form :label-width="150"
-            :model="formInfo"
-            :rules="rules"
-            form-type="vertical"
-            ref="basicForm">
-            <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)"
-                data-test-id="basicInfo-input-nodeName"
-                :ext-cls="'bk-item-width'"
-                :required="true"
-                :property="'name'">
-                <bk-input :font-size="'medium'"
-                    v-model="formInfo.name"
-                    maxlength="120">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.treeinfo['节点标签：']`)" :required="true">
-                <bk-select :ext-cls="'bk-form-width'"
-                    v-model="formInfo.tag"
-                    :clearable="false"
-                    searchable
-                    :font-size="'medium'">
-                    <bk-option v-for="option in nodeTagList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item data-test-id="basicInfo-select-ProcessingScenarios" :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
-                <bk-select :ext-cls="'bk-form-width'"
-                    v-model="formInfo.distribute_type"
-                    :clearable="false"
-                    searchable
-                    :disabled="nodeInfo.is_builtin"
-                    :font-size="'medium'"
-                    @selected="changeDistribute">
-                    <bk-option v-for="option in sceneList"
-                        :key="option.typeName"
-                        :id="option.typeName"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-                <p v-for="(item, index) in prompt"
-                    :key="index"
-                    v-if="item.id === formInfo.distribute_type"
-                    class="mt5 mb0 bk-revoke-span">
-                    <i class="bk-icon icon-exclamation-circle" style="padding-right: 5px"></i>
-                    <span>{{item.prompt}}</span>
-                </p>
-            </bk-form-item>
-            <template v-if="assignorsTypeList.some(assignor => assignor === formInfo.distribute_type)">
-                <bk-form-item data-test-id="basicInfo-select-assignors" :label="$t(`m.treeinfo['派单人：']`)" :required="true">
-                    <div @click="checkStatus.assignors = false">
-                        <deal-person
-                            ref="assignors"
-                            :value="assignorsInfo"
-                            :exclude-role-type-list="assignorExclude">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </template>
-            <template v-if="processorsInfo.type">
-                <bk-form-item data-test-id="basicInfo-component-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
-                    <div @click="checkStatus.processors = false">
-                        <deal-person
-                            ref="processors"
-                            :value="processorsInfo"
-                            :node-info="nodeInfo"
-                            :exclude-role-type-list="excludeProcessor">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </template>
-            <bk-form-item :label="$t(`m.treeinfo['设置单据状态：']`)" :required="true">
-                <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                    v-model="formInfo.ticket_type"
-                    :clearable="false"
-                    searchable
-                    :font-size="'medium'"
-                    @selected="handleTicket">
-                    <bk-option v-for="option in billStatusList"
-                        :key="option.type"
-                        :id="option.type"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-                <template v-if="formInfo.ticket_type === 'custom'">
-                    <bk-select :ext-cls="'bk-form-width bk-form-display'"
-                        v-model="formInfo.ticket_key"
-                        :loading="ticketKeyLoading"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'">
-                        <bk-option v-for="option in secondLevelList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </template>
-            </bk-form-item>
-            <template v-if="!nodeInfo.is_builtin">
-                <bk-form-item data-test-id="basicInfo-radio-canDeliver" :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
-                    <bk-radio-group v-model="formInfo.can_deliver">
-                        <bk-radio :value="trueStatus" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
-                        <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                    </bk-radio-group>
-                </bk-form-item>
-            </template>
-            <template v-if="formInfo.can_deliver">
-                <bk-form-item data-test-id="basicInfo-radio-delivers" :label="$t(`m.treeinfo['转单人：']`)" :required="true">
-                    <div @click="checkStatus.delivers = false">
-                        <deal-person
-                            ref="delivers"
-                            :value="deliversInfo"
-                            :exclude-role-type-list="deliversExclude">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </template>
-        </bk-form>
-    </div>
+  <div class="bk-basic-info" v-bkloading="{ isLoading: isLoading }">
+    <bk-form :label-width="150"
+      :model="formInfo"
+      :rules="rules"
+      form-type="vertical"
+      ref="basicForm">
+      <bk-form-item :label="$t(`m.treeinfo['节点名称：']`)"
+        data-test-id="basicInfo-input-nodeName"
+        :ext-cls="'bk-item-width'"
+        :required="true"
+        :property="'name'">
+        <bk-input :font-size="'medium'"
+          v-model="formInfo.name"
+          maxlength="120">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.treeinfo['节点标签：']`)" :required="true">
+        <bk-select :ext-cls="'bk-form-width'"
+          v-model="formInfo.tag"
+          :clearable="false"
+          searchable
+          :font-size="'medium'">
+          <bk-option v-for="option in nodeTagList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item data-test-id="basicInfo-select-ProcessingScenarios" :label="$t(`m.treeinfo['处理场景：']`)" :required="true">
+        <bk-select :ext-cls="'bk-form-width'"
+          v-model="formInfo.distribute_type"
+          :clearable="false"
+          searchable
+          :disabled="nodeInfo.is_builtin"
+          :font-size="'medium'"
+          @selected="changeDistribute">
+          <bk-option v-for="option in sceneList"
+            :key="option.typeName"
+            :id="option.typeName"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+        <p v-for="(item, index) in prompt"
+          :key="index"
+          v-if="item.id === formInfo.distribute_type"
+          class="mt5 mb0 bk-revoke-span">
+          <i class="bk-icon icon-exclamation-circle" style="padding-right: 5px"></i>
+          <span>{{item.prompt}}</span>
+        </p>
+      </bk-form-item>
+      <template v-if="assignorsTypeList.some(assignor => assignor === formInfo.distribute_type)">
+        <bk-form-item data-test-id="basicInfo-select-assignors" :label="$t(`m.treeinfo['派单人：']`)" :required="true">
+          <div @click="checkStatus.assignors = false">
+            <deal-person
+              ref="assignors"
+              :value="assignorsInfo"
+              :exclude-role-type-list="assignorExclude">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </template>
+      <template v-if="processorsInfo.type">
+        <bk-form-item data-test-id="basicInfo-component-processor" :label="$t(`m.treeinfo['处理人：']`)" :required="true">
+          <div @click="checkStatus.processors = false">
+            <deal-person
+              ref="processors"
+              :value="processorsInfo"
+              :node-info="nodeInfo"
+              :exclude-role-type-list="excludeProcessor">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </template>
+      <bk-form-item :label="$t(`m.treeinfo['设置单据状态：']`)" :required="true">
+        <bk-select :ext-cls="'bk-form-width bk-form-display'"
+          v-model="formInfo.ticket_type"
+          :clearable="false"
+          searchable
+          :font-size="'medium'"
+          @selected="handleTicket">
+          <bk-option v-for="option in billStatusList"
+            :key="option.type"
+            :id="option.type"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+        <template v-if="formInfo.ticket_type === 'custom'">
+          <bk-select :ext-cls="'bk-form-width bk-form-display'"
+            v-model="formInfo.ticket_key"
+            :loading="ticketKeyLoading"
+            :clearable="false"
+            searchable
+            :font-size="'medium'">
+            <bk-option v-for="option in secondLevelList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </template>
+      </bk-form-item>
+      <template v-if="!nodeInfo.is_builtin">
+        <bk-form-item data-test-id="basicInfo-radio-canDeliver" :label="$t(`m.treeinfo['是否可转单：']`)" :required="true">
+          <bk-radio-group v-model="formInfo.can_deliver">
+            <bk-radio :value="trueStatus" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
+            <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+          </bk-radio-group>
+        </bk-form-item>
+      </template>
+      <template v-if="formInfo.can_deliver">
+        <bk-form-item data-test-id="basicInfo-radio-delivers" :label="$t(`m.treeinfo['转单人：']`)" :required="true">
+          <div @click="checkStatus.delivers = false">
+            <deal-person
+              ref="delivers"
+              :value="deliversInfo"
+              :exclude-role-type-list="deliversExclude">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </template>
+    </bk-form>
+  </div>
 </template>
 <script>
     import dealPerson from './dealPerson.vue';

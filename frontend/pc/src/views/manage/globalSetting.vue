@@ -21,169 +21,169 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m["全局配置"]') }}
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m["全局配置"]') }}
+      </p>
+    </div>
+    <div class="itsm-page-content">
+      <!-- 附件存储 -->
+      <div class="bk-system-file">
+        <div class="bk-file-left">
+          <p class="bk-left-title">{{ $t('m.home["附件存储"]') }}</p>
+          <div class="bk-left-content">
+            <p class="bk-left-message">
+              <span v-if=" !moduleInfo.systemPath.formerValue">
+                {{ $t('m.home["（您尚未设置附件存放的目录，请填写）"]') }}
+              </span>
+              <span v-else>{{ $t('m.home["当前存放附件文件的目录为"]') }}：</span>
             </p>
+            <bk-input v-model.trim="moduleInfo.systemPath.nowValue"
+              :disabled="!moduleInfo.systemPath.changing || isAllStatusGetting"
+              :placeholder="$t(`m.home['请填写路径']`)">
+            </bk-input>
+            <div class="bk-left-btn">
+              <span
+                v-if="!moduleInfo.systemPath.changing"
+                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
+                :class="['bk-change-place', {
+                  'btn-permission-disable': !hasPermission(['global_settings_manage'])
+                }]"
+                @click="handleChangeSystemPath">
+                {{ $t('m.home["更改位置"]') }}
+              </span>
+              <template v-else-if="moduleInfo.systemPath.formerValue && moduleInfo.systemPath.changing">
+                <bk-button
+                  theme="primary"
+                  :title="$t(`m.home['保存']`)"
+                  class="mr10"
+                  :disabled="!moduleInfo.systemPath.nowValue"
+                  @click="allSwitchChange('off','systemPath')">
+                  {{$t(`m.home['保存']`)}}
+                </bk-button>
+                <bk-button theme="default"
+                  :title="$t(`m.home['取消']`)"
+                  class="mr10"
+                  @click="cancelPath">
+                  {{$t(`m.home['取消']`)}}
+                </bk-button>
+              </template>
+              <bk-button v-else
+                theme="primary"
+                :disabled="!moduleInfo.systemPath.nowValue || isAllStatusGetting"
+                :title="$t(`m.home['提交']`)"
+                class="mr10"
+                @click="allSwitchChange('off','systemPath')">
+                {{$t(`m.home['提交']`)}}
+              </bk-button>
+            </div>
+          </div>
         </div>
-        <div class="itsm-page-content">
-            <!-- 附件存储 -->
-            <div class="bk-system-file">
-                <div class="bk-file-left">
-                    <p class="bk-left-title">{{ $t('m.home["附件存储"]') }}</p>
-                    <div class="bk-left-content">
-                        <p class="bk-left-message">
-                            <span v-if=" !moduleInfo.systemPath.formerValue">
-                                {{ $t('m.home["（您尚未设置附件存放的目录，请填写）"]') }}
-                            </span>
-                            <span v-else>{{ $t('m.home["当前存放附件文件的目录为"]') }}：</span>
-                        </p>
-                        <bk-input v-model.trim="moduleInfo.systemPath.nowValue"
-                            :disabled="!moduleInfo.systemPath.changing || isAllStatusGetting"
-                            :placeholder="$t(`m.home['请填写路径']`)">
-                        </bk-input>
-                        <div class="bk-left-btn">
-                            <span
-                                v-if="!moduleInfo.systemPath.changing"
-                                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
-                                :class="['bk-change-place', {
-                                    'btn-permission-disable': !hasPermission(['global_settings_manage'])
-                                }]"
-                                @click="handleChangeSystemPath">
-                                {{ $t('m.home["更改位置"]') }}
-                            </span>
-                            <template v-else-if="moduleInfo.systemPath.formerValue && moduleInfo.systemPath.changing">
-                                <bk-button
-                                    theme="primary"
-                                    :title="$t(`m.home['保存']`)"
-                                    class="mr10"
-                                    :disabled="!moduleInfo.systemPath.nowValue"
-                                    @click="allSwitchChange('off','systemPath')">
-                                    {{$t(`m.home['保存']`)}}
-                                </bk-button>
-                                <bk-button theme="default"
-                                    :title="$t(`m.home['取消']`)"
-                                    class="mr10"
-                                    @click="cancelPath">
-                                    {{$t(`m.home['取消']`)}}
-                                </bk-button>
-                            </template>
-                            <bk-button v-else
-                                theme="primary"
-                                :disabled="!moduleInfo.systemPath.nowValue || isAllStatusGetting"
-                                :title="$t(`m.home['提交']`)"
-                                class="mr10"
-                                @click="allSwitchChange('off','systemPath')">
-                                {{$t(`m.home['提交']`)}}
-                            </bk-button>
-                        </div>
-                    </div>
-                </div>
-                <div class="bk-file-right">
-                    <p class="bk-right-title">{{ $t('m.home["附件存储"]') }}</p>
-                    <ul class="bk-number-ul">
-                        <li>
-                            {{ $t('m.home["请配置合法的系统路径，并保证每台AppServer都能访问该目录（如nfs）"]') }}
-                        </li>
-                        <li>
-                            {{ $t('m.home["若需更换目录，请务必将原目录文件拷贝到新目录"]') }}
-                        </li>
-                        <li>
-                            {{ $t('m.home["蓝鲸企业版默认提供了NFS服务，可以直接配置目录为："]') }}
-                            <span class="bk-red">/data/app/code/USERRES/</span>
-                        </li>
-                        <li>
-                            {{ $t('m.home["企业版"]') }}
-                            <span class="bk-red">2.2.x</span>
-                            {{ $t('m.home["需要先升级SaaS部署脚本（"]') }}
-                            <span class="bk-red">2.4</span>
-                            {{ $t('m.home["以后的版本不需要），请下载"]') }}
-                            <span class="bk-red">
-                                <a target="blank" :href="downUrl">{{ $t('m.home["升级压缩包"]') }}</a>
-                            </span>
-                            {{ $t('m.home["后按照"]') }}
-                            <span class="bk-red">readme</span>
-                            {{ $t('m.home["进行操作"]') }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 清除缓存 -->
-            <div class="bk-system-file">
-                <div class="bk-file-left">
-                    <p class="bk-left-title">{{ $t('m.home["清除缓存"]') }}</p>
-                    <div class="bk-left-content">
-                        <p class="bk-left-message">
-                            {{ $t('m.home["缓存内容"]') }}：
-                        </p>
-                        <p class="bk-left-message">
-                            1.{{ $t('m.home["业务列表缓存"]') }}
-                        </p>
-                        <p class="bk-left-message">
-                            2.{{ $t('m.home["业务角色及人员列表缓存"]') }}
-                        </p>
-                        <div class="bk-left-btn">
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
-                                theme="primary"
-                                :title="$t(`m.home['一键清除']`)"
-                                :class="['mr10', {
-                                    'btn-permission-disable': !hasPermission(['global_settings_manage'])
-                                }]"
-                                @click="handleClear">
-                                {{ $t('m.home["一键清除"]') }}
-                            </bk-button>
-                            <span class="bk-clear-info">
-                                {{ $t('m.home["上次清除时间："]') }}{{clearStorageTime}}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bk-file-right">
-                    <p class="bk-right-title">{{ $t('m.home["缓存清除"]') }}</p>
-                    <ul class="bk-number-ul">
-                        <li>
-                            {{ $t('m.home["如需即时更新来自CMDB的最新数据，可以通过手动清除缓存获取最新数据。"]') }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 功能开关开关-->
-            <div class="bk-system-file">
-                <div class="bk-file-left">
-                    <p class="bk-left-title">{{ $t('m.home["功能开关"]') }}</p>
-                    <div class="bk-left-content">
-                        <div class="bk-left-btn" v-for="(item,key) in moduleInfo" v-if="item.isAvailable" :key="key">
-                            <span class="bk-clear-info">
-                                {{ item.title }}
-                            </span>
-                            <bk-switcher
-                                v-model="item.open"
-                                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
-                                :class="{
-                                    'text-permission-disable': !hasPermission(['global_settings_manage'])
-                                }"
-                                :disabled="isAllStatusGetting || !hasPermission(['global_settings_manage'])"
-                                size="small"
-                                :on-text="$t(`m.home['打开']`)"
-                                :off-text="$t(`m.home['关闭']`)"
-                                @change="allSwitchChange($event,key)"></bk-switcher>
-                        </div>
-                    </div>
-                </div>
-                <div class="bk-file-right">
-                    <p class="bk-right-title">{{ $t('m.home["功能开关"]') }}</p>
-                    <ul class="bk-number-ul">
-                        <li>
-                            {{ $t('m.home["“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。"]') }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <div class="bk-file-right">
+          <p class="bk-right-title">{{ $t('m.home["附件存储"]') }}</p>
+          <ul class="bk-number-ul">
+            <li>
+              {{ $t('m.home["请配置合法的系统路径，并保证每台AppServer都能访问该目录（如nfs）"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["若需更换目录，请务必将原目录文件拷贝到新目录"]') }}
+            </li>
+            <li>
+              {{ $t('m.home["蓝鲸企业版默认提供了NFS服务，可以直接配置目录为："]') }}
+              <span class="bk-red">/data/app/code/USERRES/</span>
+            </li>
+            <li>
+              {{ $t('m.home["企业版"]') }}
+              <span class="bk-red">2.2.x</span>
+              {{ $t('m.home["需要先升级SaaS部署脚本（"]') }}
+              <span class="bk-red">2.4</span>
+              {{ $t('m.home["以后的版本不需要），请下载"]') }}
+              <span class="bk-red">
+                <a target="blank" :href="downUrl">{{ $t('m.home["升级压缩包"]') }}</a>
+              </span>
+              {{ $t('m.home["后按照"]') }}
+              <span class="bk-red">readme</span>
+              {{ $t('m.home["进行操作"]') }}
+            </li>
+          </ul>
         </div>
-        <!-- 数据库升级 -->
-        <!-- <div class="bk-system-file">
+      </div>
+      <!-- 清除缓存 -->
+      <div class="bk-system-file">
+        <div class="bk-file-left">
+          <p class="bk-left-title">{{ $t('m.home["清除缓存"]') }}</p>
+          <div class="bk-left-content">
+            <p class="bk-left-message">
+              {{ $t('m.home["缓存内容"]') }}：
+            </p>
+            <p class="bk-left-message">
+              1.{{ $t('m.home["业务列表缓存"]') }}
+            </p>
+            <p class="bk-left-message">
+              2.{{ $t('m.home["业务角色及人员列表缓存"]') }}
+            </p>
+            <div class="bk-left-btn">
+              <bk-button
+                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
+                theme="primary"
+                :title="$t(`m.home['一键清除']`)"
+                :class="['mr10', {
+                  'btn-permission-disable': !hasPermission(['global_settings_manage'])
+                }]"
+                @click="handleClear">
+                {{ $t('m.home["一键清除"]') }}
+              </bk-button>
+              <span class="bk-clear-info">
+                {{ $t('m.home["上次清除时间："]') }}{{clearStorageTime}}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="bk-file-right">
+          <p class="bk-right-title">{{ $t('m.home["缓存清除"]') }}</p>
+          <ul class="bk-number-ul">
+            <li>
+              {{ $t('m.home["如需即时更新来自CMDB的最新数据，可以通过手动清除缓存获取最新数据。"]') }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- 功能开关开关-->
+      <div class="bk-system-file">
+        <div class="bk-file-left">
+          <p class="bk-left-title">{{ $t('m.home["功能开关"]') }}</p>
+          <div class="bk-left-content">
+            <div class="bk-left-btn" v-for="(item,key) in moduleInfo" v-if="item.isAvailable" :key="key">
+              <span class="bk-clear-info">
+                {{ item.title }}
+              </span>
+              <bk-switcher
+                v-model="item.open"
+                v-cursor="{ active: !hasPermission(['global_settings_manage']) }"
+                :class="{
+                  'text-permission-disable': !hasPermission(['global_settings_manage'])
+                }"
+                :disabled="isAllStatusGetting || !hasPermission(['global_settings_manage'])"
+                size="small"
+                :on-text="$t(`m.home['打开']`)"
+                :off-text="$t(`m.home['关闭']`)"
+                @change="allSwitchChange($event,key)"></bk-switcher>
+            </div>
+          </div>
+        </div>
+        <div class="bk-file-right">
+          <p class="bk-right-title">{{ $t('m.home["功能开关"]') }}</p>
+          <ul class="bk-number-ul">
+            <li>
+              {{ $t('m.home["“功能开关”可以自定义启停以下ITSM功能模块，关闭后，该模块对应的所有的功能将被隐藏。"]') }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- 数据库升级 -->
+    <!-- <div class="bk-system-file">
             <div class="bk-file-left">
                 <p class="bk-left-title">{{ $t('m.home["数据库升级"]') }}</p>
                 <div class="bk-left-content">
@@ -233,15 +233,15 @@
                 </ul>
             </div>
         </div> -->
-        <bk-sideslider
-            :is-show.sync="versionLogData.show"
-            :title="versionLogData.title"
-            :width="versionLogData.width">
-            <div class="p20" slot="content" v-if="versionLogData.show">
-                <version-log :version-log-data="versionLogData"></version-log>
-            </div>
-        </bk-sideslider>
-    </div>
+    <bk-sideslider
+      :is-show.sync="versionLogData.show"
+      :title="versionLogData.title"
+      :width="versionLogData.width">
+      <div class="p20" slot="content" v-if="versionLogData.show">
+        <version-log :version-log-data="versionLogData"></version-log>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../utils/errorHandler';

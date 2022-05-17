@@ -21,49 +21,49 @@
   -->
 
 <template>
-    <div class="table-chart">
-        <bk-table
-            :data="chartData"
-            :pagination="pagination"
-            :outer-border="false"
-            @sort-change="handleSortChange"
-            @page-change="handlePageChange">
-            <bk-table-column
-                v-for="col in columns"
-                :key="col.key"
-                :label="col.name"
-                :show-overflow-tooltip="col.key !== 'organization'"
-                :sortable="col.sort ? 'custom' : false"
-                :align="col.align || 'left'"
-                :prop="col.key"
-                :width="('width' in col) ? col.width : 'auto'">
-                <div
-                    slot-scope="props"
-                    :class="{ 'padding-right-adjust': col.align === 'right' && col.sort }">
-                    <div v-if="col.key === 'order'" class="order" :class="getOrderCls(props.$index)">
-                        <span class="order-num">{{ getRowOrder(props.$index) }}</span>
-                    </div>
-                    <template v-else-if="typeof col.format === 'function'">
-                        <span style="font-weigth: 700;">{{ col.format.call(this, props.row) }}</span>
-                    </template>
-                    <template v-else-if="col.key === 'organization' && props.row.organization_full">
-                        <span
-                            v-bk-tooltips="{
-                                content: props.row.organization_full,
-                                position: 'top',
-                                theme: 'light'
-                            }">
-                            {{ props.row.organization }}
-                        </span>
-                    </template>
-                    <template v-else>
-                        <span v-if="col.link" class="link" @click="handlerCellClick(col, props.row)">{{ props.row[col.key] }}</span>
-                        <span v-else>{{ props.row[col.key] }}</span>
-                    </template>
-                </div>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="table-chart">
+    <bk-table
+      :data="chartData"
+      :pagination="pagination"
+      :outer-border="false"
+      @sort-change="handleSortChange"
+      @page-change="handlePageChange">
+      <bk-table-column
+        v-for="col in columns"
+        :key="col.key"
+        :label="col.name"
+        :show-overflow-tooltip="col.key !== 'organization'"
+        :sortable="col.sort ? 'custom' : false"
+        :align="col.align || 'left'"
+        :prop="col.key"
+        :width="('width' in col) ? col.width : 'auto'">
+        <div
+          slot-scope="props"
+          :class="{ 'padding-right-adjust': col.align === 'right' && col.sort }">
+          <div v-if="col.key === 'order'" class="order" :class="getOrderCls(props.$index)">
+            <span class="order-num">{{ getRowOrder(props.$index) }}</span>
+          </div>
+          <template v-else-if="typeof col.format === 'function'">
+            <span style="font-weigth: 700;">{{ col.format.call(this, props.row) }}</span>
+          </template>
+          <template v-else-if="col.key === 'organization' && props.row.organization_full">
+            <span
+              v-bk-tooltips="{
+                content: props.row.organization_full,
+                position: 'top',
+                theme: 'light'
+              }">
+              {{ props.row.organization }}
+            </span>
+          </template>
+          <template v-else>
+            <span v-if="col.link" class="link" @click="handlerCellClick(col, props.row)">{{ props.row[col.key] }}</span>
+            <span v-else>{{ props.row[col.key] }}</span>
+          </template>
+        </div>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 <script>
     export default {

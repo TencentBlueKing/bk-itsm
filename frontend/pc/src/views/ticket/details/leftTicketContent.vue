@@ -1,106 +1,106 @@
 <template>
-    <div class="left-ticket">
-        <div
-            class="base-info-content"
-            v-bkloading="{ isLoading: loading.nodeInfoLoading }">
-            <div class="ticket-base-info">
-                <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
-                    <i
-                        :class="[
-                            'bk-itsm-icon',
-                            isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou'
-                        ]"></i>
-                    <span class="ticket-title">{{ $t(`m['提单信息']`) }}</span>
-                    <span> {{ $t(`m['提单人']`) }}: {{ ticketInfo.creator }} </span>
-                    <span> {{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at }} </span>
-                </div>
-                <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
-                    <basic-information
-                        ref="basicInfo"
-                        v-if="
-                            ticketId && !loading.ticketLoading && !loading.nodeInfoLoading
-                        "
-                        :basic-infomation="ticketInfo"
-                        :first-state-fields="firstStateFields"></basic-information>
-                </div>
-            </div>
+  <div class="left-ticket">
+    <div
+      class="base-info-content"
+      v-bkloading="{ isLoading: loading.nodeInfoLoading }">
+      <div class="ticket-base-info">
+        <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
+          <i
+            :class="[
+              'bk-itsm-icon',
+              isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou'
+            ]"></i>
+          <span class="ticket-title">{{ $t(`m['提单信息']`) }}</span>
+          <span> {{ $t(`m['提单人']`) }}: {{ ticketInfo.creator }} </span>
+          <span> {{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at }} </span>
         </div>
-        <div
-            class="current-step-content"
-            v-bkloading="{ isLoading: currentStepLoading }">
-            <bk-tab
-                :active.sync="stepActiveTab"
-                type="unborder-card"
-                v-if="!currentStepLoading"
-                :validate-active="true">
-                <!-- 当前步骤 -->
-                <bk-tab-panel
-                    v-if="hasNodeOptAuth || isShowAssgin || currSetpIsIframe"
-                    name="currentStep"
-                    :label="$t(`m['单据处理']`)">
-                    <!-- 当前节点 -->
-                    <template slot="label">
-                        <span class="panel-name">
-                            {{ $t(`m['单据处理']`) }}
-                        </span>
-                        <i class="panel-count">{{ currStepNodeNum }}</i>
-                    </template>
-                    <current-steps
-                        v-if="!loading.ticketLoading && !loading.nodeInfoLoading"
-                        ref="currentNode"
-                        :is-show-basic-info="isShowBasicInfo"
-                        :loading="loading.ticketLoading"
-                        :basic-infomation="ticketInfo"
-                        :node-list="nodeList"
-                        :is-show-assgin="isShowAssgin"
-                        :current-step-list="currentStepList"
-                        :node-trigger-list="nodeTriggerList"
-                        @handlerSubmitSuccess="reloadTicket"></current-steps>
-                </bk-tab-panel>
-                <!-- 全部评论 TODO -->
-                <bk-tab-panel
-                    v-if="isShowComment"
-                    name="allComments"
-                    :label="$t(`m.newCommon['所有评论']`)">
-                    <template v-slot:label>
-                        <span class="panel-name">
-                            {{ $t(`m.newCommon['所有评论']`) }}
-                        </span>
-                        <i class="panel-count">{{ commentList.length }}</i>
-                    </template>
-                    <wang-editor
-                        ref="comment"
-                        :is-show-basic-info="isShowBasicInfo"
-                        :comment-list="commentList"
-                        :comment-id="commentId"
-                        :ticket-info="ticketInfo"
-                        :ticket-id="ticketId"
-                        :is-page-over="isPageOver"
-                        :step-active-tab="stepActiveTab"
-                        :has-node-opt-auth="hasNodeOptAuth"
-                        :comment-loading="commentLoading"
-                        :more-loading="moreLoading"
-                        @addTargetComment="addTargetComment"
-                        @refreshComment="refreshComment"></wang-editor>
-                </bk-tab-panel>
-            </bk-tab>
+        <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
+          <basic-information
+            ref="basicInfo"
+            v-if="
+              ticketId && !loading.ticketLoading && !loading.nodeInfoLoading
+            "
+            :basic-infomation="ticketInfo"
+            :first-state-fields="firstStateFields"></basic-information>
         </div>
-        <!-- v-model="$store.state.ticket.ticketProcessMap" -->
-        <bk-dialog
-            width="1280"
-            :mask-close="false"
-            :close-icon="true"
-            :show-footer="false"
-            v-model="isShow"
-            :title="$t(`m['查看完整流程']`)">
-            <order-preview
-                v-if="isShow"
-                :basic-infomation="ticketInfo"
-                :node-list="nodeList"
-                :current-step-list="currentStepList"
-                @reloadTicket="reloadTicket"></order-preview>
-        </bk-dialog>
+      </div>
     </div>
+    <div
+      class="current-step-content"
+      v-bkloading="{ isLoading: currentStepLoading }">
+      <bk-tab
+        :active.sync="stepActiveTab"
+        type="unborder-card"
+        v-if="!currentStepLoading"
+        :validate-active="true">
+        <!-- 当前步骤 -->
+        <bk-tab-panel
+          v-if="hasNodeOptAuth || isShowAssgin || currSetpIsIframe"
+          name="currentStep"
+          :label="$t(`m['单据处理']`)">
+          <!-- 当前节点 -->
+          <template slot="label">
+            <span class="panel-name">
+              {{ $t(`m['单据处理']`) }}
+            </span>
+            <i class="panel-count">{{ currStepNodeNum }}</i>
+          </template>
+          <current-steps
+            v-if="!loading.ticketLoading && !loading.nodeInfoLoading"
+            ref="currentNode"
+            :is-show-basic-info="isShowBasicInfo"
+            :loading="loading.ticketLoading"
+            :basic-infomation="ticketInfo"
+            :node-list="nodeList"
+            :is-show-assgin="isShowAssgin"
+            :current-step-list="currentStepList"
+            :node-trigger-list="nodeTriggerList"
+            @handlerSubmitSuccess="reloadTicket"></current-steps>
+        </bk-tab-panel>
+        <!-- 全部评论 TODO -->
+        <bk-tab-panel
+          v-if="isShowComment"
+          name="allComments"
+          :label="$t(`m.newCommon['所有评论']`)">
+          <template v-slot:label>
+            <span class="panel-name">
+              {{ $t(`m.newCommon['所有评论']`) }}
+            </span>
+            <i class="panel-count">{{ commentList.length }}</i>
+          </template>
+          <wang-editor
+            ref="comment"
+            :is-show-basic-info="isShowBasicInfo"
+            :comment-list="commentList"
+            :comment-id="commentId"
+            :ticket-info="ticketInfo"
+            :ticket-id="ticketId"
+            :is-page-over="isPageOver"
+            :step-active-tab="stepActiveTab"
+            :has-node-opt-auth="hasNodeOptAuth"
+            :comment-loading="commentLoading"
+            :more-loading="moreLoading"
+            @addTargetComment="addTargetComment"
+            @refreshComment="refreshComment"></wang-editor>
+        </bk-tab-panel>
+      </bk-tab>
+    </div>
+    <!-- v-model="$store.state.ticket.ticketProcessMap" -->
+    <bk-dialog
+      width="1280"
+      :mask-close="false"
+      :close-icon="true"
+      :show-footer="false"
+      v-model="isShow"
+      :title="$t(`m['查看完整流程']`)">
+      <order-preview
+        v-if="isShow"
+        :basic-infomation="ticketInfo"
+        :node-list="nodeList"
+        :current-step-list="currentStepList"
+        @reloadTicket="reloadTicket"></order-preview>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

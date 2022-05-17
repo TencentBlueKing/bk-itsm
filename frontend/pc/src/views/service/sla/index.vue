@@ -21,195 +21,195 @@
   -->
 
 <template>
-    <div class="project-sla-agreement">
-        <!-- title -->
-        <div class="is-title">
-            <p class="bk-come-back" @click="goToServiceList">
-                <i class="bk-icon icon-arrows-left"></i>
-                <span>{{ serviceData.name || '--' }}</span> > SLA{{ $t(`m['设置']`) }}
-            </p>
-        </div>
-        <!-- content -->
-        <div class="sla-agreement-container">
-            <div v-bkloading="{ isLoading: serviceLoading }" class="bk-content-group">
-                <bk-form
-                    :label-width="250"
-                    form-type="vertical"
-                    class="bk-sla-box"
-                    ref="dynamicForm">
-                    <div class="bk-sla-content">
-                        <span>{{$t(`m.serviceConfig['是否启用']`)}}</span>
-                        <bk-switcher
-                            size="small"
-                            theme="primary"
-                            v-model="isSlaActive"
-                            :pre-check="handleUseSlaPreCheck"></bk-switcher>
-                        {{$t(`m.serviceConfig['可以通过点击添加“+”或点击流程节点添加']`)}}
-                    </div>
-                    <div class="bk-sla-content" v-if="isSlaActive">
-                        <div class="bk-service-agreement">
-                            <span class="bk-service-label">
-                                {{$t(`m.serviceConfig['服务协议']`)}}
-                                <span class="red-star">*</span>
-                            </span>
-                            <div class="bk-service-agreement-list">
-                                <div class="bk-agreement-content"
-                                    v-for="(agree, index) in serviceData.sla"
-                                    :key="index">
-                                    <span class="bk-agreement-color"
-                                        :style="'background-color: ' + agree.color">
-                                    </span>
-                                    <span class="bk-agreement-text" @click="agreementTextClick(agree, 'edit')">
-                                        {{ getProtocolName(agree.sla_id) || $t(`m.tickets["未设置"]`) }}
-                                    </span>
-                                    <span class="bk-icon icon-delete"
-                                        @click="agreementCloseClick(agree, index)">
-                                    </span>
-                                </div>
-                                <bk-button
-                                    class="bk-sla-add"
-                                    size="small"
-                                    theme="default"
-                                    icon="plus"
-                                    @click="agreementTextClick({})">
-                                </bk-button>
-                            </div>
-                        </div>
-                        <div style="height: 420px;margin-top:10px" v-bkloading="{ isLoading: canvasDataLoading }">
-                            <second-flow
-                                v-if="!canvasDataLoading"
-                                ref="flowInfo"
-                                :add-list="addList"
-                                :service-agreement-list="serviceData.sla"
-                                :line-list="lineList"
-                                :flow-info="previewInfo"
-                                @slaIconClick="agreementTextClick"
-                                @configuNode="configuNode">
-                            </second-flow>
-                        </div>
-                    </div>
-                </bk-form>
-            </div>
-            <div class="bk-priority-btn">
-                <bk-button
-                    theme="primary"
-                    :title="$t(`m.slaContent['提交']`)"
-                    class="mr10"
-                    :loading="submitPending"
-                    :disabled="serviceLoading"
-                    @click="submitFn">{{ $t(`m.slaContent['提交']`) }}
-                </bk-button>
-                <bk-button
-                    theme="default"
-                    :title="$t(`m.eventdeploy['取消']`)"
-                    class="mr10"
-                    @click="goToServiceList">{{ $t('m.eventdeploy["取消"]') }}
-                </bk-button>
-            </div>
-        </div>
-        <bk-sideslider
-            :is-show.sync="serviceAgreementIsShow"
-            :quick-close="true"
-            :before-close="clearLastNode"
-            :width="695">
-            <div slot="header" class="sideslider-header">
-                {{$t(`m.serviceConfig['绑定服务协议']`)}}
-                <div @click="viewAgreementIsShow = true" class="view-agreement-text">
-                    {{$t(`m.serviceConfig['查看协议计时说明']`)}}
-                </div>
-            </div>
-            <div slot="content" class="sideslider-content">
-                <bk-form
-                    :label-width="250"
-                    form-type="vertical"
-                    :model="agreementEditData"
-                    :rules="agreementRules"
-                    ref="agreementForm">
-                    <bk-form-item
-                        style="width: calc(50% - 15px)"
-                        :label="$t(`m.serviceConfig['开始节点']`)"
-                        :required="true"
-                        :property="'start_node_id'">
-                        <bk-select
-                            :placeholder="$t(`m.serviceConfig['请选择开始计时节点']`)"
-                            v-model="agreementEditData.start_node_id"
-                            searchable
-                            @change="getPostNodes">
-                            <bk-option v-for="option in nodeOption"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                    <span class="bk-line-icon"></span>
-                    <bk-form-item
-                        style="width: calc(50% - 15px)"
-                        :label="$t(`m.serviceConfig['结束节点']`)"
-                        :required="true"
-                        :property="'end_node_id'">
-                        <bk-select
-                            :placeholder="$t(`m.serviceConfig['请选择结束计时节点']`)"
-                            v-model="agreementEditData.end_node_id"
-                            searchable
-                            :loading="endNodeSelectLoading">
-                            <bk-option v-for="option in endNodeOption"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.serviceConfig['服务协议']`)"
-                        :required="true"
-                        :property="'sla_id'">
-                        <bk-select
-                            :placeholder="$t(`m.serviceConfig['请选择服务协议']`)"
-                            v-model="agreementEditData.sla_id"
-                            searchable>
-                            <bk-option v-for="option in slaList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                                <span>{{option.name}}</span>
-                                <i v-bk-tooltips="{ content: '跳转查看协议', placements: ['top'] }"
-                                    class="bk-icon icon-edit"
-                                    @click.stop="handleEditAgreement(option)">
-                                </i>
-                            </bk-option>
-                            <div slot="extension" @click="handleCreateAgreement" style="cursor: pointer;">
-                                <i class="bk-icon icon-plus-circle"></i>{{$t(`m.serviceConfig['跳转新建协议']`)}}
-                            </div>
-                        </bk-select>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.serviceConfig['颜色标志设置']`)">
-                        <bk-color-picker v-model="agreementEditData.color"></bk-color-picker>
-                    </bk-form-item>
-                </bk-form>
-                <div style="margin-top: 20px;">
-                    <bk-button style="margin-right: 10px;width:86px" theme="primary" @click="handleSetAgreement()">
-                        确定
-                    </bk-button>
-                    <bk-button style="width:86px" theme="default" @click="handleCancelAgreement()">
-                        取消
-                    </bk-button>
-                </div>
-            </div>
-        </bk-sideslider>
-        <bk-dialog
-            v-model="viewAgreementIsShow"
-            class="viewAgreeDialog"
-            theme="primary"
-            width="1220"
-            :mask-close="false"
-            cancel-text="关闭"
-            :title="$t(`m.serviceConfig['协议计时说明']`)">
-            <div class="agree-img"></div>
-        </bk-dialog>
-
+  <div class="project-sla-agreement">
+    <!-- title -->
+    <div class="is-title">
+      <p class="bk-come-back" @click="goToServiceList">
+        <i class="bk-icon icon-arrows-left"></i>
+        <span>{{ serviceData.name || '--' }}</span> > SLA{{ $t(`m['设置']`) }}
+      </p>
     </div>
+    <!-- content -->
+    <div class="sla-agreement-container">
+      <div v-bkloading="{ isLoading: serviceLoading }" class="bk-content-group">
+        <bk-form
+          :label-width="250"
+          form-type="vertical"
+          class="bk-sla-box"
+          ref="dynamicForm">
+          <div class="bk-sla-content">
+            <span>{{$t(`m.serviceConfig['是否启用']`)}}</span>
+            <bk-switcher
+              size="small"
+              theme="primary"
+              v-model="isSlaActive"
+              :pre-check="handleUseSlaPreCheck"></bk-switcher>
+            {{$t(`m.serviceConfig['可以通过点击添加“+”或点击流程节点添加']`)}}
+          </div>
+          <div class="bk-sla-content" v-if="isSlaActive">
+            <div class="bk-service-agreement">
+              <span class="bk-service-label">
+                {{$t(`m.serviceConfig['服务协议']`)}}
+                <span class="red-star">*</span>
+              </span>
+              <div class="bk-service-agreement-list">
+                <div class="bk-agreement-content"
+                  v-for="(agree, index) in serviceData.sla"
+                  :key="index">
+                  <span class="bk-agreement-color"
+                    :style="'background-color: ' + agree.color">
+                  </span>
+                  <span class="bk-agreement-text" @click="agreementTextClick(agree, 'edit')">
+                    {{ getProtocolName(agree.sla_id) || $t(`m.tickets["未设置"]`) }}
+                  </span>
+                  <span class="bk-icon icon-delete"
+                    @click="agreementCloseClick(agree, index)">
+                  </span>
+                </div>
+                <bk-button
+                  class="bk-sla-add"
+                  size="small"
+                  theme="default"
+                  icon="plus"
+                  @click="agreementTextClick({})">
+                </bk-button>
+              </div>
+            </div>
+            <div style="height: 420px;margin-top:10px" v-bkloading="{ isLoading: canvasDataLoading }">
+              <second-flow
+                v-if="!canvasDataLoading"
+                ref="flowInfo"
+                :add-list="addList"
+                :service-agreement-list="serviceData.sla"
+                :line-list="lineList"
+                :flow-info="previewInfo"
+                @slaIconClick="agreementTextClick"
+                @configuNode="configuNode">
+              </second-flow>
+            </div>
+          </div>
+        </bk-form>
+      </div>
+      <div class="bk-priority-btn">
+        <bk-button
+          theme="primary"
+          :title="$t(`m.slaContent['提交']`)"
+          class="mr10"
+          :loading="submitPending"
+          :disabled="serviceLoading"
+          @click="submitFn">{{ $t(`m.slaContent['提交']`) }}
+        </bk-button>
+        <bk-button
+          theme="default"
+          :title="$t(`m.eventdeploy['取消']`)"
+          class="mr10"
+          @click="goToServiceList">{{ $t('m.eventdeploy["取消"]') }}
+        </bk-button>
+      </div>
+    </div>
+    <bk-sideslider
+      :is-show.sync="serviceAgreementIsShow"
+      :quick-close="true"
+      :before-close="clearLastNode"
+      :width="695">
+      <div slot="header" class="sideslider-header">
+        {{$t(`m.serviceConfig['绑定服务协议']`)}}
+        <div @click="viewAgreementIsShow = true" class="view-agreement-text">
+          {{$t(`m.serviceConfig['查看协议计时说明']`)}}
+        </div>
+      </div>
+      <div slot="content" class="sideslider-content">
+        <bk-form
+          :label-width="250"
+          form-type="vertical"
+          :model="agreementEditData"
+          :rules="agreementRules"
+          ref="agreementForm">
+          <bk-form-item
+            style="width: calc(50% - 15px)"
+            :label="$t(`m.serviceConfig['开始节点']`)"
+            :required="true"
+            :property="'start_node_id'">
+            <bk-select
+              :placeholder="$t(`m.serviceConfig['请选择开始计时节点']`)"
+              v-model="agreementEditData.start_node_id"
+              searchable
+              @change="getPostNodes">
+              <bk-option v-for="option in nodeOption"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+          <span class="bk-line-icon"></span>
+          <bk-form-item
+            style="width: calc(50% - 15px)"
+            :label="$t(`m.serviceConfig['结束节点']`)"
+            :required="true"
+            :property="'end_node_id'">
+            <bk-select
+              :placeholder="$t(`m.serviceConfig['请选择结束计时节点']`)"
+              v-model="agreementEditData.end_node_id"
+              searchable
+              :loading="endNodeSelectLoading">
+              <bk-option v-for="option in endNodeOption"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.serviceConfig['服务协议']`)"
+            :required="true"
+            :property="'sla_id'">
+            <bk-select
+              :placeholder="$t(`m.serviceConfig['请选择服务协议']`)"
+              v-model="agreementEditData.sla_id"
+              searchable>
+              <bk-option v-for="option in slaList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+                <span>{{option.name}}</span>
+                <i v-bk-tooltips="{ content: '跳转查看协议', placements: ['top'] }"
+                  class="bk-icon icon-edit"
+                  @click.stop="handleEditAgreement(option)">
+                </i>
+              </bk-option>
+              <div slot="extension" @click="handleCreateAgreement" style="cursor: pointer;">
+                <i class="bk-icon icon-plus-circle"></i>{{$t(`m.serviceConfig['跳转新建协议']`)}}
+              </div>
+            </bk-select>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.serviceConfig['颜色标志设置']`)">
+            <bk-color-picker v-model="agreementEditData.color"></bk-color-picker>
+          </bk-form-item>
+        </bk-form>
+        <div style="margin-top: 20px;">
+          <bk-button style="margin-right: 10px;width:86px" theme="primary" @click="handleSetAgreement()">
+            确定
+          </bk-button>
+          <bk-button style="width:86px" theme="default" @click="handleCancelAgreement()">
+            取消
+          </bk-button>
+        </div>
+      </div>
+    </bk-sideslider>
+    <bk-dialog
+      v-model="viewAgreementIsShow"
+      class="viewAgreeDialog"
+      theme="primary"
+      width="1220"
+      :mask-close="false"
+      cancel-text="关闭"
+      :title="$t(`m.serviceConfig['协议计时说明']`)">
+      <div class="agree-img"></div>
+    </bk-dialog>
+
+  </div>
 </template>
 
 <script>

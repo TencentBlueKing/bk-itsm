@@ -21,12 +21,12 @@
   -->
 
 <template>
-    <div class="no-data">
-        <img :src="imgUrl">
-        <p>
-            {{ text || $t('m.treeinfo["暂无数据"]') }}
-        </p>
-    </div>
+  <div class="no-data">
+    <img :src="imgUrl">
+    <p>
+      {{ text || $t('m.treeinfo["暂无数据"]') }}
+    </p>
+  </div>
 </template>
 
 <script>

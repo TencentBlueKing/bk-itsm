@@ -21,13 +21,13 @@
   -->
 
 <template>
-    <span
-        v-if="info"
-        class="node-status"
-        :class="info.cls">
-        <i class="status-icon" :class="info.icon"></i>
-        <span class="node-status-text">{{ info.text }}</span>
-    </span>
+  <span
+    v-if="info"
+    class="node-status"
+    :class="info.cls">
+    <i class="status-icon" :class="info.icon"></i>
+    <span class="node-status-text">{{ info.text }}</span>
+  </span>
 </template>
 
 <script>

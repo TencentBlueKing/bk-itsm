@@ -21,29 +21,29 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-select :class="{ 'bk-border-error': item.checkValue }"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                searchable
-                multiple
-                :font-size="'medium'"
-                :placeholder="item.desc"
-                v-model="selectedItems"
-                @selected="selected"
-                @toggle="item.checkValue = false">
-                <bk-option v-for="option in options"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-select :class="{ 'bk-border-error': item.checkValue }"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        searchable
+        multiple
+        :font-size="'medium'"
+        :placeholder="item.desc"
+        v-model="selectedItems"
+        @selected="selected"
+        @toggle="item.checkValue = false">
+        <bk-option v-for="option in options"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>

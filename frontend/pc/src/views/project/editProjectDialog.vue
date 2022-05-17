@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <bk-dialog
-        :value="isShow"
-        render-directive="if"
-        :title="title"
-        :width="600"
-        :auto-close="false"
-        :mask-close="false"
-        :loading="editProjectPending"
-        @confirm="onEditProjectConfirm"
-        @cancel="$emit('cancel')">
-        <div class="project-form">
-            <bk-form
-                ref="projectForm"
-                form-type="vertical"
-                :model="projectForm"
-                :rules="projectRules">
-                <bk-form-item property="name" :label="$t(`m['项目名称']`)" :required="true" error-display-type="normal">
-                    <bk-input
-                        v-model="projectForm.name"
-                        :maxlength="50"
-                        :show-word-limit="true"
-                        :disabled="editDialogFormDisable"
-                        :placeholder="$t(`m['请输入50个字符以内的项目名称']`)">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item property="key" :label="$t(`m['项目代号']`)" :required="true" error-display-type="normal">
-                    <bk-input
-                        v-model="projectForm.key"
-                        :maxlength="28"
-                        :show-word-limit="true"
-                        :disabled="!!project.key || editDialogFormDisable"
-                        :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item property="desc" :label="$t(`m['项目说明']`)">
-                    <bk-input
-                        v-model="projectForm.desc"
-                        type="textarea"
-                        :maxlength="100"
-                        :label="$t(`m['请输入项目说明']`)"
-                        :placeholder="$t(`m['请输入项目说明']`)">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </div>
-    </bk-dialog>
+  <bk-dialog
+    :value="isShow"
+    render-directive="if"
+    :title="title"
+    :width="600"
+    :auto-close="false"
+    :mask-close="false"
+    :loading="editProjectPending"
+    @confirm="onEditProjectConfirm"
+    @cancel="$emit('cancel')">
+    <div class="project-form">
+      <bk-form
+        ref="projectForm"
+        form-type="vertical"
+        :model="projectForm"
+        :rules="projectRules">
+        <bk-form-item property="name" :label="$t(`m['项目名称']`)" :required="true" error-display-type="normal">
+          <bk-input
+            v-model="projectForm.name"
+            :maxlength="50"
+            :show-word-limit="true"
+            :disabled="editDialogFormDisable"
+            :placeholder="$t(`m['请输入50个字符以内的项目名称']`)">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item property="key" :label="$t(`m['项目代号']`)" :required="true" error-display-type="normal">
+          <bk-input
+            v-model="projectForm.key"
+            :maxlength="28"
+            :show-word-limit="true"
+            :disabled="!!project.key || editDialogFormDisable"
+            :placeholder="$t(`m['请输入28个字符以内的项目代号']`)">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item property="desc" :label="$t(`m['项目说明']`)">
+          <bk-input
+            v-model="projectForm.desc"
+            type="textarea"
+            :maxlength="100"
+            :label="$t(`m['请输入项目说明']`)"
+            :placeholder="$t(`m['请输入项目说明']`)">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </div>
+  </bk-dialog>
 </template>
 <script>
     import { deepClone } from '@/utils/util';

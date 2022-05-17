@@ -21,80 +21,80 @@
   -->
 
 <template>
-    <div class="bk-api-run">
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["配置"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <api-run-config
-                    ref="apiRunConfig"
-                    :api-detail-info-common="apiDetailInfoCommon">
-                </api-run-config>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求数据加工"]') }}</h1>
-            </div>
-            <div class="bk-basic-content" style="position: relative;">
-                <ace
-                    :value="reqDataProcess.value"
-                    :width="dataProcess.width"
-                    :height="dataProcess.height"
-                    :lang="dataProcess.lang"
-                    :full-screen="dataProcess.fullScreen"
-                    :theme="'monokai'"
-                    @blur="reqChangBlur">
-                </ace>
-            </div>
-        </div>
-
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据加工"]') }}</h1>
-            </div>
-            <div class="bk-basic-content" style="position: relative;">
-                <ace
-                    :value="dataProcess.value"
-                    :width="dataProcess.width"
-                    :height="dataProcess.height"
-                    :lang="dataProcess.lang"
-                    :full-screen="dataProcess.fullScreen"
-                    :theme="'monokai'"
-                    @blur="changBlur">
-                </ace>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>Response</h1>
-            </div>
-            <div class="bk-basic-content" style="position: relative;">
-                <div id="#editor">
-                    <ace
-                        :value="alarmDetailConfig.value"
-                        :width="alarmDetailConfig.width"
-                        :height="alarmDetailConfig.height"
-                        :read-only="alarmDetailConfig.readOnly"
-                        :lang="alarmDetailConfig.lang"
-                        :full-screen="alarmDetailConfig.fullScreen"
-                        :theme="'monokai'"
-                        @init="editorInitAfter">
-                    </ace>
-                </div>
-            </div>
-        </div>
-        <div class="bk-basic-btn" v-if="!apiDetailInfoCommon.is_builtin">
-            <bk-button :disabled="isSuccess"
-                @click="updateApi"
-                data-test-id="apiDetail_button_runUpdateApi"
-                :theme="'primary'"
-                :title="$t(`m.systemConfig['保存参数']`)">
-                {{$t(`m.systemConfig['保存参数']`)}}
-            </bk-button>
-        </div>
+  <div class="bk-api-run">
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["配置"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <api-run-config
+          ref="apiRunConfig"
+          :api-detail-info-common="apiDetailInfoCommon">
+        </api-run-config>
+      </div>
     </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求数据加工"]') }}</h1>
+      </div>
+      <div class="bk-basic-content" style="position: relative;">
+        <ace
+          :value="reqDataProcess.value"
+          :width="dataProcess.width"
+          :height="dataProcess.height"
+          :lang="dataProcess.lang"
+          :full-screen="dataProcess.fullScreen"
+          :theme="'monokai'"
+          @blur="reqChangBlur">
+        </ace>
+      </div>
+    </div>
+
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据加工"]') }}</h1>
+      </div>
+      <div class="bk-basic-content" style="position: relative;">
+        <ace
+          :value="dataProcess.value"
+          :width="dataProcess.width"
+          :height="dataProcess.height"
+          :lang="dataProcess.lang"
+          :full-screen="dataProcess.fullScreen"
+          :theme="'monokai'"
+          @blur="changBlur">
+        </ace>
+      </div>
+    </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>Response</h1>
+      </div>
+      <div class="bk-basic-content" style="position: relative;">
+        <div id="#editor">
+          <ace
+            :value="alarmDetailConfig.value"
+            :width="alarmDetailConfig.width"
+            :height="alarmDetailConfig.height"
+            :read-only="alarmDetailConfig.readOnly"
+            :lang="alarmDetailConfig.lang"
+            :full-screen="alarmDetailConfig.fullScreen"
+            :theme="'monokai'"
+            @init="editorInitAfter">
+          </ace>
+        </div>
+      </div>
+    </div>
+    <div class="bk-basic-btn" v-if="!apiDetailInfoCommon.is_builtin">
+      <bk-button :disabled="isSuccess"
+        @click="updateApi"
+        data-test-id="apiDetail_button_runUpdateApi"
+        :theme="'primary'"
+        :title="$t(`m.systemConfig['保存参数']`)">
+        {{$t(`m.systemConfig['保存参数']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

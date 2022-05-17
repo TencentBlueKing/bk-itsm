@@ -21,153 +21,153 @@
   -->
 
 <template>
-    <div class="bk-polling" v-if="formInfo.api_info && lineInfo.expressions">
-        <div class="bk-service-name mt20">
-            <div class="mt20">
-                <bk-switcher v-model="formInfo.api_info.need_poll" size="small"></bk-switcher>
-            </div>
-        </div>
-        <div class="bk-line-form">
-            <template v-if="formInfo.api_info.need_poll">
-                <div class="bk-service-name">
-                    <h1 style="padding-left: 10px">
-                        <span>{{ $t('m.treeinfo["条件组间关系"]') }}</span>
-                        <span v-bk-tooltips.top="$t(`m.treeinfo['当所有条件组都满足且/或的条件组时，轮询才会结束']`)" class="top-middle">
-                            <i class="bk-itsm-icon icon-icon-info"></i>
-                        </span>
-                    </h1>
-                </div>
-                <div class="bk-hidden-conditions">
-                    <div class="bk-form-content" style="margin-left: 0">
-                        <bk-radio-group v-model="lineInfo.between">
-                            <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
-                            <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
-                        </bk-radio-group>
-                    </div>
-                </div>
-            </template>
-            <template v-if="formInfo.api_info.need_poll && lineInfo.expressions && lineInfo.expressions.length">
-                <div class="bk-form-content"
-                    v-for="(item, index) in lineInfo.expressions"
-                    :key="index">
-                    <p class="bk-between-title">{{lineInfo.between === 'and' ? $t(`m.treeinfo['且']`) :
-                        $t(`m.treeinfo["或"]`)}}{{ $t('m.treeinfo["-条件组"]') }}{{index + 1}}</p>
-                    <div class="bk-between-info">
-                        <p>
-                            <span class="bk-between-span">{{ $t('m.treeinfo["字段间关系"]') }}</span>
-                            <bk-radio-group v-model="item.type" style="width: auto;">
-                                <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
-                                <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
-                            </bk-radio-group>
-                        </p>
-                        <div class="bk-between-form"
-                            v-for="(node, nodeIndex) in item.expressions"
-                            :key="nodeIndex" @click="item.checkInfo = false">
-                            <!-- 组织架构 -->
-                            <div style="width: 210px; float: left; margin-right: 10px; background: white;">
-                                <div class="bk-search-tree bk-form-width"
-                                    v-click-outside="closeOther">
-                                    <div class="bk-search-tree-wrapper" @click.stop="showTree(node)">
-                                        <span :class="{ 'bk-color-tree': node.organization && node.organization.assignorTree.name }">
-                                            {{(node.organization && node.organization.assignorTree.name) ? node.organization.assignorTree.name : $t(`m.treeinfo["请选择"]`)}}
-                                        </span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                    <transition name="common-fade">
-                                        <div class="bk-search-tree-content" v-if="node.organizaInfo && node.organizaInfo.assignorShow">
-                                            <export-tree
-                                                :tree-data-list="node.organization.assignorPerson"
-                                                @toggle="assignorToggle(...arguments, node)"
-                                                @toggleChildren="toggleChildren(...arguments, node)">
-                                            </export-tree>
-                                        </div>
-                                    </transition>
-                                </div>
-                            </div>
-                            <bk-select style="width: 100px; float: left; margin-right: 10px;"
-                                v-model="node.condition"
-                                searchable
-                                :font-size="'medium'">
-                                <bk-option v-for="option in globalChoiseFilter(globalChoise.methods, node.type)"
-                                    :key="option.typeName"
-                                    :id="option.typeName"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                            <div style="width: 195px; float: left; margin-right: 10px;">
-                                <template v-if="node.type === 'boolean'">
-                                    <bk-select
-                                        v-model="node.value"
-                                        searchable
-                                        :font-size="'medium'">
-                                        <bk-option v-for="option in booleanList"
-                                            :key="option.id"
-                                            :id="option.id"
-                                            :name="option.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </template>
-                                <template v-else>
-                                    <bk-input
-                                        :clearable="true"
-                                        :type="node.type === 'INT' ? 'number' : 'text'"
-                                        v-model="node.value"
-                                        :placeholder="$t(`m.treeinfo['请输入比较值']`)">
-                                    </bk-input>
-                                </template>
-                            </div>
-                            <div class="bk-between-operat">
-                                <span class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
-                                <i class="bk-itsm-icon icon-flow-reduce"
-                                    :class="{ 'bk-no-delete': item.expressions.length === 1 }"
-                                    @click="deleteNode(item, nodeIndex)"></i>
-                            </div>
-                        </div>
-                        <i class="bk-icon icon-close"
-                            v-if="lineInfo.expressions.length !== 1"
-                            @click="delteCondition(item, index)"></i>
-                    </div>
-                </div>
-                <div :class="{ 'bk-line-padding': scrollTopStatus }">
-                    <p class="bk-add-between">
-                        <span @click="addCondition">
-                            <i class="bk-icon icon-plus-circle"></i>{{ $t('m.treeinfo["添加条件组"]') }}
-                        </span>
-                    </p>
-                </div>
-            </template>
-        </div>
-        <div class="bk-polling-configu" style="width: 650px" v-if="formInfo.api_info.need_poll">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="formInfo">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['轮询间隔']`)"
-                    :ext-cls="'bk-polling-item'">
-                    <bk-input :clearable="true"
-                        type="number"
-                        :min="1"
-                        v-model="formInfo.api_info.end_conditions.poll_interval"
-                        :placeholder="$t(`m.treeinfo['请输入间隔时间']`)">
-                        <template slot="append">
-                            <div class="group-text">{{ $t('m.treeinfo["秒"]') }}</div>
-                        </template>
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.treeinfo['轮询次数']`)"
-                    :ext-cls="'bk-polling-item bk-polling-right'">
-                    <bk-input :clearable="true"
-                        type="number"
-                        :min="1"
-                        v-model="formInfo.api_info.end_conditions.poll_time"
-                        :placeholder="$t(`m.treeinfo['请输入轮询次数']`)">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </div>
+  <div class="bk-polling" v-if="formInfo.api_info && lineInfo.expressions">
+    <div class="bk-service-name mt20">
+      <div class="mt20">
+        <bk-switcher v-model="formInfo.api_info.need_poll" size="small"></bk-switcher>
+      </div>
     </div>
+    <div class="bk-line-form">
+      <template v-if="formInfo.api_info.need_poll">
+        <div class="bk-service-name">
+          <h1 style="padding-left: 10px">
+            <span>{{ $t('m.treeinfo["条件组间关系"]') }}</span>
+            <span v-bk-tooltips.top="$t(`m.treeinfo['当所有条件组都满足且/或的条件组时，轮询才会结束']`)" class="top-middle">
+              <i class="bk-itsm-icon icon-icon-info"></i>
+            </span>
+          </h1>
+        </div>
+        <div class="bk-hidden-conditions">
+          <div class="bk-form-content" style="margin-left: 0">
+            <bk-radio-group v-model="lineInfo.between">
+              <bk-radio :value="'and'" :ext-cls="'mr20'">{{$t(`m.treeinfo['且']`)}}</bk-radio>
+              <bk-radio :value="'or'">{{$t(`m.treeinfo['或']`)}}</bk-radio>
+            </bk-radio-group>
+          </div>
+        </div>
+      </template>
+      <template v-if="formInfo.api_info.need_poll && lineInfo.expressions && lineInfo.expressions.length">
+        <div class="bk-form-content"
+          v-for="(item, index) in lineInfo.expressions"
+          :key="index">
+          <p class="bk-between-title">{{lineInfo.between === 'and' ? $t(`m.treeinfo['且']`) :
+            $t(`m.treeinfo["或"]`)}}{{ $t('m.treeinfo["-条件组"]') }}{{index + 1}}</p>
+          <div class="bk-between-info">
+            <p>
+              <span class="bk-between-span">{{ $t('m.treeinfo["字段间关系"]') }}</span>
+              <bk-radio-group v-model="item.type" style="width: auto;">
+                <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
+                <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
+              </bk-radio-group>
+            </p>
+            <div class="bk-between-form"
+              v-for="(node, nodeIndex) in item.expressions"
+              :key="nodeIndex" @click="item.checkInfo = false">
+              <!-- 组织架构 -->
+              <div style="width: 210px; float: left; margin-right: 10px; background: white;">
+                <div class="bk-search-tree bk-form-width"
+                  v-click-outside="closeOther">
+                  <div class="bk-search-tree-wrapper" @click.stop="showTree(node)">
+                    <span :class="{ 'bk-color-tree': node.organization && node.organization.assignorTree.name }">
+                      {{(node.organization && node.organization.assignorTree.name) ? node.organization.assignorTree.name : $t(`m.treeinfo["请选择"]`)}}
+                    </span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                  <transition name="common-fade">
+                    <div class="bk-search-tree-content" v-if="node.organizaInfo && node.organizaInfo.assignorShow">
+                      <export-tree
+                        :tree-data-list="node.organization.assignorPerson"
+                        @toggle="assignorToggle(...arguments, node)"
+                        @toggleChildren="toggleChildren(...arguments, node)">
+                      </export-tree>
+                    </div>
+                  </transition>
+                </div>
+              </div>
+              <bk-select style="width: 100px; float: left; margin-right: 10px;"
+                v-model="node.condition"
+                searchable
+                :font-size="'medium'">
+                <bk-option v-for="option in globalChoiseFilter(globalChoise.methods, node.type)"
+                  :key="option.typeName"
+                  :id="option.typeName"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+              <div style="width: 195px; float: left; margin-right: 10px;">
+                <template v-if="node.type === 'boolean'">
+                  <bk-select
+                    v-model="node.value"
+                    searchable
+                    :font-size="'medium'">
+                    <bk-option v-for="option in booleanList"
+                      :key="option.id"
+                      :id="option.id"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
+                </template>
+                <template v-else>
+                  <bk-input
+                    :clearable="true"
+                    :type="node.type === 'INT' ? 'number' : 'text'"
+                    v-model="node.value"
+                    :placeholder="$t(`m.treeinfo['请输入比较值']`)">
+                  </bk-input>
+                </template>
+              </div>
+              <div class="bk-between-operat">
+                <span class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
+                <i class="bk-itsm-icon icon-flow-reduce"
+                  :class="{ 'bk-no-delete': item.expressions.length === 1 }"
+                  @click="deleteNode(item, nodeIndex)"></i>
+              </div>
+            </div>
+            <i class="bk-icon icon-close"
+              v-if="lineInfo.expressions.length !== 1"
+              @click="delteCondition(item, index)"></i>
+          </div>
+        </div>
+        <div :class="{ 'bk-line-padding': scrollTopStatus }">
+          <p class="bk-add-between">
+            <span @click="addCondition">
+              <i class="bk-icon icon-plus-circle"></i>{{ $t('m.treeinfo["添加条件组"]') }}
+            </span>
+          </p>
+        </div>
+      </template>
+    </div>
+    <div class="bk-polling-configu" style="width: 650px" v-if="formInfo.api_info.need_poll">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="formInfo">
+        <bk-form-item
+          :label="$t(`m.treeinfo['轮询间隔']`)"
+          :ext-cls="'bk-polling-item'">
+          <bk-input :clearable="true"
+            type="number"
+            :min="1"
+            v-model="formInfo.api_info.end_conditions.poll_interval"
+            :placeholder="$t(`m.treeinfo['请输入间隔时间']`)">
+            <template slot="append">
+              <div class="group-text">{{ $t('m.treeinfo["秒"]') }}</div>
+            </template>
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.treeinfo['轮询次数']`)"
+          :ext-cls="'bk-polling-item bk-polling-right'">
+          <bk-input :clearable="true"
+            type="number"
+            :min="1"
+            v-model="formInfo.api_info.end_conditions.poll_time"
+            :placeholder="$t(`m.treeinfo['请输入轮询次数']`)">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </div>
+  </div>
 </template>
 
 <script>

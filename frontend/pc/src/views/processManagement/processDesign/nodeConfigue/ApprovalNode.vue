@@ -21,253 +21,253 @@
   -->
 
 <template>
-    <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
-        <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form
-                form-type="vertical"
-                style="margin-bottom: 40px"
-                :label-width="150"
-                :model="formInfo"
-                :rules="nodeInfoRule" ref="nodeInfoForm">
-                <bk-form-item
-                    data-test-id="approveNode-input-nodeName"
-                    :label="$t(`m.treeinfo['节点名称：']`)"
-                    :required="true"
-                    :property="'name'"
-                    :ext-cls="'bk-form-width'">
-                    <bk-input v-model="formInfo.name"
-                        maxlength="120">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="approveNode-input-nodeLabel"
-                    :label="$t(`m.treeinfo['节点标签：']`)"
-                    :required="true"
-                    :ext-cls="'bk-form-width'">
-                    <bk-select
-                        v-model="formInfo.tag"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'">
-                        <bk-option v-for="option in nodeTagList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="approveNode-radio-approveMode"
-                    :label="$t(`m.treeinfo['审批方式：']`)"
-                    :required="true"
-                    :property="'nodeType'">
-                    <bk-radio-group v-model="processType" @change="handleChangeDispose">
-                        <bk-radio :value="'multi'" :ext-cls="'mr20'">{{$t(`m.treeinfo['或签']`)}}
-                            <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['任一处理人完成审批即可。']`)"></i>
-                        </bk-radio>
-                        <bk-radio :value="'sequential'" :ext-cls="'mr20'">{{$t(`m.treeinfo['顺序会签']`)}}
-                            <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['所有处理人按顺序进行审批。']`)"></i>
-                        </bk-radio>
-                        <bk-radio :value="'random'">{{$t(`m.treeinfo['随机会签']`)}}
-                            <i class="bk-itsm-icon icon-icon-info tooltip-icon"
-                                v-bk-tooltips="$t(`m.treeinfo['所有处理人随机进行审批。']`)"></i>
-                        </bk-radio>
-                    </bk-radio-group>
-                    <template v-if="isShowSignSwitch">
-                        <span class="bk-condtion-switch">{{ $t(`m.treeinfo['提前结束条件']`) }}</span>
-                        <bk-switcher data-test-id="approve-switcher-condtion" v-model="isShowSignOptions" theme="primary"></bk-switcher>
-                        <i class="bk-itsm-icon icon-icon-info tooltip-icon" v-bk-tooltips="$t(`m.treeinfo['若配置了会签提前结束条件，满足条件，将提前结束']`)"></i>
-                        <div class="bk-condition-content" v-if="isShowSignOptions">
-                            <div class="bk-condition-group" v-for="(group, gIndex) in finishCondition.expressions" :key="gIndex">
-                                <p class="bk-group-title">{{$t(`m.treeinfo['或-条件组']`)}}{{gIndex + 1}}</p>
-                                <div :class="{ 'bk-group-content': true, 'bk-group-contents': group.expressions.length > 1 }">
-                                    <bk-form :label-width="0"
-                                        :rules="finishConditionRule"
-                                        ref="finishConditionForms"
-                                        v-for="(expression, eIndex) in group.expressions" :key="eIndex"
-                                        :model="expression"
-                                        form-type="inline"
-                                        :ext-cls="'bk-condition'">
-                                        <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'key'">
-                                            <div class="bk-left-block" v-if="group.expressions.length > 1">
-                                                <span :class="{ 'left-top-default': true, 'no-left-border': eIndex === 0 }"></span>
-                                                <span :class="{ 'left-bottom-default': true, 'no-left-border': eIndex === group.expressions.length - 1 }"></span>
-                                                <span class="bk-left-letter" v-if="eIndex !== group.expressions.length - 1">{{$t(`m.common['且']`)}}</span>
-                                            </div>
-                                            <bk-select
-                                                v-model="expression.key"
-                                                data-test-id="approve-select-condtionType"
-                                                :font-size="'medium'"
-                                                :clearable="false"
-                                                :ext-cls="'bk-form-width-long'"
-                                                @selected="selectCondition($event, expression, eIndex, gIndex)">
-                                                <bk-option v-for="option in allCondition"
-                                                    :key="option.id"
-                                                    :id="option.key"
-                                                    :name="option.name">
-                                                </bk-option>
-                                            </bk-select>
-                                        </bk-form-item>
-                                        <bk-form-item :ext-cls="'bk-form-item-cus'">
-                                            <bk-select v-model="expression.condition"
-                                                data-test-id="approve-select-condtion"
-                                                :font-size="'medium'"
-                                                :clearable="false"
-                                                :ext-cls="'bk-form-width-short'">
-                                                <bk-option v-for="option in betweenList"
-                                                    :key="option.key"
-                                                    :id="option.key"
-                                                    :name="option.name">
-                                                </bk-option>
-                                            </bk-select>
-                                        </bk-form-item>
-                                        <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'value'">
-                                            <bk-input v-model="expression.value"
-                                                data-test-id="approve-condtion-value"
-                                                :ext-cls="'bk-form-width-long'"
-                                                v-bk-tooltips="expression.tooltipInfo"
-                                                :disabled="(!$refs.processors.getValue().value && expression.meta.unit === 'INT') ||
-                                                    !expression.key"
-                                                :clearable="false"
-                                                type="number"
-                                                :max="expression.meta.unit === 'INT' ? formInfo.processors.length : 100"
-                                                :min="0"
-                                                :precision="0"
-                                                @change="giveTooltip(expression)"></bk-input>
-                                            <span v-if="expression.meta.unit === 'PERCENT'"
-                                                class="buttonIcon">%</span>
-                                        </bk-form-item>
-                                        <bk-form-item :ext-cls="'bk-form-item-cus'">
-                                            <div class="bk-operate-expression">
-                                                <i class="bk-itsm-icon icon-flow-add mr10" @click="operateExpression(group)"></i>
-                                                <i class="bk-itsm-icon icon-flow-reduce mr10" :class="{ 'bk-itsm-icon-disable':
-                                                    group.expressions.length === 1 }"
-                                                    @click="operateExpression(group, 'del', eIndex, gIndex, expression)"></i>
-                                            </div>
-                                        </bk-form-item>
-                                        <i class="bk-icon icon-close bk-delete-group"
-                                            @click="operateGroup('del', gIndex)"></i>
-                                    </bk-form>
-                                </div>
-                            </div>
-                            <p class="bk-add-group" data-test-id="approve-condtion-addGroup" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
-                                {{$t(`m.treeinfo['添加“或”条件组']`)}}</p>
-                        </div>
-                    </template>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="approveNode-component-processor"
-                    :label="$t(`m.treeinfo['处理人：']`)"
-                    :required="true">
-                    <div @click="checkStatus.processors = false">
-                        <deal-person
-                            ref="processors"
-                            :value="processorsInfo"
-                            :node-info="configur"
-                            :exclude-role-type-list="excludeProcessor">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="approveNode-input-ticketStatus"
-                    :label="$t(`m.treeinfo['设置单据状态：']`)"
-                    :required="true"
-                    :ext-cls="'bk-form-width'">
-                    <bk-select :ext-cls="'inline-form-width'"
-                        v-model="formInfo.ticket_type"
-                        :clearable="false"
-                        searchable
+  <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
+    <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
+      <bk-form
+        form-type="vertical"
+        style="margin-bottom: 40px"
+        :label-width="150"
+        :model="formInfo"
+        :rules="nodeInfoRule" ref="nodeInfoForm">
+        <bk-form-item
+          data-test-id="approveNode-input-nodeName"
+          :label="$t(`m.treeinfo['节点名称：']`)"
+          :required="true"
+          :property="'name'"
+          :ext-cls="'bk-form-width'">
+          <bk-input v-model="formInfo.name"
+            maxlength="120">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="approveNode-input-nodeLabel"
+          :label="$t(`m.treeinfo['节点标签：']`)"
+          :required="true"
+          :ext-cls="'bk-form-width'">
+          <bk-select
+            v-model="formInfo.tag"
+            :clearable="false"
+            searchable
+            :font-size="'medium'">
+            <bk-option v-for="option in nodeTagList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="approveNode-radio-approveMode"
+          :label="$t(`m.treeinfo['审批方式：']`)"
+          :required="true"
+          :property="'nodeType'">
+          <bk-radio-group v-model="processType" @change="handleChangeDispose">
+            <bk-radio :value="'multi'" :ext-cls="'mr20'">{{$t(`m.treeinfo['或签']`)}}
+              <i class="bk-itsm-icon icon-icon-info tooltip-icon"
+                v-bk-tooltips="$t(`m.treeinfo['任一处理人完成审批即可。']`)"></i>
+            </bk-radio>
+            <bk-radio :value="'sequential'" :ext-cls="'mr20'">{{$t(`m.treeinfo['顺序会签']`)}}
+              <i class="bk-itsm-icon icon-icon-info tooltip-icon"
+                v-bk-tooltips="$t(`m.treeinfo['所有处理人按顺序进行审批。']`)"></i>
+            </bk-radio>
+            <bk-radio :value="'random'">{{$t(`m.treeinfo['随机会签']`)}}
+              <i class="bk-itsm-icon icon-icon-info tooltip-icon"
+                v-bk-tooltips="$t(`m.treeinfo['所有处理人随机进行审批。']`)"></i>
+            </bk-radio>
+          </bk-radio-group>
+          <template v-if="isShowSignSwitch">
+            <span class="bk-condtion-switch">{{ $t(`m.treeinfo['提前结束条件']`) }}</span>
+            <bk-switcher data-test-id="approve-switcher-condtion" v-model="isShowSignOptions" theme="primary"></bk-switcher>
+            <i class="bk-itsm-icon icon-icon-info tooltip-icon" v-bk-tooltips="$t(`m.treeinfo['若配置了会签提前结束条件，满足条件，将提前结束']`)"></i>
+            <div class="bk-condition-content" v-if="isShowSignOptions">
+              <div class="bk-condition-group" v-for="(group, gIndex) in finishCondition.expressions" :key="gIndex">
+                <p class="bk-group-title">{{$t(`m.treeinfo['或-条件组']`)}}{{gIndex + 1}}</p>
+                <div :class="{ 'bk-group-content': true, 'bk-group-contents': group.expressions.length > 1 }">
+                  <bk-form :label-width="0"
+                    :rules="finishConditionRule"
+                    ref="finishConditionForms"
+                    v-for="(expression, eIndex) in group.expressions" :key="eIndex"
+                    :model="expression"
+                    form-type="inline"
+                    :ext-cls="'bk-condition'">
+                    <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'key'">
+                      <div class="bk-left-block" v-if="group.expressions.length > 1">
+                        <span :class="{ 'left-top-default': true, 'no-left-border': eIndex === 0 }"></span>
+                        <span :class="{ 'left-bottom-default': true, 'no-left-border': eIndex === group.expressions.length - 1 }"></span>
+                        <span class="bk-left-letter" v-if="eIndex !== group.expressions.length - 1">{{$t(`m.common['且']`)}}</span>
+                      </div>
+                      <bk-select
+                        v-model="expression.key"
+                        data-test-id="approve-select-condtionType"
                         :font-size="'medium'"
-                        @selected="handleTicket">
-                        <bk-option v-for="option in billStatusList"
-                            :key="option.type"
-                            :id="option.type"
-                            :name="option.name">
+                        :clearable="false"
+                        :ext-cls="'bk-form-width-long'"
+                        @selected="selectCondition($event, expression, eIndex, gIndex)">
+                        <bk-option v-for="option in allCondition"
+                          :key="option.id"
+                          :id="option.key"
+                          :name="option.name">
                         </bk-option>
-                    </bk-select>
-                    <template v-if="formInfo.ticket_type === 'custom'">
-                        <bk-select :ext-cls="'inline-form-width'"
-                            v-model="formInfo.ticket_key"
-                            :loading="ticketKeyLoading"
-                            :clearable="false"
-                            searchable
-                            :font-size="'medium'">
-                            <bk-option v-for="option in secondLevelList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </template>
-                </bk-form-item>
-                <template v-if="!configur.is_builtin">
-                    <bk-form-item
-                        data-test-id="approveNode-radio-canDeliver"
-                        :label="$t(`m.treeinfo['是否可转单：']`)"
-                        :required="true">
-                        <bk-radio-group v-model="formInfo.can_deliver">
-                            <bk-radio :value="true" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
-                            <bk-radio :value="false">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                        </bk-radio-group>
+                      </bk-select>
                     </bk-form-item>
-                </template>
-                <template v-if="formInfo.can_deliver">
-                    <bk-form-item
-                        data-test-id="approveNode-component-deliver"
-                        :label="$t(`m.treeinfo['转单人：']`)"
-                        :required="true">
-                        <div @click="checkStatus.delivers = false">
-                            <deal-person
-                                ref="delivers"
-                                :value="deliversInfo"
-                                :exclude-role-type-list="deliversExclude">
-                            </deal-person>
-                        </div>
+                    <bk-form-item :ext-cls="'bk-form-item-cus'">
+                      <bk-select v-model="expression.condition"
+                        data-test-id="approve-select-condtion"
+                        :font-size="'medium'"
+                        :clearable="false"
+                        :ext-cls="'bk-form-width-short'">
+                        <bk-option v-for="option in betweenList"
+                          :key="option.key"
+                          :id="option.key"
+                          :name="option.name">
+                        </bk-option>
+                      </bk-select>
                     </bk-form-item>
-                </template>
-                <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true">
-                    <bk-checkbox
-                        :true-value="true"
-                        :false-value="false"
-                        v-model="formInfo.is_allow_skip">
-                        节点处理人为空时，直接跳过且不视为异常
-                    </bk-checkbox>
-                </bk-form-item>
-            </bk-form>
-            <field-config
-                ref="field"
-                :is-show-title="true"
-                :flow-info="flowInfo"
-                :configur="configur">
-            </field-config>
-            <common-trigger-list :origin="'state'"
-                :node-type="configur.type"
-                :source-id="flowInfo.id"
-                :sender="configur.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
-            <div class="bk-node-btn">
-                <bk-button :theme="'primary'"
-                    data-test-id="approve-button-submit"
-                    :title="$t(`m.treeinfo['确定']`)"
-                    :loading="secondClick"
-                    class="mr10"
-                    @click="submitNode">
-                    {{$t(`m.treeinfo['确定']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="approve-button-close"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    :loading="secondClick"
-                    class="mr10"
-                    @click="closeNode">
-                    {{$t(`m.treeinfo['取消']`)}}
-                </bk-button>
+                    <bk-form-item :ext-cls="'bk-form-item-cus'" :property="'value'">
+                      <bk-input v-model="expression.value"
+                        data-test-id="approve-condtion-value"
+                        :ext-cls="'bk-form-width-long'"
+                        v-bk-tooltips="expression.tooltipInfo"
+                        :disabled="(!$refs.processors.getValue().value && expression.meta.unit === 'INT') ||
+                          !expression.key"
+                        :clearable="false"
+                        type="number"
+                        :max="expression.meta.unit === 'INT' ? formInfo.processors.length : 100"
+                        :min="0"
+                        :precision="0"
+                        @change="giveTooltip(expression)"></bk-input>
+                      <span v-if="expression.meta.unit === 'PERCENT'"
+                        class="buttonIcon">%</span>
+                    </bk-form-item>
+                    <bk-form-item :ext-cls="'bk-form-item-cus'">
+                      <div class="bk-operate-expression">
+                        <i class="bk-itsm-icon icon-flow-add mr10" @click="operateExpression(group)"></i>
+                        <i class="bk-itsm-icon icon-flow-reduce mr10" :class="{ 'bk-itsm-icon-disable':
+                          group.expressions.length === 1 }"
+                          @click="operateExpression(group, 'del', eIndex, gIndex, expression)"></i>
+                      </div>
+                    </bk-form-item>
+                    <i class="bk-icon icon-close bk-delete-group"
+                      @click="operateGroup('del', gIndex)"></i>
+                  </bk-form>
+                </div>
+              </div>
+              <p class="bk-add-group" data-test-id="approve-condtion-addGroup" @click="operateGroup"><i class="bk-itsm-icon icon-add-new mr5"></i>
+                {{$t(`m.treeinfo['添加“或”条件组']`)}}</p>
             </div>
-        </basic-card>
-    </div>
+          </template>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="approveNode-component-processor"
+          :label="$t(`m.treeinfo['处理人：']`)"
+          :required="true">
+          <div @click="checkStatus.processors = false">
+            <deal-person
+              ref="processors"
+              :value="processorsInfo"
+              :node-info="configur"
+              :exclude-role-type-list="excludeProcessor">
+            </deal-person>
+          </div>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="approveNode-input-ticketStatus"
+          :label="$t(`m.treeinfo['设置单据状态：']`)"
+          :required="true"
+          :ext-cls="'bk-form-width'">
+          <bk-select :ext-cls="'inline-form-width'"
+            v-model="formInfo.ticket_type"
+            :clearable="false"
+            searchable
+            :font-size="'medium'"
+            @selected="handleTicket">
+            <bk-option v-for="option in billStatusList"
+              :key="option.type"
+              :id="option.type"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <template v-if="formInfo.ticket_type === 'custom'">
+            <bk-select :ext-cls="'inline-form-width'"
+              v-model="formInfo.ticket_key"
+              :loading="ticketKeyLoading"
+              :clearable="false"
+              searchable
+              :font-size="'medium'">
+              <bk-option v-for="option in secondLevelList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </template>
+        </bk-form-item>
+        <template v-if="!configur.is_builtin">
+          <bk-form-item
+            data-test-id="approveNode-radio-canDeliver"
+            :label="$t(`m.treeinfo['是否可转单：']`)"
+            :required="true">
+            <bk-radio-group v-model="formInfo.can_deliver">
+              <bk-radio :value="true" :ext-cls="'mr20'">{{ $t('m.treeinfo["是"]') }}</bk-radio>
+              <bk-radio :value="false">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+            </bk-radio-group>
+          </bk-form-item>
+        </template>
+        <template v-if="formInfo.can_deliver">
+          <bk-form-item
+            data-test-id="approveNode-component-deliver"
+            :label="$t(`m.treeinfo['转单人：']`)"
+            :required="true">
+            <div @click="checkStatus.delivers = false">
+              <deal-person
+                ref="delivers"
+                :value="deliversInfo"
+                :exclude-role-type-list="deliversExclude">
+              </deal-person>
+            </div>
+          </bk-form-item>
+        </template>
+        <bk-form-item :label="$t(`m.treeinfo['自动处理']`)" :required="true">
+          <bk-checkbox
+            :true-value="true"
+            :false-value="false"
+            v-model="formInfo.is_allow_skip">
+            节点处理人为空时，直接跳过且不视为异常
+          </bk-checkbox>
+        </bk-form-item>
+      </bk-form>
+      <field-config
+        ref="field"
+        :is-show-title="true"
+        :flow-info="flowInfo"
+        :configur="configur">
+      </field-config>
+      <common-trigger-list :origin="'state'"
+        :node-type="configur.type"
+        :source-id="flowInfo.id"
+        :sender="configur.id"
+        :table="flowInfo.table">
+      </common-trigger-list>
+      <div class="bk-node-btn">
+        <bk-button :theme="'primary'"
+          data-test-id="approve-button-submit"
+          :title="$t(`m.treeinfo['确定']`)"
+          :loading="secondClick"
+          class="mr10"
+          @click="submitNode">
+          {{$t(`m.treeinfo['确定']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="approve-button-close"
+          :title="$t(`m.treeinfo['取消']`)"
+          :loading="secondClick"
+          class="mr10"
+          @click="closeNode">
+          {{$t(`m.treeinfo['取消']`)}}
+        </bk-button>
+      </div>
+    </basic-card>
+  </div>
 </template>
 <script>
     import dealPerson from './components/dealPerson.vue';

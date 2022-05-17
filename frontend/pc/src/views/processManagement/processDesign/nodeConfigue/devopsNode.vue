@@ -1,129 +1,129 @@
 <template>
-    <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
-        <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form ref="basicInfo" :model="basicInfo" :label-width="150" :rules="basicInfoRules" :ext-cls="'bk-form'" form-type="vertical">
-                <bk-form-item
-                    data-test-id="devops-input-name"
-                    :label="$t(`m.treeinfo['节点名称：']`)"
-                    :required="true"
-                    :ext-cls="'bk-form-width bk-form-display'"
-                    :property="'nodeName'">
-                    <bk-input :clearable="true" v-model="basicInfo.nodeName"></bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="devops-select-project"
-                    :label="$t(`m['项目']`)"
-                    :required="true"
-                    :ext-cls="'bk-form-width bk-form-display'"
-                    :property="'businessId'">
-                    <bk-select
-                        v-model="basicInfo.businessId"
-                        searchable
-                        :disabled="false"
-                        @selected="onSelectBusiness">
-                        <bk-option v-for="business in businessList"
-                            :key="business.englishName"
-                            :id="business.englishName"
-                            :name="business.projectName">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="devops-select-pipeline"
-                    :label="$t(`m['流水线：']`)"
-                    :required="true"
-                    :property="'pipelineId'"
-                    :ext-cls="'bk-form-width bk-form-display'">
-                    <bk-select
-                        searchable
-                        v-model="basicInfo.pipelineId"
-                        :loading="pipelineLoading"
-                        :disabled="pipelineDisabled"
-                        @selected="getPipelineInfo(0)">
-                        <bk-option v-for="pipeline in pipelineList"
-                            :key="pipeline.pipelineId"
-                            :id="pipeline.pipelineId"
-                            :name="pipeline.pipelineName">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="devops-component-processor"
-                    :label="$t(`m.treeinfo['处理人：']`)"
-                    :required="true">
-                    <div @click="checkStatus.processors = false">
-                        <deal-person
-                            ref="processors"
-                            :value="processorsInfo"
-                            :node-info="configur"
-                            :exclude-role-type-list="excludeProcessor">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </bk-form>
-        </basic-card>
-        <basic-card>
-            <div class="piprline-title">
-                <p>{{ $t(`m['流水线参数']`) }}:</p>
-                <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
-            </div>
-            <div class="bk-param" v-if="pipelineFormList.length !== 0" v-bkloading="{ isLoading: pipeFormLoading }">
-                <bk-form
-                    ref="devopsVariable"
-                    ext-cls="pipelineForm"
-                    form-type="vertical"
-                    :model="pipelineData"
-                    :rules="pipelineRules"
-                    :label-width="200">
-                    <bk-form-item v-for="pipeline in pipelineFormList"
-                        :key="pipeline.id"
-                        :label="pipeline.id"
-                        :property="pipeline.id"
-                        :rules="pipelineRules[pipeline.id]"
-                        :required="pipeline.required">
-                        <bk-input
-                            v-model="pipelineData[pipeline.id]"
-                            :clearable="true">
-                        </bk-input>
-                    </bk-form-item>
-                </bk-form>
-                <span class="setion-title-icon" @click.stop="showPipelineStages = !showPipelineStages">
-                    <i v-if="showPipelineStages" class="bk-icon icon-angle-down"></i>
-                    <i v-else class="bk-icon icon-angle-right"></i>
-                    {{ $t(`m.tickets['插件预览']`) }}
-                </span>
-                <devops-preview
-                    v-show="showPipelineStages"
-                    :stages="pipelineStages">
-                </devops-preview>
-            </div>
-            <no-data v-else></no-data>
-            <common-trigger-list :origin="'state'"
-                :node-type="configur.type"
-                :source-id="flowInfo.id"
-                :sender="configur.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
+  <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
+    <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
+      <bk-form ref="basicInfo" :model="basicInfo" :label-width="150" :rules="basicInfoRules" :ext-cls="'bk-form'" form-type="vertical">
+        <bk-form-item
+          data-test-id="devops-input-name"
+          :label="$t(`m.treeinfo['节点名称：']`)"
+          :required="true"
+          :ext-cls="'bk-form-width bk-form-display'"
+          :property="'nodeName'">
+          <bk-input :clearable="true" v-model="basicInfo.nodeName"></bk-input>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="devops-select-project"
+          :label="$t(`m['项目']`)"
+          :required="true"
+          :ext-cls="'bk-form-width bk-form-display'"
+          :property="'businessId'">
+          <bk-select
+            v-model="basicInfo.businessId"
+            searchable
+            :disabled="false"
+            @selected="onSelectBusiness">
+            <bk-option v-for="business in businessList"
+              :key="business.englishName"
+              :id="business.englishName"
+              :name="business.projectName">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="devops-select-pipeline"
+          :label="$t(`m['流水线：']`)"
+          :required="true"
+          :property="'pipelineId'"
+          :ext-cls="'bk-form-width bk-form-display'">
+          <bk-select
+            searchable
+            v-model="basicInfo.pipelineId"
+            :loading="pipelineLoading"
+            :disabled="pipelineDisabled"
+            @selected="getPipelineInfo(0)">
+            <bk-option v-for="pipeline in pipelineList"
+              :key="pipeline.pipelineId"
+              :id="pipeline.pipelineId"
+              :name="pipeline.pipelineName">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="devops-component-processor"
+          :label="$t(`m.treeinfo['处理人：']`)"
+          :required="true">
+          <div @click="checkStatus.processors = false">
+            <deal-person
+              ref="processors"
+              :value="processorsInfo"
+              :node-info="configur"
+              :exclude-role-type-list="excludeProcessor">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </bk-form>
+    </basic-card>
+    <basic-card>
+      <div class="piprline-title">
+        <p>{{ $t(`m['流水线参数']`) }}:</p>
+        <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
+      </div>
+      <div class="bk-param" v-if="pipelineFormList.length !== 0" v-bkloading="{ isLoading: pipeFormLoading }">
+        <bk-form
+          ref="devopsVariable"
+          ext-cls="pipelineForm"
+          form-type="vertical"
+          :model="pipelineData"
+          :rules="pipelineRules"
+          :label-width="200">
+          <bk-form-item v-for="pipeline in pipelineFormList"
+            :key="pipeline.id"
+            :label="pipeline.id"
+            :property="pipeline.id"
+            :rules="pipelineRules[pipeline.id]"
+            :required="pipeline.required">
+            <bk-input
+              v-model="pipelineData[pipeline.id]"
+              :clearable="true">
+            </bk-input>
+          </bk-form-item>
+        </bk-form>
+        <span class="setion-title-icon" @click.stop="showPipelineStages = !showPipelineStages">
+          <i v-if="showPipelineStages" class="bk-icon icon-angle-down"></i>
+          <i v-else class="bk-icon icon-angle-right"></i>
+          {{ $t(`m.tickets['插件预览']`) }}
+        </span>
+        <devops-preview
+          v-show="showPipelineStages"
+          :stages="pipelineStages">
+        </devops-preview>
+      </div>
+      <no-data v-else></no-data>
+      <common-trigger-list :origin="'state'"
+        :node-type="configur.type"
+        :source-id="flowInfo.id"
+        :sender="configur.id"
+        :table="flowInfo.table">
+      </common-trigger-list>
 
-            <div class="mt20" style="font-size: 0">
-                <bk-button :theme="'primary'"
-                    data-test-id="devops-button-submit"
-                    :title="$t(`m.treeinfo['确定']`)"
-                    class="mr10"
-                    @click="submit">
-                    {{$t(`m.treeinfo['确定']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="devops-button-close"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    class="mr10"
-                    @click="closeNode">
-                    {{$t(`m.treeinfo['取消']`)}}
-                </bk-button>
-            </div>
-        </basic-card>
+      <div class="mt20" style="font-size: 0">
+        <bk-button :theme="'primary'"
+          data-test-id="devops-button-submit"
+          :title="$t(`m.treeinfo['确定']`)"
+          class="mr10"
+          @click="submit">
+          {{$t(`m.treeinfo['确定']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="devops-button-close"
+          :title="$t(`m.treeinfo['取消']`)"
+          class="mr10"
+          @click="closeNode">
+          {{$t(`m.treeinfo['取消']`)}}
+        </bk-button>
+      </div>
+    </basic-card>
 
-    </div>
+  </div>
 </template>
 <script>
     import dealPerson from './components/dealPerson.vue';

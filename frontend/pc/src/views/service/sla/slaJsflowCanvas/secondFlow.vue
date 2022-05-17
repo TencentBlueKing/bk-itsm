@@ -21,56 +21,56 @@
   -->
 
 <template>
-    <div :class="{ 'bk-second-flow': true, 'bk-full-page': isFullPage }" v-if="isReset">
-        <bk-button class="bk-close-btn" :text="true" icon="close" @click="isFullPage = false;onResetPosition()"></bk-button>
-        <p class="bk-sla-text">{{$t(`m.serviceConfig['“S”代表协议生效节点，“E”代表协议结束节点，不支持节点间交叉添加协议']`)}}</p>
-        <js-flow
-            ref="jsFlow"
-            v-model="canvasData"
-            selector="entry-item"
-            :endpoint-options="endpointOptions"
-            :connector-options="connectorOptions"
-            :node-options="nodeOptions"
-            :tools="toolsInfo[+isFullPage]"
-            :editable="false"
-            @onToolClick="onToolClick"
-            @onConnectionClick="onConnectionClick"
-            @onConnection="onConnection"
-            @onConnectionDragStop="onConnectionDragStop"
-            @onBeforeDrop="onBeforeDrop"
-            @onNodeMoveStop="onNodeMoveStop"
-            @onNodeMoving="onNodeMoving">
-            <template slot="nodeTemplate" slot-scope="{ node }">
-                <div class="bk-sla-rect">
-                    <span v-for="(agree, index) in serviceAgreementList" :key="index">
-                        <span
-                            v-if="agree.start_node_id === node.nodeInfo.id"
-                            class="bk-sla-se"
-                            :style="'background: ' + agree.color"
-                            @click="slaIconClick(agree)"
-                            @mouseenter="hoverSlaObj = agree;updateCanvas()"
-                            @mouseout="hoverSlaObj = {};updateCanvas()"
-                        >S</span>
-                        <span
-                            v-if="agree.end_node_id === node.nodeInfo.id"
-                            class="bk-sla-se"
-                            :style="'background: ' + agree.color"
-                            @click="slaIconClick(agree)"
-                            @mouseenter="hoverSlaObj = agree;updateCanvas()"
-                            @mouseout="hoverSlaObj = {};updateCanvas()"
-                        >E</span>
-                    </span>
-                </div>
-                <node-template
-                    :class="{ 'bk-sla-hover-node-shadow': isHoverNode(node.nodeInfo.id) }"
-                    ref="templateNode"
-                    :node="node"
-                    :canvas-data="canvasData"
-                    @configuNode="configuNode">
-                </node-template>
-            </template>
-        </js-flow>
-    </div>
+  <div :class="{ 'bk-second-flow': true, 'bk-full-page': isFullPage }" v-if="isReset">
+    <bk-button class="bk-close-btn" :text="true" icon="close" @click="isFullPage = false;onResetPosition()"></bk-button>
+    <p class="bk-sla-text">{{$t(`m.serviceConfig['“S”代表协议生效节点，“E”代表协议结束节点，不支持节点间交叉添加协议']`)}}</p>
+    <js-flow
+      ref="jsFlow"
+      v-model="canvasData"
+      selector="entry-item"
+      :endpoint-options="endpointOptions"
+      :connector-options="connectorOptions"
+      :node-options="nodeOptions"
+      :tools="toolsInfo[+isFullPage]"
+      :editable="false"
+      @onToolClick="onToolClick"
+      @onConnectionClick="onConnectionClick"
+      @onConnection="onConnection"
+      @onConnectionDragStop="onConnectionDragStop"
+      @onBeforeDrop="onBeforeDrop"
+      @onNodeMoveStop="onNodeMoveStop"
+      @onNodeMoving="onNodeMoving">
+      <template slot="nodeTemplate" slot-scope="{ node }">
+        <div class="bk-sla-rect">
+          <span v-for="(agree, index) in serviceAgreementList" :key="index">
+            <span
+              v-if="agree.start_node_id === node.nodeInfo.id"
+              class="bk-sla-se"
+              :style="'background: ' + agree.color"
+              @click="slaIconClick(agree)"
+              @mouseenter="hoverSlaObj = agree;updateCanvas()"
+              @mouseout="hoverSlaObj = {};updateCanvas()"
+            >S</span>
+            <span
+              v-if="agree.end_node_id === node.nodeInfo.id"
+              class="bk-sla-se"
+              :style="'background: ' + agree.color"
+              @click="slaIconClick(agree)"
+              @mouseenter="hoverSlaObj = agree;updateCanvas()"
+              @mouseout="hoverSlaObj = {};updateCanvas()"
+            >E</span>
+          </span>
+        </div>
+        <node-template
+          :class="{ 'bk-sla-hover-node-shadow': isHoverNode(node.nodeInfo.id) }"
+          ref="templateNode"
+          :node="node"
+          :canvas-data="canvasData"
+          @configuNode="configuNode">
+        </node-template>
+      </template>
+    </js-flow>
+  </div>
 </template>
 <script>
     import JsFlow from '@/assets/jsflow';

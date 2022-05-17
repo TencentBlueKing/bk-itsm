@@ -21,113 +21,113 @@
   -->
 
 <template>
-    <div class="bk-itsm-box">
-        <div class="bk-itsm-service"
-            v-if="!processStatus.addNew">
-            <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-                <p class="bk-come-back">
-                    {{ $t('m.slaContent["单据状态管理"]') }}
-                </p>
-            </div>
-            <div class="itsm-page-content">
-                <!-- 提示信息 -->
-                <div class="bk-itsm-version" v-if="versionStatus">
-                    <i class="bk-icon icon-info-circle"></i>
-                    <span>{{$t('m.slaContent["单据状态：可根据需要，针对不同服务类型，定义及管理相应的单据状态、以及状态间的流转逻辑。单据状态的更新及变化，会体现在每一个具体的服务单据流转过程中。"]')}}</span>
-                    <i class="bk-icon icon-close" @click="closeVersion"></i>
-                </div>
-                <bk-table
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="dataList"
-                    :size="'small'">
-                    <bk-table-column :label="$t(`m.slaContent['服务类型']`)" width="100">
-                        <template slot-scope="props">
-                            <span
-                                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
-                                :class="['bk-lable-primary', {
-                                    'btn-permission-disable': !hasPermission(['ticket_state_manage'])
-                                }]"
-                                @click="trClick(props.row)"
-                                :title="props.row.service_type_name">
-                                {{props.row.service_type_name || '--'}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.slaContent['单据状态']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.ticket_status">{{ props.row.ticket_status || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
-                        <template slot-scope="props">
-                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.slaContent['更新人']`)" width="120">
-                        <template slot-scope="props">
-                            <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150">
-                        <template slot-scope="props">
-                            <bk-button theme="primary"
-                                v-if="!props.row.configured"
-                                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
-                                icon="icon-exclamation-circle"
-                                text
-                                :class="{
-                                    'text-permission-disable': !hasPermission(['ticket_state_manage'])
-                                }"
-                                @click="configStatus(props.row)">
-                                {{ $t('m.slaContent["未配置"]') }}
-                            </bk-button>
-                            <bk-button theme="primary" text v-else
-                                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
-                                :class="{
-                                    'text-permission-disable': !hasPermission(['ticket_state_manage'])
-                                }"
-                                @click="editStatus(props.row)">
-                                {{ $t('m.slaContent["编辑"]') }}
-                            </bk-button>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
+  <div class="bk-itsm-box">
+    <div class="bk-itsm-service"
+      v-if="!processStatus.addNew">
+      <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+        <p class="bk-come-back">
+          {{ $t('m.slaContent["单据状态管理"]') }}
+        </p>
+      </div>
+      <div class="itsm-page-content">
+        <!-- 提示信息 -->
+        <div class="bk-itsm-version" v-if="versionStatus">
+          <i class="bk-icon icon-info-circle"></i>
+          <span>{{$t('m.slaContent["单据状态：可根据需要，针对不同服务类型，定义及管理相应的单据状态、以及状态间的流转逻辑。单据状态的更新及变化，会体现在每一个具体的服务单据流转过程中。"]')}}</span>
+          <i class="bk-icon icon-close" @click="closeVersion"></i>
         </div>
-        <!-- 流程状态步骤条 -->
-        <template v-else>
-            <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-                <p class="bk-come-back" @click="backTab">
-                    <arrows-left-icon></arrows-left-icon>
-                    {{ tagName }}
-                </p>
-            </div>
-            <div class="bk-itsm-tree">
-                <div class="bk-tree-content">
-                    <div class="bk-tree-first" v-for="(item, index) in lineList" :key="item.id">
-                        <div class="bk-tree-shadow" @click="changeTree(index,'change',item)">
-                            <span
-                                class="bk-tree-step"
-                                :class="{ 'bk-tree-primary': item.type === 'primary', 'bk-tree-success': item.type === 'success', 'bk-tree-error': item.type === 'error' }">
-                                <i class="bk-icon icon-check-1" v-if="item.type === 'success'"></i>
-                                <i class="bk-icon icon-close" v-if="item.type === 'error'" style="font-size: 18px;"></i>
-                                <span v-if="item.type !== 'success' && item.type !== 'error'">{{item.id}}</span>
-                            </span>
-                            <span
-                                class="bk-tree-normal bk-tree-cursor"
-                                :class="{ 'bk-tree-info': (item.show || item.type !== 'normal') }">{{item.name}}</span>
-                        </div>
-                        <span class="bk-tree-line" v-if="item.id !== lineList.length"></span>
-                    </div>
-                </div>
-            </div>
-            <!-- 流程操作步骤组件 -->
-            <div class="bk-design-step">
-                <first-step ref="first" v-if="lineList[0].show" :status-type="statusType"></first-step>
-                <second-step ref="second" v-if="lineList[1].show" :status-type="statusType"></second-step>
-            </div>
-        </template>
+        <bk-table
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="dataList"
+          :size="'small'">
+          <bk-table-column :label="$t(`m.slaContent['服务类型']`)" width="100">
+            <template slot-scope="props">
+              <span
+                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
+                :class="['bk-lable-primary', {
+                  'btn-permission-disable': !hasPermission(['ticket_state_manage'])
+                }]"
+                @click="trClick(props.row)"
+                :title="props.row.service_type_name">
+                {{props.row.service_type_name || '--'}}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.slaContent['单据状态']`)">
+            <template slot-scope="props">
+              <span :title="props.row.ticket_status">{{ props.row.ticket_status || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
+            <template slot-scope="props">
+              <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.slaContent['更新人']`)" width="120">
+            <template slot-scope="props">
+              <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150">
+            <template slot-scope="props">
+              <bk-button theme="primary"
+                v-if="!props.row.configured"
+                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
+                icon="icon-exclamation-circle"
+                text
+                :class="{
+                  'text-permission-disable': !hasPermission(['ticket_state_manage'])
+                }"
+                @click="configStatus(props.row)">
+                {{ $t('m.slaContent["未配置"]') }}
+              </bk-button>
+              <bk-button theme="primary" text v-else
+                v-cursor="{ active: !hasPermission(['ticket_state_manage']) }"
+                :class="{
+                  'text-permission-disable': !hasPermission(['ticket_state_manage'])
+                }"
+                @click="editStatus(props.row)">
+                {{ $t('m.slaContent["编辑"]') }}
+              </bk-button>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
     </div>
+    <!-- 流程状态步骤条 -->
+    <template v-else>
+      <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+        <p class="bk-come-back" @click="backTab">
+          <arrows-left-icon></arrows-left-icon>
+          {{ tagName }}
+        </p>
+      </div>
+      <div class="bk-itsm-tree">
+        <div class="bk-tree-content">
+          <div class="bk-tree-first" v-for="(item, index) in lineList" :key="item.id">
+            <div class="bk-tree-shadow" @click="changeTree(index,'change',item)">
+              <span
+                class="bk-tree-step"
+                :class="{ 'bk-tree-primary': item.type === 'primary', 'bk-tree-success': item.type === 'success', 'bk-tree-error': item.type === 'error' }">
+                <i class="bk-icon icon-check-1" v-if="item.type === 'success'"></i>
+                <i class="bk-icon icon-close" v-if="item.type === 'error'" style="font-size: 18px;"></i>
+                <span v-if="item.type !== 'success' && item.type !== 'error'">{{item.id}}</span>
+              </span>
+              <span
+                class="bk-tree-normal bk-tree-cursor"
+                :class="{ 'bk-tree-info': (item.show || item.type !== 'normal') }">{{item.name}}</span>
+            </div>
+            <span class="bk-tree-line" v-if="item.id !== lineList.length"></span>
+          </div>
+        </div>
+      </div>
+      <!-- 流程操作步骤组件 -->
+      <div class="bk-design-step">
+        <first-step ref="first" v-if="lineList[0].show" :status-type="statusType"></first-step>
+        <second-step ref="second" v-if="lineList[1].show" :status-type="statusType"></second-step>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>

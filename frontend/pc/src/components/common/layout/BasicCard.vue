@@ -21,26 +21,26 @@
   -->
 
 <template>
-    <div class="basic-card-wrap">
-        <div
-            v-if="showFoldTitle"
-            class="more-configuration mb20" @click="showMore = !showMore">
-            <i v-if="!showMore" class="bk-icon icon-down-shape"></i>
-            <i v-else class="bk-icon icon-up-shape"></i>
-            <span>{{ foldTitle }}</span>
-        </div>
-        <collapse-transition>
-            <div class="common-section-card-block" v-if="showMore">
-                <label class="common-section-card-label">
-                    {{ cardLabel }}
-                    <p v-if="cardDesc" class="common-section-card-desc">{{ cardDesc }}</p>
-                </label>
-                <div class="common-section-card-body">
-                    <slot />
-                </div>
-            </div>
-        </collapse-transition>
+  <div class="basic-card-wrap">
+    <div
+      v-if="showFoldTitle"
+      class="more-configuration mb20" @click="showMore = !showMore">
+      <i v-if="!showMore" class="bk-icon icon-down-shape"></i>
+      <i v-else class="bk-icon icon-up-shape"></i>
+      <span>{{ foldTitle }}</span>
     </div>
+    <collapse-transition>
+      <div class="common-section-card-block" v-if="showMore">
+        <label class="common-section-card-label">
+          {{ cardLabel }}
+          <p v-if="cardDesc" class="common-section-card-desc">{{ cardDesc }}</p>
+        </label>
+        <div class="common-section-card-body">
+          <slot />
+        </div>
+      </div>
+    </collapse-transition>
+  </div>
 </template>
 
 <script>

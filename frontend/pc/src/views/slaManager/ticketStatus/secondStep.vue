@@ -21,140 +21,140 @@
   -->
 
 <template>
-    <div class="secondStep">
-        <div class="bk-itsm-version" style="margin: 0 0 10px 0;" v-if="versionStatus">
-            <i class="bk-icon icon-info-circle"></i>
-            <span>{{$t(`m.slaContent['流转设定，是设置工作状态间的先后流转关系。如果需要设置该流转，请在两个状态间的复选框内打勾。结束状态（如已完成，被终止，被撤销）无法逆向流转。']`)}}</span>
-            <i class="bk-icon icon-close" @click="closeVersion"></i>
-        </div>
-        <bk-table
-            :data="dataList"
-            :size="'small'"
-            v-bkloading="{ isLoading: isDataLoading }">
-            <bk-table-column :label="$t(`m.slaContent['状态名']`)" :min-width="150">
-                <template slot-scope="props">
-                    <span :title="nameFilter(props.row.name)">{{ nameFilter(props.row.name) }}</span>
-                </template>
-            </bk-table-column>
-            <template v-for="item in statusOwnList">
-                <bk-table-column :label="item.name" :key="item.id">
-                    <template slot-scope="props">
-                        <template v-if="props.row.checkBoxStatus">
-                            <bk-checkbox class="bk-outline-none"
-                                v-model="props.row.checkBoxStatus[item.key]"
-                                :true-value="trueStatus"
-                                :false-value="falseStatus"
-                                @change="selectFlowTo(props.row, item)">
-                            </bk-checkbox>
-                        </template>
-                    </template>
-                </bk-table-column>
-            </template>
-            <bk-table-column :label="$t(`m.slaContent['开启自动流转']`)">
-                <template slot-scope="props">
-                    <bk-checkbox class="bk-outline-none"
-                        v-model="props.row.is_auto"
-                        :true-value="trueStatus"
-                        :false-value="falseStatus">
-                    </bk-checkbox>
-                    <div class="bk-outline-mont" @click="isAutoChange(props.row)"></div>
-                    <i v-if="props.row.is_auto"
-                        class="bk-itsm-icon icon-edit-new flow-icon"
-                        @click.stop="editRule(props.row)">
-                    </i>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <div class="mt20">
-            <bk-button theme="default"
-                class="mr10"
-                :title="$t(`m.slaContent['上一步']`)"
-                :disabled="secondClick"
-                @click="previousStep">
-                {{ $t('m.slaContent["上一步"]') }}
-            </bk-button>
-            <bk-button theme="default"
-                class="mr10"
-                :title="$t(`m.deployPage['取消']`)"
-                :disabled="secondClick"
-                @click="backButton">
-                {{ $t('m.deployPage["取消"]') }}
-            </bk-button>
-            <bk-button theme="primary"
-                :title="$t(`m.slaContent['提交']`)"
-                :loading="secondClick"
-                @click="ajaxSubmit">
-                {{$t(`m.slaContent['提交']`)}}
-            </bk-button>
-        </div>
-        <bk-dialog
-            v-model="autoConfigDialog.isShow"
-            :render-directive="'if'"
-            :width="autoConfigDialog.width"
-            :header-position="autoConfigDialog.headerPosition"
-            :auto-close="autoConfigDialog.autoClose"
-            :mask-close="autoConfigDialog.autoClose"
-            @confirm="confirmFn"
-            @cancel="cancelFn">
-            <p slot="header">
-                {{ $t(`m.slaContent['自动流转设置']`) }}
-            </p>
-            <div class="bk-auto-conten">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="isAutoTemp.info"
-                    :rules="rules"
-                    ref="autoForm">
-                    <p class="bk-auto-p">
-                        {{$t(`m.slaContent['单据在']`)}}【{{isAutoTemp.item.name}}】{{$t(`m.slaContent['停留时间超过']`)}}
-                    </p>
-                    <bk-form-item class="bk-auto-time"
-                        :property="'threshold'"
-                        :icon-offset="75">
-                        <bk-input v-model="isAutoTemp.info.threshold"
-                            :font-size="'normal'"
-                            :type="'number'"
-                            :min="0">
-                            <bk-dropdown-menu class="group-text"
-                                @show="dropdownShow"
-                                @hide="dropdownHide"
-                                slot="append"
-                                :font-size="'normal'"
-                                ref="dropdown">
-                                <bk-button type="primary" slot="dropdown-trigger">
-                                    <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <template v-if="isAutoTemp.info.timeSpace === time.id">{{ time.name }}</template>
-                                    </span>
-                                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                                </bk-button>
-                                <ul class="bk-dropdown-list" slot="dropdown-content">
-                                    <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <a href="javascript:;" @click="timeHandler(time)">{{ time.name }}</a>
-                                    </li>
-                                </ul>
-                            </bk-dropdown-menu>
-                        </bk-input>
-                    </bk-form-item>
-                    <p class="bk-auto-p">{{$t(`m.slaContent['时，将自动流转至']`)}}</p>
-                    <bk-form-item style="width: 100px;"
-                        class="bk-auto-select"
-                        :property="'id'">
-                        <bk-select v-model="isAutoTemp.info.id"
-                            searchable
-                            :font-size="'medium'"
-                            :clearable="falseStatus">
-                            <bk-option v-for="option in flowList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </bk-dialog>
+  <div class="secondStep">
+    <div class="bk-itsm-version" style="margin: 0 0 10px 0;" v-if="versionStatus">
+      <i class="bk-icon icon-info-circle"></i>
+      <span>{{$t(`m.slaContent['流转设定，是设置工作状态间的先后流转关系。如果需要设置该流转，请在两个状态间的复选框内打勾。结束状态（如已完成，被终止，被撤销）无法逆向流转。']`)}}</span>
+      <i class="bk-icon icon-close" @click="closeVersion"></i>
     </div>
+    <bk-table
+      :data="dataList"
+      :size="'small'"
+      v-bkloading="{ isLoading: isDataLoading }">
+      <bk-table-column :label="$t(`m.slaContent['状态名']`)" :min-width="150">
+        <template slot-scope="props">
+          <span :title="nameFilter(props.row.name)">{{ nameFilter(props.row.name) }}</span>
+        </template>
+      </bk-table-column>
+      <template v-for="item in statusOwnList">
+        <bk-table-column :label="item.name" :key="item.id">
+          <template slot-scope="props">
+            <template v-if="props.row.checkBoxStatus">
+              <bk-checkbox class="bk-outline-none"
+                v-model="props.row.checkBoxStatus[item.key]"
+                :true-value="trueStatus"
+                :false-value="falseStatus"
+                @change="selectFlowTo(props.row, item)">
+              </bk-checkbox>
+            </template>
+          </template>
+        </bk-table-column>
+      </template>
+      <bk-table-column :label="$t(`m.slaContent['开启自动流转']`)">
+        <template slot-scope="props">
+          <bk-checkbox class="bk-outline-none"
+            v-model="props.row.is_auto"
+            :true-value="trueStatus"
+            :false-value="falseStatus">
+          </bk-checkbox>
+          <div class="bk-outline-mont" @click="isAutoChange(props.row)"></div>
+          <i v-if="props.row.is_auto"
+            class="bk-itsm-icon icon-edit-new flow-icon"
+            @click.stop="editRule(props.row)">
+          </i>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <div class="mt20">
+      <bk-button theme="default"
+        class="mr10"
+        :title="$t(`m.slaContent['上一步']`)"
+        :disabled="secondClick"
+        @click="previousStep">
+        {{ $t('m.slaContent["上一步"]') }}
+      </bk-button>
+      <bk-button theme="default"
+        class="mr10"
+        :title="$t(`m.deployPage['取消']`)"
+        :disabled="secondClick"
+        @click="backButton">
+        {{ $t('m.deployPage["取消"]') }}
+      </bk-button>
+      <bk-button theme="primary"
+        :title="$t(`m.slaContent['提交']`)"
+        :loading="secondClick"
+        @click="ajaxSubmit">
+        {{$t(`m.slaContent['提交']`)}}
+      </bk-button>
+    </div>
+    <bk-dialog
+      v-model="autoConfigDialog.isShow"
+      :render-directive="'if'"
+      :width="autoConfigDialog.width"
+      :header-position="autoConfigDialog.headerPosition"
+      :auto-close="autoConfigDialog.autoClose"
+      :mask-close="autoConfigDialog.autoClose"
+      @confirm="confirmFn"
+      @cancel="cancelFn">
+      <p slot="header">
+        {{ $t(`m.slaContent['自动流转设置']`) }}
+      </p>
+      <div class="bk-auto-conten">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="isAutoTemp.info"
+          :rules="rules"
+          ref="autoForm">
+          <p class="bk-auto-p">
+            {{$t(`m.slaContent['单据在']`)}}【{{isAutoTemp.item.name}}】{{$t(`m.slaContent['停留时间超过']`)}}
+          </p>
+          <bk-form-item class="bk-auto-time"
+            :property="'threshold'"
+            :icon-offset="75">
+            <bk-input v-model="isAutoTemp.info.threshold"
+              :font-size="'normal'"
+              :type="'number'"
+              :min="0">
+              <bk-dropdown-menu class="group-text"
+                @show="dropdownShow"
+                @hide="dropdownHide"
+                slot="append"
+                :font-size="'normal'"
+                ref="dropdown">
+                <bk-button type="primary" slot="dropdown-trigger">
+                  <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <template v-if="isAutoTemp.info.timeSpace === time.id">{{ time.name }}</template>
+                  </span>
+                  <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                </bk-button>
+                <ul class="bk-dropdown-list" slot="dropdown-content">
+                  <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <a href="javascript:;" @click="timeHandler(time)">{{ time.name }}</a>
+                  </li>
+                </ul>
+              </bk-dropdown-menu>
+            </bk-input>
+          </bk-form-item>
+          <p class="bk-auto-p">{{$t(`m.slaContent['时，将自动流转至']`)}}</p>
+          <bk-form-item style="width: 100px;"
+            class="bk-auto-select"
+            :property="'id'">
+            <bk-select v-model="isAutoTemp.info.id"
+              searchable
+              :font-size="'medium'"
+              :clearable="falseStatus">
+              <bk-option v-for="option in flowList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

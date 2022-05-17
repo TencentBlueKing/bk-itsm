@@ -21,133 +21,133 @@
   -->
 
 <template>
-    <div class="bk-priority-configur">
-        <ul class="bk-priority-head">
-            <li style="width: 25%;"><span>{{ $t('m.slaContent["优先级"]') }}</span></li>
-            <li style="width: 25%;"><span>{{ $t('m.slaContent["服务模式"]') }}</span></li>
-            <li style="width: 25%;" class="tooltipsChackbox">
-                <bk-checkbox data-test-id="slaManager-checkbox-appointedTime" v-model="changeInfo.is_reply_need">
-                    <span
-                        v-bk-tooltips.top="$t(`m.slaContent['从进入开始节点，到完成响应操作的时间。']`)"
-                        class="textDashed">
-                        {{ $t('m.slaContent["约定响应时长"]') }}
-                    </span>
-                </bk-checkbox>
-            </li>
-            <li style="width: 25%;"><span v-bk-tooltips.top="$t(`m.slaContent['从进入开始节点，到离开结束节点的时间。']`)" class="textDashed">{{ $t('m.slaContent["约定处理时长"]') }}</span></li>
-        </ul>
-        <ul class="bk-priority-head bk-priority-body" v-for="(item, index) in priorityList" :key="index">
-            <li style="width: 25%;">
-                <span v-for="(typeItem, typeIndex) in modelPriority"
-                    :key="typeIndex"
-                    :data-test-id="`slaAgreement-span-modelPriority-${typeIndex}`"
-                    style="position: relative;">
-                    <template v-if="typeItem.key === item.priority">
-                        <span class="in-select-icon" :style="'background-color: ' + typeColorList[item.priority]"></span>{{typeItem.name}}
-                    </template>
-                </span>
-            </li>
-            <li style="width: 25%;" class="bk-priority-normal bk-editor-style">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item"
-                    :rules="scheduleRules"
-                    ref="schedule">
-                    <bk-form-item
-                        data-test-id="slaAgreement-select-modelList"
-                        :property="'schedule'">
-                        <bk-select v-model="item.schedule" :ext-cls="'cus-align-left'" searchable>
-                            <bk-option v-for="option in modelList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                            <div slot="extension" @click="handleCreate" style="cursor: pointer;">
-                                <i class="bk-icon icon-plus-circle"></i>{{$t(`m.slaContent['跳转新建']`)}}
-                            </div>
-                        </bk-select>
-                    </bk-form-item>
-                </bk-form>
-            </li>
-            <li style="width: 25%;" class="bk-priority-normal bk-editor-style bk-none-radius">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item"
-                    :rules="replyTimeRules"
-                    ref="replyTime">
-                    <bk-form-item
-                        data-test-id="slaAgreement-input-replyTime"
-                        :property="'reply_time'"
-                        :icon-offset="iconOffset">
-                        <bk-input v-model.number="item.reply_time"
-                            :font-size="'normal'"
-                            :type="'number'"
-                            :min="0">
-                            <bk-dropdown-menu class="group-text"
-                                @show="dropdownShow(item, 'resp')"
-                                @hide="dropdownHide(item, 'resp')"
-                                :ref="'dropdown' + index"
-                                :key="'dropdown' + index"
-                                slot="append"
-                                :font-size="'normal'">
-                                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
-                                    <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <template v-if="item.reply_unit === time.id">{{ time.name }}</template>
-                                    </span>
-                                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isRespDropdownShow }]"></i>
-                                </bk-button>
-                                <ul class="bk-dropdown-list" slot="dropdown-content">
-                                    <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <a href="javascript:;" data-test-id="slaAgreement-a-timeHandler" @click="timeHandler('reply_unit', time, item, index, 0)">{{ time.name }}</a>
-                                    </li>
-                                </ul>
-                            </bk-dropdown-menu>
-                        </bk-input>
-                        <div class="bk-disabled-li" v-if="!changeInfo.is_reply_need"></div>
-                    </bk-form-item>
-                </bk-form>
-            </li>
-            <li style="width: 25%;" class="bk-priority-normal bk-editor-style bk-none-radius">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item"
-                    :rules="handleTimeRules"
-                    ref="handleTime">
-                    <bk-form-item
-                        :property="'handle_time'"
-                        data-test-id="slaAgreement-input-handleTime"
-                        :icon-offset="iconOffset">
-                        <bk-input v-model.number="item.handle_time"
-                            :font-size="'normal'"
-                            :type="'number'"
-                            :min="0">
-                            <bk-dropdown-menu class="group-text"
-                                @show="dropdownShow(item, 'deal')"
-                                @hide="dropdownHide(item, 'deal')"
-                                :ref="'dropdown' + index"
-                                slot="append"
-                                :font-size="'normal'">
-                                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
-                                    <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <template v-if="item.handle_unit === time.id">{{ time.name }}</template>
-                                    </span>
-                                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isDealDropdownShow }]"></i>
-                                </bk-button>
-                                <ul class="bk-dropdown-list" slot="dropdown-content">
-                                    <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <a href="javascript:;" @click="timeHandler('handle_unit', time, item, index, 1)">{{ time.name }}</a>
-                                    </li>
-                                </ul>
-                            </bk-dropdown-menu>
-                        </bk-input>
-                    </bk-form-item>
-                </bk-form>
-            </li>
-        </ul>
-    </div>
+  <div class="bk-priority-configur">
+    <ul class="bk-priority-head">
+      <li style="width: 25%;"><span>{{ $t('m.slaContent["优先级"]') }}</span></li>
+      <li style="width: 25%;"><span>{{ $t('m.slaContent["服务模式"]') }}</span></li>
+      <li style="width: 25%;" class="tooltipsChackbox">
+        <bk-checkbox data-test-id="slaManager-checkbox-appointedTime" v-model="changeInfo.is_reply_need">
+          <span
+            v-bk-tooltips.top="$t(`m.slaContent['从进入开始节点，到完成响应操作的时间。']`)"
+            class="textDashed">
+            {{ $t('m.slaContent["约定响应时长"]') }}
+          </span>
+        </bk-checkbox>
+      </li>
+      <li style="width: 25%;"><span v-bk-tooltips.top="$t(`m.slaContent['从进入开始节点，到离开结束节点的时间。']`)" class="textDashed">{{ $t('m.slaContent["约定处理时长"]') }}</span></li>
+    </ul>
+    <ul class="bk-priority-head bk-priority-body" v-for="(item, index) in priorityList" :key="index">
+      <li style="width: 25%;">
+        <span v-for="(typeItem, typeIndex) in modelPriority"
+          :key="typeIndex"
+          :data-test-id="`slaAgreement-span-modelPriority-${typeIndex}`"
+          style="position: relative;">
+          <template v-if="typeItem.key === item.priority">
+            <span class="in-select-icon" :style="'background-color: ' + typeColorList[item.priority]"></span>{{typeItem.name}}
+          </template>
+        </span>
+      </li>
+      <li style="width: 25%;" class="bk-priority-normal bk-editor-style">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item"
+          :rules="scheduleRules"
+          ref="schedule">
+          <bk-form-item
+            data-test-id="slaAgreement-select-modelList"
+            :property="'schedule'">
+            <bk-select v-model="item.schedule" :ext-cls="'cus-align-left'" searchable>
+              <bk-option v-for="option in modelList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+              <div slot="extension" @click="handleCreate" style="cursor: pointer;">
+                <i class="bk-icon icon-plus-circle"></i>{{$t(`m.slaContent['跳转新建']`)}}
+              </div>
+            </bk-select>
+          </bk-form-item>
+        </bk-form>
+      </li>
+      <li style="width: 25%;" class="bk-priority-normal bk-editor-style bk-none-radius">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item"
+          :rules="replyTimeRules"
+          ref="replyTime">
+          <bk-form-item
+            data-test-id="slaAgreement-input-replyTime"
+            :property="'reply_time'"
+            :icon-offset="iconOffset">
+            <bk-input v-model.number="item.reply_time"
+              :font-size="'normal'"
+              :type="'number'"
+              :min="0">
+              <bk-dropdown-menu class="group-text"
+                @show="dropdownShow(item, 'resp')"
+                @hide="dropdownHide(item, 'resp')"
+                :ref="'dropdown' + index"
+                :key="'dropdown' + index"
+                slot="append"
+                :font-size="'normal'">
+                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
+                  <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <template v-if="item.reply_unit === time.id">{{ time.name }}</template>
+                  </span>
+                  <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isRespDropdownShow }]"></i>
+                </bk-button>
+                <ul class="bk-dropdown-list" slot="dropdown-content">
+                  <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <a href="javascript:;" data-test-id="slaAgreement-a-timeHandler" @click="timeHandler('reply_unit', time, item, index, 0)">{{ time.name }}</a>
+                  </li>
+                </ul>
+              </bk-dropdown-menu>
+            </bk-input>
+            <div class="bk-disabled-li" v-if="!changeInfo.is_reply_need"></div>
+          </bk-form-item>
+        </bk-form>
+      </li>
+      <li style="width: 25%;" class="bk-priority-normal bk-editor-style bk-none-radius">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item"
+          :rules="handleTimeRules"
+          ref="handleTime">
+          <bk-form-item
+            :property="'handle_time'"
+            data-test-id="slaAgreement-input-handleTime"
+            :icon-offset="iconOffset">
+            <bk-input v-model.number="item.handle_time"
+              :font-size="'normal'"
+              :type="'number'"
+              :min="0">
+              <bk-dropdown-menu class="group-text"
+                @show="dropdownShow(item, 'deal')"
+                @hide="dropdownHide(item, 'deal')"
+                :ref="'dropdown' + index"
+                slot="append"
+                :font-size="'normal'">
+                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
+                  <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <template v-if="item.handle_unit === time.id">{{ time.name }}</template>
+                  </span>
+                  <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isDealDropdownShow }]"></i>
+                </bk-button>
+                <ul class="bk-dropdown-list" slot="dropdown-content">
+                  <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <a href="javascript:;" @click="timeHandler('handle_unit', time, item, index, 1)">{{ time.name }}</a>
+                  </li>
+                </ul>
+              </bk-dropdown-menu>
+            </bk-input>
+          </bk-form-item>
+        </bk-form>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>

@@ -21,34 +21,34 @@
   -->
 
 <template>
-    <div class="ticket-detail-iframe">
-        <left-ticket-content
-            v-if="!ticketErrorMessage"
-            ref="leftTicketContent"
-            :loading="loading"
-            :ticket-info="ticketInfo"
-            :has-node-opt-auth="hasNodeOptAuth"
-            :is-show-comment="isShowComment"
-            :node-list="nodeList"
-            :first-state-fields="firstStateFields"
-            :node-trigger-list="nodeTriggerList"
-            :ticket-id="ticketId">
-        </left-ticket-content>
-        <!-- 403 | 404 -->
-        <no-ticket-content v-else
-            :message="ticketErrorMessage">
-        </no-ticket-content>
-        <bk-dialog v-model="isShowNoticeDialog"
-            theme="primary"
-            :mask-close="false"
-            header-position="left"
-            title="提示"
-            @confirm="onNoticeConfirm">
-            {{$t(`m.newCommon['您要处理的节点已被']`)}}
-            {{ noticeInfo.processed_user }}
-            {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
-        </bk-dialog>
-    </div>
+  <div class="ticket-detail-iframe">
+    <left-ticket-content
+      v-if="!ticketErrorMessage"
+      ref="leftTicketContent"
+      :loading="loading"
+      :ticket-info="ticketInfo"
+      :has-node-opt-auth="hasNodeOptAuth"
+      :is-show-comment="isShowComment"
+      :node-list="nodeList"
+      :first-state-fields="firstStateFields"
+      :node-trigger-list="nodeTriggerList"
+      :ticket-id="ticketId">
+    </left-ticket-content>
+    <!-- 403 | 404 -->
+    <no-ticket-content v-else
+      :message="ticketErrorMessage">
+    </no-ticket-content>
+    <bk-dialog v-model="isShowNoticeDialog"
+      theme="primary"
+      :mask-close="false"
+      header-position="left"
+      title="提示"
+      @confirm="onNoticeConfirm">
+      {{$t(`m.newCommon['您要处理的节点已被']`)}}
+      {{ noticeInfo.processed_user }}
+      {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

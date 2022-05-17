@@ -21,21 +21,21 @@
   -->
 
 <template>
-    <div class="permisson-apply">
-        <div class="apply-content">
-            <permission-content :permission-data="permissionData.permission">
-            </permission-content>
-            <div class="operation-btns">
-                <bk-button
-                    ext-cls="apply-btn"
-                    theme="primary"
-                    :loading="loading"
-                    @click="applyBtnClick">
-                    {{hasClicked ? $t(`m.common['已申请']`) : $t(`m.common['去申请']`)}}
-                </bk-button>
-            </div>
-        </div>
+  <div class="permisson-apply">
+    <div class="apply-content">
+      <permission-content :permission-data="permissionData.permission">
+      </permission-content>
+      <div class="operation-btns">
+        <bk-button
+          ext-cls="apply-btn"
+          theme="primary"
+          :loading="loading"
+          @click="applyBtnClick">
+          {{hasClicked ? $t(`m.common['已申请']`) : $t(`m.common['去申请']`)}}
+        </bk-button>
+      </div>
     </div>
+  </div>
 </template>
 <script>
     import PermissionContent from './PermissionContent.vue';

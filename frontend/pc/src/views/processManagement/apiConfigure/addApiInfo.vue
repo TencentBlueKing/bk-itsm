@@ -21,133 +21,133 @@
   -->
 
 <template>
-    <div class="bk-add-api">
-        <bk-form
-            data-test-id="api_form_ApiInfo"
-            :label-width="200"
-            form-type="vertical"
-            :model="directory.formInfo"
-            :rules="rules"
-            ref="addApiForm">
-            <bk-form-item
-                :label="$t(`m.systemConfig['接口分类']`)"
-                :required="true"
-                :property="'key'">
-                <bk-select :disabled="!isAll && !!directory.formInfo.key"
-                    v-model="directory.formInfo.key"
-                    :clearable="false"
-                    searchable
-                    @selected="changeCode">
-                    <bk-option v-for="option in treeList.slice(1)"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <template v-if="typeInfo === 'JOIN'">
-                <bk-form-item
-                    :label="$t(`m.systemConfig['选择接口']`)"
-                    :required="true"
-                    :property="'road'">
-                    <bk-select :disabled="!directory.formInfo.key"
-                        v-model="directory.formInfo.road"
-                        :clearable="false"
-                        searchable
-                        @selected="changeMethod">
-                        <bk-option v-for="option in pathList"
-                            :key="option.path"
-                            :id="option.path"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-            </template>
-            <bk-form-item
-                :label="$t(`m.systemConfig['接口名称']`)"
-                :required="true"
-                :property="'name'">
-                <bk-input maxlength="120"
-                    :placeholder="$t(`m.systemConfig['请输入接口名称']`)"
-                    v-model="directory.formInfo.name">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.systemConfig['负责人：']`)">
-                <member-select v-model="directory.formInfo.ownersInputValue"></member-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['函数名称']`)">
-                <!-- eslint-disable vue/camelcase -->
-                <bk-input
-                    :placeholder="$t(`m.systemConfig['请输入函数名称']`)"
-                    v-model="directory.formInfo.func_name">
-                </bk-input>
-                <!-- eslint-enable -->
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['接口路径']`)">
-                <bk-input v-model="directory.formInfo.road" placeholder="please input path"
-                    :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'">
-                    <template slot="prepend">
-                        <bk-dropdown-menu class="group-text"
-                            @show="dropdownShow"
-                            @hide="dropdownHide"
-                            ref="requestwayDrop"
-                            slot="append"
-                            :font-size="'normal'">
-                            <bk-button type="primary" slot="dropdown-trigger">
-                                <span> {{ directory.formInfo.type }} </span>
-                                <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                            </bk-button>
-                            <ul class="bk-dropdown-list" slot="dropdown-content">
-                                <li v-for="(requestway, requestwayIndex) in typeList" :key="requestwayIndex">
-                                    <a href="javascript:;" @click="requestHandler(requestway, requestwayIndex)">
-                                        {{ requestway.name }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </bk-dropdown-menu>
-                    </template>
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['版本号']`)">
-                <bk-input
-                    :placeholder="$t(`m.systemConfig['请输入版本号']`)"
-                    v-model="directory.formInfo.version">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.systemConfig['API描述']`)">
-                <bk-input
-                    :placeholder="$t(`m.systemConfig['请输入API描述']`)"
-                    :type="'textarea'"
-                    :rows="3"
-                    v-model="directory.formInfo.desc">
-                </bk-input>
-            </bk-form-item>
-        </bk-form>
-        <p class="bk-form-message">
-            {{ $t('m.systemConfig["注：详细的接口数据可以在编辑页面中添加"]') }}
-        </p>
-        <div class="mb20">
-            <bk-button theme="primary"
-                data-test-id="api_button_AccessApi_createApi"
-                :title="$t(`m.systemConfig['确认']`)"
-                :loading="secondClick"
-                class="mr10"
-                @click="submitAdd">
-                {{ $t('m.systemConfig["确认"]') }}
-            </bk-button>
-            <bk-button theme="default"
-                data-test-id="api_button_closeSideslider"
-                :title="$t(`m.systemConfig['取消']`)"
-                :disabled="secondClick"
-                @click="closeAdd">
-                {{ $t('m.systemConfig["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="bk-add-api">
+    <bk-form
+      data-test-id="api_form_ApiInfo"
+      :label-width="200"
+      form-type="vertical"
+      :model="directory.formInfo"
+      :rules="rules"
+      ref="addApiForm">
+      <bk-form-item
+        :label="$t(`m.systemConfig['接口分类']`)"
+        :required="true"
+        :property="'key'">
+        <bk-select :disabled="!isAll && !!directory.formInfo.key"
+          v-model="directory.formInfo.key"
+          :clearable="false"
+          searchable
+          @selected="changeCode">
+          <bk-option v-for="option in treeList.slice(1)"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <template v-if="typeInfo === 'JOIN'">
+        <bk-form-item
+          :label="$t(`m.systemConfig['选择接口']`)"
+          :required="true"
+          :property="'road'">
+          <bk-select :disabled="!directory.formInfo.key"
+            v-model="directory.formInfo.road"
+            :clearable="false"
+            searchable
+            @selected="changeMethod">
+            <bk-option v-for="option in pathList"
+              :key="option.path"
+              :id="option.path"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+      </template>
+      <bk-form-item
+        :label="$t(`m.systemConfig['接口名称']`)"
+        :required="true"
+        :property="'name'">
+        <bk-input maxlength="120"
+          :placeholder="$t(`m.systemConfig['请输入接口名称']`)"
+          v-model="directory.formInfo.name">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.systemConfig['负责人：']`)">
+        <member-select v-model="directory.formInfo.ownersInputValue"></member-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['函数名称']`)">
+        <!-- eslint-disable vue/camelcase -->
+        <bk-input
+          :placeholder="$t(`m.systemConfig['请输入函数名称']`)"
+          v-model="directory.formInfo.func_name">
+        </bk-input>
+        <!-- eslint-enable -->
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['接口路径']`)">
+        <bk-input v-model="directory.formInfo.road" placeholder="please input path"
+          :disabled="(directory.formInfo.category === 'component' || directory.formInfo.category === 'buffet_component') && typeInfo !== 'ADD'">
+          <template slot="prepend">
+            <bk-dropdown-menu class="group-text"
+              @show="dropdownShow"
+              @hide="dropdownHide"
+              ref="requestwayDrop"
+              slot="append"
+              :font-size="'normal'">
+              <bk-button type="primary" slot="dropdown-trigger">
+                <span> {{ directory.formInfo.type }} </span>
+                <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+              </bk-button>
+              <ul class="bk-dropdown-list" slot="dropdown-content">
+                <li v-for="(requestway, requestwayIndex) in typeList" :key="requestwayIndex">
+                  <a href="javascript:;" @click="requestHandler(requestway, requestwayIndex)">
+                    {{ requestway.name }}
+                  </a>
+                </li>
+              </ul>
+            </bk-dropdown-menu>
+          </template>
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['版本号']`)">
+        <bk-input
+          :placeholder="$t(`m.systemConfig['请输入版本号']`)"
+          v-model="directory.formInfo.version">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.systemConfig['API描述']`)">
+        <bk-input
+          :placeholder="$t(`m.systemConfig['请输入API描述']`)"
+          :type="'textarea'"
+          :rows="3"
+          v-model="directory.formInfo.desc">
+        </bk-input>
+      </bk-form-item>
+    </bk-form>
+    <p class="bk-form-message">
+      {{ $t('m.systemConfig["注：详细的接口数据可以在编辑页面中添加"]') }}
+    </p>
+    <div class="mb20">
+      <bk-button theme="primary"
+        data-test-id="api_button_AccessApi_createApi"
+        :title="$t(`m.systemConfig['确认']`)"
+        :loading="secondClick"
+        class="mr10"
+        @click="submitAdd">
+        {{ $t('m.systemConfig["确认"]') }}
+      </bk-button>
+      <bk-button theme="default"
+        data-test-id="api_button_closeSideslider"
+        :title="$t(`m.systemConfig['取消']`)"
+        :disabled="secondClick"
+        @click="closeAdd">
+        {{ $t('m.systemConfig["取消"]') }}
+      </bk-button>
     </div>
+  </div>
 </template>
 
 <script>

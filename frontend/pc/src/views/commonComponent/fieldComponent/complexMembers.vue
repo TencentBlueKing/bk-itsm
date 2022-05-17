@@ -21,81 +21,81 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <!-- 一级处理人 -->
-            <div class="bk-form-width">
-                <bk-select v-model="formData.levelOne"
-                    :clearable="false"
-                    :disabled="disabled"
-                    searchable
-                    @selected="getSecondLevelList">
-                    <bk-option v-for="option in firstLevelList"
-                        :key="option.typeName"
-                        :id="option.typeName"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-            <!-- 二级处理人 -->
-            <template v-if="formData.levelOne !== 'ORGANIZATION'">
-                <div class="bk-form-width" v-if="formData.levelOne === 'VARIABLE'">
-                    <bk-select v-model="formData.levelSecond"
-                        :loading="isLoading"
-                        :disabled="disabled"
-                        show-select-all
-                        multiple
-                        searchable>
-                        <bk-option v-for="option in frontMemberField"
-                            :key="option.id"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </div>
-                <div class="bk-form-width" v-else-if="formData.levelOne === 'PERSON'">
-                    <member-select v-model="formData.levelSecond" :disabled="disabled">
-                    </member-select>
-                </div>
-                <div class="bk-form-width" v-else-if="formData.levelOne === 'CMDB'">
-                    <bk-select v-model="formData.levelSecond"
-                        :loading="isLoading"
-                        show-select-all
-                        multiple
-                        searchable>
-                        <bk-option v-for="option in secondLevelList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </div>
-                <div class="bk-form-width" v-else-if="formData.levelOne === 'GENERAL'">
-                    <bk-select v-model="formData.levelSecond"
-                        :loading="isLoading"
-                        :disabled="disabled"
-                        searchable>
-                        <bk-option v-for="option in secondLevelList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </div>
-            </template>
-            <!-- 组织架构 -->
-            <div class="bk-form-width" v-if="formData.levelOne === 'ORGANIZATION'">
-                <select-tree
-                    v-model="formData.levelSecond"
-                    :list="organizationList">
-                </select-tree>
-            </div>
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-        </template>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <!-- 一级处理人 -->
+      <div class="bk-form-width">
+        <bk-select v-model="formData.levelOne"
+          :clearable="false"
+          :disabled="disabled"
+          searchable
+          @selected="getSecondLevelList">
+          <bk-option v-for="option in firstLevelList"
+            :key="option.typeName"
+            :id="option.typeName"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
+      <!-- 二级处理人 -->
+      <template v-if="formData.levelOne !== 'ORGANIZATION'">
+        <div class="bk-form-width" v-if="formData.levelOne === 'VARIABLE'">
+          <bk-select v-model="formData.levelSecond"
+            :loading="isLoading"
+            :disabled="disabled"
+            show-select-all
+            multiple
+            searchable>
+            <bk-option v-for="option in frontMemberField"
+              :key="option.id"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </div>
+        <div class="bk-form-width" v-else-if="formData.levelOne === 'PERSON'">
+          <member-select v-model="formData.levelSecond" :disabled="disabled">
+          </member-select>
+        </div>
+        <div class="bk-form-width" v-else-if="formData.levelOne === 'CMDB'">
+          <bk-select v-model="formData.levelSecond"
+            :loading="isLoading"
+            show-select-all
+            multiple
+            searchable>
+            <bk-option v-for="option in secondLevelList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </div>
+        <div class="bk-form-width" v-else-if="formData.levelOne === 'GENERAL'">
+          <bk-select v-model="formData.levelSecond"
+            :loading="isLoading"
+            :disabled="disabled"
+            searchable>
+            <bk-option v-for="option in secondLevelList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </div>
+      </template>
+      <!-- 组织架构 -->
+      <div class="bk-form-width" v-if="formData.levelOne === 'ORGANIZATION'">
+        <select-tree
+          v-model="formData.levelSecond"
+          :list="organizationList">
+        </select-tree>
+      </div>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <bk-select :class="{ 'bk-border-error': item.checkValue }"
-                searchable
-                v-model="item.val"
-                :search-with-pinyin="true"
-                :disabled="(item.is_readonly && !isCurrent) || disabled"
-                :placeholder="item.desc"
-                :font-size="'medium'"
-                @selected="selected"
-                @toggle="item.checkValue = false">
-                <bk-option v-for="option in options"
-                    class="custom-option"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                    <span>{{option.name}}</span>
-                    <i class="bk-icon icon-close" v-if="option.can_delete" @click.stop="handleDeleteOption(option.key)"></i>
-                </bk-option>
-                <div slot="extension">
-                    <div class="plus-content" @click="addStatus = !addStatus">
-                        <i class="bk-icon icon-plus-circle"></i>新增
-                    </div>
-                    <div class="add-status" v-if="addStatus">
-                        <bk-form-item label="name">
-                            <bk-input v-model="tempChoice.name"
-                                @blur="giveDefaultKey">
-                            </bk-input>
-                        </bk-form-item>
-                        <bk-form-item label="key">
-                            <bk-input v-model="tempChoice.key">
-                            </bk-input>
-                        </bk-form-item>
-                        <p class="operations">
-                            <span @click="confirmAdd" :class="{ 'disabled': !tempChoice.name }">{{$t(`m.task['确认']`)}}</span>
-                            <span @click="cancelAdd">{{$t(`m.task['取消']`)}}</span>
-                        </p>
-                    </div>
-                </div>
-            </bk-select>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <bk-select :class="{ 'bk-border-error': item.checkValue }"
+        searchable
+        v-model="item.val"
+        :search-with-pinyin="true"
+        :disabled="(item.is_readonly && !isCurrent) || disabled"
+        :placeholder="item.desc"
+        :font-size="'medium'"
+        @selected="selected"
+        @toggle="item.checkValue = false">
+        <bk-option v-for="option in options"
+          class="custom-option"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+          <span>{{option.name}}</span>
+          <i class="bk-icon icon-close" v-if="option.can_delete" @click.stop="handleDeleteOption(option.key)"></i>
+        </bk-option>
+        <div slot="extension">
+          <div class="plus-content" @click="addStatus = !addStatus">
+            <i class="bk-icon icon-plus-circle"></i>新增
+          </div>
+          <div class="add-status" v-if="addStatus">
+            <bk-form-item label="name">
+              <bk-input v-model="tempChoice.name"
+                @blur="giveDefaultKey">
+              </bk-input>
+            </bk-form-item>
+            <bk-form-item label="key">
+              <bk-input v-model="tempChoice.key">
+              </bk-input>
+            </bk-form-item>
+            <p class="operations">
+              <span @click="confirmAdd" :class="{ 'disabled': !tempChoice.name }">{{$t(`m.task['确认']`)}}</span>
+              <span @click="cancelAdd">{{$t(`m.task['取消']`)}}</span>
+            </p>
+          </div>
+        </div>
+      </bk-select>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>

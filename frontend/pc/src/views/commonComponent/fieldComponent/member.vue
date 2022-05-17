@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <div v-if="item.showFeild" class="member-field">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="item.tips" desc-type="icon">
-            <div @click="item.checkValue = false" class="member-form-item">
-                <member-select :class="{ 'bk-border-error': item.checkValue }"
-                    v-model="selectedItems"
-                    :multiple="false"
-                    :disabled="item.is_readonly">
-                </member-select>
-                <business-card
-                    style="margin-top: 3px"
-                    :item="item">
-                </business-card>
-            </div>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild" class="member-field">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :ext-cls="'bk-ext-item'" :desc="item.tips" desc-type="icon">
+      <div @click="item.checkValue = false" class="member-form-item">
+        <member-select :class="{ 'bk-border-error': item.checkValue }"
+          v-model="selectedItems"
+          :multiple="false"
+          :disabled="item.is_readonly">
+        </member-select>
+        <business-card
+          style="margin-top: 3px"
+          :item="item">
+        </business-card>
+      </div>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>

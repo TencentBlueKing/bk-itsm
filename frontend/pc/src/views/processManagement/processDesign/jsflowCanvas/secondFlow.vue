@@ -21,59 +21,59 @@
   -->
 
 <template>
-    <div class="bk-second-flow">
-        <js-flow
-            ref="jsFlow"
-            v-model="canvasData"
-            selector="entry-item"
-            :endpoint-options="endpointOptions"
-            :connector-options="connectorOptions"
-            :node-options="nodeOptions"
-            :tools="toolsInfo"
-            @onConnectionClick="onConnectionClick"
-            @onToolClick="onToolClick"
-            @onConnection="onConnection"
-            @onConnectionDragStop="onConnectionDragStop"
-            @onBeforeDrop="onBeforeDrop"
-            @onCreateNodeBefore="onCreateNodeBefore"
-            @onNodeMoveStop="onNodeMoveStop"
-            @onNodeMoving="onNodeMoving"
-            @onOverlayClick="onOverlayClick">
-            <template slot="palettePanel">
-                <Palette></Palette>
-            </template>
-            <template slot="nodeTemplate" slot-scope="{ node }">
-                <node-template
-                    ref="templateNode"
-                    :node="node"
-                    :canvas-data="canvasData"
-                    @openDelete="openDelete"
-                    @closeShow="closeShow"
-                    @fastAddNode="fastAddNode"
-                    @updateNode="updateNode"
-                    @updateLine="updateLine"
-                    @configuNode="configuNode">
-                </node-template>
-            </template>
-        </js-flow>
-        <!-- 线条配置右侧弹窗 -->
-        <div class="bk-configu-line">
-            <bk-sideslider
-                :is-show.sync="customLine.isShow"
-                :title="customLine.title"
-                :width="customLine.width">
-                <div slot="content" v-if="customLine.isShow">
-                    <lineConfigue
-                        :custom-line="customLine"
-                        :flow-info="flowInfo"
-                        @submitLine="submitLine"
-                        @closeLine="closeLine"
-                        @deleteLine="deleteLine">
-                    </lineConfigue>
-                </div>
-            </bk-sideslider>
+  <div class="bk-second-flow">
+    <js-flow
+      ref="jsFlow"
+      v-model="canvasData"
+      selector="entry-item"
+      :endpoint-options="endpointOptions"
+      :connector-options="connectorOptions"
+      :node-options="nodeOptions"
+      :tools="toolsInfo"
+      @onConnectionClick="onConnectionClick"
+      @onToolClick="onToolClick"
+      @onConnection="onConnection"
+      @onConnectionDragStop="onConnectionDragStop"
+      @onBeforeDrop="onBeforeDrop"
+      @onCreateNodeBefore="onCreateNodeBefore"
+      @onNodeMoveStop="onNodeMoveStop"
+      @onNodeMoving="onNodeMoving"
+      @onOverlayClick="onOverlayClick">
+      <template slot="palettePanel">
+        <Palette></Palette>
+      </template>
+      <template slot="nodeTemplate" slot-scope="{ node }">
+        <node-template
+          ref="templateNode"
+          :node="node"
+          :canvas-data="canvasData"
+          @openDelete="openDelete"
+          @closeShow="closeShow"
+          @fastAddNode="fastAddNode"
+          @updateNode="updateNode"
+          @updateLine="updateLine"
+          @configuNode="configuNode">
+        </node-template>
+      </template>
+    </js-flow>
+    <!-- 线条配置右侧弹窗 -->
+    <div class="bk-configu-line">
+      <bk-sideslider
+        :is-show.sync="customLine.isShow"
+        :title="customLine.title"
+        :width="customLine.width">
+        <div slot="content" v-if="customLine.isShow">
+          <lineConfigue
+            :custom-line="customLine"
+            :flow-info="flowInfo"
+            @submitLine="submitLine"
+            @closeLine="closeLine"
+            @deleteLine="deleteLine">
+          </lineConfigue>
         </div>
+      </bk-sideslider>
     </div>
+  </div>
 </template>
 <script>
     import JsFlow from '@/assets/jsflow';

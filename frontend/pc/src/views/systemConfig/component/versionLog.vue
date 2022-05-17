@@ -21,27 +21,27 @@
   -->
 
 <template>
-    <div class="versionLog">
-        <bk-table
-            v-bkloading="{ isLoading: isDataLoading }"
-            :data="versionData"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.home['旧版本']`)" prop="version_from"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['新版本']`)" prop="version_to"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['升级人']`)" prop="operator"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['时间']`)" prop="create_at"></bk-table-column>
-            <bk-table-column :label="$t(`m.home['备注']`)" prop="note"></bk-table-column>
-        </bk-table>
-        <div style="margin-top: 20px">
-            <bk-button
-                theme="default"
-                :title="$t(`m.home['取消']`)"
-                class="mr10"
-                @click="versionLogData.show = false">
-                {{ $t('m.home["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="versionLog">
+    <bk-table
+      v-bkloading="{ isLoading: isDataLoading }"
+      :data="versionData"
+      :size="'small'">
+      <bk-table-column :label="$t(`m.home['旧版本']`)" prop="version_from"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['新版本']`)" prop="version_to"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['升级人']`)" prop="operator"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['时间']`)" prop="create_at"></bk-table-column>
+      <bk-table-column :label="$t(`m.home['备注']`)" prop="note"></bk-table-column>
+    </bk-table>
+    <div style="margin-top: 20px">
+      <bk-button
+        theme="default"
+        :title="$t(`m.home['取消']`)"
+        class="mr10"
+        @click="versionLogData.show = false">
+        {{ $t('m.home["取消"]') }}
+      </bk-button>
     </div>
+  </div>
 </template>
 
 <script>

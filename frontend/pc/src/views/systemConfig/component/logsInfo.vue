@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <div class="bk-logs-info" v-bkloading="{ isLoading: isDataLoading }">
-        <!-- 基本信息 -->
-        <div class="bk-logs-basic">
-            <h3 class="bk-basic-h3">{{ $t('m.systemConfig["基本信息"]') }}</h3>
-            <ul>
-                <li v-for="(item, index) in basicList" :key="index">
-                    <span>{{item.name}}：</span>
-                    <span class="bk-basic-value">{{item.value || '--'}}</span>
-                </li>
-            </ul>
-        </div>
-        <!-- json数据 -->
-        <div class="bk-logs-basic">
-            <h3 class="bk-basic-h3">{{ $t('m.systemConfig["请求参数"]') }}</h3>
-            <div class="bk-basic-form">
-                <div class="bk-form-content" id="#editorRequest">
-                    <ace
-                        :value="requestResponse.request"
-                        :width="requestResponse.width"
-                        :height="requestResponse.height"
-                        :read-only="requestResponse.readOnly"
-                        :lang="requestResponse.lang"
-                        :full-screen="requestResponse.fullScreen"
-                        :theme="'monokai'">
-                    </ace>
-                </div>
-            </div>
-        </div>
-        <!-- json数据 -->
-        <div class="bk-logs-basic">
-            <h3 class="bk-basic-h3">{{ $t('m.systemConfig["返回结果"]') }}</h3>
-            <div class="bk-basic-form">
-                <div class="bk-form-content" id="#editorBack">
-                    <ace
-                        :value="requestResponse.response"
-                        :width="requestResponse.width"
-                        :height="requestResponse.height"
-                        :read-only="requestResponse.readOnly"
-                        :lang="requestResponse.lang"
-                        :full-screen="requestResponse.fullScreen"
-                        :theme="'monokai'">
-                    </ace>
-                </div>
-            </div>
-        </div>
+  <div class="bk-logs-info" v-bkloading="{ isLoading: isDataLoading }">
+    <!-- 基本信息 -->
+    <div class="bk-logs-basic">
+      <h3 class="bk-basic-h3">{{ $t('m.systemConfig["基本信息"]') }}</h3>
+      <ul>
+        <li v-for="(item, index) in basicList" :key="index">
+          <span>{{item.name}}：</span>
+          <span class="bk-basic-value">{{item.value || '--'}}</span>
+        </li>
+      </ul>
     </div>
+    <!-- json数据 -->
+    <div class="bk-logs-basic">
+      <h3 class="bk-basic-h3">{{ $t('m.systemConfig["请求参数"]') }}</h3>
+      <div class="bk-basic-form">
+        <div class="bk-form-content" id="#editorRequest">
+          <ace
+            :value="requestResponse.request"
+            :width="requestResponse.width"
+            :height="requestResponse.height"
+            :read-only="requestResponse.readOnly"
+            :lang="requestResponse.lang"
+            :full-screen="requestResponse.fullScreen"
+            :theme="'monokai'">
+          </ace>
+        </div>
+      </div>
+    </div>
+    <!-- json数据 -->
+    <div class="bk-logs-basic">
+      <h3 class="bk-basic-h3">{{ $t('m.systemConfig["返回结果"]') }}</h3>
+      <div class="bk-basic-form">
+        <div class="bk-form-content" id="#editorBack">
+          <ace
+            :value="requestResponse.response"
+            :width="requestResponse.width"
+            :height="requestResponse.height"
+            :read-only="requestResponse.readOnly"
+            :lang="requestResponse.lang"
+            :full-screen="requestResponse.fullScreen"
+            :theme="'monokai'">
+          </ace>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

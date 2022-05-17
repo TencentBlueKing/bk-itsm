@@ -21,38 +21,38 @@
   -->
 
 <template>
-    <bk-dialog v-model="isShow"
-        width="650"
+  <bk-dialog v-model="isShow"
+    width="650"
+    theme="primary"
+    header-position="left"
+    :mask-close="false"
+    :title="$t(`m.newCommon['满意度评价']`)">
+    <!-- 发送评价内容 -->
+    <div class="evaluation-wrap" v-bkloading="{ isLoading: loading }">
+      <evaluation-ticket-content
+        v-if="!satisfactInfo.stars && !satisfactInfo.has_invited && !loading"
+        ref="evaluationContent"
+        :satisfact-info="satisfactInfo"
+        :ticket-info="ticketInfo"
+        :is-show-submit-btn="false"
+        @beforeSubmit="onBeforeSubmit"
+        @submitSuccess="onSubmitSuccess">
+      </evaluation-ticket-content>
+    </div>
+    <div slot="footer">
+      <bk-button
         theme="primary"
-        header-position="left"
-        :mask-close="false"
-        :title="$t(`m.newCommon['满意度评价']`)">
-        <!-- 发送评价内容 -->
-        <div class="evaluation-wrap" v-bkloading="{ isLoading: loading }">
-            <evaluation-ticket-content
-                v-if="!satisfactInfo.stars && !satisfactInfo.has_invited && !loading"
-                ref="evaluationContent"
-                :satisfact-info="satisfactInfo"
-                :ticket-info="ticketInfo"
-                :is-show-submit-btn="false"
-                @beforeSubmit="onBeforeSubmit"
-                @submitSuccess="onSubmitSuccess">
-            </evaluation-ticket-content>
-        </div>
-        <div slot="footer">
-            <bk-button
-                theme="primary"
-                :loading="submitting"
-                @click="onModelSubmitBtnClick">
-                {{ $t('m.newCommon["提交"]') }}
-            </bk-button>
-            <bk-button
-                theme="default"
-                @click="isShow = false">
-                {{ $t('m.newCommon["取消"]') }}
-            </bk-button>
-        </div>
-    </bk-dialog>
+        :loading="submitting"
+        @click="onModelSubmitBtnClick">
+        {{ $t('m.newCommon["提交"]') }}
+      </bk-button>
+      <bk-button
+        theme="default"
+        @click="isShow = false">
+        {{ $t('m.newCommon["取消"]') }}
+      </bk-button>
+    </div>
+  </bk-dialog>
 </template>
 
 <script>

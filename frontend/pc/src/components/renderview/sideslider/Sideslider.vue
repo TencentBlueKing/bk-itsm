@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <bk-sideslider
-        :is-show.sync="isShow"
-        :quick-close="true"
-        :title="title"
-        :width="width"
-        ext-cls="ui-sideslider">
-        <div slot="content">
-            <render-view
-                :form-data="formData"
-                :context="context">
-            </render-view>
-        </div>
-    </bk-sideslider>
+  <bk-sideslider
+    :is-show.sync="isShow"
+    :quick-close="true"
+    :title="title"
+    :width="width"
+    ext-cls="ui-sideslider">
+    <div slot="content">
+      <render-view
+        :form-data="formData"
+        :context="context">
+      </render-view>
+    </div>
+  </bk-sideslider>
 </template>
 
 <script>

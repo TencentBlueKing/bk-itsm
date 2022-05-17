@@ -21,70 +21,70 @@
   -->
 
 <template>
-    <div class="bk-api-editor-result">
-        <ul class="bk-request-ul">
-            <li v-for="(item, index) in jsonTitleList"
-                :key="index"
-                :class="{ 'bk-api-check': jsonCheckIndex === index }"
-                @click="changTitle(item, index)">
-                <span>{{item.name}}</span>
-            </li>
-        </ul>
-        <template v-if="!jsonCheckIndex">
-            <div class="mb10">
-                <bk-button :theme="'primary'"
-                    data-test-id="apiDetail_button_importResultJSON"
-                    :title="$t(`m.systemConfig['导入JSON']`)"
-                    :disabled="basicInfo.is_builtin"
-                    @click="closeDictionary">
-                    {{$t(`m.systemConfig['导入JSON']`)}}
-                </bk-button>
-            </div>
-            <api-request-body
-                :is-builtin="basicInfo.is_builtin"
-                :tree-data-list="responseTreeDataList"
-                @addBrotherLine="addBodyLine"
-                @addChildLine="addBodyChild"
-                @deleteLine="deleteBodyLine">
-            </api-request-body>
-        </template>
-        <template v-else>
-            <ace
-                :value="bodyDetailConfig.value"
-                :width="bodyDetailConfig.width"
-                :height="bodyDetailConfig.height"
-                :read-only="bodyDetailConfig.readOnly"
-                :lang="bodyDetailConfig.lang"
-                :full-screen="bodyDetailConfig.fullScreen"
-                :theme="'textmate'"
-                @init="editorInitAfter">
-            </ace>
-        </template>
-        <bk-dialog
-            v-model="dictDataTable.showDialog"
-            :render-directive="'if'"
-            :width="dictDataTable.width"
-            :header-position="dictDataTable.headerPosition"
-            :loading="secondClick"
-            :auto-close="dictDataTable.autoClose"
-            :mask-close="dictDataTable.autoClose"
-            :title="$t(`m.systemConfig['导入JSON']`)"
-            @confirm="submitDictionary">
-            <div class="bk-add-module">
-                <ace
-                    :value="responseDetailConfig.value"
-                    :width="responseDetailConfig.width"
-                    :height="responseDetailConfig.height"
-                    :read-only="responseDetailConfig.readOnly"
-                    :lang="responseDetailConfig.lang"
-                    :full-screen="responseDetailConfig.fullScreen"
-                    :theme="'textmate'"
-                    @blur="blur"
-                    @init="importEditorInitAfter">
-                </ace>
-            </div>
-        </bk-dialog>
-    </div>
+  <div class="bk-api-editor-result">
+    <ul class="bk-request-ul">
+      <li v-for="(item, index) in jsonTitleList"
+        :key="index"
+        :class="{ 'bk-api-check': jsonCheckIndex === index }"
+        @click="changTitle(item, index)">
+        <span>{{item.name}}</span>
+      </li>
+    </ul>
+    <template v-if="!jsonCheckIndex">
+      <div class="mb10">
+        <bk-button :theme="'primary'"
+          data-test-id="apiDetail_button_importResultJSON"
+          :title="$t(`m.systemConfig['导入JSON']`)"
+          :disabled="basicInfo.is_builtin"
+          @click="closeDictionary">
+          {{$t(`m.systemConfig['导入JSON']`)}}
+        </bk-button>
+      </div>
+      <api-request-body
+        :is-builtin="basicInfo.is_builtin"
+        :tree-data-list="responseTreeDataList"
+        @addBrotherLine="addBodyLine"
+        @addChildLine="addBodyChild"
+        @deleteLine="deleteBodyLine">
+      </api-request-body>
+    </template>
+    <template v-else>
+      <ace
+        :value="bodyDetailConfig.value"
+        :width="bodyDetailConfig.width"
+        :height="bodyDetailConfig.height"
+        :read-only="bodyDetailConfig.readOnly"
+        :lang="bodyDetailConfig.lang"
+        :full-screen="bodyDetailConfig.fullScreen"
+        :theme="'textmate'"
+        @init="editorInitAfter">
+      </ace>
+    </template>
+    <bk-dialog
+      v-model="dictDataTable.showDialog"
+      :render-directive="'if'"
+      :width="dictDataTable.width"
+      :header-position="dictDataTable.headerPosition"
+      :loading="secondClick"
+      :auto-close="dictDataTable.autoClose"
+      :mask-close="dictDataTable.autoClose"
+      :title="$t(`m.systemConfig['导入JSON']`)"
+      @confirm="submitDictionary">
+      <div class="bk-add-module">
+        <ace
+          :value="responseDetailConfig.value"
+          :width="responseDetailConfig.width"
+          :height="responseDetailConfig.height"
+          :read-only="responseDetailConfig.readOnly"
+          :lang="responseDetailConfig.lang"
+          :full-screen="responseDetailConfig.fullScreen"
+          :theme="'textmate'"
+          @blur="blur"
+          @init="importEditorInitAfter">
+        </ace>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

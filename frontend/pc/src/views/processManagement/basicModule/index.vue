@@ -21,105 +21,105 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m.basicModule["基础模型"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-only-btn">
-                <div class="bk-more-search">
-                    <bk-button :theme="'primary'"
-                        :title="$t(`m.deployPage['新增']`)"
-                        icon="plus"
-                        class="mr10 plus-cus"
-                        @click="openField({})">
-                        {{ $t(`m.deployPage['新增']`) }}
-                    </bk-button>
-                    <div class="bk-search-name">
-                        <div class="bk-search-content">
-                            <bk-input
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                :placeholder="moreSearch[0].placeholder"
-                                v-model="moreSearch[0].value"
-                                @enter="searchContent"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                        <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                            icon=" bk-itsm-icon icon-search-more"
-                            class="ml10 filter-btn"
-                            @click="searchMore">
-                        </bk-button>
-                    </div>
-                </div>
-                <search-info
-                    ref="searchInfo"
-                    :more-search="moreSearch">
-                </search-info>
-            </div>
-            <bk-table
-                v-bkloading="{ isLoading: isDataLoading }"
-                class="model-table"
-                :data="dataList"
-                :size="'small'"
-                :pagination="pagination"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
-                <bk-table-column :label="$t(`m.basicModule['模型名称']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.name">{{ props.row.name || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.basicModule['模型描述']`)" width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['更新时间']`)" prop="update_at">
-                    <template slot-scope="props">
-                        <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.treeinfo['更新人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" text @click="openField(props.row)">
-                            {{ $t('m.deployPage["编辑"]') }}
-                        </bk-button>
-                        <bk-button
-                            theme="primary"
-                            :disabled="props.row.is_builtin"
-                            text
-                            @click="deleteTable(props.row)">
-                            {{ $t('m.deployPage["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <!-- 新增字段 -->
-        <div class="bk-add-slider">
-            <bk-sideslider
-                :is-show.sync="sliderInfo.show"
-                :title="sliderInfo.title"
-                :width="sliderInfo.width">
-                <div slot="content" v-bkloading="{ isLoading: addLoading }" style="min-height: 300px;">
-                    <add-basic-module
-                        v-if="!addLoading && sliderInfo.show"
-                        :public-list="publicList"
-                        :slide-data="slideData">
-                    </add-basic-module>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m.basicModule["基础模型"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-only-btn">
+        <div class="bk-more-search">
+          <bk-button :theme="'primary'"
+            :title="$t(`m.deployPage['新增']`)"
+            icon="plus"
+            class="mr10 plus-cus"
+            @click="openField({})">
+            {{ $t(`m.deployPage['新增']`) }}
+          </bk-button>
+          <div class="bk-search-name">
+            <div class="bk-search-content">
+              <bk-input
+                :clearable="true"
+                :right-icon="'bk-icon icon-search'"
+                :placeholder="moreSearch[0].placeholder"
+                v-model="moreSearch[0].value"
+                @enter="searchContent"
+                @clear="clearSearch">
+              </bk-input>
+            </div>
+            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+              icon=" bk-itsm-icon icon-search-more"
+              class="ml10 filter-btn"
+              @click="searchMore">
+            </bk-button>
+          </div>
+        </div>
+        <search-info
+          ref="searchInfo"
+          :more-search="moreSearch">
+        </search-info>
+      </div>
+      <bk-table
+        v-bkloading="{ isLoading: isDataLoading }"
+        class="model-table"
+        :data="dataList"
+        :size="'small'"
+        :pagination="pagination"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange">
+        <bk-table-column :label="$t(`m.basicModule['模型名称']`)">
+          <template slot-scope="props">
+            <span :title="props.row.name">{{ props.row.name || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.basicModule['模型描述']`)" width="150">
+          <template slot-scope="props">
+            <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['更新时间']`)" prop="update_at">
+          <template slot-scope="props">
+            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.treeinfo['更新人']`)">
+          <template slot-scope="props">
+            <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button theme="primary" text @click="openField(props.row)">
+              {{ $t('m.deployPage["编辑"]') }}
+            </bk-button>
+            <bk-button
+              theme="primary"
+              :disabled="props.row.is_builtin"
+              text
+              @click="deleteTable(props.row)">
+              {{ $t('m.deployPage["删除"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <!-- 新增字段 -->
+    <div class="bk-add-slider">
+      <bk-sideslider
+        :is-show.sync="sliderInfo.show"
+        :title="sliderInfo.title"
+        :width="sliderInfo.width">
+        <div slot="content" v-bkloading="{ isLoading: addLoading }" style="min-height: 300px;">
+          <add-basic-module
+            v-if="!addLoading && sliderInfo.show"
+            :public-list="publicList"
+            :slide-data="slideData">
+          </add-basic-module>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 <script>
     import commonMix from '../../commonMix/common.js';

@@ -21,185 +21,185 @@
   -->
 
 <template>
-    <div class="bk-derive">
-        <p class="bk-ticket-title">{{ $t(`m.manageCommon['关联类型']`) }}</p>
-        <div class="bk-ticket-content">
-            <bk-radio-group v-model="typeSelected" @change="clearFieldList">
-                <template v-for="radio in typeSelectRadio">
-                    <bk-radio
-                        :value="radio.key"
-                        :key="radio.key"
-                        class="mr20"
-                    >{{ radio.name }}</bk-radio
-                    >
-                </template>
-            </bk-radio-group>
-        </div>
-        <template v-if="typeSelected === 'associate'">
-            <p class="bk-ticket-title">
-                {{ $t('m.manageCommon["可关联的列表"]') }}
-            </p>
-            <div class="bk-ticket-content">
-                <div class="bk-content-search">
-                    <bk-select
-                        style="width: 200px; float: left; margin-right: 10px"
-                        searchable
-                        :font-size="'medium'"
-                        multiple
-                        :placeholder="$t(`m.serviceConfig['服务类型']`)"
-                        v-model="searchInfo.serviceType"
-                        @toggle="serviceSearch"
-                        @clear="clearSearch"
-                    >
-                        <bk-option
-                            v-for="option in serviceTypeList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name"
-                        >
-                        </bk-option>
-                    </bk-select>
-                    <bk-input
-                        style="width: 200px; float: left"
-                        :placeholder="$t(`m.manageCommon['请输入标题/单号']`)"
-                        :clearable="true"
-                        :right-icon="'bk-icon icon-search'"
-                        v-model="searchInfo.keyword"
-                        @enter="getList"
-                        @clear="clearInfo"
-                    >
-                    </bk-input>
-                </div>
-                <bk-table
-                    v-bkloading="{ isLoading: isTableLoading }"
-                    :data="tabShowList"
-                    :size="'small'"
-                    :pagination="pagination"
-                    @page-change="handlePageChange"
-                    @page-limit-change="handlePageLimitChange"
-                    @select-all="handleSelectAll"
-                    @select="handleSelect"
-                >
-                    <bk-table-column
-                        type="selection"
-                        width="60"
-                        align="center"
-                        :selectable="disabledFn"
-                    >
-                    </bk-table-column>
-                    <bk-table-column
-                        type="index"
-                        label="No."
-                        align="center"
-                        width="60"
-                    ></bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['单号']`)"
-                        min-width="140"
-                    >
-                        <template slot-scope="props">
-                            <span
-                                class="bk-lable-primary"
-                                @click="checkOne(props.row)"
-                                :title="props.row.sn"
-                            >
-                                {{ props.row.sn }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.manageCommon['标题']`)"
-                        min-width="120"
-                    >
-                        <template slot-scope="props">
-                            <span :title="props.row.title">
-                                {{ props.row.title || "--" }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.manageCommon['提单人']`)"
-                        prop="creator"
-                    ></bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.manageCommon['提单时间']`)"
-                        prop="create_at"
-                    ></bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.manageCommon['状态']`)"
-                        min-width="120"
-                    >
-                        <template slot-scope="props">
-                            <span
-                                :title="props.row.current_status_display"
-                                class="bk-status-color-info"
-                                :style="getstatusColor(props.row)"
-                            >
-                                {{ props.row.current_status_display || "--" }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-            <div class="bk-ticket-button">
-                <bk-button
-                    class="mr10"
-                    theme="primary"
-                    :loading="buttonDisabled"
-                    :disabled="!checkList.length"
-                    :title="$t(`m.treeinfo['提交']`)"
-                    @click="bindTicket"
-                >
-                    {{ $t('m.treeinfo["提交"]') }}
-                </bk-button>
-                <bk-button
-                    theme="default"
-                    :disabled="buttonDisabled"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    @click="closeOpen"
-                >
-                    {{ $t('m.treeinfo["取消"]') }}
-                </bk-button>
-            </div>
+  <div class="bk-derive">
+    <p class="bk-ticket-title">{{ $t(`m.manageCommon['关联类型']`) }}</p>
+    <div class="bk-ticket-content">
+      <bk-radio-group v-model="typeSelected" @change="clearFieldList">
+        <template v-for="radio in typeSelectRadio">
+          <bk-radio
+            :value="radio.key"
+            :key="radio.key"
+            class="mr20"
+          >{{ radio.name }}</bk-radio
+          >
         </template>
-        <template v-else>
-            <select-service
-                ref="SelectService"
-                :custom-id="customId"
-                :is-get-field="isGetField"
-                @getFieldList="getFieldList"
-            >
-            </select-service>
-            <div v-bkloading="{ isLoading: showField || !fieldList.length }">
-                <p class="bk-ticket-title mt20">
-                    {{ $t('m.manageCommon["单据信息"]') }}
-                </p>
-                <div class="bk-ticket-content" style="min-height: 50px">
-                    <field-info ref="fieldInfo" :fields="fieldList">
-                    </field-info>
-                </div>
-                <div class="mt20">
-                    <bk-button
-                        class="mr10"
-                        theme="primary"
-                        :loading="buttonDisabled"
-                        :title="$t(`m.treeinfo['提交']`)"
-                        @click="setFields"
-                    >
-                        {{ $t('m.treeinfo["提交"]') }}
-                    </bk-button>
-                    <bk-button
-                        theme="default"
-                        :disabled="buttonDisabled"
-                        :title="$t(`m.treeinfo['取消']`)"
-                        @click="closeOpen"
-                    >
-                        {{ $t('m.treeinfo["取消"]') }}
-                    </bk-button>
-                </div>
-            </div>
-        </template>
+      </bk-radio-group>
     </div>
+    <template v-if="typeSelected === 'associate'">
+      <p class="bk-ticket-title">
+        {{ $t('m.manageCommon["可关联的列表"]') }}
+      </p>
+      <div class="bk-ticket-content">
+        <div class="bk-content-search">
+          <bk-select
+            style="width: 200px; float: left; margin-right: 10px"
+            searchable
+            :font-size="'medium'"
+            multiple
+            :placeholder="$t(`m.serviceConfig['服务类型']`)"
+            v-model="searchInfo.serviceType"
+            @toggle="serviceSearch"
+            @clear="clearSearch"
+          >
+            <bk-option
+              v-for="option in serviceTypeList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name"
+            >
+            </bk-option>
+          </bk-select>
+          <bk-input
+            style="width: 200px; float: left"
+            :placeholder="$t(`m.manageCommon['请输入标题/单号']`)"
+            :clearable="true"
+            :right-icon="'bk-icon icon-search'"
+            v-model="searchInfo.keyword"
+            @enter="getList"
+            @clear="clearInfo"
+          >
+          </bk-input>
+        </div>
+        <bk-table
+          v-bkloading="{ isLoading: isTableLoading }"
+          :data="tabShowList"
+          :size="'small'"
+          :pagination="pagination"
+          @page-change="handlePageChange"
+          @page-limit-change="handlePageLimitChange"
+          @select-all="handleSelectAll"
+          @select="handleSelect"
+        >
+          <bk-table-column
+            type="selection"
+            width="60"
+            align="center"
+            :selectable="disabledFn"
+          >
+          </bk-table-column>
+          <bk-table-column
+            type="index"
+            label="No."
+            align="center"
+            width="60"
+          ></bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['单号']`)"
+            min-width="140"
+          >
+            <template slot-scope="props">
+              <span
+                class="bk-lable-primary"
+                @click="checkOne(props.row)"
+                :title="props.row.sn"
+              >
+                {{ props.row.sn }}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="$t(`m.manageCommon['标题']`)"
+            min-width="120"
+          >
+            <template slot-scope="props">
+              <span :title="props.row.title">
+                {{ props.row.title || "--" }}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="$t(`m.manageCommon['提单人']`)"
+            prop="creator"
+          ></bk-table-column>
+          <bk-table-column
+            :label="$t(`m.manageCommon['提单时间']`)"
+            prop="create_at"
+          ></bk-table-column>
+          <bk-table-column
+            :label="$t(`m.manageCommon['状态']`)"
+            min-width="120"
+          >
+            <template slot-scope="props">
+              <span
+                :title="props.row.current_status_display"
+                class="bk-status-color-info"
+                :style="getstatusColor(props.row)"
+              >
+                {{ props.row.current_status_display || "--" }}
+              </span>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
+      <div class="bk-ticket-button">
+        <bk-button
+          class="mr10"
+          theme="primary"
+          :loading="buttonDisabled"
+          :disabled="!checkList.length"
+          :title="$t(`m.treeinfo['提交']`)"
+          @click="bindTicket"
+        >
+          {{ $t('m.treeinfo["提交"]') }}
+        </bk-button>
+        <bk-button
+          theme="default"
+          :disabled="buttonDisabled"
+          :title="$t(`m.treeinfo['取消']`)"
+          @click="closeOpen"
+        >
+          {{ $t('m.treeinfo["取消"]') }}
+        </bk-button>
+      </div>
+    </template>
+    <template v-else>
+      <select-service
+        ref="SelectService"
+        :custom-id="customId"
+        :is-get-field="isGetField"
+        @getFieldList="getFieldList"
+      >
+      </select-service>
+      <div v-bkloading="{ isLoading: showField || !fieldList.length }">
+        <p class="bk-ticket-title mt20">
+          {{ $t('m.manageCommon["单据信息"]') }}
+        </p>
+        <div class="bk-ticket-content" style="min-height: 50px">
+          <field-info ref="fieldInfo" :fields="fieldList">
+          </field-info>
+        </div>
+        <div class="mt20">
+          <bk-button
+            class="mr10"
+            theme="primary"
+            :loading="buttonDisabled"
+            :title="$t(`m.treeinfo['提交']`)"
+            @click="setFields"
+          >
+            {{ $t('m.treeinfo["提交"]') }}
+          </bk-button>
+          <bk-button
+            theme="default"
+            :disabled="buttonDisabled"
+            :title="$t(`m.treeinfo['取消']`)"
+            @click="closeOpen"
+          >
+            {{ $t('m.treeinfo["取消"]') }}
+          </bk-button>
+        </div>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>

@@ -21,91 +21,91 @@
   -->
 
 <template>
-    <div class="bk-input-params">
-        <bk-table
-            :data="paramTableData"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.treeinfo['名称']`)" min-width="150">
-                <template slot-scope="props">
-                    <div class="bk-more">
-                        <span :style="{ paddingLeft: 20 * props.row.level + 'px' }">
-                            <span
-                                v-if="props.row.has_children"
-                                :class="['bk-icon', 'tree-expanded-icon', props.row.showChildren ? 'icon-down-shape' : 'icon-right-shape']"
-                                @click="changeState(props.row)">
-                            </span>
-                            <span class="bk-icon bk-more-icon" v-else> </span>
-                            <span>{{props.row.key || '--'}}</span>
-                        </span>
-                    </div>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['必选']`)" width="60">
-                <template slot-scope="props">
-                    {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="200">
-                <template slot-scope="props">
-                    <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="280">
-                <template slot-scope="props">
-                    <template v-if="(props.row.type !== 'object') && (props.row.type !== 'array')">
-                        <div style="width: 120px; position: absolute; top: 5px; left: 10px;">
-                            <bk-select v-model="props.row.source_type"
-                                :clearable="false"
-                                searchable>
-                                <bk-option v-for="option in sourceTypeList"
-                                    :key="option.key"
-                                    :id="option.key"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </div>
-                        <div v-if="!props.row.source_type || (props.row.source_type === 'CUSTOM')"
-                            style="width: 120px; position: absolute; top: 4px; right: 10px;">
-                            <template v-if="props.row.type === 'string' || props.row.type === 'number'">
-                                <bk-input :type="props.row.type === 'string' ? 'text' : 'number'"
-                                    :placeholder="$t(`m.treeinfo['请输入参数值']`)"
-                                    v-model="props.row.value">
-                                </bk-input>
-                            </template>
-                            <template v-if="props.row.type === 'boolean'">
-                                <bk-radio-group v-model="props.row.value">
-                                    <bk-radio :value="trueSatatus">true</bk-radio>
-                                    <bk-radio :value="falseSatatus">false</bk-radio>
-                                </bk-radio-group>
-                            </template>
-                        </div>
-                        <div v-else style="width: 120px; position: absolute; top: 5px; right: 10px;">
-                            <bk-select v-model="props.row.value_key"
-                                :clearable="false"
-                                searchable>
-                                <bk-option v-for="option in variableList"
-                                    :key="option.key"
-                                    :id="option.key"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </div>
-                    </template>
-                </template>
-            </bk-table-column>
-            <bk-table-column width="60" class-name="last-add-row-column">
-                <template slot-scope="props">
-                    <div class="bk-between-operat" v-if="props.row.lastType === 'array'">
-                        <i class="bk-itsm-icon icon-flow-add" @click="addChildren(props.row)"></i>
-                        <i class="bk-itsm-icon icon-flow-reduce"
-                            :class="{ 'bk-no-delete': countSon(props.row) }"
-                            v-if="props.row.lastType === 'array'"
-                            @click="deletChildren(props.row)"></i>
-                    </div>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="bk-input-params">
+    <bk-table
+      :data="paramTableData"
+      :size="'small'">
+      <bk-table-column :label="$t(`m.treeinfo['名称']`)" min-width="150">
+        <template slot-scope="props">
+          <div class="bk-more">
+            <span :style="{ paddingLeft: 20 * props.row.level + 'px' }">
+              <span
+                v-if="props.row.has_children"
+                :class="['bk-icon', 'tree-expanded-icon', props.row.showChildren ? 'icon-down-shape' : 'icon-right-shape']"
+                @click="changeState(props.row)">
+              </span>
+              <span class="bk-icon bk-more-icon" v-else> </span>
+              <span>{{props.row.key || '--'}}</span>
+            </span>
+          </div>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['必选']`)" width="60">
+        <template slot-scope="props">
+          {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="200">
+        <template slot-scope="props">
+          <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="280">
+        <template slot-scope="props">
+          <template v-if="(props.row.type !== 'object') && (props.row.type !== 'array')">
+            <div style="width: 120px; position: absolute; top: 5px; left: 10px;">
+              <bk-select v-model="props.row.source_type"
+                :clearable="false"
+                searchable>
+                <bk-option v-for="option in sourceTypeList"
+                  :key="option.key"
+                  :id="option.key"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </div>
+            <div v-if="!props.row.source_type || (props.row.source_type === 'CUSTOM')"
+              style="width: 120px; position: absolute; top: 4px; right: 10px;">
+              <template v-if="props.row.type === 'string' || props.row.type === 'number'">
+                <bk-input :type="props.row.type === 'string' ? 'text' : 'number'"
+                  :placeholder="$t(`m.treeinfo['请输入参数值']`)"
+                  v-model="props.row.value">
+                </bk-input>
+              </template>
+              <template v-if="props.row.type === 'boolean'">
+                <bk-radio-group v-model="props.row.value">
+                  <bk-radio :value="trueSatatus">true</bk-radio>
+                  <bk-radio :value="falseSatatus">false</bk-radio>
+                </bk-radio-group>
+              </template>
+            </div>
+            <div v-else style="width: 120px; position: absolute; top: 5px; right: 10px;">
+              <bk-select v-model="props.row.value_key"
+                :clearable="false"
+                searchable>
+                <bk-option v-for="option in variableList"
+                  :key="option.key"
+                  :id="option.key"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </div>
+          </template>
+        </template>
+      </bk-table-column>
+      <bk-table-column width="60" class-name="last-add-row-column">
+        <template slot-scope="props">
+          <div class="bk-between-operat" v-if="props.row.lastType === 'array'">
+            <i class="bk-itsm-icon icon-flow-add" @click="addChildren(props.row)"></i>
+            <i class="bk-itsm-icon icon-flow-reduce"
+              :class="{ 'bk-no-delete': countSon(props.row) }"
+              v-if="props.row.lastType === 'array'"
+              @click="deletChildren(props.row)"></i>
+          </div>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 <script>
     import mixins from '../../../commonMix/mixins_api.js';

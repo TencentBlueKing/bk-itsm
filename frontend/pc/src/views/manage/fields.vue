@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="public-field-page">
-        <public-fields :title="$t(`m['公共字段']`)"></public-fields>
-    </div>
+  <div class="public-field-page">
+    <public-fields :title="$t(`m['公共字段']`)"></public-fields>
+  </div>
 </template>
 <script>
     import PublicFields from '../processManagement/publicField/index.vue';

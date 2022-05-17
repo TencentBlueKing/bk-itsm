@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <p style="color: #c4c6cc;" class="mt5 mb0 f12" slot="tip" v-if="item.type === 'CUSTOM-FORM'">{{$t('m["当前字段为自定义表单"]')}}</p>
-            <render-view
-                :form-data="formData"
-                :context="context">
-            </render-view>
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-        </template>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <p style="color: #c4c6cc;" class="mt5 mb0 f12" slot="tip" v-if="item.type === 'CUSTOM-FORM'">{{$t('m["当前字段为自定义表单"]')}}</p>
+      <render-view
+        :form-data="formData"
+        :context="context">
+      </render-view>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

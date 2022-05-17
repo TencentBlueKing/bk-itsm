@@ -21,120 +21,120 @@
   -->
 
 <template>
-    <div class="bk-default-value">
-        <!-- 单行文本 -->
-        <template v-if="formInfo.type === 'STRING'">
-            <bk-input :ext-cls="'bk-half'"
-                :clearable="true"
-                v-model="formInfo.default_value"
-                :placeholder="$t(`m.treeinfo['请输入']`)">
-            </bk-input>
-        </template>
-        <!-- 多行文本 -->
-        <template v-if="formInfo.type === 'TEXT'">
-            <div style="height: 30px;">
-                <textarea style="width: 49%;"
-                    rows="8"
-                    class="bk-form-textarea bk-textarea-tanble"
-                    :placeholder="$t(`m.treeinfo['请输入']`)"
-                    v-model.trim="formInfo.default_value">
+  <div class="bk-default-value">
+    <!-- 单行文本 -->
+    <template v-if="formInfo.type === 'STRING'">
+      <bk-input :ext-cls="'bk-half'"
+        :clearable="true"
+        v-model="formInfo.default_value"
+        :placeholder="$t(`m.treeinfo['请输入']`)">
+      </bk-input>
+    </template>
+    <!-- 多行文本 -->
+    <template v-if="formInfo.type === 'TEXT'">
+      <div style="height: 30px;">
+        <textarea style="width: 49%;"
+          rows="8"
+          class="bk-form-textarea bk-textarea-tanble"
+          :placeholder="$t(`m.treeinfo['请输入']`)"
+          v-model.trim="formInfo.default_value">
                 </textarea>
-            </div>
-        </template>
-        <!-- 富文本 -->
-        <template v-if="formInfo.type === 'RICHTEXT'">
-            <div>
-                <rich-text-editor
-                    v-model="formInfo.default_value"
-                    :id="'default-rich-text-editor'"
-                    :full-title="label">
-                </rich-text-editor>
-            </div>
-        </template>
-        <!-- 下拉框 -->
-        <template v-if="formInfo.type === 'MULTISELECT' || formInfo.type === 'CHECKBOX' || formInfo.type === 'SELECT' || formInfo.type === 'RADIO' || formInfo.type === 'INPUTSELECT'">
-            <template v-if="formInfo.source_type === 'API' || formInfo.source_type === 'RPC'">
-                <bk-input :ext-cls="'bk-half'"
-                    :clearable="true"
-                    v-model="formInfo.default_value"
-                    :placeholder="$t(`m.treeinfo['请输入']`)">
-                </bk-input>
-            </template>
-            <template v-else>
-                <bk-select :ext-cls="'bk-half'"
-                    v-model="formInfo.default_value"
-                    :multiple="(formInfo.type === 'MULTISELECT' || formInfo.type === 'CHECKBOX')"
-                    searchable
-                    @toggle="getSelectList">
-                    <bk-option v-for="option in selectList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </template>
-        </template>
-        <!-- 数字类型 -->
-        <template v-if="formInfo.type === 'INT'">
-            <div class="bk-half">
-                <bk-input :clearable="true"
-                    type="number"
-                    :precision="precision"
-                    v-model="formInfo.default_value">
-                </bk-input>
-            </div>
-        </template>
-        <!-- 日期 -->
-        <template v-if="formInfo.type === 'DATE'">
-            <div class="bk-half">
-                <bk-date-picker v-model="formInfo.default_value"
-                    :placeholder="$t(`m.newCommon['选择日期']`)">
-                </bk-date-picker>
-            </div>
-        </template>
-        <!-- 时间 -->
-        <template v-if="formInfo.type === 'DATETIME'">
-            <div class="bk-half">
-                <bk-date-picker v-model="formInfo.default_value"
-                    :type="'datetime'"
-                    :placeholder="$t(`m.newCommon['选择日期时间']`)">
-                </bk-date-picker>
-            </div>
-        </template>
-        <!-- 人员 -->
-        <template v-if="formInfo.type === 'MEMBER'">
-            <div style="width: 49%;">
-                <member-select v-model="formInfo.default_value" :multiple="false"></member-select>
-            </div>
-        </template>
-        <template v-if="formInfo.type === 'MEMBERS'">
-            <div style="width: 49%;">
-                <member-select v-model="formInfo.default_value">
-                </member-select>
-            </div>
-        </template>
-        <template v-if="formInfo.type === 'CUSTOM-FORM'">
-            <div class="editor-wrap">
-                <div class="editor-btn-group">
-                    <router-link
-                        target="_blank"
-                        :to="{ name: 'CustomFormTest' }"
-                        class="opt-item">{{ $t(`m.common['查看模板']`) }}</router-link>
-                    <span class="opt-item"
-                        @click="downCustomFormTempalte">
-                        {{ $t(`m.common['下载模板']`) }}</span>
-                </div>
-                <code-editor
-                    v-model="formInfo.default_value"
-                    :options="{ language: 'json' }">
-                </code-editor>
+      </div>
+    </template>
+    <!-- 富文本 -->
+    <template v-if="formInfo.type === 'RICHTEXT'">
+      <div>
+        <rich-text-editor
+          v-model="formInfo.default_value"
+          :id="'default-rich-text-editor'"
+          :full-title="label">
+        </rich-text-editor>
+      </div>
+    </template>
+    <!-- 下拉框 -->
+    <template v-if="formInfo.type === 'MULTISELECT' || formInfo.type === 'CHECKBOX' || formInfo.type === 'SELECT' || formInfo.type === 'RADIO' || formInfo.type === 'INPUTSELECT'">
+      <template v-if="formInfo.source_type === 'API' || formInfo.source_type === 'RPC'">
+        <bk-input :ext-cls="'bk-half'"
+          :clearable="true"
+          v-model="formInfo.default_value"
+          :placeholder="$t(`m.treeinfo['请输入']`)">
+        </bk-input>
+      </template>
+      <template v-else>
+        <bk-select :ext-cls="'bk-half'"
+          v-model="formInfo.default_value"
+          :multiple="(formInfo.type === 'MULTISELECT' || formInfo.type === 'CHECKBOX')"
+          searchable
+          @toggle="getSelectList">
+          <bk-option v-for="option in selectList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </template>
+    </template>
+    <!-- 数字类型 -->
+    <template v-if="formInfo.type === 'INT'">
+      <div class="bk-half">
+        <bk-input :clearable="true"
+          type="number"
+          :precision="precision"
+          v-model="formInfo.default_value">
+        </bk-input>
+      </div>
+    </template>
+    <!-- 日期 -->
+    <template v-if="formInfo.type === 'DATE'">
+      <div class="bk-half">
+        <bk-date-picker v-model="formInfo.default_value"
+          :placeholder="$t(`m.newCommon['选择日期']`)">
+        </bk-date-picker>
+      </div>
+    </template>
+    <!-- 时间 -->
+    <template v-if="formInfo.type === 'DATETIME'">
+      <div class="bk-half">
+        <bk-date-picker v-model="formInfo.default_value"
+          :type="'datetime'"
+          :placeholder="$t(`m.newCommon['选择日期时间']`)">
+        </bk-date-picker>
+      </div>
+    </template>
+    <!-- 人员 -->
+    <template v-if="formInfo.type === 'MEMBER'">
+      <div style="width: 49%;">
+        <member-select v-model="formInfo.default_value" :multiple="false"></member-select>
+      </div>
+    </template>
+    <template v-if="formInfo.type === 'MEMBERS'">
+      <div style="width: 49%;">
+        <member-select v-model="formInfo.default_value">
+        </member-select>
+      </div>
+    </template>
+    <template v-if="formInfo.type === 'CUSTOM-FORM'">
+      <div class="editor-wrap">
+        <div class="editor-btn-group">
+          <router-link
+            target="_blank"
+            :to="{ name: 'CustomFormTest' }"
+            class="opt-item">{{ $t(`m.common['查看模板']`) }}</router-link>
+          <span class="opt-item"
+            @click="downCustomFormTempalte">
+            {{ $t(`m.common['下载模板']`) }}</span>
+        </div>
+        <code-editor
+          v-model="formInfo.default_value"
+          :options="{ language: 'json' }">
+        </code-editor>
 
-            </div>
-            <p v-if="checkStatus.customFormStatus" class="bk-field-error">
-                {{ $t(`m.treeinfo['格式错误！（JSON 语法错误或者根元素缺少 schemes 和 form_data 属性）']`) }}
-            </p>
-        </template>
-    </div>
+      </div>
+      <p v-if="checkStatus.customFormStatus" class="bk-field-error">
+        {{ $t(`m.treeinfo['格式错误！（JSON 语法错误或者根元素缺少 schemes 和 form_data 属性）']`) }}
+      </p>
+    </template>
+  </div>
 </template>
 <script>
     import memberSelect from '../../../../commonComponent/memberSelect';

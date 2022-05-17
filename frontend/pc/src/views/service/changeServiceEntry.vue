@@ -21,121 +21,121 @@
   -->
 
 <template>
-    <div class="bk-add-entry">
-        <bk-form
-            :label-width="200"
-            form-type="vertical"
-            :model="directory.formInfo"
-            :rules="rules"
-            ref="dynamicForm">
-            <bk-form-item
-                :label="$t(`m.serviceConfig['服务名称']`)"
-                :required="true"
-                :property="'name'">
-                <bk-input v-model.trim="directory.formInfo.name"
-                    maxlength="120"
-                    :placeholder="$t(`m.serviceConfig['请输入服务名称']`)">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['关联流程版本']`)"
-                :required="true"
-                :property="'workflow'">
-                <bk-select v-model="directory.formInfo.workflow"
-                    :placeholder="directory.place.workflow"
-                    :clearable="false"
-                    searchable
-                    :font-size="'medium'">
-                    <bk-option v-for="option in flowList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['服务类型']`)"
-                :required="true"
-                :property="'key'">
-                <bk-select v-model="directory.formInfo.key"
-                    :placeholder="directory.place.key"
-                    :clearable="false"
-                    searchable
-                    :font-size="'medium'">
-                    <bk-option v-for="option in codeList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item v-if="openFunction.SLA_SWITCH"
-                :label="$t(`m.serviceConfig['服务协议']`)">
-                <bk-select v-model="directory.formInfo.sla"
-                    :placeholder="directory.place.sla"
-                    searchable
-                    :font-size="'medium'">
-                    <bk-option v-for="option in slaList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['可见范围']`)"
-                :required="true">
-                <deal-person
-                    class="display-range"
-                    ref="displayRange"
-                    :value="dealPersonValue"
-                    :show-role-type-list="displayRangeTypes">
-                </deal-person>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['代提单']`)">
-                <bk-switcher v-model="directory.formInfo.can_ticket_agency" size="small"></bk-switcher>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['服务描述']`)">
-                <bk-input
-                    :placeholder="$t(`m.serviceConfig['请输入服务描述']`)"
-                    :type="'textarea'"
-                    :rows="3"
-                    :maxlength="100"
-                    v-model="directory.formInfo.desc">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['服务负责人']`)"
-                :required="true"
-                :property="'admin'">
-                <member-select v-model="directory.formInfo.admin"></member-select>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.serviceConfig['启用服务']`)">
-                <bk-switcher v-model="directory.formInfo.is_valid" size="small"></bk-switcher>
-            </bk-form-item>
-            <template v-if="directory.formInfo.is_valid">
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['关联目录']`)">
-                    <select-tree
-                        v-model="directory.formInfo.catalog_id"
-                        :list="dirList"
-                        ext-cls="bk-form-width">
-                    </select-tree>
-                </bk-form-item>
-            </template>
-        </bk-form>
-        <div class="bk-add-btn">
-            <bk-button :theme="'primary'" :title="$t(`m.serviceConfig['确认']`)" class="mr10" @click="submitAdd">
-                {{$t(`m.serviceConfig['确认']`)}}
-            </bk-button>
-            <bk-button :theme="'default'" :title="$t(`m.serviceConfig['取消']`)" class="mr10" @click="closeAdd">
-                {{$t(`m.serviceConfig['取消']`)}}
-            </bk-button>
-        </div>
+  <div class="bk-add-entry">
+    <bk-form
+      :label-width="200"
+      form-type="vertical"
+      :model="directory.formInfo"
+      :rules="rules"
+      ref="dynamicForm">
+      <bk-form-item
+        :label="$t(`m.serviceConfig['服务名称']`)"
+        :required="true"
+        :property="'name'">
+        <bk-input v-model.trim="directory.formInfo.name"
+          maxlength="120"
+          :placeholder="$t(`m.serviceConfig['请输入服务名称']`)">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['关联流程版本']`)"
+        :required="true"
+        :property="'workflow'">
+        <bk-select v-model="directory.formInfo.workflow"
+          :placeholder="directory.place.workflow"
+          :clearable="false"
+          searchable
+          :font-size="'medium'">
+          <bk-option v-for="option in flowList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['服务类型']`)"
+        :required="true"
+        :property="'key'">
+        <bk-select v-model="directory.formInfo.key"
+          :placeholder="directory.place.key"
+          :clearable="false"
+          searchable
+          :font-size="'medium'">
+          <bk-option v-for="option in codeList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item v-if="openFunction.SLA_SWITCH"
+        :label="$t(`m.serviceConfig['服务协议']`)">
+        <bk-select v-model="directory.formInfo.sla"
+          :placeholder="directory.place.sla"
+          searchable
+          :font-size="'medium'">
+          <bk-option v-for="option in slaList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['可见范围']`)"
+        :required="true">
+        <deal-person
+          class="display-range"
+          ref="displayRange"
+          :value="dealPersonValue"
+          :show-role-type-list="displayRangeTypes">
+        </deal-person>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['代提单']`)">
+        <bk-switcher v-model="directory.formInfo.can_ticket_agency" size="small"></bk-switcher>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['服务描述']`)">
+        <bk-input
+          :placeholder="$t(`m.serviceConfig['请输入服务描述']`)"
+          :type="'textarea'"
+          :rows="3"
+          :maxlength="100"
+          v-model="directory.formInfo.desc">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['服务负责人']`)"
+        :required="true"
+        :property="'admin'">
+        <member-select v-model="directory.formInfo.admin"></member-select>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.serviceConfig['启用服务']`)">
+        <bk-switcher v-model="directory.formInfo.is_valid" size="small"></bk-switcher>
+      </bk-form-item>
+      <template v-if="directory.formInfo.is_valid">
+        <bk-form-item
+          :label="$t(`m.serviceConfig['关联目录']`)">
+          <select-tree
+            v-model="directory.formInfo.catalog_id"
+            :list="dirList"
+            ext-cls="bk-form-width">
+          </select-tree>
+        </bk-form-item>
+      </template>
+    </bk-form>
+    <div class="bk-add-btn">
+      <bk-button :theme="'primary'" :title="$t(`m.serviceConfig['确认']`)" class="mr10" @click="submitAdd">
+        {{$t(`m.serviceConfig['确认']`)}}
+      </bk-button>
+      <bk-button :theme="'default'" :title="$t(`m.serviceConfig['取消']`)" class="mr10" @click="closeAdd">
+        {{$t(`m.serviceConfig['取消']`)}}
+      </bk-button>
     </div>
+  </div>
 </template>
 
 <script>

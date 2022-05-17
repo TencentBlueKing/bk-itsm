@@ -21,62 +21,62 @@
   -->
 
 <template>
-    <div class="bk-task-history" v-bkloading="{ isLoading: loading }">
-        <div class="history-table">
-            <bk-table
-                :data="historyList"
-                :size="'small'"
-                @sort-change="orderingClick">
-                <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
-                    <template slot-scope="props">
-                        <span :title="props.row.end_time">
-                            {{props.row.end_time || '--'}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['响应动作']`)">
-                    <template slot-scope="props">
-                        <span
-                            :title="props.row.display_name"
-                            style="color: #3A84FF;cursor: pointer"
-                            @click="openDetail(props.row)">
-                            {{props.row.component_name || '--'}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
-                    <template slot-scope="props">
-                        <span class="bk-status-success"
-                            :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
-                            :title="props.row.status_name">
-                            {{props.row.status_name || '--'}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['操作人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.operator_username">
-                            {{props.row.operator_username || '--'}}
-                        </span>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <!-- 任务记录详情 -->
-        <bk-sideslider
-            :is-show.sync="historyDetail.isShow"
-            :title="historyDetail.title"
-            :width="historyDetail.width"
-            :quick-close="true">
-            <div slot="content">
-                <history-detail v-if="historyDetail.isShow"
-                    :history-id="historyDetail.id"
-                    :basic-infomation="basicInfomation"
-                    :node-list="nodeList">
-                </history-detail>
-            </div>
-        </bk-sideslider>
+  <div class="bk-task-history" v-bkloading="{ isLoading: loading }">
+    <div class="history-table">
+      <bk-table
+        :data="historyList"
+        :size="'small'"
+        @sort-change="orderingClick">
+        <bk-table-column :label="$t(`m.task['执行时间']`)" :sortable="'custom'">
+          <template slot-scope="props">
+            <span :title="props.row.end_time">
+              {{props.row.end_time || '--'}}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['响应动作']`)">
+          <template slot-scope="props">
+            <span
+              :title="props.row.display_name"
+              style="color: #3A84FF;cursor: pointer"
+              @click="openDetail(props.row)">
+              {{props.row.component_name || '--'}}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['执行状态']`)" :sortable="'custom'">
+          <template slot-scope="props">
+            <span class="bk-status-success"
+              :class="{ 'bk-status-failed': props.row.status === 'FAILED' }"
+              :title="props.row.status_name">
+              {{props.row.status_name || '--'}}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['操作人']`)">
+          <template slot-scope="props">
+            <span :title="props.row.operator_username">
+              {{props.row.operator_username || '--'}}
+            </span>
+          </template>
+        </bk-table-column>
+      </bk-table>
     </div>
+    <!-- 任务记录详情 -->
+    <bk-sideslider
+      :is-show.sync="historyDetail.isShow"
+      :title="historyDetail.title"
+      :width="historyDetail.width"
+      :quick-close="true">
+      <div slot="content">
+        <history-detail v-if="historyDetail.isShow"
+          :history-id="historyDetail.id"
+          :basic-infomation="basicInfomation"
+          :node-list="nodeList">
+        </history-detail>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

@@ -21,86 +21,86 @@
   -->
 
 <template>
-    <div class="ticket-table-section" v-bkloading="{ isLoading: loading }">
-        <template v-if="!loading">
-            <router-link class="enter-my-tickets" :to="{ name: 'myTodoTicket' }">{{ $t(`m.common['进入我的单据']`) }} >></router-link>
-            <bk-tab :active.sync="activePanel" type="unborder-card">
-                <bk-tab-panel
-                    v-for="panel in panels"
-                    :key="panel.name"
-                    v-bind="panel">
-                    <template slot="label">
-                        <span class="panel-name">{{ panel.label }}</span>
-                        <span class="panel-count">{{ count[panel.name] }}</span>
-                    </template>
-                    <bk-table :data="ticketList" v-bkloading="{ isLoading: tabLoading }" @sort-change="onSortChange">
-                        <bk-table-column :label="$t(`m.manageCommon['单号']`)">
-                            <template slot-scope="props">
-                                <router-link
-                                    class="table-link"
-                                    target="_blank"
-                                    :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from: 'Home' } }">
-                                    {{ props.row.sn }}
-                                </router-link>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['标题']`)" :width="200" prop="title"></bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['服务']`)" :width="140" :sortable="true" prop="service_name"></bk-table-column>
-                        <bk-table-column :label="$t(`m.newCommon['当前步骤']`)" :width="100">
-                            <template slot-scope="props">
-                                <div v-if="props.row.current_steps.length > 0" class="current-steps-wrap">
-                                    <bk-popover placement="top" :theme="'light'">
-                                        <span
-                                            class="bk-current-step">
-                                            {{props.row.current_steps[0].name}}
-                                        </span>
-                                        <div slot="content" style="max-width: 200px;">
-                                            <span class="bk-current-step auto-width"
-                                                style=""
-                                                v-for="(othernode, otherNodeIndex) in props.row.current_steps"
-                                                :key="otherNodeIndex">
-                                                {{othernode.name}}
-                                            </span>
-                                        </div>
-                                    </bk-popover>
-                                </div>
-                                <span v-else>--</span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['当前处理人']`)" :width="140" prop="current_processors">
-                            <template slot-scope="props">
-                                <span :title="props.row.current_processors">{{ props.row.current_processors || '--' }}</span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['提单人']`)" :width="140" :sortable="true" prop="creator"></bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['提单时间']`)" :width="180" :sortable="true" prop="create_at"></bk-table-column>
-                        <bk-table-column :label="$t(`m.manageCommon['操作']`)" :width="100">
-                            <template slot-scope="props">
-                                <template v-if="activePanel === 'approval'">
-                                    <bk-link theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
-                                    <bk-link theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
-                                </template>
-                                <router-link
-                                    v-else
-                                    target="_blank"
-                                    class="table-link"
-                                    :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.id, from: 'Home' } }">
-                                    {{ props.row.can_operate ? $t(`m.manageCommon['处理']`) : $t('m.manageCommon["查看"]') }}
-                                </router-link>
-                            </template>
-                        </bk-table-column>
-                    </bk-table>
-                    <router-link v-if="count[panel.name] > 10" class="view-all" :to="{ name: panel.id }">{{ $t(`m.common['查看全部']`) }}</router-link>
-                </bk-tab-panel>
-            </bk-tab>
-        </template>
-        <div v-else style="height: 400px;"></div>
-        <!-- 审批弹窗 -->
-        <approval-dialog :is-show.sync="isApprovalDialogShow"
-            :approval-info="approvalInfo"
-            @cancel="onApprovalDialogHidden">
-        </approval-dialog>
-    </div>
+  <div class="ticket-table-section" v-bkloading="{ isLoading: loading }">
+    <template v-if="!loading">
+      <router-link class="enter-my-tickets" :to="{ name: 'myTodoTicket' }">{{ $t(`m.common['进入我的单据']`) }} >></router-link>
+      <bk-tab :active.sync="activePanel" type="unborder-card">
+        <bk-tab-panel
+          v-for="panel in panels"
+          :key="panel.name"
+          v-bind="panel">
+          <template slot="label">
+            <span class="panel-name">{{ panel.label }}</span>
+            <span class="panel-count">{{ count[panel.name] }}</span>
+          </template>
+          <bk-table :data="ticketList" v-bkloading="{ isLoading: tabLoading }" @sort-change="onSortChange">
+            <bk-table-column :label="$t(`m.manageCommon['单号']`)">
+              <template slot-scope="props">
+                <router-link
+                  class="table-link"
+                  target="_blank"
+                  :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.project_key, from: 'Home' } }">
+                  {{ props.row.sn }}
+                </router-link>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['标题']`)" :width="200" prop="title"></bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['服务']`)" :width="140" :sortable="true" prop="service_name"></bk-table-column>
+            <bk-table-column :label="$t(`m.newCommon['当前步骤']`)" :width="100">
+              <template slot-scope="props">
+                <div v-if="props.row.current_steps.length > 0" class="current-steps-wrap">
+                  <bk-popover placement="top" :theme="'light'">
+                    <span
+                      class="bk-current-step">
+                      {{props.row.current_steps[0].name}}
+                    </span>
+                    <div slot="content" style="max-width: 200px;">
+                      <span class="bk-current-step auto-width"
+                        style=""
+                        v-for="(othernode, otherNodeIndex) in props.row.current_steps"
+                        :key="otherNodeIndex">
+                        {{othernode.name}}
+                      </span>
+                    </div>
+                  </bk-popover>
+                </div>
+                <span v-else>--</span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['当前处理人']`)" :width="140" prop="current_processors">
+              <template slot-scope="props">
+                <span :title="props.row.current_processors">{{ props.row.current_processors || '--' }}</span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['提单人']`)" :width="140" :sortable="true" prop="creator"></bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['提单时间']`)" :width="180" :sortable="true" prop="create_at"></bk-table-column>
+            <bk-table-column :label="$t(`m.manageCommon['操作']`)" :width="100">
+              <template slot-scope="props">
+                <template v-if="activePanel === 'approval'">
+                  <bk-link theme="primary" @click="onOpenApprovalDialog(props.row.id, true)">{{ $t(`m.managePage['通过']`) }}</bk-link>
+                  <bk-link theme="primary" @click="onOpenApprovalDialog(props.row.id, false)">{{ $t(`m.manageCommon['拒绝']`) }}</bk-link>
+                </template>
+                <router-link
+                  v-else
+                  target="_blank"
+                  class="table-link"
+                  :to="{ name: 'TicketDetail', query: { id: props.row.id, project_id: props.row.id, from: 'Home' } }">
+                  {{ props.row.can_operate ? $t(`m.manageCommon['处理']`) : $t('m.manageCommon["查看"]') }}
+                </router-link>
+              </template>
+            </bk-table-column>
+          </bk-table>
+          <router-link v-if="count[panel.name] > 10" class="view-all" :to="{ name: panel.id }">{{ $t(`m.common['查看全部']`) }}</router-link>
+        </bk-tab-panel>
+      </bk-tab>
+    </template>
+    <div v-else style="height: 400px;"></div>
+    <!-- 审批弹窗 -->
+    <approval-dialog :is-show.sync="isApprovalDialogShow"
+      :approval-info="approvalInfo"
+      @cancel="onApprovalDialogHidden">
+    </approval-dialog>
+  </div>
 </template>
 <script>
     import i18n from '@/i18n/index.js';

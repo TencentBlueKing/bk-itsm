@@ -21,146 +21,146 @@
   -->
 
 <template>
-    <div class="bk-dialog-form bk-change">
-        <div class="bk-itsm-version" v-if="versionStatus">
-            <span>{{ $t('m.newCommon["新建母子单："]') }}</span>
-            <span>
-                {{
-                    $t(
-                        'm.newCommon["可以通过母子单的创建，将一些需要进行相同处理操作的同类单据进行关联。一个母单可以关联多个子单，一个子单只能关联到一个母单。一旦关联，子单将冻结操作，子单的状态将全部跟随母单更新。"]'
-                    )
-                }}
-            </span>
-            <i class="bk-icon icon-close" @click="closeVersion"></i>
-        </div>
-        <p class="bk-ticket-title">
-            {{ $t('m.newCommon["选择以下单据作为"]') }}
-        </p>
-        <div class="bk-ticket-content">
-            <bk-radio-group v-model="templateInfo.inheritType">
-                <template v-for="radio in templateInfo.options">
-                    <bk-radio
-                        :value="radio.key"
-                        :key="radio.key"
-                        class="mr20"
-                        :disabled="getFlag(radio.key, ticketInfo)"
-                        @change="changeRadio"
-                    >
-                        {{ radio.name }}
-                    </bk-radio>
-                </template>
-            </bk-radio-group>
-        </div>
-        <p class="bk-ticket-title">
-            {{ $t('m.manageCommon["可关联的列表"]') }}
-        </p>
-        <div class="bk-ticket-content">
-            <div class="bk-content-search">
-                <bk-input
-                    style="width: 200px; float: left"
-                    :clearable="true"
-                    :right-icon="'bk-icon icon-search'"
-                    v-model="searchForm.keyword"
-                    @enter="getList"
-                    @clear="clearInfo"
-                ></bk-input>
-            </div>
-            <bk-table
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="tabInfoList"
-                :size="'small'"
-                :pagination="pagination"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange"
-            >
-                <bk-table-column
-                    width="60"
-                    align="center"
-                    :render-header="renderRadio"
-                >
-                    <template slot-scope="props">
-                        <bk-checkbox
-                            v-if="templateInfo.inheritType === 'chooseChild'"
-                            :value="props.row.check"
-                            :disabled="getItemFlag(props.row)"
-                            @change="checkOne(props.row)"
-                        ></bk-checkbox>
-                        <bk-radio
-                            v-else
-                            :value="props.row.check"
-                            :disabled="getItemFlag(props.row)"
-                            @change="checkOne(props.row)"
-                        ></bk-radio>
-                    </template>
-                </bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.newCommon['单号']`)"
-                    min-width="120"
-                >
-                    <template slot-scope="props">
-                        <span
-                            class="bk-lable-primary"
-                            @click="openNewPage(props.row)"
-                            :title="props.row.sn"
-                        >
-                            {{ props.row.sn }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.manageCommon['标题']`)"
-                    prop="title"
-                    min-width="100"
-                ></bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.manageCommon['提单人']`)"
-                    prop="creator"
-                ></bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.manageCommon['提单时间']`)"
-                    prop="create_at"
-                ></bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.manageCommon['状态']`)"
-                    min-width="80"
-                >
-                    <template slot-scope="props">
-                        <span
-                            :title="props.row.current_status_display"
-                            class="bk-status-color-info"
-                            :style="getstatusColor(props.row)"
-                        >
-                            {{
-                                localeCookie
-                                    ? props.row.current_status_display
-                                    : props.row.current_status
-                            }}
-                        </span>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <div class="bk-state-button">
-            <bk-button
-                class="mr10"
-                theme="primary"
-                :loading="secondClick"
-                :disabled="!getButtonFlag()"
-                :title="$t(`m.treeinfo['提交']`)"
-                @click="submitTemplate"
-            >
-                {{ $t('m.treeinfo["提交"]') }}
-            </bk-button>
-            <bk-button
-                theme="default"
-                :disabled="secondClick"
-                :title="$t(`m.treeinfo['取消']`)"
-                @click="closeShow"
-            >
-                {{ $t('m.treeinfo["取消"]') }}
-            </bk-button>
-        </div>
+  <div class="bk-dialog-form bk-change">
+    <div class="bk-itsm-version" v-if="versionStatus">
+      <span>{{ $t('m.newCommon["新建母子单："]') }}</span>
+      <span>
+        {{
+          $t(
+            'm.newCommon["可以通过母子单的创建，将一些需要进行相同处理操作的同类单据进行关联。一个母单可以关联多个子单，一个子单只能关联到一个母单。一旦关联，子单将冻结操作，子单的状态将全部跟随母单更新。"]'
+          )
+        }}
+      </span>
+      <i class="bk-icon icon-close" @click="closeVersion"></i>
     </div>
+    <p class="bk-ticket-title">
+      {{ $t('m.newCommon["选择以下单据作为"]') }}
+    </p>
+    <div class="bk-ticket-content">
+      <bk-radio-group v-model="templateInfo.inheritType">
+        <template v-for="radio in templateInfo.options">
+          <bk-radio
+            :value="radio.key"
+            :key="radio.key"
+            class="mr20"
+            :disabled="getFlag(radio.key, ticketInfo)"
+            @change="changeRadio"
+          >
+            {{ radio.name }}
+          </bk-radio>
+        </template>
+      </bk-radio-group>
+    </div>
+    <p class="bk-ticket-title">
+      {{ $t('m.manageCommon["可关联的列表"]') }}
+    </p>
+    <div class="bk-ticket-content">
+      <div class="bk-content-search">
+        <bk-input
+          style="width: 200px; float: left"
+          :clearable="true"
+          :right-icon="'bk-icon icon-search'"
+          v-model="searchForm.keyword"
+          @enter="getList"
+          @clear="clearInfo"
+        ></bk-input>
+      </div>
+      <bk-table
+        v-bkloading="{ isLoading: isDataLoading }"
+        :data="tabInfoList"
+        :size="'small'"
+        :pagination="pagination"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
+      >
+        <bk-table-column
+          width="60"
+          align="center"
+          :render-header="renderRadio"
+        >
+          <template slot-scope="props">
+            <bk-checkbox
+              v-if="templateInfo.inheritType === 'chooseChild'"
+              :value="props.row.check"
+              :disabled="getItemFlag(props.row)"
+              @change="checkOne(props.row)"
+            ></bk-checkbox>
+            <bk-radio
+              v-else
+              :value="props.row.check"
+              :disabled="getItemFlag(props.row)"
+              @change="checkOne(props.row)"
+            ></bk-radio>
+          </template>
+        </bk-table-column>
+        <bk-table-column
+          :label="$t(`m.newCommon['单号']`)"
+          min-width="120"
+        >
+          <template slot-scope="props">
+            <span
+              class="bk-lable-primary"
+              @click="openNewPage(props.row)"
+              :title="props.row.sn"
+            >
+              {{ props.row.sn }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column
+          :label="$t(`m.manageCommon['标题']`)"
+          prop="title"
+          min-width="100"
+        ></bk-table-column>
+        <bk-table-column
+          :label="$t(`m.manageCommon['提单人']`)"
+          prop="creator"
+        ></bk-table-column>
+        <bk-table-column
+          :label="$t(`m.manageCommon['提单时间']`)"
+          prop="create_at"
+        ></bk-table-column>
+        <bk-table-column
+          :label="$t(`m.manageCommon['状态']`)"
+          min-width="80"
+        >
+          <template slot-scope="props">
+            <span
+              :title="props.row.current_status_display"
+              class="bk-status-color-info"
+              :style="getstatusColor(props.row)"
+            >
+              {{
+                localeCookie
+                  ? props.row.current_status_display
+                  : props.row.current_status
+              }}
+            </span>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <div class="bk-state-button">
+      <bk-button
+        class="mr10"
+        theme="primary"
+        :loading="secondClick"
+        :disabled="!getButtonFlag()"
+        :title="$t(`m.treeinfo['提交']`)"
+        @click="submitTemplate"
+      >
+        {{ $t('m.treeinfo["提交"]') }}
+      </bk-button>
+      <bk-button
+        theme="default"
+        :disabled="secondClick"
+        :title="$t(`m.treeinfo['取消']`)"
+        @click="closeShow"
+      >
+        {{ $t('m.treeinfo["取消"]') }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

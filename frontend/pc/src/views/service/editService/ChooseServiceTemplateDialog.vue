@@ -21,49 +21,49 @@
   -->
 
 <template>
-    <bk-dialog
-        data-test-id="service_dialog_serviceChoiceDialog"
-        render-directive="if"
-        ext-cls="choose-service-template-dialog"
-        :width="980"
-        :value="isShow"
-        :auto-close="false"
-        :show-footer="false"
-        @value-change="onDialogClose">
-        <div class="choose-service-template">
-            <h3 class="dialog-header">
-                <span class="dialog-name">{{ createInfo.name }}</span>
-                <bk-input
-                    v-if="createWay === 'created'"
-                    class="search-input"
-                    right-icon="bk-icon icon-search"
-                    :placeholder="$t(`m.common['请输入服务名称']`)"
-                    :clearable="true"
-                    @change="searchHandler">
-                </bk-input>
-            </h3>
-            <div class="dialog-body" v-bkloading="{ isLoading: loading }">
-                <ul class="template-list" v-if="templateList.length">
-                    <li class="template-item" v-for="(template, index) in templateList"
-                        :key="index"
-                        :data-test-id="`serviceTemplateList-li-${template.id}`"
-                        @click="onTemplateClick(template)">
-                        <p class="template-name" v-html="template.name"></p>
-                        <p class="template-time" v-if="createWay === 'recom'">{{ template.time }}</p>
-                    </li>
-                </ul>
-                <div class="service-empty" v-else>
-                    <div>
-                        <i class="bk-icon icon-empty"></i>
-                        <p class="text">
-                            <span v-if="!searchModel">暂无服务</span>
-                            <span v-else>{{ $t(`m.common['无匹配服务']`) }}</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+  <bk-dialog
+    data-test-id="service_dialog_serviceChoiceDialog"
+    render-directive="if"
+    ext-cls="choose-service-template-dialog"
+    :width="980"
+    :value="isShow"
+    :auto-close="false"
+    :show-footer="false"
+    @value-change="onDialogClose">
+    <div class="choose-service-template">
+      <h3 class="dialog-header">
+        <span class="dialog-name">{{ createInfo.name }}</span>
+        <bk-input
+          v-if="createWay === 'created'"
+          class="search-input"
+          right-icon="bk-icon icon-search"
+          :placeholder="$t(`m.common['请输入服务名称']`)"
+          :clearable="true"
+          @change="searchHandler">
+        </bk-input>
+      </h3>
+      <div class="dialog-body" v-bkloading="{ isLoading: loading }">
+        <ul class="template-list" v-if="templateList.length">
+          <li class="template-item" v-for="(template, index) in templateList"
+            :key="index"
+            :data-test-id="`serviceTemplateList-li-${template.id}`"
+            @click="onTemplateClick(template)">
+            <p class="template-name" v-html="template.name"></p>
+            <p class="template-time" v-if="createWay === 'recom'">{{ template.time }}</p>
+          </li>
+        </ul>
+        <div class="service-empty" v-else>
+          <div>
+            <i class="bk-icon icon-empty"></i>
+            <p class="text">
+              <span v-if="!searchModel">暂无服务</span>
+              <span v-else>{{ $t(`m.common['无匹配服务']`) }}</span>
+            </p>
+          </div>
         </div>
-    </bk-dialog>
+      </div>
+    </div>
+  </bk-dialog>
 </template>
 
 <script>

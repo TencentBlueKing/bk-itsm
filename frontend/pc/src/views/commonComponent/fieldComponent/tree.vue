@@ -21,40 +21,40 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <div class="bk-search-tree bk-form-width"
-                :class="{ 'bk-border-error': item.checkValue }"
-                v-bk-clickoutside="closeTree">
-                <div class="bk-search-tree-wrapper"
-                    :class="{ 'bkdisabled': disabled }"
-                    @click.stop="showTree">
-                    <span :class="{ 'bk-color-tree': treeSlectInfo.info.name }">
-                        {{treeSlectInfo.info.showName || $t(`m.newCommon["请选择"]`)}}
-                    </span>
-                    <i class="bk-select-angle bk-icon icon-framework"></i>
-                </div>
-                <transition name="common-fade">
-                    <template v-if="treeSlectInfo.show">
-                        <div class="bk-search-tree-content" v-if="treeSlectInfo.treeDataList.length">
-                            <export-tree
-                                :tree-data-list="treeSlectInfo.treeDataList"
-                                @toggle="toggleInfo"
-                                @toggleChildren="toggleChildren">
-                            </export-tree>
-                        </div>
-                        <div class="bk-search-tree-content" v-else>
-                            <p class="bk-search-tree-nodata">{{ $t('m.treeinfo["暂无数据"]') }}</p>
-                        </div>
-                    </template>
-                </transition>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <div class="bk-search-tree bk-form-width"
+        :class="{ 'bk-border-error': item.checkValue }"
+        v-bk-clickoutside="closeTree">
+        <div class="bk-search-tree-wrapper"
+          :class="{ 'bkdisabled': disabled }"
+          @click.stop="showTree">
+          <span :class="{ 'bk-color-tree': treeSlectInfo.info.name }">
+            {{treeSlectInfo.info.showName || $t(`m.newCommon["请选择"]`)}}
+          </span>
+          <i class="bk-select-angle bk-icon icon-framework"></i>
+        </div>
+        <transition name="common-fade">
+          <template v-if="treeSlectInfo.show">
+            <div class="bk-search-tree-content" v-if="treeSlectInfo.treeDataList.length">
+              <export-tree
+                :tree-data-list="treeSlectInfo.treeDataList"
+                @toggle="toggleInfo"
+                @toggleChildren="toggleChildren">
+              </export-tree>
             </div>
-        </bk-form-item>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-        </template>
-    </div>
+            <div class="bk-search-tree-content" v-else>
+              <p class="bk-search-tree-nodata">{{ $t('m.treeinfo["暂无数据"]') }}</p>
+            </div>
+          </template>
+        </transition>
+      </div>
+    </bk-form-item>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

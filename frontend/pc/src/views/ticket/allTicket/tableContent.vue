@@ -21,127 +21,127 @@
   -->
 
 <template>
-    <div class="all-ticket-table">
-        <bk-table style="margin-top: 15px;"
-            :data="allTicketList"
-            :pagination="pagination"
-            :size="setting.size"
-            :row-style="getRowStyle"
-            @sort-change="orderingClick"
-            @page-change="handlePageChange"
-            @page-limit-change="handlePageLimitChange">
-            <!-- 关注单据 -->
-            <bk-table-column
-                prop="remind_btn"
-                width="30">
-                <template slot-scope="{ row }">
-                    <bk-popover :content="!row.hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
-                        :interactive="false"
-                        placement="top">
-                        <div class="attention-icon">
-                            <i
-                                data-test-id="ticket_popover_unfollow"
-                                class="bk-itsm-icon icon-rate"
-                                @click="onChangeAttention(row)"></i>
-                            <i
-                                data-test-id="ticket_popover_follow"
-                                class="bk-itsm-icon icon-favorite"
-                                :class="{ 'is-attention': row.hasAttention }"
-                                @click="onChangeAttention(row)"></i>
-                        </div>
-                    </bk-popover>
-                </template>
-            </bk-table-column>
-            <bk-table-column
-                data-test-id="ticket_table_render"
-                v-for="field in setting.selectedFields"
-                :key="field.id"
-                :label="field.label"
-                :width="field.width"
-                :min-width="field.minWidth"
-                :sortable="field.sortable"
-                :prop="field.prop">
-                <div slot-scope="{ row }">
-                    <!-- 单号 -->
-                    <template v-if="field.id === 'id'">
-                        <column-sn :row="row" :from="from"></column-sn>
-                    </template>
-                    <!-- 类型 -->
-                    <template v-else-if="field.id === 'type'">
-                        <span :title="getServerType(row.service_type)">
-                            {{getServerType(row.service_type)}}
-                        </span>
-                    </template>
-                    <!-- 优先级 -->
-                    <template v-else-if="field.id === 'priority'">
-                        <span class="bk-priority-button" :style="priorityColor(row)">
-                            {{ row.priority_name || '--' }}
-                        </span>
-                    </template>
-                    <!-- 状态 -->
-                    <template v-else-if="field.id === 'status'">
-                        <span :title="row.current_status_display"
-                            class="bk-status-color-info"
-                            :style="getstatusColor(row)">
-                            {{ row.current_status_display || '--' }}
-                        </span>
-                    </template>
-                    <!-- 当前步骤 -->
-                    <template v-else-if="field.id === 'current_steps'">
-                        <column-current-step :row="row"></column-current-step>
-                    </template>
-                    <!-- 操作 -->
-                    <template v-else-if="field.id === 'operate'">
-                        <template v-if="row.can_comment || row.can_operate">
-                            <bk-button v-if="row.can_comment"
-                                data-test-id="ticket_button_appraise"
-                                theme="primary"
-                                text
-                                @click="checkOne(row)">
-                                {{ $t('m.tickets["满意度评价"]') }}
-                            </bk-button>
-                            <router-link
-                                data-test-id="ticket_link_detail"
-                                v-if="row.can_operate"
-                                target="_blank"
-                                class="table-link"
-                                :to="{ name: 'TicketDetail', query: { id: row.id, project_id: row.project_key, from } }">
-                                {{ $t('m.tickets["处理"]') }}
-                            </router-link>
-                        </template>
-                        <template v-else>
-                            <router-link
-                                data-test-id="ticket_link_view_details "
-                                class="table-link"
-                                target="_blank"
-                                :to="{ name: 'TicketDetail', query: { id: row.id, project_id: row.project_key, from } }">
-                                {{ $t('m.tickets["查看"]') }}
-                            </router-link>
-                        </template>
-                    </template>
-                    <template v-else>
-                        <span :title="row[field.id]">{{ row[field.id] || '--' }}</span>
-                    </template>
-                </div>
-            </bk-table-column>
+  <div class="all-ticket-table">
+    <bk-table style="margin-top: 15px;"
+      :data="allTicketList"
+      :pagination="pagination"
+      :size="setting.size"
+      :row-style="getRowStyle"
+      @sort-change="orderingClick"
+      @page-change="handlePageChange"
+      @page-limit-change="handlePageLimitChange">
+      <!-- 关注单据 -->
+      <bk-table-column
+        prop="remind_btn"
+        width="30">
+        <template slot-scope="{ row }">
+          <bk-popover :content="!row.hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
+            :interactive="false"
+            placement="top">
+            <div class="attention-icon">
+              <i
+                data-test-id="ticket_popover_unfollow"
+                class="bk-itsm-icon icon-rate"
+                @click="onChangeAttention(row)"></i>
+              <i
+                data-test-id="ticket_popover_follow"
+                class="bk-itsm-icon icon-favorite"
+                :class="{ 'is-attention': row.hasAttention }"
+                @click="onChangeAttention(row)"></i>
+            </div>
+          </bk-popover>
+        </template>
+      </bk-table-column>
+      <bk-table-column
+        data-test-id="ticket_table_render"
+        v-for="field in setting.selectedFields"
+        :key="field.id"
+        :label="field.label"
+        :width="field.width"
+        :min-width="field.minWidth"
+        :sortable="field.sortable"
+        :prop="field.prop">
+        <div slot-scope="{ row }">
+          <!-- 单号 -->
+          <template v-if="field.id === 'id'">
+            <column-sn :row="row" :from="from"></column-sn>
+          </template>
+          <!-- 类型 -->
+          <template v-else-if="field.id === 'type'">
+            <span :title="getServerType(row.service_type)">
+              {{getServerType(row.service_type)}}
+            </span>
+          </template>
+          <!-- 优先级 -->
+          <template v-else-if="field.id === 'priority'">
+            <span class="bk-priority-button" :style="priorityColor(row)">
+              {{ row.priority_name || '--' }}
+            </span>
+          </template>
+          <!-- 状态 -->
+          <template v-else-if="field.id === 'status'">
+            <span :title="row.current_status_display"
+              class="bk-status-color-info"
+              :style="getstatusColor(row)">
+              {{ row.current_status_display || '--' }}
+            </span>
+          </template>
+          <!-- 当前步骤 -->
+          <template v-else-if="field.id === 'current_steps'">
+            <column-current-step :row="row"></column-current-step>
+          </template>
+          <!-- 操作 -->
+          <template v-else-if="field.id === 'operate'">
+            <template v-if="row.can_comment || row.can_operate">
+              <bk-button v-if="row.can_comment"
+                data-test-id="ticket_button_appraise"
+                theme="primary"
+                text
+                @click="checkOne(row)">
+                {{ $t('m.tickets["满意度评价"]') }}
+              </bk-button>
+              <router-link
+                data-test-id="ticket_link_detail"
+                v-if="row.can_operate"
+                target="_blank"
+                class="table-link"
+                :to="{ name: 'TicketDetail', query: { id: row.id, project_id: row.project_key, from } }">
+                {{ $t('m.tickets["处理"]') }}
+              </router-link>
+            </template>
+            <template v-else>
+              <router-link
+                data-test-id="ticket_link_view_details "
+                class="table-link"
+                target="_blank"
+                :to="{ name: 'TicketDetail', query: { id: row.id, project_id: row.project_key, from } }">
+                {{ $t('m.tickets["查看"]') }}
+              </router-link>
+            </template>
+          </template>
+          <template v-else>
+            <span :title="row[field.id]">{{ row[field.id] || '--' }}</span>
+          </template>
+        </div>
+      </bk-table-column>
 
-            <bk-table-column type="setting">
-                <bk-table-setting-content
-                    data-test-id="ticket_table_setting"
-                    :fields="setting.fields"
-                    :selected="setting.selectedFields"
-                    :size="setting.size"
-                    @setting-change="handleSettingChange">
-                </bk-table-setting-content>
-            </bk-table-column>
-        </bk-table>
-        <!-- 评价弹窗 -->
-        <evaluation-ticket-modal
-            ref="evaluationModal"
-            :ticket-info="ticketInfo"
-            @submitSuccess="evaluationSubmitSuccess">
-        </evaluation-ticket-modal>
-    </div>
+      <bk-table-column type="setting">
+        <bk-table-setting-content
+          data-test-id="ticket_table_setting"
+          :fields="setting.fields"
+          :selected="setting.selectedFields"
+          :size="setting.size"
+          @setting-change="handleSettingChange">
+        </bk-table-setting-content>
+      </bk-table-column>
+    </bk-table>
+    <!-- 评价弹窗 -->
+    <evaluation-ticket-modal
+      ref="evaluationModal"
+      :ticket-info="ticketInfo"
+      @submitSuccess="evaluationSubmitSuccess">
+    </evaluation-ticket-modal>
+  </div>
 </template>
 <script>
     import ColumnSn from '@/components/ticket/table/ColumnSn';

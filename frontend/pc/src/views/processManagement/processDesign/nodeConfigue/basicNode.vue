@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <div class="bk-basic-node">
-        <!-- <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
+  <div class="bk-basic-node">
+    <!-- <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
         </basic-card> -->
-        <basic-card>
-            <basic-info
-                ref="basic"
-                :node-info="configur"
-                :node-tag-list="nodeTagList"
-                :is-loading="isLoading"
-                :flow-info="flowInfo"
-                @baseFormInfoChange="baseFormInfoChange">
-            </basic-info>
-            <field-config
-                ref="field"
-                :is-show-title="true"
-                :flow-info="flowInfo"
-                :configur="configur">
-            </field-config>
-            <common-trigger-list
-                ref="commonTriggerList"
-                :origin="'state'"
-                :node-type="configur.type"
-                :source-id="flowInfo.id"
-                :sender="configur.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
-            <div class="bk-node-btn mt20">
-                <bk-button :theme="'primary'"
-                    data-test-id="basicNode-button-submit"
-                    :title="$t(`m.treeinfo['确定']`)"
-                    :loading="secondClick"
-                    class="mr10"
-                    @click="submitNode">
-                    {{$t(`m.treeinfo['确定']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="basicNode-button-close"
-                    :title="$t(`m.treeinfo['取消']`)"
-                    :loading="secondClick"
-                    class="mr10"
-                    @click="closeNode">
-                    {{$t(`m.treeinfo['取消']`)}}
-                </bk-button>
-            </div>
-        </basic-card>
-    </div>
+    <basic-card>
+      <basic-info
+        ref="basic"
+        :node-info="configur"
+        :node-tag-list="nodeTagList"
+        :is-loading="isLoading"
+        :flow-info="flowInfo"
+        @baseFormInfoChange="baseFormInfoChange">
+      </basic-info>
+      <field-config
+        ref="field"
+        :is-show-title="true"
+        :flow-info="flowInfo"
+        :configur="configur">
+      </field-config>
+      <common-trigger-list
+        ref="commonTriggerList"
+        :origin="'state'"
+        :node-type="configur.type"
+        :source-id="flowInfo.id"
+        :sender="configur.id"
+        :table="flowInfo.table">
+      </common-trigger-list>
+      <div class="bk-node-btn mt20">
+        <bk-button :theme="'primary'"
+          data-test-id="basicNode-button-submit"
+          :title="$t(`m.treeinfo['确定']`)"
+          :loading="secondClick"
+          class="mr10"
+          @click="submitNode">
+          {{$t(`m.treeinfo['确定']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="basicNode-button-close"
+          :title="$t(`m.treeinfo['取消']`)"
+          :loading="secondClick"
+          class="mr10"
+          @click="closeNode">
+          {{$t(`m.treeinfo['取消']`)}}
+        </bk-button>
+      </div>
+    </basic-card>
+  </div>
 </template>
 <script>
     import basicInfo from './components/basicInfo.vue';

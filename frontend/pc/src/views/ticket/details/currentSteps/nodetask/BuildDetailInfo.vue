@@ -21,28 +21,28 @@
   -->
 
 <template>
-    <div class="build-detail-info">
-        <!-- Info -->
-        <div class="base-info">
-            <h3 class="setion-title">Info</h3>
-            <ul class="basic-list block">
-                <li class="basic-item" v-for="(item, index) in infoList" :key="index">
-                    <span class="basic-name" style="width: 100px">{{ item.name }}：</span>
-                    <span class="basic-value">
-                        {{ item.value }}
-                    </span>
-                </li>
-            </ul>
-        </div>
-        <!-- 变量 -->
-        <div class="base-info mt30">
-            <bk-table
-                :data="buildItem.properties">
-                <bk-table-column label="键" prop="key" width="180"></bk-table-column>
-                <bk-table-column label="值" prop="value"></bk-table-column>
-            </bk-table>
-        </div>
+  <div class="build-detail-info">
+    <!-- Info -->
+    <div class="base-info">
+      <h3 class="setion-title">Info</h3>
+      <ul class="basic-list block">
+        <li class="basic-item" v-for="(item, index) in infoList" :key="index">
+          <span class="basic-name" style="width: 100px">{{ item.name }}：</span>
+          <span class="basic-value">
+            {{ item.value }}
+          </span>
+        </li>
+      </ul>
     </div>
+    <!-- 变量 -->
+    <div class="base-info mt30">
+      <bk-table
+        :data="buildItem.properties">
+        <bk-table-column label="键" prop="key" width="180"></bk-table-column>
+        <bk-table-column label="值" prop="value"></bk-table-column>
+      </bk-table>
+    </div>
+  </div>
 </template>
 
 <script>

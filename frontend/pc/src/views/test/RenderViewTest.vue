@@ -1,20 +1,20 @@
 <template>
-    <div class="test-page">
-        <div class="display-view">
-            <render-view
-                v-if="!errMessage"
-                :form-data="formData"
-                :context="context">
-            </render-view>
-            <div v-else class="error-tips">
-                {{ errMessage }}
-            </div>
-        </div>
-        <div class="editor">
-            <code-editor v-model="jsonConfigStr" :options="editorConfig">
-            </code-editor>
-        </div>
+  <div class="test-page">
+    <div class="display-view">
+      <render-view
+        v-if="!errMessage"
+        :form-data="formData"
+        :context="context">
+      </render-view>
+      <div v-else class="error-tips">
+        {{ errMessage }}
+      </div>
     </div>
+    <div class="editor">
+      <code-editor v-model="jsonConfigStr" :options="editorConfig">
+      </code-editor>
+    </div>
+  </div>
 </template>
 
 <script>

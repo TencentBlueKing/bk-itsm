@@ -21,57 +21,57 @@
   -->
 
 <template>
-    <div class="devops-preview" :class="{ 'full-screen': isFullScreen }">
-        <header class="devops-header">
-            <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen()"></i>
-            <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
-                <i class="bk-itsm-icon icon-order-close"></i>
-                <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
-            </span>
-        </header>
-        <section class="devops-preview-wrap">
-            <div class="devops-preview-body">
-                <div class="stage" v-for="(stage, sIndex) in stages" :key="stage.id">
-                    <span class="stage-connect-line"></span>
-                    <h4 class="stage-name">{{ stage.name }}</h4>
-                    <ul class="containers" v-for="(container, cIndex) in stage.containers" :key="container.id">
-                        <svg
-                            v-if="sIndex !== 0"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            width="60"
-                            :style="getSvgStyle(stage, cIndex)"
-                            :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
-                            class="container-connect-line left">
-                            <path :d="getPath(stage, cIndex)"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            width="60"
-                            :style="getSvgStyle(stage, cIndex)"
-                            :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
-                            class="container-connect-line">
-                            <path :d="getPath(stage, cIndex)"></path>
-                        </svg>
-                        <li class="element container-title">
-                            {{ container.name }}
-                            <span v-if="sIndex !== 0" class="semicircle"></span>
-                            <span v-if="sIndex !== 0" class="triangle"></span>
-                        </li>
-                        <li v-for="element in container.elements"
-                            :key="element.id"
-                            :class="['element', { 'not-execute': !isElementCanExecute(element) }]">
-                            {{ element.name }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div v-if="loading" class="loading">
-                <i class="bk-itsm-icon icon-icon-loading"></i>
-                <span>{{ $t(`m.tickets['预览正在加载中']`) }}</span>
-            </div>
-        </section>
-    </div>
+  <div class="devops-preview" :class="{ 'full-screen': isFullScreen }">
+    <header class="devops-header">
+      <i v-if="!isFullScreen" class="bk-itsm-icon icon-order-open" @click.stop="openFullScreen()"></i>
+      <span v-else class="exit-full-screen" @click.stop="onCloseFullScreen">
+        <i class="bk-itsm-icon icon-order-close"></i>
+        <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+      </span>
+    </header>
+    <section class="devops-preview-wrap">
+      <div class="devops-preview-body">
+        <div class="stage" v-for="(stage, sIndex) in stages" :key="stage.id">
+          <span class="stage-connect-line"></span>
+          <h4 class="stage-name">{{ stage.name }}</h4>
+          <ul class="containers" v-for="(container, cIndex) in stage.containers" :key="container.id">
+            <svg
+              v-if="sIndex !== 0"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              width="60"
+              :style="getSvgStyle(stage, cIndex)"
+              :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
+              class="container-connect-line left">
+              <path :d="getPath(stage, cIndex)"></path>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              width="60"
+              :style="getSvgStyle(stage, cIndex)"
+              :height="cIndex === 0 ? 70 : (stage.containers[cIndex - 1].elements.length + 1) * 56"
+              class="container-connect-line">
+              <path :d="getPath(stage, cIndex)"></path>
+            </svg>
+            <li class="element container-title">
+              {{ container.name }}
+              <span v-if="sIndex !== 0" class="semicircle"></span>
+              <span v-if="sIndex !== 0" class="triangle"></span>
+            </li>
+            <li v-for="element in container.elements"
+              :key="element.id"
+              :class="['element', { 'not-execute': !isElementCanExecute(element) }]">
+              {{ element.name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div v-if="loading" class="loading">
+        <i class="bk-itsm-icon icon-icon-loading"></i>
+        <span>{{ $t(`m.tickets['预览正在加载中']`) }}</span>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script>

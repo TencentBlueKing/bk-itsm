@@ -21,51 +21,51 @@
   -->
 
 <template>
-    <div class="bk-current-node">
-        <div class="bk-current-info" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
-            <template v-if="!basicInfomation.is_over">
-                <template v-if="currentStepList.length !== 0">
-                    <current-step-item
-                        v-for="(item, index) in currentStepList"
-                        :key="index"
-                        :index="index"
-                        :node-info="item"
-                        :node-list="nodeList"
-                        :is-show-assgin="isShowAssgin"
-                        :ticket-info="basicInfomation"
-                        :all-groups="allGroups"
-                        :read-only="readOnly"
-                        :is-last-node="index === currentStepList.length - 1"
-                        :node-trigger-list="nodeTriggerList"
-                        :all-field-list="allFieldList"
-                        @successFn="successFn">
-                    </current-step-item>
-                </template>
-                <template v-else>
-                    <!-- 暂无内容 -->
-                    <bk-exception
-                        class="ui-empty"
-                        type="empty"
-                        scene="part">
-                        {{$t('m.newCommon["您暂无任务需要处理"]')}}
-                    </bk-exception>
-                </template>
-            </template>
-            <template v-else>
-                <!-- 暂无内容 -->
-                <div class="bk-no-content bk-no-status">
-                    <template v-if="basicInfomation.current_status === 'TERMINATED'">
-                        <img src="../../../../images/orderStop.png">
-                        <p>{{ $t('m.newCommon["该单据已被终止"]') }}</p>
-                    </template>
-                    <template v-else>
-                        <img src="../../../../images/orderFinished.png">
-                        <p>{{ $t('m.newCommon["该单据已结束"]') }}</p>
-                    </template>
-                </div>
-            </template>
+  <div class="bk-current-node">
+    <div class="bk-current-info" :class="{ 'bk-current-padding': openStatus }" v-bkloading="{ isLoading: loading }">
+      <template v-if="!basicInfomation.is_over">
+        <template v-if="currentStepList.length !== 0">
+          <current-step-item
+            v-for="(item, index) in currentStepList"
+            :key="index"
+            :index="index"
+            :node-info="item"
+            :node-list="nodeList"
+            :is-show-assgin="isShowAssgin"
+            :ticket-info="basicInfomation"
+            :all-groups="allGroups"
+            :read-only="readOnly"
+            :is-last-node="index === currentStepList.length - 1"
+            :node-trigger-list="nodeTriggerList"
+            :all-field-list="allFieldList"
+            @successFn="successFn">
+          </current-step-item>
+        </template>
+        <template v-else>
+          <!-- 暂无内容 -->
+          <bk-exception
+            class="ui-empty"
+            type="empty"
+            scene="part">
+            {{$t('m.newCommon["您暂无任务需要处理"]')}}
+          </bk-exception>
+        </template>
+      </template>
+      <template v-else>
+        <!-- 暂无内容 -->
+        <div class="bk-no-content bk-no-status">
+          <template v-if="basicInfomation.current_status === 'TERMINATED'">
+            <img src="../../../../images/orderStop.png">
+            <p>{{ $t('m.newCommon["该单据已被终止"]') }}</p>
+          </template>
+          <template v-else>
+            <img src="../../../../images/orderFinished.png">
+            <p>{{ $t('m.newCommon["该单据已结束"]') }}</p>
+          </template>
         </div>
+      </template>
     </div>
+  </div>
 </template>
 
 <script>

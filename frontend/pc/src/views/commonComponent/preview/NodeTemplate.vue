@@ -21,66 +21,66 @@
   -->
 
 <template>
-    <div
-        data-test-id="node_template_view"
-        class="bk-flow-location"
-        @mousedown="movdeDoneFn"
-        @mousemove="moveFn"
-        @mouseup="onNodeClick(node, $event)">
-        <div v-if="node.type === 'START'" class="startpoint">
-            {{ $t('m.treeinfo["开始"]') }}
-        </div>
-        <div v-if="node.type === 'END'" class="endpoint">
-            {{ $t('m.treeinfo["结束"]') }}
-        </div>
-        <template v-for="(item, index) in typeList" v-if="node.type === item.type">
-            <div class="common-node" :class="{ 'common-auto': item.type === 'TASK' }" :key="index">
-                <span class="bk-tool-span"
-                    v-if="node.nodeInfo.statusInfo === 'WAIT'"
-                    v-bk-tooltips.top="$t(`m.treeinfo['任务未执行，无法查看']`)"></span>
-                <span class="common-auto-icon"
-                    :class="{
-                        'bk-is-draft': node.nodeInfo.is_draft,
-                        'bk-is-success': node.nodeInfo.statusInfo === 'FINISHED',
-                        'bk-is-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'),
-                        'bk-is-preview': node.nodeInfo.statusInfo === 'WAIT' }">
-                    <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
-                    <span v-else style="font-size: 12px; font-weight: bold;">API</span>
-                </span>
-                <span class="bk-more-word"
-                    :class="{
-                        'bk-more-padding': (previewInfo.canClick && node.nodeInfo.statusInfo !== 'WAIT'),
-                        'bk-word-success': node.nodeInfo.statusInfo === 'FINISHED',
-                        'bk-word-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'),
-                        'bk-word-preview': node.nodeInfo.statusInfo === 'WAIT',
-                        'bk-word-normal': normalColor
-                    }">
-                    {{node.name || $t(`m.treeinfo["新增节点"]`)}}</span>
-                <template v-if="previewInfo.canClick && node.nodeInfo.statusInfo !== 'WAIT'">
-                    <div class="bk-icon-status"
-                        :class="{ 'bk-icon-success': node.nodeInfo.statusInfo === 'FINISHED', 'bk-icon-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED') }">
-                        <i class="bk-icon icon-check-1"
-                            v-if="node.nodeInfo.statusInfo === 'FINISHED'"
-                            v-bk-tooltips.top="$t(`m.treeinfo['已通过']`)"></i>
-                        <i class="bk-icon icon-close"
-                            v-if="(node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED')"
-                            v-bk-tooltips.top="node.nodeInfo.statusInfo === 'TERMINATED' ? $t(`m.treeinfo['被终止']`) : $t(`m.treeinfo['失败']`)"></i>
-                        <img src="../../../images/loading_info.svg"
-                            v-if="(node.nodeInfo.statusInfo === 'RUNNING' || node.nodeInfo.statusInfo === 'SUSPEND')"
-                            class="bk-rotation">
-                    </div>
-                </template>
-            </div>
-        </template>
-        <!-- 网关节点 -->
-        <div v-if="node.type === 'ROUTER-P'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-convergence"></i>
-        </div>
-        <!-- 汇聚节点 -->
-        <div v-if="node.type === 'COVERAGE'" class="common-branch">
-            <i class="bk-itsm-icon icon-flow-branch"></i>
-        </div>
+  <div
+    data-test-id="node_template_view"
+    class="bk-flow-location"
+    @mousedown="movdeDoneFn"
+    @mousemove="moveFn"
+    @mouseup="onNodeClick(node, $event)">
+    <div v-if="node.type === 'START'" class="startpoint">
+      {{ $t('m.treeinfo["开始"]') }}
     </div>
+    <div v-if="node.type === 'END'" class="endpoint">
+      {{ $t('m.treeinfo["结束"]') }}
+    </div>
+    <template v-for="(item, index) in typeList" v-if="node.type === item.type">
+      <div class="common-node" :class="{ 'common-auto': item.type === 'TASK' }" :key="index">
+        <span class="bk-tool-span"
+          v-if="node.nodeInfo.statusInfo === 'WAIT'"
+          v-bk-tooltips.top="$t(`m.treeinfo['任务未执行，无法查看']`)"></span>
+        <span class="common-auto-icon"
+          :class="{
+            'bk-is-draft': node.nodeInfo.is_draft,
+            'bk-is-success': node.nodeInfo.statusInfo === 'FINISHED',
+            'bk-is-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'),
+            'bk-is-preview': node.nodeInfo.statusInfo === 'WAIT' }">
+          <i class="bk-itsm-icon" :class="item.iconStyle" v-if="item.type !== 'TASK'"></i>
+          <span v-else style="font-size: 12px; font-weight: bold;">API</span>
+        </span>
+        <span class="bk-more-word"
+          :class="{
+            'bk-more-padding': (previewInfo.canClick && node.nodeInfo.statusInfo !== 'WAIT'),
+            'bk-word-success': node.nodeInfo.statusInfo === 'FINISHED',
+            'bk-word-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED'),
+            'bk-word-preview': node.nodeInfo.statusInfo === 'WAIT',
+            'bk-word-normal': normalColor
+          }">
+          {{node.name || $t(`m.treeinfo["新增节点"]`)}}</span>
+        <template v-if="previewInfo.canClick && node.nodeInfo.statusInfo !== 'WAIT'">
+          <div class="bk-icon-status"
+            :class="{ 'bk-icon-success': node.nodeInfo.statusInfo === 'FINISHED', 'bk-icon-error': (node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED') }">
+            <i class="bk-icon icon-check-1"
+              v-if="node.nodeInfo.statusInfo === 'FINISHED'"
+              v-bk-tooltips.top="$t(`m.treeinfo['已通过']`)"></i>
+            <i class="bk-icon icon-close"
+              v-if="(node.nodeInfo.statusInfo === 'TERMINATED' || node.nodeInfo.statusInfo === 'FAILED')"
+              v-bk-tooltips.top="node.nodeInfo.statusInfo === 'TERMINATED' ? $t(`m.treeinfo['被终止']`) : $t(`m.treeinfo['失败']`)"></i>
+            <img src="../../../images/loading_info.svg"
+              v-if="(node.nodeInfo.statusInfo === 'RUNNING' || node.nodeInfo.statusInfo === 'SUSPEND')"
+              class="bk-rotation">
+          </div>
+        </template>
+      </div>
+    </template>
+    <!-- 网关节点 -->
+    <div v-if="node.type === 'ROUTER-P'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-convergence"></i>
+    </div>
+    <!-- 汇聚节点 -->
+    <div v-if="node.type === 'COVERAGE'" class="common-branch">
+      <i class="bk-itsm-icon icon-flow-branch"></i>
+    </div>
+  </div>
 </template>
 <script>
     export default {

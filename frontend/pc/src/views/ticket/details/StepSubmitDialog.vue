@@ -21,84 +21,84 @@
   -->
 
 <template>
-    <div class="bk-dialog-form bk-dialog-up">
-        <bk-dialog
-            v-model="dialogSetting.isShow"
-            :render-directive="'if'"
-            :title="dialogSetting.title"
-            :width="dialogSetting.width"
-            :header-position="dialogSetting.headerPosition"
-            :loading="secondClick"
-            :auto-close="dialogSetting.autoClose"
-            :mask-close="dialogSetting.autoClose"
-            @confirm="submitValidate"
-            @cancel="cancelForm"
-        >
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="formInfo"
-                ref="ticketForm"
-                :rules="rules"
+  <div class="bk-dialog-form bk-dialog-up">
+    <bk-dialog
+      v-model="dialogSetting.isShow"
+      :render-directive="'if'"
+      :title="dialogSetting.title"
+      :width="dialogSetting.width"
+      :header-position="dialogSetting.headerPosition"
+      :loading="secondClick"
+      :auto-close="dialogSetting.autoClose"
+      :mask-close="dialogSetting.autoClose"
+      @confirm="submitValidate"
+      @cancel="cancelForm"
+    >
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="formInfo"
+        ref="ticketForm"
+        :rules="rules"
+      >
+        <template v-if="ticketOperateType === 'suspend'">
+          <bk-form-item
+            :label="$t(`m.newCommon['挂起原因']`)"
+            :desc="
+              $t(
+                `m.slaContent['挂起后单据流程将停止运行，且不计入SLA时长']`
+              )
+            "
+            :required="true"
+            :property="'suspend_message'"
+          >
+            <bk-input
+              :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
+              :type="'textarea'"
+              :rows="3"
+              v-model="formInfo.suspend_message"
             >
-                <template v-if="ticketOperateType === 'suspend'">
-                    <bk-form-item
-                        :label="$t(`m.newCommon['挂起原因']`)"
-                        :desc="
-                            $t(
-                                `m.slaContent['挂起后单据流程将停止运行，且不计入SLA时长']`
-                            )
-                        "
-                        :required="true"
-                        :property="'suspend_message'"
-                    >
-                        <bk-input
-                            :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
-                            :type="'textarea'"
-                            :rows="3"
-                            v-model="formInfo.suspend_message"
-                        >
-                        </bk-input>
-                    </bk-form-item>
-                </template>
-                <template v-if="ticketOperateType === 'close'">
-                    <bk-form-item
-                        :label="$t(`m.newCommon['关闭状态']`)"
-                        :required="true"
-                        :property="'closeState'"
-                    >
-                        <bk-select
-                            v-model="formInfo.closeState"
-                            searchable
-                            :font-size="'medium'"
-                            :clearable="falseStatus"
-                        >
-                            <bk-option
-                                v-for="option in endList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name"
-                            >
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.newCommon['关闭原因']`)"
-                        :required="true"
-                        :property="'close_message'"
-                    >
-                        <bk-input
-                            :placeholder="$t(`m.newCommon['请输入关闭原因']`)"
-                            :type="'textarea'"
-                            :rows="3"
-                            v-model="formInfo.close_message"
-                        >
-                        </bk-input>
-                    </bk-form-item>
-                </template>
-            </bk-form>
-        </bk-dialog>
-    </div>
+            </bk-input>
+          </bk-form-item>
+        </template>
+        <template v-if="ticketOperateType === 'close'">
+          <bk-form-item
+            :label="$t(`m.newCommon['关闭状态']`)"
+            :required="true"
+            :property="'closeState'"
+          >
+            <bk-select
+              v-model="formInfo.closeState"
+              searchable
+              :font-size="'medium'"
+              :clearable="falseStatus"
+            >
+              <bk-option
+                v-for="option in endList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name"
+              >
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.newCommon['关闭原因']`)"
+            :required="true"
+            :property="'close_message'"
+          >
+            <bk-input
+              :placeholder="$t(`m.newCommon['请输入关闭原因']`)"
+              :type="'textarea'"
+              :rows="3"
+              v-model="formInfo.close_message"
+            >
+            </bk-input>
+          </bk-form-item>
+        </template>
+      </bk-form>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

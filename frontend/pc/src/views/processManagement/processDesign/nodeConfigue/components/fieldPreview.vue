@@ -21,21 +21,21 @@
   -->
 
 <template>
-    <div class="bk-field-preview" id="bkPreview">
-        <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-            <template v-for="(item, index) in fields">
-                <div :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }" v-if="item.showFeild" :key="index">
-                    <component
-                        :is="'CW-' + item.type"
-                        :item="item"
-                        :fields="fields"
-                        :is-preview="isPreview"
-                        :is-file-preview="isFilePreview">
-                    </component>
-                </div>
-            </template>
-        </bk-form>
-    </div>
+  <div class="bk-field-preview" id="bkPreview">
+    <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
+      <template v-for="(item, index) in fields">
+        <div :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }" v-if="item.showFeild" :key="index">
+          <component
+            :is="'CW-' + item.type"
+            :item="item"
+            :fields="fields"
+            :is-preview="isPreview"
+            :is-file-preview="isFilePreview">
+          </component>
+        </div>
+      </template>
+    </bk-form>
+  </div>
 </template>
 <script>
     import string from '../../../../commonComponent/fieldComponent/string.vue';

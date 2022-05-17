@@ -21,82 +21,82 @@
   -->
 
 <template>
-    <bk-dialog
-        :value="isShow"
-        :render-directive="'if'"
-        :width="exportInfo.width"
-        :header-position="exportInfo.headerPosition"
-        :loading="false"
-        :auto-close="false"
-        :mask-close="false"
-        :title="$t(`m.tickets['请勾选需要导出的字段']`)"
-        @cancel="cancelExport">
-        <div class="export-content" v-bkloading="{ isLoading: exportInfo.serviceFieldLoading }">
-            <h3 class="export-section-title">{{ $t(`m.tickets['通用字段']`) }}</h3>
-            <p class="pb20">
-                <bk-checkbox
-                    :true-value="true"
-                    :false-value="false"
-                    v-model="exportInfo.allCheck"
-                    @change="checkAll">
-                    {{ $t(`m.tickets['全选']`) }}
-                </bk-checkbox>
-            </p>
-            <bk-checkbox-group v-model="exportInfo.checkList">
-                <template v-for="item in exportFieldsList">
-                    <bk-checkbox
-                        :value="item.id"
-                        :key="item.id"
-                        class="mr10 mb10"
-                        @change="checkOne(item)">
-                        {{item.name}}
-                    </bk-checkbox>
-                </template>
-            </bk-checkbox-group>
-            <!-- 单服务提单信息 -->
-            <h3 class="export-section-title">{{ $t(`m.tickets['提单字段']`) }}</h3>
-            <template v-if="exportInfo.serviceFieldsList.length">
-                <bk-checkbox-group v-model="exportInfo.serviceCheckList">
-                    <template v-for="item in exportInfo.serviceFieldsList">
-                        <bk-checkbox
-                            :value="item.id"
-                            :key="item.id"
-                            :disabled="item.disabled"
-                            class="mr10 mb10">
-                            {{item.name}}
-                        </bk-checkbox>
-                    </template>
-                </bk-checkbox-group>
-            </template>
-            <p v-else class="export-section-desc">{{ $t(`m.tickets['未指定服务，请先选择服务：']`) }}
-                <bk-select
-                    v-model="exportInfo.serviceId"
-                    ext-cls="export-service-select"
-                    searchable
-                    :loading="serviceListLoading"
-                    @change="onServiceChange">
-                    <bk-option v-for="option in exportInfo.serviceList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </p>
-        </div>
-        <div slot="footer">
-            <bk-button
-                theme="primary"
-                :disabled="!exportInfo.checkList.length && !exportInfo.serviceCheckList.length"
-                @click="submitExport">
-                {{ $t('m.treeinfo["确定"]') }}
-            </bk-button>
-            <bk-button
-                theme="default"
-                @click="cancelExport">
-                {{ $t('m.newCommon["取消"]') }}
-            </bk-button>
-        </div>
-    </bk-dialog>
+  <bk-dialog
+    :value="isShow"
+    :render-directive="'if'"
+    :width="exportInfo.width"
+    :header-position="exportInfo.headerPosition"
+    :loading="false"
+    :auto-close="false"
+    :mask-close="false"
+    :title="$t(`m.tickets['请勾选需要导出的字段']`)"
+    @cancel="cancelExport">
+    <div class="export-content" v-bkloading="{ isLoading: exportInfo.serviceFieldLoading }">
+      <h3 class="export-section-title">{{ $t(`m.tickets['通用字段']`) }}</h3>
+      <p class="pb20">
+        <bk-checkbox
+          :true-value="true"
+          :false-value="false"
+          v-model="exportInfo.allCheck"
+          @change="checkAll">
+          {{ $t(`m.tickets['全选']`) }}
+        </bk-checkbox>
+      </p>
+      <bk-checkbox-group v-model="exportInfo.checkList">
+        <template v-for="item in exportFieldsList">
+          <bk-checkbox
+            :value="item.id"
+            :key="item.id"
+            class="mr10 mb10"
+            @change="checkOne(item)">
+            {{item.name}}
+          </bk-checkbox>
+        </template>
+      </bk-checkbox-group>
+      <!-- 单服务提单信息 -->
+      <h3 class="export-section-title">{{ $t(`m.tickets['提单字段']`) }}</h3>
+      <template v-if="exportInfo.serviceFieldsList.length">
+        <bk-checkbox-group v-model="exportInfo.serviceCheckList">
+          <template v-for="item in exportInfo.serviceFieldsList">
+            <bk-checkbox
+              :value="item.id"
+              :key="item.id"
+              :disabled="item.disabled"
+              class="mr10 mb10">
+              {{item.name}}
+            </bk-checkbox>
+          </template>
+        </bk-checkbox-group>
+      </template>
+      <p v-else class="export-section-desc">{{ $t(`m.tickets['未指定服务，请先选择服务：']`) }}
+        <bk-select
+          v-model="exportInfo.serviceId"
+          ext-cls="export-service-select"
+          searchable
+          :loading="serviceListLoading"
+          @change="onServiceChange">
+          <bk-option v-for="option in exportInfo.serviceList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </p>
+    </div>
+    <div slot="footer">
+      <bk-button
+        theme="primary"
+        :disabled="!exportInfo.checkList.length && !exportInfo.serviceCheckList.length"
+        @click="submitExport">
+        {{ $t('m.treeinfo["确定"]') }}
+      </bk-button>
+      <bk-button
+        theme="default"
+        @click="cancelExport">
+        {{ $t('m.newCommon["取消"]') }}
+      </bk-button>
+    </div>
+  </bk-dialog>
 </template>
 
 <script>

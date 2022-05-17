@@ -21,34 +21,34 @@
   -->
 
 <template>
-    <bk-dialog
-        render-directive="if"
-        :width="635"
-        :value="isShow"
-        :mask-close="false"
-        :auto-close="false"
-        :title="$t(`m.manageCommon['审批']`)"
-        :loading="approvalConfirmBtnLoading"
-        @confirm="onApprovalConfirm"
-        @cancel="onApprovalCancel">
-        <bk-form ref="approvalForm" :model="formData" :rules="formRules">
-            <bk-form-item :label="$t(`m.managePage['审批结果']`)" :label-width="140">
-                <bk-radio-group v-if="approvalInfo.showAllOption"
-                    v-model="approvalInfo.result">
-                    <bk-radio :value="true" class="mr50">{{ $t(`m.managePage['通过']`) }}</bk-radio>
-                    <bk-radio :value="false">{{ $t(`m.manageCommon['拒绝']`) }}</bk-radio>
-                </bk-radio-group>
-                <span v-else
-                    :class="['result-tag', approvalInfo.result ? '' : 'reject']">
-                    {{ approvalInfo.result ? $t(`m.managePage['通过']`) : $t(`m.manageCommon['拒绝']`) }}
-                </span>
-            </bk-form-item>
+  <bk-dialog
+    render-directive="if"
+    :width="635"
+    :value="isShow"
+    :mask-close="false"
+    :auto-close="false"
+    :title="$t(`m.manageCommon['审批']`)"
+    :loading="approvalConfirmBtnLoading"
+    @confirm="onApprovalConfirm"
+    @cancel="onApprovalCancel">
+    <bk-form ref="approvalForm" :model="formData" :rules="formRules">
+      <bk-form-item :label="$t(`m.managePage['审批结果']`)" :label-width="140">
+        <bk-radio-group v-if="approvalInfo.showAllOption"
+          v-model="approvalInfo.result">
+          <bk-radio :value="true" class="mr50">{{ $t(`m.managePage['通过']`) }}</bk-radio>
+          <bk-radio :value="false">{{ $t(`m.manageCommon['拒绝']`) }}</bk-radio>
+        </bk-radio-group>
+        <span v-else
+          :class="['result-tag', approvalInfo.result ? '' : 'reject']">
+          {{ approvalInfo.result ? $t(`m.managePage['通过']`) : $t(`m.manageCommon['拒绝']`) }}
+        </span>
+      </bk-form-item>
 
-            <bk-form-item :label="$t(`m.home['备注']`)" :label-width="140" :required="!approvalInfo.result" property="approvalNotice">
-                <bk-input type="textarea" :row="4" :maxlength="200" v-model="formData.approvalNotice"></bk-input>
-            </bk-form-item>
-        </bk-form>
-    </bk-dialog>
+      <bk-form-item :label="$t(`m.home['备注']`)" :label-width="140" :required="!approvalInfo.result" property="approvalNotice">
+        <bk-input type="textarea" :row="4" :maxlength="200" v-model="formData.approvalNotice"></bk-input>
+      </bk-form-item>
+    </bk-form>
+  </bk-dialog>
 </template>
 
 <script>

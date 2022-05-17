@@ -21,56 +21,56 @@
   -->
 
 <template>
-    <div class="bk-get-param">
-        <bk-table
-            :data="prcTable"
-            :size="'small'">
-            <bk-table-column :label="$t(`m.treeinfo['名称']`)" prop="name"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['必选']`)">
-                <template slot-scope="props">
-                    {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="150">
-                <template slot-scope="props">
-                    <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="300">
-                <template slot-scope="props">
-                    <div style="width: 120px; position: absolute; top: 5px; left: 15px;">
-                        <bk-select v-model="props.row.source_type"
-                            :clearable="false"
-                            searchable>
-                            <bk-option v-for="option in sourceTypeList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </div>
-                    <div v-if="props.row.source_type === 'CUSTOM'"
-                        style="width: 140px; position: absolute; top: 4px; right: 15px;">
-                        <bk-input :clearable="true"
-                            :placeholder="$t(`m.treeinfo['请输入参数值']`)"
-                            v-model="props.row.value">
-                        </bk-input>
-                    </div>
-                    <div v-else style="width: 140px; position: absolute; top: 4px; right: 15px;">
-                        <bk-select v-model="props.row.value_key"
-                            :clearable="false"
-                            searchable>
-                            <bk-option v-for="option in stateList"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </div>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="bk-get-param">
+    <bk-table
+      :data="prcTable"
+      :size="'small'">
+      <bk-table-column :label="$t(`m.treeinfo['名称']`)" prop="name"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['必选']`)">
+        <template slot-scope="props">
+          {{ props.row.is_necessary ? $t(`m.treeinfo["是"]`) : $t(`m.treeinfo["否"]`) }}
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="150">
+        <template slot-scope="props">
+          <span :title="props.row.desc">{{props.row.desc || '--'}}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="300">
+        <template slot-scope="props">
+          <div style="width: 120px; position: absolute; top: 5px; left: 15px;">
+            <bk-select v-model="props.row.source_type"
+              :clearable="false"
+              searchable>
+              <bk-option v-for="option in sourceTypeList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </div>
+          <div v-if="props.row.source_type === 'CUSTOM'"
+            style="width: 140px; position: absolute; top: 4px; right: 15px;">
+            <bk-input :clearable="true"
+              :placeholder="$t(`m.treeinfo['请输入参数值']`)"
+              v-model="props.row.value">
+            </bk-input>
+          </div>
+          <div v-else style="width: 140px; position: absolute; top: 4px; right: 15px;">
+            <bk-select v-model="props.row.value_key"
+              :clearable="false"
+              searchable>
+              <bk-option v-for="option in stateList"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </div>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>

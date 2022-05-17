@@ -21,48 +21,48 @@
   -->
 
 <template>
-    <div class="bk-sign-node-content" v-bkloading="{ isLoading: getLogFlag }">
-        <div class="bk-log-flow">
-            <template v-if="logs.length">
-                <time-line :line-list="logs" :parent="'sign'">
-                    <template v-slot:header="{ item }">
-                        <div class="bk-timeline-user-header">
-                            <span class="bk-inline-block bk-default-width"
-                                v-bk-tooltips.top="item.message">{{ item.message}}</span>
-                            <span class="bk-inline-block button" v-if="item.tag !== 'processors'">
-                                <span class="bk-inline-block isOn auto" @click="item.showMore = !item.showMore"
-                                    v-if="!item.showMore">{{ $t('m.newCommon["展开"]') }}
-                                    <i class="bk-icon icon-angle-down bk-selector-icon ml5"></i>
-                                </span>
-                                <span class="bk-inline-block isOff auto" @click="item.showMore = !item.showMore" v-else>{{ $t('m.newCommon["收起"]') }}<i class="bk-icon icon-angle-up bk-selector-icon ml5"></i>
-                                </span>
-                            </span>
-                        </div>
-                    </template>
-                    <template v-slot:content="{ item }">
-                        <div class="bk-timeline-user-content">
-                            <div v-if="item.showMore" class="bk-area-show-back">
-                                <!-- 静态展示 -->
-                                <template v-for="(ite, inde) in item.form_data">
-                                    <fields-done
-                                        :key="inde"
-                                        :item="ite"
-                                        origin="log"
-                                    ></fields-done>
-                                </template>
-                            </div>
-                            <div class="bk-timeline-user-footer">
-                                {{ item.operate_at }}
-                            </div>
-                        </div>
-                    </template>
-                </time-line>
-            </template>
-            <template v-else>
-                <p class="no-data">{{$t(`m.newCommon['暂无信息']`)}}</p>
-            </template>
-        </div>
+  <div class="bk-sign-node-content" v-bkloading="{ isLoading: getLogFlag }">
+    <div class="bk-log-flow">
+      <template v-if="logs.length">
+        <time-line :line-list="logs" :parent="'sign'">
+          <template v-slot:header="{ item }">
+            <div class="bk-timeline-user-header">
+              <span class="bk-inline-block bk-default-width"
+                v-bk-tooltips.top="item.message">{{ item.message}}</span>
+              <span class="bk-inline-block button" v-if="item.tag !== 'processors'">
+                <span class="bk-inline-block isOn auto" @click="item.showMore = !item.showMore"
+                  v-if="!item.showMore">{{ $t('m.newCommon["展开"]') }}
+                  <i class="bk-icon icon-angle-down bk-selector-icon ml5"></i>
+                </span>
+                <span class="bk-inline-block isOff auto" @click="item.showMore = !item.showMore" v-else>{{ $t('m.newCommon["收起"]') }}<i class="bk-icon icon-angle-up bk-selector-icon ml5"></i>
+                </span>
+              </span>
+            </div>
+          </template>
+          <template v-slot:content="{ item }">
+            <div class="bk-timeline-user-content">
+              <div v-if="item.showMore" class="bk-area-show-back">
+                <!-- 静态展示 -->
+                <template v-for="(ite, inde) in item.form_data">
+                  <fields-done
+                    :key="inde"
+                    :item="ite"
+                    origin="log"
+                  ></fields-done>
+                </template>
+              </div>
+              <div class="bk-timeline-user-footer">
+                {{ item.operate_at }}
+              </div>
+            </div>
+          </template>
+        </time-line>
+      </template>
+      <template v-else>
+        <p class="no-data">{{$t(`m.newCommon['暂无信息']`)}}</p>
+      </template>
     </div>
+  </div>
 </template>
 
 <script>

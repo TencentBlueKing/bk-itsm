@@ -22,31 +22,31 @@
 
 <!--    1104 人员名片展示-->
 <template>
-    <bk-popover
-        placement="bottom"
-        ext-cls="bk-business-card"
-        class="business-popover"
-        :on-show="showMessage"
-        trigger="click"
-        theme="light">
-        <i class="bk-icon icon-id" v-if="memberVal" ref="icon"></i>
-        <div slot="content">
-            <ul ref="message" class="bk-member-message" v-bkloading="{ isLoading: localLoading }">
-                <li v-for="(member, memIndex) in memberList"
-                    :key="memIndex"
-                    style="margin-bottom: 10px; overflow: hidden;">
-                    <p class="bk-message-name">{{member.username}}</p>
-                    <p class="bk-member-other"
-                        v-for="(person, personIndex) in memberValList"
-                        :key="personIndex"
-                        :title="member[person.type]">
-                        <span class="bk-member-label">{{person.name}} {{$t(`m.newCommon["："]`)}}</span>
-                        <pre class="bk-member-value">{{member[person.type] || '--'}}</pre>
-                    </p>
-                </li>
-            </ul>
-        </div>
-    </bk-popover>
+  <bk-popover
+    placement="bottom"
+    ext-cls="bk-business-card"
+    class="business-popover"
+    :on-show="showMessage"
+    trigger="click"
+    theme="light">
+    <i class="bk-icon icon-id" v-if="memberVal" ref="icon"></i>
+    <div slot="content">
+      <ul ref="message" class="bk-member-message" v-bkloading="{ isLoading: localLoading }">
+        <li v-for="(member, memIndex) in memberList"
+          :key="memIndex"
+          style="margin-bottom: 10px; overflow: hidden;">
+          <p class="bk-message-name">{{member.username}}</p>
+          <p class="bk-member-other"
+            v-for="(person, personIndex) in memberValList"
+            :key="personIndex"
+            :title="member[person.type]">
+            <span class="bk-member-label">{{person.name}} {{$t(`m.newCommon["："]`)}}</span>
+            <pre class="bk-member-value">{{member[person.type] || '--'}}</pre>
+          </p>
+        </li>
+      </ul>
+    </div>
+  </bk-popover>
 </template>
 
 <script>

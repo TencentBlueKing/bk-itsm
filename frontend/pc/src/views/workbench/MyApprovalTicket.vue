@@ -21,10 +21,10 @@
   -->
 
 <template>
-    <div class="my-approval-ticket-page">
-        <nav-title :title-name="$t(`m['待我审批']`)"></nav-title>
-        <approval-list></approval-list>
-    </div>
+  <div class="my-approval-ticket-page">
+    <nav-title :title-name="$t(`m['待我审批']`)"></nav-title>
+    <approval-list></approval-list>
+  </div>
 </template>
 <script>
     import NavTitle from '@/components/common/layout/NavTitle';

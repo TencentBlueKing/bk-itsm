@@ -21,128 +21,128 @@
   -->
 
 <template>
-    <div class="bk-get-param">
-        <div class="bk-params-title">
-            {{ $t('m.treeinfo["返回数据"]') }}
-        </div>
-        <!-- new -->
-        <div class="bk-param-three">
-            <!-- tree -->
-            <bk-form-item :label="$t(`m.treeinfo['选取数组']`)" :required="true">
-                <div class="bk-form-content bk-dialog-input">
-                    <div ref="cascader">
-                        <!-- 组织架构 -->
-                        <template>
-                            <div class="bk-search-tree" style="width: 100%; float: left;"
-                                v-bk-clickoutside="closeOther0">
-                                <template>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                        :class="{ 'bk-border-red': checkInfo.assignors, 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': organization.assignorTree.name }">{{organization.assignorTree.name || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-else
-                                        @click.stop="showTree(0)"
-                                        :class="{ 'bk-border-red': checkInfo.assignors, 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': organization.assignorTree.name }">{{organization.assignorTree.name || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                </template>
-
-                                <transition name="fade">
-                                    <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[0]"
-                                        :style="{ width: (maxLevelTree[0] * 50) + '%' }">
-                                        <export-tree
-                                            :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                            :tree-data-list="organization.assignorPerson"
-                                            :is-key-value="0"
-                                            @toggle="assignorToggle" @toggleChildren="toggleChildren"></export-tree>
-                                    </div>
-                                </transition>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.treeinfo['关键字字段']`)" :required="true">
-                <div class="bk-form-content bk-dialog-input">
-                    <div ref="cascader">
-                        <template>
-                            <div class="bk-search-tree" style="width: 100%; float: left;"
-                                v-bk-clickoutside="closeOther1">
-                                <template>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                        :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': settingKeyName }">{{settingKeyName || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-else
-                                        @click.stop="showTree(1)"
-                                        :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': settingKeyName }">{{settingKeyName || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                </template>
-
-                                <transition name="fade">
-                                    <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[1]"
-                                        :style="{ width: (maxLevelTree[1] * 50) + '%' }">
-                                        <export-tree
-                                            :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                            :tree-data-list="selectInfo.selectkeylist"
-                                            :is-key-value="1"
-                                            @toggle="assignorToggle" @toggleChildren="toggleChildren"></export-tree>
-                                    </div>
-                                </transition>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.treeinfo['显示字段']`)" :required="true">
-                <div class="bk-form-content bk-dialog-input">
-                    <div ref="cascader">
-                        <template>
-                            <div class="bk-search-tree" style="width: 100%; float: left;"
-                                v-bk-clickoutside="closeOther2">
-                                <template>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                        :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': settingValueName }">{{settingValueName || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                    <div class="bk-search-tree-wrapper"
-                                        v-else
-                                        @click.stop="showTree(2)"
-                                        :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
-                                        <span :class="{ 'bk-color-tree': settingValueName }">{{settingValueName || $t(`m.treeinfo["请选择"]`)}}</span>
-                                        <i class="bk-select-angle bk-icon icon-framework"></i>
-                                    </div>
-                                </template>
-
-                                <transition name="fade">
-                                    <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[2]"
-                                        :style="{ width: (maxLevelTree[2] * 50) + '%' }">
-                                        <export-tree
-                                            :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
-                                            :tree-data-list="selectInfo.selectvaluelist"
-                                            :is-key-value="2"
-                                            @toggle="assignorToggle"
-                                            @toggleChildren="toggleChildren"></export-tree>
-                                    </div>
-                                </transition>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </bk-form-item>
-        </div>
+  <div class="bk-get-param">
+    <div class="bk-params-title">
+      {{ $t('m.treeinfo["返回数据"]') }}
     </div>
+    <!-- new -->
+    <div class="bk-param-three">
+      <!-- tree -->
+      <bk-form-item :label="$t(`m.treeinfo['选取数组']`)" :required="true">
+        <div class="bk-form-content bk-dialog-input">
+          <div ref="cascader">
+            <!-- 组织架构 -->
+            <template>
+              <div class="bk-search-tree" style="width: 100%; float: left;"
+                v-bk-clickoutside="closeOther0">
+                <template>
+                  <div class="bk-search-tree-wrapper"
+                    v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                    :class="{ 'bk-border-red': checkInfo.assignors, 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': organization.assignorTree.name }">{{organization.assignorTree.name || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                  <div class="bk-search-tree-wrapper"
+                    v-else
+                    @click.stop="showTree(0)"
+                    :class="{ 'bk-border-red': checkInfo.assignors, 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': organization.assignorTree.name }">{{organization.assignorTree.name || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                </template>
+
+                <transition name="fade">
+                  <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[0]"
+                    :style="{ width: (maxLevelTree[0] * 50) + '%' }">
+                    <export-tree
+                      :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                      :tree-data-list="organization.assignorPerson"
+                      :is-key-value="0"
+                      @toggle="assignorToggle" @toggleChildren="toggleChildren"></export-tree>
+                  </div>
+                </transition>
+              </div>
+            </template>
+          </div>
+        </div>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.treeinfo['关键字字段']`)" :required="true">
+        <div class="bk-form-content bk-dialog-input">
+          <div ref="cascader">
+            <template>
+              <div class="bk-search-tree" style="width: 100%; float: left;"
+                v-bk-clickoutside="closeOther1">
+                <template>
+                  <div class="bk-search-tree-wrapper"
+                    v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                    :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': settingKeyName }">{{settingKeyName || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                  <div class="bk-search-tree-wrapper"
+                    v-else
+                    @click.stop="showTree(1)"
+                    :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': settingKeyName }">{{settingKeyName || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                </template>
+
+                <transition name="fade">
+                  <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[1]"
+                    :style="{ width: (maxLevelTree[1] * 50) + '%' }">
+                    <export-tree
+                      :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                      :tree-data-list="selectInfo.selectkeylist"
+                      :is-key-value="1"
+                      @toggle="assignorToggle" @toggleChildren="toggleChildren"></export-tree>
+                  </div>
+                </transition>
+              </div>
+            </template>
+          </div>
+        </div>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.treeinfo['显示字段']`)" :required="true">
+        <div class="bk-form-content bk-dialog-input">
+          <div ref="cascader">
+            <template>
+              <div class="bk-search-tree" style="width: 100%; float: left;"
+                v-bk-clickoutside="closeOther2">
+                <template>
+                  <div class="bk-search-tree-wrapper"
+                    v-if="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                    :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': settingValueName }">{{settingValueName || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                  <div class="bk-search-tree-wrapper"
+                    v-else
+                    @click.stop="showTree(2)"
+                    :class="{ 'bk-back-color': (changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id' }">
+                    <span :class="{ 'bk-color-tree': settingValueName }">{{settingValueName || $t(`m.treeinfo["请选择"]`)}}</span>
+                    <i class="bk-select-angle bk-icon icon-framework"></i>
+                  </div>
+                </template>
+
+                <transition name="fade">
+                  <div class="bk-search-tree-content" v-if="organizaInfo.assignorShow[2]"
+                    :style="{ width: (maxLevelTree[2] * 50) + '%' }">
+                    <export-tree
+                      :disabled="(changeInfo.is_builtin || formInfo.isModule) && formInfo.key !== 'bk_biz_id'"
+                      :tree-data-list="selectInfo.selectvaluelist"
+                      :is-key-value="2"
+                      @toggle="assignorToggle"
+                      @toggleChildren="toggleChildren"></export-tree>
+                  </div>
+                </transition>
+              </div>
+            </template>
+          </div>
+        </div>
+      </bk-form-item>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -21,153 +21,153 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form
-            ref="taskForm"
-            :model="item.sopsContent"
-            :rules="rules"
-            :label-width="200"
-            form-type="vertical">
-            <template v-if="!editTask">
-                <bk-form-item :label="$t(`m.newCommon['创建方式']`)" :required="true">
-                    <bk-radio-group v-model="item.sopsContent.createWay" @change="handleCreateWayChange">
-                        <bk-radio :disabled="disabled" class="bk-form-radio" :value="'template'">{{ $t(`m.newCommon["手动创建"]`) }}</bk-radio>
-                        <bk-radio :disabled="disabled" class="bk-form-radio" :value="'task'">{{ $t(`m.newCommon["关联未执行的任务"]`) }}</bk-radio>
-                        <bk-radio :disabled="disabled" class="bk-form-radio" :value="'started_task'">{{ $t(`m.newCommon["关联已执行的任务"]`) }}</bk-radio>
-                    </bk-radio-group>
-                </bk-form-item>
-                <bk-form-item :label="item.name" v-if="item.sopsContent.createWay === 'template'"
-                    :required="item.validate_type === 'REQUIRE'"
-                    :desc="item.tips"
-                    :ext-cls="'bk-line-height'"
-                    :property="'id'"
-                    :error-display-type="'normal'">
-                    <!-- 模板选择 -->
-                    <bk-select
-                        v-model="item.sopsContent.id"
-                        searchable
-                        @selected="onSelectTpl"
-                        ext-cls="form-item-inline-width mr5"
-                        :loading="loading.templateList"
-                        :disabled="typeInfo === 'RETRY' || disabled"
-                        :clearable="false">
-                        <bk-option
-                            v-for="(option, index) in templateList"
-                            :key="index"
-                            :name="option.name"
-                            :id="option.id">
-                        </bk-option>
-                    </bk-select>
-                    <!-- 方案选择 -->
-                    <bk-select
-                        v-if="item.sopsContent.id"
-                        v-model="item.sopsContent.planId"
-                        :loading="loading.plan"
-                        :disabled="disabled"
-                        multiple
-                        ext-cls="form-item-inline-width mr0"
-                        :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
-                        @selected="onplanSelect">
-                        <bk-option v-for="option in planList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name"
-                            class="sops-plan-option">
-                            <span>{{option.name}}</span>
-                            <span class="preview-sops-plan" @click.stop="jumpToSopsSelectSchemePage">
-                                <i class="bk-icon icon-eye"></i>
-                                {{ $t(`m.flowManager["预览"]`) }}
-                            </span>
-                        </bk-option>
-                        <div slot="extension"
-                            class="add-sops-scheme"
-                            @click="jumpToSopsSelectSchemePage">
-                            <i class="bk-icon icon-plus"></i>
-                            {{ $t(`m.newCommon['创建执行方案']`) }}
-                        </div>
-                    </bk-select>
-                    <div v-if="item.sopsContent.id" class="reload-template-plan" @click="onReloadPlanBtnClick">
-                        <i class="bk-icon icon-refresh"></i>
-                        {{ $t(`m.newCommon["刷新"]`) }}
-                    </div>
-                </bk-form-item>
-                <!-- 未执行/已执行任务列表 -->
-                <bk-form-item
-                    v-else
-                    label="标准运维的任务选择"
-                    :required="true"
-                    :property="'sopsTaskId'">
-                    <bk-select
-                        v-model="item.sopsContent.sopsTask.id"
-                        :loading="loading.sopsTaskList"
-                        :disabled="disabled"
-                        searchable
-                        @change="onSopsTaskChange">
-                        <bk-option v-for="option in sopsTaskList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                    <div class="preview-sops-task" v-if="item.sopsContent.sopsTask.id" @click.stop="jumpToSops">
-                        <i class="bk-icon icon-eye"></i>
-                        {{ $t(`m.flowManager["预览"]`) }}
-                    </div>
-                </bk-form-item>
-            </template>
-        </bk-form>
-        <!-- 标准运维参数 -->
-        <div class="form-wrapper" v-if="!formLoading" v-bkloading="{ isLoading: configLoading }">
-            <h3 class="setion-title">{{ $t(`m.newCommon["参数配置"]`) }}</h3>
-            <render-form
-                v-if="showRenderForm"
-                ref="renderForm"
-                :form-option="formOptions"
-                :constants="item.sopsContent.constants"
-                :context="item.sopsContent.context"
-                :hooked="hookedVarList"
-                v-model="item.sopsContent.formData"
-                @configLoadingChange="configLoading = $event">
-                <template slot="tagHook" slot-scope="{ scheme }">
-                    <div class="hook-area">
-                        <bk-checkbox
-                            :disabled="disabled || disabledRenderForm"
-                            :value="!!hookedVarList[scheme.tag_code]"
-                            @change="onHookChange($event, scheme)">
-                            {{ $t(`m.tickets["引用变量"]`) }}
-                        </bk-checkbox>
-                        <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
-                            <bk-select
-                                :disabled="disabled || disabledRenderForm"
-                                :class="{ 'quote-error': quoteErrors.includes(scheme.tag_code) }"
-                                :clearable="false"
-                                :value="item.sopsContent.formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
-                                @selected="onSelectVar($event, scheme)">
-                                <bk-option
-                                    v-for="varItem in quoteVars"
-                                    :key="varItem.key"
-                                    :id="varItem.key"
-                                    :name="varItem.name">
-                                    {{ varItem.name }}
-                                </bk-option>
-                            </bk-select>
-                            <span v-if="quoteErrors.includes(scheme.tag_code)" class="quote-error-text">{{ $t(`m.tickets["请选择变量"]`) }}</span>
-                            <i
-                                v-if="!item.sopsContent.constants.find(item => item.key === scheme.tag_code).changed"
-                                class="bk-icon icon-info update-tips"
-                                v-bk-tooltips.top="$t(`m.tickets['配置有更新']`)">
-                            </i>
-                        </div>
-                    </div>
-                </template>
-            </render-form>
-            <no-data v-else></no-data>
-        </div>
-        <template v-if="item.checkValue">
-            <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-            <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+  <div v-if="item.showFeild">
+    <bk-form
+      ref="taskForm"
+      :model="item.sopsContent"
+      :rules="rules"
+      :label-width="200"
+      form-type="vertical">
+      <template v-if="!editTask">
+        <bk-form-item :label="$t(`m.newCommon['创建方式']`)" :required="true">
+          <bk-radio-group v-model="item.sopsContent.createWay" @change="handleCreateWayChange">
+            <bk-radio :disabled="disabled" class="bk-form-radio" :value="'template'">{{ $t(`m.newCommon["手动创建"]`) }}</bk-radio>
+            <bk-radio :disabled="disabled" class="bk-form-radio" :value="'task'">{{ $t(`m.newCommon["关联未执行的任务"]`) }}</bk-radio>
+            <bk-radio :disabled="disabled" class="bk-form-radio" :value="'started_task'">{{ $t(`m.newCommon["关联已执行的任务"]`) }}</bk-radio>
+          </bk-radio-group>
+        </bk-form-item>
+        <bk-form-item :label="item.name" v-if="item.sopsContent.createWay === 'template'"
+          :required="item.validate_type === 'REQUIRE'"
+          :desc="item.tips"
+          :ext-cls="'bk-line-height'"
+          :property="'id'"
+          :error-display-type="'normal'">
+          <!-- 模板选择 -->
+          <bk-select
+            v-model="item.sopsContent.id"
+            searchable
+            @selected="onSelectTpl"
+            ext-cls="form-item-inline-width mr5"
+            :loading="loading.templateList"
+            :disabled="typeInfo === 'RETRY' || disabled"
+            :clearable="false">
+            <bk-option
+              v-for="(option, index) in templateList"
+              :key="index"
+              :name="option.name"
+              :id="option.id">
+            </bk-option>
+          </bk-select>
+          <!-- 方案选择 -->
+          <bk-select
+            v-if="item.sopsContent.id"
+            v-model="item.sopsContent.planId"
+            :loading="loading.plan"
+            :disabled="disabled"
+            multiple
+            ext-cls="form-item-inline-width mr0"
+            :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
+            @selected="onplanSelect">
+            <bk-option v-for="option in planList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name"
+              class="sops-plan-option">
+              <span>{{option.name}}</span>
+              <span class="preview-sops-plan" @click.stop="jumpToSopsSelectSchemePage">
+                <i class="bk-icon icon-eye"></i>
+                {{ $t(`m.flowManager["预览"]`) }}
+              </span>
+            </bk-option>
+            <div slot="extension"
+              class="add-sops-scheme"
+              @click="jumpToSopsSelectSchemePage">
+              <i class="bk-icon icon-plus"></i>
+              {{ $t(`m.newCommon['创建执行方案']`) }}
+            </div>
+          </bk-select>
+          <div v-if="item.sopsContent.id" class="reload-template-plan" @click="onReloadPlanBtnClick">
+            <i class="bk-icon icon-refresh"></i>
+            {{ $t(`m.newCommon["刷新"]`) }}
+          </div>
+        </bk-form-item>
+        <!-- 未执行/已执行任务列表 -->
+        <bk-form-item
+          v-else
+          label="标准运维的任务选择"
+          :required="true"
+          :property="'sopsTaskId'">
+          <bk-select
+            v-model="item.sopsContent.sopsTask.id"
+            :loading="loading.sopsTaskList"
+            :disabled="disabled"
+            searchable
+            @change="onSopsTaskChange">
+            <bk-option v-for="option in sopsTaskList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+          <div class="preview-sops-task" v-if="item.sopsContent.sopsTask.id" @click.stop="jumpToSops">
+            <i class="bk-icon icon-eye"></i>
+            {{ $t(`m.flowManager["预览"]`) }}
+          </div>
+        </bk-form-item>
+      </template>
+    </bk-form>
+    <!-- 标准运维参数 -->
+    <div class="form-wrapper" v-if="!formLoading" v-bkloading="{ isLoading: configLoading }">
+      <h3 class="setion-title">{{ $t(`m.newCommon["参数配置"]`) }}</h3>
+      <render-form
+        v-if="showRenderForm"
+        ref="renderForm"
+        :form-option="formOptions"
+        :constants="item.sopsContent.constants"
+        :context="item.sopsContent.context"
+        :hooked="hookedVarList"
+        v-model="item.sopsContent.formData"
+        @configLoadingChange="configLoading = $event">
+        <template slot="tagHook" slot-scope="{ scheme }">
+          <div class="hook-area">
+            <bk-checkbox
+              :disabled="disabled || disabledRenderForm"
+              :value="!!hookedVarList[scheme.tag_code]"
+              @change="onHookChange($event, scheme)">
+              {{ $t(`m.tickets["引用变量"]`) }}
+            </bk-checkbox>
+            <div v-if="hookedVarList[scheme.tag_code]" class="var-select">
+              <bk-select
+                :disabled="disabled || disabledRenderForm"
+                :class="{ 'quote-error': quoteErrors.includes(scheme.tag_code) }"
+                :clearable="false"
+                :value="item.sopsContent.formData[scheme.tag_code].replace(/^\$\{/, '').replace(/\}$/, '')"
+                @selected="onSelectVar($event, scheme)">
+                <bk-option
+                  v-for="varItem in quoteVars"
+                  :key="varItem.key"
+                  :id="varItem.key"
+                  :name="varItem.name">
+                  {{ varItem.name }}
+                </bk-option>
+              </bk-select>
+              <span v-if="quoteErrors.includes(scheme.tag_code)" class="quote-error-text">{{ $t(`m.tickets["请选择变量"]`) }}</span>
+              <i
+                v-if="!item.sopsContent.constants.find(item => item.key === scheme.tag_code).changed"
+                class="bk-icon icon-info update-tips"
+                v-bk-tooltips.top="$t(`m.tickets['配置有更新']`)">
+              </i>
+            </div>
+          </div>
         </template>
+      </render-form>
+      <no-data v-else></no-data>
     </div>
+    <template v-if="item.checkValue">
+      <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+      <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+    </template>
+  </div>
 </template>
 
 <script>

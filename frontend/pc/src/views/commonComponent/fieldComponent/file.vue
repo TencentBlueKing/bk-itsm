@@ -21,55 +21,55 @@
   -->
 
 <template>
-    <div v-if="item.showFeild">
-        <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
-            <div style="position: relative;">
-                <div class="bk-form-content" style="position: relative;">
-                    <custom-upload
-                        ref="upload"
-                        :name="'field_file'"
-                        :multiple="true"
-                        :with-credentials="true"
-                        :disabled="disabled"
-                        @on-success="uploadSuccess"
-                        @on-error="uploadErr"
-                        @on-progress="uploadProgress"
-                        @on-done="uploadDone"
-                        :tip="''"
-                        :size="200"
-                        :url="url">
-                    </custom-upload>
-                    <ul>
-                        <li v-for="(file, index) in datas"
-                            class="upload_p"
-                            v-show="!file.errorMsg"
-                            style="word-break: break-word;"
-                            :key="index">
-                            <span>{{file.name}}</span>
-                            <span style="color: #3c96ff; margin-left: 10px; cursor: pointer"
-                                @click="deleteFile(file)"
-                                class="bk-icon icon-delete">
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="bk-form-item" v-if="tempFileList.length > 0">
-                <label class="bk-label">{{ $t('m.newCommon["模板下载"]') }}：</label>
-                <div class="bk-form-content">
-                    <ul v-for="(file, index) in tempFileList" :key="index">
-                        <li @click="downloadFile(file)"
-                            class="bk-icon icon-download bk-tab-cursor fa-file"> {{file.name}}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <template v-if="item.checkValue">
-                <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
-                <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
-            </template>
-        </bk-form-item>
-    </div>
+  <div v-if="item.showFeild">
+    <bk-form-item :label="item.name" :required="item.validate_type === 'REQUIRE'" :desc="item.tips" desc-type="icon">
+      <div style="position: relative;">
+        <div class="bk-form-content" style="position: relative;">
+          <custom-upload
+            ref="upload"
+            :name="'field_file'"
+            :multiple="true"
+            :with-credentials="true"
+            :disabled="disabled"
+            @on-success="uploadSuccess"
+            @on-error="uploadErr"
+            @on-progress="uploadProgress"
+            @on-done="uploadDone"
+            :tip="''"
+            :size="200"
+            :url="url">
+          </custom-upload>
+          <ul>
+            <li v-for="(file, index) in datas"
+              class="upload_p"
+              v-show="!file.errorMsg"
+              style="word-break: break-word;"
+              :key="index">
+              <span>{{file.name}}</span>
+              <span style="color: #3c96ff; margin-left: 10px; cursor: pointer"
+                @click="deleteFile(file)"
+                class="bk-icon icon-delete">
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="bk-form-item" v-if="tempFileList.length > 0">
+        <label class="bk-label">{{ $t('m.newCommon["模板下载"]') }}：</label>
+        <div class="bk-form-content">
+          <ul v-for="(file, index) in tempFileList" :key="index">
+            <li @click="downloadFile(file)"
+              class="bk-icon icon-download bk-tab-cursor fa-file"> {{file.name}}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <template v-if="item.checkValue">
+        <p class="bk-task-error" v-if="item.checkMessage">{{ item.checkMessage }}</p>
+        <p class="bk-task-error" v-else>{{ item.name }}{{$t('m.newCommon["为必填项！"]')}}</p>
+      </template>
+    </bk-form-item>
+  </div>
 </template>
 
 <script>

@@ -21,32 +21,32 @@
   -->
 
 <template>
-    <div class="bk-design-second">
-        <div class="bk-step" v-bkloading="{ isLoading: isDataLoading }">
-            <second-flow
-                v-if="!isDataLoading"
-                ref="flowInfo"
-                :add-list="addList"
-                :line-list="lineList"
-                :flow-info="flowInfo">
-            </second-flow>
-        </div>
-        <div class="bk-second-btn">
-            <bk-button theme="default"
-                class="mr10"
-                :title="$t(`m.treeinfo['上一步']`)"
-                :disabled="secondClick"
-                @click="previousStep">
-                {{ $t('m.treeinfo["上一步"]') }}
-            </bk-button>
-            <bk-button theme="primary"
-                :title="flowInfo.is_draft ? $t(`m.treeinfo['下一步']`) : $t(`m.treeinfo['保存']`)"
-                :loading="secondClick"
-                @click="submitChart">
-                {{flowInfo.is_draft ? $t(`m.treeinfo['下一步']`) : $t(`m.treeinfo['保存']`)}}
-            </bk-button>
-        </div>
+  <div class="bk-design-second">
+    <div class="bk-step" v-bkloading="{ isLoading: isDataLoading }">
+      <second-flow
+        v-if="!isDataLoading"
+        ref="flowInfo"
+        :add-list="addList"
+        :line-list="lineList"
+        :flow-info="flowInfo">
+      </second-flow>
     </div>
+    <div class="bk-second-btn">
+      <bk-button theme="default"
+        class="mr10"
+        :title="$t(`m.treeinfo['上一步']`)"
+        :disabled="secondClick"
+        @click="previousStep">
+        {{ $t('m.treeinfo["上一步"]') }}
+      </bk-button>
+      <bk-button theme="primary"
+        :title="flowInfo.is_draft ? $t(`m.treeinfo['下一步']`) : $t(`m.treeinfo['保存']`)"
+        :loading="secondClick"
+        @click="submitChart">
+        {{flowInfo.is_draft ? $t(`m.treeinfo['下一步']`) : $t(`m.treeinfo['保存']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 <script>
     import axios from 'axios';

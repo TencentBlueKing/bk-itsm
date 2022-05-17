@@ -21,166 +21,166 @@
   -->
 
 <template>
-    <div class="bk-history-detail" v-bkloading="{ isLoading: loading }">
-        <div class="basic-information">
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['触发器名称：']`)">
-                    {{ $t('m.task["触发器名称："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.trigger_name || '--'">
-                    {{ historyInfo.trigger_name || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['触发事件：']`)">
-                    {{ $t('m.task["触发事件："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.signal_name || '--'">
-                    {{ historyInfo.signal_name || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['响应动作：']`)">
-                    {{ $t('m.task["响应动作："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.component_name || '--'">
-                    {{ historyInfo.component_name || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['执行人：']`)">
-                    {{ $t('m.task["执行人："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.operator_username || '--'">
-                    {{ historyInfo.operator_username || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['执行方式：']`)">
-                    {{ $t('m.task["执行方式："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.operate_type || '--'">
-                    {{ historyInfo.operate_type || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['执行状态：']`)">
-                    {{ $t('m.task["执行状态："]') }}
-                </span>
-                <span
-                    class="info-info"
-                    :style="{
-                        color: historyInfo.status === 'SUCCEED' ? '#2DCB56' : '#FF5656'
-                    }"
-                    :title="historyInfo.status_name || '--'">
-                    {{ historyInfo.status_name || "--" }}
-                </span>
-            </div>
-            <div class="info-content">
-                <span class="info-title" :title="$t(`m.task['执行时间：']`)">
-                    {{ $t('m.task["执行时间："]') }}
-                </span>
-                <span class="info-info" :title="historyInfo.create_at || '--'">
-                    {{ historyInfo.create_at || "--" }}
-                </span>
-            </div>
-        </div>
-        <div class="field-information">
-            <div
-                class="field-content"
-                v-for="(field, fIndex) in historyInfo.fields"
-                :key="fIndex">
-                <div
-                    class="field-content-box"
-                    v-if="field.key === 'sub_message_component'">
-                    <bk-tab :active="activeName" @tab-change="changPanel">
-                        <bk-tab-panel
-                            v-for="(panel, index) in field.value"
-                            v-bind="panel"
-                            :key="index">
-                            <template slot="label">
-                                <i class="bk-icon" :class="[panel.icon]"></i>
-                                <span class="panel-name">
-                                    {{ panel.label }}
-                                </span>
-                            </template>
-                            <div
-                                v-for="(subPanel, subIndex) in field.value"
-                                :key="subIndex"
-                                v-if="activeName === subPanel.name">
-                                <div
-                                    v-for="(schema, sIndex) in subPanel.fields"
-                                    :key="sIndex"
-                                    class="mb20"
-                                    style="display: flex">
-                                    <span class="field-title inline" :title="schema.name">
-                                        {{ schema.name }}
-                                    </span>
-                                    <span
-                                        class="field-value inline"
-                                        :title="schema.value || '--'">
-                                        {{ schema.value || "--" }}
-                                    </span>
-                                </div>
-                            </div>
-                        </bk-tab-panel>
-                    </bk-tab>
-                </div>
-                <div class="field-content-box" v-else-if="field.key === 'req_params'">
-                    <bk-table :data="apiTableData" :size="'small'">
-                        <bk-table-column :label="$t(`m.treeinfo['名称']`)" min-width="150">
-                            <template slot-scope="props">
-                                <div class="bk-more">
-                                    <span
-                                        :style="{
-                                            paddingLeft: 20 * props.row.level + 'px'
-                                        }">
-                                        <span
-                                            v-if="props.row.has_children"
-                                            :class="[
-                                                'bk-icon',
-                                                'tree-expanded-icon',
-                                                props.row.showChildren
-                                                    ? 'icon-down-shape'
-                                                    : 'icon-right-shape'
-                                            ]"
-                                            @click="changeState(props.row)"></span>
-                                        <span class="bk-icon bk-more-icon" v-else></span>
-                                        <span>{{ props.row.key || "--" }}</span>
-                                    </span>
-                                </div>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="'类型'">
-                            <template slot-scope="props">
-                                {{ props.row.type }}
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="120">
-                            <template slot-scope="props">
-                                <span :title="props.row.desc">
-                                    {{ props.row.desc || "--" }}
-                                </span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="280">
-                            <template slot-scope="props">
-                                <span>{{ props.row.value }}</span>
-                            </template>
-                        </bk-table-column>
-                    </bk-table>
-                </div>
-                <div class="field-content-box" v-else>
-                    <p class="field-title inline" :title="field.name">
-                        {{ field.name }}
-                    </p>
-                    <p class="field-value inline" :title="field.value">
-                        {{ field.value }}
-                    </p>
-                </div>
-            </div>
-        </div>
+  <div class="bk-history-detail" v-bkloading="{ isLoading: loading }">
+    <div class="basic-information">
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['触发器名称：']`)">
+          {{ $t('m.task["触发器名称："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.trigger_name || '--'">
+          {{ historyInfo.trigger_name || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['触发事件：']`)">
+          {{ $t('m.task["触发事件："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.signal_name || '--'">
+          {{ historyInfo.signal_name || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['响应动作：']`)">
+          {{ $t('m.task["响应动作："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.component_name || '--'">
+          {{ historyInfo.component_name || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['执行人：']`)">
+          {{ $t('m.task["执行人："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.operator_username || '--'">
+          {{ historyInfo.operator_username || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['执行方式：']`)">
+          {{ $t('m.task["执行方式："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.operate_type || '--'">
+          {{ historyInfo.operate_type || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['执行状态：']`)">
+          {{ $t('m.task["执行状态："]') }}
+        </span>
+        <span
+          class="info-info"
+          :style="{
+            color: historyInfo.status === 'SUCCEED' ? '#2DCB56' : '#FF5656'
+          }"
+          :title="historyInfo.status_name || '--'">
+          {{ historyInfo.status_name || "--" }}
+        </span>
+      </div>
+      <div class="info-content">
+        <span class="info-title" :title="$t(`m.task['执行时间：']`)">
+          {{ $t('m.task["执行时间："]') }}
+        </span>
+        <span class="info-info" :title="historyInfo.create_at || '--'">
+          {{ historyInfo.create_at || "--" }}
+        </span>
+      </div>
     </div>
+    <div class="field-information">
+      <div
+        class="field-content"
+        v-for="(field, fIndex) in historyInfo.fields"
+        :key="fIndex">
+        <div
+          class="field-content-box"
+          v-if="field.key === 'sub_message_component'">
+          <bk-tab :active="activeName" @tab-change="changPanel">
+            <bk-tab-panel
+              v-for="(panel, index) in field.value"
+              v-bind="panel"
+              :key="index">
+              <template slot="label">
+                <i class="bk-icon" :class="[panel.icon]"></i>
+                <span class="panel-name">
+                  {{ panel.label }}
+                </span>
+              </template>
+              <div
+                v-for="(subPanel, subIndex) in field.value"
+                :key="subIndex"
+                v-if="activeName === subPanel.name">
+                <div
+                  v-for="(schema, sIndex) in subPanel.fields"
+                  :key="sIndex"
+                  class="mb20"
+                  style="display: flex">
+                  <span class="field-title inline" :title="schema.name">
+                    {{ schema.name }}
+                  </span>
+                  <span
+                    class="field-value inline"
+                    :title="schema.value || '--'">
+                    {{ schema.value || "--" }}
+                  </span>
+                </div>
+              </div>
+            </bk-tab-panel>
+          </bk-tab>
+        </div>
+        <div class="field-content-box" v-else-if="field.key === 'req_params'">
+          <bk-table :data="apiTableData" :size="'small'">
+            <bk-table-column :label="$t(`m.treeinfo['名称']`)" min-width="150">
+              <template slot-scope="props">
+                <div class="bk-more">
+                  <span
+                    :style="{
+                      paddingLeft: 20 * props.row.level + 'px'
+                    }">
+                    <span
+                      v-if="props.row.has_children"
+                      :class="[
+                        'bk-icon',
+                        'tree-expanded-icon',
+                        props.row.showChildren
+                          ? 'icon-down-shape'
+                          : 'icon-right-shape'
+                      ]"
+                      @click="changeState(props.row)"></span>
+                    <span class="bk-icon bk-more-icon" v-else></span>
+                    <span>{{ props.row.key || "--" }}</span>
+                  </span>
+                </div>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="'类型'">
+              <template slot-scope="props">
+                {{ props.row.type }}
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.treeinfo['备注']`)" width="120">
+              <template slot-scope="props">
+                <span :title="props.row.desc">
+                  {{ props.row.desc || "--" }}
+                </span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.treeinfo['参数值']`)" width="280">
+              <template slot-scope="props">
+                <span>{{ props.row.value }}</span>
+              </template>
+            </bk-table-column>
+          </bk-table>
+        </div>
+        <div class="field-content-box" v-else>
+          <p class="field-title inline" :title="field.name">
+            {{ field.name }}
+          </p>
+          <p class="field-value inline" :title="field.value">
+            {{ field.value }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

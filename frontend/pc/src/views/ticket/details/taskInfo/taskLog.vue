@@ -21,44 +21,44 @@
   -->
 
 <template>
-    <div class="bk-task">
-        <ul v-if="showTask || showHistory || showArticle" class="bk-flow-head">
-            <li :class="{ 'bk-flow-check': checkInfo === 'task' }"
-                v-if="showTask"
-                @click="checkInfo = 'task'">
-                <span>{{$t(`m.task['任务列表']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'taskHistory' }"
-                v-if="showHistory"
-                @click="checkInfo = 'taskHistory'">
-                <span>{{$t(`m.task['触发器记录']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'slaRecord' }"
-                @click="checkInfo = 'slaRecord'">
-                <span>{{$t(`m.task['SLA记录']`)}}</span>
-            </li>
-            <li :class="{ 'bk-flow-check': checkInfo === 'article' }"
-                v-if="showArticle"
-                @click="checkInfo = 'article'">
-                <span>{{$t(`m.task['关联文章']`)}}</span>
-            </li>
-        </ul>
-        <div class="bk-task-content">
-            <div v-if="checkInfo === 'task'">
-                <task :basic-infomation="basicInfomation"
-                    :node-list="nodeList"
-                    @updateCurrentStep="updateCurrentStep">
-                </task>
-            </div>
-            <div v-if="checkInfo === 'taskHistory'">
-                <task-history :basic-infomation="basicInfomation" :node-list="nodeList"></task-history>
-            </div>
-            <div v-if="checkInfo === 'slaRecord'">
-                <sla-record :basic-infomation="basicInfomation" :node-list="nodeList"></sla-record>
-            </div>
-            <div v-if="checkInfo === 'article'"></div>
-        </div>
+  <div class="bk-task">
+    <ul v-if="showTask || showHistory || showArticle" class="bk-flow-head">
+      <li :class="{ 'bk-flow-check': checkInfo === 'task' }"
+        v-if="showTask"
+        @click="checkInfo = 'task'">
+        <span>{{$t(`m.task['任务列表']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'taskHistory' }"
+        v-if="showHistory"
+        @click="checkInfo = 'taskHistory'">
+        <span>{{$t(`m.task['触发器记录']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'slaRecord' }"
+        @click="checkInfo = 'slaRecord'">
+        <span>{{$t(`m.task['SLA记录']`)}}</span>
+      </li>
+      <li :class="{ 'bk-flow-check': checkInfo === 'article' }"
+        v-if="showArticle"
+        @click="checkInfo = 'article'">
+        <span>{{$t(`m.task['关联文章']`)}}</span>
+      </li>
+    </ul>
+    <div class="bk-task-content">
+      <div v-if="checkInfo === 'task'">
+        <task :basic-infomation="basicInfomation"
+          :node-list="nodeList"
+          @updateCurrentStep="updateCurrentStep">
+        </task>
+      </div>
+      <div v-if="checkInfo === 'taskHistory'">
+        <task-history :basic-infomation="basicInfomation" :node-list="nodeList"></task-history>
+      </div>
+      <div v-if="checkInfo === 'slaRecord'">
+        <sla-record :basic-infomation="basicInfomation" :node-list="nodeList"></sla-record>
+      </div>
+      <div v-if="checkInfo === 'article'"></div>
     </div>
+  </div>
 </template>
 
 <script>

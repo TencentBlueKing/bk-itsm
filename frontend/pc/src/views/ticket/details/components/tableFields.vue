@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <div class="bk-table-fields">
-        <template v-if="openFunction.FIRST_STATE_SWITCH">
-            <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
-            <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <template v-for="(item, index) in firstStateFields">
-                    <div v-if="item.showFeild"
-                        :key="index"
-                        class="bk-field-line">
-                        <fields-done
-                            :item="item"
-                            :basic-info-type="basicInfoType"
-                            :fields="firstStateFields"
-                            :basic-infomation="basicInfomation">
-                        </fields-done>
-                    </div>
-                </template>
-            </bk-form>
+  <div class="bk-table-fields">
+    <template v-if="openFunction.FIRST_STATE_SWITCH">
+      <span class="bk-field-tip">{{ $t(`m['提单节点字段信息：']`)}}</span>
+      <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
+        <template v-for="(item, index) in firstStateFields">
+          <div v-if="item.showFeild"
+            :key="index"
+            class="bk-field-line">
+            <fields-done
+              :item="item"
+              :basic-info-type="basicInfoType"
+              :fields="firstStateFields"
+              :basic-infomation="basicInfomation">
+            </fields-done>
+          </div>
         </template>
-        <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
-        <template v-if="openFunction.TABLE_FIELDS_SWITCH">
-            <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
-            <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
-                <div v-for="(item, index) in tableFields"
-                    :key="index"
-                    :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
-                    <!-- 静态展示 -->
-                    <template v-if="!item.isEdit">
-                        <fields-done
-                            :item="item"
-                            :basic-info-type="basicInfoType"
-                            :fields="basicInfomation.table_fields"
-                            :basic-infomation="basicInfomation">
-                        </fields-done>
-                    </template>
-                    <!-- 编辑状态 -->
-                    <template v-else>
-                        <fields-running
-                            :item="item"
-                            :fields="basicInfomation.table_fields"
-                            :basic-infomation="basicInfomation">
-                        </fields-running>
-                    </template>
-                </div>
-            </bk-form>
-        </template>
-    </div>
+      </bk-form>
+    </template>
+    <!-- <div class="split-line" v-if="openFunction.TABLE_FIELDS_SWITCH && openFunction.FIRST_STATE_SWITCH"></div> -->
+    <template v-if="openFunction.TABLE_FIELDS_SWITCH">
+      <span class="bk-field-tip">{{ $t(`m['基础字段信息：']`)}}</span>
+      <bk-form :label-width="200" form-type="vertical" :ext-cls="'bk-ext-form'">
+        <div v-for="(item, index) in tableFields"
+          :key="index"
+          :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6' }">
+          <!-- 静态展示 -->
+          <template v-if="!item.isEdit">
+            <fields-done
+              :item="item"
+              :basic-info-type="basicInfoType"
+              :fields="basicInfomation.table_fields"
+              :basic-infomation="basicInfomation">
+            </fields-done>
+          </template>
+          <!-- 编辑状态 -->
+          <template v-else>
+            <fields-running
+              :item="item"
+              :fields="basicInfomation.table_fields"
+              :basic-infomation="basicInfomation">
+            </fields-running>
+          </template>
+        </div>
+      </bk-form>
+    </template>
+  </div>
 </template>
 <script>
     import fieldsDone from './fieldsDone.vue';

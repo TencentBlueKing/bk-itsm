@@ -21,31 +21,31 @@
   -->
 
 <template>
-    <div class="chart-card">
-        <div class="card-header">
-            <h4>
-                {{ title }}
-                <i v-if="desc" class="bk-icon icon-info" v-bk-tooltips="{
-                    content: desc,
-                    placement: 'top',
-                    theme: 'light'
-                }">
-                </i>
-            </h4>
-            <div class="search-wrap" v-if="showSearch">
-                <bk-input
-                    right-icon="bk-icon icon-search"
-                    :placeholder="placeholder"
-                    :value="searchStr"
-                    :clearable="true"
-                    @change="onSearch">
-                </bk-input>
-            </div>
-        </div>
-        <div class="card-content" v-bkloading="{ isLoading: loading, opacity: 1 }">
-            <slot></slot>
-        </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <h4>
+        {{ title }}
+        <i v-if="desc" class="bk-icon icon-info" v-bk-tooltips="{
+          content: desc,
+          placement: 'top',
+          theme: 'light'
+        }">
+        </i>
+      </h4>
+      <div class="search-wrap" v-if="showSearch">
+        <bk-input
+          right-icon="bk-icon icon-search"
+          :placeholder="placeholder"
+          :value="searchStr"
+          :clearable="true"
+          @change="onSearch">
+        </bk-input>
+      </div>
     </div>
+    <div class="card-content" v-bkloading="{ isLoading: loading, opacity: 1 }">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 <script>
     import debounce from 'lodash/debounce';

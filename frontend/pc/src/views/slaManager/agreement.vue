@@ -21,226 +21,226 @@
   -->
 
 <template>
-    <div class="bk-itsm-service" ref="agreement">
-        <template v-if="!changeInfo.isShow">
-            <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-                <p class="bk-come-back">
-                    {{ $t('m.slaContent["服务协议"]') }}
-                </p>
-            </div>
-            <div class="itsm-page-content">
-                <empty-tip
-                    v-if="!isDataLoading && pagination.count === 0 && searchToggle"
-                    :title="emptyTip.title"
-                    :sub-title="emptyTip.subTitle"
-                    :desc="emptyTip.desc"
-                    :links="emptyTip.links">
-                    <template slot="btns">
-                        <bk-button
-                            data-test-id="sla_button_createAgreement_permission"
-                            v-cursor="{
-                                active: !hasPermission(
-                                    ['sla_agreement_create'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            theme="primary"
-                            :class="{
-                                'btn-permission-disable': !hasPermission(
-                                    ['sla_agreement_create'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            @click="addAgreement({}, 'sla_agreement_create')">
-                            {{ $t('m["立即创建"]') }}
-                        </bk-button>
-                    </template>
-                </empty-tip>
-                <template v-else>
-                    <!-- 提示信息 -->
-                    <div class="bk-itsm-version" v-if="versionStatus">
-                        <i class="bk-icon icon-info-circle"></i>
-                        <span>
-                            <!-- {{ $t('m.slaContent["服务协议：制定不同的服务协议内容。包括不同优先级下的服务模式
+  <div class="bk-itsm-service" ref="agreement">
+    <template v-if="!changeInfo.isShow">
+      <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+        <p class="bk-come-back">
+          {{ $t('m.slaContent["服务协议"]') }}
+        </p>
+      </div>
+      <div class="itsm-page-content">
+        <empty-tip
+          v-if="!isDataLoading && pagination.count === 0 && searchToggle"
+          :title="emptyTip.title"
+          :sub-title="emptyTip.subTitle"
+          :desc="emptyTip.desc"
+          :links="emptyTip.links">
+          <template slot="btns">
+            <bk-button
+              data-test-id="sla_button_createAgreement_permission"
+              v-cursor="{
+                active: !hasPermission(
+                  ['sla_agreement_create'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              theme="primary"
+              :class="{
+                'btn-permission-disable': !hasPermission(
+                  ['sla_agreement_create'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              @click="addAgreement({}, 'sla_agreement_create')">
+              {{ $t('m["立即创建"]') }}
+            </bk-button>
+          </template>
+        </empty-tip>
+        <template v-else>
+          <!-- 提示信息 -->
+          <div class="bk-itsm-version" v-if="versionStatus">
+            <i class="bk-icon icon-info-circle"></i>
+            <span>
+              <!-- {{ $t('m.slaContent["服务协议：制定不同的服务协议内容。包括不同优先级下的服务模式
                                 ，服务解决时长。可以制定多个不同的服务协议策略，它将会应用到具体的每个服务中。"]') }} -->
-                        </span>
-                        <i class="bk-icon icon-close" @click="closeVersion"></i>
-                    </div>
-                    <div class="bk-only-btn">
-                        <div class="bk-more-search">
-                            <bk-button
-                                data-test-id="sla_button_createAgreement"
-                                v-cursor="{ active:
-                                    !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
-                                }"
-                                :theme="'primary'"
-                                :title="$t(`m.managePage['新增']`)"
-                                icon="plus"
-                                :class="['mr10', 'plus-cus', {
-                                    'btn-permission-disable': !hasPermission(
-                                        ['sla_agreement_create'],
-                                        $store.state.project.projectAuthActions
-                                    )
-                                }]"
-                                @click="addAgreement({}, 'sla_agreement_create')">
-                                {{ $t('m.managePage["新增"]') }}
-                            </bk-button>
-                            <div class="bk-search-name">
-                                <div class="bk-search-content">
-                                    <bk-input
-                                        data-test-id="sla_button_searchAgreement"
-                                        :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
-                                        :clearable="true"
-                                        :right-icon="'bk-icon icon-search'"
-                                        v-model="moreSearch[0].value"
-                                        @enter="searchContent"
-                                        @clear="clearSearch">
-                                    </bk-input>
-                                </div>
-                                <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                                    icon=" bk-itsm-icon icon-search-more"
-                                    class="ml10 filter-btn"
-                                    @click="searchMore">
-                                </bk-button>
-                            </div>
-                        </div>
-                        <search-info
-                            ref="searchInfo"
-                            :more-search="moreSearch">
-                        </search-info>
-                    </div>
-                    <bk-table
-                        v-bkloading="{ isLoading: isDataLoading }"
-                        :data="dataList"
-                        :size="'small'"
-                        :pagination="pagination"
-                        @page-change="handlePageChange"
-                        @page-limit-change="handlePageLimitChange">
-                        <bk-table-column :label="$t(`m.slaContent['协议名称']`)">
-                            <template slot-scope="props">
-                                <bk-button
-                                    data-test-id="sla_button_agreementEditFromName"
-                                    v-if="!hasPermission(
-                                        ['sla_agreement_edit'],
-                                        [...props.row.auth_actions, ...$store.state.project.projectAuthActions]
-                                    )"
-                                    v-cursor
-                                    text
-                                    theme="primary"
-                                    class="btn-permission-disable"
-                                    @click="addAgreement(props.row, 'sla_agreement_edit')">
-                                    {{props.row.name || '--'}}
-                                </bk-button>
-                                <span
-                                    v-else
-                                    data-test-id="sla_span_agreementEditFromName"
-                                    class="bk-lable-primary"
-                                    @click="addAgreement(props.row, 'sla_agreement_edit')"
-                                    :title="props.row.name">
-                                    {{props.row.name || '--'}}
-                                </span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.slaContent['应用服务数']`)">
-                            <template slot-scope="props">
-                                <bk-popover placement="top" trigger="click" theme="light" max-width="500px">
-                                    <span style="cursor: pointer;"
-                                        :title="props.row.service_count || '0'">{{props.row.service_count || '0'}}
-                                    </span>
-                                    <div slot="content" style="white-space: normal;">
-                                        <p>{{ props.row.service_names.toString() }}</p>
-                                    </div>
-                                </bk-popover>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
-                            <template slot-scope="props">
-                                <span :title="props.row.update_at">{{props.row.update_at || '--'}}</span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.slaContent['更新人']`)">
-                            <template slot-scope="props">
-                                <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.slaContent['是否启用']`)">
-                            <template slot-scope="props">
-                                <span class="bk-status-color"
-                                    :class="{ 'bk-status-gray': !props.row.is_enabled }"></span>
-                                <span style="margin-left: 5px;"
-                                    :title="(props.row.is_enabled
-                                        ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
-                                    {{(props.row.is_enabled ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
-                                </span>
-                            </template>
-                        </bk-table-column>
-                        <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150">
-                            <template slot-scope="props">
-                                <!-- 编辑 -->
-                                <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate1"
-                                    v-if="!hasPermission(
-                                        ['sla_agreement_edit'],
-                                        [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
-                                    )"
-                                    v-cursor
-                                    text
-                                    theme="primary"
-                                    class="btn-permission-disable"
-                                    @click="addAgreement(props.row, 'sla_agreement_edit')">
-                                    {{ $t('m.deployPage["编辑"]')}}
-                                </bk-button>
-                                <bk-button
-                                    data-test-id="sla_button_agreementEditFromOperate2"
-                                    v-else
-                                    theme="primary"
-                                    text
-                                    @click="addAgreement(props.row, 'sla_agreement_edit')">
-                                    {{ $t('m.deployPage["编辑"]')}}
-                                </bk-button>
-                                <!-- 删除 -->
-                                <bk-button
-                                    data-test-id="sla_button_agreementDeleteFromOperate1"
-                                    v-if="!hasPermission(
-                                        ['sla_agreement_delete'],
-                                        [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
-                                    )"
-                                    v-cursor
-                                    text
-                                    theme="primary"
-                                    class="btn-permission-disable"
-                                    @click="deleteAgreement(props.row, ['sla_agreement_delete'])">
-                                    {{ $t('m.deployPage["删除"]') }}
-                                </bk-button>
-                                <bk-button theme="primary"
-                                    data-test-id="sla_button_agreementDeleteFromOperate2"
-                                    text
-                                    v-else-if="props.row.service_count > 0 || props.row.is_builtin"
-                                    :disabled="props.row.service_count > 0 || props.row.is_builtin"
-                                    :title="$t(`m.slaContent['应用服务数大于0或者服务协议属于系统内置的不可删除']`)">
-                                    {{ $t('m.deployPage["删除"]') }}
-                                </bk-button>
-                                <bk-button theme="primary" text v-else
-                                    data-test-id="sla_button_agreementDeleteFromOperate3"
-                                    @click="deleteAgreement(props.row)">
-                                    {{ $t('m.deployPage["删除"]') }}
-                                </bk-button>
-                            </template>
-                        </bk-table-column>
-                    </bk-table>
-                </template>
+            </span>
+            <i class="bk-icon icon-close" @click="closeVersion"></i>
+          </div>
+          <div class="bk-only-btn">
+            <div class="bk-more-search">
+              <bk-button
+                data-test-id="sla_button_createAgreement"
+                v-cursor="{ active:
+                  !hasPermission(['sla_agreement_create'], $store.state.project.projectAuthActions)
+                }"
+                :theme="'primary'"
+                :title="$t(`m.managePage['新增']`)"
+                icon="plus"
+                :class="['mr10', 'plus-cus', {
+                  'btn-permission-disable': !hasPermission(
+                    ['sla_agreement_create'],
+                    $store.state.project.projectAuthActions
+                  )
+                }]"
+                @click="addAgreement({}, 'sla_agreement_create')">
+                {{ $t('m.managePage["新增"]') }}
+              </bk-button>
+              <div class="bk-search-name">
+                <div class="bk-search-content">
+                  <bk-input
+                    data-test-id="sla_button_searchAgreement"
+                    :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
+                    :clearable="true"
+                    :right-icon="'bk-icon icon-search'"
+                    v-model="moreSearch[0].value"
+                    @enter="searchContent"
+                    @clear="clearSearch">
+                  </bk-input>
+                </div>
+                <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+                  icon=" bk-itsm-icon icon-search-more"
+                  class="ml10 filter-btn"
+                  @click="searchMore">
+                </bk-button>
+              </div>
             </div>
+            <search-info
+              ref="searchInfo"
+              :more-search="moreSearch">
+            </search-info>
+          </div>
+          <bk-table
+            v-bkloading="{ isLoading: isDataLoading }"
+            :data="dataList"
+            :size="'small'"
+            :pagination="pagination"
+            @page-change="handlePageChange"
+            @page-limit-change="handlePageLimitChange">
+            <bk-table-column :label="$t(`m.slaContent['协议名称']`)">
+              <template slot-scope="props">
+                <bk-button
+                  data-test-id="sla_button_agreementEditFromName"
+                  v-if="!hasPermission(
+                    ['sla_agreement_edit'],
+                    [...props.row.auth_actions, ...$store.state.project.projectAuthActions]
+                  )"
+                  v-cursor
+                  text
+                  theme="primary"
+                  class="btn-permission-disable"
+                  @click="addAgreement(props.row, 'sla_agreement_edit')">
+                  {{props.row.name || '--'}}
+                </bk-button>
+                <span
+                  v-else
+                  data-test-id="sla_span_agreementEditFromName"
+                  class="bk-lable-primary"
+                  @click="addAgreement(props.row, 'sla_agreement_edit')"
+                  :title="props.row.name">
+                  {{props.row.name || '--'}}
+                </span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.slaContent['应用服务数']`)">
+              <template slot-scope="props">
+                <bk-popover placement="top" trigger="click" theme="light" max-width="500px">
+                  <span style="cursor: pointer;"
+                    :title="props.row.service_count || '0'">{{props.row.service_count || '0'}}
+                  </span>
+                  <div slot="content" style="white-space: normal;">
+                    <p>{{ props.row.service_names.toString() }}</p>
+                  </div>
+                </bk-popover>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at">
+              <template slot-scope="props">
+                <span :title="props.row.update_at">{{props.row.update_at || '--'}}</span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.slaContent['更新人']`)">
+              <template slot-scope="props">
+                <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.slaContent['是否启用']`)">
+              <template slot-scope="props">
+                <span class="bk-status-color"
+                  :class="{ 'bk-status-gray': !props.row.is_enabled }"></span>
+                <span style="margin-left: 5px;"
+                  :title="(props.row.is_enabled
+                    ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
+                  {{(props.row.is_enabled ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
+                </span>
+              </template>
+            </bk-table-column>
+            <bk-table-column :label="$t(`m.slaContent['操作']`)" width="150">
+              <template slot-scope="props">
+                <!-- 编辑 -->
+                <bk-button
+                  data-test-id="sla_button_agreementEditFromOperate1"
+                  v-if="!hasPermission(
+                    ['sla_agreement_edit'],
+                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                  )"
+                  v-cursor
+                  text
+                  theme="primary"
+                  class="btn-permission-disable"
+                  @click="addAgreement(props.row, 'sla_agreement_edit')">
+                  {{ $t('m.deployPage["编辑"]')}}
+                </bk-button>
+                <bk-button
+                  data-test-id="sla_button_agreementEditFromOperate2"
+                  v-else
+                  theme="primary"
+                  text
+                  @click="addAgreement(props.row, 'sla_agreement_edit')">
+                  {{ $t('m.deployPage["编辑"]')}}
+                </bk-button>
+                <!-- 删除 -->
+                <bk-button
+                  data-test-id="sla_button_agreementDeleteFromOperate1"
+                  v-if="!hasPermission(
+                    ['sla_agreement_delete'],
+                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                  )"
+                  v-cursor
+                  text
+                  theme="primary"
+                  class="btn-permission-disable"
+                  @click="deleteAgreement(props.row, ['sla_agreement_delete'])">
+                  {{ $t('m.deployPage["删除"]') }}
+                </bk-button>
+                <bk-button theme="primary"
+                  data-test-id="sla_button_agreementDeleteFromOperate2"
+                  text
+                  v-else-if="props.row.service_count > 0 || props.row.is_builtin"
+                  :disabled="props.row.service_count > 0 || props.row.is_builtin"
+                  :title="$t(`m.slaContent['应用服务数大于0或者服务协议属于系统内置的不可删除']`)">
+                  {{ $t('m.deployPage["删除"]') }}
+                </bk-button>
+                <bk-button theme="primary" text v-else
+                  data-test-id="sla_button_agreementDeleteFromOperate3"
+                  @click="deleteAgreement(props.row)">
+                  {{ $t('m.deployPage["删除"]') }}
+                </bk-button>
+              </template>
+            </bk-table-column>
+          </bk-table>
         </template>
-        <!-- 新增/修改 -->
-        <add-agreement
-            v-else
-            :model-list="modelList"
-            :model-priority="modelPriority"
-            :email-notify-event-list="emailNotifyEventList"
-            :weixin-notify-event-list="weixinNotifyEventList"
-            :change-info="changeInfo">
-        </add-agreement>
-    </div>
+      </div>
+    </template>
+    <!-- 新增/修改 -->
+    <add-agreement
+      v-else
+      :model-list="modelList"
+      :model-priority="modelPriority"
+      :email-notify-event-list="emailNotifyEventList"
+      :weixin-notify-event-list="weixinNotifyEventList"
+      :change-info="changeInfo">
+    </add-agreement>
+  </div>
 </template>
 
 <script>

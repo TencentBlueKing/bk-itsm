@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <div class="trigger-dialog-box"></div>
+  <div class="trigger-dialog-box"></div>
 </template>
 <script>
     import { errorHandler } from '../../utils/errorHandler';

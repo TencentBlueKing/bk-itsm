@@ -21,186 +21,186 @@
   -->
 
 <template>
-    <div class="bk-add-trigger">
-        <div class="bk-service-name">
-            <h1><span class="is-outline"></span>{{ $t('m.trigger["基础信息"]') }}</h1>
-        </div>
-        <div class="bk-trigger-basic">
-            <bk-form :label-width="170"
-                :model="formData"
-                :ext-cls="'bk-basic-form'"
-                form-type="vertical"
-                :rules="rules"
-                ref="triggerBasic">
-                <bk-form-item :label="$t(`m.trigger['触发器名称']`)"
-                    data-test-id="trigger-input-name"
-                    :required="true"
-                    :property="'name'">
-                    <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)"></bk-input>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.trigger['是否启用']`)">
-                    <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small"></bk-switcher>
-                </bk-form-item>
-                <template v-if="!originInfoToTrigger.id">
-                    <bk-form-item :label="$t(`m.trigger['基础模型']`)">
-                        <bk-select v-model="formData.moduleType"
-                            searchable
-                            :loading="formData.variableLoading"
-                            :disabled="formData.moduleTypeDisabled"
-                            :font-size="'medium'"
-                            @selected="giveTableVariables">
-                            <bk-option v-for="option in moduleTypes"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                </template>
-                <bk-form-item :label="$t(`m.trigger['触发器描述']`)">
-                    <bk-input
-                        :placeholder="$t(`m.trigger['请输入触发器描述']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        :maxlength="100"
-                        v-model="formData.desc">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-            <div class="bk-basic-type" v-bk-clickoutside="handleClickOutSide">
-                <p class="bk-type-icon"><i class="bk-itsm-icon" :class="[iconInfo.key]"></i></p>
-                <p class="bk-type-name">{{iconInfo.name}}</p>
-                <div class="bk-type-change"
-                    :class="{ 'bk-show': iconInfo.status }"
-                    data-test-id="trigger_div_changeType"
-                    @click="handleClick">
-                    <span>{{$t(`m.trigger['点击更换']`)}}</span>
-                </div>
-                <ul class="bk-icon-list" v-if="iconInfo.status">
-                    <li v-for="(item, index) in iconList"
-                        :key="index"
-                        v-bk-tooltips="item.name"
-                        @click="changeIcon(item)">
-                        <i class="bk-itsm-icon" :class="[item.key]" style="font-size: 24px"></i>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="bk-service-name">
-            <h1><span class="is-outline"></span>{{$t(`m.trigger['触发机制']`)}}</h1>
-        </div>
-        <div class="bk-trigger-made">
-            <bk-form :label-width="170"
-                :model="formData"
-                form-type="vertical"
-                :rules="rules"
-                ref="triggerMade">
-                <bk-form-item :label="$t(`m.trigger['触发事件']`)"
-                    data-test-id="trigger-select-triggerEvent"
-                    :required="true"
-                    :property="'signal'"
-                    style="width: 300px;">
-                    <bk-select data-test-id="triggers_select_choiceEvent" v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)">
-                        <bk-option-group
-                            v-for="(group, index) in triggerEventList"
-                            :name="group.name"
-                            :key="index">
-                            <bk-option v-for="option in group.children"
-                                :key="option.key"
-                                :id="option.key"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-option-group>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="trigger-div-triggerRules"
-                    :label="$t(`m.trigger['触发规则']`)"
-                    :required="true">
-                    <div v-bkloading="{ isLoading: contentLoading }" style="min-height: 300px;">
-                        <div class="bk-trigger-rule mb10" v-for="(item, index) in rulesList" :key="index">
-                            <div class="bk-rule-title">
-                                <div style="float: left; margin-right: 10px;">
-                                    <i class="bk-icon icon-down-shape icon-cus" v-if="item.showContent" @click="showContent(item)"></i>
-                                    <i class="bk-icon icon-right-shape icon-cus" v-else @click="showContent(item)"></i>
-                                </div>
-                                <!-- 可以修改触发规则名称 -->
-                                <div class="bk-name-input"
-                                    v-if="item.nameChange">
-                                    <bk-input style="width: 260px; display: inline-block;"
-                                        :clearable="true"
-                                        v-model="item.name">
-                                    </bk-input>
-                                    <span class="bk-input-submit" @click.stop="handleClickName(item, 'submit')">{{$t(`m.trigger['确认']`)}}</span>
-                                    <span class="bk-input-submit" @click.stop="handleClickName(item, 'close')">{{$t(`m.trigger['取消']`)}}</span>
-                                </div>
-                                <span v-else
-                                    class="bk-title-name"
-                                    @click.stop="changeName(item)">
-                                    {{ item.name || ($t(`m.trigger['规则']`) + '-' + (index + 1)) }}
-                                </span>
-                                <!-- 删除 -->
-                                <template v-if="rulesList.length !== 1">
-                                    <i class="bk-icon icon-close icon-nodelete"
-                                        @click.stop="deleteRule(index)"></i>
-                                </template>
-                                <template v-else>
-                                    <i class="bk-icon icon-close icon-nodelete"
-                                        data-test-id="trigger_i_closeTriggerRule"
-                                        v-bk-tooltips.top-start="$t(`m.trigger['规则不能为空']`)"></i>
-                                </template>
-                                <!-- 条件触发开关 -->
-                                <div class="bk-condition-switch">
-                                    <span class="mr5">{{$t(`m.trigger['条件触发']`)}}</span>
-                                    <bk-switcher data-test-id="triggers_switcher_conditionTriggered" v-model="item.triggerStatus" size="small"></bk-switcher>
-                                </div>
-                            </div>
-                            <div v-show="item.showContent">
-                                <!-- 触发条件 -->
-                                <trigger-condition v-if="item.triggerStatus"
-                                    :trigger-rules="item.triggerRules">
-                                </trigger-condition>
-                                <!-- 响应条件 -->
-                                <response-condition
-                                    :signal="formData.signal"
-                                    :response-way-list="responseWayList"
-                                    :response-list="item.responseList">
-                                </response-condition>
-                            </div>
-                        </div>
-                        <p class="bk-add-rules" @click="addRule">
-                            <i class="bk-icon icon-plus-circle"></i><span data-test-id="trigger_span_addTriggerRules">{{$t(`m.trigger['添加规则']`)}}</span>
-                        </p>
-                    </div>
-                </bk-form-item>
-            </bk-form>
-        </div>
-        <div class="bk-submit-trigger">
-            <bk-button :theme="'primary'"
-                data-test-id="trigger_button_submitTrigger"
-                :title="$t(`m.trigger['确认']`)"
-                :disabled="btnLoading"
-                class="mr10"
-                @click="submitTrigger(false)">
-                {{$t(`m.trigger['确认']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="trigger_button_submitTrigger"
-                :title="$t(`m.trigger['保持草稿']`)"
-                :disabled="btnLoading"
-                class="mr10"
-                @click="submitTrigger(true)">
-                {{$t(`m.trigger['保持草稿']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="trigger_button_KeepDraft"
-                :disabled="btnLoading"
-                :title="$t(`m.trigger['取消']`)"
-                @click="closeTrigger">
-                {{$t(`m.trigger['取消']`)}}
-            </bk-button>
-        </div>
+  <div class="bk-add-trigger">
+    <div class="bk-service-name">
+      <h1><span class="is-outline"></span>{{ $t('m.trigger["基础信息"]') }}</h1>
     </div>
+    <div class="bk-trigger-basic">
+      <bk-form :label-width="170"
+        :model="formData"
+        :ext-cls="'bk-basic-form'"
+        form-type="vertical"
+        :rules="rules"
+        ref="triggerBasic">
+        <bk-form-item :label="$t(`m.trigger['触发器名称']`)"
+          data-test-id="trigger-input-name"
+          :required="true"
+          :property="'name'">
+          <bk-input v-model="formData.name" :placeholder="$t(`m.trigger['请输入触发器名称']`)"></bk-input>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.trigger['是否启用']`)">
+          <bk-switcher data-test-id="triggers_switcher_isUseTrigger" v-model="formData.is_enabled" size="small"></bk-switcher>
+        </bk-form-item>
+        <template v-if="!originInfoToTrigger.id">
+          <bk-form-item :label="$t(`m.trigger['基础模型']`)">
+            <bk-select v-model="formData.moduleType"
+              searchable
+              :loading="formData.variableLoading"
+              :disabled="formData.moduleTypeDisabled"
+              :font-size="'medium'"
+              @selected="giveTableVariables">
+              <bk-option v-for="option in moduleTypes"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+        </template>
+        <bk-form-item :label="$t(`m.trigger['触发器描述']`)">
+          <bk-input
+            :placeholder="$t(`m.trigger['请输入触发器描述']`)"
+            :type="'textarea'"
+            :rows="3"
+            :maxlength="100"
+            v-model="formData.desc">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+      <div class="bk-basic-type" v-bk-clickoutside="handleClickOutSide">
+        <p class="bk-type-icon"><i class="bk-itsm-icon" :class="[iconInfo.key]"></i></p>
+        <p class="bk-type-name">{{iconInfo.name}}</p>
+        <div class="bk-type-change"
+          :class="{ 'bk-show': iconInfo.status }"
+          data-test-id="trigger_div_changeType"
+          @click="handleClick">
+          <span>{{$t(`m.trigger['点击更换']`)}}</span>
+        </div>
+        <ul class="bk-icon-list" v-if="iconInfo.status">
+          <li v-for="(item, index) in iconList"
+            :key="index"
+            v-bk-tooltips="item.name"
+            @click="changeIcon(item)">
+            <i class="bk-itsm-icon" :class="[item.key]" style="font-size: 24px"></i>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="bk-service-name">
+      <h1><span class="is-outline"></span>{{$t(`m.trigger['触发机制']`)}}</h1>
+    </div>
+    <div class="bk-trigger-made">
+      <bk-form :label-width="170"
+        :model="formData"
+        form-type="vertical"
+        :rules="rules"
+        ref="triggerMade">
+        <bk-form-item :label="$t(`m.trigger['触发事件']`)"
+          data-test-id="trigger-select-triggerEvent"
+          :required="true"
+          :property="'signal'"
+          style="width: 300px;">
+          <bk-select data-test-id="triggers_select_choiceEvent" v-model="formData.signal" :placeholder="$t(`m.trigger['请选择触发事件']`)">
+            <bk-option-group
+              v-for="(group, index) in triggerEventList"
+              :name="group.name"
+              :key="index">
+              <bk-option v-for="option in group.children"
+                :key="option.key"
+                :id="option.key"
+                :name="option.name">
+              </bk-option>
+            </bk-option-group>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="trigger-div-triggerRules"
+          :label="$t(`m.trigger['触发规则']`)"
+          :required="true">
+          <div v-bkloading="{ isLoading: contentLoading }" style="min-height: 300px;">
+            <div class="bk-trigger-rule mb10" v-for="(item, index) in rulesList" :key="index">
+              <div class="bk-rule-title">
+                <div style="float: left; margin-right: 10px;">
+                  <i class="bk-icon icon-down-shape icon-cus" v-if="item.showContent" @click="showContent(item)"></i>
+                  <i class="bk-icon icon-right-shape icon-cus" v-else @click="showContent(item)"></i>
+                </div>
+                <!-- 可以修改触发规则名称 -->
+                <div class="bk-name-input"
+                  v-if="item.nameChange">
+                  <bk-input style="width: 260px; display: inline-block;"
+                    :clearable="true"
+                    v-model="item.name">
+                  </bk-input>
+                  <span class="bk-input-submit" @click.stop="handleClickName(item, 'submit')">{{$t(`m.trigger['确认']`)}}</span>
+                  <span class="bk-input-submit" @click.stop="handleClickName(item, 'close')">{{$t(`m.trigger['取消']`)}}</span>
+                </div>
+                <span v-else
+                  class="bk-title-name"
+                  @click.stop="changeName(item)">
+                  {{ item.name || ($t(`m.trigger['规则']`) + '-' + (index + 1)) }}
+                </span>
+                <!-- 删除 -->
+                <template v-if="rulesList.length !== 1">
+                  <i class="bk-icon icon-close icon-nodelete"
+                    @click.stop="deleteRule(index)"></i>
+                </template>
+                <template v-else>
+                  <i class="bk-icon icon-close icon-nodelete"
+                    data-test-id="trigger_i_closeTriggerRule"
+                    v-bk-tooltips.top-start="$t(`m.trigger['规则不能为空']`)"></i>
+                </template>
+                <!-- 条件触发开关 -->
+                <div class="bk-condition-switch">
+                  <span class="mr5">{{$t(`m.trigger['条件触发']`)}}</span>
+                  <bk-switcher data-test-id="triggers_switcher_conditionTriggered" v-model="item.triggerStatus" size="small"></bk-switcher>
+                </div>
+              </div>
+              <div v-show="item.showContent">
+                <!-- 触发条件 -->
+                <trigger-condition v-if="item.triggerStatus"
+                  :trigger-rules="item.triggerRules">
+                </trigger-condition>
+                <!-- 响应条件 -->
+                <response-condition
+                  :signal="formData.signal"
+                  :response-way-list="responseWayList"
+                  :response-list="item.responseList">
+                </response-condition>
+              </div>
+            </div>
+            <p class="bk-add-rules" @click="addRule">
+              <i class="bk-icon icon-plus-circle"></i><span data-test-id="trigger_span_addTriggerRules">{{$t(`m.trigger['添加规则']`)}}</span>
+            </p>
+          </div>
+        </bk-form-item>
+      </bk-form>
+    </div>
+    <div class="bk-submit-trigger">
+      <bk-button :theme="'primary'"
+        data-test-id="trigger_button_submitTrigger"
+        :title="$t(`m.trigger['确认']`)"
+        :disabled="btnLoading"
+        class="mr10"
+        @click="submitTrigger(false)">
+        {{$t(`m.trigger['确认']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        data-test-id="trigger_button_submitTrigger"
+        :title="$t(`m.trigger['保持草稿']`)"
+        :disabled="btnLoading"
+        class="mr10"
+        @click="submitTrigger(true)">
+        {{$t(`m.trigger['保持草稿']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        data-test-id="trigger_button_KeepDraft"
+        :disabled="btnLoading"
+        :title="$t(`m.trigger['取消']`)"
+        @click="closeTrigger">
+        {{$t(`m.trigger['取消']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 <script>
     import commonMix from '../../commonMix/common.js';

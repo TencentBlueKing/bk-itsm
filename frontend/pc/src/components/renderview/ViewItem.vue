@@ -21,31 +21,31 @@
   -->
 
 <template>
-    <div class="view-item">
-        <!-- 面包屑 -->
-        <div v-if="crumbsList.length > 1" class="bread-crumbs">
-            <span
-                v-for="(crumbs, index) in crumbsList"
-                :key="index"
-                class="crumbs-item"
-                @click.stop="onCrumbsClick(index)">
-                {{ crumbs.label }}
-            </span>
-        </div>
-        <component
-            v-if="crumbsList.length <= 1"
-            :is="componentType"
-            :form="form"
-            v-bind="getAttrs(form)">
-        </component>
-        <render-view
-            v-else
-            ref="childrenView"
-            :hidden-label="true"
-            :form-data="childrenViewConfig.form_data"
-            :context="getContext()">
-        </render-view>
+  <div class="view-item">
+    <!-- 面包屑 -->
+    <div v-if="crumbsList.length > 1" class="bread-crumbs">
+      <span
+        v-for="(crumbs, index) in crumbsList"
+        :key="index"
+        class="crumbs-item"
+        @click.stop="onCrumbsClick(index)">
+        {{ crumbs.label }}
+      </span>
     </div>
+    <component
+      v-if="crumbsList.length <= 1"
+      :is="componentType"
+      :form="form"
+      v-bind="getAttrs(form)">
+    </component>
+    <render-view
+      v-else
+      ref="childrenView"
+      :hidden-label="true"
+      :form-data="childrenViewConfig.form_data"
+      :context="getContext()">
+    </render-view>
+  </div>
 </template>
 <script>
     import TagText from './tags/TagText.vue';

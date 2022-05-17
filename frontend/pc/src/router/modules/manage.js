@@ -35,61 +35,61 @@ const GlobalSetting = () => import('../../views/manage/globalSetting.vue');
 // const dataDictionary = () => import('../../views/systemConfig/dataDictionary.vue')
 
 export default [
-    {
-        path: '/manage',
-        name: 'ManageIndex',
-        component: Index,
-        children: [
-            // {
-            //     path: 'public_service',
-            //     name: 'publicService',
-            //     component: PublicService
-            // },
-            {
-                path: 'public_fields',
-                name: 'publicFields',
-                component: PublicFields,
-            },
-            {
-                path: 'public_api',
-                name: 'publicAPI',
-                component: PublicAPI,
-            },
-            {
-                path: 'task_tpl',
-                name: 'taskTpl',
-                component: TaskTpl,
-            },
-            {
-                path: 'notify_setting',
-                name: 'notifySetting',
-                component: NotifySetting,
-            },
-            {
-                path: 'sla_priority',
-                name: 'slaPriority',
-                component: SlaPriority,
-            },
-            {
-                path: 'ticket_status',
-                name: 'ticketStatus',
-                component: TicketStatus,
-            },
-            {
-                path: 'global_setting',
-                name: 'globalSetting',
-                component: GlobalSetting,
-            },
-            // {
-            //     path: 'basic_module',
-            //     name: 'basicModule',
-            //     component: basicModule
-            // },
-            // {
-            //     path: 'data_dictionary',
-            //     name: 'dataDictionary',
-            //     component: dataDictionary
-            // }
-        ],
-    },
+  {
+    path: '/manage',
+    name: 'ManageIndex',
+    component: Index,
+    children: [
+      // {
+      //     path: 'public_service',
+      //     name: 'publicService',
+      //     component: PublicService
+      // },
+      {
+        path: 'public_fields',
+        name: 'publicFields',
+        component: PublicFields,
+      },
+      {
+        path: 'public_api',
+        name: 'publicAPI',
+        component: PublicAPI,
+      },
+      {
+        path: 'task_tpl',
+        name: 'taskTpl',
+        component: TaskTpl,
+      },
+      {
+        path: 'notify_setting',
+        name: 'notifySetting',
+        component: NotifySetting,
+      },
+      {
+        path: 'sla_priority',
+        name: 'slaPriority',
+        component: SlaPriority,
+      },
+      {
+        path: 'ticket_status',
+        name: 'ticketStatus',
+        component: TicketStatus,
+      },
+      {
+        path: 'global_setting',
+        name: 'globalSetting',
+        component: GlobalSetting,
+      },
+      // {
+      //     path: 'basic_module',
+      //     name: 'basicModule',
+      //     component: basicModule
+      // },
+      // {
+      //     path: 'data_dictionary',
+      //     name: 'dataDictionary',
+      //     component: dataDictionary
+      // }
+    ],
+  },
 ];

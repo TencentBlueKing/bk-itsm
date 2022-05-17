@@ -21,158 +21,158 @@
   -->
 
 <template>
-    <div class="bk-task-library">
-        <bk-form :label-width="200"
-            ref="addLibrary"
-            form-type="vertical">
-            <bk-form-item :label="$t(`m.task['任务库']`)"
-                :required="true">
-                <div style="width: 50%; padding-right: 10px;">
-                    <bk-select v-model="formData.key"
-                        searchable
-                        @selected="selectLibrary">
-                        <bk-option class="custom-option"
-                            v-for="option in libraryList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                            <span>{{option.name}}</span>
-                            <i class="bk-icon icon-close"
-                                style="font-size: 18px;"
-                                @click.stop="handleDeleteOption(option)">
-                            </i>
-                        </bk-option>
-                    </bk-select>
-                </div>
-            </bk-form-item>
-        </bk-form>
-        <p class="bk-library-message">
-            <i class="bk-icon icon-info-circle"></i><span>{{$t(`m.task['标准运维任务，创建成功不支持修改，请修改后再提交']`)}}</span>
-        </p>
-        <div v-if="formData.key">
-            <bk-table v-bkloading="{ isLoading: tabLoading }"
-                :data="tableList"
-                :size="'small'">
-                <bk-table-column :label="$t(`m.task['顺序']`)" :min-width="minWidth">
-                    <template slot-scope="props">
-                        <template v-if="props.row.orderStatus">
-                            <span class="bk-task-order" @click="changeOrderStatus(props.row)">{{props.row.order}}</span>
-                        </template>
-                        <template v-else>
-                            <bk-input style="display: inline-block; width: 60px;"
-                                type="number"
-                                :min="0"
-                                :precision="precision"
-                                v-model="props.row.orderInfo">
-                            </bk-input>
-                            <p style="display: inline-block; font-size: 12px;">
-                                <span style="margin-right: 5px; margin-left: 5px; cursor: pointer; color: #3a84ff;"
-                                    @click="submitOrder(props.row)">确认</span>
-                                <span style="cursor: pointer; color: #3a84ff;"
-                                    @click="closeOrder(props.row)">取消</span>
-                            </p>
-                        </template>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['任务名称']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.name">{{props.row.name || '--'}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['处理人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.processor_users">{{props.row.processor_users || '--'}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['任务类型']`)">
-                    <template slot-scope="props">
-                        <span>
-                            {{props.row.component_type === 'NORMAL' ? $t(`m.task['普通任务']`) : $t(`m.task['标准运维任务']`)}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['操作']`)" min-width="120">
-                    <template slot-scope="props">
-                        <bk-button theme="primary"
-                            text
-                            @click="editorLibrary(props.row)">
-                            {{$t(`m.task['编辑']`)}}
-                        </bk-button>
-                        <bk-button theme="primary"
-                            text
-                            @click="deleteLibrary(props.row)">
-                            {{ $t('m.user["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
+  <div class="bk-task-library">
+    <bk-form :label-width="200"
+      ref="addLibrary"
+      form-type="vertical">
+      <bk-form-item :label="$t(`m.task['任务库']`)"
+        :required="true">
+        <div style="width: 50%; padding-right: 10px;">
+          <bk-select v-model="formData.key"
+            searchable
+            @selected="selectLibrary">
+            <bk-option class="custom-option"
+              v-for="option in libraryList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+              <span>{{option.name}}</span>
+              <i class="bk-icon icon-close"
+                style="font-size: 18px;"
+                @click.stop="handleDeleteOption(option)">
+              </i>
+            </bk-option>
+          </bk-select>
         </div>
-        <div class="bk-library-btn mt20">
-            <bk-button
-                :theme="'primary'"
-                :title="$t(`m.task['确认']`)"
-                :disabled="!formData.key || !tableList.length || btnLoading"
-                class="mr10"
-                @click="submitLibrary">
-                {{$t(`m.task['确认']`)}}
+      </bk-form-item>
+    </bk-form>
+    <p class="bk-library-message">
+      <i class="bk-icon icon-info-circle"></i><span>{{$t(`m.task['标准运维任务，创建成功不支持修改，请修改后再提交']`)}}</span>
+    </p>
+    <div v-if="formData.key">
+      <bk-table v-bkloading="{ isLoading: tabLoading }"
+        :data="tableList"
+        :size="'small'">
+        <bk-table-column :label="$t(`m.task['顺序']`)" :min-width="minWidth">
+          <template slot-scope="props">
+            <template v-if="props.row.orderStatus">
+              <span class="bk-task-order" @click="changeOrderStatus(props.row)">{{props.row.order}}</span>
+            </template>
+            <template v-else>
+              <bk-input style="display: inline-block; width: 60px;"
+                type="number"
+                :min="0"
+                :precision="precision"
+                v-model="props.row.orderInfo">
+              </bk-input>
+              <p style="display: inline-block; font-size: 12px;">
+                <span style="margin-right: 5px; margin-left: 5px; cursor: pointer; color: #3a84ff;"
+                  @click="submitOrder(props.row)">确认</span>
+                <span style="cursor: pointer; color: #3a84ff;"
+                  @click="closeOrder(props.row)">取消</span>
+              </p>
+            </template>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['任务名称']`)">
+          <template slot-scope="props">
+            <span :title="props.row.name">{{props.row.name || '--'}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['处理人']`)">
+          <template slot-scope="props">
+            <span :title="props.row.processor_users">{{props.row.processor_users || '--'}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['任务类型']`)">
+          <template slot-scope="props">
+            <span>
+              {{props.row.component_type === 'NORMAL' ? $t(`m.task['普通任务']`) : $t(`m.task['标准运维任务']`)}}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['操作']`)" min-width="120">
+          <template slot-scope="props">
+            <bk-button theme="primary"
+              text
+              @click="editorLibrary(props.row)">
+              {{$t(`m.task['编辑']`)}}
             </bk-button>
-            <bk-button :theme="'default'"
-                :disabled="!formData.key || !tableList.length || btnLoading"
-                :title="$t(`m.task['更新任务库']`)"
-                class="mr10"
-                @click="updataLibrary">
-                {{$t(`m.task['更新任务库']`)}}
+            <bk-button theme="primary"
+              text
+              @click="deleteLibrary(props.row)">
+              {{ $t('m.user["删除"]') }}
             </bk-button>
-            <bk-button :theme="'default'"
-                :disabled="btnLoading"
-                :title="$t(`m.task['取消']`)"
-                @click="closeTaskLibrary">
-                {{$t(`m.task['取消']`)}}
-            </bk-button>
-        </div>
-        <!-- 编辑列表数据弹窗 -->
-        <bk-sideslider
-            :is-show.sync="tableContent.show"
-            :title="tableContent.title"
-            :width="tableContent.width">
-            <div class="bk-task-library" slot="content" v-if="tableContent.show">
-                <bk-form :ext-cls="'mb10'"
-                    :label-width="200"
-                    form-type="vertical">
-                    <!-- 处理人 -->
-                    <bk-form-item :label="$t(`m.task['处理人']`)"
-                        :required="true">
-                        <deal-person
-                            ref="personSelect"
-                            class="deal-person"
-                            :shortcut="true"
-                            :value="tableContent.formInfo"
-                            :exclude-role-type-list="excludeTypeList">
-                        </deal-person>
-                    </bk-form-item>
-                </bk-form>
-                <field-info ref="fieldInfo"
-                    :fields="tableContent.content.fields"
-                    :basic-infomation="basicInfomation">
-                </field-info>
-                <div class="mt20">
-                    <bk-button :theme="'primary'"
-                        :title="$t(`m.task['确认']`)"
-                        :disabled="btnLoading"
-                        class="mr10"
-                        @click="submitTableContent">
-                        {{$t(`m.task['确认']`)}}
-                    </bk-button>
-                    <bk-button :theme="'default'"
-                        :disabled="btnLoading"
-                        :title="$t(`m.task['取消']`)"
-                        @click.stop="tableContent.show = false">
-                        {{$t(`m.task['取消']`)}}
-                    </bk-button>
-                </div>
-            </div>
-        </bk-sideslider>
+          </template>
+        </bk-table-column>
+      </bk-table>
     </div>
+    <div class="bk-library-btn mt20">
+      <bk-button
+        :theme="'primary'"
+        :title="$t(`m.task['确认']`)"
+        :disabled="!formData.key || !tableList.length || btnLoading"
+        class="mr10"
+        @click="submitLibrary">
+        {{$t(`m.task['确认']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        :disabled="!formData.key || !tableList.length || btnLoading"
+        :title="$t(`m.task['更新任务库']`)"
+        class="mr10"
+        @click="updataLibrary">
+        {{$t(`m.task['更新任务库']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        :disabled="btnLoading"
+        :title="$t(`m.task['取消']`)"
+        @click="closeTaskLibrary">
+        {{$t(`m.task['取消']`)}}
+      </bk-button>
+    </div>
+    <!-- 编辑列表数据弹窗 -->
+    <bk-sideslider
+      :is-show.sync="tableContent.show"
+      :title="tableContent.title"
+      :width="tableContent.width">
+      <div class="bk-task-library" slot="content" v-if="tableContent.show">
+        <bk-form :ext-cls="'mb10'"
+          :label-width="200"
+          form-type="vertical">
+          <!-- 处理人 -->
+          <bk-form-item :label="$t(`m.task['处理人']`)"
+            :required="true">
+            <deal-person
+              ref="personSelect"
+              class="deal-person"
+              :shortcut="true"
+              :value="tableContent.formInfo"
+              :exclude-role-type-list="excludeTypeList">
+            </deal-person>
+          </bk-form-item>
+        </bk-form>
+        <field-info ref="fieldInfo"
+          :fields="tableContent.content.fields"
+          :basic-infomation="basicInfomation">
+        </field-info>
+        <div class="mt20">
+          <bk-button :theme="'primary'"
+            :title="$t(`m.task['确认']`)"
+            :disabled="btnLoading"
+            class="mr10"
+            @click="submitTableContent">
+            {{$t(`m.task['确认']`)}}
+          </bk-button>
+          <bk-button :theme="'default'"
+            :disabled="btnLoading"
+            :title="$t(`m.task['取消']`)"
+            @click.stop="tableContent.show = false">
+            {{$t(`m.task['取消']`)}}
+          </bk-button>
+        </div>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

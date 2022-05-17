@@ -21,109 +21,109 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t(`m["触发器"]`) }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <empty-tip
-                v-if="projectId && !isLoading && triggerList.length === 0 && searchToggle"
-                :title="emptyTip.title"
-                :sub-title="emptyTip.subTitle"
-                :desc="emptyTip.desc"
-                :links="emptyTip.links">
-                <template slot="btns">
-                    <bk-button
-                        data-test-id="triggers_button_create_permission"
-                        :theme="'primary'"
-                        v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
-                        :class="{
-                            'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
-                        }"
-                        @click="addTrigger">
-                        {{ $t('m["立即创建"]') }}
-                    </bk-button>
-                </template>
-            </empty-tip>
-            <template v-else>
-                <!-- 提示信息 -->
-                <div class="bk-itsm-version itsm-notify" v-if="versionStatus" style="margin: 10px 20px 10px 0;">
-                    <div class="notify-icon">
-                        <i class="bk-icon icon-info-circle"></i>
-                    </div>
-                    <div class="notify-content">
-                        {{ $t('m.trigger["公共触发器：供其他流程在配置过程中引用。"]') }} <br />
-                        {{ $t('m.trigger["引用原则：与引用位置相匹配的触发器。如：在节点中引用触发器，只能引用“触发事件类型=节点信号”的公共触发器。在流转条件配置时引用触发器，只能引用“触发事件类型=线条信号”的公共触发器。系统会根据引用位置来自动过滤不适用的公共触发器。"]') }}
-                    </div>
-                    <i class="bk-icon icon-close" @click="closeVersion"></i>
-                </div>
-                <div class="bk-normal-search">
-                    <bk-button :theme="'primary'"
-                        data-test-id="triggers_button_create"
-                        v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
-                        :title="$t(`m.managePage['新增']`)"
-                        icon="plus"
-                        :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
-                        }]"
-                        @click="addTrigger">
-                        {{ $t('m.managePage["新增"]') }}
-                    </bk-button>
-                    <div class="bk-search-key">
-                        <bk-input
-                            data-test-id="triggers_button_search"
-                            :clearable="true"
-                            :right-icon="'bk-icon icon-search'"
-                            v-model="searchKey"
-                            @enter="searchInfo"
-                            @clear="clearSearch">
-                        </bk-input>
-                    </div>
-                </div>
-                <div style="min-height: 300px;" v-bkloading="{ isLoading: isLoading }">
-                    <!-- table -->
-                    <ul class="bk-trigger-content">
-                        <li v-for="(item, index) in triggerList"
-                            :key="index">
-                            <span class="bk-trigger-icon">
-                                <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
-                            </span>
-                            <span class="bk-trigger-name"
-                                :title="item.name"
-                                @click="changeTrigger(item, index)">
-                                {{ item.name || '--' }}
-                                <span v-if="item.is_draft" style="color: #3A84FF;">{{ $t('m.taskTemplate["(草稿)"]') }}</span>
-                            </span>
-                            <span class="bk-trigger-delete" @click.stop="deleteTrigger(item, index)">
-                                <i class="bk-icon icon-delete"></i>
-                            </span>
-                        </li>
-                    </ul>
-                    <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
-                </div>
-            </template>
-        </div>
-        <!-- 新建触发器弹窗 -->
-        <div class="bk-add-slider">
-            <bk-sideslider
-                :is-show.sync="sliderInfo.show"
-                :title="sliderInfo.title"
-                :width="sliderInfo.width">
-                <div slot="content"
-                    v-bkloading="{ isLoading: sliderInfo.addLoading }"
-                    style="min-height: 300px;">
-                    <add-trigger v-if="sliderInfo.show"
-                        :trigger-info="triggerInfo"
-                        :project-id="projectId"
-                        @closeTrigger="closeTrigger"
-                        @getList="getList">
-                    </add-trigger>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t(`m["触发器"]`) }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <empty-tip
+        v-if="projectId && !isLoading && triggerList.length === 0 && searchToggle"
+        :title="emptyTip.title"
+        :sub-title="emptyTip.subTitle"
+        :desc="emptyTip.desc"
+        :links="emptyTip.links">
+        <template slot="btns">
+          <bk-button
+            data-test-id="triggers_button_create_permission"
+            :theme="'primary'"
+            v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
+            :class="{
+              'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
+            }"
+            @click="addTrigger">
+            {{ $t('m["立即创建"]') }}
+          </bk-button>
+        </template>
+      </empty-tip>
+      <template v-else>
+        <!-- 提示信息 -->
+        <div class="bk-itsm-version itsm-notify" v-if="versionStatus" style="margin: 10px 20px 10px 0;">
+          <div class="notify-icon">
+            <i class="bk-icon icon-info-circle"></i>
+          </div>
+          <div class="notify-content">
+            {{ $t('m.trigger["公共触发器：供其他流程在配置过程中引用。"]') }} <br />
+            {{ $t('m.trigger["引用原则：与引用位置相匹配的触发器。如：在节点中引用触发器，只能引用“触发事件类型=节点信号”的公共触发器。在流转条件配置时引用触发器，只能引用“触发事件类型=线条信号”的公共触发器。系统会根据引用位置来自动过滤不适用的公共触发器。"]') }}
+          </div>
+          <i class="bk-icon icon-close" @click="closeVersion"></i>
+        </div>
+        <div class="bk-normal-search">
+          <bk-button :theme="'primary'"
+            data-test-id="triggers_button_create"
+            v-cursor="{ active: !hasPermission(['triggers_create'], $store.state.project.projectAuthActions) }"
+            :title="$t(`m.managePage['新增']`)"
+            icon="plus"
+            :class="['mr10', 'plus-cus', {
+              'btn-permission-disable': !hasPermission(['triggers_create'], $store.state.project.projectAuthActions)
+            }]"
+            @click="addTrigger">
+            {{ $t('m.managePage["新增"]') }}
+          </bk-button>
+          <div class="bk-search-key">
+            <bk-input
+              data-test-id="triggers_button_search"
+              :clearable="true"
+              :right-icon="'bk-icon icon-search'"
+              v-model="searchKey"
+              @enter="searchInfo"
+              @clear="clearSearch">
+            </bk-input>
+          </div>
+        </div>
+        <div style="min-height: 300px;" v-bkloading="{ isLoading: isLoading }">
+          <!-- table -->
+          <ul class="bk-trigger-content">
+            <li v-for="(item, index) in triggerList"
+              :key="index">
+              <span class="bk-trigger-icon">
+                <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
+              </span>
+              <span class="bk-trigger-name"
+                :title="item.name"
+                @click="changeTrigger(item, index)">
+                {{ item.name || '--' }}
+                <span v-if="item.is_draft" style="color: #3A84FF;">{{ $t('m.taskTemplate["(草稿)"]') }}</span>
+              </span>
+              <span class="bk-trigger-delete" @click.stop="deleteTrigger(item, index)">
+                <i class="bk-icon icon-delete"></i>
+              </span>
+            </li>
+          </ul>
+          <div v-if="!searchToggle" class="search-tip">{{ $t('m["未查找到触发器"]') }}</div>
+        </div>
+      </template>
+    </div>
+    <!-- 新建触发器弹窗 -->
+    <div class="bk-add-slider">
+      <bk-sideslider
+        :is-show.sync="sliderInfo.show"
+        :title="sliderInfo.title"
+        :width="sliderInfo.width">
+        <div slot="content"
+          v-bkloading="{ isLoading: sliderInfo.addLoading }"
+          style="min-height: 300px;">
+          <add-trigger v-if="sliderInfo.show"
+            :trigger-info="triggerInfo"
+            :project-id="projectId"
+            @closeTrigger="closeTrigger"
+            @getList="getList">
+          </add-trigger>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../../utils/errorHandler';

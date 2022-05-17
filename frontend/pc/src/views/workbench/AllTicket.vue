@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="all-ticket-page">
-        <all-ticket-list from="allUserTicket"></all-ticket-list>
-    </div>
+  <div class="all-ticket-page">
+    <all-ticket-list from="allUserTicket"></all-ticket-list>
+  </div>
 </template>
 <script>
     import AllTicketList from '../ticket/allTicket/index';

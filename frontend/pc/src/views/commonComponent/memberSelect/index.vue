@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div :class="[extCls]" test-posi-id="bk-member-selector">
-        <bk-user-selector
-            :value="value"
-            class="ui-user-selector"
-            :fixed-height="true"
-            :api="api"
-            :disabled="disabled"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :default-alternate="customUserList"
-            :fuzzy-search-method="specifyIdList.length ? fuzzySearchMethod : null"
-            @change="onChange">
-        </bk-user-selector>
-    </div>
+  <div :class="[extCls]" test-posi-id="bk-member-selector">
+    <bk-user-selector
+      :value="value"
+      class="ui-user-selector"
+      :fixed-height="true"
+      :api="api"
+      :disabled="disabled"
+      :multiple="multiple"
+      :placeholder="placeholder"
+      :default-alternate="customUserList"
+      :fuzzy-search-method="specifyIdList.length ? fuzzySearchMethod : null"
+      @change="onChange">
+    </bk-user-selector>
+  </div>
 </template>
 
 <script>

@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <div :class="['form-view-item', crtForm === form.id ? 'click-status' : '']">
-        <i v-if="!addFieldStatus && crtForm === form.id" class="bk-itsm-icon icon-itsm-icon-square-one"></i>
-        <div class="drag-element">
-            <slot name="draggable"></slot>
-        </div>
-        <div class="form-view-content">
-            <component
-                :is="'CW-' + form.type"
-                :item="form"
-                :fields="fields">
-            </component>
-        </div>
-        <div class="mask" @click="$emit('onFormEditClick', form)"></div>
-        <div class="opt-btns">
-            <!-- <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four"></i> -->
-            <i class="btn-item bk-itsm-icon icon-itsm-icon-copy" v-if="form.source === 'CUSTOM' " @click="$emit('onFormCloneClick', form)"></i>
-            <i v-bk-tooltips="{ placement: 'auto-start', content: $t(`m['内置字段，不可删除']`), disabled: !deleteDisabled, theme: 'Light' }" class="btn-item bk-icon icon-delete" :class="deleteDisabled ? 'disabled' : ''" @click="onDeleteClick(form)"></i>
-        </div>
+  <div :class="['form-view-item', crtForm === form.id ? 'click-status' : '']">
+    <i v-if="!addFieldStatus && crtForm === form.id" class="bk-itsm-icon icon-itsm-icon-square-one"></i>
+    <div class="drag-element">
+      <slot name="draggable"></slot>
     </div>
+    <div class="form-view-content">
+      <component
+        :is="'CW-' + form.type"
+        :item="form"
+        :fields="fields">
+      </component>
+    </div>
+    <div class="mask" @click="$emit('onFormEditClick', form)"></div>
+    <div class="opt-btns">
+      <!-- <i class="btn-item bk-itsm-icon icon-itsm-icon-three-four"></i> -->
+      <i class="btn-item bk-itsm-icon icon-itsm-icon-copy" v-if="form.source === 'CUSTOM' " @click="$emit('onFormCloneClick', form)"></i>
+      <i v-bk-tooltips="{ placement: 'auto-start', content: $t(`m['内置字段，不可删除']`), disabled: !deleteDisabled, theme: 'Light' }" class="btn-item bk-icon icon-delete" :class="deleteDisabled ? 'disabled' : ''" @click="onDeleteClick(form)"></i>
+    </div>
+  </div>
 </template>
 <script>
     function registerFields() {

@@ -21,166 +21,166 @@
   -->
 
 <template>
-    <div class="bk-correlationsla-info" v-bkloading="{ isLoading: loading }">
-        <div
-            class="bk-correlationsla-li"
-            v-for="(sla, index) in slaList"
-            :key="index"
+  <div class="bk-correlationsla-info" v-bkloading="{ isLoading: loading }">
+    <div
+      class="bk-correlationsla-li"
+      v-for="(sla, index) in slaList"
+      :key="index"
+    >
+      <div class="bk-corr-sla-name">
+        <span
+          v-if="sla.task_status === 2 && sla.sla_status === 4"
+          class="bk-corr-sla-status"
+          :style="
+            'color: ' +
+              taskStatusColor[5].textColor +
+              '; background-color: ' +
+              taskStatusColor[5].backgroundColor
+          "
         >
-            <div class="bk-corr-sla-name">
-                <span
-                    v-if="sla.task_status === 2 && sla.sla_status === 4"
-                    class="bk-corr-sla-status"
-                    :style="
-                        'color: ' +
-                            taskStatusColor[5].textColor +
-                            '; background-color: ' +
-                            taskStatusColor[5].backgroundColor
-                    "
-                >
-                    {{ taskStatusList[5] }}
-                </span>
-                <span
-                    v-else
-                    class="bk-corr-sla-status"
-                    :style="
-                        'color: ' +
-                            taskStatusColor[sla.task_status].textColor +
-                            '; background-color: ' +
-                            taskStatusColor[sla.task_status].backgroundColor
-                    "
-                >
-                    {{ taskStatusList[sla.task_status] }}
-                </span>
-                : {{ sla.name }}
-            </div>
-            <div class="bk-time-box">
-                <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <span
-                    v-bk-tooltips.top="{
-                        content: '首次响应时间' + sla.begin_at
-                    }"
-                    class="underline time-type"
-                >{{ $t('m["响应"]')
-                }}{{
-                    sla.isResponseTimeout
-                        ? $t('m["已超时"]')
-                        : $t('m["倒计时"]')
-                }}</span
-                >
-                <span
-                    :class="[
-                        'time',
-                        sla.isResponseNormal
-                            ? ''
-                            : sla.isResponseTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_responseTime[3] }}</span
-                >&nbsp;:
-                <span
-                    :class="[
-                        'time',
-                        sla.isResponseNormal
-                            ? ''
-                            : sla.isResponseTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_responseTime[4] }}</span
-                >&nbsp;:
-                <span
-                    :class="[
-                        'time',
-                        sla.isResponseNormal
-                            ? ''
-                            : sla.isResponseTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_responseTime[5] }}</span
-                >
-                <i
-                    v-if="!sla.isResponseNormal"
-                    :class="[
-                        'status-icon',
-                        'bk-itsm-icon',
-                        sla.isResponseTimeout
-                            ? 'icon-itsm-icon-square-one'
-                            : 'icon-chaoshigaojing'
-                    ]"
-                ></i>
-            </div>
-            <div class="bk-time-box">
-                <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
-                <span
-                    v-bk-tooltips.top="{
-                        content:
-                            '首次处理时间' +
-                            (sla.replied_at || '00-00-00 00:00:00')
-                    }"
-                    class="underline time-type"
-                >{{ $t('m["处理"]')
-                }}{{
-                    sla.isProcessTimeout
-                        ? $t('m["已超时"]')
-                        : $t('m["倒计时"]')
-                }}</span
-                >
-                <span
-                    :class="[
-                        'time',
-                        sla.isProcessNormal
-                            ? ''
-                            : sla.isProcessTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_processTime[3] }}</span
-                >&nbsp;:
-                <span
-                    :class="[
-                        'time',
-                        sla.isProcessNormal
-                            ? ''
-                            : sla.isProcessTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_processTime[4] }}</span
-                >&nbsp;:
-                <span
-                    :class="[
-                        'time',
-                        sla.isProcessNormal
-                            ? ''
-                            : sla.isProcessTimeout
-                                ? 'timeout'
-                                : 'warn'
-                    ]"
-                >{{ sla.sla_processTime[5] }}</span
-                >
-                <i
-                    v-if="!sla.isProcessNormal"
-                    :class="[
-                        'status-icon',
-                        'bk-itsm-icon',
-                        sla.isProcessTimeout
-                            ? 'icon-itsm-icon-square-one'
-                            : 'icon-chaoshigaojing'
-                    ]"
-                ></i>
-            </div>
-        </div>
-        <div class="bk-no-content" v-if="slaList.length === 0 && !loading">
-            <img src="@/images/box.png" />
-            <p>
-                {{ $t('m["暂时没有设置SLA"]')
-                }}<span @click="goToSla">{{ $t('m["去设置"]') }}</span>
-            </p>
-        </div>
+          {{ taskStatusList[5] }}
+        </span>
+        <span
+          v-else
+          class="bk-corr-sla-status"
+          :style="
+            'color: ' +
+              taskStatusColor[sla.task_status].textColor +
+              '; background-color: ' +
+              taskStatusColor[sla.task_status].backgroundColor
+          "
+        >
+          {{ taskStatusList[sla.task_status] }}
+        </span>
+        : {{ sla.name }}
+      </div>
+      <div class="bk-time-box">
+        <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+        <span
+          v-bk-tooltips.top="{
+            content: '首次响应时间' + sla.begin_at
+          }"
+          class="underline time-type"
+        >{{ $t('m["响应"]')
+        }}{{
+          sla.isResponseTimeout
+            ? $t('m["已超时"]')
+            : $t('m["倒计时"]')
+        }}</span
+        >
+        <span
+          :class="[
+            'time',
+            sla.isResponseNormal
+              ? ''
+              : sla.isResponseTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_responseTime[3] }}</span
+        >&nbsp;:
+        <span
+          :class="[
+            'time',
+            sla.isResponseNormal
+              ? ''
+              : sla.isResponseTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_responseTime[4] }}</span
+        >&nbsp;:
+        <span
+          :class="[
+            'time',
+            sla.isResponseNormal
+              ? ''
+              : sla.isResponseTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_responseTime[5] }}</span
+        >
+        <i
+          v-if="!sla.isResponseNormal"
+          :class="[
+            'status-icon',
+            'bk-itsm-icon',
+            sla.isResponseTimeout
+              ? 'icon-itsm-icon-square-one'
+              : 'icon-chaoshigaojing'
+          ]"
+        ></i>
+      </div>
+      <div class="bk-time-box">
+        <i class="bk-itsm-icon icon-itsm-icon-two-five"></i>&nbsp;
+        <span
+          v-bk-tooltips.top="{
+            content:
+              '首次处理时间' +
+              (sla.replied_at || '00-00-00 00:00:00')
+          }"
+          class="underline time-type"
+        >{{ $t('m["处理"]')
+        }}{{
+          sla.isProcessTimeout
+            ? $t('m["已超时"]')
+            : $t('m["倒计时"]')
+        }}</span
+        >
+        <span
+          :class="[
+            'time',
+            sla.isProcessNormal
+              ? ''
+              : sla.isProcessTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_processTime[3] }}</span
+        >&nbsp;:
+        <span
+          :class="[
+            'time',
+            sla.isProcessNormal
+              ? ''
+              : sla.isProcessTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_processTime[4] }}</span
+        >&nbsp;:
+        <span
+          :class="[
+            'time',
+            sla.isProcessNormal
+              ? ''
+              : sla.isProcessTimeout
+                ? 'timeout'
+                : 'warn'
+          ]"
+        >{{ sla.sla_processTime[5] }}</span
+        >
+        <i
+          v-if="!sla.isProcessNormal"
+          :class="[
+            'status-icon',
+            'bk-itsm-icon',
+            sla.isProcessTimeout
+              ? 'icon-itsm-icon-square-one'
+              : 'icon-chaoshigaojing'
+          ]"
+        ></i>
+      </div>
     </div>
+    <div class="bk-no-content" v-if="slaList.length === 0 && !loading">
+      <img src="@/images/box.png" />
+      <p>
+        {{ $t('m["暂时没有设置SLA"]')
+        }}<span @click="goToSla">{{ $t('m["去设置"]') }}</span>
+      </p>
+    </div>
+  </div>
 </template>
 
 <script>

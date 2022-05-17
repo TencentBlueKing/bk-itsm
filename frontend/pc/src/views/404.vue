@@ -21,10 +21,10 @@
   -->
 
 <template>
-    <div class="exception-box">
-        <img src="https://magicbox.bk.tencent.com/static_api/v3/components/exception_building/images/building.png" alt="">
-        <p>{{ $t('m.wiki["没找到页面！"]') }}</p>
-    </div>
+  <div class="exception-box">
+    <img src="https://magicbox.bk.tencent.com/static_api/v3/components/exception_building/images/building.png" alt="">
+    <p>{{ $t('m.wiki["没找到页面！"]') }}</p>
+  </div>
 </template>
 
 <script>

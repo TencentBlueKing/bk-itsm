@@ -21,203 +21,203 @@
   -->
 
 <template>
-    <div class="bk-api-tree">
-        <div class="bk-tree-content">
-            <div class="mb20">
-                <bk-input v-model="searchWord"
-                    :right-icon="'bk-icon icon-search'"
-                    :clearable="true"
-                    @clear="clearInfo">
-                    <template slot="append">
-                        <bk-dropdown-menu class="group-text"
-                            @show="dropdownShow"
-                            @hide="dropdownHide"
-                            ref="dropdown"
-                            style="width: 70px; line-height: 30px;">
-                            <div class="dropdown-trigger-btn" style="padding-left: 19px;" slot="dropdown-trigger">
-                                <span>{{ $t(`m.systemConfig['接入']`)}}</span>
-                                <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                            </div>
-                            <ul class="bk-dropdown-list" slot="dropdown-content">
-                                <li>
-                                    <a href="javascript:;"
-                                        data-test-id="api_a_accessApi"
-                                        v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                        :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                                        :title="$t(`m.systemConfig['接入']`)"
-                                        @click="openDictionary('JION')">
-                                        {{ $t(`m.systemConfig['接入']`) }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"
-                                        data-test-id="api_a_createApi"
-                                        v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                        :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                                        :title="$t(`m.systemConfig['新增']`)"
-                                        @click="openDictionary('ADD')">
-                                        {{$t(`m.systemConfig['新增']`)}}
-                                    </a>
-                                </li>
-                            </ul>
-                        </bk-dropdown-menu>
-                    </template>
-                </bk-input>
-            </div>
-            <div class="bk-tree-info" v-bkloading="{ isLoading: isTreeLoading }">
-                <ul class="bk-tree-group" @scroll="scrollEvent">
-                    <li v-for="(item, index) in treeList"
-                        :key="index"
-                        data-test-id="api_li_viewApiTable"
-                        @click="showBackground(item, index, 0)">
-                        <template v-if="!item.id">
-                            <div class="bk-group-parent bk-p18"
-                                :class="{ 'bk-group-li': item.check }">
-                                <i class="bk-icon icon-folder bk-ml5"></i>
-                                <span>{{ $t('m.systemConfig["全部系统"]') }}</span>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div class="bk-group-parent bk-p18 bk-handel"
-                                :class="{ 'bk-group-li': item.check }">
-                                <i class="bk-icon icon-folder-open bk-ml5"></i>
-                                <span class="bk-group-name">{{item.name}}</span>
-                                <span style="display: inline-block;" class="bk-edit" v-if="item.can_edit">
-                                    <i class="bk-icon icon-more bk-tree-point bk-point-selected">
-                                    </i>
-                                    <ul class="bk-more" :style="styletranslateY">
-                                        <li
-                                            v-if="!item.is_builtin"
-                                            data-test-id="api_li_deleteApiDirectory"
-                                            v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                                            :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
-                                            @click.stop="openDelete(item)">
-                                            <span>{{ $t('m.systemConfig["删除"]') }}</span>
-                                        </li>
-                                        <li
-                                            data-test-id="api_li_editApiDirectory"
-                                            v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
-                                            :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
-                                            @click.stop="openDictionary('CHANGE' ,item)">
-                                            <span>{{ $t('m.systemConfig["编辑"]') }}</span>
-                                        </li>
-                                    </ul>
-                                </span>
-                            </div>
-                            <collapse-transition>
-                                <template v-if="item.showMore && false">
-                                    <ul class="bk-group-child">
-                                        <li v-for="(node, nodeIndex) in item.apis"
-                                            :key="nodeIndex"
-                                            class="bk-p42"
-                                            :class="{ 'bk-group-li': node.check }"
-                                            @click.stop="showBackground(node, index, 1)">
-                                            <span class="bk-group-child-name">{{node.name}}</span>
-                                        </li>
-                                    </ul>
-                                </template>
-                            </collapse-transition>
-                        </template>
+  <div class="bk-api-tree">
+    <div class="bk-tree-content">
+      <div class="mb20">
+        <bk-input v-model="searchWord"
+          :right-icon="'bk-icon icon-search'"
+          :clearable="true"
+          @clear="clearInfo">
+          <template slot="append">
+            <bk-dropdown-menu class="group-text"
+              @show="dropdownShow"
+              @hide="dropdownHide"
+              ref="dropdown"
+              style="width: 70px; line-height: 30px;">
+              <div class="dropdown-trigger-btn" style="padding-left: 19px;" slot="dropdown-trigger">
+                <span>{{ $t(`m.systemConfig['接入']`)}}</span>
+                <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+              </div>
+              <ul class="bk-dropdown-list" slot="dropdown-content">
+                <li>
+                  <a href="javascript:;"
+                    data-test-id="api_a_accessApi"
+                    v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
+                    :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                    :title="$t(`m.systemConfig['接入']`)"
+                    @click="openDictionary('JION')">
+                    {{ $t(`m.systemConfig['接入']`) }}
+                  </a>
+                </li>
+                <li>
+                  <a href="javascript:;"
+                    data-test-id="api_a_createApi"
+                    v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
+                    :class="{ 'text-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+                    :title="$t(`m.systemConfig['新增']`)"
+                    @click="openDictionary('ADD')">
+                    {{$t(`m.systemConfig['新增']`)}}
+                  </a>
+                </li>
+              </ul>
+            </bk-dropdown-menu>
+          </template>
+        </bk-input>
+      </div>
+      <div class="bk-tree-info" v-bkloading="{ isLoading: isTreeLoading }">
+        <ul class="bk-tree-group" @scroll="scrollEvent">
+          <li v-for="(item, index) in treeList"
+            :key="index"
+            data-test-id="api_li_viewApiTable"
+            @click="showBackground(item, index, 0)">
+            <template v-if="!item.id">
+              <div class="bk-group-parent bk-p18"
+                :class="{ 'bk-group-li': item.check }">
+                <i class="bk-icon icon-folder bk-ml5"></i>
+                <span>{{ $t('m.systemConfig["全部系统"]') }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <div class="bk-group-parent bk-p18 bk-handel"
+                :class="{ 'bk-group-li': item.check }">
+                <i class="bk-icon icon-folder-open bk-ml5"></i>
+                <span class="bk-group-name">{{item.name}}</span>
+                <span style="display: inline-block;" class="bk-edit" v-if="item.can_edit">
+                  <i class="bk-icon icon-more bk-tree-point bk-point-selected">
+                  </i>
+                  <ul class="bk-more" :style="styletranslateY">
+                    <li
+                      v-if="!item.is_builtin"
+                      data-test-id="api_li_deleteApiDirectory"
+                      v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                      :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                      @click.stop="openDelete(item)">
+                      <span>{{ $t('m.systemConfig["删除"]') }}</span>
                     </li>
-                </ul>
-            </div>
-        </div>
-        <!-- 接入系统 -->
-        <bk-dialog
-            data-test-id="api_dialog_accessApi"
-            v-model="dictDataTable.showDialog"
-            :render-directive="'if'"
-            :width="dictDataTable.width"
-            :header-position="dictDataTable.headerPosition"
-            :loading="secondClick"
-            :auto-close="dictDataTable.autoClose"
-            :mask-close="dictDataTable.autoClose"
-            :title="dictDataTable.title"
-            @confirm="submitDictionary">
-            <div class="bk-add-module">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="dictDataTable.formInfo"
-                    :rules="rules"
-                    ref="dictDataForm">
-                    <template v-if="dictDataTable.type === 'ADD'">
-                        <bk-form-item
-                            data-test-id="api-input-systemName"
-                            :label="$t(`m.systemConfig['系统名称：']`)"
-                            :required="true"
-                            :property="'addName'">
-                            <bk-input :clearable="true" v-model="dictDataTable.formInfo.addName"></bk-input>
-                        </bk-form-item>
-                        <bk-form-item
-                            data-test-id="api-input-systemCode"
-                            :label="$t(`m.systemConfig['系统编码：']`)"
-                            :required="true"
-                            :property="'addCode'">
-                            <bk-input :clearable="true" v-model="dictDataTable.formInfo.addCode"></bk-input>
-                        </bk-form-item>
-                    </template>
-                    <template v-else>
-                        <bk-form-item
-                            :label="$t(`m.systemConfig['系统名称：']`)"
-                            :required="true"
-                            :property="'code'">
-                            <template v-if="dictDataTable.type === 'CHANGE'">
-                                <bk-select disabled
-                                    v-model="dictDataTable.formInfo.code"
-                                    :clearable="false"
-                                    searchable
-                                    @selected="changeCode">
-                                    <bk-option v-for="option in allCodeList"
-                                        :key="option.code"
-                                        :id="option.code"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </template>
-                            <template v-else>
-                                <bk-select
-                                    v-model="dictDataTable.formInfo.code"
-                                    :clearable="false"
-                                    searchable
-                                    @selected="changeCode">
-                                    <bk-option v-for="option in codeList"
-                                        :key="option.code"
-                                        :id="option.code"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </template>
-                        </bk-form-item>
-                    </template>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['系统域名：']`)"
-                        :property="'domain'">
-                        <bk-input :clearable="true" v-model="dictDataTable.formInfo.domain"></bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['负责人：']`)">
-                        <member-select
-                            v-model="dictDataTable.formInfo.personInCharge">
-                        </member-select>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['备注：']`)">
-                        <bk-input
-                            :placeholder="$t(`m.systemConfig['请输入备注']`)"
-                            :type="'textarea'"
-                            :rows="3"
-                            v-model="dictDataTable.formInfo.desc">
-                        </bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.systemConfig['启用：']`)">
-                        <bk-switcher v-model="dictDataTable.formInfo.is_activated" size="small"></bk-switcher>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </bk-dialog>
+                    <li
+                      data-test-id="api_li_editApiDirectory"
+                      v-cursor="{ active: !projectId && hasPermission(['public_api_manage']) }"
+                      :class="{ 'text-permission-disable': !projectId && hasPermission(['public_api_manage']) }"
+                      @click.stop="openDictionary('CHANGE' ,item)">
+                      <span>{{ $t('m.systemConfig["编辑"]') }}</span>
+                    </li>
+                  </ul>
+                </span>
+              </div>
+              <collapse-transition>
+                <template v-if="item.showMore && false">
+                  <ul class="bk-group-child">
+                    <li v-for="(node, nodeIndex) in item.apis"
+                      :key="nodeIndex"
+                      class="bk-p42"
+                      :class="{ 'bk-group-li': node.check }"
+                      @click.stop="showBackground(node, index, 1)">
+                      <span class="bk-group-child-name">{{node.name}}</span>
+                    </li>
+                  </ul>
+                </template>
+              </collapse-transition>
+            </template>
+          </li>
+        </ul>
+      </div>
     </div>
+    <!-- 接入系统 -->
+    <bk-dialog
+      data-test-id="api_dialog_accessApi"
+      v-model="dictDataTable.showDialog"
+      :render-directive="'if'"
+      :width="dictDataTable.width"
+      :header-position="dictDataTable.headerPosition"
+      :loading="secondClick"
+      :auto-close="dictDataTable.autoClose"
+      :mask-close="dictDataTable.autoClose"
+      :title="dictDataTable.title"
+      @confirm="submitDictionary">
+      <div class="bk-add-module">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="dictDataTable.formInfo"
+          :rules="rules"
+          ref="dictDataForm">
+          <template v-if="dictDataTable.type === 'ADD'">
+            <bk-form-item
+              data-test-id="api-input-systemName"
+              :label="$t(`m.systemConfig['系统名称：']`)"
+              :required="true"
+              :property="'addName'">
+              <bk-input :clearable="true" v-model="dictDataTable.formInfo.addName"></bk-input>
+            </bk-form-item>
+            <bk-form-item
+              data-test-id="api-input-systemCode"
+              :label="$t(`m.systemConfig['系统编码：']`)"
+              :required="true"
+              :property="'addCode'">
+              <bk-input :clearable="true" v-model="dictDataTable.formInfo.addCode"></bk-input>
+            </bk-form-item>
+          </template>
+          <template v-else>
+            <bk-form-item
+              :label="$t(`m.systemConfig['系统名称：']`)"
+              :required="true"
+              :property="'code'">
+              <template v-if="dictDataTable.type === 'CHANGE'">
+                <bk-select disabled
+                  v-model="dictDataTable.formInfo.code"
+                  :clearable="false"
+                  searchable
+                  @selected="changeCode">
+                  <bk-option v-for="option in allCodeList"
+                    :key="option.code"
+                    :id="option.code"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </template>
+              <template v-else>
+                <bk-select
+                  v-model="dictDataTable.formInfo.code"
+                  :clearable="false"
+                  searchable
+                  @selected="changeCode">
+                  <bk-option v-for="option in codeList"
+                    :key="option.code"
+                    :id="option.code"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </template>
+            </bk-form-item>
+          </template>
+          <bk-form-item
+            :label="$t(`m.systemConfig['系统域名：']`)"
+            :property="'domain'">
+            <bk-input :clearable="true" v-model="dictDataTable.formInfo.domain"></bk-input>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['负责人：']`)">
+            <member-select
+              v-model="dictDataTable.formInfo.personInCharge">
+            </member-select>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['备注：']`)">
+            <bk-input
+              :placeholder="$t(`m.systemConfig['请输入备注']`)"
+              :type="'textarea'"
+              :rows="3"
+              v-model="dictDataTable.formInfo.desc">
+            </bk-input>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.systemConfig['启用：']`)">
+            <bk-switcher v-model="dictDataTable.formInfo.is_activated" size="small"></bk-switcher>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

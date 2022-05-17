@@ -21,174 +21,174 @@
   -->
 
 <template>
-    <div class="bk-field-info mb20">
-        <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
-        <div class="bk-node-btn">
-            <bk-button
-                data-test-id="fieldConfig-button-addField"
-                v-if="configur.type !== 'APPROVAL'"
-                :theme="'default'"
-                :title="$t(`m.treeinfo['新增字段']`)"
-                class="mr10"
-                @click="addField">
-                {{$t(`m.treeinfo['新增字段']`)}}
-            </bk-button>
-            <bk-button
-                data-test-id="fieldConfig-button-addModelField"
-                v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
-                :theme="'default'"
-                :title="$t(`m.treeinfo['选择模型字段']`)"
-                class="mr10"
-                @click="openAddModule">
-                {{$t(`m.treeinfo['选择模型字段']`)}}
-            </bk-button>
-            <bk-button :theme="'default'"
-                data-test-id="fieldConfig-button-previewField"
-                :title="$t(`m.treeinfo['字段预览']`)"
-                class="mr10"
-                style="float: right; border: 0"
-                :disabled="!showTabList.length"
-                @click="previewField">
-                <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
-                {{$t(`m.treeinfo['字段预览']`)}}
-            </bk-button>
-        </div>
-        <!-- 表格拖拽 -->
-        <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
-            <table class="bk-draggable-table">
-                <thead>
-                    <tr>
-                        <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
-                        <th style="max-width: 150px;">{{ $t('m.treeinfo["唯一标识"]') }}</th>
-                        <th>{{ $t('m.treeinfo["字段类型"]') }}</th>
-                        <!-- <th style="max-width: 100px;">{{ $t('m.treeinfo["字段值"]') }}</th> -->
-                        <th>{{ $t('m.treeinfo["是否只读"]') }}</th>
-                        <th style="min-width: 50px;">{{ $t('m.treeinfo["布局"]') }}</th>
-                        <th style="max-width: 100px;">{{ $t('m.treeinfo["字段描述"]') }}</th>
-                        <th>{{ $t('m.treeinfo["是否必填"]') }}</th>
-                        <th>{{ $t('m.treeinfo["更新人"]') }}</th>
-                        <th>{{ $t('m.treeinfo["操作"]') }}</th>
-                    </tr>
-                </thead>
-                <draggable tag="tbody" v-model="showTabList" @end="updateInfo" handle=".move-handler-content">
-                    <template v-if="showTabList.length">
-                        <tr v-for="(item, index) in showTabList" :key="index">
-                            <td class="move-handler-content">
-                                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{item.name}}</span>
-                            </td>
-                            <td style="max-width: 150px;" :title="item.key">
-                                {{item.key}}
-                            </td>
-                            <td>
-                                {{item.typeName || '--'}}
-                            </td>
-                            <!-- <td style="max-width: 100px;" :title="item.fieldValue">
+  <div class="bk-field-info mb20">
+    <p v-if="isShowTitle" class="bk-field-title">字段配置</p>
+    <div class="bk-node-btn">
+      <bk-button
+        data-test-id="fieldConfig-button-addField"
+        v-if="configur.type !== 'APPROVAL'"
+        :theme="'default'"
+        :title="$t(`m.treeinfo['新增字段']`)"
+        class="mr10"
+        @click="addField">
+        {{$t(`m.treeinfo['新增字段']`)}}
+      </bk-button>
+      <bk-button
+        data-test-id="fieldConfig-button-addModelField"
+        v-if="configur.type !== 'APPROVAL' && configur.type !== 'SIGN' && !templateStage"
+        :theme="'default'"
+        :title="$t(`m.treeinfo['选择模型字段']`)"
+        class="mr10"
+        @click="openAddModule">
+        {{$t(`m.treeinfo['选择模型字段']`)}}
+      </bk-button>
+      <bk-button :theme="'default'"
+        data-test-id="fieldConfig-button-previewField"
+        :title="$t(`m.treeinfo['字段预览']`)"
+        class="mr10"
+        style="float: right; border: 0"
+        :disabled="!showTabList.length"
+        @click="previewField">
+        <i class="bk-itsm-icon icon-itsm-icon-three" style="font-size: 16px"></i>
+        {{$t(`m.treeinfo['字段预览']`)}}
+      </bk-button>
+    </div>
+    <!-- 表格拖拽 -->
+    <div class="mt15 bk-draggable" v-bkloading="{ isLoading: isDataLoading }">
+      <table class="bk-draggable-table">
+        <thead>
+          <tr>
+            <th>{{ $t('m.treeinfo["字段名称"]') }}</th>
+            <th style="max-width: 150px;">{{ $t('m.treeinfo["唯一标识"]') }}</th>
+            <th>{{ $t('m.treeinfo["字段类型"]') }}</th>
+            <!-- <th style="max-width: 100px;">{{ $t('m.treeinfo["字段值"]') }}</th> -->
+            <th>{{ $t('m.treeinfo["是否只读"]') }}</th>
+            <th style="min-width: 50px;">{{ $t('m.treeinfo["布局"]') }}</th>
+            <th style="max-width: 100px;">{{ $t('m.treeinfo["字段描述"]') }}</th>
+            <th>{{ $t('m.treeinfo["是否必填"]') }}</th>
+            <th>{{ $t('m.treeinfo["更新人"]') }}</th>
+            <th>{{ $t('m.treeinfo["操作"]') }}</th>
+          </tr>
+        </thead>
+        <draggable tag="tbody" v-model="showTabList" @end="updateInfo" handle=".move-handler-content">
+          <template v-if="showTabList.length">
+            <tr v-for="(item, index) in showTabList" :key="index">
+              <td class="move-handler-content">
+                <span><i class="bk-itsm-icon icon-move-new move-handler"></i>{{item.name}}</span>
+              </td>
+              <td style="max-width: 150px;" :title="item.key">
+                {{item.key}}
+              </td>
+              <td>
+                {{item.typeName || '--'}}
+              </td>
+              <!-- <td style="max-width: 100px;" :title="item.fieldValue">
                                 {{item.fieldValue || '--'}}
                             </td> -->
-                            <td style="max-width: 100px;"
-                                :title="item.is_readonly ? $t(`m.treeinfo['是']`) : $t(`m.treeinfo['否']`)">
-                                {{item.is_readonly ? $t('m.treeinfo["是"]') : $t('m.treeinfo["否"]')}}
-                            </td>
-                            <td style="min-width: 50px;">
-                                {{item.layout === 'COL_6' ? $t('m.treeinfo["半行"]') : $t('m.treeinfo["整行"]')}}
-                            </td>
-                            <td style="max-width: 100px;" :title="item.desc">
-                                <pre><span>{{item.desc || '--'}}</span></pre>
-                            </td>
-                            <td>
-                                {{item.is_required || '--'}}
-                            </td>
-                            <td>
-                                {{item.updated_by || '--'}}
-                            </td>
-                            <td>
-                                <bk-button theme="primary"
-                                    class="table-opt-button"
-                                    :disabled="checkEditDisabled(item)"
-                                    text
-                                    @click="openField(item)">
-                                    {{ $t('m.user["编辑"]') }}
-                                </bk-button>
-                                <bk-button theme="primary"
-                                    class="table-opt-button"
-                                    :disabled="checkDeleteDisabled(item)"
-                                    text
-                                    @click="deleteTable(item)">
-                                    {{ $t('m.user["删除"]') }}
-                                </bk-button>
-                            </td>
-                        </tr>
-                    </template>
-                    <template v-else>
-                        <tr v-cloak>
-                            <td colspan="10" class="bk-none-content">
-                                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-                                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
-                            </td>
-                        </tr>
-                    </template>
-                </draggable>
-            </table>
-        </div>
-        <!-- 字段预览 -->
-        <bk-dialog v-model="processInfo.isShow"
-            width="760"
-            :position="processInfo.position"
-            :draggable="processInfo.draggable"
-            :title="processInfo.title"
-            :render-directive="'if'"
-            :ext-cls="'bk-preview-overflow'">
-            <field-preview :fields="previewTab"></field-preview>
-            <div slot="footer">
-                <bk-button
-                    theme="default"
-                    @click="processInfo.isShow = false">
-                    {{ $t('m.home["取消"]') }}
+              <td style="max-width: 100px;"
+                :title="item.is_readonly ? $t(`m.treeinfo['是']`) : $t(`m.treeinfo['否']`)">
+                {{item.is_readonly ? $t('m.treeinfo["是"]') : $t('m.treeinfo["否"]')}}
+              </td>
+              <td style="min-width: 50px;">
+                {{item.layout === 'COL_6' ? $t('m.treeinfo["半行"]') : $t('m.treeinfo["整行"]')}}
+              </td>
+              <td style="max-width: 100px;" :title="item.desc">
+                <pre><span>{{item.desc || '--'}}</span></pre>
+              </td>
+              <td>
+                {{item.is_required || '--'}}
+              </td>
+              <td>
+                {{item.updated_by || '--'}}
+              </td>
+              <td>
+                <bk-button theme="primary"
+                  class="table-opt-button"
+                  :disabled="checkEditDisabled(item)"
+                  text
+                  @click="openField(item)">
+                  {{ $t('m.user["编辑"]') }}
                 </bk-button>
-            </div>
-        </bk-dialog>
-        <!-- 新增字段 -->
-        <bk-sideslider
-            :is-show.sync="sliderInfo.show"
-            :title="sliderInfo.title"
-            :width="sliderInfo.width">
-            <div class="p20" slot="content" v-if="sliderInfo.show">
-                <add-field
-                    :change-info="changeInfo"
-                    :template-info="templateInfo"
-                    :template-stage="templateStage"
-                    :nodes-list="nodesList"
-                    :add-origin="addOrigin"
-                    :table-list="showTabList"
-                    :is-edit-public="isEditPublic"
-                    :workflow="flowInfo ? flowInfo.id : 0"
-                    :state="configur.id ? configur.id : 0"
-                    @closeShade="closeShade">
-                </add-field>
-            </div>
-        </bk-sideslider>
-        <!-- 模型字段 -->
-        <bk-dialog
-            v-model="moduleInfo.isShow"
-            :render-directive="'if'"
-            :width="moduleInfo.width"
-            :header-position="moduleInfo.headerPosition"
-            :loading="secondClick"
-            :auto-close="moduleInfo.autoClose"
-            :mask-close="moduleInfo.autoClose"
-            @confirm="submitModule">
-            <p slot="header">{{ $t(`m.treeinfo["选择模型字段"]`) }}</p>
-            <div class="bk-add-module">
-                <inherit-state
-                    ref="inheritState"
-                    :workflow="flowInfo ? flowInfo.id : 0"
-                    :state="configur.id ? configur.id : 0"
-                    :configur="configur"
-                    :show-tab-list="showTabList">
-                </inherit-state>
-            </div>
-        </bk-dialog>
+                <bk-button theme="primary"
+                  class="table-opt-button"
+                  :disabled="checkDeleteDisabled(item)"
+                  text
+                  @click="deleteTable(item)">
+                  {{ $t('m.user["删除"]') }}
+                </bk-button>
+              </td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-cloak>
+              <td colspan="10" class="bk-none-content">
+                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
+                <p class="bk-none-info">{{ $t('m.treeinfo["暂无数据"]') }}</p>
+              </td>
+            </tr>
+          </template>
+        </draggable>
+      </table>
     </div>
+    <!-- 字段预览 -->
+    <bk-dialog v-model="processInfo.isShow"
+      width="760"
+      :position="processInfo.position"
+      :draggable="processInfo.draggable"
+      :title="processInfo.title"
+      :render-directive="'if'"
+      :ext-cls="'bk-preview-overflow'">
+      <field-preview :fields="previewTab"></field-preview>
+      <div slot="footer">
+        <bk-button
+          theme="default"
+          @click="processInfo.isShow = false">
+          {{ $t('m.home["取消"]') }}
+        </bk-button>
+      </div>
+    </bk-dialog>
+    <!-- 新增字段 -->
+    <bk-sideslider
+      :is-show.sync="sliderInfo.show"
+      :title="sliderInfo.title"
+      :width="sliderInfo.width">
+      <div class="p20" slot="content" v-if="sliderInfo.show">
+        <add-field
+          :change-info="changeInfo"
+          :template-info="templateInfo"
+          :template-stage="templateStage"
+          :nodes-list="nodesList"
+          :add-origin="addOrigin"
+          :table-list="showTabList"
+          :is-edit-public="isEditPublic"
+          :workflow="flowInfo ? flowInfo.id : 0"
+          :state="configur.id ? configur.id : 0"
+          @closeShade="closeShade">
+        </add-field>
+      </div>
+    </bk-sideslider>
+    <!-- 模型字段 -->
+    <bk-dialog
+      v-model="moduleInfo.isShow"
+      :render-directive="'if'"
+      :width="moduleInfo.width"
+      :header-position="moduleInfo.headerPosition"
+      :loading="secondClick"
+      :auto-close="moduleInfo.autoClose"
+      :mask-close="moduleInfo.autoClose"
+      @confirm="submitModule">
+      <p slot="header">{{ $t(`m.treeinfo["选择模型字段"]`) }}</p>
+      <div class="bk-add-module">
+        <inherit-state
+          ref="inheritState"
+          :workflow="flowInfo ? flowInfo.id : 0"
+          :state="configur.id ? configur.id : 0"
+          :configur="configur"
+          :show-tab-list="showTabList">
+        </inherit-state>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import draggable from 'vuedraggable';

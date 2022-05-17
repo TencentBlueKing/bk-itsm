@@ -21,72 +21,72 @@
   -->
 
 <template>
-    <div v-if="item.showFeild" class="ci-template">
-        <bk-form
-            ref="devopsForm"
-            :model="item.devopsContent"
-            :rules="defaultRules"
-            :label-width="200"
-            form-type="vertical">
-            <bk-form-item :label="$t(`m.tickets['项目']`)" :required="true" property="project_id" error-display-type="normal">
-                <bk-select
-                    v-model="item.devopsContent.project_id"
-                    :loading="projectLoading"
-                    searchable
-                    :disabled="disabled"
-                    @selected="handleProjectChange">
-                    <bk-option v-for="option in projectList"
-                        :key="option.projectCode"
-                        :id="option.projectCode"
-                        :name="option.project_name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.tickets['流水线']`)" :required="true" property="pipeline_id" error-display-type="normal">
-                <bk-select
-                    v-model="item.devopsContent.pipeline_id"
-                    :loading="pipelineLoading"
-                    searchable
-                    :disabled="disabled"
-                    @selected="handlePipelineChange">
-                    <bk-option v-for="option in pipelineList"
-                        :key="option.pipelineId"
-                        :id="option.pipelineId"
-                        :name="option.pipelineName">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-        </bk-form>
-        <h3 class="setion-title">
-            <span class="setion-title-icon" @click.stop="showPipelineVariable = !showPipelineVariable">
-                <i v-if="showPipelineVariable" class="bk-icon icon-angle-down"></i>
-                <i v-else class="bk-icon icon-angle-right"></i>
-            </span>
-            {{ $t(`m.tickets['流水线变量']`) }}
-        </h3>
-        <bk-form
-            v-show="showPipelineVariable"
-            v-bkloading="{ isLoading: pipelineStartLoading }"
-            ref="devopsVariable"
-            :model="item.devopsContent.variables"
-            :label-width="200"
-            form-type="vertical">
-            <bk-form-item
-                v-for="variable in pipelineVariableList"
-                :key="variable.id"
-                :label="variable.id"
-                :required="true"
-                :property="variable.id"
-                :rules="rules[variable.id]"
-                class="half-width-item"
-                error-display-type="normal">
-                <bk-input
-                    v-model="item.devopsContent.variables[variable.id]"
-                    :disabled="disabled"
-                    :clearable="true">
-                </bk-input>
-                <!-- TODO: 暂时只支持输入框输入变量 -->
-                <!-- <bk-select
+  <div v-if="item.showFeild" class="ci-template">
+    <bk-form
+      ref="devopsForm"
+      :model="item.devopsContent"
+      :rules="defaultRules"
+      :label-width="200"
+      form-type="vertical">
+      <bk-form-item :label="$t(`m.tickets['项目']`)" :required="true" property="project_id" error-display-type="normal">
+        <bk-select
+          v-model="item.devopsContent.project_id"
+          :loading="projectLoading"
+          searchable
+          :disabled="disabled"
+          @selected="handleProjectChange">
+          <bk-option v-for="option in projectList"
+            :key="option.projectCode"
+            :id="option.projectCode"
+            :name="option.project_name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.tickets['流水线']`)" :required="true" property="pipeline_id" error-display-type="normal">
+        <bk-select
+          v-model="item.devopsContent.pipeline_id"
+          :loading="pipelineLoading"
+          searchable
+          :disabled="disabled"
+          @selected="handlePipelineChange">
+          <bk-option v-for="option in pipelineList"
+            :key="option.pipelineId"
+            :id="option.pipelineId"
+            :name="option.pipelineName">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+    </bk-form>
+    <h3 class="setion-title">
+      <span class="setion-title-icon" @click.stop="showPipelineVariable = !showPipelineVariable">
+        <i v-if="showPipelineVariable" class="bk-icon icon-angle-down"></i>
+        <i v-else class="bk-icon icon-angle-right"></i>
+      </span>
+      {{ $t(`m.tickets['流水线变量']`) }}
+    </h3>
+    <bk-form
+      v-show="showPipelineVariable"
+      v-bkloading="{ isLoading: pipelineStartLoading }"
+      ref="devopsVariable"
+      :model="item.devopsContent.variables"
+      :label-width="200"
+      form-type="vertical">
+      <bk-form-item
+        v-for="variable in pipelineVariableList"
+        :key="variable.id"
+        :label="variable.id"
+        :required="true"
+        :property="variable.id"
+        :rules="rules[variable.id]"
+        class="half-width-item"
+        error-display-type="normal">
+        <bk-input
+          v-model="item.devopsContent.variables[variable.id]"
+          :disabled="disabled"
+          :clearable="true">
+        </bk-input>
+        <!-- TODO: 暂时只支持输入框输入变量 -->
+        <!-- <bk-select
                     v-else
                     v-model="item.devopsContent.project_id"
                     :loading="projectLoading"
@@ -98,21 +98,21 @@
                         :name="option.project_name">
                     </bk-option>
                 </bk-select> -->
-            </bk-form-item>
-        </bk-form>
-        <h3 class="setion-title border-none">
-            <span class="setion-title-icon" @click.stop="showPipelineStages = !showPipelineStages">
-                <i v-if="showPipelineStages" class="bk-icon icon-angle-down"></i>
-                <i v-else class="bk-icon icon-angle-right"></i>
-            </span>
-            {{ $t(`m.tickets['插件预览']`) }}
-        </h3>
-        <devops-preview
-            v-show="showPipelineStages"
-            :stages="pipelineStages"
-            :loading="pipelineDetailLoading">
-        </devops-preview>
-    </div>
+      </bk-form-item>
+    </bk-form>
+    <h3 class="setion-title border-none">
+      <span class="setion-title-icon" @click.stop="showPipelineStages = !showPipelineStages">
+        <i v-if="showPipelineStages" class="bk-icon icon-angle-down"></i>
+        <i v-else class="bk-icon icon-angle-right"></i>
+      </span>
+      {{ $t(`m.tickets['插件预览']`) }}
+    </h3>
+    <devops-preview
+      v-show="showPipelineStages"
+      :stages="pipelineStages"
+      :loading="pipelineDetailLoading">
+    </devops-preview>
+  </div>
 </template>
 
 <script>

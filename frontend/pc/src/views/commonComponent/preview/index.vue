@@ -21,37 +21,37 @@
   -->
 
 <template>
-    <div class="bk-second-flow bk-preview-flow">
-        <js-flow
-            ref="previewFlow"
-            v-model="canvasData"
-            selector="entry-item"
-            :endpoint-options="endpointOptions"
-            :connector-options="connectorOptions"
-            :node-options="nodeOptions"
-            :show-palette="false"
-            @onNodeMoveStop="onNodeMoveStop">
-            <template slot="toolPanel">
-                <tool-panel
-                    @onZoomIn="onZoomIn"
-                    @onZoomOut="onZoomOut"
-                    @onResetPosition="onResetPosition"
-                    :full-status="fullStatus">
-                </tool-panel>
-            </template>
-            <template slot="nodeTemplate" slot-scope="{ node }">
-                <node-template
-                    ref="templateNode"
-                    :node="node"
-                    :canvas-data="canvasData"
-                    :preview-info="previewInfo"
-                    :normal-color="normalColor"
-                    @clickNodeInfo="clickNodeInfo"
-                    @submitNodeValue="submitNodeValue">
-                </node-template>
-            </template>
-        </js-flow>
-    </div>
+  <div class="bk-second-flow bk-preview-flow">
+    <js-flow
+      ref="previewFlow"
+      v-model="canvasData"
+      selector="entry-item"
+      :endpoint-options="endpointOptions"
+      :connector-options="connectorOptions"
+      :node-options="nodeOptions"
+      :show-palette="false"
+      @onNodeMoveStop="onNodeMoveStop">
+      <template slot="toolPanel">
+        <tool-panel
+          @onZoomIn="onZoomIn"
+          @onZoomOut="onZoomOut"
+          @onResetPosition="onResetPosition"
+          :full-status="fullStatus">
+        </tool-panel>
+      </template>
+      <template slot="nodeTemplate" slot-scope="{ node }">
+        <node-template
+          ref="templateNode"
+          :node="node"
+          :canvas-data="canvasData"
+          :preview-info="previewInfo"
+          :normal-color="normalColor"
+          @clickNodeInfo="clickNodeInfo"
+          @submitNodeValue="submitNodeValue">
+        </node-template>
+      </template>
+    </js-flow>
+  </div>
 </template>
 <script>
     import JsFlow from '@/assets/jsflow';

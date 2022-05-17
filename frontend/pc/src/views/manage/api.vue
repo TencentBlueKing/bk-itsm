@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="public-api-page">
-        <public-api :title="$t(`m['公共API']`)"></public-api>
-    </div>
+  <div class="public-api-page">
+    <public-api :title="$t(`m['公共API']`)"></public-api>
+  </div>
 </template>
 <script>
     import PublicApi from '../processManagement/apiConfigure/index.vue';

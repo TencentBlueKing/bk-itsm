@@ -21,20 +21,20 @@
   -->
 
 <template>
-    <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
-        <div class="bk-basic-info" ref="basicInfo">
-            <div class="bk-basic-form">
-                <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
-                <!-- <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
+  <div :class="['basic-info-wrap', { 'fold': !showMore }, { 'has-more-icon': displayMoreIcon }]">
+    <div class="bk-basic-info" ref="basicInfo">
+      <div class="bk-basic-form">
+        <table-fields :basic-infomation="basicInfomation" :first-state-fields="firstStateFields"></table-fields>
+        <!-- <ul :class="{ 'ul-no-border': !basicInfomation.table_fields.length }">
                     <li v-for="item in basicInfomationList" :key="item.name" :style="{ 'width': basicInfoType.includes(item.type) ? '' : '100%' }">
                         <span class="bk-info-title" :title="item.name">{{ item.name }} :</span>
                         <span v-if="basicInfoType.includes(item.type)" class="bk-info-content">{{ item.display_value || '--'}}</span>
                         <fields-done v-else class="show" :item="item" :is-show-name="false" :field="basicInfomation.table_fields" :basic-infomation="basicInfomation"></fields-done>
                     </li>
                 </ul> -->
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>

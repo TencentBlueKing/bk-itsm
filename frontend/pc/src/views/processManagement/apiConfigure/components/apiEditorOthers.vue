@@ -21,16 +21,16 @@
   -->
 
 <template>
-    <div class="bk-api-editor-others">
-        <bk-form
-            :label-width="120"
-            :model="basicInfo">
-            <bk-form-item
-                :label="$t(`m.systemConfig['开放接口：']`)">
-                <bk-switcher v-model="basicInfo.is_activated" size="small" :disabled="basicInfo.is_builtin"></bk-switcher>
-            </bk-form-item>
-        </bk-form>
-    </div>
+  <div class="bk-api-editor-others">
+    <bk-form
+      :label-width="120"
+      :model="basicInfo">
+      <bk-form-item
+        :label="$t(`m.systemConfig['开放接口：']`)">
+        <bk-switcher v-model="basicInfo.is_activated" size="small" :disabled="basicInfo.is_builtin"></bk-switcher>
+      </bk-form-item>
+    </bk-form>
+  </div>
 </template>
 
 <script>

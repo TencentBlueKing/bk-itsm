@@ -21,18 +21,18 @@
   -->
 
 <template>
-    <div :class="{ 'full-screen-wrap': isFull }">
-        <div v-if="isFull" class="full-screen-header">
-            <span class="full-screen-title">{{ title }}</span>
-            <div class="full-exit-btn" @click.stop="onClose">
-                <i class="bk-itsm-icon icon-order-close"></i>
-                <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
-            </div>
-        </div>
-        <div class="full-screen-content">
-            <slot></slot>
-        </div>
+  <div :class="{ 'full-screen-wrap': isFull }">
+    <div v-if="isFull" class="full-screen-header">
+      <span class="full-screen-title">{{ title }}</span>
+      <div class="full-exit-btn" @click.stop="onClose">
+        <i class="bk-itsm-icon icon-order-close"></i>
+        <span class="exit-text">{{$t(`m.common['退出全屏']`)}}</span>
+      </div>
     </div>
+    <div class="full-screen-content">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 
 <script>

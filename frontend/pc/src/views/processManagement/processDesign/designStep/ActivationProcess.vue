@@ -21,214 +21,214 @@
   -->
 
 <template>
-    <div class="bk-design-third" v-bkloading="{ isLoading: isDataLoading }">
-        <basic-card :card-label="$t(`m.tickets['启用设置']`)">
-            <bk-form :label-width="170" :model="formData" :rules="rules" ref="withdrawForm">
-                <bk-form-item :label="$t(`m.treeinfo['是否支持撤回']`)">
-                    <bk-radio-group v-model="formData.can_withdraw">
-                        <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
-                        <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                    </bk-radio-group>
-                    <p class="card-inner-body" v-if="formData.can_withdraw">
-                        <bk-radio-group v-model="formData.revoke_config.type">
-                            <bk-radio :value="2" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`)}}</bk-radio>
-                            <bk-radio :value="1" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['任何节点，提单人都可撤回单据']`)}}</bk-radio>
-                            <bk-radio :value="3" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['指定节点前可以撤回']`)}}</bk-radio>
-                        </bk-radio-group>
-                        <bk-select
-                            v-if="formData.revoke_config.type === 3"
-                            v-model="formData.revoke_config.state"
-                            style="width: 330px;" class="mt10"
-                            :placeholder="$t(`m.treeinfo['请选择撤单节点']`)"
-                            :loading="nodeListLoading"
-                            searchable>
-                            <bk-option v-for="option in nodeList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                        <span v-if="revokeStateError" class="bk-task-error">{{$t(`m.treeinfo['请选择撤单节点']`)}}</span>
-                    </p>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['是否立即部署流程']`)">
-                    <bk-radio-group v-model="formData.can_deploy">
-                        <!-- 没有部署权限禁用 -->
-                        <span
-                            v-if="!hasPermission(['workflow_deploy'], flowInfo.auth_actions)"
-                            v-cursor
-                            class="radio-permission-disable"
-                            @click="checkFlowDeployPerm()">
-                            {{ $t('m.treeinfo["是"]') }}
-                        </span>
-                        <bk-radio
-                            v-else
-                            :value="trueStatus"
-                            class="mr20">
-                            {{ $t('m.treeinfo["是"]') }}
-                        </bk-radio>
-                        <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                    </bk-radio-group>
-                    <p class="card-inner-body" v-if="formData.can_deploy">
-                        <bk-form-item :label-width="100" :label="$t(`m.treeinfo['部署流程名']`)"
-                            :required="true"
-                            :property="'deploy_name'"
-                            style="width: 500px;">
-                            <bk-input v-model="formData.deploy_name" :placeholder="$t(`m.treeinfo['请输入部署流程名']`)"></bk-input>
-                        </bk-form-item>
-                    </p>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
-                    <bk-checkbox
-                        :true-value="true"
-                        :false-value="false"
-                        v-model="formData.is_auto_approve">
-                        当审批节点的审批人为申请人时，自动通过
-                    </bk-checkbox>
-                </bk-form-item>
-            </bk-form>
-        </basic-card>
+  <div class="bk-design-third" v-bkloading="{ isLoading: isDataLoading }">
+    <basic-card :card-label="$t(`m.tickets['启用设置']`)">
+      <bk-form :label-width="170" :model="formData" :rules="rules" ref="withdrawForm">
+        <bk-form-item :label="$t(`m.treeinfo['是否支持撤回']`)">
+          <bk-radio-group v-model="formData.can_withdraw">
+            <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
+            <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+          </bk-radio-group>
+          <p class="card-inner-body" v-if="formData.can_withdraw">
+            <bk-radio-group v-model="formData.revoke_config.type">
+              <bk-radio :value="2" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['提单后，单据未被处理流转前，提单人可以撤回']`)}}</bk-radio>
+              <bk-radio :value="1" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['任何节点，提单人都可撤回单据']`)}}</bk-radio>
+              <bk-radio :value="3" ext-cls="withdraw-type-radio">{{$t(`m.treeinfo['指定节点前可以撤回']`)}}</bk-radio>
+            </bk-radio-group>
+            <bk-select
+              v-if="formData.revoke_config.type === 3"
+              v-model="formData.revoke_config.state"
+              style="width: 330px;" class="mt10"
+              :placeholder="$t(`m.treeinfo['请选择撤单节点']`)"
+              :loading="nodeListLoading"
+              searchable>
+              <bk-option v-for="option in nodeList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+            <span v-if="revokeStateError" class="bk-task-error">{{$t(`m.treeinfo['请选择撤单节点']`)}}</span>
+          </p>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.treeinfo['是否立即部署流程']`)">
+          <bk-radio-group v-model="formData.can_deploy">
+            <!-- 没有部署权限禁用 -->
+            <span
+              v-if="!hasPermission(['workflow_deploy'], flowInfo.auth_actions)"
+              v-cursor
+              class="radio-permission-disable"
+              @click="checkFlowDeployPerm()">
+              {{ $t('m.treeinfo["是"]') }}
+            </span>
+            <bk-radio
+              v-else
+              :value="trueStatus"
+              class="mr20">
+              {{ $t('m.treeinfo["是"]') }}
+            </bk-radio>
+            <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+          </bk-radio-group>
+          <p class="card-inner-body" v-if="formData.can_deploy">
+            <bk-form-item :label-width="100" :label="$t(`m.treeinfo['部署流程名']`)"
+              :required="true"
+              :property="'deploy_name'"
+              style="width: 500px;">
+              <bk-input v-model="formData.deploy_name" :placeholder="$t(`m.treeinfo['请输入部署流程名']`)"></bk-input>
+            </bk-form-item>
+          </p>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
+          <bk-checkbox
+            :true-value="true"
+            :false-value="false"
+            v-model="formData.is_auto_approve">
+            当审批节点的审批人为申请人时，自动通过
+          </bk-checkbox>
+        </bk-form-item>
+      </bk-form>
+    </basic-card>
 
-        <basic-card class="mt20" :card-label="'通知策略'">
-            <bk-form :label-width="170" :model="noticeData">
-                <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
-                    <bk-checkbox-group v-model="noticeData.notify">
-                        <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr30'">
-                            <img class="notice-option-icon" :src="qwIcon" style="width: 20px" /> {{ $t(`m.treeinfo["企业微信"]`) }}
-                        </bk-checkbox>
-                        <bk-checkbox :value="'EMAIL'" :ext-cls="'mr30'">
-                            <img class="notice-option-icon" :src="emailIcon" style="width: 20px" /> {{ $t(`m.treeinfo["邮件"]`) }}
-                        </bk-checkbox>
-                        <bk-checkbox :value="'SMS'" :ext-cls="'mr30'">{{ $t(`m.treeinfo["SMS短信"]`) }}</bk-checkbox>
-                    </bk-checkbox-group>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['是否通知']`)">
-                    <bk-radio-group v-model="noticeData.can_notice" @change="handleNotice">
-                        <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
-                        <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                    </bk-radio-group>
-                    <p class="card-inner-body" v-if="noticeData.can_notice">
-                        <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)">
-                            <bk-radio-group v-model="noticeData.notify_rule">
-                                <bk-radio :value="'ONCE'"
-                                    :ext-cls="'mr20 bk-line-radio'">
-                                    {{ $t('m.treeinfo["首次通知，以后不再通知"]') }}
-                                </bk-radio>
-                                <div class="bk-line-radio">
-                                    <bk-radio :value="'RETRY'" :ext-cls="'mr20 bk-float-radio'">
-                                        {{ $t('m.treeinfo["首次通知后，次日起每天定时通知"]') }}
-                                    </bk-radio>
-                                    <bk-select v-if="noticeData.notify_rule === 'RETRY'"
-                                        style="float: left; width: 200px;"
-                                        v-model="noticeData.notify_freq"
-                                        :clearable="false"
-                                        searchable
-                                        :font-size="'medium'">
-                                        <bk-option v-for="option in frequencyList"
-                                            :key="option.id"
-                                            :id="option.id"
-                                            :name="option.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </div>
-                            </bk-radio-group>
-                        </bk-form-item>
-                    </p>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.treeinfo['是否督办']`)">
-                    <bk-radio-group v-model="noticeData.is_supervise_needed">
-                        <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
-                        <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
-                    </bk-radio-group>
-                    <p class="card-inner-body" v-if="noticeData.is_supervise_needed">
-                        <bk-form-item :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
-                            <bk-select style="float: left; width: 330px; margin-right: 10px;"
-                                v-model="noticeData.supervise_type"
-                                :clearable="false"
-                                searchable
-                                :font-size="'medium'"
-                                @selected="changeSupChildList">
-                                <bk-option v-for="option in roles.grouplist"
-                                    :key="option.type"
-                                    :id="option.type"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                            <div style="float: left; width: 330px;"
-                                v-if="noticeData.supervise_type !== 'EMPTY'">
-                                <template v-if="noticeData.supervise_type === 'PERSON'">
-                                    <member-select
-                                        v-model="noticeData.personList">
-                                    </member-select>
-                                </template>
-                                <template v-else>
-                                    <bk-select
-                                        v-model="noticeData.supervisor"
-                                        searchable
-                                        :font-size="'medium'">
-                                        <bk-option v-for="option in roles.supChildList"
-                                            :key="option.id"
-                                            :id="option.id"
-                                            :name="option.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </template>
-                            </div>
-                            <p class="mt5 mb0 bk-revoke-span" v-if="noticeData.supervise_type === 'EMPTY'">
-                                <i class="bk-icon icon-exclamation-circle" style="padding-right: 5px"></i>
-                                <span>{{ $t('m.treeinfo["默认督办人：提单人"]') }}</span>
-                            </p>
-                        </bk-form-item>
-                    </p>
-                </bk-form-item>
-            </bk-form>
-        </basic-card>
-        <!-- 展开高级配置 -->
-        <div
-            v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH"
-            class="more-configuration mt20" data-test-id="activationProcess-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
-            <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
-            <i v-else class="bk-icon icon-up-shape"></i>
-            <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
-        </div>
-        <template v-if="showMoreConfig">
-            <collapse-transition>
-                <div>
-                    <basic-card class="mt20"
-                        :card-label="$t(`m.newCommon['触发器']`)"
-                        :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
-                        <common-trigger-list
-                            v-if="openFunction.TRIGGER_SWITCH"
-                            :origin="'workflow'"
-                            :source-id="processId"
-                            :table="flowInfo.table">
-                        </common-trigger-list>
-                    </basic-card>
-                    <basic-card class="mt20"
-                        :card-label="$t(`m.taskTemplate['任务配置']`)"
-                        :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)">
-                        <TaskConfigPanel ref="taskConfigPanel" :workflow-info="flowInfo"></TaskConfigPanel>
-                    </basic-card>
+    <basic-card class="mt20" :card-label="'通知策略'">
+      <bk-form :label-width="170" :model="noticeData">
+        <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
+          <bk-checkbox-group v-model="noticeData.notify">
+            <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr30'">
+              <img class="notice-option-icon" :src="qwIcon" style="width: 20px" /> {{ $t(`m.treeinfo["企业微信"]`) }}
+            </bk-checkbox>
+            <bk-checkbox :value="'EMAIL'" :ext-cls="'mr30'">
+              <img class="notice-option-icon" :src="emailIcon" style="width: 20px" /> {{ $t(`m.treeinfo["邮件"]`) }}
+            </bk-checkbox>
+            <bk-checkbox :value="'SMS'" :ext-cls="'mr30'">{{ $t(`m.treeinfo["SMS短信"]`) }}</bk-checkbox>
+          </bk-checkbox-group>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.treeinfo['是否通知']`)">
+          <bk-radio-group v-model="noticeData.can_notice" @change="handleNotice">
+            <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
+            <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+          </bk-radio-group>
+          <p class="card-inner-body" v-if="noticeData.can_notice">
+            <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)">
+              <bk-radio-group v-model="noticeData.notify_rule">
+                <bk-radio :value="'ONCE'"
+                  :ext-cls="'mr20 bk-line-radio'">
+                  {{ $t('m.treeinfo["首次通知，以后不再通知"]') }}
+                </bk-radio>
+                <div class="bk-line-radio">
+                  <bk-radio :value="'RETRY'" :ext-cls="'mr20 bk-float-radio'">
+                    {{ $t('m.treeinfo["首次通知后，次日起每天定时通知"]') }}
+                  </bk-radio>
+                  <bk-select v-if="noticeData.notify_rule === 'RETRY'"
+                    style="float: left; width: 200px;"
+                    v-model="noticeData.notify_freq"
+                    :clearable="false"
+                    searchable
+                    :font-size="'medium'">
+                    <bk-option v-for="option in frequencyList"
+                      :key="option.id"
+                      :id="option.id"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
                 </div>
-            </collapse-transition>
-        </template>
-        <div class="bk-four-btn">
-            <bk-button :theme="'default'"
-                :title="$t(`m.treeinfo['上一步']`)"
-                :disabled="secondClick"
-                class="mr10"
-                @click="previousStep">
-                {{ $t('m.treeinfo["上一步"]') }}
-            </bk-button>
-            <bk-button :theme="'primary'"
-                :title="$t(`m.treeinfo['提交']`)"
-                :loading="secondClick"
-                class="mr10"
-                @click="backTab">
-                {{ $t('m.treeinfo["提交"]') }}
-            </bk-button>
-        </div>
+              </bk-radio-group>
+            </bk-form-item>
+          </p>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.treeinfo['是否督办']`)">
+          <bk-radio-group v-model="noticeData.is_supervise_needed">
+            <bk-radio :value="trueStatus" class="mr20">{{ $t('m.treeinfo["是"]') }}</bk-radio>
+            <bk-radio :value="falseStatus">{{ $t('m.treeinfo["否"]') }}</bk-radio>
+          </bk-radio-group>
+          <p class="card-inner-body" v-if="noticeData.is_supervise_needed">
+            <bk-form-item :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
+              <bk-select style="float: left; width: 330px; margin-right: 10px;"
+                v-model="noticeData.supervise_type"
+                :clearable="false"
+                searchable
+                :font-size="'medium'"
+                @selected="changeSupChildList">
+                <bk-option v-for="option in roles.grouplist"
+                  :key="option.type"
+                  :id="option.type"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+              <div style="float: left; width: 330px;"
+                v-if="noticeData.supervise_type !== 'EMPTY'">
+                <template v-if="noticeData.supervise_type === 'PERSON'">
+                  <member-select
+                    v-model="noticeData.personList">
+                  </member-select>
+                </template>
+                <template v-else>
+                  <bk-select
+                    v-model="noticeData.supervisor"
+                    searchable
+                    :font-size="'medium'">
+                    <bk-option v-for="option in roles.supChildList"
+                      :key="option.id"
+                      :id="option.id"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
+                </template>
+              </div>
+              <p class="mt5 mb0 bk-revoke-span" v-if="noticeData.supervise_type === 'EMPTY'">
+                <i class="bk-icon icon-exclamation-circle" style="padding-right: 5px"></i>
+                <span>{{ $t('m.treeinfo["默认督办人：提单人"]') }}</span>
+              </p>
+            </bk-form-item>
+          </p>
+        </bk-form-item>
+      </bk-form>
+    </basic-card>
+    <!-- 展开高级配置 -->
+    <div
+      v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH"
+      class="more-configuration mt20" data-test-id="activationProcess-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
+      <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
+      <i v-else class="bk-icon icon-up-shape"></i>
+      <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
     </div>
+    <template v-if="showMoreConfig">
+      <collapse-transition>
+        <div>
+          <basic-card class="mt20"
+            :card-label="$t(`m.newCommon['触发器']`)"
+            :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
+            <common-trigger-list
+              v-if="openFunction.TRIGGER_SWITCH"
+              :origin="'workflow'"
+              :source-id="processId"
+              :table="flowInfo.table">
+            </common-trigger-list>
+          </basic-card>
+          <basic-card class="mt20"
+            :card-label="$t(`m.taskTemplate['任务配置']`)"
+            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)">
+            <TaskConfigPanel ref="taskConfigPanel" :workflow-info="flowInfo"></TaskConfigPanel>
+          </basic-card>
+        </div>
+      </collapse-transition>
+    </template>
+    <div class="bk-four-btn">
+      <bk-button :theme="'default'"
+        :title="$t(`m.treeinfo['上一步']`)"
+        :disabled="secondClick"
+        class="mr10"
+        @click="previousStep">
+        {{ $t('m.treeinfo["上一步"]') }}
+      </bk-button>
+      <bk-button :theme="'primary'"
+        :title="$t(`m.treeinfo['提交']`)"
+        :loading="secondClick"
+        class="mr10"
+        @click="backTab">
+        {{ $t('m.treeinfo["提交"]') }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 <script>
     import commonMix from '../../../commonMix/common.js';

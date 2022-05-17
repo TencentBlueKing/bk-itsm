@@ -21,35 +21,35 @@
   -->
 
 <template>
-    <div class="bk-field-preview" id="bkPreview" ref="fieldContent">
-        <bk-form :label-width="labelWidth" form-type="vertical" :ext-cls="'bk-ext-form'">
-            <template v-for="(item, index) in fields">
-                <div :key="index" v-if="item.showFeild" :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6', 'bk-field-trigger': origin === 'trigger' }">
-                    <component :ref="'component' + index"
-                        :is="'CW-' + item.type"
-                        :item="item"
-                        :fields="fields"
-                        :basic-infomation="basicInfomation"
-                        :type-info="typeInfo"
-                        :disabled="disabled">
-                    </component>
-                    <!-- api和rpc字段添加刷新 -->
-                    <template v-if="origin !== 'trigger'">
-                        <i class="bk-icon icon-refresh bk-icon-refresh"
-                            :class="{ 'not-rotate': !rotate,'rotate': rotate }"
-                            v-if="item.source_type === 'API'"
-                            @click="freshBtn(item)">
-                        </i>
-                        <i class="bk-icon icon-refresh bk-icon-refresh"
-                            :class="{ 'not-rotate': !rotate,'rotate': rotate }"
-                            v-if="item.source_type === 'RPC'"
-                            @click="freshRpc(item)">
-                        </i>
-                    </template>
-                </div>
-            </template>
-        </bk-form>
-    </div>
+  <div class="bk-field-preview" id="bkPreview" ref="fieldContent">
+    <bk-form :label-width="labelWidth" form-type="vertical" :ext-cls="'bk-ext-form'">
+      <template v-for="(item, index) in fields">
+        <div :key="index" v-if="item.showFeild" :class="{ 'bk-field-line': item.layout === 'COL_12', 'bk-field-half': item.layout === 'COL_6', 'bk-field-trigger': origin === 'trigger' }">
+          <component :ref="'component' + index"
+            :is="'CW-' + item.type"
+            :item="item"
+            :fields="fields"
+            :basic-infomation="basicInfomation"
+            :type-info="typeInfo"
+            :disabled="disabled">
+          </component>
+          <!-- api和rpc字段添加刷新 -->
+          <template v-if="origin !== 'trigger'">
+            <i class="bk-icon icon-refresh bk-icon-refresh"
+              :class="{ 'not-rotate': !rotate,'rotate': rotate }"
+              v-if="item.source_type === 'API'"
+              @click="freshBtn(item)">
+            </i>
+            <i class="bk-icon icon-refresh bk-icon-refresh"
+              :class="{ 'not-rotate': !rotate,'rotate': rotate }"
+              v-if="item.source_type === 'RPC'"
+              @click="freshRpc(item)">
+            </i>
+          </template>
+        </div>
+      </template>
+    </bk-form>
+  </div>
 </template>
 <script>
     import string from '../../commonComponent/fieldComponent/string.vue';

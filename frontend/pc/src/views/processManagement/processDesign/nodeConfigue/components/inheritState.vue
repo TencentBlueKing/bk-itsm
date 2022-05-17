@@ -21,38 +21,38 @@
   -->
 
 <template>
-    <div class="bk-dialog-form">
-        <bk-table ref="table"
-            v-bkloading="{ isLoading: isDataLoading }"
-            :data="dataList"
-            :size="'small'"
-            @select-all="handleSelectAll"
-            @select="handleSelect">
-            <bk-table-column type="selection"
-                width="60"
-                align="center"
-                :selectable="disabledFn">
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" prop="name"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['唯一标识']`)" prop="key"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" prop="typeName"></bk-table-column>
-            <bk-table-column :label="$t(`m.treeinfo['是否只读']`)">
-                <template slot-scope="props">
-                    <bk-radio-group v-model="props.row.is_readonly">
-                        <bk-radio :value="trueStatus"
-                            :disabled="props.row.key === 'priority' || props.row.is_disabled"
-                            class="mr20">
-                            {{ $t('m.treeinfo["是"]') }}
-                        </bk-radio>
-                        <bk-radio :value="falseStatus"
-                            :disabled="props.row.key === 'priority' || props.row.is_disabled">
-                            {{ $t('m.treeinfo["否"]') }}
-                        </bk-radio>
-                    </bk-radio-group>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="bk-dialog-form">
+    <bk-table ref="table"
+      v-bkloading="{ isLoading: isDataLoading }"
+      :data="dataList"
+      :size="'small'"
+      @select-all="handleSelectAll"
+      @select="handleSelect">
+      <bk-table-column type="selection"
+        width="60"
+        align="center"
+        :selectable="disabledFn">
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" prop="name"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['唯一标识']`)" prop="key"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" prop="typeName"></bk-table-column>
+      <bk-table-column :label="$t(`m.treeinfo['是否只读']`)">
+        <template slot-scope="props">
+          <bk-radio-group v-model="props.row.is_readonly">
+            <bk-radio :value="trueStatus"
+              :disabled="props.row.key === 'priority' || props.row.is_disabled"
+              class="mr20">
+              {{ $t('m.treeinfo["是"]') }}
+            </bk-radio>
+            <bk-radio :value="falseStatus"
+              :disabled="props.row.key === 'priority' || props.row.is_disabled">
+              {{ $t('m.treeinfo["否"]') }}
+            </bk-radio>
+          </bk-radio-group>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>

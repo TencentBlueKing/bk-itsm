@@ -21,108 +21,108 @@
   -->
 
 <template>
-    <div class="bk-api-editor-request">
-        <p class="bk-basic-p" v-if="basicInfo.method === 'GET'">Query：</p>
-        <p class="bk-basic-p" v-if="basicInfo.method === 'POST'">Body：</p>
-        <!-- Query -->
-        <ul class="bk-request-ul" v-if="basicInfo.method === 'GET'">
-            <template v-if="basicInfo.req_params && basicInfo.req_params.length">
-                <li v-for="(item, index) in basicInfo.req_params" :key="index">
-                    <div class="bk-request-form">
-                        <div class="bk-ul-form">
-                            <bk-input :clearable="true"
-                                :disabled="basicInfo.is_builtin"
-                                :placeholder="$t(`m.systemConfig['参数名称']`)"
-                                v-model="item.name">
-                            </bk-input>
-                        </div>
-                        <div class="bk-ul-form">
-                            <bk-select v-model="item.is_necessary"
-                                :clearable="false"
-                                :font-size="'medium'"
-                                :disabled="basicInfo.is_builtin">
-                                <bk-option v-for="option in necessaryList"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </div>
-                        <div class="bk-ul-form">
-                            <bk-input
-                                :clearable="true"
-                                :disabled="basicInfo.is_builtin"
-                                :placeholder="$t(`m.systemConfig['参数示例']`)"
-                                v-model="item.sample">
-                            </bk-input>
-                        </div>
-                        <div class="bk-ul-form">
-                            <bk-input
-                                :clearable="true"
-                                :disabled="basicInfo.is_builtin"
-                                :placeholder="$t(`m.systemConfig['备注']`)"
-                                v-model="item.desc">
-                            </bk-input>
-                        </div>
-                    </div>
-                    <div class="bk-request-operat" v-if="!basicInfo.is_builtin">
-                        <span class="bk-add-node" @click="addQuery(basicInfo.req_params, index)">
-                            <i class="bk-icon icon-plus" style="font-size: 24px"></i>
-                        </span>
-                        <span class="bk-reduce-node"
-                            :class="{ 'bk-reduce-disable': basicInfo.req_params.length === 1 }"
-                            @click="deleteQuery(basicInfo.req_params, index)">
-                            <i class="bk-icon icon-close" style="font-size: 24px"></i>
-                        </span>
-                    </div>
-                </li>
-            </template>
-        </ul>
-        <!-- Body -->
-        <template v-if="basicInfo.method === 'POST'">
-            <div class="mb10">
-                <bk-button :theme="'primary'"
-                    data-test-id="apiDetail_button_importRequsetJSON"
-                    :title="$t(`m.systemConfig['导入JSON']`)"
-                    :disabled="basicInfo.is_builtin"
-                    @click="closeDictionary">
-                    {{$t(`m.systemConfig['导入JSON']`)}}
-                </bk-button>
+  <div class="bk-api-editor-request">
+    <p class="bk-basic-p" v-if="basicInfo.method === 'GET'">Query：</p>
+    <p class="bk-basic-p" v-if="basicInfo.method === 'POST'">Body：</p>
+    <!-- Query -->
+    <ul class="bk-request-ul" v-if="basicInfo.method === 'GET'">
+      <template v-if="basicInfo.req_params && basicInfo.req_params.length">
+        <li v-for="(item, index) in basicInfo.req_params" :key="index">
+          <div class="bk-request-form">
+            <div class="bk-ul-form">
+              <bk-input :clearable="true"
+                :disabled="basicInfo.is_builtin"
+                :placeholder="$t(`m.systemConfig['参数名称']`)"
+                v-model="item.name">
+              </bk-input>
             </div>
-            <api-request-body
-                :is-body="true"
-                :is-builtin="basicInfo.is_builtin"
-                :tree-data-list="treeDataList"
-                @addBrotherLine="addBodyLine"
-                @addChildLine="addBodyChild"
-                @deleteLine="deleteBodyLine">
-            </api-request-body>
-        </template>
-        <bk-dialog
-            v-model="dictDataTable.showDialog"
-            :render-directive="'if'"
-            :width="dictDataTable.width"
-            :header-position="dictDataTable.headerPosition"
-            :loading="secondClick"
-            :auto-close="dictDataTable.autoClose"
-            :mask-close="dictDataTable.autoClose"
-            :title="$t(`m.systemConfig['导入JSON']`)"
-            @confirm="submitDictionary">
-            <div class="bk-add-module">
-                <ace
-                    :value="responseDetailConfig.value"
-                    :width="responseDetailConfig.width"
-                    :height="responseDetailConfig.height"
-                    :read-only="responseDetailConfig.readOnly"
-                    :lang="responseDetailConfig.lang"
-                    :full-screen="responseDetailConfig.fullScreen"
-                    :theme="'textmate'"
-                    @blur="blur"
-                    @init="importEditorInitAfter">
-                </ace>
+            <div class="bk-ul-form">
+              <bk-select v-model="item.is_necessary"
+                :clearable="false"
+                :font-size="'medium'"
+                :disabled="basicInfo.is_builtin">
+                <bk-option v-for="option in necessaryList"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
             </div>
-        </bk-dialog>
-    </div>
+            <div class="bk-ul-form">
+              <bk-input
+                :clearable="true"
+                :disabled="basicInfo.is_builtin"
+                :placeholder="$t(`m.systemConfig['参数示例']`)"
+                v-model="item.sample">
+              </bk-input>
+            </div>
+            <div class="bk-ul-form">
+              <bk-input
+                :clearable="true"
+                :disabled="basicInfo.is_builtin"
+                :placeholder="$t(`m.systemConfig['备注']`)"
+                v-model="item.desc">
+              </bk-input>
+            </div>
+          </div>
+          <div class="bk-request-operat" v-if="!basicInfo.is_builtin">
+            <span class="bk-add-node" @click="addQuery(basicInfo.req_params, index)">
+              <i class="bk-icon icon-plus" style="font-size: 24px"></i>
+            </span>
+            <span class="bk-reduce-node"
+              :class="{ 'bk-reduce-disable': basicInfo.req_params.length === 1 }"
+              @click="deleteQuery(basicInfo.req_params, index)">
+              <i class="bk-icon icon-close" style="font-size: 24px"></i>
+            </span>
+          </div>
+        </li>
+      </template>
+    </ul>
+    <!-- Body -->
+    <template v-if="basicInfo.method === 'POST'">
+      <div class="mb10">
+        <bk-button :theme="'primary'"
+          data-test-id="apiDetail_button_importRequsetJSON"
+          :title="$t(`m.systemConfig['导入JSON']`)"
+          :disabled="basicInfo.is_builtin"
+          @click="closeDictionary">
+          {{$t(`m.systemConfig['导入JSON']`)}}
+        </bk-button>
+      </div>
+      <api-request-body
+        :is-body="true"
+        :is-builtin="basicInfo.is_builtin"
+        :tree-data-list="treeDataList"
+        @addBrotherLine="addBodyLine"
+        @addChildLine="addBodyChild"
+        @deleteLine="deleteBodyLine">
+      </api-request-body>
+    </template>
+    <bk-dialog
+      v-model="dictDataTable.showDialog"
+      :render-directive="'if'"
+      :width="dictDataTable.width"
+      :header-position="dictDataTable.headerPosition"
+      :loading="secondClick"
+      :auto-close="dictDataTable.autoClose"
+      :mask-close="dictDataTable.autoClose"
+      :title="$t(`m.systemConfig['导入JSON']`)"
+      @confirm="submitDictionary">
+      <div class="bk-add-module">
+        <ace
+          :value="responseDetailConfig.value"
+          :width="responseDetailConfig.width"
+          :height="responseDetailConfig.height"
+          :read-only="responseDetailConfig.readOnly"
+          :lang="responseDetailConfig.lang"
+          :full-screen="responseDetailConfig.fullScreen"
+          :theme="'textmate'"
+          @blur="blur"
+          @init="importEditorInitAfter">
+        </ace>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

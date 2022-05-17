@@ -21,52 +21,52 @@
   -->
 
 <template>
-    <!-- 通知关注人 -->
-    <div class="bk-log-flow">
-        <bk-form
-            :label-width="200"
-            form-type="vertical">
-            <bk-form-item
-                :label="$t(`m.newCommon['收件人']`)"
-                :required="true">
-                <deal-person
-                    ref="personSelect"
-                    class="recipient-person"
-                    form-type="vertical"
-                    :value="personSelectCheckValue"
-                    :shortcut="true"
-                    :show-role-type-list="includeTypes"
-                    :required-msg="$t(`m.newCommon['请选择收件人']`)">
-                </deal-person>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.newCommon['通知内容']`)"
-                :required="true">
-                <bk-input
-                    :placeholder="$t(`m.newCommon['请输入通知内容，长度不能超过200']`)"
-                    :type="'textarea'"
-                    :rows="3"
-                    :maxlength="200"
-                    v-model="followers.comments">
-                </bk-input>
-            </bk-form-item>
-            <bk-form-item>
-                <bk-button :theme="'primary'" class="mr10 mt10"
-                    :title="$t(`m.newCommon['发送']`)"
-                    :disabled="followers.clickSecond"
-                    @click="postFollowlogs">
-                    {{ $t('m.newCommon["发送"]') }}
-                </bk-button>
-            </bk-form-item>
-        </bk-form>
-        <template v-if="flowList.length && ticketInfo.can_invite_followers">
-            <h3 class="setion-title">{{ $t('m.newCommon["发送历史"]') }}</h3>
-        </template>
-        <bk-timeline
-            ext-cls="log-time-line"
-            :list="flowList">
-        </bk-timeline>
-    </div>
+  <!-- 通知关注人 -->
+  <div class="bk-log-flow">
+    <bk-form
+      :label-width="200"
+      form-type="vertical">
+      <bk-form-item
+        :label="$t(`m.newCommon['收件人']`)"
+        :required="true">
+        <deal-person
+          ref="personSelect"
+          class="recipient-person"
+          form-type="vertical"
+          :value="personSelectCheckValue"
+          :shortcut="true"
+          :show-role-type-list="includeTypes"
+          :required-msg="$t(`m.newCommon['请选择收件人']`)">
+        </deal-person>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.newCommon['通知内容']`)"
+        :required="true">
+        <bk-input
+          :placeholder="$t(`m.newCommon['请输入通知内容，长度不能超过200']`)"
+          :type="'textarea'"
+          :rows="3"
+          :maxlength="200"
+          v-model="followers.comments">
+        </bk-input>
+      </bk-form-item>
+      <bk-form-item>
+        <bk-button :theme="'primary'" class="mr10 mt10"
+          :title="$t(`m.newCommon['发送']`)"
+          :disabled="followers.clickSecond"
+          @click="postFollowlogs">
+          {{ $t('m.newCommon["发送"]') }}
+        </bk-button>
+      </bk-form-item>
+    </bk-form>
+    <template v-if="flowList.length && ticketInfo.can_invite_followers">
+      <h3 class="setion-title">{{ $t('m.newCommon["发送历史"]') }}</h3>
+    </template>
+    <bk-timeline
+      ext-cls="log-time-line"
+      :list="flowList">
+    </bk-timeline>
+  </div>
 </template>
 
 <script>

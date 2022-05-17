@@ -21,12 +21,12 @@
   -->
 
 <template>
-    <div class="exception-box">
-        <img class="exception-img" src="../../../../images/403.png" alt=""
-            v-if="message === $t(`m.wiki['您没有权限访问']`)" />
-        <img class="exception-img" src="../../../../images/404.png" alt="" v-else />
-        <p class="exception-p">{{ message }}</p>
-    </div>
+  <div class="exception-box">
+    <img class="exception-img" src="../../../../images/403.png" alt=""
+      v-if="message === $t(`m.wiki['您没有权限访问']`)" />
+    <img class="exception-img" src="../../../../images/404.png" alt="" v-else />
+    <p class="exception-p">{{ message }}</p>
+  </div>
 </template>
 <script>
     export default {

@@ -21,94 +21,94 @@
   -->
 
 <template>
-    <div class="bk-trigger-condition">
-        <div class="bk-condition-name"><span>{{$t(`m.trigger['触发条件']`)}}</span></div>
-        <div class="bk-condition-content" @click="triggerRules.checkStatus = false">
-            <ul class="bk-content-step">
-                <li class="bk-content-li" v-for="(item, index) in triggerRules.list" :key="index">
-                    <ul class="bk-content-item" :class="{ 'bk-more-margin': item.itemList.length !== 1 }">
-                        <li class="bk-content-item-li"
-                            :class="{ 'bk-none-margin': item.itemList.length - 1 === nodeIndex }"
-                            v-for="(node, nodeIndex) in item.itemList"
-                            :key="nodeIndex">
-                            <template v-if="item.itemList.length !== 1">
-                                <div class="bk-content-type"
-                                    v-if="nodeIndex !== item.itemList.length - 1"
-                                    @click="changeBetween(item)">
-                                    <span>{{ item.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
-                                    <i class="bk-icon icon-down-shape"></i>
-                                </div>
-                                <!-- 线条 -->
-                                <div class="bk-item-line"></div>
-                                <div class="bk-item-line-none bk-item-none" v-if="nodeIndex === 0"></div>
-                                <div class="bk-item-line-none bk-item-none-bottom" v-if="nodeIndex === item.itemList.length - 1"></div>
-                            </template>
-                            <!-- 内容 -->
-                            <bk-select style="width: 190px;"
-                                :ext-cls="'bk-item-float'"
-                                v-model="node.key"
-                                :clearable="false"
-                                searchable
-                                @change="changeContent(node)">
-                                <bk-option v-for="option in keyList"
-                                    :key="option.key"
-                                    :id="option.key"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                            <bk-select style="width: 140px;"
-                                :ext-cls="'bk-item-float'"
-                                v-model="node.condition"
-                                :clearable="false"
-                                searchable
-                                @selected="changeCondition(node)">
-                                <bk-option v-for="option in node.conditionList"
-                                    :key="option.name"
-                                    :id="option.name"
-                                    :name="option.label">
-                                </bk-option>
-                            </bk-select>
-                            <template v-if="node.conditionType !== 'none'">
-                                <trigger-field style="width: 170px; float: left; margin-right: 8px;"
-                                    :item="node">
-                                </trigger-field>
-                            </template>
-                            <!-- 新增和删除 -->
-                            <div class="bk-between-operat">
-                                <i class="bk-itsm-icon icon-flow-add" @click="addLine(item, node, nodeIndex)"></i>
-                                <i class="bk-itsm-icon icon-flow-reduce"
-                                    :class="{ 'bk-no-delete': item.itemList.length === 1 }"
-                                    @click="deleteLine(item, node, nodeIndex)"></i>
-                            </div>
-                        </li>
-                    </ul>
-                    <!-- 删除 -->
-                    <i class="bk-icon icon-close-circle-shape"
-                        :class="{ 'bk-no-delete': triggerRules.list.length === 1 }"
-                        @click="deleteGroup(item, index)"></i>
-                    <!-- 且或关系 -->
-                    <div class="bk-content-type" @click="handleBetween">
-                        <span>{{ triggerRules.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
-                        <i class="bk-icon icon-down-shape"></i>
-                    </div>
-                    <!-- 最外层线条 -->
-                    <div class="bk-item-line"></div>
-                    <div class="bk-item-line-none bk-item-none" v-if="index === 0"></div>
-                    <!-- 内层线条 -->
-                    <div class="bk-content-line" v-if="item.itemList.length !== 1"></div>
-                </li>
-                <li class="bk-content-add">
-                    <span @click="addGroup">
-                        <i class="bk-icon icon-plus-circle mr5"></i><span>{{$t(`m.trigger['添加']`)}}</span>
-                    </span>
-                    <div class="bk-item-line"></div>
-                    <div class="bk-item-line-none" :class="{ 'bk-item-over-line': triggerRules.checkStatus }"></div>
-                </li>
-            </ul>
-            <div class="bk-content-line"></div>
-            <p class="bk-error-info" v-if="triggerRules.checkStatus">{{$t(`m.trigger['请填写完整的触发条件']`)}}</p>
-        </div>
+  <div class="bk-trigger-condition">
+    <div class="bk-condition-name"><span>{{$t(`m.trigger['触发条件']`)}}</span></div>
+    <div class="bk-condition-content" @click="triggerRules.checkStatus = false">
+      <ul class="bk-content-step">
+        <li class="bk-content-li" v-for="(item, index) in triggerRules.list" :key="index">
+          <ul class="bk-content-item" :class="{ 'bk-more-margin': item.itemList.length !== 1 }">
+            <li class="bk-content-item-li"
+              :class="{ 'bk-none-margin': item.itemList.length - 1 === nodeIndex }"
+              v-for="(node, nodeIndex) in item.itemList"
+              :key="nodeIndex">
+              <template v-if="item.itemList.length !== 1">
+                <div class="bk-content-type"
+                  v-if="nodeIndex !== item.itemList.length - 1"
+                  @click="changeBetween(item)">
+                  <span>{{ item.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
+                  <i class="bk-icon icon-down-shape"></i>
+                </div>
+                <!-- 线条 -->
+                <div class="bk-item-line"></div>
+                <div class="bk-item-line-none bk-item-none" v-if="nodeIndex === 0"></div>
+                <div class="bk-item-line-none bk-item-none-bottom" v-if="nodeIndex === item.itemList.length - 1"></div>
+              </template>
+              <!-- 内容 -->
+              <bk-select style="width: 190px;"
+                :ext-cls="'bk-item-float'"
+                v-model="node.key"
+                :clearable="false"
+                searchable
+                @change="changeContent(node)">
+                <bk-option v-for="option in keyList"
+                  :key="option.key"
+                  :id="option.key"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+              <bk-select style="width: 140px;"
+                :ext-cls="'bk-item-float'"
+                v-model="node.condition"
+                :clearable="false"
+                searchable
+                @selected="changeCondition(node)">
+                <bk-option v-for="option in node.conditionList"
+                  :key="option.name"
+                  :id="option.name"
+                  :name="option.label">
+                </bk-option>
+              </bk-select>
+              <template v-if="node.conditionType !== 'none'">
+                <trigger-field style="width: 170px; float: left; margin-right: 8px;"
+                  :item="node">
+                </trigger-field>
+              </template>
+              <!-- 新增和删除 -->
+              <div class="bk-between-operat">
+                <i class="bk-itsm-icon icon-flow-add" @click="addLine(item, node, nodeIndex)"></i>
+                <i class="bk-itsm-icon icon-flow-reduce"
+                  :class="{ 'bk-no-delete': item.itemList.length === 1 }"
+                  @click="deleteLine(item, node, nodeIndex)"></i>
+              </div>
+            </li>
+          </ul>
+          <!-- 删除 -->
+          <i class="bk-icon icon-close-circle-shape"
+            :class="{ 'bk-no-delete': triggerRules.list.length === 1 }"
+            @click="deleteGroup(item, index)"></i>
+          <!-- 且或关系 -->
+          <div class="bk-content-type" @click="handleBetween">
+            <span>{{ triggerRules.type === 'all' ? $t(`m.trigger['且']`) : $t(`m.trigger['或']`) }}</span>
+            <i class="bk-icon icon-down-shape"></i>
+          </div>
+          <!-- 最外层线条 -->
+          <div class="bk-item-line"></div>
+          <div class="bk-item-line-none bk-item-none" v-if="index === 0"></div>
+          <!-- 内层线条 -->
+          <div class="bk-content-line" v-if="item.itemList.length !== 1"></div>
+        </li>
+        <li class="bk-content-add">
+          <span @click="addGroup">
+            <i class="bk-icon icon-plus-circle mr5"></i><span>{{$t(`m.trigger['添加']`)}}</span>
+          </span>
+          <div class="bk-item-line"></div>
+          <div class="bk-item-line-none" :class="{ 'bk-item-over-line': triggerRules.checkStatus }"></div>
+        </li>
+      </ul>
+      <div class="bk-content-line"></div>
+      <p class="bk-error-info" v-if="triggerRules.checkStatus">{{$t(`m.trigger['请填写完整的触发条件']`)}}</p>
     </div>
+  </div>
 </template>
 <script>
     import triggerField from '../common/triggerField.vue';

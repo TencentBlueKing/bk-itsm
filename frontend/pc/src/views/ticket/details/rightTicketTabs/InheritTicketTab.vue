@@ -21,240 +21,240 @@
   -->
 
 <template>
-    <div class="bk-flowlog-inherit">
-        <div class="mb20">
-            <bk-button
-                :theme="'default'"
-                class="mr10"
-                data-test-id="ticket_button_createInheritTicket"
-                :title="
-                    ticketInfo.is_over || !ticketInfo.can_operate
-                        ? $t(`m.newCommon['暂无权限或单据已结束']`)
-                        : $t(`m.newCommon['新建']`)
-                "
-                :disabled="ticketInfo.is_over || !ticketInfo.can_operate"
-                @click="openAddInheritSlider"
-            >
-                {{ $t('m.newCommon["新建"]') }}
-            </bk-button>
-            <bk-button
-                :theme="'default'"
-                class="icon-cus"
-                data-test-id="ticket_button_InheritTicketBindingHistory"
-                :title="
-                    historyList.length
-                        ? $t(`m.newCommon['绑定历史']`)
-                        : $t(`m.newCommon['暂无关联历史']`)
-                "
-                icon=" bk-itsm-icon icon-history"
-                :disabled="!historyList.length"
-                @click="showHistory"
-            >
-            </bk-button>
-        </div>
-        <div
-            class="mb20"
-            v-if="masterOrSlave === 'slave' || !inheritStateList.length"
-        >
-            <p class="inherit-table-tittle">{{ $t('m.newCommon["母单"]') }}</p>
-            <bk-table
-                v-bkloading="{ isLoading: tableLoading }"
-                :data="inheritStateList"
-                :size="'small'"
-            >
-                <bk-table-column
-                    :label="$t(`m.newCommon['单号']`)"
-                    min-width="140"
-                >
-                    <template slot-scope="props">
-                        <span
-                            class="bk-lable-primary"
-                            @click="checkOne(props.row)"
-                            :title="props.row.sn"
-                        >
-                            {{ props.row.sn }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
-                    <template slot-scope="props">
-                        <span
-                            v-if="props.row.related_status === 'UNBIND_FAILED'"
-                            class="bk-failed-status"
-                        ></span>
-                        <i
-                            v-if="props.row.related_status === 'RUNNING'"
-                            class="bk-itsm-icon icon-inherit-loading bk-running-status"
-                        ></i>
-                        <span
-                            v-if="
-                                props.row.related_status === 'UNBIND_FAILED' ||
-                                    props.row.related_status === 'RUNNING'
-                            "
-                        >{{ props.row.status }}</span
-                        >
-                        <span v-else>{{ props.row.bind_at }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.newCommon['操作']`)" width="100">
-                    <template slot-scope="props">
-                        <bk-button
-                            theme="primary"
-                            text
-                            :disabled="props.row.related_status === 'RUNNING'"
-                            @click="giveUnbindInfo('one', props.row)"
-                        >
-                            {{ $t('m.newCommon["取消关联"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <div
-            class="mb20"
-            v-if="masterOrSlave === 'master' || !inheritStateList.length"
-        >
-            <p class="inherit-table-tittle">{{ $t('m.newCommon["子单"]') }}</p>
-            <bk-table
-                v-bkloading="{ isLoading: tableLoading }"
-                :data="inheritStateList"
-                :size="'small'"
-                @select-all="handleSelectAll"
-                @select="handleSelect"
-            >
-                <bk-table-column
-                    type="selection"
-                    width="60"
-                    align="center"
-                    :selectable="disabledFn"
-                >
-                </bk-table-column>
-                <bk-table-column
-                    :label="$t(`m.newCommon['单号']`)"
-                    min-width="140"
-                >
-                    <template slot-scope="props">
-                        <span
-                            class="bk-lable-primary"
-                            @click="checkOne(props.row)"
-                            :title="props.row.sn"
-                        >
-                            {{ props.row.sn }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
-                    <template slot-scope="props">
-                        <span
-                            v-if="props.row.related_status === 'UNBIND_FAILED'"
-                            class="bk-failed-status"
-                        ></span>
-                        <i
-                            v-if="props.row.related_status === 'RUNNING'"
-                            class="bk-itsm-icon icon-inherit-loading bk-running-status loading"
-                        ></i>
-                        <span
-                            v-if="
-                                props.row.related_status === 'UNBIND_FAILED' ||
-                                    props.row.related_status === 'RUNNING'
-                            "
-                        >{{ props.row.status }}</span
-                        >
-                        <span v-else>{{ props.row.bind_at }}</span>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <div class="inherit-bottom-button">
-            <bk-button
-                data-test-id="ticket_button_batchUnbind"
-                theme="default"
-                :title="$t(`m.newCommon['批量解绑']`)"
-                :disabled="!checkList.length"
-                @click="giveUnbindInfo('batch')"
-            >
-                {{ $t('m.newCommon["批量解绑"]') }}
-            </bk-button>
-        </div>
-        <bk-dialog
-            v-model="historyInfo.isShow"
-            :render-directive="'if'"
-            :title="historyInfo.title"
-            :width="historyInfo.width"
-            :header-position="historyInfo.headerPosition"
-            :loading="secondClick"
-            :auto-close="historyInfo.autoClose"
-            :mask-close="historyInfo.autoClose"
-        >
-            <div style="width: 100%; max-height: 347px">
-                <bk-table
-                    v-bkloading="{ isLoading: historyTableLoading }"
-                    :data="historyList"
-                    :size="'small'"
-                >
-                    <bk-table-column
-                        :label="$t(`m.newCommon['单号']`)"
-                        min-width="100"
-                    >
-                        <template slot-scope="props">
-                            <span
-                                class="bk-lable-primary"
-                                @click="checkOne(props.row)"
-                                :title="props.row.sn"
-                            >
-                                {{ props.row.sn }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['状态']`)"
-                        width="80"
-                    >
-                        <template slot-scope="props">
-                            {{
-                                props.row.related_type === "master"
-                                    ? $t('m.newCommon["母单"]')
-                                    : $t('m.newCommon["子单"]')
-                            }}
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['绑定时间']`)"
-                        prop="create_at"
-                    ></bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['解绑时间']`)"
-                        prop="end_at"
-                    ></bk-table-column>
-                </bk-table>
-            </div>
-            <div slot="footer">
-                <bk-button theme="default" @click="closeHistory">
-                    {{ $t('m.home["取消"]') }}
-                </bk-button>
-            </div>
-        </bk-dialog>
-
-        <!-- 新建母子单 -->
-        <bk-sideslider
-            :is-show.sync="isShowAddInheritTicket"
-            :quick-close="true"
-            :title="$t(`m.newCommon['新建母子单']`)"
-            :before-close="closeSideslider"
-            :width="750"
-        >
-            <div class="p20" slot="content">
-                <inherit-ticket-add-dialog
-                    ref="addInheritTicket"
-                    v-if="isShowAddInheritTicket"
-                    :template-info="inheritStateInfo"
-                    :ticket-info="ticketInfo"
-                    @close="isShowAddInheritTicket = false"
-                >
-                </inherit-ticket-add-dialog>
-            </div>
-        </bk-sideslider>
+  <div class="bk-flowlog-inherit">
+    <div class="mb20">
+      <bk-button
+        :theme="'default'"
+        class="mr10"
+        data-test-id="ticket_button_createInheritTicket"
+        :title="
+          ticketInfo.is_over || !ticketInfo.can_operate
+            ? $t(`m.newCommon['暂无权限或单据已结束']`)
+            : $t(`m.newCommon['新建']`)
+        "
+        :disabled="ticketInfo.is_over || !ticketInfo.can_operate"
+        @click="openAddInheritSlider"
+      >
+        {{ $t('m.newCommon["新建"]') }}
+      </bk-button>
+      <bk-button
+        :theme="'default'"
+        class="icon-cus"
+        data-test-id="ticket_button_InheritTicketBindingHistory"
+        :title="
+          historyList.length
+            ? $t(`m.newCommon['绑定历史']`)
+            : $t(`m.newCommon['暂无关联历史']`)
+        "
+        icon=" bk-itsm-icon icon-history"
+        :disabled="!historyList.length"
+        @click="showHistory"
+      >
+      </bk-button>
     </div>
+    <div
+      class="mb20"
+      v-if="masterOrSlave === 'slave' || !inheritStateList.length"
+    >
+      <p class="inherit-table-tittle">{{ $t('m.newCommon["母单"]') }}</p>
+      <bk-table
+        v-bkloading="{ isLoading: tableLoading }"
+        :data="inheritStateList"
+        :size="'small'"
+      >
+        <bk-table-column
+          :label="$t(`m.newCommon['单号']`)"
+          min-width="140"
+        >
+          <template slot-scope="props">
+            <span
+              class="bk-lable-primary"
+              @click="checkOne(props.row)"
+              :title="props.row.sn"
+            >
+              {{ props.row.sn }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
+          <template slot-scope="props">
+            <span
+              v-if="props.row.related_status === 'UNBIND_FAILED'"
+              class="bk-failed-status"
+            ></span>
+            <i
+              v-if="props.row.related_status === 'RUNNING'"
+              class="bk-itsm-icon icon-inherit-loading bk-running-status"
+            ></i>
+            <span
+              v-if="
+                props.row.related_status === 'UNBIND_FAILED' ||
+                  props.row.related_status === 'RUNNING'
+              "
+            >{{ props.row.status }}</span
+            >
+            <span v-else>{{ props.row.bind_at }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.newCommon['操作']`)" width="100">
+          <template slot-scope="props">
+            <bk-button
+              theme="primary"
+              text
+              :disabled="props.row.related_status === 'RUNNING'"
+              @click="giveUnbindInfo('one', props.row)"
+            >
+              {{ $t('m.newCommon["取消关联"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <div
+      class="mb20"
+      v-if="masterOrSlave === 'master' || !inheritStateList.length"
+    >
+      <p class="inherit-table-tittle">{{ $t('m.newCommon["子单"]') }}</p>
+      <bk-table
+        v-bkloading="{ isLoading: tableLoading }"
+        :data="inheritStateList"
+        :size="'small'"
+        @select-all="handleSelectAll"
+        @select="handleSelect"
+      >
+        <bk-table-column
+          type="selection"
+          width="60"
+          align="center"
+          :selectable="disabledFn"
+        >
+        </bk-table-column>
+        <bk-table-column
+          :label="$t(`m.newCommon['单号']`)"
+          min-width="140"
+        >
+          <template slot-scope="props">
+            <span
+              class="bk-lable-primary"
+              @click="checkOne(props.row)"
+              :title="props.row.sn"
+            >
+              {{ props.row.sn }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
+          <template slot-scope="props">
+            <span
+              v-if="props.row.related_status === 'UNBIND_FAILED'"
+              class="bk-failed-status"
+            ></span>
+            <i
+              v-if="props.row.related_status === 'RUNNING'"
+              class="bk-itsm-icon icon-inherit-loading bk-running-status loading"
+            ></i>
+            <span
+              v-if="
+                props.row.related_status === 'UNBIND_FAILED' ||
+                  props.row.related_status === 'RUNNING'
+              "
+            >{{ props.row.status }}</span
+            >
+            <span v-else>{{ props.row.bind_at }}</span>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <div class="inherit-bottom-button">
+      <bk-button
+        data-test-id="ticket_button_batchUnbind"
+        theme="default"
+        :title="$t(`m.newCommon['批量解绑']`)"
+        :disabled="!checkList.length"
+        @click="giveUnbindInfo('batch')"
+      >
+        {{ $t('m.newCommon["批量解绑"]') }}
+      </bk-button>
+    </div>
+    <bk-dialog
+      v-model="historyInfo.isShow"
+      :render-directive="'if'"
+      :title="historyInfo.title"
+      :width="historyInfo.width"
+      :header-position="historyInfo.headerPosition"
+      :loading="secondClick"
+      :auto-close="historyInfo.autoClose"
+      :mask-close="historyInfo.autoClose"
+    >
+      <div style="width: 100%; max-height: 347px">
+        <bk-table
+          v-bkloading="{ isLoading: historyTableLoading }"
+          :data="historyList"
+          :size="'small'"
+        >
+          <bk-table-column
+            :label="$t(`m.newCommon['单号']`)"
+            min-width="100"
+          >
+            <template slot-scope="props">
+              <span
+                class="bk-lable-primary"
+                @click="checkOne(props.row)"
+                :title="props.row.sn"
+              >
+                {{ props.row.sn }}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['状态']`)"
+            width="80"
+          >
+            <template slot-scope="props">
+              {{
+                props.row.related_type === "master"
+                  ? $t('m.newCommon["母单"]')
+                  : $t('m.newCommon["子单"]')
+              }}
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['绑定时间']`)"
+            prop="create_at"
+          ></bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['解绑时间']`)"
+            prop="end_at"
+          ></bk-table-column>
+        </bk-table>
+      </div>
+      <div slot="footer">
+        <bk-button theme="default" @click="closeHistory">
+          {{ $t('m.home["取消"]') }}
+        </bk-button>
+      </div>
+    </bk-dialog>
+
+    <!-- 新建母子单 -->
+    <bk-sideslider
+      :is-show.sync="isShowAddInheritTicket"
+      :quick-close="true"
+      :title="$t(`m.newCommon['新建母子单']`)"
+      :before-close="closeSideslider"
+      :width="750"
+    >
+      <div class="p20" slot="content">
+        <inherit-ticket-add-dialog
+          ref="addInheritTicket"
+          v-if="isShowAddInheritTicket"
+          :template-info="inheritStateInfo"
+          :ticket-info="ticketInfo"
+          @close="isShowAddInheritTicket = false"
+        >
+        </inherit-ticket-add-dialog>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

@@ -21,262 +21,262 @@
   -->
 
 <template>
-    <div class="bk-configu-line" ref="lienHeight">
-        <div class="bk-line-graph">
-            <div class="bk-line-div"
-                :class="{ 'bk-line-small': widthStatus === 2, 'bk-line-big': widthStatus === 1 }">
-                <template-node
-                    :node="customLine.nodeInfo.from_state"></template-node>
-                <div class="bk-line-style">
-                    <span class="bk-line-line">
-                        <span class="bk-line-info"></span>
-                    </span>
-                    <!-- 显示改变后的数据 -->
-                    <span class="bk-line-word"> {{lineInfo.name || '--'}} </span>
-                    <span class="bk-line-squrea"></span>
-                </div>
-                <template-node
-                    :node="customLine.nodeInfo.to_state"></template-node>
-            </div>
+  <div class="bk-configu-line" ref="lienHeight">
+    <div class="bk-line-graph">
+      <div class="bk-line-div"
+        :class="{ 'bk-line-small': widthStatus === 2, 'bk-line-big': widthStatus === 1 }">
+        <template-node
+          :node="customLine.nodeInfo.from_state"></template-node>
+        <div class="bk-line-style">
+          <span class="bk-line-line">
+            <span class="bk-line-info"></span>
+          </span>
+          <!-- 显示改变后的数据 -->
+          <span class="bk-line-word"> {{lineInfo.name || '--'}} </span>
+          <span class="bk-line-squrea"></span>
         </div>
-        <bk-form
-            :label-width="200"
-            :model="lineInfo"
-            form-type="vertical"
-            :rules="rules"
-            ref="lineForm">
-            <template v-if="!customLine.isOnly">
-                <bk-form-item
-                    :label="$t(`m.treeinfo['关系模板']`)"
-                    :desc="$t(`m.treeinfo['（使用模版可以快速填写）']`)">
-                    <bk-select v-model="lineInfo.template"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'"
-                        @selected="changeTemplate">
-                        <bk-option v-for="option in templateList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.treeinfo['流转条件']`)"
-                    :required="true">
-                    <bk-select v-model="lineInfo.condition_type"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'"
-                        @selected="changeCondition">
-                        <bk-option v-for="option in globalChoise.condition_type"
-                            :key="option.typeName"
-                            :id="option.typeName"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-            </template>
-            <bk-form-item
-                :label="$t(`m.treeinfo['关系名称']`)"
-                :property="'name'"
-                :required="true">
-                <bk-input v-model.trim="lineInfo.name"
-                    maxlength="120"
-                    :placeholder="$t(`m.treeinfo['请输入关系名称']`)">
-                </bk-input>
-            </bk-form-item>
-        </bk-form>
-        <!-- 字段判断 -->
-        <template v-if="lineInfo.condition_type !== 'default'">
-            <div v-bkloading="{ isLoading: isDataLoading }">
-                <bk-form
-                    :label-width="200"
-                    :model="lineInfo"
-                    :ext-cls="'bk-line-form'"
-                    form-type="vertical"
-                    ref="conditionForm">
-                    <bk-form-item
-                        :label="$t(`m.treeinfo['条件组间关系']`)"
-                        :desc="$t(`m.treeinfo['当所有条件组都满足且/或的条件时，节点才会流转']`)"
-                        :ext-cls="'mb10 mt10'">
-                        <bk-radio-group v-model="lineInfo.between">
-                            <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
-                            <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
-                        </bk-radio-group>
-                    </bk-form-item>
-                    <div class="bk-form-content"
-                        v-for="(item, index) in lineInfo.expressions"
-                        :key="index">
-                        <p class="bk-between-title">{{lineInfo.between === 'and' ? $t(`m.treeinfo['且']`) :
-                            $t(`m.treeinfo["或"]`)}}{{ $t('m.treeinfo["-条件组"]') }}{{index + 1}}</p>
-                        <div class="bk-between-info">
-                            <p>
-                                <span class="bk-between-span">{{ $t('m.treeinfo["字段间关系"]') }}</span>
-                                <bk-radio-group v-model="item.type" style="width: auto;">
-                                    <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
-                                    <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
-                                </bk-radio-group>
-                            </p>
-                            <div class="bk-between-form"
-                                v-for="(node, nodeIndex) in item.expressions"
-                                :key="nodeIndex" @click="item.checkInfo = false">
-                                <bk-form-item
-                                    :ext-cls="'bk-width210 no-label'">
-                                    <bk-select
-                                        v-model="node.key"
-                                        :clearable="false"
-                                        searchable
-                                        :font-size="'medium'"
-                                        @selected="changeName(...arguments, node)">
-                                        <bk-option v-for="option in fieldList"
-                                            :key="option.key"
-                                            :id="option.key"
-                                            :name="option.name">
-                                        </bk-option>
-                                    </bk-select>
-                                </bk-form-item>
-                                <template v-if="node.betweenList">
-                                    <bk-form-item
-                                        :ext-cls="'bk-width100 no-label'">
-                                        <bk-select
-                                            v-model="node.condition"
-                                            :clearable="false"
-                                            searchable
-                                            :font-size="'medium'">
-                                            <bk-option v-for="option in node.betweenList"
-                                                :key="option.typeName"
-                                                :id="option.typeName"
-                                                :name="option.name">
-                                            </bk-option>
-                                        </bk-select>
-                                    </bk-form-item>
-                                </template>
-                                <bk-form-item
-                                    :label="''"
-                                    :ext-cls="'bk-width195 no-label'">
-                                    <template v-if="node.source !== 'global'">
-                                        <template v-if="globalTypeList.some(global => node.type === global)">
-                                            <bk-select
-                                                v-if="node.choiceList.length"
-                                                v-model="node.value"
-                                                :multiple="node.multiSelect"
-                                                searchable
-                                                :font-size="'medium'">
-                                                <bk-option v-for="option in node.choiceList"
-                                                    :key="option.id"
-                                                    :id="option.id"
-                                                    :name="option.name">
-                                                </bk-option>
-                                            </bk-select>
-                                            <bk-input
-                                                v-else
-                                                :clearable="true"
-                                                :type="node.type === 'INT' ? 'number' : 'text'"
-                                                v-model="node.value"
-                                                :placeholder="$t(`m.treeinfo['请输入条件值']`)">
-                                            </bk-input>
-                                        </template>
-                                        <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
-                                            <bk-date-picker
-                                                v-model="node.value"
-                                                :placeholder="'选择日期时间'"
-                                                :type="node.type === 'DATETIME' ? 'datetime' : 'date'">
-                                            </bk-date-picker>
-                                        </template>
-                                        <template v-else>
-                                            <bk-input
-                                                :clearable="true"
-                                                :type="node.type === 'INT' ? 'number' : 'text'"
-                                                v-model="node.value"
-                                                :placeholder="$t(`m.treeinfo['请输入条件值']`)">
-                                            </bk-input>
-                                            <span v-if="node.meta && node.meta.unit" class="buttonIcon">%</span>
-                                        </template>
-                                    </template>
-                                    <template v-if="node.source === 'global'">
-                                        <template v-if="node.type === 'BOOLEAN'">
-                                            <bk-select
-                                                v-model="node.value"
-                                                searchable
-                                                :font-size="'medium'">
-                                                <bk-option v-for="option in booleanList"
-                                                    :key="option.id"
-                                                    :id="option.id"
-                                                    :name="option.name">
-                                                </bk-option>
-                                            </bk-select>
-                                        </template>
-                                        <template v-else>
-                                            <bk-input
-                                                :clearable="true"
-                                                :type="node.type === 'INT' ? 'number' : 'text'"
-                                                v-model="node.value"
-                                                :placeholder="$t(`m.treeinfo['请输入比较值']`)">
-                                            </bk-input>
-                                        </template>
-                                    </template>
-                                </bk-form-item>
-                                <div class="bk-between-operat">
-                                    <span class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
-                                    <i class="bk-itsm-icon icon-flow-reduce"
-                                        :class="{ 'bk-no-delete': item.expressions.length === 1 }"
-                                        @click="deleteNode(item, nodeIndex)"></i>
-                                </div>
-                            </div>
-                            <i class="bk-icon icon-close"
-                                v-if="lineInfo.expressions.length !== 1"
-                                @click="delteCondition(item, index)"></i>
-                        </div>
-                        <p class="bk-error-msg" v-if="item.checkInfo">{{ $t('m.treeinfo["关系组内的数据不能为空"]') }}</p>
-                    </div>
-                </bk-form>
-            </div>
-            <p class="bk-add-between">
-                <span @click="addCondition">
-                    <i class="bk-icon icon-plus-circle"></i>{{ $t('m.treeinfo["添加条件组"]') }}
-                </span>
-            </p>
-        </template>
-        <div :class="{ 'bk-line-padding': scrollTopStatus }" v-if="openFunction.TRIGGER_SWITCH">
-            <common-trigger-list :origin="'transition'"
-                :source-id="customLine.lineValue.workflow"
-                :sender="customLine.lineValue.id"
-                :table="flowInfo.table">
-            </common-trigger-list>
-        </div>
-        <div class="mt20" :class="{ 'bk-line-btn': scrollTopStatus }">
-            <bk-button theme="primary"
-                class="mr10"
-                :title="$t(`m.treeinfo['确认']`)"
-                :loading="secondClick"
-                @click="submitLine">
-                {{ $t('m.treeinfo["确认"]') }}
-            </bk-button>
-            <bk-button theme="default"
-                class="mr10"
-                :title="$t(`m.treeinfo['取消']`)"
-                :disabled="secondClick"
-                @click="closeLine">
-                {{ $t('m.treeinfo["取消"]') }}
-            </bk-button>
-            <bk-button theme="default"
-                class="mr10"
-                :title="$t(`m.treeinfo['删除']`)"
-                :disabled="secondClick"
-                @click="deleteLine">
-                {{ $t('m.treeinfo["删除"]') }}
-            </bk-button>
-            <bk-button theme="default"
-                v-if="lineInfo.condition_type === 'by_field'"
-                style="float: right;"
-                :title="lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)"
-                :disabled="secondClick"
-                @click="submitTemplate">
-                {{lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)}}
-            </bk-button>
-        </div>
+        <template-node
+          :node="customLine.nodeInfo.to_state"></template-node>
+      </div>
     </div>
+    <bk-form
+      :label-width="200"
+      :model="lineInfo"
+      form-type="vertical"
+      :rules="rules"
+      ref="lineForm">
+      <template v-if="!customLine.isOnly">
+        <bk-form-item
+          :label="$t(`m.treeinfo['关系模板']`)"
+          :desc="$t(`m.treeinfo['（使用模版可以快速填写）']`)">
+          <bk-select v-model="lineInfo.template"
+            :clearable="false"
+            searchable
+            :font-size="'medium'"
+            @selected="changeTemplate">
+            <bk-option v-for="option in templateList"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.treeinfo['流转条件']`)"
+          :required="true">
+          <bk-select v-model="lineInfo.condition_type"
+            :clearable="false"
+            searchable
+            :font-size="'medium'"
+            @selected="changeCondition">
+            <bk-option v-for="option in globalChoise.condition_type"
+              :key="option.typeName"
+              :id="option.typeName"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+      </template>
+      <bk-form-item
+        :label="$t(`m.treeinfo['关系名称']`)"
+        :property="'name'"
+        :required="true">
+        <bk-input v-model.trim="lineInfo.name"
+          maxlength="120"
+          :placeholder="$t(`m.treeinfo['请输入关系名称']`)">
+        </bk-input>
+      </bk-form-item>
+    </bk-form>
+    <!-- 字段判断 -->
+    <template v-if="lineInfo.condition_type !== 'default'">
+      <div v-bkloading="{ isLoading: isDataLoading }">
+        <bk-form
+          :label-width="200"
+          :model="lineInfo"
+          :ext-cls="'bk-line-form'"
+          form-type="vertical"
+          ref="conditionForm">
+          <bk-form-item
+            :label="$t(`m.treeinfo['条件组间关系']`)"
+            :desc="$t(`m.treeinfo['当所有条件组都满足且/或的条件时，节点才会流转']`)"
+            :ext-cls="'mb10 mt10'">
+            <bk-radio-group v-model="lineInfo.between">
+              <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
+              <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
+            </bk-radio-group>
+          </bk-form-item>
+          <div class="bk-form-content"
+            v-for="(item, index) in lineInfo.expressions"
+            :key="index">
+            <p class="bk-between-title">{{lineInfo.between === 'and' ? $t(`m.treeinfo['且']`) :
+              $t(`m.treeinfo["或"]`)}}{{ $t('m.treeinfo["-条件组"]') }}{{index + 1}}</p>
+            <div class="bk-between-info">
+              <p>
+                <span class="bk-between-span">{{ $t('m.treeinfo["字段间关系"]') }}</span>
+                <bk-radio-group v-model="item.type" style="width: auto;">
+                  <bk-radio :value="'and'" class="mr10">{{ $t('m.treeinfo["且"]') }}</bk-radio>
+                  <bk-radio :value="'or'">{{ $t('m.treeinfo["或"]') }}</bk-radio>
+                </bk-radio-group>
+              </p>
+              <div class="bk-between-form"
+                v-for="(node, nodeIndex) in item.expressions"
+                :key="nodeIndex" @click="item.checkInfo = false">
+                <bk-form-item
+                  :ext-cls="'bk-width210 no-label'">
+                  <bk-select
+                    v-model="node.key"
+                    :clearable="false"
+                    searchable
+                    :font-size="'medium'"
+                    @selected="changeName(...arguments, node)">
+                    <bk-option v-for="option in fieldList"
+                      :key="option.key"
+                      :id="option.key"
+                      :name="option.name">
+                    </bk-option>
+                  </bk-select>
+                </bk-form-item>
+                <template v-if="node.betweenList">
+                  <bk-form-item
+                    :ext-cls="'bk-width100 no-label'">
+                    <bk-select
+                      v-model="node.condition"
+                      :clearable="false"
+                      searchable
+                      :font-size="'medium'">
+                      <bk-option v-for="option in node.betweenList"
+                        :key="option.typeName"
+                        :id="option.typeName"
+                        :name="option.name">
+                      </bk-option>
+                    </bk-select>
+                  </bk-form-item>
+                </template>
+                <bk-form-item
+                  :label="''"
+                  :ext-cls="'bk-width195 no-label'">
+                  <template v-if="node.source !== 'global'">
+                    <template v-if="globalTypeList.some(global => node.type === global)">
+                      <bk-select
+                        v-if="node.choiceList.length"
+                        v-model="node.value"
+                        :multiple="node.multiSelect"
+                        searchable
+                        :font-size="'medium'">
+                        <bk-option v-for="option in node.choiceList"
+                          :key="option.id"
+                          :id="option.id"
+                          :name="option.name">
+                        </bk-option>
+                      </bk-select>
+                      <bk-input
+                        v-else
+                        :clearable="true"
+                        :type="node.type === 'INT' ? 'number' : 'text'"
+                        v-model="node.value"
+                        :placeholder="$t(`m.treeinfo['请输入条件值']`)">
+                      </bk-input>
+                    </template>
+                    <template v-else-if="node.type === 'DATE' || node.type === 'DATETIME'">
+                      <bk-date-picker
+                        v-model="node.value"
+                        :placeholder="'选择日期时间'"
+                        :type="node.type === 'DATETIME' ? 'datetime' : 'date'">
+                      </bk-date-picker>
+                    </template>
+                    <template v-else>
+                      <bk-input
+                        :clearable="true"
+                        :type="node.type === 'INT' ? 'number' : 'text'"
+                        v-model="node.value"
+                        :placeholder="$t(`m.treeinfo['请输入条件值']`)">
+                      </bk-input>
+                      <span v-if="node.meta && node.meta.unit" class="buttonIcon">%</span>
+                    </template>
+                  </template>
+                  <template v-if="node.source === 'global'">
+                    <template v-if="node.type === 'BOOLEAN'">
+                      <bk-select
+                        v-model="node.value"
+                        searchable
+                        :font-size="'medium'">
+                        <bk-option v-for="option in booleanList"
+                          :key="option.id"
+                          :id="option.id"
+                          :name="option.name">
+                        </bk-option>
+                      </bk-select>
+                    </template>
+                    <template v-else>
+                      <bk-input
+                        :clearable="true"
+                        :type="node.type === 'INT' ? 'number' : 'text'"
+                        v-model="node.value"
+                        :placeholder="$t(`m.treeinfo['请输入比较值']`)">
+                      </bk-input>
+                    </template>
+                  </template>
+                </bk-form-item>
+                <div class="bk-between-operat">
+                  <span class="bk-itsm-icon icon-flow-add" @click="addNode(item, nodeIndex)"></span>
+                  <i class="bk-itsm-icon icon-flow-reduce"
+                    :class="{ 'bk-no-delete': item.expressions.length === 1 }"
+                    @click="deleteNode(item, nodeIndex)"></i>
+                </div>
+              </div>
+              <i class="bk-icon icon-close"
+                v-if="lineInfo.expressions.length !== 1"
+                @click="delteCondition(item, index)"></i>
+            </div>
+            <p class="bk-error-msg" v-if="item.checkInfo">{{ $t('m.treeinfo["关系组内的数据不能为空"]') }}</p>
+          </div>
+        </bk-form>
+      </div>
+      <p class="bk-add-between">
+        <span @click="addCondition">
+          <i class="bk-icon icon-plus-circle"></i>{{ $t('m.treeinfo["添加条件组"]') }}
+        </span>
+      </p>
+    </template>
+    <div :class="{ 'bk-line-padding': scrollTopStatus }" v-if="openFunction.TRIGGER_SWITCH">
+      <common-trigger-list :origin="'transition'"
+        :source-id="customLine.lineValue.workflow"
+        :sender="customLine.lineValue.id"
+        :table="flowInfo.table">
+      </common-trigger-list>
+    </div>
+    <div class="mt20" :class="{ 'bk-line-btn': scrollTopStatus }">
+      <bk-button theme="primary"
+        class="mr10"
+        :title="$t(`m.treeinfo['确认']`)"
+        :loading="secondClick"
+        @click="submitLine">
+        {{ $t('m.treeinfo["确认"]') }}
+      </bk-button>
+      <bk-button theme="default"
+        class="mr10"
+        :title="$t(`m.treeinfo['取消']`)"
+        :disabled="secondClick"
+        @click="closeLine">
+        {{ $t('m.treeinfo["取消"]') }}
+      </bk-button>
+      <bk-button theme="default"
+        class="mr10"
+        :title="$t(`m.treeinfo['删除']`)"
+        :disabled="secondClick"
+        @click="deleteLine">
+        {{ $t('m.treeinfo["删除"]') }}
+      </bk-button>
+      <bk-button theme="default"
+        v-if="lineInfo.condition_type === 'by_field'"
+        style="float: right;"
+        :title="lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)"
+        :disabled="secondClick"
+        @click="submitTemplate">
+        {{lineInfo.template ? $t(`m.treeinfo['更新模板']`) : $t(`m.treeinfo['存为模版']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 <script>
     import templateNode from './templateNode.vue';

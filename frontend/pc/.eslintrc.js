@@ -87,7 +87,7 @@ module.exports = {
         // https://eslint.org/docs/rules/camelcase
         'camelcase': 'off',
 
-        // 缩进使用 4 个空格，并且 switch 语句中的 Case 需要缩进
+        // 缩进使用 2 个空格，并且 switch 语句中的 Case 需要缩进
         // https://eslint.org/docs/rules/indent
         'indent': ['error', 2, {
             'SwitchCase': 1,
@@ -133,11 +133,11 @@ module.exports = {
 
         // 函数圆括号之前有一个空格
         // https://eslint.org/docs/rules/space-before-function-paren
-        'space-before-function-paren': ['error', {
-            'anonymous': 'always', // 匿名函数表达式
-            'named': 'always', // 命名的函数表达式
-            'asyncArrow': 'always' // 异步的箭头函数表达式
-        }],
+        // 'space-before-function-paren': ['error', {
+        //     'anonymous': 'always', // 匿名函数表达式
+        //     'named': 'always', // 命名的函数表达式
+        //     'asyncArrow': 'always' // 异步的箭头函数表达式
+        // }],
 
         // 禁止行尾有空格
         // https://eslint.org/docs/rules/no-trailing-spaces
@@ -233,7 +233,7 @@ module.exports = {
         'vue/html-end-tags': 'error',
 
         // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/html-indent.md
-        'vue/html-indent': ['error', 4, {
+        'vue/html-indent': ['error', 2, {
             'attribute': 1,
             'baseIndent': 1,
             'closeBracket': 0,

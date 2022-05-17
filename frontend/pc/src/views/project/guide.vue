@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <div class="project-guide-page">
-        <empty-tip
-            :title="emptyTip.title"
-            :sub-title="emptyTip.subTitle"
-            :desc="emptyTip.desc"
-            :links="emptyTip.links">
-            <template slot="btns">
-                <bk-button theme="primary"
-                    v-cursor="{ active: !hasPermission(['project_create']) }"
-                    :class="{
-                        'btn-permission-disable': !hasPermission(['project_create'])
-                    }"
-                    @click="handleCreateProject">
-                    {{ $t(`m['立即创建']`) }}
-                </bk-button>
-                <bk-button style="margin-left: 6px;" @click="handleApplyProject">{{ $t('m["申请项目权限"]') }}</bk-button>
-            </template>
-        </empty-tip>
-    </div>
+  <div class="project-guide-page">
+    <empty-tip
+      :title="emptyTip.title"
+      :sub-title="emptyTip.subTitle"
+      :desc="emptyTip.desc"
+      :links="emptyTip.links">
+      <template slot="btns">
+        <bk-button theme="primary"
+          v-cursor="{ active: !hasPermission(['project_create']) }"
+          :class="{
+            'btn-permission-disable': !hasPermission(['project_create'])
+          }"
+          @click="handleCreateProject">
+          {{ $t(`m['立即创建']`) }}
+        </bk-button>
+        <bk-button style="margin-left: 6px;" @click="handleApplyProject">{{ $t('m["申请项目权限"]') }}</bk-button>
+      </template>
+    </empty-tip>
+  </div>
 </template>
 <script>
     import EmptyTip from '../project/components/emptyTip.vue';

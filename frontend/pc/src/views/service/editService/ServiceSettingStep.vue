@@ -21,89 +21,89 @@
   -->
 
 <template>
-    <div class="service-setting">
-        <section class="settion-card">
-            <h2 class="card-title">{{ $t(`m.tickets['服务设置']`) }}</h2>
-            <div class="card-content">
-                <bk-form data-test-id="service_form_serviceSetting" ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
-                    <bk-form-item :label="$t(`m.serviceConfig['可见范围']`)">
-                        <deal-person
-                            style="width: 600px;"
-                            class="display-range"
-                            form-type="inline-auto-width"
-                            ref="displayRange"
-                            :value="formData.visibleRange"
-                            :show-role-type-list="displayRangeTypes">
-                        </deal-person>
-                    </bk-form-item>
-                    <bk-form-item :label="$t(`m.tickets['撤回方式']`)" class="auto-with-form-item mt20">
-                        <bk-select v-model="formData.revokeWay">
-                            <bk-option v-for="option in revokeWayList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                        <bk-select
-                            v-if="formData.revokeWay === 'specify_node'"
-                            v-model="formData.revokeState"
-                            :placeholder="$t(`m.treeinfo['请选择撤单节点']`)"
-                            :loading="nodeListLoading"
-                            searchable>
-                            <bk-option v-for="option in nodeList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                    </bk-form-item>
-                    <bk-form-item :label="$t(`m.tickets['其他设置']`)" class="mt20">
-                        <bk-checkbox-group v-model="formData.otherSettings">
-                            <bk-checkbox value="can_ticket_agency" class="mr40">
-                                {{ $t(`m.tickets['支持代提']`) }}
-                            </bk-checkbox>
-                            <bk-checkbox value="is_supervise_needed" class="mr40">
-                                {{ $t(`m.tickets['允许督办']`) }}
-                            </bk-checkbox>
-                        </bk-checkbox-group>
-                    </bk-form-item>
-                    <bk-form-item v-if="formData.otherSettings.includes('is_supervise_needed')" :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
-                        <deal-person
-                            ref="supervisePerson"
-                            form-type="inline-auto-width"
-                            :value="supervisePerson"
-                            :show-role-type-list="superviseTypes">
-                        </deal-person>
-                    </bk-form-item>
-                    <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
-                        <bk-checkbox
-                            :true-value="true"
-                            :false-value="false"
-                            v-model="formData.is_auto_approve">
-                            当审批节点的审批人为申请人时，自动通过
-                        </bk-checkbox>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </section>
-        <section class="settion-card notic-card">
-            <h2 class="card-title">{{ $t(`m.tickets['通知设置']`) }}</h2>
-            <div class="card-content">
-                <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
-                    <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
-                        <bk-checkbox-group v-model="formData.notify">
-                            <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
-                                {{ $t(`m.treeinfo["企业微信"]`) }}
-                            </bk-checkbox>
-                            <bk-checkbox :value="'EMAIL'" :ext-cls="'mr40'">
-                                {{ $t(`m.treeinfo["邮件"]`) }}
-                            </bk-checkbox>
-                            <bk-checkbox :value="'SMS'">
-                                {{ $t('m.treeinfo["手机短信"]') }}
-                            </bk-checkbox>
-                        </bk-checkbox-group>
-                    </bk-form-item>
-                    <!-- <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
+  <div class="service-setting">
+    <section class="settion-card">
+      <h2 class="card-title">{{ $t(`m.tickets['服务设置']`) }}</h2>
+      <div class="card-content">
+        <bk-form data-test-id="service_form_serviceSetting" ref="serviceSetting" form-type="vertical" :model="formData" class="service-setting-form">
+          <bk-form-item :label="$t(`m.serviceConfig['可见范围']`)">
+            <deal-person
+              style="width: 600px;"
+              class="display-range"
+              form-type="inline-auto-width"
+              ref="displayRange"
+              :value="formData.visibleRange"
+              :show-role-type-list="displayRangeTypes">
+            </deal-person>
+          </bk-form-item>
+          <bk-form-item :label="$t(`m.tickets['撤回方式']`)" class="auto-with-form-item mt20">
+            <bk-select v-model="formData.revokeWay">
+              <bk-option v-for="option in revokeWayList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+            <bk-select
+              v-if="formData.revokeWay === 'specify_node'"
+              v-model="formData.revokeState"
+              :placeholder="$t(`m.treeinfo['请选择撤单节点']`)"
+              :loading="nodeListLoading"
+              searchable>
+              <bk-option v-for="option in nodeList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+          </bk-form-item>
+          <bk-form-item :label="$t(`m.tickets['其他设置']`)" class="mt20">
+            <bk-checkbox-group v-model="formData.otherSettings">
+              <bk-checkbox value="can_ticket_agency" class="mr40">
+                {{ $t(`m.tickets['支持代提']`) }}
+              </bk-checkbox>
+              <bk-checkbox value="is_supervise_needed" class="mr40">
+                {{ $t(`m.tickets['允许督办']`) }}
+              </bk-checkbox>
+            </bk-checkbox-group>
+          </bk-form-item>
+          <bk-form-item v-if="formData.otherSettings.includes('is_supervise_needed')" :label-width="100" :label="$t(`m.treeinfo['其他督办人']`)">
+            <deal-person
+              ref="supervisePerson"
+              form-type="inline-auto-width"
+              :value="supervisePerson"
+              :show-role-type-list="superviseTypes">
+            </deal-person>
+          </bk-form-item>
+          <bk-form-item :label="$t(`m.treeinfo['自动处理']`)">
+            <bk-checkbox
+              :true-value="true"
+              :false-value="false"
+              v-model="formData.is_auto_approve">
+              当审批节点的审批人为申请人时，自动通过
+            </bk-checkbox>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </section>
+    <section class="settion-card notic-card">
+      <h2 class="card-title">{{ $t(`m.tickets['通知设置']`) }}</h2>
+      <div class="card-content">
+        <bk-form data-test-id="service_form_serviceSettingNotification" form-type="vertical" :model="formData" class="service-setting-form">
+          <bk-form-item :label="$t(`m.treeinfo['通知方式']`)">
+            <bk-checkbox-group v-model="formData.notify">
+              <bk-checkbox :value="'WEIXIN'" :ext-cls="'mr40'">
+                {{ $t(`m.treeinfo["企业微信"]`) }}
+              </bk-checkbox>
+              <bk-checkbox :value="'EMAIL'" :ext-cls="'mr40'">
+                {{ $t(`m.treeinfo["邮件"]`) }}
+              </bk-checkbox>
+              <bk-checkbox :value="'SMS'">
+                {{ $t('m.treeinfo["手机短信"]') }}
+              </bk-checkbox>
+            </bk-checkbox-group>
+          </bk-form-item>
+          <!-- <bk-form-item :label-width="80" :label="$t(`m.treeinfo['通知频率']`)" v-if="formData.notify.length">
                         <bk-radio-group v-model="formData.notify_rule">
                             <bk-radio :value="'ONCE'"
                                 :ext-cls="'mr20 bk-line-radio'">
@@ -128,53 +128,53 @@
                             </div>
                         </bk-radio-group>
                     </bk-form-item> -->
-                </bk-form>
-            </div>
-        </section>
-        <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
-            <div
-                class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
-                <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
-                <i v-else class="bk-icon icon-up-shape"></i>
-                <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
-            </div>
-            <div v-if="showMoreConfig">
-                <collapse-transition>
-                    <div>
-                        <basic-card class="mt20"
-                            :card-label="$t(`m.newCommon['触发器']`)"
-                            :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
-                            <common-trigger-list
-                                :origin="'workflow'"
-                                :source-id="processId"
-                                :table="flowInfo.table">
-                            </common-trigger-list>
-                        </basic-card>
-                        <basic-card class="mt20"
-                            :card-label="$t(`m.taskTemplate['任务配置']`)"
-                            :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的流程字段配置中，将已有字段中的“关联业务” 字段添加至流程中。']`)">
-                            <TaskConfigPanel ref="taskConfigPanel" :service-info="serviceInfo"></TaskConfigPanel>
-                        </basic-card>
-                    </div>
-                </collapse-transition>
-            </div>
-        </section>
-        <bk-dialog
-            v-model="slaValidateDialogShow"
-            :mask-close="false"
-            :show-footer="false"
-            @cancel="goToServiceList">
-            <div class="sla-validate-msg">
-                <i class="bk-icon icon-check-circle"></i>
-                <h4>{{ $t(`m['保存成功']`) }}</h4>
-                <p v-for="(item, index) in slaValidateMsg" :key="index">{{ item }}</p>
-                <div class="operate-btns">
-                    <bk-button theme="primary" @click="slaValidateDialogShow = false">{{ $t(`m['确定']`) }}</bk-button>
-                    <bk-button @click="goToServiceList">{{ $t(`m['取消']`) }}</bk-button>
-                </div>
-            </div>
-        </bk-dialog>
-    </div>
+        </bk-form>
+      </div>
+    </section>
+    <section class="settion-card" v-if="openFunction.TRIGGER_SWITCH || openFunction.TASK_SWITCH">
+      <div
+        class="card-title more-configuration mt20" data-test-id="editService-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
+        <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
+        <i v-else class="bk-icon icon-up-shape"></i>
+        <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
+      </div>
+      <div v-if="showMoreConfig">
+        <collapse-transition>
+          <div>
+            <basic-card class="mt20"
+              :card-label="$t(`m.newCommon['触发器']`)"
+              :card-desc="$t(`m.taskTemplate['满足触发条件后要完成的特定动作']`)">
+              <common-trigger-list
+                :origin="'workflow'"
+                :source-id="processId"
+                :table="flowInfo.table">
+              </common-trigger-list>
+            </basic-card>
+            <basic-card class="mt20"
+              :card-label="$t(`m.taskTemplate['任务配置']`)"
+              :card-desc="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的流程字段配置中，将已有字段中的“关联业务” 字段添加至流程中。']`)">
+              <TaskConfigPanel ref="taskConfigPanel" :service-info="serviceInfo"></TaskConfigPanel>
+            </basic-card>
+          </div>
+        </collapse-transition>
+      </div>
+    </section>
+    <bk-dialog
+      v-model="slaValidateDialogShow"
+      :mask-close="false"
+      :show-footer="false"
+      @cancel="goToServiceList">
+      <div class="sla-validate-msg">
+        <i class="bk-icon icon-check-circle"></i>
+        <h4>{{ $t(`m['保存成功']`) }}</h4>
+        <p v-for="(item, index) in slaValidateMsg" :key="index">{{ item }}</p>
+        <div class="operate-btns">
+          <bk-button theme="primary" @click="slaValidateDialogShow = false">{{ $t(`m['确定']`) }}</bk-button>
+          <bk-button @click="goToServiceList">{{ $t(`m['取消']`) }}</bk-button>
+        </div>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

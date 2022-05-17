@@ -21,26 +21,26 @@
   -->
 
 <template>
-    <div class="tag-table">
-        <label v-if="!hiddenLabel" class="table-label">{{ label }}</label>
-        <bk-table
-            ref="tagTable"
-            :data="form.value"
-            :border="true">
-            <bk-table-column
-                v-for="(item) in column"
-                :key="item.key"
-                :label="item.name"
-                :prop="item.key">
-                <template slot-scope="scope">
-                    <ViewItem
-                        :scheme="getScheme(item, scope.row[item.key])"
-                        :form="scope.row[item.key]">
-                    </ViewItem>
-                </template>
-            </bk-table-column>
-        </bk-table>
-    </div>
+  <div class="tag-table">
+    <label v-if="!hiddenLabel" class="table-label">{{ label }}</label>
+    <bk-table
+      ref="tagTable"
+      :data="form.value"
+      :border="true">
+      <bk-table-column
+        v-for="(item) in column"
+        :key="item.key"
+        :label="item.name"
+        :prop="item.key">
+        <template slot-scope="scope">
+          <ViewItem
+            :scheme="getScheme(item, scope.row[item.key])"
+            :form="scope.row[item.key]">
+          </ViewItem>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>

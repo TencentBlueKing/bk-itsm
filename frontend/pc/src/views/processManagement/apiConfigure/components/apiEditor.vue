@@ -21,93 +21,93 @@
   -->
 
 <template>
-    <div class="bk-api-editor">
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["基本设置"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <api-editor-basic ref="apiEditorBasic"
-                    :detail-info-ori="DetailInfo"
-                    :tree-list="treeList"
-                    :path-list="pathList"
-                    :is-builtin-id-list="isBuiltinIdList"
-                    @changeRequest="changeRequest">
-                </api-editor-basic>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求参数"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <api-editor-request
-                    :detail-info-ori="DetailInfo">
-                </api-editor-request>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求数据加工"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <ace
-                    :value="DetailInfo.before_req"
-                    :width="dataProcess.width"
-                    :height="dataProcess.height"
-                    :lang="dataProcess.lang"
-                    :full-screen="dataProcess.fullScreen"
-                    :theme="'monokai'"
-                    @blur="reqChangBlur">
-                </ace>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据加工"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <ace
-                    :value="DetailInfo.map_code"
-                    :width="dataProcess.width"
-                    :height="dataProcess.height"
-                    :lang="dataProcess.lang"
-                    :full-screen="dataProcess.fullScreen"
-                    :theme="'monokai'"
-                    @blur="changBlur">
-                </ace>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回结果"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <api-editor-result
-                    :detail-info-ori="DetailInfo">
-                </api-editor-result>
-            </div>
-        </div>
-        <div class="bk-basic-item mt20">
-            <div class="bk-service-name">
-                <h1><span class="is-outline"></span>{{ $t('m.systemConfig["其他"]') }}</h1>
-            </div>
-            <div class="bk-basic-content">
-                <api-editor-others
-                    :detail-info-ori="DetailInfo">
-                </api-editor-others>
-            </div>
-        </div>
-        <div class="bk-basic-btn" v-if="!DetailInfo.is_builtin">
-            <bk-button
-                :theme="'primary'"
-                data-test-id="apiDetail_button_editUpdateApi"
-                :title="$t(`m.systemConfig['保存']`)"
-                @click="updateApi">
-                {{$t(`m.systemConfig['保存']`)}}
-            </bk-button>
-        </div>
+  <div class="bk-api-editor">
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["基本设置"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <api-editor-basic ref="apiEditorBasic"
+          :detail-info-ori="DetailInfo"
+          :tree-list="treeList"
+          :path-list="pathList"
+          :is-builtin-id-list="isBuiltinIdList"
+          @changeRequest="changeRequest">
+        </api-editor-basic>
+      </div>
     </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求参数"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <api-editor-request
+          :detail-info-ori="DetailInfo">
+        </api-editor-request>
+      </div>
+    </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["请求数据加工"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <ace
+          :value="DetailInfo.before_req"
+          :width="dataProcess.width"
+          :height="dataProcess.height"
+          :lang="dataProcess.lang"
+          :full-screen="dataProcess.fullScreen"
+          :theme="'monokai'"
+          @blur="reqChangBlur">
+        </ace>
+      </div>
+    </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回数据加工"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <ace
+          :value="DetailInfo.map_code"
+          :width="dataProcess.width"
+          :height="dataProcess.height"
+          :lang="dataProcess.lang"
+          :full-screen="dataProcess.fullScreen"
+          :theme="'monokai'"
+          @blur="changBlur">
+        </ace>
+      </div>
+    </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["返回结果"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <api-editor-result
+          :detail-info-ori="DetailInfo">
+        </api-editor-result>
+      </div>
+    </div>
+    <div class="bk-basic-item mt20">
+      <div class="bk-service-name">
+        <h1><span class="is-outline"></span>{{ $t('m.systemConfig["其他"]') }}</h1>
+      </div>
+      <div class="bk-basic-content">
+        <api-editor-others
+          :detail-info-ori="DetailInfo">
+        </api-editor-others>
+      </div>
+    </div>
+    <div class="bk-basic-btn" v-if="!DetailInfo.is_builtin">
+      <bk-button
+        :theme="'primary'"
+        data-test-id="apiDetail_button_editUpdateApi"
+        :title="$t(`m.systemConfig['保存']`)"
+        @click="updateApi">
+        {{$t(`m.systemConfig['保存']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

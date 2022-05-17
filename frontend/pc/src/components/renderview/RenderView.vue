@@ -21,19 +21,19 @@
   -->
 
 <template>
-    <div class="render-view" style="margin-left: 10px;">
-        <div
-            v-for="(form, index) in formData"
-            :key="index + new Date()"
-            class="view-item-wrap">
-            <ViewItem
-                :top-index="index"
-                :is-top="true"
-                :scheme="getScheme(form)"
-                :form="form">
-            </ViewItem>
-        </div>
+  <div class="render-view" style="margin-left: 10px;">
+    <div
+      v-for="(form, index) in formData"
+      :key="index + new Date()"
+      class="view-item-wrap">
+      <ViewItem
+        :top-index="index"
+        :is-top="true"
+        :scheme="getScheme(form)"
+        :form="form">
+      </ViewItem>
     </div>
+  </div>
 </template>
 <script>
     import ViewItem from './ViewItem';

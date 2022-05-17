@@ -21,166 +21,166 @@
   -->
 
 <template>
-    <div class="operation-home" ref="operationHome">
-        <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
-            <bk-date-picker
-                type="daterange"
-                :clearable="false"
-                :shortcuts="shortcuts"
-                :value="dateRange"
-                @change="onSelectDate">
-            </bk-date-picker>
-        </div>
-        <div class="summary-data statistics-section" v-bkloading="{ isLoading: loading.summary, opacity: 1 }">
-            <summary-card
-                :title="$t(`m.operation['单据总数']`)"
-                :card-data="{ total: summaryData.total.count, week: summaryData.week.ticket }">
-                <i class="bk-icon icon-order-shape" slot="icon"></i>
-            </summary-card>
-            <summary-card
-                :title="$t(`m.operation['服务总数']`)"
-                :card-data="{ total: summaryData.total.service_count, week: summaryData.week.service }">
-                <i class="bk-icon icon-heart-shape" slot="icon"></i>
-            </summary-card>
-            <summary-card
-                :title="$t(`m.operation['业务总数']`)"
-                :card-data="{ total: summaryData.total.biz_count, week: summaryData.week.biz }">
-                <i class="bk-icon icon-folder-open-shape" slot="icon"></i>
-            </summary-card>
-            <summary-card
-                :title="$t(`m.operation['用户总数']`)"
-                :card-data="{ total: summaryData.total.user_count, week: summaryData.week.user }">
-                <i class="bk-icon icon-user-shape" slot="icon"></i>
-            </summary-card>
-        </div>
-        <div class="global-statistics statistics-section">
-            <h4>{{ $t(`m.operation['全局统计']`) }}</h4>
-            <div class="charts-wrap">
-                <chart-card
-                    style="height: 568px;"
-                    :title="$t(`m.operation['服务使用统计']`)"
-                    :show-search="!loading.bizList"
-                    :placeholder="$t(`m.operation['请输入服务名称']`)"
-                    :loading="loading.serviceUse"
-                    @search="handleServiceSearch">
-                    <table-chart
-                        :show-pagination="true"
-                        :pagination="serviceTablePagination"
-                        :columns="serviceTableColumns"
-                        :chart-data="serviceUseData"
-                        @onPageChange="onServiceTablePageChange"
-                        @onOrderChange="onServiceTableOrderChange">
-                    </table-chart>
-                </chart-card>
-                <chart-card
-                    style="height: 568px;"
-                    :title="$t(`m.operation['业务使用统计']`)"
-                    :desc="$t(`m.operation['按照业务维度，统计业务的单量以及服务使用量。']`)"
-                    :placeholder="$t(`m.operation['请输入业务名称']`)"
-                    :show-search="true"
-                    :loading="loading.bizUse"
-                    @search="handleBizSearch">
-                    <table-chart
-                        :show-pagination="true"
-                        :pagination="bizTablePagination"
-                        :columns="bizTableColumns"
-                        :chart-data="bizUseData"
-                        @onPageChange="onBizTablePageChange"
-                        @onOrderChange="onBizTableOrderChange">
-                    </table-chart>
-                </chart-card>
-                <chart-card :title="$t(`m.operation['单据数量-按类型统计']`)" :loading="loading.ticketClassify">
-                    <bar-chart
-                        :loading="loading.ticketClassify"
-                        :y-axis-name="$t(`m.operation['单量（条）']`)"
-                        :chart-data="ticketClassifyData">
-                    </bar-chart>
-                </chart-card>
-                <chart-card :title="$t(`m.operation['单据状态占比']`)" :loading="loading.ticketStatus">
-                    <pie-chart
-                        :loading="loading.ticketStatus"
-                        :chart-data="ticketStatusData">
-                    </pie-chart>
-                </chart-card>
-            </div>
-        </div>
-        <div class="ticket-statistics statistics-section">
-            <h4>{{ $t(`m.operation['提单统计']`) }}</h4>
-            <div class="charts-wrap">
-                <chart-card
-                    style="height: 410px;"
-                    :title="$t(`m.operation['提单人数']`)"
-                    :loading="loading.creator">
-                    <line-chart
-                        :loading="loading.creator"
-                        :min="0"
-                        :gradient-color="['rgba(58, 132, 255, 0)', 'rgba(58, 132, 255, 0.3)']"
-                        :y-axis-name="$t(`m.operation['人数（人）']`)"
-                        :chart-data="creatorData"
-                        :dimension="creatorChartDismension"
-                        @onDimensionChange="onCreatorDimensionChange">
-                    </line-chart>
-                </chart-card>
-                <chart-card
-                    style="height: 410px;"
-                    :title="$t(`m.operation['Top 10 提单用户']`)"
-                    :loading="loading.top10CreateTicketUser">
-                    <table-chart
-                        :loading="loading.top10CreateTicketUser"
-                        :columns="creatorTableColumns"
-                        :chart-data="top10CreateTicketUserData">
-                    </table-chart>
-                </chart-card>
-                <chart-card
-                    style="height: 410px;"
-                    :title="$t(`m.operation['Top 10 单据分布占比']`)"
-                    :desc="$t(`m.operation['按组织架构统计']`)"
-                    :loading="loading.top10TicketOrganization">
-                    <pie-chart
-                        :loading="loading.top10TicketOrganization"
-                        :chart-data="top10TicketOrganizationData">
-                    </pie-chart>
-                </chart-card>
-            </div>
-        </div>
-        <div class="added-statistics statistics-section">
-            <h4>{{ $t(`m.operation['新增统计']`) }}</h4>
-            <div class="charts-wrap">
-                <chart-card :title="$t(`m.operation['新增单量']`)" :desc="$t(`m.operation['选定周期内，新增的单量']`)" :loading="loading.addedTicket">
-                    <line-chart
-                        :loading="loading.addedTicket"
-                        :gradient-color="['rgba(37, 91, 175, 0)', 'rgba(37, 91, 175, 0.3)']"
-                        :y-axis-name="$t(`m.operation['单量（条）']`)"
-                        :chart-data="addedTicketData"
-                        :dimension="addedTicketChartDismension"
-                        @onDimensionChange="onAddedTicketDimensionChange">
-                    </line-chart>
-                </chart-card>
-                <chart-card :title="$t(`m.operation['新增用户数']`)" :desc="$t(`m.operation['选定周期内，新增的用户']`)" :loading="loading.addedUser">
-                    <line-chart
-                        :loading="loading.addedUser"
-                        :min="0"
-                        :gradient-color="['rgba(19, 143, 203, 0)', 'rgba(23, 142, 207, 0.3)']"
-                        :y-axis-name="$t(`m.operation['人数（人）']`)"
-                        :chart-data="addedUserData"
-                        :dimension="addedUserChartDismension"
-                        @onDimensionChange="onAddedUserDimensionChange">
-                    </line-chart>
-                </chart-card>
-                <chart-card :title="$t(`m.operation['新增服务']`)" :desc="$t(`m.operation['选定周期内，新增的服务']`)" :loading="loading.addedService">
-                    <line-chart
-                        :loading="loading.addedService"
-                        :min="0"
-                        :gradient-color="['rgba(123, 227, 221, 0)', 'rgba(69, 195, 184, 0.3)']"
-                        :y-axis-name="$t(`m.operation['服务（个）']`)"
-                        :chart-data="addedServiceData"
-                        :dimension="addedServiceChartDismension"
-                        @onDimensionChange="onAddedServiceDimensionChange">
-                    </line-chart>
-                </chart-card>
-            </div>
-        </div>
+  <div class="operation-home" ref="operationHome">
+    <div class="date-selector" :class="{ 'selector-fixed': isDateSelectorFixed }">
+      <bk-date-picker
+        type="daterange"
+        :clearable="false"
+        :shortcuts="shortcuts"
+        :value="dateRange"
+        @change="onSelectDate">
+      </bk-date-picker>
     </div>
+    <div class="summary-data statistics-section" v-bkloading="{ isLoading: loading.summary, opacity: 1 }">
+      <summary-card
+        :title="$t(`m.operation['单据总数']`)"
+        :card-data="{ total: summaryData.total.count, week: summaryData.week.ticket }">
+        <i class="bk-icon icon-order-shape" slot="icon"></i>
+      </summary-card>
+      <summary-card
+        :title="$t(`m.operation['服务总数']`)"
+        :card-data="{ total: summaryData.total.service_count, week: summaryData.week.service }">
+        <i class="bk-icon icon-heart-shape" slot="icon"></i>
+      </summary-card>
+      <summary-card
+        :title="$t(`m.operation['业务总数']`)"
+        :card-data="{ total: summaryData.total.biz_count, week: summaryData.week.biz }">
+        <i class="bk-icon icon-folder-open-shape" slot="icon"></i>
+      </summary-card>
+      <summary-card
+        :title="$t(`m.operation['用户总数']`)"
+        :card-data="{ total: summaryData.total.user_count, week: summaryData.week.user }">
+        <i class="bk-icon icon-user-shape" slot="icon"></i>
+      </summary-card>
+    </div>
+    <div class="global-statistics statistics-section">
+      <h4>{{ $t(`m.operation['全局统计']`) }}</h4>
+      <div class="charts-wrap">
+        <chart-card
+          style="height: 568px;"
+          :title="$t(`m.operation['服务使用统计']`)"
+          :show-search="!loading.bizList"
+          :placeholder="$t(`m.operation['请输入服务名称']`)"
+          :loading="loading.serviceUse"
+          @search="handleServiceSearch">
+          <table-chart
+            :show-pagination="true"
+            :pagination="serviceTablePagination"
+            :columns="serviceTableColumns"
+            :chart-data="serviceUseData"
+            @onPageChange="onServiceTablePageChange"
+            @onOrderChange="onServiceTableOrderChange">
+          </table-chart>
+        </chart-card>
+        <chart-card
+          style="height: 568px;"
+          :title="$t(`m.operation['业务使用统计']`)"
+          :desc="$t(`m.operation['按照业务维度，统计业务的单量以及服务使用量。']`)"
+          :placeholder="$t(`m.operation['请输入业务名称']`)"
+          :show-search="true"
+          :loading="loading.bizUse"
+          @search="handleBizSearch">
+          <table-chart
+            :show-pagination="true"
+            :pagination="bizTablePagination"
+            :columns="bizTableColumns"
+            :chart-data="bizUseData"
+            @onPageChange="onBizTablePageChange"
+            @onOrderChange="onBizTableOrderChange">
+          </table-chart>
+        </chart-card>
+        <chart-card :title="$t(`m.operation['单据数量-按类型统计']`)" :loading="loading.ticketClassify">
+          <bar-chart
+            :loading="loading.ticketClassify"
+            :y-axis-name="$t(`m.operation['单量（条）']`)"
+            :chart-data="ticketClassifyData">
+          </bar-chart>
+        </chart-card>
+        <chart-card :title="$t(`m.operation['单据状态占比']`)" :loading="loading.ticketStatus">
+          <pie-chart
+            :loading="loading.ticketStatus"
+            :chart-data="ticketStatusData">
+          </pie-chart>
+        </chart-card>
+      </div>
+    </div>
+    <div class="ticket-statistics statistics-section">
+      <h4>{{ $t(`m.operation['提单统计']`) }}</h4>
+      <div class="charts-wrap">
+        <chart-card
+          style="height: 410px;"
+          :title="$t(`m.operation['提单人数']`)"
+          :loading="loading.creator">
+          <line-chart
+            :loading="loading.creator"
+            :min="0"
+            :gradient-color="['rgba(58, 132, 255, 0)', 'rgba(58, 132, 255, 0.3)']"
+            :y-axis-name="$t(`m.operation['人数（人）']`)"
+            :chart-data="creatorData"
+            :dimension="creatorChartDismension"
+            @onDimensionChange="onCreatorDimensionChange">
+          </line-chart>
+        </chart-card>
+        <chart-card
+          style="height: 410px;"
+          :title="$t(`m.operation['Top 10 提单用户']`)"
+          :loading="loading.top10CreateTicketUser">
+          <table-chart
+            :loading="loading.top10CreateTicketUser"
+            :columns="creatorTableColumns"
+            :chart-data="top10CreateTicketUserData">
+          </table-chart>
+        </chart-card>
+        <chart-card
+          style="height: 410px;"
+          :title="$t(`m.operation['Top 10 单据分布占比']`)"
+          :desc="$t(`m.operation['按组织架构统计']`)"
+          :loading="loading.top10TicketOrganization">
+          <pie-chart
+            :loading="loading.top10TicketOrganization"
+            :chart-data="top10TicketOrganizationData">
+          </pie-chart>
+        </chart-card>
+      </div>
+    </div>
+    <div class="added-statistics statistics-section">
+      <h4>{{ $t(`m.operation['新增统计']`) }}</h4>
+      <div class="charts-wrap">
+        <chart-card :title="$t(`m.operation['新增单量']`)" :desc="$t(`m.operation['选定周期内，新增的单量']`)" :loading="loading.addedTicket">
+          <line-chart
+            :loading="loading.addedTicket"
+            :gradient-color="['rgba(37, 91, 175, 0)', 'rgba(37, 91, 175, 0.3)']"
+            :y-axis-name="$t(`m.operation['单量（条）']`)"
+            :chart-data="addedTicketData"
+            :dimension="addedTicketChartDismension"
+            @onDimensionChange="onAddedTicketDimensionChange">
+          </line-chart>
+        </chart-card>
+        <chart-card :title="$t(`m.operation['新增用户数']`)" :desc="$t(`m.operation['选定周期内，新增的用户']`)" :loading="loading.addedUser">
+          <line-chart
+            :loading="loading.addedUser"
+            :min="0"
+            :gradient-color="['rgba(19, 143, 203, 0)', 'rgba(23, 142, 207, 0.3)']"
+            :y-axis-name="$t(`m.operation['人数（人）']`)"
+            :chart-data="addedUserData"
+            :dimension="addedUserChartDismension"
+            @onDimensionChange="onAddedUserDimensionChange">
+          </line-chart>
+        </chart-card>
+        <chart-card :title="$t(`m.operation['新增服务']`)" :desc="$t(`m.operation['选定周期内，新增的服务']`)" :loading="loading.addedService">
+          <line-chart
+            :loading="loading.addedService"
+            :min="0"
+            :gradient-color="['rgba(123, 227, 221, 0)', 'rgba(69, 195, 184, 0.3)']"
+            :y-axis-name="$t(`m.operation['服务（个）']`)"
+            :chart-data="addedServiceData"
+            :dimension="addedServiceChartDismension"
+            @onDimensionChange="onAddedServiceDimensionChange">
+          </line-chart>
+        </chart-card>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
     import dayjs from 'dayjs';

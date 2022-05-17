@@ -21,74 +21,74 @@
   -->
 
 <template>
-    <div class="bk-data-source">
-        <!-- 总选数据框 -->
-        <bk-select :ext-cls="typeClass"
-            v-model="formInfo.source_type"
-            :clearable="false"
-            :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
-            searchable
-            @selected="changeSource">
-            <bk-option v-for="option in sourceList"
-                :key="option.typeName"
-                :id="option.typeName"
-                :name="option.name">
-            </bk-option>
-        </bk-select>
-        <template v-if="formInfo.source_type === 'DATADICT'">
-            <bk-select :ext-cls="'bk-halfline-item'"
-                v-model="dictionaryData.check"
-                :clearable="false"
-                searchable>
-                <bk-option v-for="option in dictionaryData.list"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </template>
-        <template v-if="formInfo.source_type === 'API'">
-            <bk-select :ext-cls="'bk-threeline-item bk-halfline-margin'"
-                v-model="apiInfo.remote_system_id"
-                :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
-                :clearable="false"
-                :loading="isSystemLoading"
-                searchable
-                @selected="changeApiSystem">
-                <bk-option v-for="option in apiSysList"
-                    :key="option.id"
-                    :id="option.id"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <bk-select :ext-cls="'bk-threeline-item'"
-                v-model="apiInfo.remote_api_id"
-                :placeholder="$t(`m.treeinfo['请选择接口']`)"
-                :clearable="false"
-                :loading="isApiLoading"
-                searchable
-                @selected="changeApiPort">
-                <bk-option v-for="option in apiPortList"
-                    :key="option.id"
-                    :id="option.id"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </template>
-        <template v-if="formInfo.source_type === 'RPC'">
-            <bk-select :ext-cls="'bk-halfline-item'"
-                v-model="prcData.check"
-                :clearable="false"
-                searchable
-                @selected="changeRpc">
-                <bk-option v-for="option in prcData.list"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </template>
-    </div>
+  <div class="bk-data-source">
+    <!-- 总选数据框 -->
+    <bk-select :ext-cls="typeClass"
+      v-model="formInfo.source_type"
+      :clearable="false"
+      :disabled="(changeInfo.is_builtin || changeInfo.source === 'TABLE' || (changeInfo.meta && changeInfo.meta.code === 'APPROVE_RESULT')) && formInfo.key !== 'bk_biz_id'"
+      searchable
+      @selected="changeSource">
+      <bk-option v-for="option in sourceList"
+        :key="option.typeName"
+        :id="option.typeName"
+        :name="option.name">
+      </bk-option>
+    </bk-select>
+    <template v-if="formInfo.source_type === 'DATADICT'">
+      <bk-select :ext-cls="'bk-halfline-item'"
+        v-model="dictionaryData.check"
+        :clearable="false"
+        searchable>
+        <bk-option v-for="option in dictionaryData.list"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+    <template v-if="formInfo.source_type === 'API'">
+      <bk-select :ext-cls="'bk-threeline-item bk-halfline-margin'"
+        v-model="apiInfo.remote_system_id"
+        :placeholder="$t(`m.treeinfo['请选择接入系统']`)"
+        :clearable="false"
+        :loading="isSystemLoading"
+        searchable
+        @selected="changeApiSystem">
+        <bk-option v-for="option in apiSysList"
+          :key="option.id"
+          :id="option.id"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <bk-select :ext-cls="'bk-threeline-item'"
+        v-model="apiInfo.remote_api_id"
+        :placeholder="$t(`m.treeinfo['请选择接口']`)"
+        :clearable="false"
+        :loading="isApiLoading"
+        searchable
+        @selected="changeApiPort">
+        <bk-option v-for="option in apiPortList"
+          :key="option.id"
+          :id="option.id"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+    <template v-if="formInfo.source_type === 'RPC'">
+      <bk-select :ext-cls="'bk-halfline-item'"
+        v-model="prcData.check"
+        :clearable="false"
+        searchable
+        @selected="changeRpc">
+        <bk-option v-for="option in prcData.list"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../../../../utils/errorHandler';

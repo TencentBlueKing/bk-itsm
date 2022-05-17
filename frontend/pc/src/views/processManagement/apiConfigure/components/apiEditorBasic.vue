@@ -21,64 +21,64 @@
   -->
 
 <template>
-    <div class="bk-api-editor-basic">
-        <bk-form
-            :label-width="120"
-            :model="basicInfo">
-            <bk-form-item class="bk-editor-form"
-                :required="true"
-                :label="$t(`m.systemConfig['接口名称：']`)">
-                <bk-input
-                    :disabled="basicInfo.is_builtin"
-                    :placeholder="$t(`m.systemConfig['请输入接口名称']`)"
-                    v-model="basicInfo.name">
-                </bk-input>
-            </bk-form-item>
-            <template v-if="basicInfo.hasOwnProperty('method')">
-                <bk-form-item class="bk-editor-form"
-                    :required="true"
-                    :label="$t(`m.systemConfig['接口路径：']`)">
-                    <bk-input v-model="basicInfo.path" placeholder="/path"
-                        :disabled="basicInfo.is_builtin">
-                        <template slot="prepend">
-                            <bk-dropdown-menu class="group-text"
-                                @show="dropdownShow"
-                                @hide="dropdownHide"
-                                ref="requestwayDrop"
-                                slot="append"
-                                :font-size="'normal'"
-                                :disabled="basicInfo.is_builtin">
-                                <bk-button type="primary" slot="dropdown-trigger">
-                                    <span> {{ basicInfo.method }} </span>
-                                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                                </bk-button>
-                                <ul class="bk-dropdown-list" slot="dropdown-content">
-                                    <li v-for="(requestway, requestwayIndex) in typeList" :key="requestwayIndex">
-                                        <a href="javascript:;" @click="requestHandler(requestway, requestwayIndex)">
-                                            {{ requestway.name }}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </bk-dropdown-menu>
-                        </template>
-                    </bk-input>
-                </bk-form-item>
+  <div class="bk-api-editor-basic">
+    <bk-form
+      :label-width="120"
+      :model="basicInfo">
+      <bk-form-item class="bk-editor-form"
+        :required="true"
+        :label="$t(`m.systemConfig['接口名称：']`)">
+        <bk-input
+          :disabled="basicInfo.is_builtin"
+          :placeholder="$t(`m.systemConfig['请输入接口名称']`)"
+          v-model="basicInfo.name">
+        </bk-input>
+      </bk-form-item>
+      <template v-if="basicInfo.hasOwnProperty('method')">
+        <bk-form-item class="bk-editor-form"
+          :required="true"
+          :label="$t(`m.systemConfig['接口路径：']`)">
+          <bk-input v-model="basicInfo.path" placeholder="/path"
+            :disabled="basicInfo.is_builtin">
+            <template slot="prepend">
+              <bk-dropdown-menu class="group-text"
+                @show="dropdownShow"
+                @hide="dropdownHide"
+                ref="requestwayDrop"
+                slot="append"
+                :font-size="'normal'"
+                :disabled="basicInfo.is_builtin">
+                <bk-button type="primary" slot="dropdown-trigger">
+                  <span> {{ basicInfo.method }} </span>
+                  <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                </bk-button>
+                <ul class="bk-dropdown-list" slot="dropdown-content">
+                  <li v-for="(requestway, requestwayIndex) in typeList" :key="requestwayIndex">
+                    <a href="javascript:;" @click="requestHandler(requestway, requestwayIndex)">
+                      {{ requestway.name }}
+                    </a>
+                  </li>
+                </ul>
+              </bk-dropdown-menu>
             </template>
-            <bk-form-item class="bk-editor-form"
-                :label="$t(`m.user['负责人：']`)">
-                <member-select v-model="basicInfo.ownersInputValue"></member-select>
-            </bk-form-item>
-            <bk-form-item class="bk-editor-form"
-                :label="$t(`m.systemConfig['备注：']`)">
-                <bk-input :disabled="basicInfo.is_builtin "
-                    :placeholder="$t(`m.systemConfig['请输入描述']`)"
-                    :type="'textarea'"
-                    :rows="3"
-                    v-model="basicInfo.desc">
-                </bk-input>
-            </bk-form-item>
-        </bk-form>
-    </div>
+          </bk-input>
+        </bk-form-item>
+      </template>
+      <bk-form-item class="bk-editor-form"
+        :label="$t(`m.user['负责人：']`)">
+        <member-select v-model="basicInfo.ownersInputValue"></member-select>
+      </bk-form-item>
+      <bk-form-item class="bk-editor-form"
+        :label="$t(`m.systemConfig['备注：']`)">
+        <bk-input :disabled="basicInfo.is_builtin "
+          :placeholder="$t(`m.systemConfig['请输入描述']`)"
+          :type="'textarea'"
+          :rows="3"
+          v-model="basicInfo.desc">
+        </bk-input>
+      </bk-form-item>
+    </bk-form>
+  </div>
 </template>
 
 <script>

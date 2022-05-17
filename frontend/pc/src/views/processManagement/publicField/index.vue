@@ -21,208 +21,208 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ title }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <empty-tip
-                v-if="projectId && !isDataLoading && pagination.count === 0 && searchToggle"
-                :title="emptyTip.title"
-                :sub-title="emptyTip.subTitle"
-                :desc="emptyTip.desc"
-                :links="emptyTip.links">
-                <template slot="btns">
-                    <bk-button :theme="'primary'"
-                        data-test-id="field_button_createField"
-                        v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
-                        :class="{
-                            'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
-                        }"
-                        @click="addField">
-                        {{ $t('m["立即创建"]') }}
-                    </bk-button>
-                </template>
-            </empty-tip>
-            <template v-else>
-                <div class="bk-only-btn">
-                    <div class="bk-more-search">
-                        <bk-button :theme="'primary'"
-                            data-test-id="field_button_addField"
-                            v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
-                            :title="$t(`m.deployPage['新增']`)"
-                            icon="plus"
-                            :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
-                            }]"
-                            @click="addField">
-                            {{ $t('m.deployPage["新增"]') }}
-                        </bk-button>
-                        <div class="bk-search-name">
-                            <div class="bk-search-content">
-                                <bk-input
-                                    data-test-id="field_input_searchField"
-                                    :clearable="true"
-                                    :right-icon="'bk-icon icon-search'"
-                                    :placeholder="moreSearch[0].placeholder"
-                                    v-model="moreSearch[0].value"
-                                    @enter="searchContent"
-                                    @clear="clearSearch">
-                                </bk-input>
-                            </div>
-                            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                                icon=" bk-itsm-icon icon-search-more"
-                                class="ml10 filter-btn"
-                                @click="searchMore">
-                            </bk-button>
-                        </div>
-                    </div>
-                    <search-info
-                        ref="searchInfo"
-                        :more-search="moreSearch">
-                    </search-info>
-                </div>
-                <bk-table
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="dataList"
-                    :size="'small'"
-                    :pagination="pagination"
-                    @sort-change="handleSortChange"
-                    @page-change="handlePageChange"
-                    @page-limit-change="handlePageLimitChange">
-                    <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
-                        <template slot-scope="props">
-                            <bk-button
-                                v-if="!hasPermission(
-                                    editFieldPerm,
-                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
-                                )"
-                                data-test-id="field_button_viewfield"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="openField(props.row, editFieldPerm)">
-                                {{props.row.name}}
-                            </bk-button>
-                            <span v-else class="bk-lable-primary"
-                                @click="openField(props.row)"
-                                :title="props.row.name">
-                                {{props.row.name}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['唯一标识']`)" min-width="150">
-                        <template slot-scope="props">
-                            <span :title="props.row.key">{{ props.row.key || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" min-width="150">
-                        <template slot-scope="props">
-                            <span :title="typeTransition(props.row.type)">
-                                {{ typeTransition(props.row.type) || '--' }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['字段值']`)" width="220">
-                        <template slot-scope="props">
-                            <span :title="valueTransition(props.row)">{{ valueTransition(props.row) || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['字段描述']`)" width="150">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['最近更新人']`)" width="150">
-                        <template slot-scope="props">
-                            <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        sortable
-                        :sort-orders="['descending', 'ascending', null]"
-                        :label="$t(`m.treeinfo['最近更新时间']`)" width="150">
-                        <template slot-scope="props">
-                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
-                        <template slot-scope="props">
-                            <!-- 编辑 -->
-                            <bk-button
-                                v-if="!hasPermission(
-                                    editFieldPerm,
-                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
-                                )"
-                                v-cursor
-                                data-test-id="field_button_editfield_permission"
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="openField(props.row, editFieldPerm)">
-                                {{ $t('m.deployPage["编辑"]') }}
-                            </bk-button>
-                            <bk-button
-                                data-test-id="field_button_editfield"
-                                v-else theme="primary"
-                                text
-                                @click="openField(props.row)">
-                                {{ $t('m.deployPage["编辑"]') }}
-                            </bk-button>
-                            <!-- 删除 -->
-                            <bk-button
-                                v-if="!hasPermission(
-                                    deleteFieldPerm,
-                                    [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
-                                )"
-                                data-test-id="field_button_deletefield_permission"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="deleteField(props.row)">
-                                {{ $t('m.deployPage["删除"]') }}
-                            </bk-button>
-                            <bk-button
-                                data-test-id="field_button_deletefield"
-                                v-else
-                                theme="primary"
-                                text
-                                :disabled="!!props.row.is_builtin"
-                                @click="deleteField(props.row)">
-                                {{ $t('m.deployPage["删除"]') }}
-                            </bk-button>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </template>
-        </div>
-        <!-- 新增字段 -->
-        <div class="bk-add-slider">
-            <bk-sideslider
-                :is-show.sync="sliderInfo.show"
-                :title="sliderInfo.title"
-                :quick-close="true"
-                :before-close="closeSideslider"
-                :width="sliderInfo.width">
-                <div class="p20" slot="content" v-if="sliderInfo.show">
-                    <add-field
-                        ref="addField"
-                        :change-info="changeInfo"
-                        :table-list="listInfo"
-                        :is-edit-public="isEditPublic"
-                        :workflow="workflow"
-                        :add-origin="addOrigin"
-                        :state="stateId"
-                        @closeShade="closeShade">
-                    </add-field>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ title }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <empty-tip
+        v-if="projectId && !isDataLoading && pagination.count === 0 && searchToggle"
+        :title="emptyTip.title"
+        :sub-title="emptyTip.subTitle"
+        :desc="emptyTip.desc"
+        :links="emptyTip.links">
+        <template slot="btns">
+          <bk-button :theme="'primary'"
+            data-test-id="field_button_createField"
+            v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
+            :class="{
+              'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
+            }"
+            @click="addField">
+            {{ $t('m["立即创建"]') }}
+          </bk-button>
+        </template>
+      </empty-tip>
+      <template v-else>
+        <div class="bk-only-btn">
+          <div class="bk-more-search">
+            <bk-button :theme="'primary'"
+              data-test-id="field_button_addField"
+              v-cursor="{ active: !hasPermission(createFieldPerm, curPermission) }"
+              :title="$t(`m.deployPage['新增']`)"
+              icon="plus"
+              :class="['mr10', 'plus-cus', {
+                'btn-permission-disable': !hasPermission(createFieldPerm, curPermission)
+              }]"
+              @click="addField">
+              {{ $t('m.deployPage["新增"]') }}
+            </bk-button>
+            <div class="bk-search-name">
+              <div class="bk-search-content">
+                <bk-input
+                  data-test-id="field_input_searchField"
+                  :clearable="true"
+                  :right-icon="'bk-icon icon-search'"
+                  :placeholder="moreSearch[0].placeholder"
+                  v-model="moreSearch[0].value"
+                  @enter="searchContent"
+                  @clear="clearSearch">
+                </bk-input>
+              </div>
+              <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+                icon=" bk-itsm-icon icon-search-more"
+                class="ml10 filter-btn"
+                @click="searchMore">
+              </bk-button>
+            </div>
+          </div>
+          <search-info
+            ref="searchInfo"
+            :more-search="moreSearch">
+          </search-info>
+        </div>
+        <bk-table
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="dataList"
+          :size="'small'"
+          :pagination="pagination"
+          @sort-change="handleSortChange"
+          @page-change="handlePageChange"
+          @page-limit-change="handlePageLimitChange">
+          <bk-table-column :label="$t(`m.treeinfo['字段名称']`)" min-width="150">
+            <template slot-scope="props">
+              <bk-button
+                v-if="!hasPermission(
+                  editFieldPerm,
+                  [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                )"
+                data-test-id="field_button_viewfield"
+                v-cursor
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="openField(props.row, editFieldPerm)">
+                {{props.row.name}}
+              </bk-button>
+              <span v-else class="bk-lable-primary"
+                @click="openField(props.row)"
+                :title="props.row.name">
+                {{props.row.name}}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['唯一标识']`)" min-width="150">
+            <template slot-scope="props">
+              <span :title="props.row.key">{{ props.row.key || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['字段类型']`)" min-width="150">
+            <template slot-scope="props">
+              <span :title="typeTransition(props.row.type)">
+                {{ typeTransition(props.row.type) || '--' }}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['字段值']`)" width="220">
+            <template slot-scope="props">
+              <span :title="valueTransition(props.row)">{{ valueTransition(props.row) || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['字段描述']`)" width="150">
+            <template slot-scope="props">
+              <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['最近更新人']`)" width="150">
+            <template slot-scope="props">
+              <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            sortable
+            :sort-orders="['descending', 'ascending', null]"
+            :label="$t(`m.treeinfo['最近更新时间']`)" width="150">
+            <template slot-scope="props">
+              <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.treeinfo['操作']`)" width="150">
+            <template slot-scope="props">
+              <!-- 编辑 -->
+              <bk-button
+                v-if="!hasPermission(
+                  editFieldPerm,
+                  [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                )"
+                v-cursor
+                data-test-id="field_button_editfield_permission"
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="openField(props.row, editFieldPerm)">
+                {{ $t('m.deployPage["编辑"]') }}
+              </bk-button>
+              <bk-button
+                data-test-id="field_button_editfield"
+                v-else theme="primary"
+                text
+                @click="openField(props.row)">
+                {{ $t('m.deployPage["编辑"]') }}
+              </bk-button>
+              <!-- 删除 -->
+              <bk-button
+                v-if="!hasPermission(
+                  deleteFieldPerm,
+                  [...$store.state.project.projectAuthActions, ...props.row.auth_actions]
+                )"
+                data-test-id="field_button_deletefield_permission"
+                v-cursor
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="deleteField(props.row)">
+                {{ $t('m.deployPage["删除"]') }}
+              </bk-button>
+              <bk-button
+                data-test-id="field_button_deletefield"
+                v-else
+                theme="primary"
+                text
+                :disabled="!!props.row.is_builtin"
+                @click="deleteField(props.row)">
+                {{ $t('m.deployPage["删除"]') }}
+              </bk-button>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </template>
+    </div>
+    <!-- 新增字段 -->
+    <div class="bk-add-slider">
+      <bk-sideslider
+        :is-show.sync="sliderInfo.show"
+        :title="sliderInfo.title"
+        :quick-close="true"
+        :before-close="closeSideslider"
+        :width="sliderInfo.width">
+        <div class="p20" slot="content" v-if="sliderInfo.show">
+          <add-field
+            ref="addField"
+            :change-info="changeInfo"
+            :table-list="listInfo"
+            :is-edit-public="isEditPublic"
+            :workflow="workflow"
+            :add-origin="addOrigin"
+            :state="stateId"
+            @closeShade="closeShade">
+          </add-field>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 <script>
     import i18n from '@/i18n/index.js';

@@ -21,16 +21,16 @@
   -->
 
 <template>
-    <section class="common-card-block">
-        <label class="common-card-label" :style="{ width: applyLabelWidth }">
-            <slot name="label"></slot>
-            {{ label }}
-            <p class="common-card-desc">{{ desc }}</p>
-        </label>
-        <div class="common-card-body">
-            <slot></slot>
-        </div>
-    </section>
+  <section class="common-card-block">
+    <label class="common-card-label" :style="{ width: applyLabelWidth }">
+      <slot name="label"></slot>
+      {{ label }}
+      <p class="common-card-desc">{{ desc }}</p>
+    </label>
+    <div class="common-card-body">
+      <slot></slot>
+    </div>
+  </section>
 </template>
 
 <script>

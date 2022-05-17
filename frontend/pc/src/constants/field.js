@@ -21,6 +21,6 @@
  */
 
 export const CUSTOM_FORM_DEFAULT_VALUE = (() => JSON.stringify({
-    schemes: {},
-    form_data: [],
+  schemes: {},
+  form_data: [],
 }, null, 4))();

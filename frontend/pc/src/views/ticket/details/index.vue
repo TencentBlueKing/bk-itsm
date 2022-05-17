@@ -21,120 +21,120 @@
   -->
 
 <template>
-    <div
-        class="ticket-detail-panel"
-        v-bkloading="{ isLoading: loading.ticketLoading }"
-    >
-        <template v-if="!ticketErrorMessage">
-            <ticket-header
-                ref="ticketHeader"
-                v-if="!loading.ticketLoading"
-                :header-info="headerInfo"
-                :ticket-info="ticketInfo"
-                :ticket-trigger-list="ticketTriggerList"
-                @reloadTicket="reloadTicket"
-            ></ticket-header>
+  <div
+    class="ticket-detail-panel"
+    v-bkloading="{ isLoading: loading.ticketLoading }"
+  >
+    <template v-if="!ticketErrorMessage">
+      <ticket-header
+        ref="ticketHeader"
+        v-if="!loading.ticketLoading"
+        :header-info="headerInfo"
+        :ticket-info="ticketInfo"
+        :ticket-trigger-list="ticketTriggerList"
+        @reloadTicket="reloadTicket"
+      ></ticket-header>
 
-            <div class="ticket-container">
-                <div class="ticket-container-left">
-                    <!-- 基础信息/工单预览 -->
-                    <left-ticket-content
-                        ref="leftTicketContent"
-                        :comment-list="commentList"
-                        :comment-id="commentId"
-                        :loading="loading"
-                        :ticket-info="ticketInfo"
-                        :node-list="nodeList"
-                        :first-state-fields="firstStateFields"
-                        :node-trigger-list="nodeTriggerList"
-                        :ticket-id="ticketId"
-                        :is-page-over="isPageOver"
-                        :has-node-opt-auth="hasNodeOptAuth"
-                        :is-show-assgin="isShowAssgin"
-                        :comment-loading="commentLoading"
-                        :more-loading="moreLoading"
-                        @addTargetComment="addTargetComment"
-                        @refreshComment="refreshComment"
-                        @getBacicInfoStatus="getBacicInfoStatus"
-                    ></left-ticket-content>
-                </div>
-                <!-- 分屏拖拽线 -->
-                <div
-                    data-test-id="ticket_line_screen_drag"
-                    class="drag-line"
-                    @mousedown="handleLineMouseDown"
-                    v-show="showRightTabs"
-                ></div>
-                <div
-                    class="show-right-icon"
-                    @click="onShowRightContent"
-                    v-show="!showRightTabs"
-                >
-                    <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
-                </div>
-                <div
-                    id="ticketContainerRight"
-                    class="ticket-container-right"
-                    v-show="showRightTabs"
-                >
-                    <div
-                        v-if="hasNodeOptAuth"
-                        :class="['sla-information', isShowSla ? 'hide' : '']"
-                    >
-                        <div class="sla-view">
-                            <div class="sla-title" @click="handleClickShowSla">
-                                <i
-                                    :class="[
-                                        'bk-itsm-icon',
-                                        !isShowSla
-                                            ? 'icon-xiangxia'
-                                            : 'icon-xiangyou'
-                                    ]"
-                                ></i>
-                                <span>{{ $t('m["SLA信息"]') }}</span>
-                            </div>
-                            <span class="view-sla-rule" @click="viewSlaRule">
-                                {{ $t('m["规则查看"]') }}
-                            </span>
-                        </div>
-                        <sla-record-tab
-                            v-if="!isShowSla"
-                            :threshold="threshold"
-                            :ticket-id="ticketId"
-                            :basic-infomation="ticketInfo"
-                            :node-list="nodeList"
-                        ></sla-record-tab>
-                    </div>
-                    <right-ticket-tabs
-                        class="right-ticket-tabs"
-                        v-if="!loading.ticketLoading"
-                        :ticket-info="ticketInfo"
-                        :has-node-opt-auth="hasNodeOptAuth"
-                        :node-list="nodeList"
-                        @ticketFinishAppraise="ticketFinishAppraise"
-                        @viewProcess="viewProcess"
-                    ></right-ticket-tabs>
-                </div>
-            </div>
-        </template>
-        <!-- 403 | 404 -->
-        <no-ticket-content
-            v-else
-            :message="ticketErrorMessage"
-        ></no-ticket-content>
-        <bk-dialog
-            v-model="isShowNoticeDialog"
-            theme="primary"
-            :mask-close="false"
-            header-position="left"
-            :title="$t(`m.newCommon['提示']`)"
-            @confirm="onNoticeConfirm"
+      <div class="ticket-container">
+        <div class="ticket-container-left">
+          <!-- 基础信息/工单预览 -->
+          <left-ticket-content
+            ref="leftTicketContent"
+            :comment-list="commentList"
+            :comment-id="commentId"
+            :loading="loading"
+            :ticket-info="ticketInfo"
+            :node-list="nodeList"
+            :first-state-fields="firstStateFields"
+            :node-trigger-list="nodeTriggerList"
+            :ticket-id="ticketId"
+            :is-page-over="isPageOver"
+            :has-node-opt-auth="hasNodeOptAuth"
+            :is-show-assgin="isShowAssgin"
+            :comment-loading="commentLoading"
+            :more-loading="moreLoading"
+            @addTargetComment="addTargetComment"
+            @refreshComment="refreshComment"
+            @getBacicInfoStatus="getBacicInfoStatus"
+          ></left-ticket-content>
+        </div>
+        <!-- 分屏拖拽线 -->
+        <div
+          data-test-id="ticket_line_screen_drag"
+          class="drag-line"
+          @mousedown="handleLineMouseDown"
+          v-show="showRightTabs"
+        ></div>
+        <div
+          class="show-right-icon"
+          @click="onShowRightContent"
+          v-show="!showRightTabs"
         >
-            {{ $t(`m.newCommon['您要处理的节点已被']`) }}
-            {{ noticeInfo.processed_user }}
-            {{ $t(`m.newCommon['处理完成，可在流转日志中查看详情。']`) }}
-        </bk-dialog>
-    </div>
+          <i data-v-639c8670="" class="bk-icon icon-angle-left"></i>
+        </div>
+        <div
+          id="ticketContainerRight"
+          class="ticket-container-right"
+          v-show="showRightTabs"
+        >
+          <div
+            v-if="hasNodeOptAuth"
+            :class="['sla-information', isShowSla ? 'hide' : '']"
+          >
+            <div class="sla-view">
+              <div class="sla-title" @click="handleClickShowSla">
+                <i
+                  :class="[
+                    'bk-itsm-icon',
+                    !isShowSla
+                      ? 'icon-xiangxia'
+                      : 'icon-xiangyou'
+                  ]"
+                ></i>
+                <span>{{ $t('m["SLA信息"]') }}</span>
+              </div>
+              <span class="view-sla-rule" @click="viewSlaRule">
+                {{ $t('m["规则查看"]') }}
+              </span>
+            </div>
+            <sla-record-tab
+              v-if="!isShowSla"
+              :threshold="threshold"
+              :ticket-id="ticketId"
+              :basic-infomation="ticketInfo"
+              :node-list="nodeList"
+            ></sla-record-tab>
+          </div>
+          <right-ticket-tabs
+            class="right-ticket-tabs"
+            v-if="!loading.ticketLoading"
+            :ticket-info="ticketInfo"
+            :has-node-opt-auth="hasNodeOptAuth"
+            :node-list="nodeList"
+            @ticketFinishAppraise="ticketFinishAppraise"
+            @viewProcess="viewProcess"
+          ></right-ticket-tabs>
+        </div>
+      </div>
+    </template>
+    <!-- 403 | 404 -->
+    <no-ticket-content
+      v-else
+      :message="ticketErrorMessage"
+    ></no-ticket-content>
+    <bk-dialog
+      v-model="isShowNoticeDialog"
+      theme="primary"
+      :mask-close="false"
+      header-position="left"
+      :title="$t(`m.newCommon['提示']`)"
+      @confirm="onNoticeConfirm"
+    >
+      {{ $t(`m.newCommon['您要处理的节点已被']`) }}
+      {{ noticeInfo.processed_user }}
+      {{ $t(`m.newCommon['处理完成，可在流转日志中查看详情。']`) }}
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

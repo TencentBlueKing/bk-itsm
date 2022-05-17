@@ -21,86 +21,86 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <!-- title -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m.slaContent["优先级管理"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <!-- 提示信息 -->
-            <!-- table切换栏 -->
-            <ul class="bk-priority-type">
-                <li v-for="(item, index) in choiceTypeList"
-                    :key="index"
-                    :class="{ 'bk-check-li': checkType.key === item.key }"
-                    @click="changeTab(item, index)">
-                    <span>{{item.name}}</span>
-                </li>
-            </ul>
-            <div class="bk-itsm-version" v-if="versionStatus">
-                <i class="bk-icon icon-info-circle"></i>
-                <span>{{ $t('m.slaContent["优先级管理：通过影响范围和紧急程度两个维度来进行不同服务类型的优先级矩阵管理。"]') }}</span>
-                <i class="bk-icon icon-close" @click="closeVersion"></i>
-            </div>
-            <!-- 优先级表格 -->
-            <div class="bk-priority-table" v-bkloading="{ isLoading: isDataLoading }">
-                <priority-table
-                    v-if="!isDataLoading"
-                    ref="priorityTable"
-                    :priority-conten="priorityConten">
-                </priority-table>
-            </div>
-            <p class="bk-priority-message" v-if="!priorityConten.editorStatus">
-                <span>{{ $t('m.slaContent["注：可在 "]') }}
-                    <span style="color: #3A84FF; cursor: pointer;"
-                        @click="gotoDataDictionary">
-                        {{ $t('m.slaContent["数据字典 "]') }}
-                    </span>
-                    {{ $t('m.slaContent["中修改 影响范围（IMPACT）、 紧急程度（URGENCY）以及 优先级（PRIORITY）的具体选项"]') }}
-                </span>
-            </p>
-            <div class="other-choice" v-if="priorityConten.editorStatus">
-                <span>{{ $t('m["应用到其它类型"]') }}: </span>
-                <bk-checkbox-group class="choice-checkbox-group" v-model="serviceTypeList">
-                    <bk-checkbox class="choice-checkbox" v-for="choice in serviceTypeOptions" :key="choice.key" :value="choice.key">{{choice.name}}</bk-checkbox>
-                </bk-checkbox-group>
-            </div>
-            <!-- 编辑操作 -->
-            <div class="bk-priority-btn" :class="{ 'bk-margin-btn': priorityConten.editorStatus }">
-                <template v-if="!priorityConten.editorStatus">
-                    <bk-button
-                        v-cursor="{ active: !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions) }"
-                        :theme="'primary'"
-                        :title="$t(`m.eventdeploy['编辑']`)"
-                        :class="['mr10', {
-                            'btn-permission-disable': !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions)
-                        }]"
-                        :loading="secondClick"
-                        @click="editorPriority">
-                        {{ $t('m.eventdeploy["编辑"]') }}
-                    </bk-button>
-                </template>
-                <template v-else>
-                    <bk-button :theme="'primary'"
-                        :title="$t(`m.eventdeploy['保存']`)"
-                        class="mr10"
-                        :loading="secondClick"
-                        @click="submitEditor">
-                        {{ $t('m.eventdeploy["保存"]') }}
-                    </bk-button>
-                    <bk-button :theme="'default'"
-                        :title="$t(`m.eventdeploy['取消']`)"
-                        class="mr10"
-                        :loading="secondClick"
-                        @click="closeEditor">
-                        {{ $t('m.eventdeploy["取消"]') }}
-                    </bk-button>
-                </template>
-            </div>
-        </div>
+  <div class="bk-itsm-service">
+    <!-- title -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m.slaContent["优先级管理"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <!-- 提示信息 -->
+      <!-- table切换栏 -->
+      <ul class="bk-priority-type">
+        <li v-for="(item, index) in choiceTypeList"
+          :key="index"
+          :class="{ 'bk-check-li': checkType.key === item.key }"
+          @click="changeTab(item, index)">
+          <span>{{item.name}}</span>
+        </li>
+      </ul>
+      <div class="bk-itsm-version" v-if="versionStatus">
+        <i class="bk-icon icon-info-circle"></i>
+        <span>{{ $t('m.slaContent["优先级管理：通过影响范围和紧急程度两个维度来进行不同服务类型的优先级矩阵管理。"]') }}</span>
+        <i class="bk-icon icon-close" @click="closeVersion"></i>
+      </div>
+      <!-- 优先级表格 -->
+      <div class="bk-priority-table" v-bkloading="{ isLoading: isDataLoading }">
+        <priority-table
+          v-if="!isDataLoading"
+          ref="priorityTable"
+          :priority-conten="priorityConten">
+        </priority-table>
+      </div>
+      <p class="bk-priority-message" v-if="!priorityConten.editorStatus">
+        <span>{{ $t('m.slaContent["注：可在 "]') }}
+          <span style="color: #3A84FF; cursor: pointer;"
+            @click="gotoDataDictionary">
+            {{ $t('m.slaContent["数据字典 "]') }}
+          </span>
+          {{ $t('m.slaContent["中修改 影响范围（IMPACT）、 紧急程度（URGENCY）以及 优先级（PRIORITY）的具体选项"]') }}
+        </span>
+      </p>
+      <div class="other-choice" v-if="priorityConten.editorStatus">
+        <span>{{ $t('m["应用到其它类型"]') }}: </span>
+        <bk-checkbox-group class="choice-checkbox-group" v-model="serviceTypeList">
+          <bk-checkbox class="choice-checkbox" v-for="choice in serviceTypeOptions" :key="choice.key" :value="choice.key">{{choice.name}}</bk-checkbox>
+        </bk-checkbox-group>
+      </div>
+      <!-- 编辑操作 -->
+      <div class="bk-priority-btn" :class="{ 'bk-margin-btn': priorityConten.editorStatus }">
+        <template v-if="!priorityConten.editorStatus">
+          <bk-button
+            v-cursor="{ active: !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions) }"
+            :theme="'primary'"
+            :title="$t(`m.eventdeploy['编辑']`)"
+            :class="['mr10', {
+              'btn-permission-disable': !hasPermission(['sla_priority_manage'], $store.state.project.projectAuthActions)
+            }]"
+            :loading="secondClick"
+            @click="editorPriority">
+            {{ $t('m.eventdeploy["编辑"]') }}
+          </bk-button>
+        </template>
+        <template v-else>
+          <bk-button :theme="'primary'"
+            :title="$t(`m.eventdeploy['保存']`)"
+            class="mr10"
+            :loading="secondClick"
+            @click="submitEditor">
+            {{ $t('m.eventdeploy["保存"]') }}
+          </bk-button>
+          <bk-button :theme="'default'"
+            :title="$t(`m.eventdeploy['取消']`)"
+            class="mr10"
+            :loading="secondClick"
+            @click="closeEditor">
+            {{ $t('m.eventdeploy["取消"]') }}
+          </bk-button>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

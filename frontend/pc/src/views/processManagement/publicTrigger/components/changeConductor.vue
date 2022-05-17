@@ -21,122 +21,122 @@
   -->
 
 <template>
-    <div class="bk-change-conductor">
-        <template v-if="itemInfo.type === 'STRING'">
-            <bk-input style="width: 260px;"
-                v-model="itemInfo.value"
-                v-cursorIndex="'conductorId' + index"
-                :placeholder="$t(`m.trigger['20个字符以内']`)">
-            </bk-input>
+  <div class="bk-change-conductor">
+    <template v-if="itemInfo.type === 'STRING'">
+      <bk-input style="width: 260px;"
+        v-model="itemInfo.value"
+        v-cursorIndex="'conductorId' + index"
+        :placeholder="$t(`m.trigger['20个字符以内']`)">
+      </bk-input>
+    </template>
+    <template v-if="itemInfo.type === 'SELECT'">
+      <bk-select style="width: 260px;"
+        ext-cls="bk-insert-info"
+        v-model="itemInfo.value"
+        :clearable="false"
+        searchable>
+        <bk-option v-for="option in itemInfo.choice"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+    <template v-if="itemInfo.type === 'MULTISELECT'">
+      <bk-select style="width: 260px;"
+        ext-cls="bk-insert-info"
+        v-model="itemInfo.value"
+        :clearable="false"
+        searchable
+        multiple>
+        <bk-option v-for="option in itemInfo.choice"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+    <template v-if="itemInfo.type === 'MEMBERS' || itemInfo.type === 'MULTI_MEMBERS'">
+      <div class="bk-send-recipient"
+        :class="{ 'bk-none-margin': itemInfo.value.length - 1 === recipientIndex }"
+        v-for="(recipientItem, recipientIndex) in itemInfo.value"
+        :key="recipientIndex">
+        <member-info
+          :item-info="itemInfo"
+          :recipient-item="recipientItem"
+          :recipient-index="recipientIndex">
+        </member-info>
+      </div>
+    </template>
+    <template v-if="itemInfo.type === 'TEXT'">
+      <bk-input
+        v-cursorIndex="'conductorId' + index"
+        v-model="itemInfo.value"
+        type="textarea"
+        :ext-cls="'bk-remindway-form'"
+        :rows="6"
+        @blur="changeMessagePanel">
+      </bk-input>
+    </template>
+    <template v-if="itemInfo.type === 'RADIO'">
+      <bk-radio-group v-model="itemInfo.value">
+        <template v-for="(radioItem, radioIndex) in itemInfo.choice">
+          <bk-radio :value="radioItem.key" :ext-cls="'mr50'" :key="radioIndex">{{radioItem.name}}</bk-radio>
         </template>
-        <template v-if="itemInfo.type === 'SELECT'">
-            <bk-select style="width: 260px;"
-                ext-cls="bk-insert-info"
-                v-model="itemInfo.value"
-                :clearable="false"
-                searchable>
-                <bk-option v-for="option in itemInfo.choice"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
+      </bk-radio-group>
+    </template>
+    <template v-if="itemInfo.type === 'CHECKBOX'">
+      <bk-checkbox-group v-model="itemInfo.value">
+        <template v-for="(checkboxItem, checkboxIndex) in itemInfo.choice">
+          <bk-checkbox :value="checkboxItem.key" :ext-cls="'mr10'" :key="checkboxIndex">{{checkboxItem.name}}</bk-checkbox>
         </template>
-        <template v-if="itemInfo.type === 'MULTISELECT'">
-            <bk-select style="width: 260px;"
-                ext-cls="bk-insert-info"
-                v-model="itemInfo.value"
-                :clearable="false"
-                searchable
-                multiple>
-                <bk-option v-for="option in itemInfo.choice"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </template>
-        <template v-if="itemInfo.type === 'MEMBERS' || itemInfo.type === 'MULTI_MEMBERS'">
-            <div class="bk-send-recipient"
-                :class="{ 'bk-none-margin': itemInfo.value.length - 1 === recipientIndex }"
-                v-for="(recipientItem, recipientIndex) in itemInfo.value"
-                :key="recipientIndex">
-                <member-info
-                    :item-info="itemInfo"
-                    :recipient-item="recipientItem"
-                    :recipient-index="recipientIndex">
-                </member-info>
-            </div>
-        </template>
-        <template v-if="itemInfo.type === 'TEXT'">
-            <bk-input
-                v-cursorIndex="'conductorId' + index"
-                v-model="itemInfo.value"
-                type="textarea"
-                :ext-cls="'bk-remindway-form'"
-                :rows="6"
-                @blur="changeMessagePanel">
-            </bk-input>
-        </template>
-        <template v-if="itemInfo.type === 'RADIO'">
-            <bk-radio-group v-model="itemInfo.value">
-                <template v-for="(radioItem, radioIndex) in itemInfo.choice">
-                    <bk-radio :value="radioItem.key" :ext-cls="'mr50'" :key="radioIndex">{{radioItem.name}}</bk-radio>
-                </template>
-            </bk-radio-group>
-        </template>
-        <template v-if="itemInfo.type === 'CHECKBOX'">
-            <bk-checkbox-group v-model="itemInfo.value">
-                <template v-for="(checkboxItem, checkboxIndex) in itemInfo.choice">
-                    <bk-checkbox :value="checkboxItem.key" :ext-cls="'mr10'" :key="checkboxIndex">{{checkboxItem.name}}</bk-checkbox>
-                </template>
-            </bk-checkbox-group>
-        </template>
-        <template v-if="itemInfo.type === 'INT'">
-            <bk-input :clearable="true"
-                :precision="precision"
-                type="number"
-                v-model="itemInfo.value">
-            </bk-input>
-        </template>
-        <!-- 引用变量 -->
-        <template v-if="itemInfo.type === 'STRING' || itemInfo.type === 'TEXT'">
-            <div class="bk-select-btn">
-                <bk-button
-                    theme="default"
-                    :title="$t(`m.slaContent['插入变量']`)"
-                    class="bk-form-btn plus-cus"
-                    icon="plus">
-                    {{ $t('m.slaContent["插入变量"]') }}
-                </bk-button>
-                <bk-select v-model="insertValue"
-                    ext-cls="bk-select-btn-opacity"
-                    searchable
-                    @selected="changeInsert">
-                    <bk-option v-for="option in variableList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </div>
-        </template>
-        <!-- 下拉框引用变量 -->
-        <template v-if="itemInfo.value === 'VARIABLE'">
-            <bk-select style="width: 260px;"
-                v-model="itemInfo.insertValue"
-                ext-cls="bk-insert-info"
-                searchable
-                :multiple="Array.isArray(itemInfo.insertValue)"
-                @selected="changeImport">
-                <bk-option v-for="option in variableList"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </template>
-    </div>
+      </bk-checkbox-group>
+    </template>
+    <template v-if="itemInfo.type === 'INT'">
+      <bk-input :clearable="true"
+        :precision="precision"
+        type="number"
+        v-model="itemInfo.value">
+      </bk-input>
+    </template>
+    <!-- 引用变量 -->
+    <template v-if="itemInfo.type === 'STRING' || itemInfo.type === 'TEXT'">
+      <div class="bk-select-btn">
+        <bk-button
+          theme="default"
+          :title="$t(`m.slaContent['插入变量']`)"
+          class="bk-form-btn plus-cus"
+          icon="plus">
+          {{ $t('m.slaContent["插入变量"]') }}
+        </bk-button>
+        <bk-select v-model="insertValue"
+          ext-cls="bk-select-btn-opacity"
+          searchable
+          @selected="changeInsert">
+          <bk-option v-for="option in variableList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </div>
+    </template>
+    <!-- 下拉框引用变量 -->
+    <template v-if="itemInfo.value === 'VARIABLE'">
+      <bk-select style="width: 260px;"
+        v-model="itemInfo.insertValue"
+        ext-cls="bk-insert-info"
+        searchable
+        :multiple="Array.isArray(itemInfo.insertValue)"
+        @selected="changeImport">
+        <bk-option v-for="option in variableList"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </template>
+  </div>
 </template>
 <script>
     import memberInfo from '../common/memberInfo.vue';

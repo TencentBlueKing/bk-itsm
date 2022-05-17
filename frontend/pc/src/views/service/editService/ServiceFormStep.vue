@@ -21,165 +21,165 @@
   -->
 
 <template>
-    <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
-        <!-- 字段选择 -->
-        <div :class="['field-option', isShowField ? 'field-hide' : '']">
-            <div style="overflow: hidden; height: 100%;">
-                <div class="field-type">字段类型</div>
-                <div class="show-field" @click="handleShowField">
-                    <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
-                </div>
-                <div style="    display: flex; height: calc(100% - 100px); flex-direction: column;">
-                    <div class="field-content">
-                        <!-- <div class="field-title">控件库</div> -->
-                        <div class="field-title">
-                            <span>控件库</span>
-                            <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
-                        </div>
-                        <ul class="field-list">
-                            <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
-                                <span class="field-name">{{ field.name }}</span>
-                            </li>
-                        </ul>
-                        <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
-                    </div>
-                    <div class="field-content">
-                        <!-- <div class="field-title">已有字段</div> -->
-                        <div class="field-title">
-                            <span>已有字段</span>
-                            <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
-                        </div>
-                        <ul class="field-list">
-                            <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
-                                <span class="field-name">{{ field.name }}</span>
-                            </li>
-                        </ul>
-                        <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
-                    </div>
-                </div>
+  <div class="service-form" :class="{ 'hide-field-option': !showFieldOption }">
+    <!-- 字段选择 -->
+    <div :class="['field-option', isShowField ? 'field-hide' : '']">
+      <div style="overflow: hidden; height: 100%;">
+        <div class="field-type">字段类型</div>
+        <div class="show-field" @click="handleShowField">
+          <i :class="['bk-itsm-icon', isShowField ? 'icon-xiangyou1' : 'icon-xiangzuo1']"></i>
+        </div>
+        <div style="    display: flex; height: calc(100% - 100px); flex-direction: column;">
+          <div class="field-content">
+            <!-- <div class="field-title">控件库</div> -->
+            <div class="field-title">
+              <span>控件库</span>
+              <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchLibrary"></bk-input>
             </div>
-        </div>
-        <!-- 基础信息 -->
-        <div class="basic-body">
-            <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
-                <!-- 选择服务模板1 -->
-                <div v-if="!showFieldOption" class="service-template">
-                    <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
-                        :key="index"
-                        data-test-id="servie_section_QuicklyCreateForm"
-                        @click="onCreateFormWayCLick(way)">
-                        <i class="bk-itsm-icon icon-it-new-globalview"></i>
-                        <span>{{way.name}}</span>
-                    </div>
-                </div>
-                <div class="create-service-form" v-bkloading="{ isLoading: formLoading }">
-                    <div>
-                        <ServiceForm
-                            ref="serviceForm"
-                            :add-field-status="addFieldStatus"
-                            :service-info="serviceInfo"
-                            :node-id="createTicketNodeId"
-                            :forms="ticketNodeForm"
-                            :crt-form.sync="crtForm"
-                            @dragUpdateList="dragUpdateList"
-                            @onAddFormClick="onAddFormClick"
-                            @addField="addField"
-                            @onFormEditClick="onFormEditClick"
-                            @cancelAdd="cancelAddField"
-                            @fieldClone="fieldClone"
-                            @fieldDelete="fieldDelete"
-                            @saveField="saveField">
-                        </ServiceForm>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
-        <div v-show="crtForm" class="edit-service-field">
-            <div class="edit-service-title">字段属性</div>
-            <div class="edit-service-forms">
-                <template v-for="form in ticketNodeForm">
-                    <form-edit-item
-                        v-if="form.id === crtForm"
-                        :key="form.id"
-                        :fields="ticketNodeForm"
-                        :form="form"
-                        :workflow-id="serviceInfo.workflow_id"
-                        :node-id="createTicketNodeId"
-                        @onEditCancel="onEditCancel"
-                        @getAddFieldStatus="getAddFieldStatus"
-                        @onEditConfirm="onEditConfirm">
-                    </form-edit-item>
-                </template>
+            <ul class="field-list">
+              <li class="field-item" v-for="(field, index) in fieldsLibrary" :key="index" @click="onAddFormClick(field)">
+                <span class="field-name">{{ field.name }}</span>
+              </li>
+            </ul>
+            <div v-if="fieldsLibrary.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
+          </div>
+          <div class="field-content">
+            <!-- <div class="field-title">已有字段</div> -->
+            <div class="field-title">
+              <span>已有字段</span>
+              <bk-input class="search-field" size="small" :right-icon="'bk-icon icon-search'" @enter="handleSearchField"></bk-input>
             </div>
+            <ul class="field-list">
+              <li class="field-item" v-for="(field, index) in publicFields" :key="index" @click="addField(field)">
+                <span class="field-name">{{ field.name }}</span>
+              </li>
+            </ul>
+            <div v-if="publicFields.length === 0" class="public-field"><i class="bk-itsm-icon icon-itsm-icon-four-zero" style="font-size: 14px"></i> 已有字段不存在你搜索的内容</div>
+          </div>
         </div>
-        <bk-dialog
-            width="800"
-            :value="isCreateService"
-            :mask-close="false"
-            :title="'创建服务'"
-            :auto-close="false"
-            @confirm="onBasicFormSubmit"
-            @cancel="onBasicFormCancel">
-            <bk-form
-                ref="basicForm"
-                form-type="vertical"
-                class="basic-form"
-                :rules="rules"
-                :model="formData">
-                <bk-form-item
-                    data-test-id="service-input-serviceName"
-                    :label="$t(`m.newCommon['服务名称']`)"
-                    :required="true"
-                    property="name"
-                    error-display-type="normal">
-                    <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['服务描述']`)"
-                    property="desc">
-                    <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="service-select-serviceDirectory"
-                    :label="$t(`m.tickets['所属目录']`)"
-                    :required="true"
-                    property="catalog_id"
-                    error-display-type="normal">
-                    <select-tree
-                        v-model="formData.catalog_id"
-                        :list="dirList"
-                        ext-cls="bk-form-width">
-                    </select-tree>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="service-select-serviceType"
-                    :label="$t(`m.serviceConfig['服务类型']`)"
-                    :required="true"
-                    property="key"
-                    error-display-type="normal">
-                    <bk-select v-model="formData.key"
-                        :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
-                        :clearable="false"
-                        searchable
-                        :font-size="'medium'">
-                        <bk-option v-for="option in serviceTypeList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-            </bk-form>
-        </bk-dialog>
-        <!-- 选择服务模板 -->
-        <choose-service-template-dialog
-            :is-show.sync="isShowChooseSerTempDialog"
-            :create-info="currCreateFormWay"
-            :service-id="serviceId"
-            @updateServiceSource="updateServiceSource">
-        </choose-service-template-dialog>
+      </div>
     </div>
+    <!-- 基础信息 -->
+    <div class="basic-body">
+      <section data-test-id="servie_section_serviceticketInformation" class="settion-card create-info-card">
+        <!-- 选择服务模板1 -->
+        <div v-if="!showFieldOption" class="service-template">
+          <div class="template-type" v-for="(way, index) in serviceFormCreateWays.slice(0, 2)"
+            :key="index"
+            data-test-id="servie_section_QuicklyCreateForm"
+            @click="onCreateFormWayCLick(way)">
+            <i class="bk-itsm-icon icon-it-new-globalview"></i>
+            <span>{{way.name}}</span>
+          </div>
+        </div>
+        <div class="create-service-form" v-bkloading="{ isLoading: formLoading }">
+          <div>
+            <ServiceForm
+              ref="serviceForm"
+              :add-field-status="addFieldStatus"
+              :service-info="serviceInfo"
+              :node-id="createTicketNodeId"
+              :forms="ticketNodeForm"
+              :crt-form.sync="crtForm"
+              @dragUpdateList="dragUpdateList"
+              @onAddFormClick="onAddFormClick"
+              @addField="addField"
+              @onFormEditClick="onFormEditClick"
+              @cancelAdd="cancelAddField"
+              @fieldClone="fieldClone"
+              @fieldDelete="fieldDelete"
+              @saveField="saveField">
+            </ServiceForm>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div v-show="crtForm" class="drag-line" @mousedown="handleDragLine"></div>
+    <div v-show="crtForm" class="edit-service-field">
+      <div class="edit-service-title">字段属性</div>
+      <div class="edit-service-forms">
+        <template v-for="form in ticketNodeForm">
+          <form-edit-item
+            v-if="form.id === crtForm"
+            :key="form.id"
+            :fields="ticketNodeForm"
+            :form="form"
+            :workflow-id="serviceInfo.workflow_id"
+            :node-id="createTicketNodeId"
+            @onEditCancel="onEditCancel"
+            @getAddFieldStatus="getAddFieldStatus"
+            @onEditConfirm="onEditConfirm">
+          </form-edit-item>
+        </template>
+      </div>
+    </div>
+    <bk-dialog
+      width="800"
+      :value="isCreateService"
+      :mask-close="false"
+      :title="'创建服务'"
+      :auto-close="false"
+      @confirm="onBasicFormSubmit"
+      @cancel="onBasicFormCancel">
+      <bk-form
+        ref="basicForm"
+        form-type="vertical"
+        class="basic-form"
+        :rules="rules"
+        :model="formData">
+        <bk-form-item
+          data-test-id="service-input-serviceName"
+          :label="$t(`m.newCommon['服务名称']`)"
+          :required="true"
+          property="name"
+          error-display-type="normal">
+          <bk-input v-model="formData.name" :maxlength="120" :show-word-limit="true"></bk-input>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.serviceConfig['服务描述']`)"
+          property="desc">
+          <bk-input v-model="formData.desc" type="textarea" :row="3" :maxlength="100"></bk-input>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="service-select-serviceDirectory"
+          :label="$t(`m.tickets['所属目录']`)"
+          :required="true"
+          property="catalog_id"
+          error-display-type="normal">
+          <select-tree
+            v-model="formData.catalog_id"
+            :list="dirList"
+            ext-cls="bk-form-width">
+          </select-tree>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="service-select-serviceType"
+          :label="$t(`m.serviceConfig['服务类型']`)"
+          :required="true"
+          property="key"
+          error-display-type="normal">
+          <bk-select v-model="formData.key"
+            :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+            :clearable="false"
+            searchable
+            :font-size="'medium'">
+            <bk-option v-for="option in serviceTypeList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+      </bk-form>
+    </bk-dialog>
+    <!-- 选择服务模板 -->
+    <choose-service-template-dialog
+      :is-show.sync="isShowChooseSerTempDialog"
+      :create-info="currCreateFormWay"
+      :service-id="serviceId"
+      @updateServiceSource="updateServiceSource">
+    </choose-service-template-dialog>
+  </div>
 </template>
 
 <script>

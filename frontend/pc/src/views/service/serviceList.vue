@@ -21,342 +21,342 @@
   -->
 
 <template>
-    <div>
-        <nav-title :title-name="$t(`m.serviceConfig['服务']`)"></nav-title>
-        <div class="page-content">
-            <!-- btn -->
-            <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
-                <tree-info :tree-info="treeInfo" :dir-list="dirList"></tree-info>
-                <div class="hidden-tree" @click="hiddenTree">
-                    <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
-                </div>
-            </div>
-            <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
-                <div class="bk-only-btn">
-                    <div class="bk-more-search">
-                        <bk-button
-                            data-test-id="service_button_createService"
-                            v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
-                            :theme="'primary'"
-                            icon="plus"
-                            :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
-                            }]"
-                            :title="$t(`m.serviceConfig['新增']`)"
-                            @click="onServiceCreatePermissonCheck">
-                            {{$t(`m.serviceConfig['新增']`)}}
-                        </bk-button>
-                        <bk-button :theme="'default'"
-                            class="mr10"
-                            data-test-id="service_button_batchImportService"
-                            :title="$t(`m['导入']`)"
-                            @click="importService">
-                            {{$t(`m['导入']`)}}
-                        </bk-button>
-                        <bk-button :theme="'default'"
-                            data-test-id="service_button_batchDeleteService"
-                            :title="$t(`m.serviceConfig['批量删除']`)"
-                            :disabled="!checkList.length"
-                            @click="deleteCheck">
-                            {{$t(`m.serviceConfig['批量删除']`)}}
-                        </bk-button>
-                        <div class="bk-search-name">
-                            <div class="bk-search-content">
-                                <bk-input
-                                    :placeholder="moreSearch[0].placeholder || $t(`m.serviceConfig['请输入服务名']`)"
-                                    :clearable="true"
-                                    :right-icon="'bk-icon icon-search'"
-                                    v-model="moreSearch[0].value"
-                                    @enter="searchContent"
-                                    @clear="clearSearch">
-                                </bk-input>
-                            </div>
-                            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                                icon=" bk-itsm-icon icon-search-more"
-                                class="ml10 filter-btn"
-                                @click="searchMore">
-                            </bk-button>
-                        </div>
-                    </div>
-                    <search-info
-                        ref="searchInfo"
-                        :more-search="moreSearch">
-                    </search-info>
-                </div>
-                <bk-table
-                    ref="serviceTable"
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="dataList"
-                    :size="'small'"
-                    :pagination="pagination"
-                    @cell-mouse-enter="cellMouseEnter"
-                    @cell-mouse-leave="cellMouseLeave"
-                    @page-change="handlePageChange"
-                    @page-limit-change="handlePageLimitChange"
-                    @select-all="handleSelectAll"
-                    @select="handleSelect">
-                    <bk-table-column
-                        type="selection"
-                        width="60"
-                        align="center"
-                        :selectable="disabledFn">
-                        <template slot-scope="props">
-                            <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
-                                <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
-                                    <span
-                                        v-cursor
-                                        class="checkbox-permission-disable"
-                                        @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                    </span>
-                                </div>
-                            </template>
-                            <template v-else>
-                                <bk-checkbox
-                                    data-test-id="service_checkbox_checkService"
-                                    :true-value="trueStatus"
-                                    :false-value="falseStatus"
-                                    v-model="props.row.checkStatus"
-                                    @change="changeCheck(props.row)">
-                                </bk-checkbox>
-                            </template>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                        <template slot-scope="props">
-                            <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
-                        <template slot-scope="props">
-                            <span
-                                v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
-                                v-cursor
-                                class="bk-lable-primary text-permission-disable"
-                                ::title="props.row.name"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                {{ props.row.name }}
-                            </span>
-                            <template v-else>
-                                <div v-if="props.row.id !== changeFrom.name" class="bk-lable-display">
-                                    <span
-                                        class="bk-lable-primary"
-                                        :title="props.row.name"
-                                        @click="changeEntry(props.row, 'edit')">
-                                        {{ props.row.name }}
-                                    </span>
-                                    <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
-                                </div>
-                                <div v-else class="hover-show-icon">
-                                    <bk-input v-model="editValue"></bk-input>
-                                    <div class="operation">
-                                        <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name',props.row)"></i>
-                                        <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
-                                    </div>
-                                </div>
-                            </template>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['类型']`)" :width="changeFrom.serviceType ? '250' : '150'">
-                        <template slot-scope="props">
-                            <template v-if="props.row.id !== changeFrom.serviceType">
-                                <template v-for="(type, typeIndex) in serviceTypesMap">
-                                    <span v-if="props.row.key === type.key"
-                                        :title="type.name"
-                                        :key="typeIndex">
-                                        {{ type.name }}
-                                        <i v-show="tableHoverId === props.row.id" @click="handleChange('key', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
-                                    </span>
-                                </template>
-                            </template>
-                            <div v-else class="hover-show-icon">
-                                <bk-select v-model="editValue"
-                                    :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
-                                    :clearable="false"
-                                    style="width: 150px"
-                                    searchable
-                                    :font-size="'medium'">
-                                    <bk-option v-for="option in serviceTypeList"
-                                        :key="option.key"
-                                        :id="option.key"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                                <div class="operation">
-                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key',props.row)"></i>
-                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
-                                </div>
-                            </div>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['创建人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['更新人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
-                        <template slot-scope="props">
-                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
-                        <template slot-scope="props">
-                            <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
-                            <div v-else class="hover-show-icon">
-                                <bk-cascade
-                                    :list="dirList"
-                                    clearable
-                                    :check-any-level="true"
-                                    style="width: 250px;"
-                                    :ext-popover-cls="'custom-cls'"
-                                    @change="handleChangeTree">
-                                </bk-cascade>
-                                <div class="operation">
-                                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id',props.row)"></i>
-                                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
-                                </div>
-                            </div>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
-                        <template slot-scope="props">
-                            <span class="bk-status-color"
-                                :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
-                            <span style="margin-left: 5px;"
-                                :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
-                                {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
-                        <template slot-scope="props">
-                            <!-- sla -->
-                            <bk-button
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                SLA
-                            </bk-button>
-                            <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
-                            <!-- 编辑 -->
-                            <bk-button
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                {{ $t('m.serviceConfig["编辑"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-else
-                                data-test-id="service_button_editService"
-                                theme="primary"
-                                text
-                                @click="changeEntry(props.row, 'edit')">
-                                {{ $t('m.serviceConfig["编辑"]') }}
-                            </bk-button>
-                            <!-- 克隆 -->
-                            <bk-button
-                                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                v-cursor
-                                text
-                                theme="primary"
-                                class="btn-permission-disable"
-                                @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                {{ $t('m.serviceConfig["克隆"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-else
-                                data-test-id="service_button_editService"
-                                theme="primary"
-                                text
-                                @click="changeEntry(props.row, 'clone')">
-                                {{ $t('m.serviceConfig["克隆"]') }}
-                            </bk-button>
-                            <!-- 删除 -->
-                            <bk-popover placement="bottom" theme="light">
-                                <i class="bk-itsm-icon icon-move-new"></i>
-                                <div slot="content" style="white-space: normal;">
-                                    <bk-button
-                                        style="font-size: 12px;"
-                                        data-test-id="service_button_deleteService1"
-                                        v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
-                                        v-cursor
-                                        text
-                                        theme="primary"
-                                        class="btn-permission-disable"
-                                        @click="onServicePermissonCheck(['service_manage'], props.row)">
-                                        {{ $t('m.serviceConfig["删除"]') }}
-                                    </bk-button>
-                                    <template v-else>
-                                        <bk-button
-                                            style="font-size: 12px;"
-                                            data-test-id="service_button_deleteService3"
-                                            theme="primary"
-                                            text
-                                            @click="deleteOne(props.row)">
-                                            {{ $t('m.serviceConfig["删除"]') }}
-                                        </bk-button>
-                                    </template>
-                                    <bk-button
-                                        style="font-size: 12px; display: block"
-                                        data-test-id="service_button_deleteService3"
-                                        theme="primary"
-                                        text
-                                        @click="exportService(props.row)">
-                                        {{ $t('m["导出"]') }}
-                                    </bk-button>
-                                </div>
-                            </bk-popover>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </div>
-            <bk-dialog
-                width="800"
-                v-model="isImportServiceShow"
-                title="导入服务"
-                theme="primary"
-                :auto-close="false"
-                :mask-close="false"
-                @confirm="importConfirm"
-                @cancel="closeImport">
-                <bk-form ref="importForm" id="importForm">
-                    <bk-form-item label="选择目录" required>
-                        <bk-cascade
-                            v-model="importCatalogId"
-                            :list="dirList"
-                            clearable
-                            :check-any-level="true"
-                            :ext-popover-cls="'custom-cls'"
-                            @change="handleChangeTree">
-                        </bk-cascade>
-                    </bk-form-item>
-                    <bk-form-item label="选择文件" required>
-                        <bk-button class="bk-btn-file" style="width: 100px">
-                            <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
-                            {{ $t(`m['选择文件']`) }}
-                            <span class="bk-input-tip">{{ $t(`m['仅支持json文件！']`) }}</span>
-                        </bk-button>
-                    </bk-form-item>
-                    <template v-if="importFileNameList.length !== 0">
-                        <div class="file-list" v-for="(item, index) in importFileNameList" :key="index">{{ item }}
-                            <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeFile"></i>
-                        </div>
-                    </template>
-                    <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
-                </bk-form>
-            </bk-dialog>
+  <div>
+    <nav-title :title-name="$t(`m.serviceConfig['服务']`)"></nav-title>
+    <div class="page-content">
+      <!-- btn -->
+      <div :class="['service-left', isHiddenDirectory ? 'hide' : '']">
+        <tree-info :tree-info="treeInfo" :dir-list="dirList"></tree-info>
+        <div class="hidden-tree" @click="hiddenTree">
+          <i :class="['bk-itsm-icon', isHiddenDirectory ? 'icon-arrow-right' : 'icon-xiangzuo1']"></i>
         </div>
+      </div>
+      <div :class="['service-right', isHiddenDirectory ? 'auto-wight' : '']">
+        <div class="bk-only-btn">
+          <div class="bk-more-search">
+            <bk-button
+              data-test-id="service_button_createService"
+              v-cursor="{ active: !hasPermission(['service_create'], $store.state.project.projectAuthActions) }"
+              :theme="'primary'"
+              icon="plus"
+              :class="['mr10', 'plus-cus', {
+                'btn-permission-disable': !hasPermission(['service_create'], $store.state.project.projectAuthActions)
+              }]"
+              :title="$t(`m.serviceConfig['新增']`)"
+              @click="onServiceCreatePermissonCheck">
+              {{$t(`m.serviceConfig['新增']`)}}
+            </bk-button>
+            <bk-button :theme="'default'"
+              class="mr10"
+              data-test-id="service_button_batchImportService"
+              :title="$t(`m['导入']`)"
+              @click="importService">
+              {{$t(`m['导入']`)}}
+            </bk-button>
+            <bk-button :theme="'default'"
+              data-test-id="service_button_batchDeleteService"
+              :title="$t(`m.serviceConfig['批量删除']`)"
+              :disabled="!checkList.length"
+              @click="deleteCheck">
+              {{$t(`m.serviceConfig['批量删除']`)}}
+            </bk-button>
+            <div class="bk-search-name">
+              <div class="bk-search-content">
+                <bk-input
+                  :placeholder="moreSearch[0].placeholder || $t(`m.serviceConfig['请输入服务名']`)"
+                  :clearable="true"
+                  :right-icon="'bk-icon icon-search'"
+                  v-model="moreSearch[0].value"
+                  @enter="searchContent"
+                  @clear="clearSearch">
+                </bk-input>
+              </div>
+              <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+                icon=" bk-itsm-icon icon-search-more"
+                class="ml10 filter-btn"
+                @click="searchMore">
+              </bk-button>
+            </div>
+          </div>
+          <search-info
+            ref="searchInfo"
+            :more-search="moreSearch">
+          </search-info>
+        </div>
+        <bk-table
+          ref="serviceTable"
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="dataList"
+          :size="'small'"
+          :pagination="pagination"
+          @cell-mouse-enter="cellMouseEnter"
+          @cell-mouse-leave="cellMouseLeave"
+          @page-change="handlePageChange"
+          @page-limit-change="handlePageLimitChange"
+          @select-all="handleSelectAll"
+          @select="handleSelect">
+          <bk-table-column
+            type="selection"
+            width="60"
+            align="center"
+            :selectable="disabledFn">
+            <template slot-scope="props">
+              <template v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])">
+                <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                  <span
+                    v-cursor
+                    class="checkbox-permission-disable"
+                    @click="onServicePermissonCheck(['service_manage'], props.row)">
+                  </span>
+                </div>
+              </template>
+              <template v-else>
+                <bk-checkbox
+                  data-test-id="service_checkbox_checkService"
+                  :true-value="trueStatus"
+                  :false-value="falseStatus"
+                  v-model="props.row.checkStatus"
+                  @change="changeCheck(props.row)">
+                </bk-checkbox>
+              </template>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+            <template slot-scope="props">
+              <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['服务名称']`)" prop="name" min-width="200" :width="changeFrom.name ? '300' : '200'">
+            <template slot-scope="props">
+              <span
+                v-if="!hasPermission(['service_manage'], [...$store.state.project.projectAuthActions, ...props.row.auth_actions])"
+                v-cursor
+                class="bk-lable-primary text-permission-disable"
+                ::title="props.row.name"
+                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                {{ props.row.name }}
+              </span>
+              <template v-else>
+                <div v-if="props.row.id !== changeFrom.name" class="bk-lable-display">
+                  <span
+                    class="bk-lable-primary"
+                    :title="props.row.name"
+                    @click="changeEntry(props.row, 'edit')">
+                    {{ props.row.name }}
+                  </span>
+                  <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                </div>
+                <div v-else class="hover-show-icon">
+                  <bk-input v-model="editValue"></bk-input>
+                  <div class="operation">
+                    <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('name',props.row)"></i>
+                    <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                  </div>
+                </div>
+              </template>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['类型']`)" :width="changeFrom.serviceType ? '250' : '150'">
+            <template slot-scope="props">
+              <template v-if="props.row.id !== changeFrom.serviceType">
+                <template v-for="(type, typeIndex) in serviceTypesMap">
+                  <span v-if="props.row.key === type.key"
+                    :title="type.name"
+                    :key="typeIndex">
+                    {{ type.name }}
+                    <i v-show="tableHoverId === props.row.id" @click="handleChange('key', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
+                  </span>
+                </template>
+              </template>
+              <div v-else class="hover-show-icon">
+                <bk-select v-model="editValue"
+                  :placeholder="$t(`m.serviceConfig['请选择服务类型']`)"
+                  :clearable="false"
+                  style="width: 150px"
+                  searchable
+                  :font-size="'medium'">
+                  <bk-option v-for="option in serviceTypeList"
+                    :key="option.key"
+                    :id="option.key"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+                <div class="operation">
+                  <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('key',props.row)"></i>
+                  <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                </div>
+              </div>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['创建人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['更新人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.updated_by">{{props.row.updated_by || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['更新时间']`)" width="200">
+            <template slot-scope="props">
+              <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['关联目录']`)" :width="changeFrom.bounded_catalogs ? '250' : '200'">
+            <template slot-scope="props">
+              <span v-if="props.row.id !== changeFrom.bounded_catalogs" :title="props.row.bounded_catalogs[0]">{{ props.row.bounded_catalogs[0] || '--' }}<i v-show="tableHoverId === props.row.id" @click="handleChange('catalog_id', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i></span>
+              <div v-else class="hover-show-icon">
+                <bk-cascade
+                  :list="dirList"
+                  clearable
+                  :check-any-level="true"
+                  style="width: 250px;"
+                  :ext-popover-cls="'custom-cls'"
+                  @change="handleChangeTree">
+                </bk-cascade>
+                <div class="operation">
+                  <i class="bk-itsm-icon icon-itsm-icon-fill-fit" @click="submitEditService('catalog_id',props.row)"></i>
+                  <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeEdit"></i>
+                </div>
+              </div>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['状态']`)" width="80">
+            <template slot-scope="props">
+              <span class="bk-status-color"
+                :class="{ 'bk-status-gray': !props.row.is_valid }"></span>
+              <span style="margin-left: 5px;"
+                :title="props.row.is_valid ? $t(`m.serviceConfig['启用']`) : $t(`m.serviceConfig['关闭']`)">
+                {{(props.row.is_valid ? $t(`m.serviceConfig["启用"]`) : $t(`m.serviceConfig["关闭"]`))}}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.serviceConfig['操作']`)" width="160">
+            <template slot-scope="props">
+              <!-- sla -->
+              <bk-button
+                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                v-cursor
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                SLA
+              </bk-button>
+              <router-link v-else data-test-id="service_link_linkToSLA" class="bk-button-text bk-primary" :to="{ name: 'projectServiceSla', params: { id: props.row.id }, query: { project_id: $store.state.project.id, catalog_id: $route.query.catalog_id } }">SLA</router-link>
+              <!-- 编辑 -->
+              <bk-button
+                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                v-cursor
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                {{ $t('m.serviceConfig["编辑"]') }}
+              </bk-button>
+              <bk-button
+                v-else
+                data-test-id="service_button_editService"
+                theme="primary"
+                text
+                @click="changeEntry(props.row, 'edit')">
+                {{ $t('m.serviceConfig["编辑"]') }}
+              </bk-button>
+              <!-- 克隆 -->
+              <bk-button
+                v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                v-cursor
+                text
+                theme="primary"
+                class="btn-permission-disable"
+                @click="onServicePermissonCheck(['service_manage'], props.row)">
+                {{ $t('m.serviceConfig["克隆"]') }}
+              </bk-button>
+              <bk-button
+                v-else
+                data-test-id="service_button_editService"
+                theme="primary"
+                text
+                @click="changeEntry(props.row, 'clone')">
+                {{ $t('m.serviceConfig["克隆"]') }}
+              </bk-button>
+              <!-- 删除 -->
+              <bk-popover placement="bottom" theme="light">
+                <i class="bk-itsm-icon icon-move-new"></i>
+                <div slot="content" style="white-space: normal;">
+                  <bk-button
+                    style="font-size: 12px;"
+                    data-test-id="service_button_deleteService1"
+                    v-if="!hasPermission(['service_manage'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])"
+                    v-cursor
+                    text
+                    theme="primary"
+                    class="btn-permission-disable"
+                    @click="onServicePermissonCheck(['service_manage'], props.row)">
+                    {{ $t('m.serviceConfig["删除"]') }}
+                  </bk-button>
+                  <template v-else>
+                    <bk-button
+                      style="font-size: 12px;"
+                      data-test-id="service_button_deleteService3"
+                      theme="primary"
+                      text
+                      @click="deleteOne(props.row)">
+                      {{ $t('m.serviceConfig["删除"]') }}
+                    </bk-button>
+                  </template>
+                  <bk-button
+                    style="font-size: 12px; display: block"
+                    data-test-id="service_button_deleteService3"
+                    theme="primary"
+                    text
+                    @click="exportService(props.row)">
+                    {{ $t('m["导出"]') }}
+                  </bk-button>
+                </div>
+              </bk-popover>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </div>
+      <bk-dialog
+        width="800"
+        v-model="isImportServiceShow"
+        title="导入服务"
+        theme="primary"
+        :auto-close="false"
+        :mask-close="false"
+        @confirm="importConfirm"
+        @cancel="closeImport">
+        <bk-form ref="importForm" id="importForm">
+          <bk-form-item label="选择目录" required>
+            <bk-cascade
+              v-model="importCatalogId"
+              :list="dirList"
+              clearable
+              :check-any-level="true"
+              :ext-popover-cls="'custom-cls'"
+              @change="handleChangeTree">
+            </bk-cascade>
+          </bk-form-item>
+          <bk-form-item label="选择文件" required>
+            <bk-button class="bk-btn-file" style="width: 100px">
+              <input class="bk-input-file" type="file" ref="importInput" @change="handleFile" />
+              {{ $t(`m['选择文件']`) }}
+              <span class="bk-input-tip">{{ $t(`m['仅支持json文件！']`) }}</span>
+            </bk-button>
+          </bk-form-item>
+          <template v-if="importFileNameList.length !== 0">
+            <div class="file-list" v-for="(item, index) in importFileNameList" :key="index">{{ item }}
+              <i class="bk-itsm-icon icon-itsm-icon-three-one" @click="closeFile"></i>
+            </div>
+          </template>
+          <p v-if="isCheckImport" class="import-error-tip">{{ errorName }}为必选项!</p>
+        </bk-form>
+      </bk-dialog>
     </div>
+  </div>
 </template>
 
 <script>

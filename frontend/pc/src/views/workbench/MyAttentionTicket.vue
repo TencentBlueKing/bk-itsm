@@ -21,10 +21,10 @@
   -->
 
 <template>
-    <div class="my-attention-ticket-page">
-        <nav-title :title-name="$t(`m['我关注的']`)"></nav-title>
-        <attention-list from="myAttentionTicket"></attention-list>
-    </div>
+  <div class="my-attention-ticket-page">
+    <nav-title :title-name="$t(`m['我关注的']`)"></nav-title>
+    <attention-list from="myAttentionTicket"></attention-list>
+  </div>
 </template>
 <script>
     import NavTitle from '@/components/common/layout/NavTitle';

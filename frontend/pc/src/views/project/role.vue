@@ -21,164 +21,164 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m["用户组"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <empty-tip
-                v-if="!isDataLoading && tableList.length === 0 && searchToggle"
-                :title="emptyTip.title"
-                :sub-title="emptyTip.subTitle"
-                :desc="emptyTip.desc"
-                :links="emptyTip.links">
-                <template slot="btns">
-                    <bk-button theme="primary"
-                        data-test-id="userGroup_button_create_permission"
-                        v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
-                        :class="{
-                            'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
-                        }"
-                        @click="showEditor({
-                            name: '',
-                            staffInputValue: [],
-                            ownersInputValue: []
-                        }, 'new')">
-                        {{ $t(`m['立即创建']`) }}
-                    </bk-button>
-                </template>
-            </empty-tip>
-            <template v-else>
-                <div class="bk-only-btn">
-                    <bk-button theme="primary"
-                        data-test-id="userGroup_button_create"
-                        v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
-                        icon="plus"
-                        :title="$t(`m.deployPage['新增']`)"
-                        :class="['mr10', 'plus-cus', {
-                            'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
-                        }]"
-                        @click="showEditor({
-                            name: '',
-                            staffInputValue: [],
-                            ownersInputValue: []
-                        }, 'new')">
-                        {{ $t(`m.deployPage['新增']`) }}
-                    </bk-button>
-                    <div class="bk-only-search">
-                        <bk-input
-                            data-test-id="userGroup_input_search"
-                            :placeholder="$t(`m.systemConfig['请输入角色名称']`)"
-                            :clearable="true"
-                            :right-icon="'bk-icon icon-search'"
-                            v-model="searchName"
-                            @enter="getList(1)"
-                            @clear="getList(1)">
-                        </bk-input>
-                    </div>
-                </div>
-                <bk-table
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="tableList"
-                    :size="'small'">
-                    <!--<bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>-->
-                    <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                        <template slot-scope="props">
-                            <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-
-                    <bk-table-column :label="$t(`m.user['角色名']`)" width="200">
-                        <template slot-scope="props">
-                            <span :title="props.row.name">{{ props.row.name || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.user['人员']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.members">{{props.row.members}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['创建人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['负责人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.user['操作']`)" width="150">
-                        <template slot-scope="props">
-                            <bk-button
-                                data-test-id="userGroup_button_edit"
-                                v-cursor="{ active: !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
-                                theme="primary"
-                                text
-                                :class="[{
-                                    'btn-permission-disable': !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
-                                }]"
-                                @click="showEditor(props.row, 'edit')">
-                                {{ $t('m.user["编辑"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-if="!props.row.is_builtin"
-                                data-test-id="userGroup_button_delete"
-                                v-cursor="{ active: !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
-                                theme="primary"
-                                text
-                                :class="[{
-                                    'btn-permission-disable': !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
-                                }]"
-                                @click="deleteUser(props.row)">
-                                {{ $t('m.user["删除"]') }}
-                            </bk-button>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </template>
-        </div>
-        <!-- 编辑列表 -->
-        <bk-dialog
-            data-test-id="userGroup_dialog_editAndCreate"
-            v-model="openDialog.isShow"
-            :render-directive="'if'"
-            :width="openDialog.width"
-            :header-position="openDialog.headerPosition"
-            :loading="secondClick"
-            :auto-close="openDialog.autoClose"
-            :mask-close="openDialog.autoClose"
-            @confirm="submitUser">
-            <p slot="header">{{ itemContent.id ? $t('m.user["修改通用角色"]') : $t('m.user["新增通用角色"]') }}</p>
-            <div class="bk-add-project bk-add-module">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :rules="rules"
-                    :model="formData"
-                    ref="dynamicForm">
-                    <bk-form-item
-                        data-test-id="role-input-roleName"
-                        :label="$t(`m.user['角色名称：']`)"
-                        :required="true"
-                        :property="'name'">
-                        <bk-input v-model.trim="formData.name" maxlength="120"></bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        data-test-id="role-input-staffList"
-                        :label="$t(`m.user['人员名单：']`)"
-                        :required="true">
-                        <member-select v-model="formData.staffInputValue"></member-select>
-                    </bk-form-item>
-                    <bk-form-item :label="$t(`m.user['负责人：']`)">
-                        <member-select v-model="formData.ownersInputValue"></member-select>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </bk-dialog>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m["用户组"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <empty-tip
+        v-if="!isDataLoading && tableList.length === 0 && searchToggle"
+        :title="emptyTip.title"
+        :sub-title="emptyTip.subTitle"
+        :desc="emptyTip.desc"
+        :links="emptyTip.links">
+        <template slot="btns">
+          <bk-button theme="primary"
+            data-test-id="userGroup_button_create_permission"
+            v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
+            :class="{
+              'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
+            }"
+            @click="showEditor({
+              name: '',
+              staffInputValue: [],
+              ownersInputValue: []
+            }, 'new')">
+            {{ $t(`m['立即创建']`) }}
+          </bk-button>
+        </template>
+      </empty-tip>
+      <template v-else>
+        <div class="bk-only-btn">
+          <bk-button theme="primary"
+            data-test-id="userGroup_button_create"
+            v-cursor="{ active: !hasPermission(['user_group_create'], $store.state.project.projectAuthActions) }"
+            icon="plus"
+            :title="$t(`m.deployPage['新增']`)"
+            :class="['mr10', 'plus-cus', {
+              'btn-permission-disable': !hasPermission(['user_group_create'], $store.state.project.projectAuthActions)
+            }]"
+            @click="showEditor({
+              name: '',
+              staffInputValue: [],
+              ownersInputValue: []
+            }, 'new')">
+            {{ $t(`m.deployPage['新增']`) }}
+          </bk-button>
+          <div class="bk-only-search">
+            <bk-input
+              data-test-id="userGroup_input_search"
+              :placeholder="$t(`m.systemConfig['请输入角色名称']`)"
+              :clearable="true"
+              :right-icon="'bk-icon icon-search'"
+              v-model="searchName"
+              @enter="getList(1)"
+              @clear="getList(1)">
+            </bk-input>
+          </div>
+        </div>
+        <bk-table
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="tableList"
+          :size="'small'">
+          <!--<bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>-->
+          <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+            <template slot-scope="props">
+              <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+            </template>
+          </bk-table-column>
+
+          <bk-table-column :label="$t(`m.user['角色名']`)" width="200">
+            <template slot-scope="props">
+              <span :title="props.row.name">{{ props.row.name || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.user['人员']`)">
+            <template slot-scope="props">
+              <span :title="props.row.members">{{props.row.members}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['创建人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['负责人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.user['操作']`)" width="150">
+            <template slot-scope="props">
+              <bk-button
+                data-test-id="userGroup_button_edit"
+                v-cursor="{ active: !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
+                theme="primary"
+                text
+                :class="[{
+                  'btn-permission-disable': !hasPermission(['user_group_edit'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
+                }]"
+                @click="showEditor(props.row, 'edit')">
+                {{ $t('m.user["编辑"]') }}
+              </bk-button>
+              <bk-button
+                v-if="!props.row.is_builtin"
+                data-test-id="userGroup_button_delete"
+                v-cursor="{ active: !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions]) }"
+                theme="primary"
+                text
+                :class="[{
+                  'btn-permission-disable': !hasPermission(['user_group_delete'], [...props.row.auth_actions, ...$store.state.project.projectAuthActions])
+                }]"
+                @click="deleteUser(props.row)">
+                {{ $t('m.user["删除"]') }}
+              </bk-button>
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </template>
+    </div>
+    <!-- 编辑列表 -->
+    <bk-dialog
+      data-test-id="userGroup_dialog_editAndCreate"
+      v-model="openDialog.isShow"
+      :render-directive="'if'"
+      :width="openDialog.width"
+      :header-position="openDialog.headerPosition"
+      :loading="secondClick"
+      :auto-close="openDialog.autoClose"
+      :mask-close="openDialog.autoClose"
+      @confirm="submitUser">
+      <p slot="header">{{ itemContent.id ? $t('m.user["修改通用角色"]') : $t('m.user["新增通用角色"]') }}</p>
+      <div class="bk-add-project bk-add-module">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :rules="rules"
+          :model="formData"
+          ref="dynamicForm">
+          <bk-form-item
+            data-test-id="role-input-roleName"
+            :label="$t(`m.user['角色名称：']`)"
+            :required="true"
+            :property="'name'">
+            <bk-input v-model.trim="formData.name" maxlength="120"></bk-input>
+          </bk-form-item>
+          <bk-form-item
+            data-test-id="role-input-staffList"
+            :label="$t(`m.user['人员名单：']`)"
+            :required="true">
+            <member-select v-model="formData.staffInputValue"></member-select>
+          </bk-form-item>
+          <bk-form-item :label="$t(`m.user['负责人：']`)">
+            <member-select v-model="formData.ownersInputValue"></member-select>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import memberSelect from '../commonComponent/memberSelect';

@@ -21,17 +21,17 @@
   -->
 
 <template>
-    <div class="tip-box">
-        <div class="tip-content">
-            <i class="bk-itsm-icon icon-success-fill"></i>
-            <span>{{ $t(`m['提单成功']`) }}</span>
-            <p>{{ $t(`m['当前流程已跳转至下一节点']`) }}，{{ time }}s{{ $t(`m['后将自动跳转至流程详情查看']`) }}</p>
-            <div class="tip-operation">
-                <bk-button class="back-list-btn" :theme="'default'" type="submit" @click="onBackClick">{{ $t(`m['返回单据列表']`) }}</bk-button>
-                <bk-button class="view-detail-btn" :theme="'primary'" @click="jumpPage">{{ $t(`m['查看流程详情']`) }}</bk-button>
-            </div>
-        </div>
+  <div class="tip-box">
+    <div class="tip-content">
+      <i class="bk-itsm-icon icon-success-fill"></i>
+      <span>{{ $t(`m['提单成功']`) }}</span>
+      <p>{{ $t(`m['当前流程已跳转至下一节点']`) }}，{{ time }}s{{ $t(`m['后将自动跳转至流程详情查看']`) }}</p>
+      <div class="tip-operation">
+        <bk-button class="back-list-btn" :theme="'default'" type="submit" @click="onBackClick">{{ $t(`m['返回单据列表']`) }}</bk-button>
+        <bk-button class="view-detail-btn" :theme="'primary'" @click="jumpPage">{{ $t(`m['查看流程详情']`) }}</bk-button>
+      </div>
     </div>
+  </div>
 </template>
 <script>
     export default {

@@ -21,79 +21,79 @@
   -->
 
 <template>
-    <div class="member-content">
-        <bk-select :class="{ 'member-select': true, 'half-member-select': recipientItem.key }"
-            v-model="recipientItem.key"
-            searchable
-            @selected="getSecondLevelList">
-            <bk-option v-for="option in recipientKeyList"
-                :key="option.typeName"
-                :id="option.typeName"
-                :name="option.name">
-            </bk-option>
+  <div class="member-content">
+    <bk-select :class="{ 'member-select': true, 'half-member-select': recipientItem.key }"
+      v-model="recipientItem.key"
+      searchable
+      @selected="getSecondLevelList">
+      <bk-option v-for="option in recipientKeyList"
+        :key="option.typeName"
+        :id="option.typeName"
+        :name="option.name">
+      </bk-option>
+    </bk-select>
+    <!-- 二级处理人 -->
+    <template v-if="recipientItem.key !== 'ORGANIZATION'">
+      <template v-if="recipientItem.key === 'VARIABLE'">
+        <bk-select v-model="recipientItem.value"
+          style="float: left; width: 50%; margin-right: 6px;"
+          searchable>
+          <bk-option v-for="option in variableList"
+            :key="option.key"
+            :id="option.key"
+            :name="option.name">
+          </bk-option>
         </bk-select>
-        <!-- 二级处理人 -->
-        <template v-if="recipientItem.key !== 'ORGANIZATION'">
-            <template v-if="recipientItem.key === 'VARIABLE'">
-                <bk-select v-model="recipientItem.value"
-                    style="float: left; width: 50%; margin-right: 6px;"
-                    searchable>
-                    <bk-option v-for="option in variableList"
-                        :key="option.key"
-                        :id="option.key"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </template>
-            <template v-else-if="recipientItem.key === 'PERSON' && Array.isArray(recipientItem.value)">
-                <member-select style="float: left; width: 50%; margin-right: 6px;"
-                    v-model="recipientItem.value">
-                </member-select>
-            </template>
-            <template v-else-if="(recipientItem.key === 'GENERAL' || recipientItem.key === 'CMDB') && Array.isArray(recipientItem.value)">
-                <bk-select style="float: left; width: 50%; margin-right: 6px;"
-                    v-model="recipientItem.value"
-                    :loading="recipientItem.isLoading"
-                    show-select-all
-                    multiple
-                    searchable>
-                    <bk-option v-for="option in recipientItem.secondLevelList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </template>
-        </template>
-        <!-- 组织架构 -->
-        <template v-if="recipientItem.key === 'ORGANIZATION'">
-            <div class="bk-search-tree"
-                style="float: left; width: 50%; margin-right: 6px;"
-                v-bk-clickoutside="closeTree">
-                <div class="bk-search-tree-wrapper" @click.stop="showTree('view')">
-                    <span :class="{ 'bk-color-tree': roles.viewtree.name }">
-                        {{roles.viewtree.showName || $t(`m.serviceConfig["请选择"]`)}}
-                    </span>
-                    <i class="bk-select-angle bk-icon icon-framework"></i>
-                </div>
-                <transition name="common-fade">
-                    <div class="bk-search-tree-content" v-if="roles.viewTreeOpen">
-                        <export-tree
-                            :tree-data-list="roles.viewTreeDataList"
-                            @toggle="toggleInfo"
-                            @toggleChildren="toggleChildren(...arguments,'view')">
-                        </export-tree>
-                    </div>
-                </transition>
-            </div>
-        </template>
-        <div class="bk-between-operat" v-if="itemInfo.type === 'MULTI_MEMBERS'">
-            <i class="bk-itsm-icon icon-flow-add" @click="addRecipient"></i>
-            <i class="bk-itsm-icon icon-flow-reduce"
-                :class="{ 'bk-no-delete': itemInfo.value.length === 1 }"
-                @click="deleteRecipient"></i>
+      </template>
+      <template v-else-if="recipientItem.key === 'PERSON' && Array.isArray(recipientItem.value)">
+        <member-select style="float: left; width: 50%; margin-right: 6px;"
+          v-model="recipientItem.value">
+        </member-select>
+      </template>
+      <template v-else-if="(recipientItem.key === 'GENERAL' || recipientItem.key === 'CMDB') && Array.isArray(recipientItem.value)">
+        <bk-select style="float: left; width: 50%; margin-right: 6px;"
+          v-model="recipientItem.value"
+          :loading="recipientItem.isLoading"
+          show-select-all
+          multiple
+          searchable>
+          <bk-option v-for="option in recipientItem.secondLevelList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </template>
+    </template>
+    <!-- 组织架构 -->
+    <template v-if="recipientItem.key === 'ORGANIZATION'">
+      <div class="bk-search-tree"
+        style="float: left; width: 50%; margin-right: 6px;"
+        v-bk-clickoutside="closeTree">
+        <div class="bk-search-tree-wrapper" @click.stop="showTree('view')">
+          <span :class="{ 'bk-color-tree': roles.viewtree.name }">
+            {{roles.viewtree.showName || $t(`m.serviceConfig["请选择"]`)}}
+          </span>
+          <i class="bk-select-angle bk-icon icon-framework"></i>
         </div>
+        <transition name="common-fade">
+          <div class="bk-search-tree-content" v-if="roles.viewTreeOpen">
+            <export-tree
+              :tree-data-list="roles.viewTreeDataList"
+              @toggle="toggleInfo"
+              @toggleChildren="toggleChildren(...arguments,'view')">
+            </export-tree>
+          </div>
+        </transition>
+      </div>
+    </template>
+    <div class="bk-between-operat" v-if="itemInfo.type === 'MULTI_MEMBERS'">
+      <i class="bk-itsm-icon icon-flow-add" @click="addRecipient"></i>
+      <i class="bk-itsm-icon icon-flow-reduce"
+        :class="{ 'bk-no-delete': itemInfo.value.length === 1 }"
+        @click="deleteRecipient"></i>
     </div>
+  </div>
 </template>
 <script>
     import memberSelect from '../../../commonComponent/memberSelect';

@@ -21,29 +21,29 @@
   -->
 
 <template>
-    <div style="width: 100%">
-        <full-screen
-            :is-full="isFull"
-            :title="fullTitle"
-            @onClose="closeFullSreen">
-            <viewer v-if="isPreview" :initial-value="value" :height="height + 'px'">
-            </viewer>
-            <editor
-                v-else
-                ref="toastuiEditor"
-                :height="height + 'px'"
-                initial-edit-type="wysiwyg"
-                preview-style="vertical"
-                :initial-value="value"
-                :options="editorOptions"
-                @load="onEditorLoad"
-                @blur="onEditorBlur" />
-            <i
-                v-if="!isFull"
-                class="bk-itsm-icon icon-order-open"
-                @click.stop="openFullScreen"></i>
-        </full-screen>
-    </div>
+  <div style="width: 100%">
+    <full-screen
+      :is-full="isFull"
+      :title="fullTitle"
+      @onClose="closeFullSreen">
+      <viewer v-if="isPreview" :initial-value="value" :height="height + 'px'">
+      </viewer>
+      <editor
+        v-else
+        ref="toastuiEditor"
+        :height="height + 'px'"
+        initial-edit-type="wysiwyg"
+        preview-style="vertical"
+        :initial-value="value"
+        :options="editorOptions"
+        @load="onEditorLoad"
+        @blur="onEditorBlur" />
+      <i
+        v-if="!isFull"
+        class="bk-itsm-icon icon-order-open"
+        @click.stop="openFullScreen"></i>
+    </full-screen>
+  </div>
 </template>
 
 <script>

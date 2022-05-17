@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="fields-page">
-        <public-field :project-id="$store.state.project.id"></public-field>
-    </div>
+  <div class="fields-page">
+    <public-field :project-id="$store.state.project.id"></public-field>
+  </div>
 </template>
 <script>
     import PublicField from '../../views/processManagement/publicField';

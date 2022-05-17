@@ -21,146 +21,146 @@
   -->
 
 <template>
-    <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
-        <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
-            <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'" form-type="vertical">
-                <bk-form-item data-test-id="sopsNode-select-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
-                    <bk-input
-                        :ext-cls="'bk-form-width'"
-                        v-model="basicsFormData.name"
-                        maxlength="120">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-processType" :label="$t(`m['流程类型：']`)" :required="true" :property="'processType'">
-                    <bk-select
-                        :ext-cls="'bk-form-width bk-form-display'"
-                        v-model="basicsFormData.processType"
-                        :placeholder="$t(`m['请选择流程类型']`)"
-                        searchable
-                        @selected="getTemplateList">
-                        <bk-option
-                            v-for="process in processOptions"
-                            :key="process.id"
-                            :id="process.id"
-                            :name="process.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-business" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
-                    <bk-select
-                        :ext-cls="'bk-form-width bk-form-display'"
-                        v-model="basicsFormData.projectId"
-                        :placeholder="$t(`m['请选择关联业务']`)"
-                        searchable
-                        :disabled="processDisable"
-                        @clear="onClearProcess"
-                        @selected="getProjectTemplateList">
-                        <bk-option
-                            v-for="project in projectList"
-                            :key="project.bk_biz_id"
-                            :id="project.bk_biz_id"
-                            :name="project.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item data-test-id="sopsNode-select-processTemplate" :label="$t(`m['流程模板：']`)" :required="true" :property="'templateId'">
-                    <bk-select
-                        :ext-cls="'bk-form-width bk-form-display'"
-                        v-model="basicsFormData.templateId"
-                        :placeholder="$t(`m['请选择流程模板']`)"
-                        searchable
-                        :disabled="templateDisable"
-                        :loading="processesLoading"
-                        @clear="onClearTemplate"
-                        @selected="getTemplateDetail">
-                        <bk-option
-                            v-for="template in templateList"
-                            :key="template.id"
-                            :id="template.id"
-                            :name="template.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m['执行方案：']`)">
-                    <bk-select
-                        :ext-cls="'bk-form-width bk-form-display'"
-                        :disabled="planDisable"
-                        :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
-                        v-model="basicsFormData.planId"
-                        multiple
-                        :clearable="true"
-                        :loading="planLoading"
-                        @selected="onplanSelect">
-                        <bk-option
-                            v-for="options in planList"
-                            :key="options.id"
-                            :id="options.id"
-                            :name="options.name">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item
-                    data-test-id="sopsnode-component-processor"
-                    :label="$t(`m.treeinfo['处理人：']`)"
-                    :required="true">
-                    <div @click="checkStatus.processors = false">
-                        <deal-person
-                            ref="processors"
-                            :value="processorsInfo"
-                            :node-info="configur"
-                            :exclude-role-type-list="excludeProcessor">
-                        </deal-person>
-                    </div>
-                </bk-form-item>
-            </bk-form>
-        </basic-card>
-        <basic-card>
-            <div class="sops-params-title">
-                <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
-                <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
-            </div>
-            <div class="bk-param" v-bkloading="{ isLoading: sopsFormLoading }">
-                <sops-get-param
-                    v-if="constants.length !== 0"
-                    ref="getParam"
-                    :configur="configur"
-                    :param-table-data="paramTableData"
-                    :state-list="stateList"
-                    :fields="fieldList"
-                    :context="context"
-                    :constants="constants"
-                    :hooked-var-list="hookedVarList"
-                    :constant-default-value="constantDefaultValue"
-                    :quote-vars="quoteVars"
-                    :flow-info="flowInfo"
-                    @onChangeHook="onChangeHook">
-                </sops-get-param>
-                <no-data v-else></no-data>
-                <common-trigger-list :origin="'state'"
-                    :node-type="configur.type"
-                    :source-id="flowInfo.id"
-                    :sender="configur.id"
-                    :table="flowInfo.table">
-                </common-trigger-list>
-                <div class="mt20" style="font-size: 0">
-                    <bk-button :theme="'primary'"
-                        data-test-id="sopsNode-button-submit"
-                        :title="$t(`m.treeinfo['确定']`)"
-                        class="mr10"
-                        @click="submit">
-                        {{$t(`m.treeinfo['确定']`)}}
-                    </bk-button>
-                    <bk-button :theme="'default'"
-                        data-test-id="sopsNode-button-close"
-                        :title="$t(`m.treeinfo['取消']`)"
-                        class="mr10"
-                        @click="closeNode">
-                        {{$t(`m.treeinfo['取消']`)}}
-                    </bk-button>
-                </div>
-            </div>
-        </basic-card>
-    </div>
+  <div class="bk-basic-node" v-bkloading="{ isLoading: isLoading }">
+    <basic-card :card-label="$t(`m.treeinfo['基本信息']`)">
+      <bk-form data-test-id="service-form-sopsNode" :label-width="150" :model="basicsFormData" ref="basicsForm" :rules="rules" :ext-cls="'bk-form'" form-type="vertical">
+        <bk-form-item data-test-id="sopsNode-select-nodeName" :label="$t(`m.treeinfo['节点名称：']`)" :required="true" :property="'name'">
+          <bk-input
+            :ext-cls="'bk-form-width'"
+            v-model="basicsFormData.name"
+            maxlength="120">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item data-test-id="sopsNode-select-processType" :label="$t(`m['流程类型：']`)" :required="true" :property="'processType'">
+          <bk-select
+            :ext-cls="'bk-form-width bk-form-display'"
+            v-model="basicsFormData.processType"
+            :placeholder="$t(`m['请选择流程类型']`)"
+            searchable
+            @selected="getTemplateList">
+            <bk-option
+              v-for="process in processOptions"
+              :key="process.id"
+              :id="process.id"
+              :name="process.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item data-test-id="sopsNode-select-business" :label="$t(`m['关联业务：']`)" :required="true" :property="'projectId'">
+          <bk-select
+            :ext-cls="'bk-form-width bk-form-display'"
+            v-model="basicsFormData.projectId"
+            :placeholder="$t(`m['请选择关联业务']`)"
+            searchable
+            :disabled="processDisable"
+            @clear="onClearProcess"
+            @selected="getProjectTemplateList">
+            <bk-option
+              v-for="project in projectList"
+              :key="project.bk_biz_id"
+              :id="project.bk_biz_id"
+              :name="project.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item data-test-id="sopsNode-select-processTemplate" :label="$t(`m['流程模板：']`)" :required="true" :property="'templateId'">
+          <bk-select
+            :ext-cls="'bk-form-width bk-form-display'"
+            v-model="basicsFormData.templateId"
+            :placeholder="$t(`m['请选择流程模板']`)"
+            searchable
+            :disabled="templateDisable"
+            :loading="processesLoading"
+            @clear="onClearTemplate"
+            @selected="getTemplateDetail">
+            <bk-option
+              v-for="template in templateList"
+              :key="template.id"
+              :id="template.id"
+              :name="template.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m['执行方案：']`)">
+          <bk-select
+            :ext-cls="'bk-form-width bk-form-display'"
+            :disabled="planDisable"
+            :placeholder="$t(`m['选择执行方案，默认选择全部任务节点']`)"
+            v-model="basicsFormData.planId"
+            multiple
+            :clearable="true"
+            :loading="planLoading"
+            @selected="onplanSelect">
+            <bk-option
+              v-for="options in planList"
+              :key="options.id"
+              :id="options.id"
+              :name="options.name">
+            </bk-option>
+          </bk-select>
+        </bk-form-item>
+        <bk-form-item
+          data-test-id="sopsnode-component-processor"
+          :label="$t(`m.treeinfo['处理人：']`)"
+          :required="true">
+          <div @click="checkStatus.processors = false">
+            <deal-person
+              ref="processors"
+              :value="processorsInfo"
+              :node-info="configur"
+              :exclude-role-type-list="excludeProcessor">
+            </deal-person>
+          </div>
+        </bk-form-item>
+      </bk-form>
+    </basic-card>
+    <basic-card>
+      <div class="sops-params-title">
+        <p>{{ $t(`m.treeinfo['输入参数']`) }}:</p>
+        <p>{{ $t(`m.treeinfo['调用该API需要传递的参数信息']`) }}</p>
+      </div>
+      <div class="bk-param" v-bkloading="{ isLoading: sopsFormLoading }">
+        <sops-get-param
+          v-if="constants.length !== 0"
+          ref="getParam"
+          :configur="configur"
+          :param-table-data="paramTableData"
+          :state-list="stateList"
+          :fields="fieldList"
+          :context="context"
+          :constants="constants"
+          :hooked-var-list="hookedVarList"
+          :constant-default-value="constantDefaultValue"
+          :quote-vars="quoteVars"
+          :flow-info="flowInfo"
+          @onChangeHook="onChangeHook">
+        </sops-get-param>
+        <no-data v-else></no-data>
+        <common-trigger-list :origin="'state'"
+          :node-type="configur.type"
+          :source-id="flowInfo.id"
+          :sender="configur.id"
+          :table="flowInfo.table">
+        </common-trigger-list>
+        <div class="mt20" style="font-size: 0">
+          <bk-button :theme="'primary'"
+            data-test-id="sopsNode-button-submit"
+            :title="$t(`m.treeinfo['确定']`)"
+            class="mr10"
+            @click="submit">
+            {{$t(`m.treeinfo['确定']`)}}
+          </bk-button>
+          <bk-button :theme="'default'"
+            data-test-id="sopsNode-button-close"
+            :title="$t(`m.treeinfo['取消']`)"
+            class="mr10"
+            @click="closeNode">
+            {{$t(`m.treeinfo['取消']`)}}
+          </bk-button>
+        </div>
+      </div>
+    </basic-card>
+  </div>
 </template>
 <script>
     import dealPerson from './components/dealPerson.vue';

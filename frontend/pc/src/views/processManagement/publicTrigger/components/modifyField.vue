@@ -21,63 +21,63 @@
   -->
 
 <template>
-    <div class="modify-fields">
-        <bk-form-item :ext-cls="'bk-field-schema'"
-            :label="fieldKeyItem.name"
-            :required="fieldKeyItem.required"
-            :desc="fieldKeyItem.tips">
-            <bk-select style="width: 270px;"
-                ext-cls="bk-insert-info"
-                v-model="fieldKeyItem.value"
-                searchable
-                @selected="selectedFieldKey">
-                <bk-option v-for="option in fieldKeyItem.choice"
-                    :key="option.key"
-                    :id="option.key"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </bk-form-item>
-        <template v-if="fieldKeyItem.value">
-            <bk-form-item :ext-cls="'bk-field-schema'"
-                :label="fieldValueItem.name"
-                :required="fieldValueItem.required"
-                :desc="fieldValueItem.tips">
-                <!-- 设置自定义和引用变量数据 -->
-                <div style="float: left; width: 268px;">
-                    <bk-select v-model="fieldValueItem.referenceType"
-                        :clearable="false"
-                        searchable
-                        @selected="selectedReference">
-                        <bk-option v-for="option in sourceTypeList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </div>
-                <div
-                    style="float: left; width: 268px; margin-left: 10px"
-                    v-if="fieldValueItem.referenceType === 'custom'">
-                    <field-info :fields="fieldValueItem.itemInfo" :origin="'trigger'" v-if="show"></field-info>
-                </div>
-                <div
-                    style="float: left; width: 268px; margin-left: 10px"
-                    v-if="fieldValueItem.referenceType === 'reference'">
-                    <bk-select style="width: 270px;"
-                        v-model="fieldValueItem.itemInfo[0].value"
-                        ext-cls="bk-insert-info"
-                        searchable>
-                        <bk-option v-for="option in variableList"
-                            :key="option.key"
-                            :id="option.key"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
-                </div>
-            </bk-form-item>
-        </template>
-    </div>
+  <div class="modify-fields">
+    <bk-form-item :ext-cls="'bk-field-schema'"
+      :label="fieldKeyItem.name"
+      :required="fieldKeyItem.required"
+      :desc="fieldKeyItem.tips">
+      <bk-select style="width: 270px;"
+        ext-cls="bk-insert-info"
+        v-model="fieldKeyItem.value"
+        searchable
+        @selected="selectedFieldKey">
+        <bk-option v-for="option in fieldKeyItem.choice"
+          :key="option.key"
+          :id="option.key"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+    </bk-form-item>
+    <template v-if="fieldKeyItem.value">
+      <bk-form-item :ext-cls="'bk-field-schema'"
+        :label="fieldValueItem.name"
+        :required="fieldValueItem.required"
+        :desc="fieldValueItem.tips">
+        <!-- 设置自定义和引用变量数据 -->
+        <div style="float: left; width: 268px;">
+          <bk-select v-model="fieldValueItem.referenceType"
+            :clearable="false"
+            searchable
+            @selected="selectedReference">
+            <bk-option v-for="option in sourceTypeList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </div>
+        <div
+          style="float: left; width: 268px; margin-left: 10px"
+          v-if="fieldValueItem.referenceType === 'custom'">
+          <field-info :fields="fieldValueItem.itemInfo" :origin="'trigger'" v-if="show"></field-info>
+        </div>
+        <div
+          style="float: left; width: 268px; margin-left: 10px"
+          v-if="fieldValueItem.referenceType === 'reference'">
+          <bk-select style="width: 270px;"
+            v-model="fieldValueItem.itemInfo[0].value"
+            ext-cls="bk-insert-info"
+            searchable>
+            <bk-option v-for="option in variableList"
+              :key="option.key"
+              :id="option.key"
+              :name="option.name">
+            </bk-option>
+          </bk-select>
+        </div>
+      </bk-form-item>
+    </template>
+  </div>
 </template>
 <script>
     import fieldInfo from '../../../managePage/billCom/fieldInfo';

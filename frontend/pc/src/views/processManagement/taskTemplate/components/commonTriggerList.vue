@@ -21,137 +21,137 @@
   -->
 
 <template>
-    <div class="mt20 mb20">
-        <div
-            v-if="openFunction.TRIGGER_SWITCH && origin !== 'workflow' && origin !== 'transition'"
-            class="more-configuration" data-test-id="trigger-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
-            <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
-            <i v-else class="bk-icon icon-up-shape"></i>
-            <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
-        </div>
-        <div v-if="showMoreConfig"
-            class="common-section-card-block mt20"
-            :class="[{ 'inner-mode': origin === 'workflow' || origin === 'transition' }]">
-            <label class="common-section-card-label">
-                {{$t(`m.newCommon['触发器']`)}}
-            </label>
-            <div class="common-section-card-body">
-                <template v-if="showMoreConfig">
-                    <collapse-transition>
-                        <div>
-                            <!-- 触发器列表 -->
-                            <div>
-                                <ul class="bk-trigger-content">
-                                    <li v-for="(item, index) in boundTriggerList" :key="index" @click.stop="openNew('add', item)" :class="{ 'li-transition': origin === 'transition' }">
-                                        <span class="bk-trigger-icon">
-                                            <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
-                                        </span>
-                                        <span class="bk-trigger-name" :title="item.name">{{ item.name || '--' }}
-                                            <span v-if="item.is_draft" style="color: #3A84FF;">{{ $t('m.taskTemplate["(草稿)"]') }}</span>
-                                        </span>
-                                        <span class="bk-trigger-delete">
-                                            <i class="bk-icon icon-delete" @click.stop="delTrigger(item)"></i>
-                                        </span>
-                                    </li>
-                                    <bk-dropdown-menu trigger="click" style="float: left;">
-                                        <div class="bk-trigger-add" slot="dropdown-trigger" :title="$t(`m.taskTemplate['添加触发器']`)">
-                                            <i class="bk-icon icon-plus"></i>
-                                        </div>
-                                        <ul class="bk-dropdown-list" slot="dropdown-content">
-                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-addTrigger" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
-                                            <li><a href="javascript:;" data-test-id="taskTemplate-li-quoteCommonTrigger" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
-                                        </ul>
-                                    </bk-dropdown-menu>
-                                </ul>
-                            </div>
-                        </div>
-                    </collapse-transition>
-                </template>
-            </div>
-            <!-- 引用公共触发器 -->
-            <template>
-                <bk-dialog v-model="triggerDialogInfo.isShow"
-                    theme="primary"
-                    width="660"
-                    :mask-close="false">
-                    <div slot="header" class="trigger-dialog-header">
-                        <span>{{$t(`m.taskTemplate['引用公共触发器']`)}}</span>
-                        <div class="bk-search-key">
-                            <bk-input
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                v-model="triggerDialogInfo.searchKey"
-                                @enter="searchInfo"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                    </div>
-                    <div class="trigger-dialog-box" v-bkloading="{ isLoading: triggerDialogInfo.listLoading }">
-                        <p class="dialog-none-content" v-if="triggerDialogInfo.list.length === 0">
-                            <i class="bk-icon icon-info-circle"></i>
-                            <span>{{$t(`m.taskTemplate['暂无匹配的公共触发器，']`)}}</span>
-                            <span class="bk-primary" @click="newTrigger">{{$t(`m.taskTemplate['跳转创建']`)}}</span>
-                        </p>
-                        <!-- table -->
-                        <template v-else>
-                            <span>{{$t(`m.taskTemplate['根据您当前的引用位置，系统已筛选出适用的公共触发器。']`)}}</span>
-                            <ul class="bk-trigger-content">
-                                <li v-for="(item, index) in triggerDialogInfo.list"
-                                    :class="{ 'li-checked': item.checked }"
-                                    :key="index" @click="item.checked = !item.checked">
-                                    <span class="bk-trigger-icon">
-                                        <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
-                                    </span>
-                                    <span class="bk-trigger-name" :title="item.name">{{ item.name || '--' }}</span>
-                                    <span class="bk-trigger-delete">
-                                        <bk-checkbox :value="item.checked"></bk-checkbox>
-                                    </span>
-                                </li>
-                            </ul>
-                        </template>
-                    </div>
-                    <div slot="footer" class="trigger-dialog-footer">
-                        <bk-checkbox :value="Boolean((triggerDialogInfo.list.length === citeList.length) && triggerDialogInfo.list.length)"
-                            :ext-cls="'checkbox'"
-                            :disabled="!triggerDialogInfo.list.length"
-                            @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
-                        <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
-                        <bk-button theme="primary"
-                            data-test-id="common-trigger-confirm"
-                            class="mr10"
-                            :title="$t(`m.taskTemplate['确定']`)"
-                            @click="citeTrigger">
-                            {{$t(`m.taskTemplate['确定']`)}}
-                        </bk-button>
-                        <bk-button theme="default"
-                            class="mr10"
-                            :title="$t(`m.taskTemplate['取消']`)"
-                            @click="initDialogInfo">
-                            {{$t(`m.taskTemplate['取消']`)}}
-                        </bk-button>
-                    </div>
-                </bk-dialog>
-            </template>
-            <!-- 新增触发器 -->
-            <template>
-                <bk-sideslider
-                    :is-show.sync="triggerSliderInfo.isShow"
-                    :title="triggerSliderInfo.title"
-                    :width="triggerSliderInfo.width">
-                    <div slot="content" v-bkloading="{ isLoading: triggerSliderInfo.addLoading }" style="min-height: 300px;">
-                        <add-trigger
-                            v-if="triggerSliderInfo.isShow"
-                            :node-type="nodeType"
-                            :trigger-info="triggerSliderInfo.item"
-                            :origin-info-to-trigger="originInfoToTrigger"
-                            @closeTrigger="triggerSliderInfo.isShow = false"
-                            @getList="getBoundTriggerList">
-                        </add-trigger>
-                    </div>
-                </bk-sideslider>
-            </template>
-        </div>
+  <div class="mt20 mb20">
+    <div
+      v-if="openFunction.TRIGGER_SWITCH && origin !== 'workflow' && origin !== 'transition'"
+      class="more-configuration" data-test-id="trigger-div-showMoreConfig" @click="showMoreConfig = !showMoreConfig">
+      <i v-if="!showMoreConfig" class="bk-icon icon-down-shape"></i>
+      <i v-else class="bk-icon icon-up-shape"></i>
+      <span>{{$t(`m.taskTemplate['高级配置']`)}}</span>
     </div>
+    <div v-if="showMoreConfig"
+      class="common-section-card-block mt20"
+      :class="[{ 'inner-mode': origin === 'workflow' || origin === 'transition' }]">
+      <label class="common-section-card-label">
+        {{$t(`m.newCommon['触发器']`)}}
+      </label>
+      <div class="common-section-card-body">
+        <template v-if="showMoreConfig">
+          <collapse-transition>
+            <div>
+              <!-- 触发器列表 -->
+              <div>
+                <ul class="bk-trigger-content">
+                  <li v-for="(item, index) in boundTriggerList" :key="index" @click.stop="openNew('add', item)" :class="{ 'li-transition': origin === 'transition' }">
+                    <span class="bk-trigger-icon">
+                      <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
+                    </span>
+                    <span class="bk-trigger-name" :title="item.name">{{ item.name || '--' }}
+                      <span v-if="item.is_draft" style="color: #3A84FF;">{{ $t('m.taskTemplate["(草稿)"]') }}</span>
+                    </span>
+                    <span class="bk-trigger-delete">
+                      <i class="bk-icon icon-delete" @click.stop="delTrigger(item)"></i>
+                    </span>
+                  </li>
+                  <bk-dropdown-menu trigger="click" style="float: left;">
+                    <div class="bk-trigger-add" slot="dropdown-trigger" :title="$t(`m.taskTemplate['添加触发器']`)">
+                      <i class="bk-icon icon-plus"></i>
+                    </div>
+                    <ul class="bk-dropdown-list" slot="dropdown-content">
+                      <li><a href="javascript:;" data-test-id="taskTemplate-li-addTrigger" @click="openNew('add')">{{$t(`m.taskTemplate['新建']`)}}</a></li>
+                      <li><a href="javascript:;" data-test-id="taskTemplate-li-quoteCommonTrigger" @click="openNew('cite')">{{$t(`m.taskTemplate['引用公共触发器']`)}}</a></li>
+                    </ul>
+                  </bk-dropdown-menu>
+                </ul>
+              </div>
+            </div>
+          </collapse-transition>
+        </template>
+      </div>
+      <!-- 引用公共触发器 -->
+      <template>
+        <bk-dialog v-model="triggerDialogInfo.isShow"
+          theme="primary"
+          width="660"
+          :mask-close="false">
+          <div slot="header" class="trigger-dialog-header">
+            <span>{{$t(`m.taskTemplate['引用公共触发器']`)}}</span>
+            <div class="bk-search-key">
+              <bk-input
+                :clearable="true"
+                :right-icon="'bk-icon icon-search'"
+                v-model="triggerDialogInfo.searchKey"
+                @enter="searchInfo"
+                @clear="clearSearch">
+              </bk-input>
+            </div>
+          </div>
+          <div class="trigger-dialog-box" v-bkloading="{ isLoading: triggerDialogInfo.listLoading }">
+            <p class="dialog-none-content" v-if="triggerDialogInfo.list.length === 0">
+              <i class="bk-icon icon-info-circle"></i>
+              <span>{{$t(`m.taskTemplate['暂无匹配的公共触发器，']`)}}</span>
+              <span class="bk-primary" @click="newTrigger">{{$t(`m.taskTemplate['跳转创建']`)}}</span>
+            </p>
+            <!-- table -->
+            <template v-else>
+              <span>{{$t(`m.taskTemplate['根据您当前的引用位置，系统已筛选出适用的公共触发器。']`)}}</span>
+              <ul class="bk-trigger-content">
+                <li v-for="(item, index) in triggerDialogInfo.list"
+                  :class="{ 'li-checked': item.checked }"
+                  :key="index" @click="item.checked = !item.checked">
+                  <span class="bk-trigger-icon">
+                    <i class="bk-itsm-icon icon-info-circle" :class="[item.iconKey]" style="font-size: 24px"></i>
+                  </span>
+                  <span class="bk-trigger-name" :title="item.name">{{ item.name || '--' }}</span>
+                  <span class="bk-trigger-delete">
+                    <bk-checkbox :value="item.checked"></bk-checkbox>
+                  </span>
+                </li>
+              </ul>
+            </template>
+          </div>
+          <div slot="footer" class="trigger-dialog-footer">
+            <bk-checkbox :value="Boolean((triggerDialogInfo.list.length === citeList.length) && triggerDialogInfo.list.length)"
+              :ext-cls="'checkbox'"
+              :disabled="!triggerDialogInfo.list.length"
+              @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
+            <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
+            <bk-button theme="primary"
+              data-test-id="common-trigger-confirm"
+              class="mr10"
+              :title="$t(`m.taskTemplate['确定']`)"
+              @click="citeTrigger">
+              {{$t(`m.taskTemplate['确定']`)}}
+            </bk-button>
+            <bk-button theme="default"
+              class="mr10"
+              :title="$t(`m.taskTemplate['取消']`)"
+              @click="initDialogInfo">
+              {{$t(`m.taskTemplate['取消']`)}}
+            </bk-button>
+          </div>
+        </bk-dialog>
+      </template>
+      <!-- 新增触发器 -->
+      <template>
+        <bk-sideslider
+          :is-show.sync="triggerSliderInfo.isShow"
+          :title="triggerSliderInfo.title"
+          :width="triggerSliderInfo.width">
+          <div slot="content" v-bkloading="{ isLoading: triggerSliderInfo.addLoading }" style="min-height: 300px;">
+            <add-trigger
+              v-if="triggerSliderInfo.isShow"
+              :node-type="nodeType"
+              :trigger-info="triggerSliderInfo.item"
+              :origin-info-to-trigger="originInfoToTrigger"
+              @closeTrigger="triggerSliderInfo.isShow = false"
+              @getList="getBoundTriggerList">
+            </add-trigger>
+          </div>
+        </bk-sideslider>
+      </template>
+    </div>
+  </div>
 </template>
 <script>
     import addTrigger from '../../publicTrigger/addTrigger.vue';

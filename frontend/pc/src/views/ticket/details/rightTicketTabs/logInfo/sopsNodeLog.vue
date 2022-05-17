@@ -21,18 +21,18 @@
   -->
 
 <template>
-    <div class="bk-page bk-auto-node-basic">
-        <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
-        <div>
-            <div class="bk-param">
-                <get-param
-                    ref="getParam"
-                    :is-static="true"
-                    :is-static-data="sopsInfo">
-                </get-param>
-            </div>
-        </div>
+  <div class="bk-page bk-auto-node-basic">
+    <p class="bk-header-bold">{{ $t('m.newCommon["任务参数"]') }}</p>
+    <div>
+      <div class="bk-param">
+        <get-param
+          ref="getParam"
+          :is-static="true"
+          :is-static-data="sopsInfo">
+        </get-param>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>

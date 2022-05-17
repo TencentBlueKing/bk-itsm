@@ -21,65 +21,65 @@
   -->
 
 <template>
-    <div class="service-ticket-form">
-        <div v-if="formList.length" class="form-list" style="padding: 10px 0">
-            <bk-form form-type="vertical">
-                <draggable
-                    data-test-id="service_draggable_serviceFormDrag"
-                    handle=".dragElement"
-                    :value="formList"
-                    :group="{
-                        name: 'view-form',
-                        pull: false,
-                        put: ['view-form', 'half-row-field', 'form-view-item']
-                    }"
-                    @end="onRowDragEnd"
-                    @add="onHalfRowDragToRow">
-                    <template v-for="(form, index) in formList">
-                        <!-- 半行表单 -->
-                        <half-row-form
-                            v-if="Array.isArray(form)"
-                            :key="index"
-                            :row-index="index"
-                            :workflow-id="serviceInfo.workflow_id"
-                            :node-id="nodeId"
-                            :fields="forms"
-                            :row-forms="form"
-                            :add-field-status="addFieldStatus"
-                            :crt-form="crtForm"
-                            @onHalfRowDragToHalfRow="onHalfRowDragToHalfRow"
-                            @onFormEditClick="onFormEditClick"
-                            @onFormCloneClick="onFormCloneClick"
-                            @onFormDeleteClick="$emit('fieldDelete', $event)"
-                            @onEditCancel="onEditCancel"
-                            @onEditConfirm="onEditConfirm">
-                        </half-row-form>
-                        <!-- 全行表单 -->
-                        <template v-else>
-                            <form-view-item
-                                :data-id="form.id"
-                                :key="form.id"
-                                :fields="forms"
-                                :form="form"
-                                :add-field-status="addFieldStatus"
-                                :crt-form="crtForm"
-                                @onFormEditClick="onFormEditClick"
-                                @onFormCloneClick="onFormCloneClick"
-                                @onFormDeleteClick="$emit('fieldDelete', $event)">
-                                <div class="dragElement" slot="draggable">
-                                    <i class="bk-itsm-icon icon-move-new"></i>
-                                </div>
-                            </form-view-item>
-                        </template>
-                    </template>
-                </draggable>
-            </bk-form>
-        </div>
-        <div v-else class="no-form">
-            <h3>{{ $t(`m.tickets['暂无服务表单']`) }}</h3>
-            <p>{{ $t(`m.tickets['请在左侧的“控件库”或“已有字段”点击添加']`) }}</p>
-        </div>
+  <div class="service-ticket-form">
+    <div v-if="formList.length" class="form-list" style="padding: 10px 0">
+      <bk-form form-type="vertical">
+        <draggable
+          data-test-id="service_draggable_serviceFormDrag"
+          handle=".dragElement"
+          :value="formList"
+          :group="{
+            name: 'view-form',
+            pull: false,
+            put: ['view-form', 'half-row-field', 'form-view-item']
+          }"
+          @end="onRowDragEnd"
+          @add="onHalfRowDragToRow">
+          <template v-for="(form, index) in formList">
+            <!-- 半行表单 -->
+            <half-row-form
+              v-if="Array.isArray(form)"
+              :key="index"
+              :row-index="index"
+              :workflow-id="serviceInfo.workflow_id"
+              :node-id="nodeId"
+              :fields="forms"
+              :row-forms="form"
+              :add-field-status="addFieldStatus"
+              :crt-form="crtForm"
+              @onHalfRowDragToHalfRow="onHalfRowDragToHalfRow"
+              @onFormEditClick="onFormEditClick"
+              @onFormCloneClick="onFormCloneClick"
+              @onFormDeleteClick="$emit('fieldDelete', $event)"
+              @onEditCancel="onEditCancel"
+              @onEditConfirm="onEditConfirm">
+            </half-row-form>
+            <!-- 全行表单 -->
+            <template v-else>
+              <form-view-item
+                :data-id="form.id"
+                :key="form.id"
+                :fields="forms"
+                :form="form"
+                :add-field-status="addFieldStatus"
+                :crt-form="crtForm"
+                @onFormEditClick="onFormEditClick"
+                @onFormCloneClick="onFormCloneClick"
+                @onFormDeleteClick="$emit('fieldDelete', $event)">
+                <div class="dragElement" slot="draggable">
+                  <i class="bk-itsm-icon icon-move-new"></i>
+                </div>
+              </form-view-item>
+            </template>
+          </template>
+        </draggable>
+      </bk-form>
     </div>
+    <div v-else class="no-form">
+      <h3>{{ $t(`m.tickets['暂无服务表单']`) }}</h3>
+      <p>{{ $t(`m.tickets['请在左侧的“控件库”或“已有字段”点击添加']`) }}</p>
+    </div>
+  </div>
 </template>
 
 <script>

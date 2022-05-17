@@ -21,72 +21,72 @@
   -->
 
 <template>
-    <div class="bk-order-preview">
-        <!-- 工单进度预览 -->
-        <div class="bk-basic-head bk-change">
-            <span class="bk-head-icon" v-if="false"></span>
-            <!-- <i class="bk-icon icon-order-progress"></i> -->
-            <span v-if="false">{{ $t('m.newCommon["工单进度预览"]') }}</span>
-            <span data-test-id="ticket_button_progressFullscreen" class="bk-font-icon" @click="openFull" title="全屏">
-                <i class="bk-itsm-icon icon-order-open cus-order-open"></i>
-            </span>
-        </div>
-        <!-- 流程预览图 -->
-        <div class="bk-order-flow" v-bkloading="{ isLoading: isDataLoading }">
-            <template v-if="!isDataLoading && !fullStatus">
-                <preview
-                    ref="preview"
-                    :add-list="addList"
-                    :line-list="lineList"
-                    :preview-info="previewInfo">
-                </preview>
-            </template>
-        </div>
-        <!-- 底部隔层 -->
-        <div class="bk-current-bottom"></div>
-        <!-- 查看全图 -->
-        <div class="bk-preview-full" v-if="fullStatus">
-            <div class="bk-basic-head">
-                <span class="bk-head-icon"></span>
-                <!-- <i class="bk-icon icon-order-progress"></i> -->
-                <span>{{ $t('m.newCommon["工单进度预览"]') }}</span>
-                <span class="bk-font-icon" @click="closeFull" title="小屏">
-                    <i class="bk-itsm-icon icon-order-close cus-order-open" style="margin-right: 0;"></i>
-                </span>
-            </div>
-            <div class="bk-full-div">
-                <preview
-                    ref="preview"
-                    :add-list="addList"
-                    :line-list="lineList"
-                    :preview-info="previewInfo"
-                    :full-status="fullStatus">
-                </preview>
-            </div>
-        </div>
-        <!-- 单个节点的详情信息 -->
-        <div class="bk-node-content">
-            <bk-sideslider
-                :show-mask="false"
-                :is-show.sync="nodeContent.isShow"
-                :title="nodeContent.title"
-                :width="nodeContent.width"
-                :quick-close="nodeContent.quick">
-                <div slot="content" v-if="nodeContent.isShow">
-                    <node-info
-                        @initInfo="initInfo"
-                        :node-list="nodeInfo"
-                        :read-only="nodeContent.isShow"
-                        :current-step-list="currentStepList"
-                        :basic-infomation="basicInfomation"
-                        :open-node-info="openNodeInfo"
-                        :is-loading="isNodeLoading"
-                        @closeSlider="closeNodeContent">
-                    </node-info>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-order-preview">
+    <!-- 工单进度预览 -->
+    <div class="bk-basic-head bk-change">
+      <span class="bk-head-icon" v-if="false"></span>
+      <!-- <i class="bk-icon icon-order-progress"></i> -->
+      <span v-if="false">{{ $t('m.newCommon["工单进度预览"]') }}</span>
+      <span data-test-id="ticket_button_progressFullscreen" class="bk-font-icon" @click="openFull" title="全屏">
+        <i class="bk-itsm-icon icon-order-open cus-order-open"></i>
+      </span>
     </div>
+    <!-- 流程预览图 -->
+    <div class="bk-order-flow" v-bkloading="{ isLoading: isDataLoading }">
+      <template v-if="!isDataLoading && !fullStatus">
+        <preview
+          ref="preview"
+          :add-list="addList"
+          :line-list="lineList"
+          :preview-info="previewInfo">
+        </preview>
+      </template>
+    </div>
+    <!-- 底部隔层 -->
+    <div class="bk-current-bottom"></div>
+    <!-- 查看全图 -->
+    <div class="bk-preview-full" v-if="fullStatus">
+      <div class="bk-basic-head">
+        <span class="bk-head-icon"></span>
+        <!-- <i class="bk-icon icon-order-progress"></i> -->
+        <span>{{ $t('m.newCommon["工单进度预览"]') }}</span>
+        <span class="bk-font-icon" @click="closeFull" title="小屏">
+          <i class="bk-itsm-icon icon-order-close cus-order-open" style="margin-right: 0;"></i>
+        </span>
+      </div>
+      <div class="bk-full-div">
+        <preview
+          ref="preview"
+          :add-list="addList"
+          :line-list="lineList"
+          :preview-info="previewInfo"
+          :full-status="fullStatus">
+        </preview>
+      </div>
+    </div>
+    <!-- 单个节点的详情信息 -->
+    <div class="bk-node-content">
+      <bk-sideslider
+        :show-mask="false"
+        :is-show.sync="nodeContent.isShow"
+        :title="nodeContent.title"
+        :width="nodeContent.width"
+        :quick-close="nodeContent.quick">
+        <div slot="content" v-if="nodeContent.isShow">
+          <node-info
+            @initInfo="initInfo"
+            :node-list="nodeInfo"
+            :read-only="nodeContent.isShow"
+            :current-step-list="currentStepList"
+            :basic-infomation="basicInfomation"
+            :open-node-info="openNodeInfo"
+            :is-loading="isNodeLoading"
+            @closeSlider="closeNodeContent">
+          </node-info>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 
 <script>

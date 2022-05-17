@@ -21,363 +21,363 @@
   -->
 
 <template>
-    <div class="bk-add-model">
-        <!-- title -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back" @click="backList">
-                <arrows-left-icon></arrows-left-icon>
-                {{ isEdit ? changeInfo.info.name : $t('m.slaContent["新增服务模式"]') }}
-            </p>
-        </div>
-        <!-- content -->
-        <div class="bk-add-content">
-            <div class="bk-content-group" style="width: 400px;">
-                <p class="bk-group-title">{{ $t('m.slaContent["基本信息"]') }}</p>
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="formInfo"
-                    :rules="nameRules"
-                    ref="dynamicForm">
-                    <bk-form-item
-                        data-test-id="slaModel-input-modelName"
-                        :label="$t(`m.slaContent['服务模式名称']`)"
-                        :required="true"
-                        :property="'name'">
-                        <bk-input v-model.trim="formInfo.name"
-                            maxlength="120"
-                            :placeholder="$t(`m.slaContent['请输入模式名称']`)"
-                            :disabled="changeInfo.info.is_builtin">
-                        </bk-input>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["工作时间"]') }}</p>
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="formInfo"
-                    ref="daysForm">
-                    <div class="bk-group-table"
-                        style="padding-right: 35px;"
-                        v-for="(item, index) in formInfo.days"
-                        :key="index">
-                        <div class="bk-group-select" style="width: 400px; height: 64px;">
-                            <bk-form-item
-                                :label="$t(`m.slaContent['星期']`)"
-                                :required="true"
-                                :rules="weekRules.week"
-                                :property="'days.' + index + '.week'">
-                                <bk-select v-model="item.week"
-                                    multiple
-                                    show-select-all
-                                    searchable>
-                                    <bk-option v-for="option in weekList"
-                                        :key="option.id"
-                                        :id="option.id"
-                                        :name="option.name">
-                                    </bk-option>
-                                </bk-select>
-                            </bk-form-item>
-                        </div>
-                        <ul class="bk-group-time">
-                            <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
-                                <p class="bk-width-label">
-                                    <bk-popconfirm
-                                        placement="bottom-start"
-                                        v-if="!timeItem.changStatus"
-                                        style="line-height: 25px;"
-                                        trigger="click"
-                                        :confirm-text="$t(`m.slaContent['确定']`)"
-                                        :cancel-text="$t(`m.slaContent['取消']`)"
-                                        @confirm="timeItem.name = timeItemNameTemplate">
-                                        <div slot="content">
-                                            <bk-input v-model.trim="timeItemNameTemplate"
-                                                style="width:226px"
-                                                maxlength="120"
-                                                :placeholder="$t(`m.slaContent['请输入时段名称']`)">
-                                            </bk-input>
-                                        </div>
-                                        <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
-                                    </bk-popconfirm>
-                                    <i class="bk-icon icon-delete"
-                                        v-if="item.time.length !== 1"
-                                        @click="deleteTimeName(item.time, timeIndex)"></i>
-                                </p>
-                                <div class="bk-form-content bk-sla-time">
-                                    <bk-time-picker
-                                        v-model="timeItem.value"
-                                        :type="'timerange'"
-                                        :clearable="false">
-                                    </bk-time-picker>
-                                    <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
-                                        <i v-if="item.time.length !== 3"
-                                            class="bk-itsm-icon"
-                                            v-bk-tooltips="bktooltipsInfo.addTime"
-                                            @click="addTimeFrame(index,'days')">+</i>
-                                        <i v-else class="icon-flow-add bk-icon-false"
-                                            v-bk-tooltips="bktooltipsInfo.overTime"></i>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="add-and-reduce-box">
-                            <div v-if="formInfo.days.length !== 1" class="bk-add-group" @click="deleteLine(item, index, 'days')">
-                                <i class="bk-itsm-icon icon-flow-reduce"></i>
-                            </div>
-                            <div class="bk-add-group" @click="addLine('days')">
-                                <i class="bk-itsm-icon icon-flow-add"></i>
-                            </div>
-                        </div>
-                    </div>
-                </bk-form>
-
-            </div>
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["加班时间"]') }}</p>
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="formInfo"
-                    ref="workdaysForm">
-                    <div class="bk-group-table"
-                        style="padding-right: 35px;"
-                        v-for="(item, index) in formInfo.workdays"
-                        :key="index">
-                        <div class="bk-group-select" style="width: 400px; height: 64px;">
-                            <bk-form-item
-                                :label="$t(`m.slaContent['日期']`)"
-                                :required="true"
-                                :rules="dayTimeRules.dayTime"
-                                :property="'workdays.' + index + '.dayTime'">
-                                <bk-date-picker
-                                    v-model="item.dayTime"
-                                    :type="'daterange'"
-                                    :clearable="false"
-                                    :ext-cls="'cus-width'">
-                                </bk-date-picker>
-                            </bk-form-item>
-                        </div>
-                        <ul class="bk-group-time">
-                            <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
-                                <p class="bk-width-label">
-                                    <bk-popconfirm
-                                        placement="bottom-start"
-                                        v-if="!timeItem.changStatus"
-                                        style="line-height: 25px;"
-                                        trigger="click"
-                                        :confirm-text="$t(`m.slaContent['确定']`)"
-                                        :cancel-text="$t(`m.slaContent['取消']`)"
-                                        @confirm="timeItem.name = timeItemNameTemplate">
-                                        <div slot="content">
-                                            <bk-input v-model.trim="timeItemNameTemplate"
-                                                style="width:226px"
-                                                maxlength="120"
-                                                :placeholder="$t(`m.slaContent['请输入时段名称']`)">
-                                            </bk-input>
-                                        </div>
-                                        <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
-                                    </bk-popconfirm>
-                                    <i class="bk-icon icon-delete"
-                                        v-if="item.time.length !== 1"
-                                        @click="deleteTimeName(item.time, timeIndex)"></i>
-                                </p>
-                                <div class="bk-form-content bk-sla-time">
-                                    <bk-time-picker
-                                        v-model="timeItem.value"
-                                        :type="'timerange'"
-                                        :clearable="false">
-                                    </bk-time-picker>
-                                    <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
-                                        <i v-if="item.time.length !== 3"
-                                            class="bk-itsm-icon"
-                                            v-bk-tooltips="bktooltipsInfo.addTime"
-                                            @click="addTimeFrame(index,'workdays')">+</i>
-                                        <i v-else class="icon-flow-add bk-icon-false"
-                                            v-bk-tooltips="bktooltipsInfo.overTime"></i>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="add-and-reduce-box">
-                            <div class="bk-add-group" @click="deleteLine(item, index, 'workdays')">
-                                <i class="bk-itsm-icon icon-flow-reduce"></i>
-                            </div>
-                            <div class="bk-add-group" @click="addLine('workdays')">
-                                <i class="bk-itsm-icon icon-flow-add"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="add-and-reduce-box" v-if="formInfo.workdays.length === 0">
-                        <div class="bk-add-group" data-test-id="slaPattern_div_addGroup" @click="addLine('workdays')">
-                            <i class="bk-itsm-icon icon-flow-add"></i>
-                        </div>
-                    </div>
-                </bk-form>
-            </div>
-            <!-- 假期时间 -->
-            <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["假期时间"]') }}</p>
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="formInfo"
-                    ref="timeOutForm"
-                    :key="formKey">
-                    <div class="bk-group-table"
-                        style="padding-right: 35px;"
-                        v-for="(item, index) in formInfo.holidays"
-                        :key="index">
-                        <div class="bk-group-select" style="width: 400px; height: 64px;">
-                            <bk-form-item
-                                :label="$t(`m.slaContent['节日名称']`)"
-                                :required="true"
-                                :rules="dayNameRules.dayName"
-                                :property="'holidays.' + index + '.dayName'">
-                                <bk-input v-model.trim="item.dayName"
-                                    :placeholder="$t(`m.slaContent['请输入节假日名称']`)">
-                                </bk-input>
-                            </bk-form-item>
-                        </div>
-                        <div class="bk-group-select" style="width: 200px; height: 64px;">
-                            <bk-form-item
-                                :label="$t(`m.slaContent['节日日期']`)"
-                                :required="true">
-                                <bk-date-picker
-                                    v-model="item.dayTime"
-                                    :type="'daterange'"
-                                    :clearable="false">
-                                </bk-date-picker>
-                            </bk-form-item>
-                        </div>
-                        <ul class="bk-group-time">
-                            <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
-                                <p class="bk-width-label">
-                                    <bk-popconfirm
-                                        placement="bottom-start"
-                                        v-if="!timeItem.changStatus"
-                                        style="line-height: 25px;"
-                                        trigger="click"
-                                        :confirm-text="$t(`m.slaContent['确定']`)"
-                                        :cancel-text="$t(`m.slaContent['取消']`)"
-                                        @confirm="timeItem.name = timeItemNameTemplate">
-                                        <div slot="content">
-                                            <bk-input v-model.trim="timeItemNameTemplate"
-                                                style="width:226px"
-                                                maxlength="120"
-                                                :placeholder="$t(`m.slaContent['请输入时段名称']`)">
-                                            </bk-input>
-                                        </div>
-                                        <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
-                                    </bk-popconfirm>
-                                    <i class="bk-icon icon-delete"
-                                        v-if="item.time.length !== 1"
-                                        @click="deleteTimeName(item.time, timeIndex)"></i>
-                                </p>
-                                <div class="bk-form-content bk-sla-time">
-                                    <bk-time-picker
-                                        v-model="timeItem.value"
-                                        :type="'timerange'"
-                                        :clearable="false">
-                                    </bk-time-picker>
-                                    <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
-                                        <i v-if="item.time.length !== 3"
-                                            class="bk-itsm-icon"
-                                            v-bk-tooltips="bktooltipsInfo.addTime"
-                                            @click="addTimeFrame(index,'holidays')">+</i>
-                                        <i v-else class="icon-flow-add bk-icon-false"
-                                            v-bk-tooltips="bktooltipsInfo.overTime"></i>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="add-and-reduce-box">
-                            <div class="bk-add-group" @click="deleteLine(item, index, 'holidays')">
-                                <i class="bk-itsm-icon icon-flow-reduce"></i>
-                            </div>
-                            <div class="bk-add-group" @click="addLine('holidays')">
-                                <i class="bk-itsm-icon icon-flow-add"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="add-and-reduce-box" v-if="formInfo.holidays.length === 0">
-                        <div class="bk-add-group" @click="addLine('holidays')">
-                            <i class="bk-itsm-icon icon-flow-add"></i>
-                        </div>
-                    </div>
-                </bk-form>
-            </div>
-            <div class="bk-model-btn">
-                <bk-button
-                    data-test-id="slaModel-button-modelSave"
-                    v-if="isEdit"
-                    theme="primary"
-                    :title="$t(`m.deployPage['保存']`)"
-                    class="mr10"
-                    @click="saveSchedule"
-                    :disabled="clickSecond">{{ $t(`m.deployPage['保存']`) }}
-                </bk-button>
-                <bk-button
-                    data-test-id="slaModel-button-modelSubmit"
-                    v-else
-                    theme="primary"
-                    :title="$t(`m.slaContent['提交']`)"
-                    class="mr10"
-                    @click="saveSchedule"
-                    :disabled="clickSecond">{{$t(`m.slaContent['提交']`)}}
-                </bk-button>
-                <bk-button
-                    data-test-id="slaModel-button-modelClose"
-                    theme="default"
-                    :title="$t(`m.wiki['取消']`)"
-                    class="mr10"
-                    :disabled="clickSecond"
-                    @click="backList">{{ $t(`m.wiki['取消']`) }}
-                </bk-button>
-            </div>
-        </div>
-        <!-- 添加时段 -->
-        <bk-dialog
-            v-model="timeInfo.show"
-            :render-directive="'if'"
-            :width="timeInfo.width"
-            :header-position="timeInfo.headerPosition"
-            :auto-close="timeInfo.autoClose"
-            :mask-close="timeInfo.autoClose"
-            @confirm="TimeFrameComfirm">
-            <p slot="header">
-                {{tempTime.isEdit ? $t(`m.slaContent["修改时段"]`) : $t(`m.slaContent["添加时段"]`)}}
-            </p>
-            <div class="bk-add-project bk-add-module">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="tempTime.info"
-                    :rules="nameRules"
-                    ref="dialogForm">
-                    <bk-form-item
-                        :label="$t(`m.slaContent['时段名称']`)"
-                        :required="true"
-                        :property="'name'">
-                        <bk-input v-model.trim="tempTime.info.name"
-                            maxlength="120"
-                            :placeholder="$t(`m.slaContent['请输入时段名称']`)">
-                        </bk-input>
-                    </bk-form-item>
-                    <bk-form-item
-                        :label="$t(`m.slaContent['起止时间']`)"
-                        :required="true">
-                        <bk-time-picker
-                            v-model="tempTime.info.value"
-                            :type="'timerange'"
-                            :clearable="false">
-                        </bk-time-picker>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </bk-dialog>
+  <div class="bk-add-model">
+    <!-- title -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back" @click="backList">
+        <arrows-left-icon></arrows-left-icon>
+        {{ isEdit ? changeInfo.info.name : $t('m.slaContent["新增服务模式"]') }}
+      </p>
     </div>
+    <!-- content -->
+    <div class="bk-add-content">
+      <div class="bk-content-group" style="width: 400px;">
+        <p class="bk-group-title">{{ $t('m.slaContent["基本信息"]') }}</p>
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="formInfo"
+          :rules="nameRules"
+          ref="dynamicForm">
+          <bk-form-item
+            data-test-id="slaModel-input-modelName"
+            :label="$t(`m.slaContent['服务模式名称']`)"
+            :required="true"
+            :property="'name'">
+            <bk-input v-model.trim="formInfo.name"
+              maxlength="120"
+              :placeholder="$t(`m.slaContent['请输入模式名称']`)"
+              :disabled="changeInfo.info.is_builtin">
+            </bk-input>
+          </bk-form-item>
+        </bk-form>
+      </div>
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m.slaContent["工作时间"]') }}</p>
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="formInfo"
+          ref="daysForm">
+          <div class="bk-group-table"
+            style="padding-right: 35px;"
+            v-for="(item, index) in formInfo.days"
+            :key="index">
+            <div class="bk-group-select" style="width: 400px; height: 64px;">
+              <bk-form-item
+                :label="$t(`m.slaContent['星期']`)"
+                :required="true"
+                :rules="weekRules.week"
+                :property="'days.' + index + '.week'">
+                <bk-select v-model="item.week"
+                  multiple
+                  show-select-all
+                  searchable>
+                  <bk-option v-for="option in weekList"
+                    :key="option.id"
+                    :id="option.id"
+                    :name="option.name">
+                  </bk-option>
+                </bk-select>
+              </bk-form-item>
+            </div>
+            <ul class="bk-group-time">
+              <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
+                <p class="bk-width-label">
+                  <bk-popconfirm
+                    placement="bottom-start"
+                    v-if="!timeItem.changStatus"
+                    style="line-height: 25px;"
+                    trigger="click"
+                    :confirm-text="$t(`m.slaContent['确定']`)"
+                    :cancel-text="$t(`m.slaContent['取消']`)"
+                    @confirm="timeItem.name = timeItemNameTemplate">
+                    <div slot="content">
+                      <bk-input v-model.trim="timeItemNameTemplate"
+                        style="width:226px"
+                        maxlength="120"
+                        :placeholder="$t(`m.slaContent['请输入时段名称']`)">
+                      </bk-input>
+                    </div>
+                    <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
+                  </bk-popconfirm>
+                  <i class="bk-icon icon-delete"
+                    v-if="item.time.length !== 1"
+                    @click="deleteTimeName(item.time, timeIndex)"></i>
+                </p>
+                <div class="bk-form-content bk-sla-time">
+                  <bk-time-picker
+                    v-model="timeItem.value"
+                    :type="'timerange'"
+                    :clearable="false">
+                  </bk-time-picker>
+                  <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
+                    <i v-if="item.time.length !== 3"
+                      class="bk-itsm-icon"
+                      v-bk-tooltips="bktooltipsInfo.addTime"
+                      @click="addTimeFrame(index,'days')">+</i>
+                    <i v-else class="icon-flow-add bk-icon-false"
+                      v-bk-tooltips="bktooltipsInfo.overTime"></i>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div class="add-and-reduce-box">
+              <div v-if="formInfo.days.length !== 1" class="bk-add-group" @click="deleteLine(item, index, 'days')">
+                <i class="bk-itsm-icon icon-flow-reduce"></i>
+              </div>
+              <div class="bk-add-group" @click="addLine('days')">
+                <i class="bk-itsm-icon icon-flow-add"></i>
+              </div>
+            </div>
+          </div>
+        </bk-form>
+
+      </div>
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m.slaContent["加班时间"]') }}</p>
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="formInfo"
+          ref="workdaysForm">
+          <div class="bk-group-table"
+            style="padding-right: 35px;"
+            v-for="(item, index) in formInfo.workdays"
+            :key="index">
+            <div class="bk-group-select" style="width: 400px; height: 64px;">
+              <bk-form-item
+                :label="$t(`m.slaContent['日期']`)"
+                :required="true"
+                :rules="dayTimeRules.dayTime"
+                :property="'workdays.' + index + '.dayTime'">
+                <bk-date-picker
+                  v-model="item.dayTime"
+                  :type="'daterange'"
+                  :clearable="false"
+                  :ext-cls="'cus-width'">
+                </bk-date-picker>
+              </bk-form-item>
+            </div>
+            <ul class="bk-group-time">
+              <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
+                <p class="bk-width-label">
+                  <bk-popconfirm
+                    placement="bottom-start"
+                    v-if="!timeItem.changStatus"
+                    style="line-height: 25px;"
+                    trigger="click"
+                    :confirm-text="$t(`m.slaContent['确定']`)"
+                    :cancel-text="$t(`m.slaContent['取消']`)"
+                    @confirm="timeItem.name = timeItemNameTemplate">
+                    <div slot="content">
+                      <bk-input v-model.trim="timeItemNameTemplate"
+                        style="width:226px"
+                        maxlength="120"
+                        :placeholder="$t(`m.slaContent['请输入时段名称']`)">
+                      </bk-input>
+                    </div>
+                    <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
+                  </bk-popconfirm>
+                  <i class="bk-icon icon-delete"
+                    v-if="item.time.length !== 1"
+                    @click="deleteTimeName(item.time, timeIndex)"></i>
+                </p>
+                <div class="bk-form-content bk-sla-time">
+                  <bk-time-picker
+                    v-model="timeItem.value"
+                    :type="'timerange'"
+                    :clearable="false">
+                  </bk-time-picker>
+                  <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
+                    <i v-if="item.time.length !== 3"
+                      class="bk-itsm-icon"
+                      v-bk-tooltips="bktooltipsInfo.addTime"
+                      @click="addTimeFrame(index,'workdays')">+</i>
+                    <i v-else class="icon-flow-add bk-icon-false"
+                      v-bk-tooltips="bktooltipsInfo.overTime"></i>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div class="add-and-reduce-box">
+              <div class="bk-add-group" @click="deleteLine(item, index, 'workdays')">
+                <i class="bk-itsm-icon icon-flow-reduce"></i>
+              </div>
+              <div class="bk-add-group" @click="addLine('workdays')">
+                <i class="bk-itsm-icon icon-flow-add"></i>
+              </div>
+            </div>
+          </div>
+          <div class="add-and-reduce-box" v-if="formInfo.workdays.length === 0">
+            <div class="bk-add-group" data-test-id="slaPattern_div_addGroup" @click="addLine('workdays')">
+              <i class="bk-itsm-icon icon-flow-add"></i>
+            </div>
+          </div>
+        </bk-form>
+      </div>
+      <!-- 假期时间 -->
+      <div class="bk-content-group">
+        <p class="bk-group-title">{{ $t('m.slaContent["假期时间"]') }}</p>
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="formInfo"
+          ref="timeOutForm"
+          :key="formKey">
+          <div class="bk-group-table"
+            style="padding-right: 35px;"
+            v-for="(item, index) in formInfo.holidays"
+            :key="index">
+            <div class="bk-group-select" style="width: 400px; height: 64px;">
+              <bk-form-item
+                :label="$t(`m.slaContent['节日名称']`)"
+                :required="true"
+                :rules="dayNameRules.dayName"
+                :property="'holidays.' + index + '.dayName'">
+                <bk-input v-model.trim="item.dayName"
+                  :placeholder="$t(`m.slaContent['请输入节假日名称']`)">
+                </bk-input>
+              </bk-form-item>
+            </div>
+            <div class="bk-group-select" style="width: 200px; height: 64px;">
+              <bk-form-item
+                :label="$t(`m.slaContent['节日日期']`)"
+                :required="true">
+                <bk-date-picker
+                  v-model="item.dayTime"
+                  :type="'daterange'"
+                  :clearable="false">
+                </bk-date-picker>
+              </bk-form-item>
+            </div>
+            <ul class="bk-group-time">
+              <li v-for="(timeItem, timeIndex) in item.time" :key="timeIndex">
+                <p class="bk-width-label">
+                  <bk-popconfirm
+                    placement="bottom-start"
+                    v-if="!timeItem.changStatus"
+                    style="line-height: 25px;"
+                    trigger="click"
+                    :confirm-text="$t(`m.slaContent['确定']`)"
+                    :cancel-text="$t(`m.slaContent['取消']`)"
+                    @confirm="timeItem.name = timeItemNameTemplate">
+                    <div slot="content">
+                      <bk-input v-model.trim="timeItemNameTemplate"
+                        style="width:226px"
+                        maxlength="120"
+                        :placeholder="$t(`m.slaContent['请输入时段名称']`)">
+                      </bk-input>
+                    </div>
+                    <span @click="timeItemNameTemplate = timeItem.name" class="cus-ellipsis" :title="timeItem.name">{{ timeItem.name }}</span>
+                  </bk-popconfirm>
+                  <i class="bk-icon icon-delete"
+                    v-if="item.time.length !== 1"
+                    @click="deleteTimeName(item.time, timeIndex)"></i>
+                </p>
+                <div class="bk-form-content bk-sla-time">
+                  <bk-time-picker
+                    v-model="timeItem.value"
+                    :type="'timerange'"
+                    :clearable="false">
+                  </bk-time-picker>
+                  <div class="bk-group-icon" v-if="timeIndex === item.time.length - 1">
+                    <i v-if="item.time.length !== 3"
+                      class="bk-itsm-icon"
+                      v-bk-tooltips="bktooltipsInfo.addTime"
+                      @click="addTimeFrame(index,'holidays')">+</i>
+                    <i v-else class="icon-flow-add bk-icon-false"
+                      v-bk-tooltips="bktooltipsInfo.overTime"></i>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div class="add-and-reduce-box">
+              <div class="bk-add-group" @click="deleteLine(item, index, 'holidays')">
+                <i class="bk-itsm-icon icon-flow-reduce"></i>
+              </div>
+              <div class="bk-add-group" @click="addLine('holidays')">
+                <i class="bk-itsm-icon icon-flow-add"></i>
+              </div>
+            </div>
+          </div>
+          <div class="add-and-reduce-box" v-if="formInfo.holidays.length === 0">
+            <div class="bk-add-group" @click="addLine('holidays')">
+              <i class="bk-itsm-icon icon-flow-add"></i>
+            </div>
+          </div>
+        </bk-form>
+      </div>
+      <div class="bk-model-btn">
+        <bk-button
+          data-test-id="slaModel-button-modelSave"
+          v-if="isEdit"
+          theme="primary"
+          :title="$t(`m.deployPage['保存']`)"
+          class="mr10"
+          @click="saveSchedule"
+          :disabled="clickSecond">{{ $t(`m.deployPage['保存']`) }}
+        </bk-button>
+        <bk-button
+          data-test-id="slaModel-button-modelSubmit"
+          v-else
+          theme="primary"
+          :title="$t(`m.slaContent['提交']`)"
+          class="mr10"
+          @click="saveSchedule"
+          :disabled="clickSecond">{{$t(`m.slaContent['提交']`)}}
+        </bk-button>
+        <bk-button
+          data-test-id="slaModel-button-modelClose"
+          theme="default"
+          :title="$t(`m.wiki['取消']`)"
+          class="mr10"
+          :disabled="clickSecond"
+          @click="backList">{{ $t(`m.wiki['取消']`) }}
+        </bk-button>
+      </div>
+    </div>
+    <!-- 添加时段 -->
+    <bk-dialog
+      v-model="timeInfo.show"
+      :render-directive="'if'"
+      :width="timeInfo.width"
+      :header-position="timeInfo.headerPosition"
+      :auto-close="timeInfo.autoClose"
+      :mask-close="timeInfo.autoClose"
+      @confirm="TimeFrameComfirm">
+      <p slot="header">
+        {{tempTime.isEdit ? $t(`m.slaContent["修改时段"]`) : $t(`m.slaContent["添加时段"]`)}}
+      </p>
+      <div class="bk-add-project bk-add-module">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="tempTime.info"
+          :rules="nameRules"
+          ref="dialogForm">
+          <bk-form-item
+            :label="$t(`m.slaContent['时段名称']`)"
+            :required="true"
+            :property="'name'">
+            <bk-input v-model.trim="tempTime.info.name"
+              maxlength="120"
+              :placeholder="$t(`m.slaContent['请输入时段名称']`)">
+            </bk-input>
+          </bk-form-item>
+          <bk-form-item
+            :label="$t(`m.slaContent['起止时间']`)"
+            :required="true">
+            <bk-time-picker
+              v-model="tempTime.info.value"
+              :type="'timerange'"
+              :clearable="false">
+            </bk-time-picker>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 
 <script>

@@ -21,189 +21,189 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m.flowManager["流程版本"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <!-- 提示信息 -->
-            <div class="bk-itsm-version" v-if="versionStatus">
-                <i class="bk-icon icon-info-circle"></i>
-                <span>{{ $t('m.flowManager["流程版本：由流程模板部署后即可生成"]') }}</span>
-                <i class="bk-icon icon-close" @click="closeVersion"></i>
-            </div>
-            <div class="bk-only-btn">
-                <div class="bk-more-search">
-                    <bk-button
-                        :theme="'primary'"
-                        :title="$t(`m.flowManager['批量删除']`)"
-                        :disabled="!checkList.length"
-                        class="mr10"
-                        @click="openConfirmDialog({}, 'batchDelete')">
-                        {{ $t(`m.flowManager['批量删除']`) }}
-                    </bk-button>
-                    <div class="bk-search-name">
-                        <div class="bk-search-content">
-                            <bk-input
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                v-model="moreSearch[0].value"
-                                @enter="searchContent"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                        <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                            icon=" bk-itsm-icon icon-search-more"
-                            class="ml10 filter-btn"
-                            @click="searchMore">
-                        </bk-button>
-                    </div>
-                </div>
-                <search-info
-                    ref="searchInfo"
-                    :more-search="moreSearch">
-                </search-info>
-            </div>
-            <bk-table ref="versionTable"
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="dataList"
-                :size="'small'"
-                :pagination="pagination"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange"
-                @select-all="handleSelectAll"
-                @select="handleSelect">
-                <bk-table-column type="selection"
-                    width="60"
-                    align="center"
-                    :selectable="disabledFn">
-                    <template slot-scope="props">
-                        <template v-if="!hasPermission(['flow_version_manage'], props.row.auth_actions)">
-                            <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
-                                <span
-                                    v-cursor
-                                    class="checkbox-permission-disable"
-                                    @click="checkfowManagePermisson(props.row)">
-                                </span>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <bk-checkbox
-                                v-bk-tooltips.top="{
-                                    content: $t(`m.flowManager['流程已绑定服务，不能进行删除操作']`),
-                                    disabled: !props.row.service_cnt
-                                }"
-                                :true-value="trueStatus"
-                                :false-value="falseStatus"
-                                :disabled="!!props.row.service_cnt"
-                                v-model="props.row.checkStatus"
-                                @change="changeCheck(props.row)">
-                            </bk-checkbox>
-                        </template>
-                    </template>
-                </bk-table-column>
-                <!--<bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>-->
-                <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                    <template slot-scope="props">
-                        <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                    </template>
-                </bk-table-column>
-
-                <bk-table-column :label="$t(`m.flowManager['流程名']`)" width="200">
-                    <template slot-scope="props">
-                        <span :title="props.row.name">{{ props.row.name || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.flowManager['版本号']`)" min-width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.version_number">{{ props.row.version_number || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.flowManager['发布人']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.flowManager['发布时间']`)" min-width="150">
-                    <template slot-scope="props">
-                        <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.flowManager['关联服务数']`)" width="90">
-                    <template slot-scope="props">
-                        <span :title="props.row.service_cnt">{{ props.row.service_cnt || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.flowManager['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['flow_version_manage'], props.row.auth_actions) }"
-                            text
-                            theme="primary"
-                            :title="$t(`m.flowManager['预览']`)"
-                            :class="[{
-                                'btn-permission-disable':
-                                    !hasPermission(['flow_version_manage'], props.row.auth_actions)
-                            }]"
-                            @click="onFlowPreview(props.row)">
-                            {{ $t('m.flowManager["预览"]') }}
-                        </bk-button>
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['flow_version_restore'], props.row.auth_actions) }"
-                            text
-                            theme="primary"
-                            :title="$t(`m.flowManager['还原']`)"
-                            :class="[{
-                                'btn-permission-disable':
-                                    !hasPermission(['flow_version_restore'], props.row.auth_actions)
-                            }]"
-                            @click="openConfirmDialog(props.row, 'restore')">
-                            {{ $t('m.flowManager["还原"]') }}
-                        </bk-button>
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['flow_version_manage'], props.row.auth_actions) }"
-                            text
-                            theme="primary"
-                            :title="$t(`m.flowManager['删除']`)"
-                            :disabled="hasPermission(['flow_version_manage'], props.row.auth_actions)
-                                && !!props.row.service_cnt"
-                            :class="[{
-                                'btn-permission-disable':
-                                    !hasPermission(['flow_version_manage'], props.row.auth_actions)
-                            }]"
-                            @click="openConfirmDialog(props.row, 'delete')">
-                            {{ $t('m.flowManager["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <!-- 预览 -->
-        <bk-dialog v-model="processInfo.isShow"
-            width="760"
-            :position="processInfo.position"
-            :draggable="processInfo.draggable"
-            :title="processInfo.title">
-            <div style="width: 100%; height: 347px;" v-bkloading="{ isLoading: processInfo.loading }">
-                <preview
-                    v-if="!processInfo.loading"
-                    :add-list="addList"
-                    :line-list="lineList"
-                    :preview-info="previewInfo"
-                    :normal-color="normalColor">
-                </preview>
-            </div>
-            <div slot="footer">
-                <bk-button
-                    theme="default"
-                    @click="processInfo.isShow = false">
-                    {{ $t('m.deployPage["关闭"]') }}
-                </bk-button>
-            </div>
-        </bk-dialog>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m.flowManager["流程版本"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <!-- 提示信息 -->
+      <div class="bk-itsm-version" v-if="versionStatus">
+        <i class="bk-icon icon-info-circle"></i>
+        <span>{{ $t('m.flowManager["流程版本：由流程模板部署后即可生成"]') }}</span>
+        <i class="bk-icon icon-close" @click="closeVersion"></i>
+      </div>
+      <div class="bk-only-btn">
+        <div class="bk-more-search">
+          <bk-button
+            :theme="'primary'"
+            :title="$t(`m.flowManager['批量删除']`)"
+            :disabled="!checkList.length"
+            class="mr10"
+            @click="openConfirmDialog({}, 'batchDelete')">
+            {{ $t(`m.flowManager['批量删除']`) }}
+          </bk-button>
+          <div class="bk-search-name">
+            <div class="bk-search-content">
+              <bk-input
+                :clearable="true"
+                :right-icon="'bk-icon icon-search'"
+                v-model="moreSearch[0].value"
+                @enter="searchContent"
+                @clear="clearSearch">
+              </bk-input>
+            </div>
+            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+              icon=" bk-itsm-icon icon-search-more"
+              class="ml10 filter-btn"
+              @click="searchMore">
+            </bk-button>
+          </div>
+        </div>
+        <search-info
+          ref="searchInfo"
+          :more-search="moreSearch">
+        </search-info>
+      </div>
+      <bk-table ref="versionTable"
+        v-bkloading="{ isLoading: isDataLoading }"
+        :data="dataList"
+        :size="'small'"
+        :pagination="pagination"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
+        @select-all="handleSelectAll"
+        @select="handleSelect">
+        <bk-table-column type="selection"
+          width="60"
+          align="center"
+          :selectable="disabledFn">
+          <template slot-scope="props">
+            <template v-if="!hasPermission(['flow_version_manage'], props.row.auth_actions)">
+              <div style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                <span
+                  v-cursor
+                  class="checkbox-permission-disable"
+                  @click="checkfowManagePermisson(props.row)">
+                </span>
+              </div>
+            </template>
+            <template v-else>
+              <bk-checkbox
+                v-bk-tooltips.top="{
+                  content: $t(`m.flowManager['流程已绑定服务，不能进行删除操作']`),
+                  disabled: !props.row.service_cnt
+                }"
+                :true-value="trueStatus"
+                :false-value="falseStatus"
+                :disabled="!!props.row.service_cnt"
+                v-model="props.row.checkStatus"
+                @change="changeCheck(props.row)">
+              </bk-checkbox>
+            </template>
+          </template>
+        </bk-table-column>
+        <!--<bk-table-column type="index" label="NO." align="center" width="60"></bk-table-column>-->
+        <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+          <template slot-scope="props">
+            <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+          </template>
+        </bk-table-column>
+
+        <bk-table-column :label="$t(`m.flowManager['流程名']`)" width="200">
+          <template slot-scope="props">
+            <span :title="props.row.name">{{ props.row.name || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.flowManager['版本号']`)" min-width="150">
+          <template slot-scope="props">
+            <span :title="props.row.version_number">{{ props.row.version_number || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.flowManager['发布人']`)">
+          <template slot-scope="props">
+            <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.flowManager['发布时间']`)" min-width="150">
+          <template slot-scope="props">
+            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.flowManager['关联服务数']`)" width="90">
+          <template slot-scope="props">
+            <span :title="props.row.service_cnt">{{ props.row.service_cnt || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.flowManager['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button
+              v-cursor="{ active: !hasPermission(['flow_version_manage'], props.row.auth_actions) }"
+              text
+              theme="primary"
+              :title="$t(`m.flowManager['预览']`)"
+              :class="[{
+                'btn-permission-disable':
+                  !hasPermission(['flow_version_manage'], props.row.auth_actions)
+              }]"
+              @click="onFlowPreview(props.row)">
+              {{ $t('m.flowManager["预览"]') }}
+            </bk-button>
+            <bk-button
+              v-cursor="{ active: !hasPermission(['flow_version_restore'], props.row.auth_actions) }"
+              text
+              theme="primary"
+              :title="$t(`m.flowManager['还原']`)"
+              :class="[{
+                'btn-permission-disable':
+                  !hasPermission(['flow_version_restore'], props.row.auth_actions)
+              }]"
+              @click="openConfirmDialog(props.row, 'restore')">
+              {{ $t('m.flowManager["还原"]') }}
+            </bk-button>
+            <bk-button
+              v-cursor="{ active: !hasPermission(['flow_version_manage'], props.row.auth_actions) }"
+              text
+              theme="primary"
+              :title="$t(`m.flowManager['删除']`)"
+              :disabled="hasPermission(['flow_version_manage'], props.row.auth_actions)
+                && !!props.row.service_cnt"
+              :class="[{
+                'btn-permission-disable':
+                  !hasPermission(['flow_version_manage'], props.row.auth_actions)
+              }]"
+              @click="openConfirmDialog(props.row, 'delete')">
+              {{ $t('m.flowManager["删除"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <!-- 预览 -->
+    <bk-dialog v-model="processInfo.isShow"
+      width="760"
+      :position="processInfo.position"
+      :draggable="processInfo.draggable"
+      :title="processInfo.title">
+      <div style="width: 100%; height: 347px;" v-bkloading="{ isLoading: processInfo.loading }">
+        <preview
+          v-if="!processInfo.loading"
+          :add-list="addList"
+          :line-list="lineList"
+          :preview-info="previewInfo"
+          :normal-color="normalColor">
+        </preview>
+      </div>
+      <div slot="footer">
+        <bk-button
+          theme="default"
+          @click="processInfo.isShow = false">
+          {{ $t('m.deployPage["关闭"]') }}
+        </bk-button>
+      </div>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import axios from 'axios';

@@ -21,148 +21,148 @@
   -->
 
 <template>
-    <div class="bk-tree-info" @click="hidden">
-        <div class="bk-tree-content" v-bkloading="{ isLoading: isTreeLoading }">
-            <div style="overflow: hidden">
-                <div class="bk-tree-addService">
-                    <span>{{ $t(`m['服务目录']`) }}</span>
-                    <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
-                </div>
-                <div class="bk-tree-search">
-                    <bk-input
-                        class="bk-tree-input"
-                        data-test-id="directory-input-search"
-                        :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
-                        :clearable="true"
-                        :right-icon="'bk-icon icon-search'"
-                        v-model="searchWord"
-                        @enter="searchInfo"
-                        @clear="clearInfo">
-                    </bk-input>
-                </div>
-            </div>
-            <div class="bk-tree-div" id="treeOther">
-                <div ref="treeTree">
-                    <tree
-                        ref="tree5"
-                        class="bk-tree-class"
-                        :data="treeList"
-                        :node-key="'id'"
-                        :has-border="true"
-                        @on-click="nodeClick"
-                        @on-expanded="nodeExpand"
-                        @on-icon="iconNode"
-                        @on-drag-node="onDragNode">
-                    </tree>
-                </div>
-                <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
-                    <ul>
-                        <li
-                            data-test-id="directoty-li-addCatalogue"
-                            v-cursor="{
-                                active: !hasPermission(
-                                    ['catalog_create'],
-                                    $store.state.project.projectAuthActions
-                                ),
-                                zIndex: 3001
-                            }"
-                            :title="$t(`m.serviceConfig['新增']`)"
-                            :class="{
-                                'bk-disabled-add': String(treeInfo.node.level) === '3',
-                                'text-permission-disable': !hasPermission(
-                                    ['catalog_create'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            @click="openAdd">
-                            <span>{{ $t('m.serviceConfig["新增"]') }}</span>
-                        </li>
-                        <li
-                            data-test-id="directoty-li-editCatalogue"
-                            v-cursor="{
-                                active: !hasPermission(
-                                    ['catalog_edit'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            :title="$t(`m.serviceConfig['编辑']`)"
-                            :class="{
-                                'text-permission-disable': !hasPermission(
-                                    ['catalog_edit'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            @click="openUpdate">
-                            <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
-                        </li>
-                        <li
-                            data-test-id="directoty-li-delCatalogue"
-                            v-cursor="{
-                                active: !hasPermission(
-                                    ['catalog_delete'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            :title="$t(`m.serviceConfig['删除']`)"
-                            :class="{
-                                'text-permission-disable': !hasPermission(
-                                    ['catalog_delete'],
-                                    $store.state.project.projectAuthActions
-                                )
-                            }"
-                            @click="openDelete">
-                            <span>{{ $t('m.serviceConfig["删除"]') }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+  <div class="bk-tree-info" @click="hidden">
+    <div class="bk-tree-content" v-bkloading="{ isLoading: isTreeLoading }">
+      <div style="overflow: hidden">
+        <div class="bk-tree-addService">
+          <span>{{ $t(`m['服务目录']`) }}</span>
+          <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
         </div>
-        <!-- 新增条目 -->
-        <bk-dialog
-            width="480"
-            :value.sync="addDirectory.show"
-            :title="addDirectory.title"
-            :mask-close="false"
-            @confirm="submitAdd"
-            @cancel="toggleDialog">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="addDirectory.formInfo"
-                :rules="rules"
-                ref="dynamicForm">
-                <bk-form-item
-                    v-if="addDirectory.formInfo.parent__id !== 1"
-                    :label="$t(`m.serviceConfig['父级目录']`)"
-                    :required="true">
-                    <bk-input disabled
-                        v-model.trim="addDirectory.formInfo.parent___name">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['目录名称']`)"
-                    :required="true"
-                    error-display-type="normal"
-                    :property="'name'">
-                    <bk-input v-model.trim="addDirectory.formInfo.name"
-                        :maxlength="120"
-                        :show-word-limit="true"
-                        :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.serviceConfig['目录描述']`)">
-                    <bk-input
-                        :placeholder="$t(`m.serviceConfig['请输入目录描述']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        :maxlength="255"
-                        v-model="addDirectory.formInfo.desc">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </bk-dialog>
+        <div class="bk-tree-search">
+          <bk-input
+            class="bk-tree-input"
+            data-test-id="directory-input-search"
+            :placeholder="$t(`m.serviceConfig['请输入搜索关键字']`)"
+            :clearable="true"
+            :right-icon="'bk-icon icon-search'"
+            v-model="searchWord"
+            @enter="searchInfo"
+            @clear="clearInfo">
+          </bk-input>
+        </div>
+      </div>
+      <div class="bk-tree-div" id="treeOther">
+        <div ref="treeTree">
+          <tree
+            ref="tree5"
+            class="bk-tree-class"
+            :data="treeList"
+            :node-key="'id'"
+            :has-border="true"
+            @on-click="nodeClick"
+            @on-expanded="nodeExpand"
+            @on-icon="iconNode"
+            @on-drag-node="onDragNode">
+          </tree>
+        </div>
+        <div class="bk-tree-more" ref="treeOperat" v-show="showMore">
+          <ul>
+            <li
+              data-test-id="directoty-li-addCatalogue"
+              v-cursor="{
+                active: !hasPermission(
+                  ['catalog_create'],
+                  $store.state.project.projectAuthActions
+                ),
+                zIndex: 3001
+              }"
+              :title="$t(`m.serviceConfig['新增']`)"
+              :class="{
+                'bk-disabled-add': String(treeInfo.node.level) === '3',
+                'text-permission-disable': !hasPermission(
+                  ['catalog_create'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              @click="openAdd">
+              <span>{{ $t('m.serviceConfig["新增"]') }}</span>
+            </li>
+            <li
+              data-test-id="directoty-li-editCatalogue"
+              v-cursor="{
+                active: !hasPermission(
+                  ['catalog_edit'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              :title="$t(`m.serviceConfig['编辑']`)"
+              :class="{
+                'text-permission-disable': !hasPermission(
+                  ['catalog_edit'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              @click="openUpdate">
+              <span>{{ $t('m.serviceConfig["编辑"]') }}</span>
+            </li>
+            <li
+              data-test-id="directoty-li-delCatalogue"
+              v-cursor="{
+                active: !hasPermission(
+                  ['catalog_delete'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              :title="$t(`m.serviceConfig['删除']`)"
+              :class="{
+                'text-permission-disable': !hasPermission(
+                  ['catalog_delete'],
+                  $store.state.project.projectAuthActions
+                )
+              }"
+              @click="openDelete">
+              <span>{{ $t('m.serviceConfig["删除"]') }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+    <!-- 新增条目 -->
+    <bk-dialog
+      width="480"
+      :value.sync="addDirectory.show"
+      :title="addDirectory.title"
+      :mask-close="false"
+      @confirm="submitAdd"
+      @cancel="toggleDialog">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="addDirectory.formInfo"
+        :rules="rules"
+        ref="dynamicForm">
+        <bk-form-item
+          v-if="addDirectory.formInfo.parent__id !== 1"
+          :label="$t(`m.serviceConfig['父级目录']`)"
+          :required="true">
+          <bk-input disabled
+            v-model.trim="addDirectory.formInfo.parent___name">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.serviceConfig['目录名称']`)"
+          :required="true"
+          error-display-type="normal"
+          :property="'name'">
+          <bk-input v-model.trim="addDirectory.formInfo.name"
+            :maxlength="120"
+            :show-word-limit="true"
+            :placeholder="$t(`m.serviceConfig['请输入目录名称']`)">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.serviceConfig['目录描述']`)">
+          <bk-input
+            :placeholder="$t(`m.serviceConfig['请输入目录描述']`)"
+            :type="'textarea'"
+            :rows="3"
+            :maxlength="255"
+            v-model="addDirectory.formInfo.desc">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import tree from './commonTree/tree.vue';

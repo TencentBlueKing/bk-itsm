@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <div class="right-content">
-        <bk-tab
-            data-test-id="ticket_tab_rightMenu"
-            :active.sync="activeTab"
-            type="unborder-card"
-            ext-cls="right-tiket-tabs"
+  <div class="right-content">
+    <bk-tab
+      data-test-id="ticket_tab_rightMenu"
+      :active.sync="activeTab"
+      type="unborder-card"
+      ext-cls="right-tiket-tabs"
+    >
+      <bk-tab-panel name="log" :label="$t(`m.newCommon['流水日志']`)">
+        <log-tab
+          v-if="activeTab === 'log'"
+          :ticket-info="ticketInfo"
+          :node="nodeList"
+          @ticketFinishAppraise="$emit('ticketFinishAppraise')"
+          @viewProcess="viewProcess"
         >
-            <bk-tab-panel name="log" :label="$t(`m.newCommon['流水日志']`)">
-                <log-tab
-                    v-if="activeTab === 'log'"
-                    :ticket-info="ticketInfo"
-                    :node="nodeList"
-                    @ticketFinishAppraise="$emit('ticketFinishAppraise')"
-                    @viewProcess="viewProcess"
-                >
-                </log-tab>
-            </bk-tab-panel>
-            <!-- 待设计稿 -->
-            <!-- <bk-tab-panel
+        </log-tab>
+      </bk-tab-panel>
+      <!-- 待设计稿 -->
+      <!-- <bk-tab-panel
                 name="log"
                 :label="$t(`m.newCommon['流转进程']`)">
                 <log-tab
@@ -49,76 +49,76 @@
                     @viewProcess="viewProcess">
                 </log-tab>
             </bk-tab-panel> -->
-            <template v-if="hasNodeOptAuth">
-                <bk-tab-panel
-                    name="all-task"
-                    :label="$t(`m.newCommon['所有任务']`)"
-                >
-                    <all-task-tab
-                        v-if="activeTab === 'all-task'"
-                        :ticket-info="ticketInfo"
-                    >
-                    </all-task-tab>
-                </bk-tab-panel>
-                <bk-tab-panel
-                    name="triggerLog"
-                    :label="$t(`m.task['触发器记录']`)"
-                >
-                    <task-history
-                        v-if="activeTab === 'triggerLog'"
-                        :basic-infomation="ticketInfo"
-                        :node-list="nodeList"
-                    ></task-history>
-                </bk-tab-panel>
-                <bk-tab-panel
-                    v-if="ticketInfo.can_invite_followers"
-                    name="email-notice"
-                    :label="$t(`m.newCommon['邮件通知']`)"
-                >
-                    <email-notice-tab
-                        v-if="activeTab === 'email-notice'"
-                        :ticket-info="ticketInfo"
-                    >
-                    </email-notice-tab>
-                </bk-tab-panel>
-                <bk-tab-panel
-                    v-if="Number(ticketInfo.comment_id) !== -1"
-                    name="comment"
-                    :label="$t(`m.newCommon['评价']`)"
-                >
-                    <comment-tab
-                        v-if="activeTab === 'comment'"
-                        :ticket-info="ticketInfo"
-                    >
-                    </comment-tab>
-                </bk-tab-panel>
-                <bk-tab-panel
-                    v-if="openFunction.CHILD_TICKET_SWITCH"
-                    name="mother-child"
-                    :label="$t(`m.newCommon['母子单']`)"
-                >
-                    <div
-                        class="bk-log-flow"
-                        v-if="activeTab === 'mother-child'"
-                    >
-                        <inherit-ticket
-                            :ticket-info="ticketInfo"
-                        ></inherit-ticket>
-                    </div>
-                </bk-tab-panel>
-                <bk-tab-panel
-                    name="related-ticket"
-                    :label="$t(`m.newCommon['关联单']`)"
-                >
-                    <associated-tab
-                        v-if="activeTab === 'related-ticket'"
-                        :ticket-info="ticketInfo"
-                    >
-                    </associated-tab>
-                </bk-tab-panel>
-            </template>
-        </bk-tab>
-    </div>
+      <template v-if="hasNodeOptAuth">
+        <bk-tab-panel
+          name="all-task"
+          :label="$t(`m.newCommon['所有任务']`)"
+        >
+          <all-task-tab
+            v-if="activeTab === 'all-task'"
+            :ticket-info="ticketInfo"
+          >
+          </all-task-tab>
+        </bk-tab-panel>
+        <bk-tab-panel
+          name="triggerLog"
+          :label="$t(`m.task['触发器记录']`)"
+        >
+          <task-history
+            v-if="activeTab === 'triggerLog'"
+            :basic-infomation="ticketInfo"
+            :node-list="nodeList"
+          ></task-history>
+        </bk-tab-panel>
+        <bk-tab-panel
+          v-if="ticketInfo.can_invite_followers"
+          name="email-notice"
+          :label="$t(`m.newCommon['邮件通知']`)"
+        >
+          <email-notice-tab
+            v-if="activeTab === 'email-notice'"
+            :ticket-info="ticketInfo"
+          >
+          </email-notice-tab>
+        </bk-tab-panel>
+        <bk-tab-panel
+          v-if="Number(ticketInfo.comment_id) !== -1"
+          name="comment"
+          :label="$t(`m.newCommon['评价']`)"
+        >
+          <comment-tab
+            v-if="activeTab === 'comment'"
+            :ticket-info="ticketInfo"
+          >
+          </comment-tab>
+        </bk-tab-panel>
+        <bk-tab-panel
+          v-if="openFunction.CHILD_TICKET_SWITCH"
+          name="mother-child"
+          :label="$t(`m.newCommon['母子单']`)"
+        >
+          <div
+            class="bk-log-flow"
+            v-if="activeTab === 'mother-child'"
+          >
+            <inherit-ticket
+              :ticket-info="ticketInfo"
+            ></inherit-ticket>
+          </div>
+        </bk-tab-panel>
+        <bk-tab-panel
+          name="related-ticket"
+          :label="$t(`m.newCommon['关联单']`)"
+        >
+          <associated-tab
+            v-if="activeTab === 'related-ticket'"
+            :ticket-info="ticketInfo"
+          >
+          </associated-tab>
+        </bk-tab-panel>
+      </template>
+    </bk-tab>
+  </div>
 </template>
 
 <script>

@@ -21,121 +21,121 @@
   -->
 
 <template>
-    <!-- 终止,挂起,转单 -->
-    <bk-dialog
-        v-model="openFormInfo.isShow"
-        :render-directive="'if'"
-        :title="openFormInfo.title"
-        :width="openFormInfo.width"
-        :header-position="openFormInfo.headerPosition"
-        :loading="submitting"
-        :auto-close="openFormInfo.autoClose"
-        :mask-close="openFormInfo.autoClose"
-        @confirm="submitForm"
-        @cancel="cancelForm">
-        <!-- 终止/暂停 -->
-        <template v-if="openFormInfo.btnInfo.key === 'TERMINATE' || openFormInfo.btnInfo.key === 'SUSPEND'">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="formData"
-                :rules="rules"
-                ref="dialogForm">
-                <template v-if="openFormInfo.btnInfo.key === 'TERMINATE'">
-                    <bk-form-item
-                        :label="$t(`m.newCommon['终止原因']`)"
-                        :required="true"
-                        :property="'terminate_message'">
-                        <bk-input
-                            :placeholder="$t(`m.newCommon['请输入终止原因']`)"
-                            :type="'textarea'"
-                            :rows="3"
-                            v-model="formData.terminate_message">
-                        </bk-input>
-                    </bk-form-item>
-                </template>
-                <template v-if="openFormInfo.btnInfo.key === 'SUSPEND'">
-                    <bk-form-item
-                        :label="$t(`m.newCommon['挂起原因']`)"
-                        :required="true"
-                        :property="'suspend_message'">
-                        <bk-input
-                            :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
-                            :type="'textarea'"
-                            :rows="3"
-                            v-model="formData.suspend_message">
-                        </bk-input>
-                    </bk-form-item>
-                </template>
-            </bk-form>
+  <!-- 终止,挂起,转单 -->
+  <bk-dialog
+    v-model="openFormInfo.isShow"
+    :render-directive="'if'"
+    :title="openFormInfo.title"
+    :width="openFormInfo.width"
+    :header-position="openFormInfo.headerPosition"
+    :loading="submitting"
+    :auto-close="openFormInfo.autoClose"
+    :mask-close="openFormInfo.autoClose"
+    @confirm="submitForm"
+    @cancel="cancelForm">
+    <!-- 终止/暂停 -->
+    <template v-if="openFormInfo.btnInfo.key === 'TERMINATE' || openFormInfo.btnInfo.key === 'SUSPEND'">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="formData"
+        :rules="rules"
+        ref="dialogForm">
+        <template v-if="openFormInfo.btnInfo.key === 'TERMINATE'">
+          <bk-form-item
+            :label="$t(`m.newCommon['终止原因']`)"
+            :required="true"
+            :property="'terminate_message'">
+            <bk-input
+              :placeholder="$t(`m.newCommon['请输入终止原因']`)"
+              :type="'textarea'"
+              :rows="3"
+              v-model="formData.terminate_message">
+            </bk-input>
+          </bk-form-item>
         </template>
-        <!-- 分派 -->
-        <template v-if="openFormInfo.btnInfo.key === 'DISTRIBUTE'">
-            <bk-form
-                :label-width="200"
-                :rules="rules"
-                form-type="vertical"
-                ref="dialogForm">
-                <bk-form-item
-                    :label="$t(`m.newCommon['指定处理人']`)"
-                    :required="true">
-                    <deal-person
-                        ref="personSelect"
-                        class="deal-person"
-                        form-type="vertical"
-                        :shortcut="true"
-                        :value="{
-                            type: distribution.type,
-                            value: distribution.value
-                        }"
-                        :specify-id-list="distribution.specifyIdList"
-                        :exclude-role-type-list="distribution.excludeTypeList"
-                        :show-role-type-list="distribution.includeTypeList"
-                        :required-msg="$t(`m.treeinfo['派单人不能为空']`)">
-                    </deal-person>
-                </bk-form-item>
-            </bk-form>
+        <template v-if="openFormInfo.btnInfo.key === 'SUSPEND'">
+          <bk-form-item
+            :label="$t(`m.newCommon['挂起原因']`)"
+            :required="true"
+            :property="'suspend_message'">
+            <bk-input
+              :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
+              :type="'textarea'"
+              :rows="3"
+              v-model="formData.suspend_message">
+            </bk-input>
+          </bk-form-item>
         </template>
-        <!-- 转单 -->
-        <template v-if="openFormInfo.btnInfo.key === 'DELIVER' || openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE'">
-            <bk-form
-                :model="formData"
-                :rules="rules"
-                :label-width="200"
-                form-type="vertical"
-                ref="dialogForm">
-                <bk-form-item
-                    :label="$t(`m.newCommon['${type}至：']`)"
-                    :required="true">
-                    <deal-person
-                        ref="personSelect"
-                        class="deal-person"
-                        form-type="vertical"
-                        :shortcut="true"
-                        :value="{
-                            type: deliverInfo.type,
-                            value: deliverInfo.value
-                        }"
-                        :specify-id-list="deliverInfo.specifyIdList"
-                        :exclude-role-type-list="type === '转单' ? deliverInfo.excludeTypeList : excludeAssignList"
-                        :show-role-type-list="deliverInfo.includeTypeList"
-                        :required-msg="$t(`m.newCommon['${type}人不能为空']`)">
-                    </deal-person>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.newCommon['${type}原因']`)"
-                    :required="true"
-                    :property="'deliverReason'">
-                    <bk-input
-                        :placeholder="$t(`m.newCommon['请输入${type}原因']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        v-model="formData.deliverReason">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </template>
-    </bk-dialog>
+      </bk-form>
+    </template>
+    <!-- 分派 -->
+    <template v-if="openFormInfo.btnInfo.key === 'DISTRIBUTE'">
+      <bk-form
+        :label-width="200"
+        :rules="rules"
+        form-type="vertical"
+        ref="dialogForm">
+        <bk-form-item
+          :label="$t(`m.newCommon['指定处理人']`)"
+          :required="true">
+          <deal-person
+            ref="personSelect"
+            class="deal-person"
+            form-type="vertical"
+            :shortcut="true"
+            :value="{
+              type: distribution.type,
+              value: distribution.value
+            }"
+            :specify-id-list="distribution.specifyIdList"
+            :exclude-role-type-list="distribution.excludeTypeList"
+            :show-role-type-list="distribution.includeTypeList"
+            :required-msg="$t(`m.treeinfo['派单人不能为空']`)">
+          </deal-person>
+        </bk-form-item>
+      </bk-form>
+    </template>
+    <!-- 转单 -->
+    <template v-if="openFormInfo.btnInfo.key === 'DELIVER' || openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE'">
+      <bk-form
+        :model="formData"
+        :rules="rules"
+        :label-width="200"
+        form-type="vertical"
+        ref="dialogForm">
+        <bk-form-item
+          :label="$t(`m.newCommon['${type}至：']`)"
+          :required="true">
+          <deal-person
+            ref="personSelect"
+            class="deal-person"
+            form-type="vertical"
+            :shortcut="true"
+            :value="{
+              type: deliverInfo.type,
+              value: deliverInfo.value
+            }"
+            :specify-id-list="deliverInfo.specifyIdList"
+            :exclude-role-type-list="type === '转单' ? deliverInfo.excludeTypeList : excludeAssignList"
+            :show-role-type-list="deliverInfo.includeTypeList"
+            :required-msg="$t(`m.newCommon['${type}人不能为空']`)">
+          </deal-person>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.newCommon['${type}原因']`)"
+          :required="true"
+          :property="'deliverReason'">
+          <bk-input
+            :placeholder="$t(`m.newCommon['请输入${type}原因']`)"
+            :type="'textarea'"
+            :rows="3"
+            v-model="formData.deliverReason">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </template>
+  </bk-dialog>
 </template>
 
 <script>

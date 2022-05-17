@@ -21,189 +21,189 @@
   -->
 
 <template>
-    <div class="bk-api-table">
-        <div class="bk-api-button mb20">
-            <p class="bk-api-title">{{ $t(`m.systemConfig["API列表"]`) }}</p>
-            <div class="bk-api-button">
-                <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown">
-                    <div class="dropdown-trigger-btn" style="padding-left: 19px;" slot="dropdown-trigger">
-                        <span style="font-size: 14px;">{{ $t(`m.systemConfig['接入']`)}}</span>
-                        <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                    </div>
-                    <ul class="bk-dropdown-list" slot="dropdown-content">
-                        <li>
-                            <a href="javascript:;"
-                                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                :class="{ 'text-permission-disable': !projectId
-                                    && !hasPermission(['public_api_create']) }"
-                                :title="$t(`m.systemConfig['接入']`)"
-                                data-test-id="api_a_apiTableAccessApi"
-                                @click="openShade('JOIN')">
-                                {{ $t(`m.systemConfig['接入']`) }}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:;"
-                                data-test-id="api_a_apiTableCreateApi"
-                                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                                :class="{ 'text-permission-disable': !projectId
-                                    && !hasPermission(['public_api_create']) }"
-                                :title="$t(`m.systemConfig['新增']`)"
-                                @click="openShade('ADD')">
-                                {{$t(`m.systemConfig['新增']`)}}
-                            </a>
-                        </li>
-                    </ul>
-                </bk-dropdown-menu>
-                <bk-button :theme="'default'"
-                    data-test-id="api_button_apiTableuploadApi"
-                    v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
-                    :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
-                    :title="$t(`m.systemConfig['点击上传']`)"
-                    class="mr10 bk-btn-file">
-                    <input :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'"
-                        :value="fileVal"
-                        class="bk-input-file"
-                        @change="handleFile"
-                        @click="hasImportPermission">
-                    {{$t(`m.systemConfig['导入']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    data-test-id="api_button_apiTableBatchDeleteApi"
-                    class="mr10 batch-remove-btn"
-                    :title="$t(`m.systemConfig['批量移除']`)"
-                    :disabled="!checkList.length"
-                    @click="deleteCheck">
-                    {{$t(`m.systemConfig['批量移除']`)}}
-                </bk-button>
-                <bk-input class="bk-api-input"
-                    data-test-id="api_input_apiTableKeyword"
-                    v-model="searchInfo.key"
-                    :placeholder="$t(`m.systemConfig['请输入关键字']`)"
-                    :right-icon="'bk-icon icon-search'"
-                    :clearable="true"
-                    @clear="clearInfo"
-                    @enter="serchEntry">
-                </bk-input>
-            </div>
-        </div>
-        <bk-table
-            v-bkloading="{ isLoading: isTableLoading }"
-            :data="listInfo"
-            :size="'small'"
-            :pagination="pagination"
-            @page-change="handlePageChange"
-            @page-limit-change="handlePageLimitChange"
-            @select-all="handleSelectAll"
-            @select="handleSelect">
-            <bk-table-column type="selection"
-                width="60"
-                align="center"
-                :selectable="disabledFn">
-            </bk-table-column>
-            <!--<bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>-->
-            <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                <template slot-scope="props">
-                    <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['接口名称']`)" min-width="150">
-                <template slot-scope="props">
-                    <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
-                    <span class="bk-lable-primary"
-                        data-test-id="api_span_apiTableViewDetail"
-                        v-cursor="{ active: !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :title="props.row.name"
-                        @click="entryOne(props.row)">
-                        {{props.row.name || '--'}}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['接口路径']`)" min-width="250">
-                <template slot-scope="props">
-                    <span class="bk-table-type">{{props.row.method}}</span>
-                    <span :title="props.row.path">{{props.row.path || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['接口分类']`)" min-width="100">
-                <template slot-scope="props">
-                    <span :title="systemName(props.row.remote_system)">
-                        {{systemName(props.row.remote_system) || '--'}}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['状态']`)" min-width="60">
-                <template slot-scope="props">
-                    <span :title="props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)">
-                        {{props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)}}
-                    </span>
-                </template>
-            </bk-table-column>
-
-            <bk-table-column :label="$t(`m.common['负责人']`)">
-                <template slot-scope="props">
-                    <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.common['创建人']`)">
-                <template slot-scope="props">
-                    <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                </template>
-            </bk-table-column>
-
-            <bk-table-column :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
-            <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
-                <template slot-scope="props">
-                    <bk-button theme="primary" text
-                        data-test-id="api_button_apiTableExportApi"
-                        :title="$t(`m.systemConfig['导出']`)"
-                        :disabled="props.row.is_builtin"
-                        @click="exportFlow(props.row)">
-                        {{ $t('m.systemConfig["导出"]') }}
-                    </bk-button>
-                    <bk-button theme="primary" text
-                        data-test-id="api_button_apiTableEditApi"
-                        v-cursor="{ active: !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :title="$t(`m.systemConfig['编辑']`)"
-                        :disabled="(projectId || hasPermission(['public_api_manage'], props.row.auth_actions))
-                            && (props.row.is_builtin || !!props.row.count)"
-                        @click="entryOne(props.row)">
-                        {{ $t('m.systemConfig["编辑"]') }}
-                    </bk-button>
-                    <bk-button theme="primary" text
-                        data-test-id="api_button_apiTableDeleteApi"
-                        v-cursor="{ active: !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :class="{ 'text-permission-disable': !projectId
-                            && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
-                        :title="$t(`m.systemConfig['移除']`)"
-                        :disabled="props.row.is_builtin"
-                        @click="openDelete(props.row)">
-                        {{ $t('m.systemConfig["移除"]') }}
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <bk-sideslider
-            :is-show.sync="entryInfo.show"
-            :title="entryInfo.title"
-            :width="entryInfo.width">
-            <div slot="content" style="padding: 20px" v-if="entryInfo.show">
-                <add-api-info
-                    :first-level-info="firstLevelInfo"
-                    :path-list="pathList"
-                    :tree-list="treeList"
-                    :type-info="typeInfo">
-                </add-api-info>
-            </div>
-        </bk-sideslider>
+  <div class="bk-api-table">
+    <div class="bk-api-button mb20">
+      <p class="bk-api-title">{{ $t(`m.systemConfig["API列表"]`) }}</p>
+      <div class="bk-api-button">
+        <bk-dropdown-menu class="mr10 access-btn" @show="dropdownShow" @hide="dropdownHide" ref="apiDropdown">
+          <div class="dropdown-trigger-btn" style="padding-left: 19px;" slot="dropdown-trigger">
+            <span style="font-size: 14px;">{{ $t(`m.systemConfig['接入']`)}}</span>
+            <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+          </div>
+          <ul class="bk-dropdown-list" slot="dropdown-content">
+            <li>
+              <a href="javascript:;"
+                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
+                :class="{ 'text-permission-disable': !projectId
+                  && !hasPermission(['public_api_create']) }"
+                :title="$t(`m.systemConfig['接入']`)"
+                data-test-id="api_a_apiTableAccessApi"
+                @click="openShade('JOIN')">
+                {{ $t(`m.systemConfig['接入']`) }}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:;"
+                data-test-id="api_a_apiTableCreateApi"
+                v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
+                :class="{ 'text-permission-disable': !projectId
+                  && !hasPermission(['public_api_create']) }"
+                :title="$t(`m.systemConfig['新增']`)"
+                @click="openShade('ADD')">
+                {{$t(`m.systemConfig['新增']`)}}
+              </a>
+            </li>
+          </ul>
+        </bk-dropdown-menu>
+        <bk-button :theme="'default'"
+          data-test-id="api_button_apiTableuploadApi"
+          v-cursor="{ active: !projectId && !hasPermission(['public_api_create']) }"
+          :class="{ 'btn-permission-disable': !projectId && !hasPermission(['public_api_create']) }"
+          :title="$t(`m.systemConfig['点击上传']`)"
+          class="mr10 bk-btn-file">
+          <input :type="!projectId && !hasPermission(['public_api_create']) ? 'button' : 'file'"
+            :value="fileVal"
+            class="bk-input-file"
+            @change="handleFile"
+            @click="hasImportPermission">
+          {{$t(`m.systemConfig['导入']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          data-test-id="api_button_apiTableBatchDeleteApi"
+          class="mr10 batch-remove-btn"
+          :title="$t(`m.systemConfig['批量移除']`)"
+          :disabled="!checkList.length"
+          @click="deleteCheck">
+          {{$t(`m.systemConfig['批量移除']`)}}
+        </bk-button>
+        <bk-input class="bk-api-input"
+          data-test-id="api_input_apiTableKeyword"
+          v-model="searchInfo.key"
+          :placeholder="$t(`m.systemConfig['请输入关键字']`)"
+          :right-icon="'bk-icon icon-search'"
+          :clearable="true"
+          @clear="clearInfo"
+          @enter="serchEntry">
+        </bk-input>
+      </div>
     </div>
+    <bk-table
+      v-bkloading="{ isLoading: isTableLoading }"
+      :data="listInfo"
+      :size="'small'"
+      :pagination="pagination"
+      @page-change="handlePageChange"
+      @page-limit-change="handlePageLimitChange"
+      @select-all="handleSelectAll"
+      @select="handleSelect">
+      <bk-table-column type="selection"
+        width="60"
+        align="center"
+        :selectable="disabledFn">
+      </bk-table-column>
+      <!--<bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>-->
+      <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+        <template slot-scope="props">
+          <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['接口名称']`)" min-width="150">
+        <template slot-scope="props">
+          <!-- :disabled="props.row.is_builtin || !!props.row.count" -->
+          <span class="bk-lable-primary"
+            data-test-id="api_span_apiTableViewDetail"
+            v-cursor="{ active: !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :class="{ 'text-permission-disable': !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :title="props.row.name"
+            @click="entryOne(props.row)">
+            {{props.row.name || '--'}}
+          </span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['接口路径']`)" min-width="250">
+        <template slot-scope="props">
+          <span class="bk-table-type">{{props.row.method}}</span>
+          <span :title="props.row.path">{{props.row.path || '--'}}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['接口分类']`)" min-width="100">
+        <template slot-scope="props">
+          <span :title="systemName(props.row.remote_system)">
+            {{systemName(props.row.remote_system) || '--'}}
+          </span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['状态']`)" min-width="60">
+        <template slot-scope="props">
+          <span :title="props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)">
+            {{props.row.is_activated ? $t(`m.systemConfig['启用']`) : $t(`m.systemConfig['关闭']`)}}
+          </span>
+        </template>
+      </bk-table-column>
+
+      <bk-table-column :label="$t(`m.common['负责人']`)">
+        <template slot-scope="props">
+          <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.common['创建人']`)">
+        <template slot-scope="props">
+          <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
+        </template>
+      </bk-table-column>
+
+      <bk-table-column :label="$t(`m.systemConfig['接入数']`)" prop="count" width="80"></bk-table-column>
+      <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
+        <template slot-scope="props">
+          <bk-button theme="primary" text
+            data-test-id="api_button_apiTableExportApi"
+            :title="$t(`m.systemConfig['导出']`)"
+            :disabled="props.row.is_builtin"
+            @click="exportFlow(props.row)">
+            {{ $t('m.systemConfig["导出"]') }}
+          </bk-button>
+          <bk-button theme="primary" text
+            data-test-id="api_button_apiTableEditApi"
+            v-cursor="{ active: !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :class="{ 'text-permission-disable': !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :title="$t(`m.systemConfig['编辑']`)"
+            :disabled="(projectId || hasPermission(['public_api_manage'], props.row.auth_actions))
+              && (props.row.is_builtin || !!props.row.count)"
+            @click="entryOne(props.row)">
+            {{ $t('m.systemConfig["编辑"]') }}
+          </bk-button>
+          <bk-button theme="primary" text
+            data-test-id="api_button_apiTableDeleteApi"
+            v-cursor="{ active: !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :class="{ 'text-permission-disable': !projectId
+              && !hasPermission(['public_api_manage'], props.row.auth_actions) }"
+            :title="$t(`m.systemConfig['移除']`)"
+            :disabled="props.row.is_builtin"
+            @click="openDelete(props.row)">
+            {{ $t('m.systemConfig["移除"]') }}
+          </bk-button>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <bk-sideslider
+      :is-show.sync="entryInfo.show"
+      :title="entryInfo.title"
+      :width="entryInfo.width">
+      <div slot="content" style="padding: 20px" v-if="entryInfo.show">
+        <add-api-info
+          :first-level-info="firstLevelInfo"
+          :path-list="pathList"
+          :tree-list="treeList"
+          :type-info="typeInfo">
+        </add-api-info>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

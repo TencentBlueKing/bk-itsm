@@ -21,60 +21,60 @@
   -->
 
 <template>
-    <div class="bk-build-bill">
-        <bk-form
-            :label-width="200"
-            form-type="vertical"
-            :model="formData"
-            ref="billForm"
-            :class="{ 'inline-form': isGetField }"
+  <div class="bk-build-bill">
+    <bk-form
+      :label-width="200"
+      form-type="vertical"
+      :model="formData"
+      ref="billForm"
+      :class="{ 'inline-form': isGetField }"
+    >
+      <bk-form-item
+        :label="$t(`m.manageCommon['服务目录']`)"
+        class="inline-item"
+      >
+        <common-cascade
+          style="width: 100%"
+          ref="commoncascader"
+          v-model="formData.cascadeCheck"
+          :options="cascadeList"
+          :iscollect-two="customId !== 'all'"
+          :isshow-number="customId !== 'all'"
+          :isactive="true"
+          :options-favorites="optionsFavorites"
+          @change="handleChange"
+          @collect="collect"
+          @cancelcollect="cancelcollect"
         >
-            <bk-form-item
-                :label="$t(`m.manageCommon['服务目录']`)"
-                class="inline-item"
-            >
-                <common-cascade
-                    style="width: 100%"
-                    ref="commoncascader"
-                    v-model="formData.cascadeCheck"
-                    :options="cascadeList"
-                    :iscollect-two="customId !== 'all'"
-                    :isshow-number="customId !== 'all'"
-                    :isactive="true"
-                    :options-favorites="optionsFavorites"
-                    @change="handleChange"
-                    @collect="collect"
-                    @cancelcollect="cancelcollect"
-                >
-                </common-cascade>
-            </bk-form-item>
-            <bk-form-item
-                :label="$t(`m.manageCommon['服务']`)"
-                class="inline-item"
-            >
-                <bk-select
-                    v-model="formData.service_id"
-                    :clearable="false"
-                    :loading="isSecondLoading"
-                    searchable
-                    :font-size="'medium'"
-                    @selected="selectedService"
-                >
-                    <bk-option
-                        v-for="option in billList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name"
-                        :disabled="option.disabled"
-                    >
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.manageCommon['服务说明']`)">
-                <p class="bk-sevice-desc">{{ billListInfo || "--" }}</p>
-            </bk-form-item>
-        </bk-form>
-    </div>
+        </common-cascade>
+      </bk-form-item>
+      <bk-form-item
+        :label="$t(`m.manageCommon['服务']`)"
+        class="inline-item"
+      >
+        <bk-select
+          v-model="formData.service_id"
+          :clearable="false"
+          :loading="isSecondLoading"
+          searchable
+          :font-size="'medium'"
+          @selected="selectedService"
+        >
+          <bk-option
+            v-for="option in billList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name"
+            :disabled="option.disabled"
+          >
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.manageCommon['服务说明']`)">
+        <p class="bk-sevice-desc">{{ billListInfo || "--" }}</p>
+      </bk-form-item>
+    </bk-form>
+  </div>
 </template>
 
 <script>

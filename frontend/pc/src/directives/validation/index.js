@@ -45,18 +45,18 @@ import Rules from './rules';
  *  解析rule
  */
 function parseRule(rule) {
-    if (typeof rule !== 'string') {
-        return {
-            rule: 'not_empty',
-        };
-    }
-
-    const $rule = rule.split(':');
-
+  if (typeof rule !== 'string') {
     return {
-        rule: $rule[0],
-        ext: $rule[1],
+      rule: 'not_empty',
     };
+  }
+
+  const $rule = rule.split(':');
+
+  return {
+    rule: $rule[0],
+    ext: $rule[1],
+  };
 }
 
 /**
@@ -65,45 +65,45 @@ function parseRule(rule) {
  *  @param {Boolean} valid - 当前的值是否通过检测
  */
 function ErrorHandler(el, valid) {
-    if (!valid) {
-        el.classList.add('has-error');
-        el.setAttribute('data-bk-valid', false);
-    } else {
-        el.classList.remove('has-error');
-        el.setAttribute('data-bk-valid', true);
-    }
+  if (!valid) {
+    el.classList.add('has-error');
+    el.setAttribute('data-bk-valid', false);
+  } else {
+    el.classList.remove('has-error');
+    el.setAttribute('data-bk-valid', true);
+  }
 }
 
 const install = (Vue) => {
-    Vue.directive('bk-validation', {
-        inserted() {
-            // el.focus()
-        },
-        update(el, binding) {
-            const {
-                value,
-                oldValue,
-            } = binding;
+  Vue.directive('bk-validation', {
+    inserted() {
+      // el.focus()
+    },
+    update(el, binding) {
+      const {
+        value,
+        oldValue,
+      } = binding;
 
-            // 避免不必要的更新
-            if (value.val === oldValue.val) return;
+      // 避免不必要的更新
+      if (value.val === oldValue.val) return;
 
-            // const parsedType = parseType(value.type);
-            const parsedRule = parseRule(value.rule);
-            let result;
+      // const parsedType = parseType(value.type);
+      const parsedRule = parseRule(value.rule);
+      let result;
 
-            switch (parsedRule.rule) {
-                case 'not_empty':
-                    result = Rules.notEmpty(value.val);
-                    break;
-                case 'limit':
-                    result = Rules.limit(value.val, parsedRule.ext);
-                    break;
-            }
+      switch (parsedRule.rule) {
+        case 'not_empty':
+          result = Rules.notEmpty(value.val);
+          break;
+        case 'limit':
+          result = Rules.limit(value.val, parsedRule.ext);
+          break;
+      }
 
-            ErrorHandler(el, result);
-        },
-    });
+      ErrorHandler(el, result);
+    },
+  });
 };
 
 export default install;

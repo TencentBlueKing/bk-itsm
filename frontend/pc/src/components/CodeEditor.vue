@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <section class="code-editor"></section>
+  <section class="code-editor"></section>
 </template>
 <script>
     import * as monaco from 'monaco-editor';

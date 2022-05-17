@@ -21,67 +21,67 @@
   -->
 
 <template>
-    <div class="thirdStep">
-        <div class="bk-itsm-version" style="margin: 0 0 10px 0;" v-if="versionStatus">
-            <i class="bk-icon icon-info-circle"></i>
-            <span>{{$t(`m.slaContent['服务时长 = 单据更改为“结束计时状态”的时间 - 不计时的状态停留时长']`)}}</span>
-            <i class="bk-icon icon-close" @click="closeVersion"></i>
-        </div>
-        <bk-form
-            :label-width="350"
-            form-type="vertical"
-            :model="formDataInfo.endStatus"
-            ref="timeRules">
-            <bk-form-item class="bk-time-width"
-                :label="$t(`m.slaContent['结束计时的单据状态']`)">
-                <bk-select
-                    v-model="formDataInfo.endStatus.info"
-                    :clearable="false"
-                    multiple
-                    searchable
-                    :font-size="'medium'"
-                    @selected="endSelectFn">
-                    <bk-option v-for="option in endCheckboxList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-                <i class="bk-itsm-icon ml5 icon-icon-info icon-cus" v-bk-tooltips="$t(`m.slaContent['说明： 单据结束状态默认为SLA停止计时的状态：']`) + endTips"></i>
-            </bk-form-item>
-            <bk-form-item class="bk-time-width mt20"
-                :label="$t(`m.slaContent['流转过程中不计入时长统计的单据状态']`)">
-                <bk-select
-                    v-model="formDataInfo.ignoreStatus.info"
-                    :clearable="false"
-                    multiple
-                    searchable
-                    :font-size="'medium'"
-                    @selected="ignoreSelectFn">
-                    <bk-option v-for="option in ignoreCheckboxList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-        </bk-form>
-        <div class="mt20">
-            <bk-button theme="default"
-                :title="$t(`m.slaContent['上一步']`)"
-                class="mr10"
-                :disabled="secondClick"
-                @click="previousStep">
-                {{$t(`m.slaContent['上一步']`)}}
-            </bk-button>
-            <bk-button theme="primary"
-                :title="$t(`m.slaContent['提交']`)"
-                :loading="secondClick"
-                @click="submit">
-                {{$t(`m.slaContent['提交']`)}}
-            </bk-button>
-        </div>
+  <div class="thirdStep">
+    <div class="bk-itsm-version" style="margin: 0 0 10px 0;" v-if="versionStatus">
+      <i class="bk-icon icon-info-circle"></i>
+      <span>{{$t(`m.slaContent['服务时长 = 单据更改为“结束计时状态”的时间 - 不计时的状态停留时长']`)}}</span>
+      <i class="bk-icon icon-close" @click="closeVersion"></i>
     </div>
+    <bk-form
+      :label-width="350"
+      form-type="vertical"
+      :model="formDataInfo.endStatus"
+      ref="timeRules">
+      <bk-form-item class="bk-time-width"
+        :label="$t(`m.slaContent['结束计时的单据状态']`)">
+        <bk-select
+          v-model="formDataInfo.endStatus.info"
+          :clearable="false"
+          multiple
+          searchable
+          :font-size="'medium'"
+          @selected="endSelectFn">
+          <bk-option v-for="option in endCheckboxList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+        <i class="bk-itsm-icon ml5 icon-icon-info icon-cus" v-bk-tooltips="$t(`m.slaContent['说明： 单据结束状态默认为SLA停止计时的状态：']`) + endTips"></i>
+      </bk-form-item>
+      <bk-form-item class="bk-time-width mt20"
+        :label="$t(`m.slaContent['流转过程中不计入时长统计的单据状态']`)">
+        <bk-select
+          v-model="formDataInfo.ignoreStatus.info"
+          :clearable="false"
+          multiple
+          searchable
+          :font-size="'medium'"
+          @selected="ignoreSelectFn">
+          <bk-option v-for="option in ignoreCheckboxList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+    </bk-form>
+    <div class="mt20">
+      <bk-button theme="default"
+        :title="$t(`m.slaContent['上一步']`)"
+        class="mr10"
+        :disabled="secondClick"
+        @click="previousStep">
+        {{$t(`m.slaContent['上一步']`)}}
+      </bk-button>
+      <bk-button theme="primary"
+        :title="$t(`m.slaContent['提交']`)"
+        :loading="secondClick"
+        @click="submit">
+        {{$t(`m.slaContent['提交']`)}}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -21,258 +21,258 @@
   -->
 
 <template>
-    <div class="bk-itsm-box">
-        <!-- 首页列表 -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m.deployPage["流程设计"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-itsm-version" v-if="versionStatus">
-                <i class="bk-icon icon-info-circle"></i>
-                <span>{{ $t('m.deployPage["流程设计：流程修改后，需要重新部署才能使改动生效"]') }}</span>
-                <i class="bk-icon icon-close" @click="closeVersion"></i>
-            </div>
-            <div class="bk-design-table">
-                <div class="bk-only-btn">
-                    <div class="bk-more-search">
-                        <bk-button
-                            v-cursor="{ active: !hasPermission(['workflow_create']) }"
-                            icon="plus"
-                            :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['workflow_create'])
-                            }]"
-                            :theme="'primary'"
-                            :title="$t(`m.deployPage['新增']`)"
-                            @click="addProcess">
-                            {{ $t('m.deployPage["新增"]') }}
-                        </bk-button>
-                        <bk-button
-                            v-if="!hasPermission(['workflow_create'])"
-                            v-cursor="{ active: !hasPermission(['workflow_create']) }"
-                            :theme="'default'"
-                            :title="$t(`m.deployPage['点击上传']`)"
-                            :class="['mr10', 'bk-btn-file', {
-                                'btn-permission-disable': !hasPermission(['workflow_create'])
-                            }]"
-                            @click="onProcessImportPermissonApply">
-                            {{ $t('m.deployPage["导入"]') }}
-                        </bk-button>
-                        <bk-button
-                            v-else
-                            :theme="'default'"
-                            :title="$t(`m.deployPage['点击上传']`)"
-                            class="mr10 bk-btn-file">
-                            <input type="file" :value="fileVal" class="bk-input-file" @change="handleFile">
-                            {{ $t('m.deployPage["导入"]') }}
-                        </bk-button>
-                        <div class="bk-search-name">
-                            <div class="bk-search-content">
-                                <bk-input
-                                    :clearable="true"
-                                    :right-icon="'bk-icon icon-search'"
-                                    :placeholder="moreSearch[0].placeholder"
-                                    v-model="moreSearch[0].value"
-                                    @enter="searchContent"
-                                    @clear="clearSearch">
-                                </bk-input>
-                            </div>
-                            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                                icon=" bk-itsm-icon icon-search-more"
-                                class="ml10 filter-btn"
-                                @click="searchMore">
-                            </bk-button>
-                        </div>
-                    </div>
-                    <search-info
-                        ref="searchInfo"
-                        :more-search="moreSearch">
-                    </search-info>
-                </div>
-                <bk-table
-                    v-bkloading="{ isLoading: isDataLoading }"
-                    :data="dataList"
-                    :size="'small'"
-                    :pagination="pagination"
-                    @page-change="handlePageChange"
-                    @page-limit-change="handlePageLimitChange">
-                    <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
-                        <template slot-scope="props">
-                            <span :title="props.row.id">{{ props.row.id || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-
-                    <bk-table-column :label="$t(`m.deployPage['流程名']`)" min-width="200">
-                        <template slot-scope="props">
-                            <span class="bk-lable-primary"
-                                @click="onFlowEdit(props.row)"
-                                :title="props.row.name">
-                                {{props.row.name}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.deployPage['说明']`)" min-width="200">
-                        <template slot-scope="props">
-                            <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['负责人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['创建人']`)">
-                        <template slot-scope="props">
-                            <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.common['更新人']`)" min-width="100">
-                        <template slot-scope="props">
-                            <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.deployPage['更新时间']`)" width="180">
-                        <template slot-scope="props">
-                            <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.deployPage['状态']`)" width="80">
-                        <template slot-scope="props">
-                            <span class="bk-status-color"
-                                :class="{ 'bk-status-gray':
-                                    !props.row.is_enabled, 'bk-status-primary': props.row.is_draft }">
-                            </span>
-                            <span style="margin-left: 5px;"
-                                :title="props.row.is_draft
-                                    ? $t(`m.deployPage['草稿']`) : (props.row.is_enabled
-                                        ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
-                                {{props.row.is_draft
-                                    ? $t(`m.deployPage["草稿"]`) : (props.row.is_enabled
-                                        ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.deployPage['操作']`)" width="300">
-                        <template slot-scope="props">
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :class="[{
-                                    'btn-permission-disable':
-                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
-                                }]"
-                                @click="onFlowEdit(props.row)">
-                                {{ $t('m.deployPage["编辑"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['workflow_deploy'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions)
-                                    && (props.row.is_draft || !props.row.is_enabled)"
-                                :class="[{
-                                    'btn-permission-disable':
-                                        !hasPermission(['workflow_deploy'], props.row.auth_actions)
-                                }]"
-                                @click="onFlowDeploy(props.row)">
-                                {{ $t('m.deployPage["部署"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :class="[{
-                                    'btn-permission-disable':
-                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
-                                }]"
-                                @click="onFlowPreview(props.row)">
-                                {{ $t('m.deployPage["预览"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :disabled="hasPermission(['workflow_manage'], props.row.auth_actions)
-                                    && props.row.is_draft"
-                                :class="[{
-                                    'btn-permission-disable':
-                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
-                                }]"
-                                @click="onFlowExport(props.row)">
-                                {{ $t('m.deployPage["导出"]') }}
-                            </bk-button>
-                            <bk-button
-                                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
-                                text
-                                theme="primary"
-                                :class="[{
-                                    'btn-permission-disable':
-                                        !hasPermission(['workflow_manage'], props.row.auth_actions)
-                                }]"
-                                @click="deleteConfirm(props.row)">
-                                {{ $t('m.deployPage["删除"]') }}
-                            </bk-button>
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-                <!-- 预览 -->
-                <bk-dialog v-model="processInfo.isShow"
-                    width="760"
-                    :position="processInfo.position"
-                    :draggable="processInfo.draggable"
-                    :title="processInfo.title">
-                    <div style="width: 100%; height: 347px;" v-bkloading="{ isLoading: processInfo.loading }">
-                        <preview
-                            v-if="!processInfo.loading"
-                            :add-list="addList"
-                            :line-list="lineList"
-                            :preview-info="previewInfo"
-                            :normal-color="normalColor">
-                        </preview>
-                    </div>
-                    <div slot="footer">
-                        <bk-button
-                            theme="default"
-                            @click="processInfo.isShow = false">
-                            {{ $t('m.deployPage["关闭"]') }}
-                        </bk-button>
-                    </div>
-                </bk-dialog>
-                <!-- 部署确认 -->
-                <bk-dialog
-                    v-model="deployInfo.isShow"
-                    :render-directive="'if'"
-                    :width="deployInfo.width"
-                    :header-position="deployInfo.headerPosition"
-                    :loading="secondClick"
-                    :auto-close="deployInfo.autoClose"
-                    :mask-close="deployInfo.autoClose"
-                    @confirm="submitForm">
-                    <p slot="header">{{ $t(`m.deployPage["确认部署"]`) }}</p>
-                    <div class="bk-add-project">
-                        <bk-form
-                            :label-width="200"
-                            form-type="vertical"
-                            :model="deployInfo.formInfo"
-                            :rules="rules"
-                            ref="deployForm">
-                            <bk-form-item
-                                :label="$t(`m.deployPage['部署流程名']`)"
-                                :required="true"
-                                :property="'name'">
-                                <bk-input v-model.trim="deployInfo.formInfo.name"
-                                    maxlength="120"
-                                    :placeholder="$t(`m.deployPage['请输入部署流程名']`)">
-                                </bk-input>
-                            </bk-form-item>
-                        </bk-form>
-                    </div>
-                </bk-dialog>
-            </div>
-        </div>
+  <div class="bk-itsm-box">
+    <!-- 首页列表 -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m.deployPage["流程设计"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-itsm-version" v-if="versionStatus">
+        <i class="bk-icon icon-info-circle"></i>
+        <span>{{ $t('m.deployPage["流程设计：流程修改后，需要重新部署才能使改动生效"]') }}</span>
+        <i class="bk-icon icon-close" @click="closeVersion"></i>
+      </div>
+      <div class="bk-design-table">
+        <div class="bk-only-btn">
+          <div class="bk-more-search">
+            <bk-button
+              v-cursor="{ active: !hasPermission(['workflow_create']) }"
+              icon="plus"
+              :class="['mr10', 'plus-cus', {
+                'btn-permission-disable': !hasPermission(['workflow_create'])
+              }]"
+              :theme="'primary'"
+              :title="$t(`m.deployPage['新增']`)"
+              @click="addProcess">
+              {{ $t('m.deployPage["新增"]') }}
+            </bk-button>
+            <bk-button
+              v-if="!hasPermission(['workflow_create'])"
+              v-cursor="{ active: !hasPermission(['workflow_create']) }"
+              :theme="'default'"
+              :title="$t(`m.deployPage['点击上传']`)"
+              :class="['mr10', 'bk-btn-file', {
+                'btn-permission-disable': !hasPermission(['workflow_create'])
+              }]"
+              @click="onProcessImportPermissonApply">
+              {{ $t('m.deployPage["导入"]') }}
+            </bk-button>
+            <bk-button
+              v-else
+              :theme="'default'"
+              :title="$t(`m.deployPage['点击上传']`)"
+              class="mr10 bk-btn-file">
+              <input type="file" :value="fileVal" class="bk-input-file" @change="handleFile">
+              {{ $t('m.deployPage["导入"]') }}
+            </bk-button>
+            <div class="bk-search-name">
+              <div class="bk-search-content">
+                <bk-input
+                  :clearable="true"
+                  :right-icon="'bk-icon icon-search'"
+                  :placeholder="moreSearch[0].placeholder"
+                  v-model="moreSearch[0].value"
+                  @enter="searchContent"
+                  @clear="clearSearch">
+                </bk-input>
+              </div>
+              <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+                icon=" bk-itsm-icon icon-search-more"
+                class="ml10 filter-btn"
+                @click="searchMore">
+              </bk-button>
+            </div>
+          </div>
+          <search-info
+            ref="searchInfo"
+            :more-search="moreSearch">
+          </search-info>
+        </div>
+        <bk-table
+          v-bkloading="{ isLoading: isDataLoading }"
+          :data="dataList"
+          :size="'small'"
+          :pagination="pagination"
+          @page-change="handlePageChange"
+          @page-limit-change="handlePageLimitChange">
+          <bk-table-column :label="$t(`m.common['ID']`)" min-width="60">
+            <template slot-scope="props">
+              <span :title="props.row.id">{{ props.row.id || '--' }}</span>
+            </template>
+          </bk-table-column>
+
+          <bk-table-column :label="$t(`m.deployPage['流程名']`)" min-width="200">
+            <template slot-scope="props">
+              <span class="bk-lable-primary"
+                @click="onFlowEdit(props.row)"
+                :title="props.row.name">
+                {{props.row.name}}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.deployPage['说明']`)" min-width="200">
+            <template slot-scope="props">
+              <span :title="props.row.desc">{{ props.row.desc || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['负责人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.owners">{{props.row.owners || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['创建人']`)">
+            <template slot-scope="props">
+              <span :title="props.row.creator">{{props.row.creator || '--'}}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.common['更新人']`)" min-width="100">
+            <template slot-scope="props">
+              <span :title="props.row.updated_by">{{ props.row.updated_by || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.deployPage['更新时间']`)" width="180">
+            <template slot-scope="props">
+              <span :title="props.row.update_at">{{ props.row.update_at || '--' }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.deployPage['状态']`)" width="80">
+            <template slot-scope="props">
+              <span class="bk-status-color"
+                :class="{ 'bk-status-gray':
+                  !props.row.is_enabled, 'bk-status-primary': props.row.is_draft }">
+              </span>
+              <span style="margin-left: 5px;"
+                :title="props.row.is_draft
+                  ? $t(`m.deployPage['草稿']`) : (props.row.is_enabled
+                    ? $t(`m.deployPage['启用']`) : $t(`m.deployPage['关闭']`))">
+                {{props.row.is_draft
+                  ? $t(`m.deployPage["草稿"]`) : (props.row.is_enabled
+                    ? $t(`m.deployPage["启用"]`) : $t(`m.deployPage["关闭"]`))}}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.deployPage['操作']`)" width="300">
+            <template slot-scope="props">
+              <bk-button
+                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :class="[{
+                  'btn-permission-disable':
+                    !hasPermission(['workflow_manage'], props.row.auth_actions)
+                }]"
+                @click="onFlowEdit(props.row)">
+                {{ $t('m.deployPage["编辑"]') }}
+              </bk-button>
+              <bk-button
+                v-cursor="{ active: !hasPermission(['workflow_deploy'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :disabled="hasPermission(['workflow_deploy'], props.row.auth_actions)
+                  && (props.row.is_draft || !props.row.is_enabled)"
+                :class="[{
+                  'btn-permission-disable':
+                    !hasPermission(['workflow_deploy'], props.row.auth_actions)
+                }]"
+                @click="onFlowDeploy(props.row)">
+                {{ $t('m.deployPage["部署"]') }}
+              </bk-button>
+              <bk-button
+                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :class="[{
+                  'btn-permission-disable':
+                    !hasPermission(['workflow_manage'], props.row.auth_actions)
+                }]"
+                @click="onFlowPreview(props.row)">
+                {{ $t('m.deployPage["预览"]') }}
+              </bk-button>
+              <bk-button
+                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :disabled="hasPermission(['workflow_manage'], props.row.auth_actions)
+                  && props.row.is_draft"
+                :class="[{
+                  'btn-permission-disable':
+                    !hasPermission(['workflow_manage'], props.row.auth_actions)
+                }]"
+                @click="onFlowExport(props.row)">
+                {{ $t('m.deployPage["导出"]') }}
+              </bk-button>
+              <bk-button
+                v-cursor="{ active: !hasPermission(['workflow_manage'], props.row.auth_actions) }"
+                text
+                theme="primary"
+                :class="[{
+                  'btn-permission-disable':
+                    !hasPermission(['workflow_manage'], props.row.auth_actions)
+                }]"
+                @click="deleteConfirm(props.row)">
+                {{ $t('m.deployPage["删除"]') }}
+              </bk-button>
+            </template>
+          </bk-table-column>
+        </bk-table>
+        <!-- 预览 -->
+        <bk-dialog v-model="processInfo.isShow"
+          width="760"
+          :position="processInfo.position"
+          :draggable="processInfo.draggable"
+          :title="processInfo.title">
+          <div style="width: 100%; height: 347px;" v-bkloading="{ isLoading: processInfo.loading }">
+            <preview
+              v-if="!processInfo.loading"
+              :add-list="addList"
+              :line-list="lineList"
+              :preview-info="previewInfo"
+              :normal-color="normalColor">
+            </preview>
+          </div>
+          <div slot="footer">
+            <bk-button
+              theme="default"
+              @click="processInfo.isShow = false">
+              {{ $t('m.deployPage["关闭"]') }}
+            </bk-button>
+          </div>
+        </bk-dialog>
+        <!-- 部署确认 -->
+        <bk-dialog
+          v-model="deployInfo.isShow"
+          :render-directive="'if'"
+          :width="deployInfo.width"
+          :header-position="deployInfo.headerPosition"
+          :loading="secondClick"
+          :auto-close="deployInfo.autoClose"
+          :mask-close="deployInfo.autoClose"
+          @confirm="submitForm">
+          <p slot="header">{{ $t(`m.deployPage["确认部署"]`) }}</p>
+          <div class="bk-add-project">
+            <bk-form
+              :label-width="200"
+              form-type="vertical"
+              :model="deployInfo.formInfo"
+              :rules="rules"
+              ref="deployForm">
+              <bk-form-item
+                :label="$t(`m.deployPage['部署流程名']`)"
+                :required="true"
+                :property="'name'">
+                <bk-input v-model.trim="deployInfo.formInfo.name"
+                  maxlength="120"
+                  :placeholder="$t(`m.deployPage['请输入部署流程名']`)">
+                </bk-input>
+              </bk-form-item>
+            </bk-form>
+          </div>
+        </bk-dialog>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
     import axios from 'axios';

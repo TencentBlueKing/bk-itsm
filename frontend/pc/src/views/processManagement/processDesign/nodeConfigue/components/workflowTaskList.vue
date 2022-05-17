@@ -21,167 +21,167 @@
   -->
 
 <template>
-    <div class="bk-trigger-info mt20" v-bkloading="{ isLoading: loading }">
-        <div class="bk-service-name">
-            <h1 style="padding-left: 10px">
-                <span class="is-outline"></span>
-                {{$t(`m.taskTemplate['任务配置']`)}}
-                <i class="bk-itsm-icon icon-icon-info"
-                    v-bk-tooltips="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)"></i>
-            </h1>
-        </div>
-        <div style="width: 100%">
-            <div class="bk-trigger-add" @click="openCite">
-                <i class="bk-itsm-icon icon-add-new"></i>
-                <span>{{$t(`m.taskTemplate['添加流程任务']`)}}</span>
-            </div>
-            <!-- 模板列表 -->
-            <div class="task-table">
-                <ul class="bk-task-content">
-                    <li v-for="(item, index) in boundTaskList" :key="index" @click="editTemplate(item)">
-                        <span class="bk-task-icon">
-                            <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
-                        </span>
-                        <span class="bk-task-name" :title="item.name">
-                            <span>{{ item.name || '--' }}</span>
-                            <span>{{ item.update_at || '--' }}</span>
-                        </span>
-                        <span class="bk-task-operate">
-                            <i class="bk-icon icon-delete"
-                                :class="{ 'icon-disable': item.builtIn }"
-                                v-bk-tooltips="$t(`m.taskTemplate['删除模板']`)"
-                                @click.stop="delTask(index)"></i>
-                            <i class="bk-itsm-icon icon-itsm-icon-three-seven"
-                                v-bk-tooltips="$t(`m.taskTemplate['跳转查看']`)"
-                                @click.stop="toTaskPage()"></i>
-                        </span>
-                    </li>
-                </ul>
-            </div>
-            <!-- 模板配置 -->
-            <div class="task-form" v-if="boundTaskList.length">
-                <bk-form :label-width="170" :model="taskConfig" :rules="taskConfigRule" ref="taskForm">
-                    <bk-form-item :label="$t(`m.taskTemplate['条件配置：']`)" :required="true" :property="'createId'" class="config-form-item">
-                        <div class="config-content">
-                            <span>{{$t(`m.taskTemplate['创建任务的条件']`)}}</span>
-                            <div class="config-item">
-                                <span class="ml50 mr20">{{$t(`m.taskTemplate['处于']`)}}</span>
-                                <bk-select v-model="taskConfig.createId"
-                                    :placeholder="$t(`m.taskTemplate['请选择节点']`)"
-                                    :ext-cls="'bk-form-width'"
-                                    searchable
-                                    clearable
-                                    @change="getPostNodes">
-                                    <bk-option v-for="node in createList"
-                                        :key="node.id"
-                                        :id="node.id"
-                                        :name="node.name">
-                                    </bk-option>
-                                </bk-select>
-                                <span>{{$t(`m.taskTemplate['时']`)}}</span>
-                            </div>
-                        </div>
-                    </bk-form-item>
-                    <bk-form-item :property="'handleId'" class="config-form-item">
-                        <div class="config-content">
-                            <span>{{$t(`m.taskTemplate['处理任务的条件']`)}}</span>
-                            <div class="config-item">
-                                <span class="ml50 mr20">{{$t(`m.taskTemplate['处于']`)}}</span>
-                                <bk-select v-model="taskConfig.handleId"
-                                    :placeholder="$t(`m.taskTemplate['请选择节点']`)"
-                                    searchable
-                                    :ext-cls="'bk-form-width'"
-                                    clearable
-                                    :loading="handleListLoading">
-                                    <bk-option v-for="node in handleList"
-                                        :key="node.id"
-                                        :id="node.id"
-                                        :name="node.name">
-                                    </bk-option>
-                                </bk-select>
-                                <span class="mr40">{{$t(`m.taskTemplate['时']`)}}</span>
-                            </div>
-                        </div>
-                    </bk-form-item>
-                    <bk-form-item>
-                        <div class="config-content auto-height">
-                            <span>{{$t(`m.newCommon['应用设置']`)}}</span>
-                            <div class="config-item setting">
-                                <p>
-                                    <bk-checkbox class="ml50 mr20" :value="taskConfig.execute_can_create" @change="taskConfig.execute_can_create = !taskConfig.execute_can_create"></bk-checkbox>
-                                    <span>{{$t(`m.taskTemplate['处理任务的节点也可以创建任务']`)}}</span>
-                                </p>
-                                <p>
-                                    <bk-checkbox class="ml50 mr20" :value="taskConfig.waitTask" @change="taskConfig.waitTask = !taskConfig.waitTask"></bk-checkbox>
-                                    <span>{{$t(`m.taskTemplate['下一个节点流转是否必须等待任务处理完成']`)}}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </bk-form-item>
-                </bk-form>
-            </div>
-        </div>
-        <template>
-            <bk-dialog v-model="taskDialogInfo.isShow"
-                theme="primary"
-                width="660"
-                :mask-close="false">
-                <div slot="header" class="trigger-dialog-header">
-                    <span>{{$t(`m.taskTemplate['选择任务模板']`)}}</span>
-                    <div class="bk-search-key">
-                        <bk-input
-                            :clearable="true"
-                            :right-icon="'bk-icon icon-search'"
-                            v-model="taskDialogInfo.searchKey"
-                            @enter="searchInfo"
-                            @clear="clearSearch">
-                        </bk-input>
-                    </div>
-                </div>
-                <div class="trigger-dialog-box" v-bkloading="{ isLoading: taskDialogInfo.listLoading }">
-                    <p class="dialog-none-content" v-if="taskDialogInfo.list.length === 0">
-                        <i class="bk-icon icon-info-circle"></i>
-                        <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
-                        <span class="bk-primary" @click="toTaskPage">{{$t(`m.taskTemplate['跳转创建']`)}}</span>
-                    </p>
-                    <ul class="bk-task-dialog" v-else>
-                        <li v-for="(item, index) in taskDialogInfo.list"
-                            :key="index" @click="item.checked = !item.checked">
-                            <span class="bk-task-icon">
-                                <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
-                            </span>
-                            <span class="bk-task-name" :title="item.name">
-                                <span>{{ item.name || '--' }}</span>
-                                <span>{{ item.update_at || '--' }}</span>
-                            </span>
-                            <span class="bk-task-operate">
-                                <bk-checkbox :value="item.checked"></bk-checkbox>
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-                <div slot="footer" class="trigger-dialog-footer">
-                    <bk-checkbox :value="Boolean((taskDialogInfo.list.length === citeList.length) && taskDialogInfo.list.length)"
-                        :ext-cls="'checkbox'"
-                        :disabled="!taskDialogInfo.list.length"
-                        @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
-                    <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
-                    <bk-button theme="primary"
-                        class="mr10"
-                        :title="$t(`m.taskTemplate['确定']`)"
-                        @click="citeTask">
-                        {{$t(`m.taskTemplate['确定']`)}}
-                    </bk-button>
-                    <bk-button theme="default"
-                        class="mr10"
-                        :title="$t(`m.taskTemplate['取消']`)"
-                        @click="initDialogInfo">
-                        {{$t(`m.taskTemplate['取消']`)}}
-                    </bk-button>
-                </div>
-            </bk-dialog>
-        </template>
+  <div class="bk-trigger-info mt20" v-bkloading="{ isLoading: loading }">
+    <div class="bk-service-name">
+      <h1 style="padding-left: 10px">
+        <span class="is-outline"></span>
+        {{$t(`m.taskTemplate['任务配置']`)}}
+        <i class="bk-itsm-icon icon-icon-info"
+          v-bk-tooltips="$t(`m.taskTemplate['如果需要在流程中调用标准运维的业务流程进而创建任务，请在第一步的“填写流程信息”中，打开“是否关联业务”的开关。']`)"></i>
+      </h1>
     </div>
+    <div style="width: 100%">
+      <div class="bk-trigger-add" @click="openCite">
+        <i class="bk-itsm-icon icon-add-new"></i>
+        <span>{{$t(`m.taskTemplate['添加流程任务']`)}}</span>
+      </div>
+      <!-- 模板列表 -->
+      <div class="task-table">
+        <ul class="bk-task-content">
+          <li v-for="(item, index) in boundTaskList" :key="index" @click="editTemplate(item)">
+            <span class="bk-task-icon">
+              <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
+            </span>
+            <span class="bk-task-name" :title="item.name">
+              <span>{{ item.name || '--' }}</span>
+              <span>{{ item.update_at || '--' }}</span>
+            </span>
+            <span class="bk-task-operate">
+              <i class="bk-icon icon-delete"
+                :class="{ 'icon-disable': item.builtIn }"
+                v-bk-tooltips="$t(`m.taskTemplate['删除模板']`)"
+                @click.stop="delTask(index)"></i>
+              <i class="bk-itsm-icon icon-itsm-icon-three-seven"
+                v-bk-tooltips="$t(`m.taskTemplate['跳转查看']`)"
+                @click.stop="toTaskPage()"></i>
+            </span>
+          </li>
+        </ul>
+      </div>
+      <!-- 模板配置 -->
+      <div class="task-form" v-if="boundTaskList.length">
+        <bk-form :label-width="170" :model="taskConfig" :rules="taskConfigRule" ref="taskForm">
+          <bk-form-item :label="$t(`m.taskTemplate['条件配置：']`)" :required="true" :property="'createId'" class="config-form-item">
+            <div class="config-content">
+              <span>{{$t(`m.taskTemplate['创建任务的条件']`)}}</span>
+              <div class="config-item">
+                <span class="ml50 mr20">{{$t(`m.taskTemplate['处于']`)}}</span>
+                <bk-select v-model="taskConfig.createId"
+                  :placeholder="$t(`m.taskTemplate['请选择节点']`)"
+                  :ext-cls="'bk-form-width'"
+                  searchable
+                  clearable
+                  @change="getPostNodes">
+                  <bk-option v-for="node in createList"
+                    :key="node.id"
+                    :id="node.id"
+                    :name="node.name">
+                  </bk-option>
+                </bk-select>
+                <span>{{$t(`m.taskTemplate['时']`)}}</span>
+              </div>
+            </div>
+          </bk-form-item>
+          <bk-form-item :property="'handleId'" class="config-form-item">
+            <div class="config-content">
+              <span>{{$t(`m.taskTemplate['处理任务的条件']`)}}</span>
+              <div class="config-item">
+                <span class="ml50 mr20">{{$t(`m.taskTemplate['处于']`)}}</span>
+                <bk-select v-model="taskConfig.handleId"
+                  :placeholder="$t(`m.taskTemplate['请选择节点']`)"
+                  searchable
+                  :ext-cls="'bk-form-width'"
+                  clearable
+                  :loading="handleListLoading">
+                  <bk-option v-for="node in handleList"
+                    :key="node.id"
+                    :id="node.id"
+                    :name="node.name">
+                  </bk-option>
+                </bk-select>
+                <span class="mr40">{{$t(`m.taskTemplate['时']`)}}</span>
+              </div>
+            </div>
+          </bk-form-item>
+          <bk-form-item>
+            <div class="config-content auto-height">
+              <span>{{$t(`m.newCommon['应用设置']`)}}</span>
+              <div class="config-item setting">
+                <p>
+                  <bk-checkbox class="ml50 mr20" :value="taskConfig.execute_can_create" @change="taskConfig.execute_can_create = !taskConfig.execute_can_create"></bk-checkbox>
+                  <span>{{$t(`m.taskTemplate['处理任务的节点也可以创建任务']`)}}</span>
+                </p>
+                <p>
+                  <bk-checkbox class="ml50 mr20" :value="taskConfig.waitTask" @change="taskConfig.waitTask = !taskConfig.waitTask"></bk-checkbox>
+                  <span>{{$t(`m.taskTemplate['下一个节点流转是否必须等待任务处理完成']`)}}</span>
+                </p>
+              </div>
+            </div>
+          </bk-form-item>
+        </bk-form>
+      </div>
+    </div>
+    <template>
+      <bk-dialog v-model="taskDialogInfo.isShow"
+        theme="primary"
+        width="660"
+        :mask-close="false">
+        <div slot="header" class="trigger-dialog-header">
+          <span>{{$t(`m.taskTemplate['选择任务模板']`)}}</span>
+          <div class="bk-search-key">
+            <bk-input
+              :clearable="true"
+              :right-icon="'bk-icon icon-search'"
+              v-model="taskDialogInfo.searchKey"
+              @enter="searchInfo"
+              @clear="clearSearch">
+            </bk-input>
+          </div>
+        </div>
+        <div class="trigger-dialog-box" v-bkloading="{ isLoading: taskDialogInfo.listLoading }">
+          <p class="dialog-none-content" v-if="taskDialogInfo.list.length === 0">
+            <i class="bk-icon icon-info-circle"></i>
+            <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
+            <span class="bk-primary" @click="toTaskPage">{{$t(`m.taskTemplate['跳转创建']`)}}</span>
+          </p>
+          <ul class="bk-task-dialog" v-else>
+            <li v-for="(item, index) in taskDialogInfo.list"
+              :key="index" @click="item.checked = !item.checked">
+              <span class="bk-task-icon">
+                <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
+              </span>
+              <span class="bk-task-name" :title="item.name">
+                <span>{{ item.name || '--' }}</span>
+                <span>{{ item.update_at || '--' }}</span>
+              </span>
+              <span class="bk-task-operate">
+                <bk-checkbox :value="item.checked"></bk-checkbox>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div slot="footer" class="trigger-dialog-footer">
+          <bk-checkbox :value="Boolean((taskDialogInfo.list.length === citeList.length) && taskDialogInfo.list.length)"
+            :ext-cls="'checkbox'"
+            :disabled="!taskDialogInfo.list.length"
+            @change="selectAllFn">{{$t(`m.taskTemplate['全选']`)}}</bk-checkbox>
+          <span>{{$t(`m.taskTemplate['已选']`)}}<span>{{citeList.length}}</span>个</span>
+          <bk-button theme="primary"
+            class="mr10"
+            :title="$t(`m.taskTemplate['确定']`)"
+            @click="citeTask">
+            {{$t(`m.taskTemplate['确定']`)}}
+          </bk-button>
+          <bk-button theme="default"
+            class="mr10"
+            :title="$t(`m.taskTemplate['取消']`)"
+            @click="initDialogInfo">
+            {{$t(`m.taskTemplate['取消']`)}}
+          </bk-button>
+        </div>
+      </bk-dialog>
+    </template>
+  </div>
 </template>
 <script>
     import { errorHandler } from '../../../../../utils/errorHandler';

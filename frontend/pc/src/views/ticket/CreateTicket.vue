@@ -21,145 +21,145 @@
   -->
 
 <template>
-    <div class="create-ticket-page">
-        <nav-title :show-icon="true"
-            :title-name="$t(`m.navigation['提单']`)"
-            @goBack="onBackIconClick">
-        </nav-title>
-        <div class="create-ticket-body" v-if="!isRemindPageShow" v-bkloading="{ isLoading: serviceLoading }">
-            <!-- 服务信息 -->
-            <section class="service-info">
-                <div class="service-icon-wrap">
-                    <span class="service-icon">
-                        <i class="bk-itsm-icon icon-service"></i>
-                    </span>
-                </div>
-                <div class="service-description">
-                    <h3 class="service-title">
-                        <span class="service-name">{{ service.name }}</span>
-                        <i
-                            :class="['bk-itsm-icon favorite', favorite ? 'icon-favorite' : 'icon-rate']"
-                            v-bk-tooltips="{
-                                content: favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
-                                placement: 'top',
-                                delay: [300, 0]
-                            }"
-                            @click.stop="onCollectClick">
-                        </i>
-                        <span class="change-service" @click="onChangeService">{{ $t(`m.common['切换服务']`) }}</span>
-                    </h3>
-                    <pre class="service-content">{{ service.desc || $t(`m.common['暂无描述']`) }}</pre>
-                </div>
-            </section>
-            <!-- 提单信息 -->
-            <section class="form-panel creaet-fields" v-bkloading="{ isLoading: fieldListLoading }">
-                <div class="panel-label">
-                    <h3 class="panel-label-name">{{ $t(`m.tickets['提单信息']`) }}</h3>
-                    <div class="select-template" @click="handleTemplateSelect">
-                        <span>{{ $t(`m['模板选择']`) }}</span>
-                        <i :class="['bk-itsm-icon', isShowTemplateList ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>
-                        <ul v-show="isShowTemplateList && templateList.length !== 0" class="template-list">
-                            <li v-for="option in templateList"
-                                :key="option.id"
-                                @click="handleTemplateChange(option.id)">
-                                {{ option.name }}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="panel-content" v-if="!serviceLoading && !fieldListLoading">
-                    <!-- 添加特定字段，提单人 -->
-                    <div class="bk-member-form" v-if="service.can_ticket_agency">
-                        <p class="bk-member-label">{{ $t(`m.common['提单人']`) }}</p>
-                        <member-select v-model="creator" :multiple="false" style="height: 32px;"></member-select>
-                    </div>
-                    <field-info
-                        ref="fieldInfo"
-                        :fields="fieldList">
-                    </field-info>
-                    <!-- 进度更新提醒 -->
-                    <div class="ticket-remind">
-                        <bk-checkbox
-                            v-model="remindCheck">
-                            {{ $t('m.common["关注单据，单据进度更新时通知我"]') }}
-                        </bk-checkbox>
-                    </div>
-                </div>
-            </section>
-            <!-- 按钮组 -->
-            <div class="bottom-group mt20">
-                <bk-button :theme="'primary'"
-                    data-test-id="createTicket-button-submit"
-                    :title="$t(`m.common['提交']`)"
-                    :loading="submitting"
-                    class="mr10"
-                    @click="onCreateTicket">
-                    {{$t(`m.common['提交']`)}}
-                </bk-button>
-                <bk-button :theme="'default'"
-                    :title="$t(`m['取消']`)"
-                    :disabled="submitting"
-                    class="mr10"
-                    @click="onBackIconClick">
-                    {{$t(`m['取消']`)}}
-                </bk-button>
-                <!-- 模板 -->
-                <bk-popover
-                    ref="templatePopover"
-                    placement="bottom-start"
-                    trigger="click"
-                    ext-cls="save-template-pop"
-                    theme="light">
-                    <bk-button v-if="tempalteId"
-                        :theme="'default'"
-                        :title="$t(`m.common['更新模板']`)"
-                        :disabled="submitting"
-                        class="mr10"
-                        @click.stop="onOpenUpdateTemplate">
-                        {{$t(`m.common['更新模板']`)}}
-                    </bk-button>
-                    <bk-button v-if="tempalteId"
-                        :theme="'default'"
-                        :title="$t(`m.common['另存为模板']`)"
-                        :disabled="submitting"
-                        class="mr10">
-                        {{$t(`m.common['另存为模板']`)}}
-                    </bk-button>
-                    <bk-button
-                        v-else
-                        :theme="'default'"
-                        :title="$t(`m.common['存为模板']`)"
-                        :disabled="submitting"
-                        class="mr10">
-                        {{$t(`m.common['存为模板']`)}}
-                    </bk-button>
-                    <div slot="content" style="width: 320px;">
-                        <h3 class="save-title">{{$t(`m.common['存为模板']`)}}</h3>
-                        <bk-form
-                            width="320"
-                            form-type="vertical"
-                            :model="templateFormData"
-                            :rules="rules"
-                            ref="templateForm">
-                            <bk-form-item :label="''" :required="true" :property="'name'">
-                                <bk-input v-model="templateFormData.name" maxlength="120" :placeholder="$t(`m.common['请输入模板名称']`)"></bk-input>
-                            </bk-form-item>
-                        </bk-form>
-                        <div class="btn-group">
-                            <span @click="onSaveTemplate">{{$t(`m.systemConfig['确认']`)}}</span>
-                            <span @click="cancelTemplate">{{$t(`m.systemConfig['取消']`)}}</span>
-                        </div>
-                    </div>
-                </bk-popover>
-            </div>
+  <div class="create-ticket-page">
+    <nav-title :show-icon="true"
+      :title-name="$t(`m.navigation['提单']`)"
+      @goBack="onBackIconClick">
+    </nav-title>
+    <div class="create-ticket-body" v-if="!isRemindPageShow" v-bkloading="{ isLoading: serviceLoading }">
+      <!-- 服务信息 -->
+      <section class="service-info">
+        <div class="service-icon-wrap">
+          <span class="service-icon">
+            <i class="bk-itsm-icon icon-service"></i>
+          </span>
         </div>
-        <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
-        <create-ticket-success
-            v-if="isRemindPageShow"
-            :router-info="routerInfo"
-            @onBackIconClick="onBackIconClick">
-        </create-ticket-success>
+        <div class="service-description">
+          <h3 class="service-title">
+            <span class="service-name">{{ service.name }}</span>
+            <i
+              :class="['bk-itsm-icon favorite', favorite ? 'icon-favorite' : 'icon-rate']"
+              v-bk-tooltips="{
+                content: favorite ? $t(`m.common['取消收藏']`) : $t(`m.common['添加收藏']`),
+                placement: 'top',
+                delay: [300, 0]
+              }"
+              @click.stop="onCollectClick">
+            </i>
+            <span class="change-service" @click="onChangeService">{{ $t(`m.common['切换服务']`) }}</span>
+          </h3>
+          <pre class="service-content">{{ service.desc || $t(`m.common['暂无描述']`) }}</pre>
+        </div>
+      </section>
+      <!-- 提单信息 -->
+      <section class="form-panel creaet-fields" v-bkloading="{ isLoading: fieldListLoading }">
+        <div class="panel-label">
+          <h3 class="panel-label-name">{{ $t(`m.tickets['提单信息']`) }}</h3>
+          <div class="select-template" @click="handleTemplateSelect">
+            <span>{{ $t(`m['模板选择']`) }}</span>
+            <i :class="['bk-itsm-icon', isShowTemplateList ? 'icon-arrow-bottom' : 'icon-arrow-right']"></i>
+            <ul v-show="isShowTemplateList && templateList.length !== 0" class="template-list">
+              <li v-for="option in templateList"
+                :key="option.id"
+                @click="handleTemplateChange(option.id)">
+                {{ option.name }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel-content" v-if="!serviceLoading && !fieldListLoading">
+          <!-- 添加特定字段，提单人 -->
+          <div class="bk-member-form" v-if="service.can_ticket_agency">
+            <p class="bk-member-label">{{ $t(`m.common['提单人']`) }}</p>
+            <member-select v-model="creator" :multiple="false" style="height: 32px;"></member-select>
+          </div>
+          <field-info
+            ref="fieldInfo"
+            :fields="fieldList">
+          </field-info>
+          <!-- 进度更新提醒 -->
+          <div class="ticket-remind">
+            <bk-checkbox
+              v-model="remindCheck">
+              {{ $t('m.common["关注单据，单据进度更新时通知我"]') }}
+            </bk-checkbox>
+          </div>
+        </div>
+      </section>
+      <!-- 按钮组 -->
+      <div class="bottom-group mt20">
+        <bk-button :theme="'primary'"
+          data-test-id="createTicket-button-submit"
+          :title="$t(`m.common['提交']`)"
+          :loading="submitting"
+          class="mr10"
+          @click="onCreateTicket">
+          {{$t(`m.common['提交']`)}}
+        </bk-button>
+        <bk-button :theme="'default'"
+          :title="$t(`m['取消']`)"
+          :disabled="submitting"
+          class="mr10"
+          @click="onBackIconClick">
+          {{$t(`m['取消']`)}}
+        </bk-button>
+        <!-- 模板 -->
+        <bk-popover
+          ref="templatePopover"
+          placement="bottom-start"
+          trigger="click"
+          ext-cls="save-template-pop"
+          theme="light">
+          <bk-button v-if="tempalteId"
+            :theme="'default'"
+            :title="$t(`m.common['更新模板']`)"
+            :disabled="submitting"
+            class="mr10"
+            @click.stop="onOpenUpdateTemplate">
+            {{$t(`m.common['更新模板']`)}}
+          </bk-button>
+          <bk-button v-if="tempalteId"
+            :theme="'default'"
+            :title="$t(`m.common['另存为模板']`)"
+            :disabled="submitting"
+            class="mr10">
+            {{$t(`m.common['另存为模板']`)}}
+          </bk-button>
+          <bk-button
+            v-else
+            :theme="'default'"
+            :title="$t(`m.common['存为模板']`)"
+            :disabled="submitting"
+            class="mr10">
+            {{$t(`m.common['存为模板']`)}}
+          </bk-button>
+          <div slot="content" style="width: 320px;">
+            <h3 class="save-title">{{$t(`m.common['存为模板']`)}}</h3>
+            <bk-form
+              width="320"
+              form-type="vertical"
+              :model="templateFormData"
+              :rules="rules"
+              ref="templateForm">
+              <bk-form-item :label="''" :required="true" :property="'name'">
+                <bk-input v-model="templateFormData.name" maxlength="120" :placeholder="$t(`m.common['请输入模板名称']`)"></bk-input>
+              </bk-form-item>
+            </bk-form>
+            <div class="btn-group">
+              <span @click="onSaveTemplate">{{$t(`m.systemConfig['确认']`)}}</span>
+              <span @click="cancelTemplate">{{$t(`m.systemConfig['取消']`)}}</span>
+            </div>
+          </div>
+        </bk-popover>
+      </div>
     </div>
+    <create-ticket-dialog :is-show.sync="isCreateTicketDialogShow"></create-ticket-dialog>
+    <create-ticket-success
+      v-if="isRemindPageShow"
+      :router-info="routerInfo"
+      @onBackIconClick="onBackIconClick">
+    </create-ticket-success>
+  </div>
 </template>
 <script>
     import NavTitle from '@/components/common/layout/NavTitle';

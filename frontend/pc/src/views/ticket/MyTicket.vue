@@ -21,270 +21,270 @@
   -->
 
 <template>
-    <div
-        class="my-ticket-page"
-        v-bkloading="{ isLoading: tabLoading || countLoading }"
-    >
-        <nav-title :title-name="$t(`m.navigation['我的工单']`)">
-            <bk-tab
-                v-if="!countLoading"
-                slot="tab"
-                :active.sync="activePanel"
-                type="unborder-card"
-                @tab-change="handleTabChange"
+  <div
+    class="my-ticket-page"
+    v-bkloading="{ isLoading: tabLoading || countLoading }"
+  >
+    <nav-title :title-name="$t(`m.navigation['我的工单']`)">
+      <bk-tab
+        v-if="!countLoading"
+        slot="tab"
+        :active.sync="activePanel"
+        type="unborder-card"
+        @tab-change="handleTabChange"
+      >
+        <bk-tab-panel
+          v-for="(panel, index) in panels"
+          v-bind="panel"
+          :key="index"
+        >
+          <template slot="label">
+            <span class="panel-name">{{ panel.label }}</span>
+            <span
+              class="panel-count"
+              v-if="
+                tabCount[panel.name] ||
+                  tabCount[panel.name] === 0
+              "
             >
-                <bk-tab-panel
-                    v-for="(panel, index) in panels"
-                    v-bind="panel"
-                    :key="index"
-                >
-                    <template slot="label">
-                        <span class="panel-name">{{ panel.label }}</span>
-                        <span
-                            class="panel-count"
-                            v-if="
-                                tabCount[panel.name] ||
-                                    tabCount[panel.name] === 0
-                            "
-                        >
-                            {{ tabCount[panel.name] }}
-                        </span>
-                        <span
-                            class="red-dot"
-                            v-if="tabCount[panel.name]"
-                        ></span>
-                    </template>
-                </bk-tab-panel>
-            </bk-tab>
-        </nav-title>
-        <div class="table-wrap">
-            <advanced-search
-                class="advanced-search"
-                ref="advancedSearch"
-                :forms="searchForms"
-                @search="handleSearch"
-                @clear="handleClearSearch"
-                @formChange="handleSearchFormChange"
+              {{ tabCount[panel.name] }}
+            </span>
+            <span
+              class="red-dot"
+              v-if="tabCount[panel.name]"
+            ></span>
+          </template>
+        </bk-tab-panel>
+      </bk-tab>
+    </nav-title>
+    <div class="table-wrap">
+      <advanced-search
+        class="advanced-search"
+        ref="advancedSearch"
+        :forms="searchForms"
+        @search="handleSearch"
+        @clear="handleClearSearch"
+        @formChange="handleSearchFormChange"
+      >
+        <div class="slot-content">
+          <bk-button
+            class="export"
+            :title="$t(`m.tickets['导出']`)"
+            @click="openExportList"
+          >
+            {{ $t('m.tickets["导出"]') }}</bk-button
             >
-                <div class="slot-content">
-                    <bk-button
-                        class="export"
-                        :title="$t(`m.tickets['导出']`)"
-                        @click="openExportList"
-                    >
-                        {{ $t('m.tickets["导出"]') }}</bk-button
-                        >
-                    <bk-button
-                        v-if="activePanel === 'approval'"
-                        :theme="'default'"
-                        :title="$t(`m.managePage['批量审批']`)"
-                        class="mr10 plus-cus"
-                        :disabled="!selectedList.length"
-                        @click="onBatchApprovalClick"
-                    >
-                        {{ $t(`m.managePage['批量审批']`) }}
-                    </bk-button>
-                </div>
-            </advanced-search>
-            <bk-table
-                ref="ticketList"
-                v-if="!tabLoading"
-                class="ticket-table"
-                :data="ticketList"
-                :pagination="pagination"
-                :size="setting.size"
-                :row-style="getRowStyle"
-                @sort-change="onSortChange"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange"
-                @select-all="handleSelectAll"
-            >
-                <bk-table-column
-                    v-if="activePanel === 'approval'"
-                    type="selection"
-                    width="60"
-                    :selectable="canSelected"
-                >
-                    <template slot-scope="props">
-                        <bk-checkbox
-                            v-if="props.row.waiting_approve"
-                            v-model="props.row.checkStatus"
-                            @change="changeSelection(props.row)"
-                        >
-                        </bk-checkbox>
-                    </template>
-                </bk-table-column>
-                <!-- 关注单据 -->
-                <bk-table-column prop="remind_btn" width="30">
-                    <template slot-scope="{ row }">
-                        <bk-popover
-                            :content="
-                                !row.hasAttention
-                                    ? $t(`m.manageCommon['关注单据']`)
-                                    : $t(`m.manageCommon['取消关注']`)
-                            "
-                            :interactive="false"
-                            placement="top"
-                        >
-                            <div class="attention-icon">
-                                <i
-                                    class="bk-itsm-icon icon-rate"
-                                    @click="onChangeAttention(row)"
-                                ></i>
-                                <i
-                                    class="bk-itsm-icon icon-favorite"
-                                    :class="{
-                                        'is-attention': row.hasAttention
-                                    }"
-                                    @click="onChangeAttention(row)"
-                                ></i>
-                            </div>
-                        </bk-popover>
-                    </template>
-                </bk-table-column>
-                <bk-table-column
-                    v-for="field in setting.selectedFields"
-                    :key="field.id"
-                    :label="field.label"
-                    :width="field.width"
-                    :min-width="field.minWidth"
-                    :sortable="field.sortable"
-                    :prop="field.prop"
-                >
-                    <template slot-scope="props">
-                        <!-- 单号 -->
-                        <column-sn
-                            v-if="field.id === 'id'"
-                            :row="props.row"
-                            :from="fromRouter"
-                        ></column-sn>
-                        <!-- 当前步骤 -->
-                        <column-current-step
-                            v-else-if="field.id === 'current_steps'"
-                            :row="props.row"
-                        ></column-current-step>
-                        <!-- 状态 -->
-                        <span
-                            v-else-if="field.id === 'status'"
-                            :title="props.row.current_status_display"
-                            class="bk-status-color-info"
-                            :style="getstatusColor(props.row)"
-                        >
-                            {{ props.row.current_status_display || "--" }}
-                        </span>
-                        <!-- 优先级 -->
-                        <span
-                            v-else-if="field.id === 'priority'"
-                            class="bk-priority-button"
-                            :style="getPriorityColor(props.row)"
-                        >
-                            {{ props.row.priority_name || "--" }}
-                        </span>
-                        <!-- 操作 -->
-                        <template v-else-if="field.id === 'operate'">
-                            <template v-if="activePanel === 'approval'">
-                                <bk-link
-                                    class="table-link mr10"
-                                    theme="primary"
-                                    @click="
-                                        onOpenApprovalDialog(props.row.id, true)
-                                    "
-                                >
-                                    {{ $t(`m.managePage['通过']`) }}
-                                </bk-link>
-                                <bk-link
-                                    class="table-link"
-                                    theme="primary"
-                                    @click="
-                                        onOpenApprovalDialog(
-                                            props.row.id,
-                                            false
-                                        )
-                                    "
-                                >
-                                    {{ $t(`m.manageCommon['拒绝']`) }}
-                                </bk-link>
-                            </template>
-                            <bk-link
-                                v-else-if="props.row.can_comment"
-                                class="table-link mr10"
-                                theme="primary"
-                                @click="onOpenEvaluationTicketModal(props.row)"
-                            >
-                                {{ $t('m.manageCommon["满意度评价"]') }}
-                            </bk-link>
-                            <router-link
-                                v-else
-                                target="_blank"
-                                class="table-link mr10"
-                                :to="{
-                                    name: 'TicketDetail',
-                                    query: {
-                                        id: props.row.id,
-                                        from: fromRouter
-                                    }
-                                }"
-                            >
-                                {{
-                                    props.row.can_operate
-                                        ? $t(`m.manageCommon['处理']`)
-                                        : $t('m.manageCommon["查看"]')
-                                }}
-                            </router-link>
-                            <!-- 重新提单，我的申请单中状态为已撤销出现 -->
-                            <bk-link
-                                v-if="
-                                    activePanel === 'created' &&
-                                        props.row.current_status === 'REVOKED'
-                                "
-                                class="table-link"
-                                theme="primary"
-                                @click="reCreateTicket(props.row)"
-                            >
-                                {{ $t('m.manageCommon["复制提单"]') }}
-                            </bk-link>
-                        </template>
-                        <!-- 其他 -->
-                        <span v-else :title="props.row[field.id]">{{
-                            props.row[field.id] || "--"
-                        }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column type="setting">
-                    <bk-table-setting-content
-                        :size="setting.size"
-                        :fields="setting.fields"
-                        :selected="setting.selectedFields"
-                        @setting-change="handleSettingChange"
-                    >
-                    </bk-table-setting-content>
-                </bk-table-column>
-            </bk-table>
+          <bk-button
+            v-if="activePanel === 'approval'"
+            :theme="'default'"
+            :title="$t(`m.managePage['批量审批']`)"
+            class="mr10 plus-cus"
+            :disabled="!selectedList.length"
+            @click="onBatchApprovalClick"
+          >
+            {{ $t(`m.managePage['批量审批']`) }}
+          </bk-button>
         </div>
-        <!-- 审批弹窗 -->
-        <approval-dialog
-            :is-show.sync="isApprovalDialogShow"
-            :approval-info="approvalInfo"
-            @cancel="onApprovalDialogHidden"
+      </advanced-search>
+      <bk-table
+        ref="ticketList"
+        v-if="!tabLoading"
+        class="ticket-table"
+        :data="ticketList"
+        :pagination="pagination"
+        :size="setting.size"
+        :row-style="getRowStyle"
+        @sort-change="onSortChange"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
+        @select-all="handleSelectAll"
+      >
+        <bk-table-column
+          v-if="activePanel === 'approval'"
+          type="selection"
+          width="60"
+          :selectable="canSelected"
         >
-        </approval-dialog>
-        <!-- 评价弹窗 -->
-        <evaluation-ticket-modal
-            ref="evaluationModal"
-            :ticket-info="evaluationTicketInfo"
-            @submitSuccess="getTicketList"
+          <template slot-scope="props">
+            <bk-checkbox
+              v-if="props.row.waiting_approve"
+              v-model="props.row.checkStatus"
+              @change="changeSelection(props.row)"
+            >
+            </bk-checkbox>
+          </template>
+        </bk-table-column>
+        <!-- 关注单据 -->
+        <bk-table-column prop="remind_btn" width="30">
+          <template slot-scope="{ row }">
+            <bk-popover
+              :content="
+                !row.hasAttention
+                  ? $t(`m.manageCommon['关注单据']`)
+                  : $t(`m.manageCommon['取消关注']`)
+              "
+              :interactive="false"
+              placement="top"
+            >
+              <div class="attention-icon">
+                <i
+                  class="bk-itsm-icon icon-rate"
+                  @click="onChangeAttention(row)"
+                ></i>
+                <i
+                  class="bk-itsm-icon icon-favorite"
+                  :class="{
+                    'is-attention': row.hasAttention
+                  }"
+                  @click="onChangeAttention(row)"
+                ></i>
+              </div>
+            </bk-popover>
+          </template>
+        </bk-table-column>
+        <bk-table-column
+          v-for="field in setting.selectedFields"
+          :key="field.id"
+          :label="field.label"
+          :width="field.width"
+          :min-width="field.minWidth"
+          :sortable="field.sortable"
+          :prop="field.prop"
         >
-        </evaluation-ticket-modal>
-        <!-- 导出 -->
-        <export-ticket-dialog
-            :is-show="isExportDialogShow"
-            :pagination="pagination"
-            :view-type="'my_' + activePanel"
-            :search-params="lastSearchParams"
-            @close="isExportDialogShow = false"
-        >
-        </export-ticket-dialog>
+          <template slot-scope="props">
+            <!-- 单号 -->
+            <column-sn
+              v-if="field.id === 'id'"
+              :row="props.row"
+              :from="fromRouter"
+            ></column-sn>
+            <!-- 当前步骤 -->
+            <column-current-step
+              v-else-if="field.id === 'current_steps'"
+              :row="props.row"
+            ></column-current-step>
+            <!-- 状态 -->
+            <span
+              v-else-if="field.id === 'status'"
+              :title="props.row.current_status_display"
+              class="bk-status-color-info"
+              :style="getstatusColor(props.row)"
+            >
+              {{ props.row.current_status_display || "--" }}
+            </span>
+            <!-- 优先级 -->
+            <span
+              v-else-if="field.id === 'priority'"
+              class="bk-priority-button"
+              :style="getPriorityColor(props.row)"
+            >
+              {{ props.row.priority_name || "--" }}
+            </span>
+            <!-- 操作 -->
+            <template v-else-if="field.id === 'operate'">
+              <template v-if="activePanel === 'approval'">
+                <bk-link
+                  class="table-link mr10"
+                  theme="primary"
+                  @click="
+                    onOpenApprovalDialog(props.row.id, true)
+                  "
+                >
+                  {{ $t(`m.managePage['通过']`) }}
+                </bk-link>
+                <bk-link
+                  class="table-link"
+                  theme="primary"
+                  @click="
+                    onOpenApprovalDialog(
+                      props.row.id,
+                      false
+                    )
+                  "
+                >
+                  {{ $t(`m.manageCommon['拒绝']`) }}
+                </bk-link>
+              </template>
+              <bk-link
+                v-else-if="props.row.can_comment"
+                class="table-link mr10"
+                theme="primary"
+                @click="onOpenEvaluationTicketModal(props.row)"
+              >
+                {{ $t('m.manageCommon["满意度评价"]') }}
+              </bk-link>
+              <router-link
+                v-else
+                target="_blank"
+                class="table-link mr10"
+                :to="{
+                  name: 'TicketDetail',
+                  query: {
+                    id: props.row.id,
+                    from: fromRouter
+                  }
+                }"
+              >
+                {{
+                  props.row.can_operate
+                    ? $t(`m.manageCommon['处理']`)
+                    : $t('m.manageCommon["查看"]')
+                }}
+              </router-link>
+              <!-- 重新提单，我的申请单中状态为已撤销出现 -->
+              <bk-link
+                v-if="
+                  activePanel === 'created' &&
+                    props.row.current_status === 'REVOKED'
+                "
+                class="table-link"
+                theme="primary"
+                @click="reCreateTicket(props.row)"
+              >
+                {{ $t('m.manageCommon["复制提单"]') }}
+              </bk-link>
+            </template>
+            <!-- 其他 -->
+            <span v-else :title="props.row[field.id]">{{
+              props.row[field.id] || "--"
+            }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column type="setting">
+          <bk-table-setting-content
+            :size="setting.size"
+            :fields="setting.fields"
+            :selected="setting.selectedFields"
+            @setting-change="handleSettingChange"
+          >
+          </bk-table-setting-content>
+        </bk-table-column>
+      </bk-table>
     </div>
+    <!-- 审批弹窗 -->
+    <approval-dialog
+      :is-show.sync="isApprovalDialogShow"
+      :approval-info="approvalInfo"
+      @cancel="onApprovalDialogHidden"
+    >
+    </approval-dialog>
+    <!-- 评价弹窗 -->
+    <evaluation-ticket-modal
+      ref="evaluationModal"
+      :ticket-info="evaluationTicketInfo"
+      @submitSuccess="getTicketList"
+    >
+    </evaluation-ticket-modal>
+    <!-- 导出 -->
+    <export-ticket-dialog
+      :is-show="isExportDialogShow"
+      :pagination="pagination"
+      :view-type="'my_' + activePanel"
+      :search-params="lastSearchParams"
+      @close="isExportDialogShow = false"
+    >
+    </export-ticket-dialog>
+  </div>
 </template>
 <script>
     import i18n from '@/i18n/index.js';

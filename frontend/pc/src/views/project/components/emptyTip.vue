@@ -21,35 +21,35 @@
   -->
 
 <template>
-    <div class="empty-page-tip">
-        <div class="tip-content-wrap">
-            <h3>{{ title }}</h3>
-            <p>{{ subTitle }}</p>
-            <div class="btns-area">
-                <slot name="btns"></slot>
-            </div>
-            <div class="desc-area">
-                <div class="desc-item" v-for="(item, index) in desc" :key="index">
-                    <div class="desc-img">
-                        <img :src="item.src" alt="tips" />
-                    </div>
-                    <div class="desc-content">
-                        <h4>{{ item.title }}</h4>
-                        <p>{{ item.content }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="link-area">
-                <div class="link-item" v-for="(item, index) in links" :key="index">
-                    {{item.text}}
-                    <a :href="item.href" target="_blank" class="link-btn">
-                        {{ item.btn }}
-                        <i class="bk-itsm-icon icon-itsm-icon-three-seven"></i>
-                    </a>
-                </div>
-            </div>
+  <div class="empty-page-tip">
+    <div class="tip-content-wrap">
+      <h3>{{ title }}</h3>
+      <p>{{ subTitle }}</p>
+      <div class="btns-area">
+        <slot name="btns"></slot>
+      </div>
+      <div class="desc-area">
+        <div class="desc-item" v-for="(item, index) in desc" :key="index">
+          <div class="desc-img">
+            <img :src="item.src" alt="tips" />
+          </div>
+          <div class="desc-content">
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.content }}</p>
+          </div>
         </div>
+      </div>
+      <div class="link-area">
+        <div class="link-item" v-for="(item, index) in links" :key="index">
+          {{item.text}}
+          <a :href="item.href" target="_blank" class="link-btn">
+            {{ item.btn }}
+            <i class="bk-itsm-icon icon-itsm-icon-three-seven"></i>
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 <script>
     export default {

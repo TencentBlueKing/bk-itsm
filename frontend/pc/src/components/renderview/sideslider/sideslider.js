@@ -25,34 +25,34 @@ import SidesliderVue from './Sideslider.vue';
 const SidesliderConstructor = Vue.extend(SidesliderVue);
 
 const Sideslider = (options = {
-    title: 'title',
-    formData: [],
-    context: {
-        schemes: {},
-    },
+  title: 'title',
+  formData: [],
+  context: {
+    schemes: {},
+  },
 }) => {
-    const instance = new SidesliderConstructor({
-        el: document.createElement('div'),
-        propsData: {
-            isShow: false,
-            title: options.title,
-            formData: options.formData,
-            context: options.context,
-        },
-        data: {
-            isShow: false,
-        },
-    });
-    instance.viewmodel = instance.$mount();
-    const parent = document.body;
-    parent.appendChild(instance.viewmodel.$el);
-    instance.isShow = true;
-    instance.$on('update:isShow', (show) => {
-        if (!show) {
-            instance.isShow = false;
-        }
-    });
-    return instance.viewmodel;
+  const instance = new SidesliderConstructor({
+    el: document.createElement('div'),
+    propsData: {
+      isShow: false,
+      title: options.title,
+      formData: options.formData,
+      context: options.context,
+    },
+    data: {
+      isShow: false,
+    },
+  });
+  instance.viewmodel = instance.$mount();
+  const parent = document.body;
+  parent.appendChild(instance.viewmodel.$el);
+  instance.isShow = true;
+  instance.$on('update:isShow', (show) => {
+    if (!show) {
+      instance.isShow = false;
+    }
+  });
+  return instance.viewmodel;
 };
 
 export default Sideslider;

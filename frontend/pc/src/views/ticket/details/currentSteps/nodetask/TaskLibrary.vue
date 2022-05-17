@@ -21,90 +21,90 @@
   -->
 
 <template>
-    <div class="task-library">
-        <bk-form :label-width="200" form-type="vertical">
-            <bk-form-item :label="$t(`m.task['任务库']`)" :required="true">
-                <bk-select
-                    :loading="templateListLoading"
-                    v-model="formData.templateId"
-                    :placeholder="$t(`m.taskTemplate['请选择任务模板']`)"
-                    searchable
-                    @change="onTaskLibChange">
-                    <bk-option v-for="option in templateList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                        <span>{{ option.name }}</span>
-                        <div class="del-lib-icon" @click.stop>
-                            <bk-popconfirm
-                                class="del-lib-icon"
-                                title="确定删除该任务库？"
-                                trigger="click"
-                                @confirm="handleDeleteTaskLib(option)">
-                                <i class="bk-icon icon-close"></i>
-                            </bk-popconfirm>
-                        </div>
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-            <bk-form-item :label="$t(`m.tickets['请勾选任务']`)" :required="true" v-if="formData.templateId">
-                <bk-table
-                    v-bkloading="{ isLoading: taskListLoading }"
-                    :data="taskList"
-                    @selection-change="handleSelectedTaskChange">
-                    <bk-table-column type="selection" width="60"></bk-table-column>
-                    <bk-table-column :label="$t(`m.task['任务名称']`)" prop="name">
-                        <template slot-scope="props">
-                            <span class="task-name" @click="onTaskNameClick(props.row)">{{ props.row.name }}</span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column :label="$t(`m.task['处理人']`)" prop="processors"></bk-table-column>
-                    <bk-table-column :label="$t(`m.task['任务类型']`)">
-                        <template slot-scope="props">
-                            {{ getTaskZhName(props.row.component_type) }}
-                        </template>
-                    </bk-table-column>
-                </bk-table>
-            </bk-form-item>
-        </bk-form>
-        <div class="operation-btns mt20">
-            <bk-button :theme="'primary'" type="submit" @click="handleSubmitClick" class="mr10" :loading="btnLoading">
-                {{ $t(`m.systemConfig['确认']`) }}
-            </bk-button>
-            <bk-button class="mr10" @click="$emit('close')">
-                {{ $t(`m.common['取消']`) }}
-            </bk-button>
-        </div>
-        <bk-sideslider
-            :is-show.sync="viewTaskInfo.show"
-            :width="800"
-            :quick-close="true"
-            :title="$t(`m.task['查看任务']`)">
-            <div slot="content" class="view-task-sideslider">
-                <bk-form :ext-cls="'mb10'"
-                    :label-width="200"
-                    form-type="vertical">
-                    <!-- 处理人 -->
-                    <bk-form-item :label="$t(`m.task['处理人']`)"
-                        :required="true">
-                        <deal-person
-                            ref="personSelect"
-                            class="deal-person"
-                            :shortcut="true"
-                            :value="viewTaskInfo.dealPerson">
-                        </deal-person>
-                    </bk-form-item>
-                </bk-form>
-                <field-info
-                    v-if="viewTaskInfo.show"
-                    ref="fieldInfo"
-                    :fields="viewTaskInfo.item.fields"
-                    :basic-infomation="ticketInfo">
-                </field-info>
-                <div class="bk-task-disabled"></div>
+  <div class="task-library">
+    <bk-form :label-width="200" form-type="vertical">
+      <bk-form-item :label="$t(`m.task['任务库']`)" :required="true">
+        <bk-select
+          :loading="templateListLoading"
+          v-model="formData.templateId"
+          :placeholder="$t(`m.taskTemplate['请选择任务模板']`)"
+          searchable
+          @change="onTaskLibChange">
+          <bk-option v-for="option in templateList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+            <span>{{ option.name }}</span>
+            <div class="del-lib-icon" @click.stop>
+              <bk-popconfirm
+                class="del-lib-icon"
+                title="确定删除该任务库？"
+                trigger="click"
+                @confirm="handleDeleteTaskLib(option)">
+                <i class="bk-icon icon-close"></i>
+              </bk-popconfirm>
             </div>
-        </bk-sideslider>
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+      <bk-form-item :label="$t(`m.tickets['请勾选任务']`)" :required="true" v-if="formData.templateId">
+        <bk-table
+          v-bkloading="{ isLoading: taskListLoading }"
+          :data="taskList"
+          @selection-change="handleSelectedTaskChange">
+          <bk-table-column type="selection" width="60"></bk-table-column>
+          <bk-table-column :label="$t(`m.task['任务名称']`)" prop="name">
+            <template slot-scope="props">
+              <span class="task-name" @click="onTaskNameClick(props.row)">{{ props.row.name }}</span>
+            </template>
+          </bk-table-column>
+          <bk-table-column :label="$t(`m.task['处理人']`)" prop="processors"></bk-table-column>
+          <bk-table-column :label="$t(`m.task['任务类型']`)">
+            <template slot-scope="props">
+              {{ getTaskZhName(props.row.component_type) }}
+            </template>
+          </bk-table-column>
+        </bk-table>
+      </bk-form-item>
+    </bk-form>
+    <div class="operation-btns mt20">
+      <bk-button :theme="'primary'" type="submit" @click="handleSubmitClick" class="mr10" :loading="btnLoading">
+        {{ $t(`m.systemConfig['确认']`) }}
+      </bk-button>
+      <bk-button class="mr10" @click="$emit('close')">
+        {{ $t(`m.common['取消']`) }}
+      </bk-button>
     </div>
+    <bk-sideslider
+      :is-show.sync="viewTaskInfo.show"
+      :width="800"
+      :quick-close="true"
+      :title="$t(`m.task['查看任务']`)">
+      <div slot="content" class="view-task-sideslider">
+        <bk-form :ext-cls="'mb10'"
+          :label-width="200"
+          form-type="vertical">
+          <!-- 处理人 -->
+          <bk-form-item :label="$t(`m.task['处理人']`)"
+            :required="true">
+            <deal-person
+              ref="personSelect"
+              class="deal-person"
+              :shortcut="true"
+              :value="viewTaskInfo.dealPerson">
+            </deal-person>
+          </bk-form-item>
+        </bk-form>
+        <field-info
+          v-if="viewTaskInfo.show"
+          ref="fieldInfo"
+          :fields="viewTaskInfo.item.fields"
+          :basic-infomation="ticketInfo">
+        </field-info>
+        <div class="bk-task-disabled"></div>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

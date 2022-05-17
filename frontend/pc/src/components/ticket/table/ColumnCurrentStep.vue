@@ -21,27 +21,27 @@
   -->
 
 <template>
-    <!-- 当前步骤 -->
-    <div v-if="row.current_steps.length > 0"
-        class="current-steps-wrap">
-        <bk-popover
-            placement="top"
-            :theme="'light'"
-            :interactive="false">
-            <span
-                class="bk-current-step">
-                {{row.current_steps[0].name}}
-            </span>
-            <div slot="content" style="max-width: 200px;">
-                <span class="bk-current-step auto-width"
-                    v-for="(othernode, otherNodeIndex) in row.current_steps"
-                    :key="otherNodeIndex">
-                    {{othernode.name}}
-                </span>
-            </div>
-        </bk-popover>
-    </div>
-    <span v-else>--</span>
+  <!-- 当前步骤 -->
+  <div v-if="row.current_steps.length > 0"
+    class="current-steps-wrap">
+    <bk-popover
+      placement="top"
+      :theme="'light'"
+      :interactive="false">
+      <span
+        class="bk-current-step">
+        {{row.current_steps[0].name}}
+      </span>
+      <div slot="content" style="max-width: 200px;">
+        <span class="bk-current-step auto-width"
+          v-for="(othernode, otherNodeIndex) in row.current_steps"
+          :key="otherNodeIndex">
+          {{othernode.name}}
+        </span>
+      </div>
+    </bk-popover>
+  </div>
+  <span v-else>--</span>
 </template>
 
 <script>

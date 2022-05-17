@@ -21,115 +21,115 @@
   -->
 
 <template>
-    <div class="evaluation-content">
-        <p style="margin-bottom: 10px">
-            {{$t('m.newCommon["单据已经处理完成，请对整体单据处理进行评价"]')}}</p>
-        <div class="mb20">
-            <bk-radio-group v-model="picked">
-                <bk-radio :value="'One'" class="mr20">{{ $t('m.newCommon["直接评价"]') }}</bk-radio>
-                <bk-radio :value="'Two'" class="mr20" v-if="isShowSMSComment">
-                    {{ $t('m.newCommon["短信评价"]') }}
-                </bk-radio>
-                <bk-radio :value="'Three'">{{ $t('m.newCommon["邮件评价"]') }}</bk-radio>
-            </bk-radio-group>
-        </div>
-        <!-- 直接评价 -->
-        <template v-if="picked === 'One'">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="scoreInfo"
-                ref="scoreForm">
-                <bk-form-item
-                    :label="$t(`m.newCommon['评分：']`)"
-                    :required="true">
-                    <bk-rate :width="18"
-                        :height="18"
-                        :rate="scoreInfo.startInfo"
-                        :edit="true"
-                        @score="chooseRate">
-                    </bk-rate>
-                    <template v-if="scoreInfo.startInfo">
-                        {{ scoreInfo.scoreList[scoreInfo.startInfo - 1].name }}
-                    </template>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.newCommon['意见：']`)">
-                    <bk-input
-                        :placeholder="$t(`m.newCommon['请填写你的意见']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        v-model="scoreInfo.comments">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </template>
-        <!-- 短信评价 -->
-        <template v-if="picked === 'Two'">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="scoreInfo"
-                ref="telephoneForm">
-                <bk-form-item
-                    :label="$t(`m.newCommon['手机号码：']`)"
-                    :required="true">
-                    <bk-input :clearable="true"
-                        v-model="scoreInfo.telephone"
-                        :disabled="!!satisfactInfo.has_invited"
-                        :placeholder="$t(`m.newCommon['请输入，多个用英文逗号分隔']`)">
-                    </bk-input>
-                    <div style="margin-top: 4px;position: relative;">
-                        <span v-if="!satisfactInfo.has_invited" style="color: #979BA5">
-                            {{ $t('m.newCommon["提交后系统会发送信息至需求方进行满意度评价"]') }}</span>
-                        <span v-else style="color: #979BA5">
-                            {{ $t('m.newCommon["你已发送过满意度评价短信给"]') }}
-                            <span style="padding: 0 10px; color: #3c96ff;">{{satisfactInfo.has_invited}}</span>{{ $t('m.newCommon["的用户"]') }}
-                        </span>
-                    </div>
-                </bk-form-item>
-            </bk-form>
-        </template>
-        <!-- 邮件评价 -->
-        <template v-if="picked === 'Three'">
-            <bk-form
-                :label-width="200"
-                form-type="vertical"
-                :model="scoreInfo"
-                ref="emailForm">
-                <bk-form-item
-                    :label="$t(`m.newCommon['接收人：']`)"
-                    :required="true">
-                    <member-select
-                        v-model="scoreInfo.emailTempInfo.val"
-                        class="member-select"
-                        :placeholder="$t(`m.newCommon['请输入蓝鲸用户']`)">
-                    </member-select>
-                    <business-card
-                        v-if="scoreInfo.emailTempInfo.val.length"
-                        class="bk-email-card"
-                        :item="{
-                            val: scoreInfo.emailTempInfo.val.join(',')
-                        }">
-                    </business-card>
-                </bk-form-item>
-            </bk-form>
-            <div style="margin-top: 4px;position: relative;">
-                <span v-if="!satisfactInfo.has_invited" style="color: #979BA5">{{$t('m.newCommon["提交后系统会发送邮件到接收人邮箱"]')}}</span>
-                <span v-else style="color: #979BA5">{{$t('m.newCommon["你已发送过满意度评价邮件给"]')}}
-                    <span style="padding: 0 10px; color: #3c96ff;">{{satisfactInfo.has_invited}}</span>{{ $t('m.newCommon["的用户"]') }}
-                </span>
-            </div>
-        </template>
-        <bk-button v-if="isShowSubmitBtn"
-            class="mr10 mt20"
-            :theme="'primary'"
-            :title="submitBtnInfo.name"
-            :disabled="submitBtnInfo.disabled"
-            @click="onSubmit">
-            {{ submitBtnInfo.name }}
-        </bk-button>
+  <div class="evaluation-content">
+    <p style="margin-bottom: 10px">
+      {{$t('m.newCommon["单据已经处理完成，请对整体单据处理进行评价"]')}}</p>
+    <div class="mb20">
+      <bk-radio-group v-model="picked">
+        <bk-radio :value="'One'" class="mr20">{{ $t('m.newCommon["直接评价"]') }}</bk-radio>
+        <bk-radio :value="'Two'" class="mr20" v-if="isShowSMSComment">
+          {{ $t('m.newCommon["短信评价"]') }}
+        </bk-radio>
+        <bk-radio :value="'Three'">{{ $t('m.newCommon["邮件评价"]') }}</bk-radio>
+      </bk-radio-group>
     </div>
+    <!-- 直接评价 -->
+    <template v-if="picked === 'One'">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="scoreInfo"
+        ref="scoreForm">
+        <bk-form-item
+          :label="$t(`m.newCommon['评分：']`)"
+          :required="true">
+          <bk-rate :width="18"
+            :height="18"
+            :rate="scoreInfo.startInfo"
+            :edit="true"
+            @score="chooseRate">
+          </bk-rate>
+          <template v-if="scoreInfo.startInfo">
+            {{ scoreInfo.scoreList[scoreInfo.startInfo - 1].name }}
+          </template>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.newCommon['意见：']`)">
+          <bk-input
+            :placeholder="$t(`m.newCommon['请填写你的意见']`)"
+            :type="'textarea'"
+            :rows="3"
+            v-model="scoreInfo.comments">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </template>
+    <!-- 短信评价 -->
+    <template v-if="picked === 'Two'">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="scoreInfo"
+        ref="telephoneForm">
+        <bk-form-item
+          :label="$t(`m.newCommon['手机号码：']`)"
+          :required="true">
+          <bk-input :clearable="true"
+            v-model="scoreInfo.telephone"
+            :disabled="!!satisfactInfo.has_invited"
+            :placeholder="$t(`m.newCommon['请输入，多个用英文逗号分隔']`)">
+          </bk-input>
+          <div style="margin-top: 4px;position: relative;">
+            <span v-if="!satisfactInfo.has_invited" style="color: #979BA5">
+              {{ $t('m.newCommon["提交后系统会发送信息至需求方进行满意度评价"]') }}</span>
+            <span v-else style="color: #979BA5">
+              {{ $t('m.newCommon["你已发送过满意度评价短信给"]') }}
+              <span style="padding: 0 10px; color: #3c96ff;">{{satisfactInfo.has_invited}}</span>{{ $t('m.newCommon["的用户"]') }}
+            </span>
+          </div>
+        </bk-form-item>
+      </bk-form>
+    </template>
+    <!-- 邮件评价 -->
+    <template v-if="picked === 'Three'">
+      <bk-form
+        :label-width="200"
+        form-type="vertical"
+        :model="scoreInfo"
+        ref="emailForm">
+        <bk-form-item
+          :label="$t(`m.newCommon['接收人：']`)"
+          :required="true">
+          <member-select
+            v-model="scoreInfo.emailTempInfo.val"
+            class="member-select"
+            :placeholder="$t(`m.newCommon['请输入蓝鲸用户']`)">
+          </member-select>
+          <business-card
+            v-if="scoreInfo.emailTempInfo.val.length"
+            class="bk-email-card"
+            :item="{
+              val: scoreInfo.emailTempInfo.val.join(',')
+            }">
+          </business-card>
+        </bk-form-item>
+      </bk-form>
+      <div style="margin-top: 4px;position: relative;">
+        <span v-if="!satisfactInfo.has_invited" style="color: #979BA5">{{$t('m.newCommon["提交后系统会发送邮件到接收人邮箱"]')}}</span>
+        <span v-else style="color: #979BA5">{{$t('m.newCommon["你已发送过满意度评价邮件给"]')}}
+          <span style="padding: 0 10px; color: #3c96ff;">{{satisfactInfo.has_invited}}</span>{{ $t('m.newCommon["的用户"]') }}
+        </span>
+      </div>
+    </template>
+    <bk-button v-if="isShowSubmitBtn"
+      class="mr10 mt20"
+      :theme="'primary'"
+      :title="submitBtnInfo.name"
+      :disabled="submitBtnInfo.disabled"
+      @click="onSubmit">
+      {{ submitBtnInfo.name }}
+    </bk-button>
+  </div>
 </template>
 
 <script>

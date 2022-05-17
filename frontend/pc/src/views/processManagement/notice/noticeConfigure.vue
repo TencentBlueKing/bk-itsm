@@ -21,67 +21,67 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <!-- title -->
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t(`m.navigation["通知配置"]`) }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <!-- tab -->
-            <ul class="bk-notice-tab">
-                <li v-for="(item, index) in remindWayList"
-                    :key="item.id"
-                    :class="{ 'bk-check-notice': checkId === item.id }"
-                    @click="changeNotice(item, index)">
-                    <span>{{ item.name }}</span>
-                </li>
-            </ul>
-            <!-- content table -->
-            <bk-table
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="noticeList"
-                :size="'small'">
-                <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
-                    <template slot-scope="props">
-                        <template v-if="hasPermission(['notification_manage'], $store.state.project.projectAuthActions)">
-                            <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
-                        </template>
-                        <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" :disabled="!hasPermission(['notification_manage'], $store.state.project.projectAuthActions)" text @click="editorInfo(props.row)">
-                            {{ $t('m.deployPage["编辑"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <!-- 编辑右侧弹窗 -->
-        <div class="bk-add-data">
-            <bk-sideslider
-                :is-show.sync="noticeInfo.show"
-                :title="noticeInfo.title"
-                :quick-close="true"
-                :before-close="closeSideslider"
-                :width="noticeInfo.width">
-                <div slot="content" style="padding: 20px 34px;" v-if="noticeInfo.show">
-                    <editor-notice
-                        ref="editorNotice"
-                        :check-id="checkId"
-                        :notice-info="noticeInfo.formInfo"
-                        @closeEditor="closeEditor">
-                    </editor-notice>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-itsm-service">
+    <!-- title -->
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t(`m.navigation["通知配置"]`) }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <!-- tab -->
+      <ul class="bk-notice-tab">
+        <li v-for="(item, index) in remindWayList"
+          :key="item.id"
+          :class="{ 'bk-check-notice': checkId === item.id }"
+          @click="changeNotice(item, index)">
+          <span>{{ item.name }}</span>
+        </li>
+      </ul>
+      <!-- content table -->
+      <bk-table
+        v-bkloading="{ isLoading: isDataLoading }"
+        :data="noticeList"
+        :size="'small'">
+        <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['通知类型']`)">
+          <template slot-scope="props">
+            <template v-if="hasPermission(['notification_manage'], $store.state.project.projectAuthActions)">
+              <span class="bk-lable-primary" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
+            </template>
+            <span v-else class="bk-table-permission" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" @click="editorInfo(props.row)">{{props.row.action_name}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button theme="primary" v-cursor="{ active: !hasPermission(['notification_manage'], $store.state.project.projectAuthActions) }" :disabled="!hasPermission(['notification_manage'], $store.state.project.projectAuthActions)" text @click="editorInfo(props.row)">
+              {{ $t('m.deployPage["编辑"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <!-- 编辑右侧弹窗 -->
+    <div class="bk-add-data">
+      <bk-sideslider
+        :is-show.sync="noticeInfo.show"
+        :title="noticeInfo.title"
+        :quick-close="true"
+        :before-close="closeSideslider"
+        :width="noticeInfo.width">
+        <div slot="content" style="padding: 20px 34px;" v-if="noticeInfo.show">
+          <editor-notice
+            ref="editorNotice"
+            :check-id="checkId"
+            :notice-info="noticeInfo.formInfo"
+            @closeEditor="closeEditor">
+          </editor-notice>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 
 <script>

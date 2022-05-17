@@ -21,113 +21,113 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m.navigation["接口日志"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-only-btn">
-                <div class="bk-more-search">
-                    <bk-button :theme="'primary'"
-                        :title="$t(`m.systemConfig['批量导出']`)"
-                        :disabled="checkList.length === 0"
-                        @click="exportLogs">
-                        {{$t(`m.systemConfig['批量导出']`)}}
-                    </bk-button>
-                    <div class="bk-search-name">
-                        <div class="bk-search-content">
-                            <bk-input
-                                :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                v-model="moreSearch[0].value"
-                                @enter="searchContent"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                        <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
-                            icon=" bk-itsm-icon icon-search-more"
-                            class="ml10 filter-btn"
-                            @click="searchMore">
-                        </bk-button>
-                    </div>
-                </div>
-                <search-info
-                    ref="searchInfo"
-                    :more-search="moreSearch">
-                </search-info>
-            </div>
-            <bk-table
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="dataList"
-                :size="'small'"
-                :pagination="pagination"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange"
-                @select-all="handleSelectAll"
-                @select="handleSelect">
-                <bk-table-column type="selection" width="60" align="center"></bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['接口地址']`)" width="350">
-                    <template slot-scope="props">
-                        <span class="bk-lable-primary"
-                            :title="props.row.url"
-                            @click="seeLogs(props.row)">
-                            {{props.row.url || '--'}}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['请求方法']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.method">{{ props.row.method || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['状态']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.status_code">{{ props.row.status_code}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['请求时间']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.date_created">{{ props.row.date_created || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['耗时']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.duration">{{ props.row.duration || '--' }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['接口ID']`)">
-                    <template slot-scope="props">
-                        <span :title="props.row.api_instance_id">{{ props.row.api_instance_id}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button
-                            theme="primary"
-                            text
-                            @click="exportLog(props.row)">
-                            {{ $t('m.systemConfig["导出"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <!-- 查看详情 -->
-        <div class="bk-logs">
-            <bk-sideslider
-                :is-show.sync="customSettings.isShow"
-                :title="customSettings.title"
-                :quick-close="true"
-                :width="customSettings.width">
-                <div class="p20" slot="content" v-if="customSettings.isShow">
-                    <logs-info :logs-object="customSettings.logsObject"></logs-info>
-                </div>
-            </bk-sideslider>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m.navigation["接口日志"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-only-btn">
+        <div class="bk-more-search">
+          <bk-button :theme="'primary'"
+            :title="$t(`m.systemConfig['批量导出']`)"
+            :disabled="checkList.length === 0"
+            @click="exportLogs">
+            {{$t(`m.systemConfig['批量导出']`)}}
+          </bk-button>
+          <div class="bk-search-name">
+            <div class="bk-search-content">
+              <bk-input
+                :placeholder="moreSearch[0].placeholder || $t(`m.deployPage['请输入流程名']`)"
+                :clearable="true"
+                :right-icon="'bk-icon icon-search'"
+                v-model="moreSearch[0].value"
+                @enter="searchContent"
+                @clear="clearSearch">
+              </bk-input>
+            </div>
+            <bk-button :title="$t(`m.deployPage['更多筛选条件']`)"
+              icon=" bk-itsm-icon icon-search-more"
+              class="ml10 filter-btn"
+              @click="searchMore">
+            </bk-button>
+          </div>
+        </div>
+        <search-info
+          ref="searchInfo"
+          :more-search="moreSearch">
+        </search-info>
+      </div>
+      <bk-table
+        v-bkloading="{ isLoading: isDataLoading }"
+        :data="dataList"
+        :size="'small'"
+        :pagination="pagination"
+        @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
+        @select-all="handleSelectAll"
+        @select="handleSelect">
+        <bk-table-column type="selection" width="60" align="center"></bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['接口地址']`)" width="350">
+          <template slot-scope="props">
+            <span class="bk-lable-primary"
+              :title="props.row.url"
+              @click="seeLogs(props.row)">
+              {{props.row.url || '--'}}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['请求方法']`)">
+          <template slot-scope="props">
+            <span :title="props.row.method">{{ props.row.method || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['状态']`)">
+          <template slot-scope="props">
+            <span :title="props.row.status_code">{{ props.row.status_code}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['请求时间']`)">
+          <template slot-scope="props">
+            <span :title="props.row.date_created">{{ props.row.date_created || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['耗时']`)">
+          <template slot-scope="props">
+            <span :title="props.row.duration">{{ props.row.duration || '--' }}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['接口ID']`)">
+          <template slot-scope="props">
+            <span :title="props.row.api_instance_id">{{ props.row.api_instance_id}}</span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.systemConfig['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button
+              theme="primary"
+              text
+              @click="exportLog(props.row)">
+              {{ $t('m.systemConfig["导出"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <!-- 查看详情 -->
+    <div class="bk-logs">
+      <bk-sideslider
+        :is-show.sync="customSettings.isShow"
+        :title="customSettings.title"
+        :quick-close="true"
+        :width="customSettings.width">
+        <div class="p20" slot="content" v-if="customSettings.isShow">
+          <logs-info :logs-object="customSettings.logsObject"></logs-info>
+        </div>
+      </bk-sideslider>
+    </div>
+  </div>
 </template>
 <script>
     import searchInfo from '../commonComponent/searchInfo/searchInfo.vue';

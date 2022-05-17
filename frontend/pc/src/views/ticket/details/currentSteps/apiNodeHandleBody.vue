@@ -21,95 +21,95 @@
   -->
 
 <template>
-    <div class="failed-wrap">
-        <div v-if="operationType === '' && reason && nodeInfo.status === 'FAILED'" class="fail-reason">
-            <span class="reason-title">{{ $t('m.common["失败原因："]') }}</span>
-            <input type="checkbox" :name="`toggle-${nodeInfo.state_id}`" :id="`toggle-${nodeInfo.state_id}`" style="display: none;">
-            <p :class="`describe-${nodeInfo.state_id}`">
-                {{reason}}
-            </p>
-            <label class="show-more" :for="`toggle-${nodeInfo.state_id}`">...<span class="show-more-text">{{ $t('m.common["展示更多"]') }}</span></label>
-        </div>
-        <p v-else class="operation-tips">{{ operationTips }}</p>
-        <template v-if="(operationType === '' || operationType === 'retry') && !reloadParams">
-            <div class="bk-param"
-                v-if="nodeInfo.api_info.remote_api_info.req_params && nodeInfo.api_info.remote_api_info.req_params.length">
-                <h3 class="params-title">{{ $t('m.newCommon["输入参数"]') }}</h3>
-                <get-param
-                    ref="getParam"
-                    :query-value="nodeInfo.api_info.req_params"
-                    :is-static="!operationType"
-                    :is-custom="true"
-                    :api-detail="nodeInfo.api_info.remote_api_info">
-                </get-param>
-            </div>
-            <div class="bk-param"
-                v-if="nodeInfo.api_info.remote_api_info.req_body
-                    && Object.keys(nodeInfo.api_info.remote_api_info.req_body).length
-                    && nodeInfo.api_info.remote_api_info.req_body.properties
-                    && Object.keys(nodeInfo.api_info.remote_api_info.req_body.properties).length ">
-                <h3 class="params-title">{{ $t('m.newCommon["输入参数"]') }}</h3>
-                <post-param
-                    ref="postParam"
-                    :body-value="nodeInfo.api_info.req_body"
-                    :is-static="!operationType"
-                    :is-custom="true"
-                    :api-detail="nodeInfo.api_info.remote_api_info">
-                </post-param>
-            </div>
-        </template>
-        <!-- 返回数据/可选数组Tree -->
-        <div class="bk-param"
-            v-if=" (operationType === '' || operationType === 'ignore' || operationType === 'hand')
-                && apiDetail.rsp_data
-                && Object.keys(apiDetail.rsp_data).length
-                && apiDetail.rsp_data.properties
-                && Object.keys(apiDetail.rsp_data.properties).length
-                && !reloadParams">
-            <h3 class="params-title">{{ $t('m.systemConfig["返回数据"]') }}</h3>
-            <response-data-node
-                ref="responseDataNode"
-                :change-info="{}"
-                :api-detail="apiDetail"
-                :is-static="!operationType"
-                :is-custom="true">
-            </response-data-node>
-        </div>
-        <div class="operation-button-group">
-            <template v-if="!operationType">
-                <bk-button
-                    class="mr10"
-                    v-for="buttom in buttons"
-                    :key="buttom.key"
-                    :theme="buttom.theme"
-                    :title="buttom.name"
-                    :disabled="!nodeInfo.is_schedule_ready || nodeInfo.status !== 'FAILED' || !nodeInfo.can_operate"
-                    @click="clickBtn(buttom.key)">
-                    <template v-if="!nodeInfo.is_schedule_ready">
-                        <span v-bk-tooltips.top="readyTips">{{ buttom.name }}</span>
-                    </template>
-                    <template v-else>
-                        {{ buttom.name }}
-                    </template>
-                </bk-button>
-            </template>
-            <template v-if="operationType && nodeInfo.status === 'FAILED'">
-                <bk-button
-                    class="mr10"
-                    :theme="'primary'"
-                    @click="onSubmit">
-                    {{ $t('m.common["提交"]') }}
-                </bk-button>
-                <bk-button
-                    class="mr10"
-                    @click="onCancel">
-                    {{ $t('m.common["取消"]') }}
-                </bk-button>
-            </template>
-            <slot name="button-extend">
-            </slot>
-        </div>
+  <div class="failed-wrap">
+    <div v-if="operationType === '' && reason && nodeInfo.status === 'FAILED'" class="fail-reason">
+      <span class="reason-title">{{ $t('m.common["失败原因："]') }}</span>
+      <input type="checkbox" :name="`toggle-${nodeInfo.state_id}`" :id="`toggle-${nodeInfo.state_id}`" style="display: none;">
+      <p :class="`describe-${nodeInfo.state_id}`">
+        {{reason}}
+      </p>
+      <label class="show-more" :for="`toggle-${nodeInfo.state_id}`">...<span class="show-more-text">{{ $t('m.common["展示更多"]') }}</span></label>
     </div>
+    <p v-else class="operation-tips">{{ operationTips }}</p>
+    <template v-if="(operationType === '' || operationType === 'retry') && !reloadParams">
+      <div class="bk-param"
+        v-if="nodeInfo.api_info.remote_api_info.req_params && nodeInfo.api_info.remote_api_info.req_params.length">
+        <h3 class="params-title">{{ $t('m.newCommon["输入参数"]') }}</h3>
+        <get-param
+          ref="getParam"
+          :query-value="nodeInfo.api_info.req_params"
+          :is-static="!operationType"
+          :is-custom="true"
+          :api-detail="nodeInfo.api_info.remote_api_info">
+        </get-param>
+      </div>
+      <div class="bk-param"
+        v-if="nodeInfo.api_info.remote_api_info.req_body
+          && Object.keys(nodeInfo.api_info.remote_api_info.req_body).length
+          && nodeInfo.api_info.remote_api_info.req_body.properties
+          && Object.keys(nodeInfo.api_info.remote_api_info.req_body.properties).length ">
+        <h3 class="params-title">{{ $t('m.newCommon["输入参数"]') }}</h3>
+        <post-param
+          ref="postParam"
+          :body-value="nodeInfo.api_info.req_body"
+          :is-static="!operationType"
+          :is-custom="true"
+          :api-detail="nodeInfo.api_info.remote_api_info">
+        </post-param>
+      </div>
+    </template>
+    <!-- 返回数据/可选数组Tree -->
+    <div class="bk-param"
+      v-if=" (operationType === '' || operationType === 'ignore' || operationType === 'hand')
+        && apiDetail.rsp_data
+        && Object.keys(apiDetail.rsp_data).length
+        && apiDetail.rsp_data.properties
+        && Object.keys(apiDetail.rsp_data.properties).length
+        && !reloadParams">
+      <h3 class="params-title">{{ $t('m.systemConfig["返回数据"]') }}</h3>
+      <response-data-node
+        ref="responseDataNode"
+        :change-info="{}"
+        :api-detail="apiDetail"
+        :is-static="!operationType"
+        :is-custom="true">
+      </response-data-node>
+    </div>
+    <div class="operation-button-group">
+      <template v-if="!operationType">
+        <bk-button
+          class="mr10"
+          v-for="buttom in buttons"
+          :key="buttom.key"
+          :theme="buttom.theme"
+          :title="buttom.name"
+          :disabled="!nodeInfo.is_schedule_ready || nodeInfo.status !== 'FAILED' || !nodeInfo.can_operate"
+          @click="clickBtn(buttom.key)">
+          <template v-if="!nodeInfo.is_schedule_ready">
+            <span v-bk-tooltips.top="readyTips">{{ buttom.name }}</span>
+          </template>
+          <template v-else>
+            {{ buttom.name }}
+          </template>
+        </bk-button>
+      </template>
+      <template v-if="operationType && nodeInfo.status === 'FAILED'">
+        <bk-button
+          class="mr10"
+          :theme="'primary'"
+          @click="onSubmit">
+          {{ $t('m.common["提交"]') }}
+        </bk-button>
+        <bk-button
+          class="mr10"
+          @click="onCancel">
+          {{ $t('m.common["取消"]') }}
+        </bk-button>
+      </template>
+      <slot name="button-extend">
+      </slot>
+    </div>
+  </div>
 </template>
 
 <script>

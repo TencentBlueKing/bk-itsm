@@ -21,18 +21,18 @@
   -->
 
 <template>
-    <div class="home-page-wrapper">
-        <div class="home-page-view">
-            <div class="home-background">
-                <p class="welcome-tips">Hi，{{ userName }}，{{ $t(`m.home['欢迎使用流程服务！']`) }}</p>
-            </div>
-            <div class="main-content">
-                <service-list></service-list>
-                <ticket-table></ticket-table>
-            </div>
-            <copyright-footer></copyright-footer>
-        </div>
+  <div class="home-page-wrapper">
+    <div class="home-page-view">
+      <div class="home-background">
+        <p class="welcome-tips">Hi，{{ userName }}，{{ $t(`m.home['欢迎使用流程服务！']`) }}</p>
+      </div>
+      <div class="main-content">
+        <service-list></service-list>
+        <ticket-table></ticket-table>
+      </div>
+      <copyright-footer></copyright-footer>
     </div>
+  </div>
 </template>
 <script>
     import ServiceList from './serviceList.vue';

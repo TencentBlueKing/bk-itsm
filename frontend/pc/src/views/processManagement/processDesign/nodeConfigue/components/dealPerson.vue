@@ -21,67 +21,67 @@
   -->
 
 <template>
-    <div class="bk-deal-person" :class="{
-        'person-vertical': formType === 'vertical',
-        'inline-auto-width': formType === 'inline-auto-width',
-        'no-second': noSecondTypeList.includes(formData.levelOne)
-    }">
-        <div class="first-level">
-            <!-- 一级处理人 -->
-            <bk-select :ext-cls="'bk-form-width mr10'"
-                data-test-id="dealPerson-select-firstHandler"
-                v-model="formData.levelOne"
-                :loading="initLoaing"
-                :clearable="false"
-                searchable
-                :font-size="'medium'"
-                @selected="onFirstLevelChange">
-                <bk-option v-for="option in firstLevelList"
-                    :data-test-id="`dealPerson-select-first-${option.id}`"
-                    :key="option.id"
-                    :id="option.id"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-        </div>
-        <!-- 二级处理人 -->
-        <div class="second-level" v-if="['PERSON', 'GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE', 'ORGANIZATION'].includes(formData.levelOne)">
-            <!-- 个人 -->
-            <template v-if="formData.levelOne === 'PERSON' && Array.isArray(formData.levelSecond)">
-                <member-select data-test-id="dealPerson-select-personSecondHandler" :ext-cls="'bk-form-width'"
-                    v-model="formData.levelSecond" :specify-id-list="targetSpecifyIdList">
-                </member-select>
-            </template>
-            <!-- 通用角色表|CMDB|权限中心|第三方系统|指定节点处理人上级|引用变量 -->
-            <template v-else-if="['GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE'].includes(formData.levelOne)">
-                <bk-select :ext-cls="'bk-form-width'"
-                    data-test-id="dealPerson-select-secondHandler"
-                    v-model="formData.levelSecond"
-                    :loading="isLoading"
-                    show-select-all
-                    :multiple="!['ASSIGN_LEADER'].includes(formData.levelOne)"
-                    searchable
-                    :font-size="'medium'">
-                    <bk-option v-for="option in secondLevelList"
-                        :data-test-id="`dealPerson-select-second-${option.id}`"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </template>
-            <!-- 组织架构 -->
-            <template v-else-if="formData.levelOne === 'ORGANIZATION'">
-                <select-tree
-                    v-model="formData.levelSecond"
-                    :list="organizationList"
-                    :organization-loading="organizationLoading"
-                    ext-cls="bk-form-width">
-                </select-tree>
-            </template>
-        </div>
-        <p class="bk-error-info" v-if="showError">{{ requiredMsg || $t(`m.treeinfo['处理人不能为空']`) }}</p>
+  <div class="bk-deal-person" :class="{
+    'person-vertical': formType === 'vertical',
+    'inline-auto-width': formType === 'inline-auto-width',
+    'no-second': noSecondTypeList.includes(formData.levelOne)
+  }">
+    <div class="first-level">
+      <!-- 一级处理人 -->
+      <bk-select :ext-cls="'bk-form-width mr10'"
+        data-test-id="dealPerson-select-firstHandler"
+        v-model="formData.levelOne"
+        :loading="initLoaing"
+        :clearable="false"
+        searchable
+        :font-size="'medium'"
+        @selected="onFirstLevelChange">
+        <bk-option v-for="option in firstLevelList"
+          :data-test-id="`dealPerson-select-first-${option.id}`"
+          :key="option.id"
+          :id="option.id"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
     </div>
+    <!-- 二级处理人 -->
+    <div class="second-level" v-if="['PERSON', 'GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE', 'ORGANIZATION'].includes(formData.levelOne)">
+      <!-- 个人 -->
+      <template v-if="formData.levelOne === 'PERSON' && Array.isArray(formData.levelSecond)">
+        <member-select data-test-id="dealPerson-select-personSecondHandler" :ext-cls="'bk-form-width'"
+          v-model="formData.levelSecond" :specify-id-list="targetSpecifyIdList">
+        </member-select>
+      </template>
+      <!-- 通用角色表|CMDB|权限中心|第三方系统|指定节点处理人上级|引用变量 -->
+      <template v-else-if="['GENERAL', 'CMDB', 'IAM', 'API', 'ASSIGN_LEADER', 'VARIABLE'].includes(formData.levelOne)">
+        <bk-select :ext-cls="'bk-form-width'"
+          data-test-id="dealPerson-select-secondHandler"
+          v-model="formData.levelSecond"
+          :loading="isLoading"
+          show-select-all
+          :multiple="!['ASSIGN_LEADER'].includes(formData.levelOne)"
+          searchable
+          :font-size="'medium'">
+          <bk-option v-for="option in secondLevelList"
+            :data-test-id="`dealPerson-select-second-${option.id}`"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </template>
+      <!-- 组织架构 -->
+      <template v-else-if="formData.levelOne === 'ORGANIZATION'">
+        <select-tree
+          v-model="formData.levelSecond"
+          :list="organizationList"
+          :organization-loading="organizationLoading"
+          ext-cls="bk-form-width">
+        </select-tree>
+      </template>
+    </div>
+    <p class="bk-error-info" v-if="showError">{{ requiredMsg || $t(`m.treeinfo['处理人不能为空']`) }}</p>
+  </div>
 </template>
 <script>
     import memberSelect from '../../../../commonComponent/memberSelect';

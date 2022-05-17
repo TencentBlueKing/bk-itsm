@@ -21,43 +21,43 @@
   -->
 
 <template>
-    <div class="bk-api-content">
-        <div class="is-title-back">
-            <p class="bk-come-back" @click="backTab">
-                <arrows-left-icon></arrows-left-icon>
-                <template>{{ backName }}</template>
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-api-ul">
-                <ul>
-                    <li v-for="(item, index) in titleList"
-                        :key="index"
-                        :class="{ 'bk-api-check': checkIndex === index }"
-                        @click="changTitle(item, index)">
-                        <span>{{item.name}}</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="bk-api-info">
-                <api-basic
-                    :api-detail-info="apiDetailInfo"
-                    v-if="checkIndex === 0">
-                </api-basic>
-                <api-editor
-                    :api-detail-info-common="apiDetailInfoCommon"
-                    :tree-list="treeList"
-                    :path-list="pathList"
-                    :is-builtin-id-list="isBuiltinIdList"
-                    v-if="checkIndex === 1">
-                </api-editor>
-                <api-run
-                    :api-detail-info-common="apiDetailInfoCommon"
-                    v-if="checkIndex === 2">
-                </api-run>
-            </div>
-        </div>
+  <div class="bk-api-content">
+    <div class="is-title-back">
+      <p class="bk-come-back" @click="backTab">
+        <arrows-left-icon></arrows-left-icon>
+        <template>{{ backName }}</template>
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-api-ul">
+        <ul>
+          <li v-for="(item, index) in titleList"
+            :key="index"
+            :class="{ 'bk-api-check': checkIndex === index }"
+            @click="changTitle(item, index)">
+            <span>{{item.name}}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="bk-api-info">
+        <api-basic
+          :api-detail-info="apiDetailInfo"
+          v-if="checkIndex === 0">
+        </api-basic>
+        <api-editor
+          :api-detail-info-common="apiDetailInfoCommon"
+          :tree-list="treeList"
+          :path-list="pathList"
+          :is-builtin-id-list="isBuiltinIdList"
+          v-if="checkIndex === 1">
+        </api-editor>
+        <api-run
+          :api-detail-info-common="apiDetailInfoCommon"
+          v-if="checkIndex === 2">
+        </api-run>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

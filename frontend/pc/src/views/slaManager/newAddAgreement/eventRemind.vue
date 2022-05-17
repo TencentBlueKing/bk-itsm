@@ -21,150 +21,150 @@
   -->
 
 <template>
-    <div class="bk-priority-configur">
-        <ul class="bk-priority-head">
-            <li style="width: 140px;padding-left: 50px"><span>{{ $t('m["提醒事件"]') }}</span></li>
-            <li style="width: calc(19% - 35px);"><span>{{ $t('m["提醒规则"]') }}</span></li>
-            <li style="width: calc(21% - 35px);"><span>{{ $t('m.slaContent["提醒对象"]') }}</span></li>
-            <li style="width: calc(24% - 35px);"><span>{{ $t('m.slaContent["提醒方式"]') }}</span></li>
-            <li style="width: calc(36% - 35px);"><span>{{ $t('m.slaContent["提醒频率"]') }}</span></li>
-        </ul>
+  <div class="bk-priority-configur">
+    <ul class="bk-priority-head">
+      <li style="width: 140px;padding-left: 50px"><span>{{ $t('m["提醒事件"]') }}</span></li>
+      <li style="width: calc(19% - 35px);"><span>{{ $t('m["提醒规则"]') }}</span></li>
+      <li style="width: calc(21% - 35px);"><span>{{ $t('m.slaContent["提醒对象"]') }}</span></li>
+      <li style="width: calc(24% - 35px);"><span>{{ $t('m.slaContent["提醒方式"]') }}</span></li>
+      <li style="width: calc(36% - 35px);"><span>{{ $t('m.slaContent["提醒频率"]') }}</span></li>
+    </ul>
 
-        <ul class="bk-priority-head bk-priority-body" v-for="(item, index) in priorityList" :key="index">
-            <li style="width: 140px;padding-right: 10px;" class="bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
-                <span>
-                    <bk-checkbox data-test-id="slaAgreement-checkbox-eventName" v-if="item.hasCheckBox" style="padding-right: 10px" v-model="item.isCheck"></bk-checkbox>
-                    <span v-else style="padding-right: 30px"></span>
-                    {{item.eventName}}
-                </span>
-            </li>
-            <!-- 提醒规则 -->
-            <li style="width: calc(19% - 35px);" class="bk-priority-normal bk-editor-style bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item">
-                    <bk-form-item>
-                        {{item.remindRuleText}}
-                        <span v-if="'remindRuleValue' in item" class="bk-border-bottom">
-                            <bk-popconfirm data-test-id="slaAgreement-popconfirm-remindRuleValue" placement="bottom" confirm-text="" cancel-text="" trigger="click">
-                                <div slot="content" style="width: 188px;padding-top: 6px">
-                                    <bk-slider v-model="item.remindRuleValue"></bk-slider>
-                                </div>
-                                {{item.remindRuleValue}}
-                                {{item.remindRuleUnit}}
-                            </bk-popconfirm>
-                        </span>
-                        <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
-                    </bk-form-item>
-                </bk-form>
-            </li>
-            <!-- 提醒对象 -->
-            <li style="width: calc(21% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item"
-                    :rules="receiversRules"
-                    ref="receivers">
-                    <bk-form-item
-                        data-test-id="slaAgreement-select-receivers"
-                        :property="'receivers'">
-                        <bk-select v-model="item.receivers" :ext-cls="'cus-align-left'" :clearable="false">
-                            <bk-option v-for="option in receiversOptionList"
-                                :key="option.id"
-                                :id="option.id"
-                                :name="option.name">
-                            </bk-option>
-                        </bk-select>
-                        <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
-                    </bk-form-item>
-                </bk-form>
-            </li>
-            <!-- 提醒方式 -->
-            <li style="width: calc(24% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-remind-type" v-if="!item.hasCheckBox || hasCheckBox">
-                <bk-form
-                    :label-width="200"
-                    form-type="vertical"
-                    :model="item"
-                    :rules="notifyTypeRules"
-                    ref="notifyType">
-                    <bk-checkbox-group data-test-id="slaAgreement-checkboxGroup-RemindType" v-model="item.notify_type_list" @change="notifyTypeChange(item.notify_type_list, index)">
-                        <bk-checkbox :value="'email'" style="margin-bottom: 12px">
-                            {{$t('m.treeinfo["邮件"]')}}
-                        </bk-checkbox>
-                        <bk-checkbox :value="'weixin'">{{$t('m.treeinfo["企业微信"]')}}</bk-checkbox>
-                        <bk-form-item
-                            data-test-id="slaAgreement-select-emailNotifyEventList"
-                            class="cus-email"
-                            v-if="item.notify_type_list.indexOf('email') !== -1"
-                            :property="'email_notify'">
-                            <bk-select
-                                v-model="item.email_notify"
-                                :clearable="false"
-                                :placeholder="$t(`m.slaContent['请选择通知事件']`)"
-                                size="small"
-                                :popover-width="150"
-                                searchable>
-                                <bk-option v-for="option in emailNotifyEventList"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                        <bk-form-item
-                            data-test-id="slaAgreement-select-weixinNotifyEventList"
-                            class="cus-weixin"
-                            v-if="item.notify_type_list.indexOf('weixin') !== -1"
-                            :property="'weixin_notify'">
-                            <bk-select :clearable="false" :placeholder="$t(`m.slaContent['请选择通知事件']`)" size="small" v-model="item.weixin_notify" searchable>
-                                <bk-option v-for="option in weixinNotifyEventList"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                    </bk-checkbox-group>
-                    <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
-                </bk-form>
-            </li>
-            <!-- 提醒频率 -->
-            <li style="width: calc(36% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-remind-radio" v-if="!item.hasCheckBox || hasCheckBox">
-                <bk-radio-group data-test-id="slaAgreement-radio-notifyRule" v-model="item.notify_rule">
-                    <bk-radio style="margin-bottom: 6px" :value="'once'">{{$t('m.slaContent["单次提醒"]')}}</bk-radio>
-                    <bk-radio :value="'retry'">
-                        {{$t('m.slaContent["递增首次提醒后，耗时每增加"]')}}
-                        <span class="bk-border-bottom">
-                            <input data-test-id="slaAgreement-radio-notifyFreq" @change="notifyFreqChange(item.notify_freq, index)" type="number" v-model.number="item.notify_freq">
-                        </span>
-                        <span class="freq-unit">
-                            <bk-dropdown-menu class="group-text"
-                                @show="dropdownShow()"
-                                @hide="dropdownHide()"
-                                :ref="'dropdown' + index"
-                                slot="append"
-                                :font-size="'normal'">
-                                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
-                                    <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <template v-if="item.freq_unit === time.id">{{ time.name }}</template>
-                                    </span>
-                                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isDropdownShow }]"></i>
-                                </bk-button>
-                                <ul class="bk-dropdown-list" slot="dropdown-content">
-                                    <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
-                                        <a href="javascript:;" :data-test-id="`slaAgreement-a-timeHandler-${timeIndex}`" @click="timeHandler(time, item, index)">{{ time.name }}</a>
-                                    </li>
-                                </ul>
-                            </bk-dropdown-menu>
-                        </span>
-                        {{$t('m.slaContent["再次提醒"]')}}</bk-radio>
-                </bk-radio-group>
-                <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
-            </li>
-        </ul>
-    </div>
+    <ul class="bk-priority-head bk-priority-body" v-for="(item, index) in priorityList" :key="index">
+      <li style="width: 140px;padding-right: 10px;" class="bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
+        <span>
+          <bk-checkbox data-test-id="slaAgreement-checkbox-eventName" v-if="item.hasCheckBox" style="padding-right: 10px" v-model="item.isCheck"></bk-checkbox>
+          <span v-else style="padding-right: 30px"></span>
+          {{item.eventName}}
+        </span>
+      </li>
+      <!-- 提醒规则 -->
+      <li style="width: calc(19% - 35px);" class="bk-priority-normal bk-editor-style bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item">
+          <bk-form-item>
+            {{item.remindRuleText}}
+            <span v-if="'remindRuleValue' in item" class="bk-border-bottom">
+              <bk-popconfirm data-test-id="slaAgreement-popconfirm-remindRuleValue" placement="bottom" confirm-text="" cancel-text="" trigger="click">
+                <div slot="content" style="width: 188px;padding-top: 6px">
+                  <bk-slider v-model="item.remindRuleValue"></bk-slider>
+                </div>
+                {{item.remindRuleValue}}
+                {{item.remindRuleUnit}}
+              </bk-popconfirm>
+            </span>
+            <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
+          </bk-form-item>
+        </bk-form>
+      </li>
+      <!-- 提醒对象 -->
+      <li style="width: calc(21% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-transform-10" v-if="!item.hasCheckBox || hasCheckBox">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item"
+          :rules="receiversRules"
+          ref="receivers">
+          <bk-form-item
+            data-test-id="slaAgreement-select-receivers"
+            :property="'receivers'">
+            <bk-select v-model="item.receivers" :ext-cls="'cus-align-left'" :clearable="false">
+              <bk-option v-for="option in receiversOptionList"
+                :key="option.id"
+                :id="option.id"
+                :name="option.name">
+              </bk-option>
+            </bk-select>
+            <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
+          </bk-form-item>
+        </bk-form>
+      </li>
+      <!-- 提醒方式 -->
+      <li style="width: calc(24% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-remind-type" v-if="!item.hasCheckBox || hasCheckBox">
+        <bk-form
+          :label-width="200"
+          form-type="vertical"
+          :model="item"
+          :rules="notifyTypeRules"
+          ref="notifyType">
+          <bk-checkbox-group data-test-id="slaAgreement-checkboxGroup-RemindType" v-model="item.notify_type_list" @change="notifyTypeChange(item.notify_type_list, index)">
+            <bk-checkbox :value="'email'" style="margin-bottom: 12px">
+              {{$t('m.treeinfo["邮件"]')}}
+            </bk-checkbox>
+            <bk-checkbox :value="'weixin'">{{$t('m.treeinfo["企业微信"]')}}</bk-checkbox>
+            <bk-form-item
+              data-test-id="slaAgreement-select-emailNotifyEventList"
+              class="cus-email"
+              v-if="item.notify_type_list.indexOf('email') !== -1"
+              :property="'email_notify'">
+              <bk-select
+                v-model="item.email_notify"
+                :clearable="false"
+                :placeholder="$t(`m.slaContent['请选择通知事件']`)"
+                size="small"
+                :popover-width="150"
+                searchable>
+                <bk-option v-for="option in emailNotifyEventList"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+            <bk-form-item
+              data-test-id="slaAgreement-select-weixinNotifyEventList"
+              class="cus-weixin"
+              v-if="item.notify_type_list.indexOf('weixin') !== -1"
+              :property="'weixin_notify'">
+              <bk-select :clearable="false" :placeholder="$t(`m.slaContent['请选择通知事件']`)" size="small" v-model="item.weixin_notify" searchable>
+                <bk-option v-for="option in weixinNotifyEventList"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+          </bk-checkbox-group>
+          <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
+        </bk-form>
+      </li>
+      <!-- 提醒频率 -->
+      <li style="width: calc(36% - 35px);" class="bk-priority-normal bk-editor-style bk-none-radius bk-remind-radio" v-if="!item.hasCheckBox || hasCheckBox">
+        <bk-radio-group data-test-id="slaAgreement-radio-notifyRule" v-model="item.notify_rule">
+          <bk-radio style="margin-bottom: 6px" :value="'once'">{{$t('m.slaContent["单次提醒"]')}}</bk-radio>
+          <bk-radio :value="'retry'">
+            {{$t('m.slaContent["递增首次提醒后，耗时每增加"]')}}
+            <span class="bk-border-bottom">
+              <input data-test-id="slaAgreement-radio-notifyFreq" @change="notifyFreqChange(item.notify_freq, index)" type="number" v-model.number="item.notify_freq">
+            </span>
+            <span class="freq-unit">
+              <bk-dropdown-menu class="group-text"
+                @show="dropdownShow()"
+                @hide="dropdownHide()"
+                :ref="'dropdown' + index"
+                slot="append"
+                :font-size="'normal'">
+                <bk-button type="primary" slot="dropdown-trigger" :ext-cls="'cus-width'">
+                  <span v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <template v-if="item.freq_unit === time.id">{{ time.name }}</template>
+                  </span>
+                  <i :class="['bk-icon icon-angle-down',{ 'icon-flip': item.isDropdownShow }]"></i>
+                </bk-button>
+                <ul class="bk-dropdown-list" slot="dropdown-content">
+                  <li v-for="(time, timeIndex) in timeList" :key="timeIndex">
+                    <a href="javascript:;" :data-test-id="`slaAgreement-a-timeHandler-${timeIndex}`" @click="timeHandler(time, item, index)">{{ time.name }}</a>
+                  </li>
+                </ul>
+              </bk-dropdown-menu>
+            </span>
+            {{$t('m.slaContent["再次提醒"]')}}</bk-radio>
+        </bk-radio-group>
+        <div class="bk-disabled-li" v-if="item.hasCheckBox && !item.isCheck"></div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>

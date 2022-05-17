@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="manage-page">
-        <router-view></router-view>
-    </div>
+  <div class="manage-page">
+    <router-view></router-view>
+  </div>
 </template>
 <script>
     export default {

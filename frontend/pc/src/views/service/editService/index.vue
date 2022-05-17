@@ -21,22 +21,22 @@
   -->
 
 <template>
-    <div>
-        <nav-title :show-icon="true"
-            :title-name="serviceInfo.name || $t(`m.serviceConfig['新建服务']`)"
-            @goBack="onBackIconClick">
-            <div slot="step">
-                <bk-steps ext-cls="steps-icon"
-                    data-test-id="service_steps_serviceEditStep"
-                    :controllable="true"
-                    line-type="solid"
-                    :cur-step="currStep"
-                    :steps="stepList"
-                    @step-changed="onStepChange">
-                </bk-steps>
-            </div>
-        </nav-title>
-        <!-- <div class="steps-container">
+  <div>
+    <nav-title :show-icon="true"
+      :title-name="serviceInfo.name || $t(`m.serviceConfig['新建服务']`)"
+      @goBack="onBackIconClick">
+      <div slot="step">
+        <bk-steps ext-cls="steps-icon"
+          data-test-id="service_steps_serviceEditStep"
+          :controllable="true"
+          line-type="solid"
+          :cur-step="currStep"
+          :steps="stepList"
+          @step-changed="onStepChange">
+        </bk-steps>
+      </div>
+    </nav-title>
+    <!-- <div class="steps-container">
             <bk-steps ext-cls="steps-icon"
                 data-test-id="service_steps_serviceEditStep"
                 :controllable="true"
@@ -46,50 +46,50 @@
                 @step-changed="onStepChange">
             </bk-steps>
         </div> -->
-        <div :class="['steps-content', { 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
-            <template v-if="!serviceLoading && !flowInfoLoading">
-                <service-form-step v-if="currStep === 1"
-                    ref="serviceFormStep"
-                    :type="type"
-                    :service-id="serviceId"
-                    :service-info="serviceInfo"
-                    :create-ticket-node-id="serviceInfo.first_state_id"
-                    @updateServiceInfo="updateServiceInfo">
-                </service-form-step>
-                <service-process-step v-else-if="currStep === 2"
-                    ref="serviceProcessStep"
-                    :service-info="serviceInfo"
-                    :flow-info="flowInfo"
-                    @updateFlowInfo="getFlowDetailInfo"
-                    @setConfigStatus="setConfigStatus">
-                </service-process-step>
-                <service-setting-step v-else-if="currStep === 3"
-                    ref="serviceSettingStep"
-                    :service-info="serviceInfo"
-                    :flow-info="flowInfo">
-                </service-setting-step>
-            </template>
-        </div>
-        <div v-show="!isShowNodeConfig || currStep !== 2" class="submit-footer-bar">
-            <bk-button
-                data-test-id="service_button_prevStep"
-                ext-cls="button-item"
-                theme="default"
-                :disabled="isSubmitting"
-                @click="onPrevStepClick">
-                {{ prevStepBtnName }}
-            </bk-button>
-            <bk-button
-                data-test-id="service_button_nextStepAndSave"
-                ext-cls="button-item"
-                theme="primary"
-                :disabled="!serviceId && serviceId !== 0"
-                :loading="isSubmitting"
-                @click="onNextStepClick">
-                {{ nextStepBtnName }}
-            </bk-button>
-        </div>
+    <div :class="['steps-content', { 'steps-content-height': isShowNodeConfig }]" v-bkloading="{ isLoading: serviceLoading || flowInfoLoading }">
+      <template v-if="!serviceLoading && !flowInfoLoading">
+        <service-form-step v-if="currStep === 1"
+          ref="serviceFormStep"
+          :type="type"
+          :service-id="serviceId"
+          :service-info="serviceInfo"
+          :create-ticket-node-id="serviceInfo.first_state_id"
+          @updateServiceInfo="updateServiceInfo">
+        </service-form-step>
+        <service-process-step v-else-if="currStep === 2"
+          ref="serviceProcessStep"
+          :service-info="serviceInfo"
+          :flow-info="flowInfo"
+          @updateFlowInfo="getFlowDetailInfo"
+          @setConfigStatus="setConfigStatus">
+        </service-process-step>
+        <service-setting-step v-else-if="currStep === 3"
+          ref="serviceSettingStep"
+          :service-info="serviceInfo"
+          :flow-info="flowInfo">
+        </service-setting-step>
+      </template>
     </div>
+    <div v-show="!isShowNodeConfig || currStep !== 2" class="submit-footer-bar">
+      <bk-button
+        data-test-id="service_button_prevStep"
+        ext-cls="button-item"
+        theme="default"
+        :disabled="isSubmitting"
+        @click="onPrevStepClick">
+        {{ prevStepBtnName }}
+      </bk-button>
+      <bk-button
+        data-test-id="service_button_nextStepAndSave"
+        ext-cls="button-item"
+        theme="primary"
+        :disabled="!serviceId && serviceId !== 0"
+        :loading="isSubmitting"
+        @click="onNextStepClick">
+        {{ nextStepBtnName }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 <script>
     import NavTitle from '@/components/common/layout/NavTitle';

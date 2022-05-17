@@ -1,115 +1,115 @@
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ $t('m["通知配置"]') }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <ul class="bk-notice-tab">
-                <li v-for="(item, index) in remindWayList"
-                    :key="item.id"
-                    :class="{ 'bk-check-notice': acticeTab === item.id }"
-                    @click="changeNotice(item, index)">
-                    <span>{{ item.name }}</span>
-                </li>
-            </ul>
-            <div class="bk-only-btn">
-                <bk-button theme="primary"
-                    data-test-id="notice_button_create"
-                    @click="addNotice">
-                    <i class="bk-itsm-icon icon-itsm-icon-one-five"></i>
-                    {{ $t(`m.deployPage['新增']`) }}
-                </bk-button>
-                <div class="bk-only-search">
-                    <bk-input
-                        data-test-id="notice_input_search"
-                        :placeholder="$t(`m['请输入模板内容']`)"
-                        :clearable="true"
-                        :right-icon="'bk-icon icon-search'"
-                        v-model="searchNotice"
-                        @enter="getNoticeList(1)"
-                        @clear="getNoticeList(1)">
-                    </bk-input>
-                </div>
-            </div>
-            <bk-table
-                v-bkloading="{ isLoading: isDataLoading }"
-                :data="noticeList"
-                :size="'small'">
-                <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['通知类型']`)" prop="action_name"></bk-table-column>
-                <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
-                <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
-                    <template slot-scope="props">
-                        <bk-button
-                            theme="primary"
-                            text
-                            @click="editNotice(props.row)">
-                            {{ $t('m.deployPage["编辑"]') }}
-                        </bk-button>
-                        <bk-button
-                            theme="primary"
-                            text
-                            @click="deleteNotice(props.row)">
-                            {{ $t('m.deployPage["删除"]') }}
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-            <bk-dialog v-model="isShowEdit"
-                width="690"
-                theme="primary"
-                :mask-close="false"
-                :auto-close="false"
-                :header-position="'left'"
-                :title="isEdit ? $t(`m['编辑']`) : $t(`m['新建']`) "
-                @confirm="submitNotice"
-                @cancel="closeNotice">
-                <div class="notice-forms">
-                    <bk-form ref="basicFrom" :model="formData" :label-width="300" width="700" form-type="vertical" :rules="rules">
-                        <bk-form-item :label="$t(`m['通知方式']`)" :required="true" :property="'noticeType'">
-                            <bk-select :disabled="true" v-model="formData.noticeType" searchable>
-                                <bk-option v-for="option in noticeTypeLIST"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                        <bk-form-item :label="$t(`m['通知场景']`)" :required="true" :property="'noticeUserBy'">
-                            <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
-                                <bk-option v-for="option in userByList"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                        <bk-form-item :label="$t(`m['通知类型']`)" :required="true" :property="'noticeAction'">
-                            <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
-                                <bk-option v-for="option in actionList"
-                                    :key="option.id"
-                                    :id="option.id"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                    </bk-form>
-                    <editor-notice
-                        ref="editorNotice"
-                        :custom-row="customRow"
-                        :is-show-title="true"
-                        :check-id="acticeTab"
-                        :is-show-footer="false"
-                        :notice-info="formInfo"
-                        @closeEditor="closeEditor">
-                    </editor-notice>
-                </div>
-            </bk-dialog>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ $t('m["通知配置"]') }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <ul class="bk-notice-tab">
+        <li v-for="(item, index) in remindWayList"
+          :key="item.id"
+          :class="{ 'bk-check-notice': acticeTab === item.id }"
+          @click="changeNotice(item, index)">
+          <span>{{ item.name }}</span>
+        </li>
+      </ul>
+      <div class="bk-only-btn">
+        <bk-button theme="primary"
+          data-test-id="notice_button_create"
+          @click="addNotice">
+          <i class="bk-itsm-icon icon-itsm-icon-one-five"></i>
+          {{ $t(`m.deployPage['新增']`) }}
+        </bk-button>
+        <div class="bk-only-search">
+          <bk-input
+            data-test-id="notice_input_search"
+            :placeholder="$t(`m['请输入模板内容']`)"
+            :clearable="true"
+            :right-icon="'bk-icon icon-search'"
+            v-model="searchNotice"
+            @enter="getNoticeList(1)"
+            @clear="getNoticeList(1)">
+          </bk-input>
+        </div>
+      </div>
+      <bk-table
+        v-bkloading="{ isLoading: isDataLoading }"
+        :data="noticeList"
+        :size="'small'">
+        <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['通知类型']`)" prop="action_name"></bk-table-column>
+        <bk-table-column :label="$t(`m.slaContent['更新时间']`)" prop="update_at"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['更新人']`)" prop="updated_by"></bk-table-column>
+        <bk-table-column :label="$t(`m.deployPage['操作']`)" width="150">
+          <template slot-scope="props">
+            <bk-button
+              theme="primary"
+              text
+              @click="editNotice(props.row)">
+              {{ $t('m.deployPage["编辑"]') }}
+            </bk-button>
+            <bk-button
+              theme="primary"
+              text
+              @click="deleteNotice(props.row)">
+              {{ $t('m.deployPage["删除"]') }}
+            </bk-button>
+          </template>
+        </bk-table-column>
+      </bk-table>
+      <bk-dialog v-model="isShowEdit"
+        width="690"
+        theme="primary"
+        :mask-close="false"
+        :auto-close="false"
+        :header-position="'left'"
+        :title="isEdit ? $t(`m['编辑']`) : $t(`m['新建']`) "
+        @confirm="submitNotice"
+        @cancel="closeNotice">
+        <div class="notice-forms">
+          <bk-form ref="basicFrom" :model="formData" :label-width="300" width="700" form-type="vertical" :rules="rules">
+            <bk-form-item :label="$t(`m['通知方式']`)" :required="true" :property="'noticeType'">
+              <bk-select :disabled="true" v-model="formData.noticeType" searchable>
+                <bk-option v-for="option in noticeTypeLIST"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+            <bk-form-item :label="$t(`m['通知场景']`)" :required="true" :property="'noticeUserBy'">
+              <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
+                <bk-option v-for="option in userByList"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+            <bk-form-item :label="$t(`m['通知类型']`)" :required="true" :property="'noticeAction'">
+              <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
+                <bk-option v-for="option in actionList"
+                  :key="option.id"
+                  :id="option.id"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+          </bk-form>
+          <editor-notice
+            ref="editorNotice"
+            :custom-row="customRow"
+            :is-show-title="true"
+            :check-id="acticeTab"
+            :is-show-footer="false"
+            :notice-info="formInfo"
+            @closeEditor="closeEditor">
+          </editor-notice>
+        </div>
+      </bk-dialog>
+    </div>
+  </div>
 </template>
 
 <script>

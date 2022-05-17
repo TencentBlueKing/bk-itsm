@@ -21,44 +21,44 @@
   -->
 
 <template>
-    <div class="bk-itsm-service">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <p class="bk-come-back">
-                {{ title }}
-            </p>
-        </div>
-        <div class="itsm-page-content">
-            <div class="bk-api-configure">
-                <div class="bk-directory-tree">
-                    <api-tree
-                        ref="apiTree"
-                        :project-id="projectId"
-                        :code-list="codeList"
-                        :all-code-list="allCodeList"
-                        :tree-list-ori="treeList">
-                    </api-tree>
-                </div>
-                <div class="bk-directory-table">
-                    <api-table v-if="!Object.keys(displayInfo['level_1']).length"
-                        ref="apiTable"
-                        :project-id="projectId"
-                        :first-level-info="firstLevelInfo"
-                        :custom-paging="customPaging"
-                        :tree-list="treeList"
-                        :path-list="pathList"
-                        :list-info-ori="listInfo">
-                    </api-table>
-                    <api-content v-else
-                        :second-level-info="secondLevelInfo"
-                        :api-detail-info="apiDetailInfo"
-                        :tree-list="treeList"
-                        :path-list="pathList"
-                        :is-builtin-id-list="isBuiltinIdList">
-                    </api-content>
-                </div>
-            </div>
-        </div>
+  <div class="bk-itsm-service">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <p class="bk-come-back">
+        {{ title }}
+      </p>
     </div>
+    <div class="itsm-page-content">
+      <div class="bk-api-configure">
+        <div class="bk-directory-tree">
+          <api-tree
+            ref="apiTree"
+            :project-id="projectId"
+            :code-list="codeList"
+            :all-code-list="allCodeList"
+            :tree-list-ori="treeList">
+          </api-tree>
+        </div>
+        <div class="bk-directory-table">
+          <api-table v-if="!Object.keys(displayInfo['level_1']).length"
+            ref="apiTable"
+            :project-id="projectId"
+            :first-level-info="firstLevelInfo"
+            :custom-paging="customPaging"
+            :tree-list="treeList"
+            :path-list="pathList"
+            :list-info-ori="listInfo">
+          </api-table>
+          <api-content v-else
+            :second-level-info="secondLevelInfo"
+            :api-detail-info="apiDetailInfo"
+            :tree-list="treeList"
+            :path-list="pathList"
+            :is-builtin-id-list="isBuiltinIdList">
+          </api-content>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

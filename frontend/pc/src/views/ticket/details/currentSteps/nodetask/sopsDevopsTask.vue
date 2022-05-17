@@ -1,60 +1,60 @@
 <template>
-    <div>
-        <!-- SOPS -->
-        <sops-get-param
-            v-if="nodeInfo.type === 'TASK-SOPS'"
-            class="sops-form"
-            ref="sopsGetParam"
-            :key="new Date().getTime()"
-            :hooked-var-list="hookedVarList"
-            :constants="constants"
-            :context="context"
-            :is-hook="isHook"
-            :is-edit="isEdit"
-            :state-list="stateList"
-            :is-static="isStatic"
-            :constant-default-value="constantDefaultValue"
-            @onChangeHook="onChangeHook"
-        ></sops-get-param>
-        <!-- DEVOPS -->
-        <bk-form
-            v-if="nodeInfo.type === 'TASK-DEVOPS'"
-            ref="devopsVariable"
-            ext-cls="pipelineForm"
-            form-type="vertical"
-            :model="pipelineData"
-            :rules="pipelineRules"
-            :label-width="200"
-        >
-            <bk-form-item
-                v-for="pipeline in pipelineList"
-                :key="pipeline.id"
-                :label="pipeline.id"
-                :property="pipeline.id"
-                :rules="pipelineRules[pipeline.id]"
-                :required="pipeline.required"
-            >
-                <bk-input
-                    :disabled="!changeBtn"
-                    v-model="pipelineData[pipeline.id]"
-                    :clearable="true"
-                ></bk-input>
-            </bk-form-item>
-        </bk-form>
-        <devops-preview
-            v-if="nodeInfo.type === 'TASK-DEVOPS'"
-            :stages="pipelineStages"
-        ></devops-preview>
-        <div class="submit-btn">
-            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">
-                {{ $t(`m["提交"]`) }}
-            </bk-button>
-            <bk-button :theme="'primary'" @click="reSetSopTask">
-                {{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}
-            </bk-button>
-            <bk-button @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
-        </div>
+  <div>
+    <!-- SOPS -->
+    <sops-get-param
+      v-if="nodeInfo.type === 'TASK-SOPS'"
+      class="sops-form"
+      ref="sopsGetParam"
+      :key="new Date().getTime()"
+      :hooked-var-list="hookedVarList"
+      :constants="constants"
+      :context="context"
+      :is-hook="isHook"
+      :is-edit="isEdit"
+      :state-list="stateList"
+      :is-static="isStatic"
+      :constant-default-value="constantDefaultValue"
+      @onChangeHook="onChangeHook"
+    ></sops-get-param>
+    <!-- DEVOPS -->
+    <bk-form
+      v-if="nodeInfo.type === 'TASK-DEVOPS'"
+      ref="devopsVariable"
+      ext-cls="pipelineForm"
+      form-type="vertical"
+      :model="pipelineData"
+      :rules="pipelineRules"
+      :label-width="200"
+    >
+      <bk-form-item
+        v-for="pipeline in pipelineList"
+        :key="pipeline.id"
+        :label="pipeline.id"
+        :property="pipeline.id"
+        :rules="pipelineRules[pipeline.id]"
+        :required="pipeline.required"
+      >
+        <bk-input
+          :disabled="!changeBtn"
+          v-model="pipelineData[pipeline.id]"
+          :clearable="true"
+        ></bk-input>
+      </bk-form-item>
+    </bk-form>
+    <devops-preview
+      v-if="nodeInfo.type === 'TASK-DEVOPS'"
+      :stages="pipelineStages"
+    ></devops-preview>
+    <div class="submit-btn">
+      <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">
+        {{ $t(`m["提交"]`) }}
+      </bk-button>
+      <bk-button :theme="'primary'" @click="reSetSopTask">
+        {{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}
+      </bk-button>
+      <bk-button @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
     </div>
+  </div>
 </template>
 
 <script>

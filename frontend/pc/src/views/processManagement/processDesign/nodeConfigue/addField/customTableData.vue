@@ -21,46 +21,46 @@
   -->
 
 <template>
-    <div class="bk-customtable-data">
-        <div class="bk-custom-line"
-            :class="{ 'mb10': itemIndex !== customTableInfo.list.length - 1 }"
-            v-for="(item, itemIndex) in customTableInfo.list"
-            :key="itemIndex">
-            <bk-input :ext-cls="'bk-custom-input'"
-                :clearable="true"
-                :placeholder="$t(`m.treeinfo['请输入名称']`)"
-                v-model="item.name">
-            </bk-input>
-            <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
-                :true-value="trueStatus"
-                :false-value="falseStatus"
-                v-model="item.required">
-                {{ $t(`m.treeinfo['必填']`) }}
-            </bk-checkbox>
-            <bk-select :ext-cls="'bk-custom-small'"
-                v-model="item.display"
-                :clearable="false"
-                searchable>
-                <bk-option v-for="option in typeList"
-                    :key="option.id"
-                    :id="option.id"
-                    :name="option.name">
-                </bk-option>
-            </bk-select>
-            <textarea style="width: 180px; min-height: 32px;"
-                class="bk-form-textarea bk-textarea-tanble"
-                :placeholder="$t(`m.treeinfo['请输入，Enter分隔']`)"
-                :disabled="item.display !== 'select' && item.display !== 'multiselect'"
-                v-model.trim="item.choice">
+  <div class="bk-customtable-data">
+    <div class="bk-custom-line"
+      :class="{ 'mb10': itemIndex !== customTableInfo.list.length - 1 }"
+      v-for="(item, itemIndex) in customTableInfo.list"
+      :key="itemIndex">
+      <bk-input :ext-cls="'bk-custom-input'"
+        :clearable="true"
+        :placeholder="$t(`m.treeinfo['请输入名称']`)"
+        v-model="item.name">
+      </bk-input>
+      <bk-checkbox style="float: left; margin-right: 10px; line-height: 32px;"
+        :true-value="trueStatus"
+        :false-value="falseStatus"
+        v-model="item.required">
+        {{ $t(`m.treeinfo['必填']`) }}
+      </bk-checkbox>
+      <bk-select :ext-cls="'bk-custom-small'"
+        v-model="item.display"
+        :clearable="false"
+        searchable>
+        <bk-option v-for="option in typeList"
+          :key="option.id"
+          :id="option.id"
+          :name="option.name">
+        </bk-option>
+      </bk-select>
+      <textarea style="width: 180px; min-height: 32px;"
+        class="bk-form-textarea bk-textarea-tanble"
+        :placeholder="$t(`m.treeinfo['请输入，Enter分隔']`)"
+        :disabled="item.display !== 'select' && item.display !== 'multiselect'"
+        v-model.trim="item.choice">
             </textarea>
-            <div class="bk-custom-icon">
-                <i class="bk-itsm-icon icon-flow-add" @click="addTableData(item, itemIndex)"></i>
-                <i class="bk-itsm-icon icon-flow-reduce"
-                    :class="{ 'bk-no-delete': customTableInfo.list.length === 1 }"
-                    @click="reduceTableData(item, itemIndex)"></i>
-            </div>
-        </div>
+      <div class="bk-custom-icon">
+        <i class="bk-itsm-icon icon-flow-add" @click="addTableData(item, itemIndex)"></i>
+        <i class="bk-itsm-icon icon-flow-reduce"
+          :class="{ 'bk-no-delete': customTableInfo.list.length === 1 }"
+          @click="reduceTableData(item, itemIndex)"></i>
+      </div>
     </div>
+  </div>
 </template>
 <script>
     export default {

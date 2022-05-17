@@ -21,28 +21,28 @@
   -->
 
 <template>
-    <div class="trigger-handle">
-        <div class="left-content">
-            <span class="handle-title mr10">{{ title }}</span>
-            <task-status v-if="showStatus" ext-cls="mr30" :status="taskInfo.status" type="block"></task-status>
-            <bk-dropdown-menu
-                v-if="triggerList.length" @show="dropdownShow = true" @hide="dropdownShow = false">
-                <bk-button slot="dropdown-trigger" :loading="gettingTriggers">
-                    <span>{{ $t('m.newCommon["更多操作"]') }}</span>
-                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': dropdownShow }]"></i>
-                </bk-button>
-                <ul slot="dropdown-content" class="bk-dropdown-list trigger-ul">
-                    <li v-for="(trigger, tIndex) in triggerList" :key="tIndex">
-                        <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
-                    </li>
-                </ul>
-            </bk-dropdown-menu>
-        </div>
-        <div class="right-content">
-            <slot name="right-content"></slot>
-        </div>
-        <ticket-trigger-dialog ref="triggerDialog" @init-info="refreshTicket"></ticket-trigger-dialog>
+  <div class="trigger-handle">
+    <div class="left-content">
+      <span class="handle-title mr10">{{ title }}</span>
+      <task-status v-if="showStatus" ext-cls="mr30" :status="taskInfo.status" type="block"></task-status>
+      <bk-dropdown-menu
+        v-if="triggerList.length" @show="dropdownShow = true" @hide="dropdownShow = false">
+        <bk-button slot="dropdown-trigger" :loading="gettingTriggers">
+          <span>{{ $t('m.newCommon["更多操作"]') }}</span>
+          <i :class="['bk-icon icon-angle-down',{ 'icon-flip': dropdownShow }]"></i>
+        </bk-button>
+        <ul slot="dropdown-content" class="bk-dropdown-list trigger-ul">
+          <li v-for="(trigger, tIndex) in triggerList" :key="tIndex">
+            <a href="javascript:;" @click="openTriggerDialog(trigger)">{{trigger.display_name}}</a>
+          </li>
+        </ul>
+      </bk-dropdown-menu>
     </div>
+    <div class="right-content">
+      <slot name="right-content"></slot>
+    </div>
+    <ticket-trigger-dialog ref="triggerDialog" @init-info="refreshTicket"></ticket-trigger-dialog>
+  </div>
 </template>
 
 <script>

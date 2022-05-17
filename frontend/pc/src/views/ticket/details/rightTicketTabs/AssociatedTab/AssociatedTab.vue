@@ -21,132 +21,132 @@
   -->
 
 <template>
-    <!-- 关联单-->
-    <div class="bk-log-flow" v-bkloading="{ isLoading: loading }">
-        <div class="mb20">
-            <bk-button
-                class="mr10"
-                data-test-id="ticket_button_createAssociateTicket"
-                theme="default"
-                :title="$t(`m.newCommon['新建']`)"
-                @click="openAddAssociation"
-            >
-                {{ $t('m.newCommon["新建"]') }}
-            </bk-button>
-            <bk-button
-                data-test-id="ticket_button_associateTicketHistory"
-                class="icon-cus"
-                theme="default"
-                icon=" bk-itsm-icon icon-history"
-                :disabled="!historyList.length"
-                :title="
-                    historyList.length
-                        ? $t(`m.newCommon['绑定历史']`)
-                        : $t(`m.newCommon['暂无关联历史']`)
-                "
-                @click="showHistory"
-            >
-            </bk-button>
-        </div>
-        <bk-table :data="associatedList" :size="'small'">
-            <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
-                <template slot-scope="props">
-                    <span
-                        class="bk-lable-primary"
-                        @click="checkOne(props.row, 'noInfo')"
-                        :title="props.row.sn"
-                    >
-                        {{ props.row.sn }}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.newCommon['工单类型']`)">
-                <template slot-scope="props">
-                    {{ props.row.service_type_name || "--" }}
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.newCommon['服务名称']`)">
-                <template slot-scope="props">
-                    <span :title="props.row.service_name">{{
-                        props.row.service_name || "--"
-                    }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t(`m.newCommon['操作']`)" width="100">
-                <template slot-scope="props">
-                    <bk-button
-                        theme="primary"
-                        text
-                        :disabled="!props.row.can_derive"
-                        @click="unBindDialogShow(props.row)"
-                    >
-                        {{ $t('m.newCommon["取消关联"]') }}
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <!-- 查看关联历史 -->
-        <bk-dialog
-            v-model="historyInfo.isShow"
-            :render-directive="'if'"
-            :title="historyInfo.title"
-            :width="historyInfo.width"
-            :header-position="historyInfo.headerPosition"
-            :auto-close="historyInfo.autoClose"
-            :mask-close="historyInfo.autoClose"
-        >
-            <div style="width: 100%; max-height: 347px">
-                <bk-table :data="historyList" :size="'small'">
-                    <bk-table-column
-                        :label="$t(`m.newCommon['单号']`)"
-                        min-width="100"
-                    >
-                        <template slot-scope="props">
-                            <span
-                                class="bk-lable-primary"
-                                @click="checkOne(props.row)"
-                                :title="props.row.sn"
-                            >
-                                {{ props.row.sn }}
-                            </span>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['绑定时间']`)"
-                        prop="create_at"
-                    ></bk-table-column>
-                    <bk-table-column
-                        :label="$t(`m.newCommon['解绑时间']`)"
-                        prop="end_at"
-                    ></bk-table-column>
-                </bk-table>
-            </div>
-            <div slot="footer">
-                <bk-button theme="default" @click="closeHistory">
-                    {{ $t('m.home["取消"]') }}
-                </bk-button>
-            </div>
-        </bk-dialog>
-
-        <bk-sideslider
-            :is-show.sync="isShowAddAssociation"
-            :title="$t(`m.manageCommon['新建关联单']`)"
-            :quick-close="true"
-            :before-close="closeSideslider"
-            :width="750"
-        >
-            <div class="p20" slot="content">
-                <associated-dialog
-                    ref="associated"
-                    v-if="isShowAddAssociation"
-                    :ticket-info="ticketInfo"
-                    @close="isShowAddAssociation = false"
-                    @submitSuccess="submitSuccess"
-                >
-                </associated-dialog>
-            </div>
-        </bk-sideslider>
+  <!-- 关联单-->
+  <div class="bk-log-flow" v-bkloading="{ isLoading: loading }">
+    <div class="mb20">
+      <bk-button
+        class="mr10"
+        data-test-id="ticket_button_createAssociateTicket"
+        theme="default"
+        :title="$t(`m.newCommon['新建']`)"
+        @click="openAddAssociation"
+      >
+        {{ $t('m.newCommon["新建"]') }}
+      </bk-button>
+      <bk-button
+        data-test-id="ticket_button_associateTicketHistory"
+        class="icon-cus"
+        theme="default"
+        icon=" bk-itsm-icon icon-history"
+        :disabled="!historyList.length"
+        :title="
+          historyList.length
+            ? $t(`m.newCommon['绑定历史']`)
+            : $t(`m.newCommon['暂无关联历史']`)
+        "
+        @click="showHistory"
+      >
+      </bk-button>
     </div>
+    <bk-table :data="associatedList" :size="'small'">
+      <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
+        <template slot-scope="props">
+          <span
+            class="bk-lable-primary"
+            @click="checkOne(props.row, 'noInfo')"
+            :title="props.row.sn"
+          >
+            {{ props.row.sn }}
+          </span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.newCommon['工单类型']`)">
+        <template slot-scope="props">
+          {{ props.row.service_type_name || "--" }}
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.newCommon['服务名称']`)">
+        <template slot-scope="props">
+          <span :title="props.row.service_name">{{
+            props.row.service_name || "--"
+          }}</span>
+        </template>
+      </bk-table-column>
+      <bk-table-column :label="$t(`m.newCommon['操作']`)" width="100">
+        <template slot-scope="props">
+          <bk-button
+            theme="primary"
+            text
+            :disabled="!props.row.can_derive"
+            @click="unBindDialogShow(props.row)"
+          >
+            {{ $t('m.newCommon["取消关联"]') }}
+          </bk-button>
+        </template>
+      </bk-table-column>
+    </bk-table>
+    <!-- 查看关联历史 -->
+    <bk-dialog
+      v-model="historyInfo.isShow"
+      :render-directive="'if'"
+      :title="historyInfo.title"
+      :width="historyInfo.width"
+      :header-position="historyInfo.headerPosition"
+      :auto-close="historyInfo.autoClose"
+      :mask-close="historyInfo.autoClose"
+    >
+      <div style="width: 100%; max-height: 347px">
+        <bk-table :data="historyList" :size="'small'">
+          <bk-table-column
+            :label="$t(`m.newCommon['单号']`)"
+            min-width="100"
+          >
+            <template slot-scope="props">
+              <span
+                class="bk-lable-primary"
+                @click="checkOne(props.row)"
+                :title="props.row.sn"
+              >
+                {{ props.row.sn }}
+              </span>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['绑定时间']`)"
+            prop="create_at"
+          ></bk-table-column>
+          <bk-table-column
+            :label="$t(`m.newCommon['解绑时间']`)"
+            prop="end_at"
+          ></bk-table-column>
+        </bk-table>
+      </div>
+      <div slot="footer">
+        <bk-button theme="default" @click="closeHistory">
+          {{ $t('m.home["取消"]') }}
+        </bk-button>
+      </div>
+    </bk-dialog>
+
+    <bk-sideslider
+      :is-show.sync="isShowAddAssociation"
+      :title="$t(`m.manageCommon['新建关联单']`)"
+      :quick-close="true"
+      :before-close="closeSideslider"
+      :width="750"
+    >
+      <div class="p20" slot="content">
+        <associated-dialog
+          ref="associated"
+          v-if="isShowAddAssociation"
+          :ticket-info="ticketInfo"
+          @close="isShowAddAssociation = false"
+          @submitSuccess="submitSuccess"
+        >
+        </associated-dialog>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

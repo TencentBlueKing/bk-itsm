@@ -21,25 +21,25 @@
   -->
 
 <template>
-    <div
-        :class="['tag-text', { 'active-link': hasChildren }]" @click="onClick">
-        <div v-if="Array.isArray(value)">
-            <p class="text-block" v-for="(item, index) in value" :key="index">
-                <label v-if="item.label" class="label">
-                    {{ item.label }}
-                    <i v-if="item.desc || desc" v-bk-tooltips="item.desc || desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
-                </label>
-                <span class="value">{{ item.value }}</span>
-            </p>
-        </div>
-        <p v-else>
-            <label v-if="label" class="label">
-                {{ label }}
-                <i v-if="desc" v-bk-tooltips="desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
-            </label>
-            <span class="value">{{ value }}</span>
-        </p>
+  <div
+    :class="['tag-text', { 'active-link': hasChildren }]" @click="onClick">
+    <div v-if="Array.isArray(value)">
+      <p class="text-block" v-for="(item, index) in value" :key="index">
+        <label v-if="item.label" class="label">
+          {{ item.label }}
+          <i v-if="item.desc || desc" v-bk-tooltips="item.desc || desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
+        </label>
+        <span class="value">{{ item.value }}</span>
+      </p>
     </div>
+    <p v-else>
+      <label v-if="label" class="label">
+        {{ label }}
+        <i v-if="desc" v-bk-tooltips="desc" class="bk-itsm-icon icon-itsm-icon-help"></i>
+      </label>
+      <span class="value">{{ value }}</span>
+    </p>
+  </div>
 </template>
 
 <script>

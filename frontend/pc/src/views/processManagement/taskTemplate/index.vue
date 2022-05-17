@@ -21,160 +21,160 @@
   -->
 
 <template>
-    <div class="bk-itsm-box">
-        <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
-            <template v-if="!addStatus">
-                <p class="bk-come-back">
-                    {{$t(`m['任务模板']`)}}
-                </p>
-            </template>
-            <template v-else>
-                <p class="bk-come-back" @click="backTab">
-                    <arrows-left-icon></arrows-left-icon>
-                    <template>{{templateInfo.itemInfo.name}}</template>
-                </p>
-            </template>
-        </div>
-        <div class="itsm-page-content">
-            <div v-if="!addStatus" class="add-status">
-                <div class="bk-itsm-service" v-bkloading="{ isLoading: listLoading }">
-                    <div class="bk-itsm-version" v-if="infoStatus">
-                        <i class="bk-icon icon-info-circle"></i>
-                        <span>{{$t(`m.taskTemplate['任务模版：管理使用不同任务场景下的任务模板。当流程中开启任务模块时，可以设置适用的任务模板。任务处理人只需要按照任务模板进行任务处理即可。']`)}}
-                        </span>
-                        <i class="bk-icon icon-close" @click="infoStatus = false"></i>
-                    </div>
-                    <div class="bk-normal-search">
-                        <bk-button
-                            data-test-id="taskTemplate-button-create"
-                            v-cursor="{ active: !hasPermission(['task_template_create']) }"
-                            :theme="'primary'"
-                            :title="$t(`m.systemConfig['新增']`)"
-                            icon="plus"
-                            :class="['mr10', 'plus-cus', {
-                                'btn-permission-disable': !hasPermission(['task_template_create'])
-                            }]"
-                            @click="addTemplate">
-                            {{$t(`m.systemConfig['新增']`)}}
-                        </bk-button>
-                        <div class="bk-search-key">
-                            <bk-input
-                                data-test-id="taskTemplate-input-search"
-                                :clearable="true"
-                                :right-icon="'bk-icon icon-search'"
-                                v-model="searchKey"
-                                @enter="getTemplateList"
-                                @clear="clearSearch">
-                            </bk-input>
-                        </div>
-                    </div>
-                    <div class="bk-task-content">
-                        <p class="bk-none-content" v-if="templateList.length === 0">
-                            <i class="bk-icon icon-info-circle"></i>
-                            <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
-                            <span
-                                v-cursor="{ active: !hasPermission(['task_template_create']) }"
-                                :class="['bk-primary', {
-                                    'text-permission-disable': !hasPermission(['task_template_create'])
-                                }]"
-                                @click="addTemplate">
-                                {{$t(`m.taskTemplate['立即创建']`)}}
-                            </span>
-                        </p>
-                        <ul v-else>
-                            <li v-for="(item, index) in templateList" :key="index" @click="editTemplate(item)">
-                                <span class="bk-task-icon">
-                                    <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
-                                </span>
-                                <span class="bk-task-name" :title="item.name">
-                                    <span :style="{ maxWidth: item.is_draft ? 'calc(100% - 50px)' : '100%' }">{{ item.name || '--' }}</span>
-                                    <span v-show="item.is_draft">{{$t(`m.taskTemplate['(草稿)']`)}}</span>
-                                    <span>{{ item.update_at || '--' }}</span>
-                                </span>
-                                <span class="bk-task-operate">
-                                    <i class="bk-itsm-icon icon-itsm-icon-copy"
-                                        :data-test-id="`taskTemplate-i-cloneTemplate${index}`"
-                                        :class="{ 'icon-disable': item.component_type === 'SOPS' }"
-                                        v-bk-tooltips="item.component_type === 'SOPS' ? $t(`m.taskTemplate['标准运维模板不可克隆']`) : $t(`m.taskTemplate['克隆模板']`)"
-                                        @click.stop="cloneTemplate(item)"></i>
-                                    <i class="bk-icon icon-delete"
-                                        :data-test-id="`taskTemplate-i-deleteTemplate${index}`"
-                                        :class="{ 'icon-disable': item.is_builtin }"
-                                        v-bk-tooltips="item.is_builtin ? $t(`m.taskTemplate['内置模板不可删除']`) : $t(`m.taskTemplate['删除模板']`)"
-                                        @click.stop="deleteTemplate(item)"></i>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div v-else class="step-wrap-content">
-                <!-- 流程步骤 -->
-                <div class="bk-itsm-tree">
-                    <div class="bk-tree-content">
-                        <div class="bk-tree-first" v-for="(item, index) in stepList" :key="item.id">
-                            <div class="bk-tree-shadow" @click="changeTree(item, index, 'tree')">
-                                <span
-                                    class="bk-tree-step"
-                                    :class="{ 'bk-tree-primary': item.type === 'primary', 'bk-tree-success': item.type === 'success', 'bk-tree-error': item.type === 'error' }">
-                                    <i class="bk-icon icon-check-1" v-if="item.type === 'success'"></i>
-                                    <i class="bk-icon icon-close" v-if="item.type === 'error'" style="font-size: 18px;"></i>
-                                    <span v-if="item.type !== 'success' && item.type !== 'error'">{{item.id}}</span>
-                                </span>
-                                <span
-                                    class="bk-tree-normal bk-tree-cursor"
-                                    :class="{ 'bk-tree-info': (item.show || item.type !== 'normal') }">{{item.name}}</span>
-                            </div>
-                            <span class="bk-tree-line" v-if="item.id !== stepList.length"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bk-design-step">
-                    <common-step :template-info="templateInfo"
-                        :step="stepList.findIndex(step => step.show)"
-                        :step-list="stepList"></common-step>
-                </div>
-            </div>
-        </div>
-        <!-- 新增弹窗 -->
-        <bk-dialog v-model="addDialogInfo.isShow"
-            data-test-id="taskTemplate-dialog-taskCreate"
-            :title="addDialogInfo.title"
-            :auto-close="false"
-            :mask-close="false"
-            :render-directive="'if'"
-            :header-position="'left'"
-            :width="addDialogInfo.width"
-            :ok-text="$t(`m.taskTemplate['进入配置']`)"
-            @confirm="saveTemplate">
-            <bk-form :label-width="150" :model="firstStepInfo" :rules="formRule" ref="taskInfoForm" :form-type="'vertical'">
-                <bk-form-item
-                    data-test-id="taskTemplate-dialog-taskTemplateName"
-                    :label="$t(`m.taskTemplate['任务模板名称']`)"
-                    :required="true"
-                    :property="'name'"
-                    :ext-cls="'bk-form-width'">
-                    <bk-input v-model="firstStepInfo.name"
-                        maxlength="120">
-                    </bk-input>
-                </bk-form-item>
-                <bk-form-item :label="$t(`m.user['负责人：']`)">
-                    <member-select v-model="firstStepInfo.ownersInputValue"></member-select>
-                </bk-form-item>
-                <bk-form-item
-                    :label="$t(`m.taskTemplate['任务描述']`)"
-                    :ext-cls="'bk-form-width'">
-                    <bk-input
-                        :placeholder="$t(`m.taskTemplate['请输入任务描述']`)"
-                        :type="'textarea'"
-                        :rows="3"
-                        :maxlength="100"
-                        v-model="firstStepInfo.desc">
-                    </bk-input>
-                </bk-form-item>
-            </bk-form>
-        </bk-dialog>
+  <div class="bk-itsm-box">
+    <div class="is-title" :class="{ 'bk-title-left': !sliderStatus }">
+      <template v-if="!addStatus">
+        <p class="bk-come-back">
+          {{$t(`m['任务模板']`)}}
+        </p>
+      </template>
+      <template v-else>
+        <p class="bk-come-back" @click="backTab">
+          <arrows-left-icon></arrows-left-icon>
+          <template>{{templateInfo.itemInfo.name}}</template>
+        </p>
+      </template>
     </div>
+    <div class="itsm-page-content">
+      <div v-if="!addStatus" class="add-status">
+        <div class="bk-itsm-service" v-bkloading="{ isLoading: listLoading }">
+          <div class="bk-itsm-version" v-if="infoStatus">
+            <i class="bk-icon icon-info-circle"></i>
+            <span>{{$t(`m.taskTemplate['任务模版：管理使用不同任务场景下的任务模板。当流程中开启任务模块时，可以设置适用的任务模板。任务处理人只需要按照任务模板进行任务处理即可。']`)}}
+            </span>
+            <i class="bk-icon icon-close" @click="infoStatus = false"></i>
+          </div>
+          <div class="bk-normal-search">
+            <bk-button
+              data-test-id="taskTemplate-button-create"
+              v-cursor="{ active: !hasPermission(['task_template_create']) }"
+              :theme="'primary'"
+              :title="$t(`m.systemConfig['新增']`)"
+              icon="plus"
+              :class="['mr10', 'plus-cus', {
+                'btn-permission-disable': !hasPermission(['task_template_create'])
+              }]"
+              @click="addTemplate">
+              {{$t(`m.systemConfig['新增']`)}}
+            </bk-button>
+            <div class="bk-search-key">
+              <bk-input
+                data-test-id="taskTemplate-input-search"
+                :clearable="true"
+                :right-icon="'bk-icon icon-search'"
+                v-model="searchKey"
+                @enter="getTemplateList"
+                @clear="clearSearch">
+              </bk-input>
+            </div>
+          </div>
+          <div class="bk-task-content">
+            <p class="bk-none-content" v-if="templateList.length === 0">
+              <i class="bk-icon icon-info-circle"></i>
+              <span>{{$t(`m.taskTemplate['尚未创建任一任务模板，']`)}}</span>
+              <span
+                v-cursor="{ active: !hasPermission(['task_template_create']) }"
+                :class="['bk-primary', {
+                  'text-permission-disable': !hasPermission(['task_template_create'])
+                }]"
+                @click="addTemplate">
+                {{$t(`m.taskTemplate['立即创建']`)}}
+              </span>
+            </p>
+            <ul v-else>
+              <li v-for="(item, index) in templateList" :key="index" @click="editTemplate(item)">
+                <span class="bk-task-icon">
+                  <i class="bk-itsm-icon" :class="item.component_type === 'NORMAL' ? 'icon-itsm-icon-task' : 'icon-task-node'"></i>
+                </span>
+                <span class="bk-task-name" :title="item.name">
+                  <span :style="{ maxWidth: item.is_draft ? 'calc(100% - 50px)' : '100%' }">{{ item.name || '--' }}</span>
+                  <span v-show="item.is_draft">{{$t(`m.taskTemplate['(草稿)']`)}}</span>
+                  <span>{{ item.update_at || '--' }}</span>
+                </span>
+                <span class="bk-task-operate">
+                  <i class="bk-itsm-icon icon-itsm-icon-copy"
+                    :data-test-id="`taskTemplate-i-cloneTemplate${index}`"
+                    :class="{ 'icon-disable': item.component_type === 'SOPS' }"
+                    v-bk-tooltips="item.component_type === 'SOPS' ? $t(`m.taskTemplate['标准运维模板不可克隆']`) : $t(`m.taskTemplate['克隆模板']`)"
+                    @click.stop="cloneTemplate(item)"></i>
+                  <i class="bk-icon icon-delete"
+                    :data-test-id="`taskTemplate-i-deleteTemplate${index}`"
+                    :class="{ 'icon-disable': item.is_builtin }"
+                    v-bk-tooltips="item.is_builtin ? $t(`m.taskTemplate['内置模板不可删除']`) : $t(`m.taskTemplate['删除模板']`)"
+                    @click.stop="deleteTemplate(item)"></i>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div v-else class="step-wrap-content">
+        <!-- 流程步骤 -->
+        <div class="bk-itsm-tree">
+          <div class="bk-tree-content">
+            <div class="bk-tree-first" v-for="(item, index) in stepList" :key="item.id">
+              <div class="bk-tree-shadow" @click="changeTree(item, index, 'tree')">
+                <span
+                  class="bk-tree-step"
+                  :class="{ 'bk-tree-primary': item.type === 'primary', 'bk-tree-success': item.type === 'success', 'bk-tree-error': item.type === 'error' }">
+                  <i class="bk-icon icon-check-1" v-if="item.type === 'success'"></i>
+                  <i class="bk-icon icon-close" v-if="item.type === 'error'" style="font-size: 18px;"></i>
+                  <span v-if="item.type !== 'success' && item.type !== 'error'">{{item.id}}</span>
+                </span>
+                <span
+                  class="bk-tree-normal bk-tree-cursor"
+                  :class="{ 'bk-tree-info': (item.show || item.type !== 'normal') }">{{item.name}}</span>
+              </div>
+              <span class="bk-tree-line" v-if="item.id !== stepList.length"></span>
+            </div>
+          </div>
+        </div>
+        <div class="bk-design-step">
+          <common-step :template-info="templateInfo"
+            :step="stepList.findIndex(step => step.show)"
+            :step-list="stepList"></common-step>
+        </div>
+      </div>
+    </div>
+    <!-- 新增弹窗 -->
+    <bk-dialog v-model="addDialogInfo.isShow"
+      data-test-id="taskTemplate-dialog-taskCreate"
+      :title="addDialogInfo.title"
+      :auto-close="false"
+      :mask-close="false"
+      :render-directive="'if'"
+      :header-position="'left'"
+      :width="addDialogInfo.width"
+      :ok-text="$t(`m.taskTemplate['进入配置']`)"
+      @confirm="saveTemplate">
+      <bk-form :label-width="150" :model="firstStepInfo" :rules="formRule" ref="taskInfoForm" :form-type="'vertical'">
+        <bk-form-item
+          data-test-id="taskTemplate-dialog-taskTemplateName"
+          :label="$t(`m.taskTemplate['任务模板名称']`)"
+          :required="true"
+          :property="'name'"
+          :ext-cls="'bk-form-width'">
+          <bk-input v-model="firstStepInfo.name"
+            maxlength="120">
+          </bk-input>
+        </bk-form-item>
+        <bk-form-item :label="$t(`m.user['负责人：']`)">
+          <member-select v-model="firstStepInfo.ownersInputValue"></member-select>
+        </bk-form-item>
+        <bk-form-item
+          :label="$t(`m.taskTemplate['任务描述']`)"
+          :ext-cls="'bk-form-width'">
+          <bk-input
+            :placeholder="$t(`m.taskTemplate['请输入任务描述']`)"
+            :type="'textarea'"
+            :rows="3"
+            :maxlength="100"
+            v-model="firstStepInfo.desc">
+          </bk-input>
+        </bk-form-item>
+      </bk-form>
+    </bk-dialog>
+  </div>
 </template>
 <script>
     import commonStep from './components/commonStep';

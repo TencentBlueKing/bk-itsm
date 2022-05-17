@@ -21,110 +21,110 @@
   -->
 
 <template>
-    <div class="bk-new-task">
-        <h3 class="setion-title">
-            <span
-                class="setion-title-icon"
-                @click.stop="showTaskInfo = !showTaskInfo"
-            >
-                <i v-if="showTaskInfo" class="bk-icon icon-angle-down"></i>
-                <i v-else class="bk-icon icon-angle-right"></i>
-            </span>
-            {{ $t(`m.task['任务信息']`) }}
-        </h3>
-        <bk-form
-            v-show="showTaskInfo"
-            :label-width="200"
-            ref="addTask"
-            form-type="vertical"
-            class="task-info"
+  <div class="bk-new-task">
+    <h3 class="setion-title">
+      <span
+        class="setion-title-icon"
+        @click.stop="showTaskInfo = !showTaskInfo"
+      >
+        <i v-if="showTaskInfo" class="bk-icon icon-angle-down"></i>
+        <i v-else class="bk-icon icon-angle-right"></i>
+      </span>
+      {{ $t(`m.task['任务信息']`) }}
+    </h3>
+    <bk-form
+      v-show="showTaskInfo"
+      :label-width="200"
+      ref="addTask"
+      form-type="vertical"
+      class="task-info"
+    >
+      <template v-if="nodeInfo.task_schemas.length !== 0">
+        <bk-form-item
+          :label="$t(`m.task['任务模板']`)"
+          :required="true"
+          :property="'template'"
+          class="half-width-item"
         >
-            <template v-if="nodeInfo.task_schemas.length !== 0">
-                <bk-form-item
-                    :label="$t(`m.task['任务模板']`)"
-                    :required="true"
-                    :property="'template'"
-                    class="half-width-item"
-                >
-                    <bk-select
-                        searchable
-                        :clearable="falseStatus"
-                        v-model="formData.template"
-                        @selected="selectTemplate"
-                        :disabled="!!itemContent.id"
-                    >
-                        <bk-option
-                            v-for="option in nodeInfo.task_schemas"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name"
-                        ></bk-option>
-                    </bk-select>
-                    <p class="bk-task-error" v-if="checkInfo.template">
-                        {{ $t(`m.task['任务模板为必填项']`) }}
-                    </p>
-                </bk-form-item>
-            </template>
-            <!-- 处理人 -->
-            <template v-if="isComplexMembers">
-                <bk-form-item
-                    :label="$t(`m.task['处理人']`)"
-                    :required="true"
-                    :property="'processor'"
-                >
-                    <deal-person
-                        ref="personSelect"
-                        class="deal-person"
-                        :shortcut="true"
-                        :value="dealPersonData"
-                        :exclude-role-type-list="excludeTypeList"
-                    ></deal-person>
-                </bk-form-item>
-            </template>
-        </bk-form>
-        <h3 class="setion-title">
-            <span
-                class="setion-title-icon"
-                @click.stop="showTemplateInfo = !showTemplateInfo"
-            >
-                <i v-if="showTemplateInfo" class="bk-icon icon-angle-down"></i>
-                <i v-else class="bk-icon icon-angle-right"></i>
-            </span>
-            {{ $t(`m.tickets['模板信息']`) }}
-        </h3>
-        <!-- 自定义渲染拉取到的表单字段 -->
-        <div
-            class="bk-field-info"
-            v-bkloading="{ isLoading: fieldLoading }"
-            v-show="showTemplateInfo"
+          <bk-select
+            searchable
+            :clearable="falseStatus"
+            v-model="formData.template"
+            @selected="selectTemplate"
+            :disabled="!!itemContent.id"
+          >
+            <bk-option
+              v-for="option in nodeInfo.task_schemas"
+              :key="option.id"
+              :id="option.id"
+              :name="option.name"
+            ></bk-option>
+          </bk-select>
+          <p class="bk-task-error" v-if="checkInfo.template">
+            {{ $t(`m.task['任务模板为必填项']`) }}
+          </p>
+        </bk-form-item>
+      </template>
+      <!-- 处理人 -->
+      <template v-if="isComplexMembers">
+        <bk-form-item
+          :label="$t(`m.task['处理人']`)"
+          :required="true"
+          :property="'processor'"
         >
-            <field-info
-                v-if="showField"
-                ref="fieldInfo"
-                :fields="fieldList"
-                :basic-infomation="basicInfomation"
-            ></field-info>
-        </div>
-        <div slot="footer" class="bk-submit-task">
-            <bk-button
-                :theme="'primary'"
-                :title="$t(`m.task['确认']`)"
-                :disabled="btnLoading || fieldLoading"
-                class="mr10"
-                @click="submitTask"
-            >
-                {{ $t(`m.task['确认']`) }}
-            </bk-button>
-            <bk-button
-                :theme="'default'"
-                :disabled="btnLoading"
-                :title="$t(`m.task['取消']`)"
-                @click="closeSlider"
-            >
-                {{ $t(`m.task['取消']`) }}
-            </bk-button>
-        </div>
+          <deal-person
+            ref="personSelect"
+            class="deal-person"
+            :shortcut="true"
+            :value="dealPersonData"
+            :exclude-role-type-list="excludeTypeList"
+          ></deal-person>
+        </bk-form-item>
+      </template>
+    </bk-form>
+    <h3 class="setion-title">
+      <span
+        class="setion-title-icon"
+        @click.stop="showTemplateInfo = !showTemplateInfo"
+      >
+        <i v-if="showTemplateInfo" class="bk-icon icon-angle-down"></i>
+        <i v-else class="bk-icon icon-angle-right"></i>
+      </span>
+      {{ $t(`m.tickets['模板信息']`) }}
+    </h3>
+    <!-- 自定义渲染拉取到的表单字段 -->
+    <div
+      class="bk-field-info"
+      v-bkloading="{ isLoading: fieldLoading }"
+      v-show="showTemplateInfo"
+    >
+      <field-info
+        v-if="showField"
+        ref="fieldInfo"
+        :fields="fieldList"
+        :basic-infomation="basicInfomation"
+      ></field-info>
     </div>
+    <div slot="footer" class="bk-submit-task">
+      <bk-button
+        :theme="'primary'"
+        :title="$t(`m.task['确认']`)"
+        :disabled="btnLoading || fieldLoading"
+        class="mr10"
+        @click="submitTask"
+      >
+        {{ $t(`m.task['确认']`) }}
+      </bk-button>
+      <bk-button
+        :theme="'default'"
+        :disabled="btnLoading"
+        :title="$t(`m.task['取消']`)"
+        @click="closeSlider"
+      >
+        {{ $t(`m.task['取消']`) }}
+      </bk-button>
+    </div>
+  </div>
 </template>
 
 <script>

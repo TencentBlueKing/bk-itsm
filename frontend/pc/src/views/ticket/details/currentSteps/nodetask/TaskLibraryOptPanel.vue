@@ -21,46 +21,46 @@
   -->
 
 <template>
-    <div class="task-library-opt-panel">
-        <div class="bk-button-group">
-            <bk-button size="small"
-                :class="[{ 'is-selected': type === 'new' }]"
-                @click="onSwitchType('new')">
-                {{ $t(`m.systemConfig['新增']`) }}</bk-button>
-            <bk-button size="small"
-                :class="[{ 'is-selected': type === 'update' }]"
-                @click="onSwitchType('update')">
-                {{ $t(`m.tickets['更新']`) }}</bk-button>
-        </div>
-        <bk-form ref="taskForm" :model="formData" :rules="rules" form-type="vertical" class="mt15">
-            <bk-form-item
-                :label="$t(`m.task['任务库名称']`)"
-                :required="true"
-                :property="'name'">
-                <template v-if="type === 'new'">
-                    <bk-input
-                        v-model="formData.name"
-                        :placeholder="$t(`m.tickets['请输入任务库名称']`)"
-                        :max-length="120"></bk-input>
-                    <p class="desc">{{ $t(`m.tickets['存入任务库后，可用于快速创建任务']`) }}</p>
-                </template>
-                <bk-select v-else
-                    v-model="formData.name"
-                    searchable
-                    :loading="templateListLoading">
-                    <bk-option v-for="option in templateList"
-                        :key="option.id"
-                        :id="option.id"
-                        :name="option.name">
-                    </bk-option>
-                </bk-select>
-            </bk-form-item>
-        </bk-form>
-        <div class="opt-btns">
-            <span @click="onSbumit">{{ $t(`m.treeinfo['确定']`) }}</span>
-            <span @click="$emit('close')">{{ $t('m.treeinfo["取消"]') }}</span>
-        </div>
+  <div class="task-library-opt-panel">
+    <div class="bk-button-group">
+      <bk-button size="small"
+        :class="[{ 'is-selected': type === 'new' }]"
+        @click="onSwitchType('new')">
+        {{ $t(`m.systemConfig['新增']`) }}</bk-button>
+      <bk-button size="small"
+        :class="[{ 'is-selected': type === 'update' }]"
+        @click="onSwitchType('update')">
+        {{ $t(`m.tickets['更新']`) }}</bk-button>
     </div>
+    <bk-form ref="taskForm" :model="formData" :rules="rules" form-type="vertical" class="mt15">
+      <bk-form-item
+        :label="$t(`m.task['任务库名称']`)"
+        :required="true"
+        :property="'name'">
+        <template v-if="type === 'new'">
+          <bk-input
+            v-model="formData.name"
+            :placeholder="$t(`m.tickets['请输入任务库名称']`)"
+            :max-length="120"></bk-input>
+          <p class="desc">{{ $t(`m.tickets['存入任务库后，可用于快速创建任务']`) }}</p>
+        </template>
+        <bk-select v-else
+          v-model="formData.name"
+          searchable
+          :loading="templateListLoading">
+          <bk-option v-for="option in templateList"
+            :key="option.id"
+            :id="option.id"
+            :name="option.name">
+          </bk-option>
+        </bk-select>
+      </bk-form-item>
+    </bk-form>
+    <div class="opt-btns">
+      <span @click="onSbumit">{{ $t(`m.treeinfo['确定']`) }}</span>
+      <span @click="$emit('close')">{{ $t('m.treeinfo["取消"]') }}</span>
+    </div>
+  </div>
 </template>
 
 <script>

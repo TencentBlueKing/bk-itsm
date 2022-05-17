@@ -21,9 +21,9 @@
   -->
 
 <template>
-    <div class="operation-data-page">
-        <router-view></router-view>
-    </div>
+  <div class="operation-data-page">
+    <router-view></router-view>
+  </div>
 </template>
 <script>
     export default {

@@ -21,156 +21,211 @@
   -->
 
 <template>
-    <div class="all-ticket-page" v-bkloading="{ isLoading: loading }">
-        <template v-if="!loading">
-            <div class="ticket-tab">
-                <nav-title :title-name="titleName">
-                    <div slot="tab">
-                        <div class="nav-list">
-                            <draggable class="drag-scroll" v-model="serviceList" @end="onEnd" filter=".forbid">
-                                <li class="drag-list" v-for="(item, index) in serviceList" :key="item.key" :class="{ 'active': item.name === currentTab, 'forbid': fixedTabs.includes(item.name) }" @click="changeTag(item.name)">
-                                    <span>{{ item.name }}</span>
-                                    <span v-if="counts[item.key]" class="ticket-file-count">{{ counts[item.key]}}</span>
-                                    <template v-if="!fixedTabs.includes(item.name) && isInProject">
-                                        <span style="font-size: 18px; margin-left: 4px;" class="bk-itsm-icon icon-edit-new" @click.stop="editProjectTab(item)"></span>
-                                        <i class="bk-itsm-icon icon-itsm-icon-three-one" @click.stop="closePanel(index, item)"></i>
-                                    </template>
-                                </li>
-                                <li v-if="isInProject" class="drag-list forbid bk-itsm-icon icon-jia-2" @click.stop="addPanel" title="添加自定义tab"></li>
-                            </draggable>
-                        </div>
-                    </div>
-                </nav-title>
-                <template v-for="item in serviceList">
-                    <div class="ticket-content" v-if="serviceType === item.key" :key="item.key">
-                        <div class="operate-wrapper">
-                            <advanced-search
-                                class="advanced-search"
-                                ref="advancedSearch"
-                                :forms="searchForms"
-                                :panel="item.key"
-                                :cur-servcie="item"
-                                :is-custom-tab="isCustomTab"
-                                :search-result-list="searchResultList"
-                                @search="handleSearch"
-                                @deteleSearchResult="deteleSearchResult"
-                                @onChangeHighlight="getAllTicketList()"
-                                @formChange="handleSearchFormChange"
-                                @clear="handleClearSearch">
-                                <div class="slot-content">
-                                    <bk-button
-                                        data-test-id="ticket_button_export"
-                                        class="export"
-                                        :title="$t(`m.tickets['导出']`)"
-                                        @click="openExportList">
-                                        {{ $t('m.tickets["导出"]') }}
-                                    </bk-button>
-                                </div>
-                            </advanced-search>
-                        </div>
-                        <div class="table-wrapper">
-                            <table-content
-                                v-bkloading="{ isLoading: tableLoading }"
-                                :data-list="dataList"
-                                :pagination="pagination"
-                                :color-hex-list="colorHexList"
-                                :service-type="serviceType"
-                                @submitSuccess="evaluationSubmitSuccess"
-                                @orderingClick="orderingClick"
-                                @handlePageLimitChange="handlePageLimitChange"
-                                @handlePageChange="handlePageChange">
-                            </table-content>
-                        </div>
-                    </div>
-                </template>
+  <div class="all-ticket-page" v-bkloading="{ isLoading: loading }">
+    <template v-if="!loading">
+      <div class="ticket-tab">
+        <nav-title :title-name="titleName">
+          <div slot="tab">
+            <div class="nav-list">
+              <draggable
+                class="drag-scroll"
+                v-model="serviceList"
+                @end="onEnd"
+                filter=".forbid">
+                <li
+                  class="drag-list"
+                  v-for="(item, index) in serviceList"
+                  :key="item.key"
+                  :class="{
+                    active: item.name === currentTab,
+                    forbid: fixedTabs.includes(item.name)
+                  }"
+                  @click="changeTag(item.name)">
+                  <span>{{ item.name }}</span>
+                  <span v-if="counts[item.key]" class="ticket-file-count">{{
+                    counts[item.key]
+                  }}</span>
+                  <template
+                    v-if="!fixedTabs.includes(item.name) && isInProject">
+                    <span
+                      style="font-size: 18px; margin-left: 4px"
+                      class="bk-itsm-icon icon-edit-new"
+                      @click.stop="editProjectTab(item)"></span>
+                    <i
+                      class="bk-itsm-icon icon-itsm-icon-three-one"
+                      @click.stop="closePanel(index, item)"></i>
+                  </template>
+                </li>
+                <li
+                  v-if="isInProject"
+                  class="drag-list forbid bk-itsm-icon icon-jia-2"
+                  @click.stop="addPanel"
+                  title="添加自定义tab"></li>
+              </draggable>
             </div>
+          </div>
+        </nav-title>
+        <template v-for="item in serviceList">
+          <div
+            class="ticket-content"
+            v-if="serviceType === item.key"
+            :key="item.key">
+            <div class="operate-wrapper">
+              <advanced-search
+                class="advanced-search"
+                ref="advancedSearch"
+                :forms="searchForms"
+                :panel="item.key"
+                :cur-servcie="item"
+                :is-custom-tab="isCustomTab"
+                :search-result-list="searchResultList"
+                @search="handleSearch"
+                @deteleSearchResult="deteleSearchResult"
+                @onChangeHighlight="getAllTicketList()"
+                @formChange="handleSearchFormChange"
+                @clear="handleClearSearch">
+                <div class="slot-content">
+                  <bk-button
+                    data-test-id="ticket_button_export"
+                    class="export"
+                    :title="$t(`m.tickets['导出']`)"
+                    @click="openExportList">
+                    {{ $t('m.tickets["导出"]') }}
+                  </bk-button>
+                </div>
+              </advanced-search>
+            </div>
+            <div class="table-wrapper">
+              <table-content
+                v-bkloading="{ isLoading: tableLoading }"
+                :data-list="dataList"
+                :pagination="pagination"
+                :color-hex-list="colorHexList"
+                :service-type="serviceType"
+                @submitSuccess="evaluationSubmitSuccess"
+                @orderingClick="orderingClick"
+                @handlePageLimitChange="handlePageLimitChange"
+                @handlePageChange="handlePageChange">
+              </table-content>
+            </div>
+          </div>
         </template>
-        <!-- 自定义tab -->
-        <bk-dialog v-model="showCustomTabEdit"
-            width="1000"
-            :draggable="false"
-            theme="primary"
-            :mask-close="false"
-            :auto-close="false"
-            :title="isEditTab ? $t(`m['编辑标签']`) : $t(`m['新建标签']`)"
-            @confirm="handleAddTabs('add')"
-            @cancel="handleCloseTabs">
-            <bk-form
-                ref="customFrom"
-                :label-width="150"
-                class="bk-form"
-                form-type="horizontal"
-                :model="customTabForm"
-                :rules="customRules">
-                <template>
-                    <p class="bk-form-title">{{ $t(`m['基本信息']`) }}</p>
-                    <bk-form-item class="bk-form-item" :label="$t(`m['自定义tab名称']`)" :required="true" :property="'name'">
-                        <bk-input v-model="customTabForm.name" :maxlength="20" :show-word-limit="true" :placeholder="$t(`m['请输入名称']`)"></bk-input>
-                    </bk-form-item>
-                    <bk-form-item :label="$t(`m['描述信息']`)">
-                        <bk-input v-model="customTabForm.desc" :type="'textarea'" :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
-                    </bk-form-item>
-                    <p class="bk-form-title">{{ $t(`m['筛选信息']`) }}</p>
-                    <template
-                        v-for="(item, index) in customForm">
-                        <bk-form-item :label="item.name" v-if="item.type === 'input'" :key="index">
-                            <bk-input v-model="customTabForm.conditions[item.key]"
-                                :placeholder="item.placeholder">
-                            </bk-input>
-                        </bk-form-item>
-                        <bk-form-item :label="item.name" v-if="item.type === 'select'" :key="index">
-                            <bk-select
-                                searchable
-                                :placeholder="item.placeholder"
-                                :show-select-all="item.multiSelect"
-                                :multiple="item.multiSelect"
-                                v-model="customTabForm.conditions[item.key]">
-                                <bk-option v-for="option in item.list"
-                                    :key="option.key"
-                                    :id="option.key"
-                                    :name="option.name">
-                                </bk-option>
-                            </bk-select>
-                        </bk-form-item>
-                        <bk-form-item :label="item.name" v-if="item.type === 'datetime'" :key="index">
-                            <bk-date-picker
-                                style="width: 100%;"
-                                v-model="customTabForm.conditions[item.key]"
-                                :placeholder="item.placeholder"
-                                :type="'datetimerange'">
-                            </bk-date-picker>
-                        </bk-form-item>
-                        <!-- 级联类型 -->
-                        <bk-form-item :label="item.name" v-if="item.type === 'cascade'" :key="index">
-                            <bk-cascade
-                                style="width: 100%;"
-                                v-model="customTabForm.conditions[item.key]"
-                                :list="item.list"
-                                :check-any-level="true"
-                                clearable
-                                :ext-popover-cls="'custom-cls'">
-                            </bk-cascade>
-                        </bk-form-item>
-                        <!-- 人员 -->
-                        <bk-form-item :label="item.name" v-if="item.type === 'member'" :key="index">
-                            <member-select
-                                v-model="customTabForm.conditions[item.key]"
-                                :multiple="false"
-                                :placeholder="item.placeholder"></member-select>
-                        </bk-form-item>
-                    </template>
-                </template>
-            </bk-form>
-        </bk-dialog>
-        <!-- 导出 -->
-        <export-ticket-dialog
-            :is-show="isExportDialogShow"
-            :pagination="pagination"
-            :view-type="''"
-            :search-params="searchParams"
-            @close="isExportDialogShow = false">
-        </export-ticket-dialog>
-    </div>
+      </div>
+    </template>
+    <!-- 自定义tab -->
+    <bk-dialog
+      v-model="showCustomTabEdit"
+      width="1000"
+      :draggable="false"
+      theme="primary"
+      :mask-close="false"
+      :auto-close="false"
+      :title="isEditTab ? $t(`m['编辑标签']`) : $t(`m['新建标签']`)"
+      @confirm="handleAddTabs('add')"
+      @cancel="handleCloseTabs">
+      <bk-form
+        ref="customFrom"
+        :label-width="150"
+        class="bk-form"
+        form-type="horizontal"
+        :model="customTabForm"
+        :rules="customRules">
+        <template>
+          <p class="bk-form-title">{{ $t(`m['基本信息']`) }}</p>
+          <bk-form-item
+            class="bk-form-item"
+            :label="$t(`m['自定义tab名称']`)"
+            :required="true"
+            :property="'name'">
+            <bk-input
+              v-model="customTabForm.name"
+              :maxlength="20"
+              :show-word-limit="true"
+              :placeholder="$t(`m['请输入名称']`)"></bk-input>
+          </bk-form-item>
+          <bk-form-item :label="$t(`m['描述信息']`)">
+            <bk-input
+              v-model="customTabForm.desc"
+              :type="'textarea'"
+              :placeholder="$t(`m['请输入描述信息']`)"></bk-input>
+          </bk-form-item>
+          <p class="bk-form-title">{{ $t(`m['筛选信息']`) }}</p>
+          <template v-for="(item, index) in customForm">
+            <bk-form-item
+              :label="item.name"
+              v-if="item.type === 'input'"
+              :key="index">
+              <bk-input
+                v-model="customTabForm.conditions[item.key]"
+                :placeholder="item.placeholder">
+              </bk-input>
+            </bk-form-item>
+            <bk-form-item
+              :label="item.name"
+              v-if="item.type === 'select'"
+              :key="index">
+              <bk-select
+                searchable
+                :placeholder="item.placeholder"
+                :show-select-all="item.multiSelect"
+                :multiple="item.multiSelect"
+                v-model="customTabForm.conditions[item.key]">
+                <bk-option
+                  v-for="option in item.list"
+                  :key="option.key"
+                  :id="option.key"
+                  :name="option.name">
+                </bk-option>
+              </bk-select>
+            </bk-form-item>
+            <bk-form-item
+              :label="item.name"
+              v-if="item.type === 'datetime'"
+              :key="index">
+              <bk-date-picker
+                style="width: 100%"
+                v-model="customTabForm.conditions[item.key]"
+                :placeholder="item.placeholder"
+                :type="'datetimerange'">
+              </bk-date-picker>
+            </bk-form-item>
+            <!-- 级联类型 -->
+            <bk-form-item
+              :label="item.name"
+              v-if="item.type === 'cascade'"
+              :key="index">
+              <bk-cascade
+                style="width: 100%"
+                v-model="customTabForm.conditions[item.key]"
+                :list="item.list"
+                :check-any-level="true"
+                clearable
+                :ext-popover-cls="'custom-cls'">
+              </bk-cascade>
+            </bk-form-item>
+            <!-- 人员 -->
+            <bk-form-item
+              :label="item.name"
+              v-if="item.type === 'member'"
+              :key="index">
+              <member-select
+                v-model="customTabForm.conditions[item.key]"
+                :multiple="false"
+                :placeholder="item.placeholder"></member-select>
+            </bk-form-item>
+          </template>
+        </template>
+      </bk-form>
+    </bk-dialog>
+    <!-- 导出 -->
+    <export-ticket-dialog
+      :is-show="isExportDialogShow"
+      :pagination="pagination"
+      :view-type="''"
+      :search-params="searchParams"
+      @close="isExportDialogShow = false">
+    </export-ticket-dialog>
+  </div>
 </template>
 <!-- 自定义tab 选择服务目录是只能选择下级目录 -->
 <script>
@@ -310,7 +365,8 @@
                 searchForms: SEARCH_FORM.slice(0),
                 searchParams: {}, // 高级搜索内容
                 orderKey: '-create_at', // 排序
-                searchResultList: { // 搜索结果
+                searchResultList: {
+                    // 搜索结果
                     request: [],
                     change: [],
                     event: [],
@@ -335,8 +391,10 @@
                         },
                         {
                             validator: (val) => {
-                                const curEdit = this.serviceList.find(item => item.id === this.editTabId);
-                                const list = this.isEditTab ? this.checkTabNameList.filter(item => item !== curEdit.name) : this.checkTabNameList;
+                                const curEdit = this.serviceList.find((item) => item.id === this.editTabId);
+                                const list = this.isEditTab
+                                    ? this.checkTabNameList.filter((item) => item !== curEdit.name)
+                                    : this.checkTabNameList;
                                 return !list.includes(val);
                             },
                             message: this.$t('m["该TAB名称已存在"]'),
@@ -379,14 +437,14 @@
             // 拖拽后变更自定义列表order
             onEnd(e) {
                 const text = e.item.textContent.trim();
-                const curDrag = this.customList.find(item => item.name === text);
+                const curDrag = this.customList.find((item) => item.name === text);
                 const params = {
                     new_order: e.newIndex - 3,
                     tab_id: curDrag.id,
                 };
-                this.$store.dispatch('project/moveProjectTab', params).then(() => {
-
-                })
+                this.$store
+                    .dispatch('project/moveProjectTab', params)
+                    .then(() => {})
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
@@ -423,27 +481,29 @@
                 }
             },
             handleAddTabs() {
-                this.$refs.customFrom.validate().then(() => {
-                    const params = {
-                        name: this.customTabForm.name,
-                        desc: this.customTabForm.desc,
-                        conditions: this.customTabForm.conditions,
-                    };
-                    let url = 'project/createProjectTab';
-                    if (this.isEditTab) {
-                        params.id = this.editTabId;
-                        url = 'project/editProjectTab';
-                    } else {
-                        params.project_key = this.$route.query.project_id;
-                    }
-                    this.$store.dispatch(url, params).then((res) => {
-                        if (Object.keys(res.data).length !== 0) {
-                            this.$set(this.counts, res.data.id, 0);
-                            this.getProjectTabList();
+                this.$refs.customFrom
+                    .validate()
+                    .then(() => {
+                        const params = {
+                            name: this.customTabForm.name,
+                            desc: this.customTabForm.desc,
+                            conditions: this.customTabForm.conditions,
+                        };
+                        let url = 'project/createProjectTab';
+                        if (this.isEditTab) {
+                            params.id = this.editTabId;
+                            url = 'project/editProjectTab';
+                        } else {
+                            params.project_key = this.$route.query.project_id;
                         }
-                    });
-                    this.showCustomTabEdit = false;
-                })
+                        this.$store.dispatch(url, params).then((res) => {
+                            if (Object.keys(res.data).length !== 0) {
+                                this.$set(this.counts, res.data.id, 0);
+                                this.getProjectTabList();
+                            }
+                        });
+                        this.showCustomTabEdit = false;
+                    })
                     .finally(() => {
                         if (this.isEditTab) {
                             this.currentTab = this.customTabForm.name;
@@ -477,18 +537,20 @@
                 const params = {
                     project_key: this.$route.query.project_id,
                 };
-                this.$store.dispatch('project/getProjectTab', params).then((res) => {
-                    res.data.forEach((item) => {
-                        item.key = String(item.id);
-                        this.customList.push(item);
-                    });
-                    this.customList = res.data;
-                    this.serviceList.splice(4);
-                    this.customList.forEach((ite) => {
-                        this.serviceList.push(ite);
-                    });
-                    this.checkTabNameList = this.serviceList.map(item => item.name);
-                })
+                this.$store
+                    .dispatch('project/getProjectTab', params)
+                    .then((res) => {
+                        res.data.forEach((item) => {
+                            item.key = String(item.id);
+                            this.customList.push(item);
+                        });
+                        this.customList = res.data;
+                        this.serviceList.splice(4);
+                        this.customList.forEach((ite) => {
+                            this.serviceList.push(ite);
+                        });
+                        this.checkTabNameList = this.serviceList.map((item) => item.name);
+                    })
                     .catch((e) => {
                         console.log(e);
                     });
@@ -531,16 +593,18 @@
                     this.$bkInfo({
                         title: `请确认是否删除-[${panel.name}]`,
                         confirmFn: () => {
-                            this.$store.dispatch('project/deleteProjectTab', this.serviceList[index].id).then((res) => {
-                                if (res.result) {
-                                    this.serviceList.splice(index, 1);
-                                    if (this.currentTab === panel.name) {
-                                        this.currentTab = '请求管理';
-                                        this.serviceType = 'request';
+                            this.$store
+                                .dispatch('project/deleteProjectTab', this.serviceList[index].id)
+                                .then((res) => {
+                                    if (res.result) {
+                                        this.serviceList.splice(index, 1);
+                                        if (this.currentTab === panel.name) {
+                                            this.currentTab = '请求管理';
+                                            this.serviceType = 'request';
+                                        }
+                                        this.getProjectTabList();
                                     }
-                                    this.getProjectTabList();
-                                }
-                            });
+                                });
                         },
                     });
                 }
@@ -548,23 +612,27 @@
             changeTime(str) {
                 if (str === '') return undefined;
                 const time = new Date(str);
-                return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+                return `${time.getFullYear()}-${
+                    time.getMonth() + 1
+                }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
             },
             // 获取所有服务类型列表
             async getServiceTypeList() {
                 this.isTabLoading = true;
-                return this.$store.dispatch('getCustom').then((res) => {
-                    if (res.result) {
-                        this.serviceList = res.data;
-                        console.log(res.data);
-                        this.serviceList.forEach((item) => {
-                            item.label = item.name;
-                            this.$set(this.counts, item.key, 0);
-                        });
-                        this.serviceType = this.serviceList[0].key;
-                        this.currentTab = this.serviceList[0].name;
-                    }
-                })
+                return this.$store
+                    .dispatch('getCustom')
+                    .then((res) => {
+                        if (res.result) {
+                            this.serviceList = res.data;
+                            console.log(res.data);
+                            this.serviceList.forEach((item) => {
+                                item.label = item.name;
+                                this.$set(this.counts, item.key, 0);
+                            });
+                            this.serviceType = this.serviceList[0].key;
+                            this.currentTab = this.serviceList[0].name;
+                        }
+                    })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
@@ -600,12 +668,21 @@
                     fixParams.project_key = this.$route.query.project_id;
                     fixParams.tab_conditions = {
                         keyword: this.curService.conditions.keyword || undefined,
-                        catalog_id: Number(this.curService.conditions.catalog_id.slice(-1).join()) || undefined,
-                        creator__in: this.curService.conditions.creator__in.join() || undefined,
-                        current_processor: this.curService.conditions.current_processor.join() || undefined,
-                        overall_current_status__in: this.curService.conditions.current_status__in.join() || undefined,
-                        create_at__gte: this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[0]) : undefined,
-                        create_at__lte: this.curService.conditions.date_update ? this.changeTime(this.curService.conditions.date_update[1]) : undefined,
+                        catalog_id:
+                            Number(this.curService.conditions.catalog_id.slice(-1).join())
+                            || undefined,
+                        creator__in:
+                            this.curService.conditions.creator__in.join() || undefined,
+                        current_processor:
+                            this.curService.conditions.current_processor.join() || undefined,
+                        overall_current_status__in:
+                            this.curService.conditions.current_status__in.join() || undefined,
+                        create_at__gte: this.curService.conditions.date_update
+                            ? this.changeTime(this.curService.conditions.date_update[0])
+                            : undefined,
+                        create_at__lte: this.curService.conditions.date_update
+                            ? this.changeTime(this.curService.conditions.date_update[1])
+                            : undefined,
                         bk_biz_id: this.curService.conditions.bk_biz_id || undefined,
                     };
                     fixParams.extra_conditions = {
@@ -620,22 +697,24 @@
                     fixParams.service_type = type;
                     Object.assign(fixParams, searchParams);
                 }
-                return this.$store.dispatch(url, fixParams).then((res) => {
-                    if (!excludeList.includes(type)) {
-                        // this.$set(this.counts, service.key, res.data.count)
-                        this.customTabList = res.data.items;
-                    } else {
-                        this[`${type}List`] = res.data.items;
-                        // 异步加载列表中的某些字段信息
-                        this.__asyncReplaceTicketListAttr(this[`${type}List`]);
-                        this.$set(this.counts, type, res.data.count);
-                    }
-                    // 分页
-                    this.pagination.current = res.data.page;
-                    if (this.serviceType === type) {
-                        this.pagination.count = res.data.count;
-                    }
-                })
+                return this.$store
+                    .dispatch(url, fixParams)
+                    .then((res) => {
+                        if (!excludeList.includes(type)) {
+                            // this.$set(this.counts, service.key, res.data.count)
+                            this.customTabList = res.data.items;
+                        } else {
+                            this[`${type}List`] = res.data.items;
+                            // 异步加载列表中的某些字段信息
+                            this.__asyncReplaceTicketListAttr(this[`${type}List`]);
+                            this.$set(this.counts, type, res.data.count);
+                        }
+                        // 分页
+                        this.pagination.current = res.data.page;
+                        if (this.serviceType === type) {
+                            this.pagination.count = res.data.count;
+                        }
+                    })
                     .finally(() => {
                         this[`${type}Loading`] = false;
                         this.customTabLoading = false;
@@ -644,7 +723,7 @@
             // 获取所有tab的单据列表
             getAllTabTicketList() {
                 this.loading = true;
-                const tableList = this.serviceList.map(item => this.getAllTicketList(item.key));
+                const tableList = this.serviceList.map((item) => this.getAllTicketList(item.key));
                 Promise.all(tableList).then(() => {
                     this.loading = false;
                 });
@@ -660,22 +739,24 @@
                 if (this.projectId) {
                     params.project_key = this.projectId;
                 }
-                this.$store.dispatch('serviceCatalog/getTreeData', params).then((res) => {
-                    const formItem = this.searchForms.find(item => item.key === 'catalog_id');
-                    formItem.list = res.data[0] ? res.data[0].children : [];
-                    // const current = this.serviceList.find(item => item.key === this.serviceType)
-                    // if (!this.fixedTabs.includes(current.name)) {
-                    //     const list = []
-                    //     this.searchForms.forEach(item => {
-                    //         if (item.key === 'catalog_id') {
-                    //             list.push(this.getTreebyId(item.list, current.conditions.catalog_id[0]))
-                    //         }
-                    //     })
-                    //     formItem.list = list
-                    // } else {
-                    //     formItem.list = res.data[0] ? res.data[0]['children'] : []
-                    // }
-                })
+                this.$store
+                    .dispatch('serviceCatalog/getTreeData', params)
+                    .then((res) => {
+                        const formItem = this.searchForms.find((item) => item.key === 'catalog_id');
+                        formItem.list = res.data[0] ? res.data[0].children : [];
+                        // const current = this.serviceList.find(item => item.key === this.serviceType)
+                        // if (!this.fixedTabs.includes(current.name)) {
+                        //     const list = []
+                        //     this.searchForms.forEach(item => {
+                        //         if (item.key === 'catalog_id') {
+                        //             list.push(this.getTreebyId(item.list, current.conditions.catalog_id[0]))
+                        //         }
+                        //     })
+                        //     formItem.list = list
+                        // } else {
+                        //     formItem.list = res.data[0] ? res.data[0]['children'] : []
+                        // }
+                    })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
@@ -688,10 +769,12 @@
                 const params = {
                     source_uri: 'ticket_status',
                 };
-                this.$store.dispatch('ticketStatus/getOverallTicketStatuses', params).then((res) => {
-                    const formItem = this.searchForms.find(item => item.key === 'current_status__in');
-                    formItem.list = res.data;
-                })
+                this.$store
+                    .dispatch('ticketStatus/getOverallTicketStatuses', params)
+                    .then((res) => {
+                        const formItem = this.searchForms.find((item) => item.key === 'current_status__in');
+                        formItem.list = res.data;
+                    })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
@@ -709,41 +792,45 @@
                 if (this.projectId) {
                     params.project_key = this.projectId;
                 }
-                this.$store.dispatch('catalogService/getServices', params).then((res) => {
-                    const formItem = this.searchForms.find(item => item.key === 'service_id__in');
-                    formItem.list = [];
-                    res.data.forEach((item) => {
-                        formItem.list.push({
-                            key: item.id,
-                            name: item.name,
+                this.$store
+                    .dispatch('catalogService/getServices', params)
+                    .then((res) => {
+                        const formItem = this.searchForms.find((item) => item.key === 'service_id__in');
+                        formItem.list = [];
+                        res.data.forEach((item) => {
+                            formItem.list.push({
+                                key: item.id,
+                                name: item.name,
+                            });
                         });
-                    });
-                })
+                    })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
                             theme: 'error',
                         });
                     })
-                    .finally(() => {
-
-                    });
+                    .finally(() => {});
             },
             // 获取状态颜色接口
             getTypeStatus() {
                 const params = {};
                 const type = this.serviceType;
-                this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
-                    this.colorHexList = res.data;
-                })
+                this.$store
+                    .dispatch('ticketStatus/getTypeStatus', { type, params })
+                    .then((res) => {
+                        this.colorHexList = res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
             },
             getBusinessList() {
-                this.$store.dispatch('eventType/getAppList').then((res) => {
-                    this.searchForms.find(item => item.key === 'bk_biz_id').list = res.data;
-                })
+                this.$store
+                    .dispatch('eventType/getAppList')
+                    .then((res) => {
+                        this.searchForms.find((item) => item.key === 'bk_biz_id').list =            res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -758,7 +845,7 @@
                 this.searchForms.forEach((item) => {
                     item.value = item.multiSelect ? [] : '';
                 });
-                this.curService = this.serviceList.find(item => item.name === val);
+                this.curService = this.serviceList.find((item) => item.name === val);
                 this.serviceType = this.curService.key;
                 if (this.fixedTabs.includes(this.curService.name)) {
                     this.getServiceTree();
@@ -802,7 +889,7 @@
             // 展开高级搜索
             handleSearchFormChange(key, val) {
                 if (key === 'catalog_id') {
-                    const formItem = this.searchForms.find(item => item.key === 'service_id__in');
+                    const formItem = this.searchForms.find((item) => item.key === 'service_id__in');
                     formItem.display = val.length;
                     if (val.length) {
                         const serviceCatalogId = val[val.length - 1];
@@ -835,150 +922,150 @@
     };
 </script>
 <style lang="scss" scoped>
-@import '~@/scss/mixins/scroller.scss';
-    .all-ticket-page {
-        height: 100%;
-        background: #fafbfd;
-        /deep/ .bk-tab-section {
-            padding: 0;
-            background-color: #f5f7fa;
-        }
-        .bk-tab-label-item {
-            .list-wrapper {
-                display: flex;
-                align-items: center;
-                position: relative;
-                .ticket-file-count {
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin: 0 3px;
-                    min-width: 24px;
-                    height: 16px;
-                    padding: 0 4px ;
-                    line-height: 16px;
-                    border-radius: 8px;
-                    text-align: center;
-                    font-style: normal;
-                    font-size: 12px;
-                    font-weight: bold;
-                    font-family: Helvetica, Arial;
-                    color: #979ba5;
-                    background-color: #f0f1f5;
-                }
-            }
-            &.active,
-            &:hover {
-                .ticket-file-count {
-                    background: #e1ecff;
-                    color: #3a84ff;
-                }
-            }
-        }
-        /deep/ .bk-tab-label-wrapper {
-            box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.1);
-        }
-        .ticket-content {
-            padding: 14px 18px 15px 22px;
-            height: calc(100vh - 146px);
-            overflow: auto;
-            @include scroller;
-            .operate-wrapper {
-                margin-bottom: 14px;
-                .slot-content {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    .checkbox-wapper {
-                        display: flex;
-                        align-items: center;
-                    }
-                    .export {
-                        width: 86px;
-                    }
-                    .bk-form-checkbox {
-                        width: 78px;
-                        margin-right: 21px;
-                    }
-                }
-            }
-        }
+@import "~@/scss/mixins/scroller.scss";
+.all-ticket-page {
+  height: 100%;
+  background: #fafbfd;
+  /deep/ .bk-tab-section {
+    padding: 0;
+    background-color: #f5f7fa;
+  }
+  .bk-tab-label-item {
+    .list-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+      .ticket-file-count {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 3px;
+        min-width: 24px;
+        height: 16px;
+        padding: 0 4px;
+        line-height: 16px;
+        border-radius: 8px;
+        text-align: center;
+        font-style: normal;
+        font-size: 12px;
+        font-weight: bold;
+        font-family: Helvetica, Arial;
+        color: #979ba5;
+        background-color: #f0f1f5;
+      }
     }
-    .nav-list {
+    &.active,
+    &:hover {
+      .ticket-file-count {
+        background: #e1ecff;
+        color: #3a84ff;
+      }
+    }
+  }
+  /deep/ .bk-tab-label-wrapper {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+  }
+  .ticket-content {
+    padding: 14px 18px 15px 22px;
+    height: calc(100vh - 146px);
+    overflow: auto;
+    @include scroller;
+    .operate-wrapper {
+      margin-bottom: 14px;
+      .slot-content {
         display: flex;
-        height: 50px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        z-index: 999;
-        @include scroller(#a5a5a5, 4px, 4px);
-        .drag-scroll {
-            display: flex;
-            justify-content: space-evenly;
-            .drag-list {
-                cursor: pointer;
-                display: inline-block;
-                height: 50px;
-                line-height: 50px;
-                font-size: 14px;
-                padding: 2px 20px;
-                overflow: hidden;
-                text-overflow:ellipsis;
-                white-space: nowrap;
-                color: #63656e;
-                &:hover {
-                    color: #3a84ff;
-                    .ticket-file-count {
-                        background: #3a84ff;
-                        color: white;
-                    }
-                    .icon-itsm-icon-three-one {
-                        display: inline-block;
-                    }
-                    .icon-edit-new {
-                        display: inline-block;
-                    }
-                }
-                .icon-itsm-icon-three-one {
-                    width: 20px;
-                    display: none;
-                }
-                .icon-edit-new {
-                    display: none;
-                    width: 20px;
-                }
-                .ticket-file-count {
-                    font-size: 12px;
-                    background: #f0f1f5;
-                    border-radius: 7px;
-                    padding: 0 2px;
-                }
-            }
-            .active {
-                color: #3a84ff;
-                border-bottom: 4px solid #3a84ff;
-            }
+        align-items: center;
+        justify-content: space-between;
+        .checkbox-wapper {
+          display: flex;
+          align-items: center;
         }
+        .export {
+          width: 86px;
+        }
+        .bk-form-checkbox {
+          width: 78px;
+          margin-right: 21px;
+        }
+      }
     }
-    .bk-form {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        .bk-form-title {
-            width: 100%;
-            margin-left: 2px;
-            font-size: 14px;
-            font-weight: 600;
+  }
+}
+.nav-list {
+  display: flex;
+  height: 50px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  z-index: 999;
+  @include scroller(#a5a5a5, 4px, 4px);
+  .drag-scroll {
+    display: flex;
+    justify-content: space-evenly;
+    .drag-list {
+      cursor: pointer;
+      display: inline-block;
+      height: 50px;
+      line-height: 50px;
+      font-size: 14px;
+      padding: 2px 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #63656e;
+      &:hover {
+        color: #3a84ff;
+        .ticket-file-count {
+          background: #3a84ff;
+          color: white;
         }
-        .bk-form-item {
-            width: 50%;
-            min-height: 32px;
-            /deep/ .bk-form-content {
-                width: auto;
-                min-height: 32px;
-                margin-left: 150px;
-                position: relative;
-                outline: none;
-                line-height: 0px;
-            }
+        .icon-itsm-icon-three-one {
+          display: inline-block;
         }
+        .icon-edit-new {
+          display: inline-block;
+        }
+      }
+      .icon-itsm-icon-three-one {
+        width: 20px;
+        display: none;
+      }
+      .icon-edit-new {
+        display: none;
+        width: 20px;
+      }
+      .ticket-file-count {
+        font-size: 12px;
+        background: #f0f1f5;
+        border-radius: 7px;
+        padding: 0 2px;
+      }
     }
+    .active {
+      color: #3a84ff;
+      border-bottom: 4px solid #3a84ff;
+    }
+  }
+}
+.bk-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  .bk-form-title {
+    width: 100%;
+    margin-left: 2px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .bk-form-item {
+    width: 50%;
+    min-height: 32px;
+    /deep/ .bk-form-content {
+      width: auto;
+      min-height: 32px;
+      margin-left: 150px;
+      position: relative;
+      outline: none;
+      line-height: 0px;
+    }
+  }
+}
 </style>

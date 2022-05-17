@@ -21,360 +21,360 @@
   -->
 
 <template>
-    <div class="node-task-list">
-        <div class="task-header">
-            <span class="task-title">{{ $t(`m.task['任务列表']`) }}</span>
-            <template v-if="nodeInfo.can_create_task">
-                <bk-button
-                    theme="primary"
-                    :title="$t(`m.task['创建任务']`)"
-                    icon="plus"
-                    size="small"
-                    class="ml20"
-                    :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
-                    @click="onCreateTaskClick"
-                >
-                    {{ $t(`m.task['创建任务']`) }}
-                </bk-button>
-                <bk-button
-                    :title="$t(`m.task['从任务库创建']`)"
-                    size="small"
-                    class="ml10"
-                    :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
-                    @click="onCreateByTaskLibrary"
-                >
-                    {{ $t(`m.task['从任务库创建']`) }}
-                </bk-button>
-            </template>
-            <span class="header-right-content">
-                <bk-popover
-                    ref="taskLibraryPopover"
-                    placement="bottom-start"
-                    trigger="manual"
-                    ext-cls="save-template-pop"
-                    theme="light"
-                    :tippy-options="{
-                        hideOnClick: false
-                    }"
-                >
-                    <bk-button
-                        v-if="nodeInfo.can_create_task"
-                        :title="$t(`m.tickets['存入任务库']`)"
-                        size="small"
-                        class="mr10"
-                        :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
-                        @click="$refs.taskLibraryPopover.showHandler()"
-                    >
-                        {{ $t(`m.tickets['存入任务库']`) }}
-                    </bk-button>
-                    <div
-                        slot="content"
-                        style="width: 294px"
-                        class="task-library-manage-panel"
-                    >
-                        <task-library-opt-panel
-                            :task-list="taskList"
-                            :ticket-info="ticketInfo"
-                            @close="$refs.taskLibraryPopover.hideHandler()"
-                        ></task-library-opt-panel>
-                    </div>
-                </bk-popover>
-                <span
-                    class="refresh-tasks-icon"
-                    @click="refreshTaskList('refreshBtn')"
-                >
-                    <i class="bk-icon icon-refresh"></i>
-                </span>
-            </span>
-        </div>
-        <div class="task-list-content">
-            <bk-table
-                v-bkloading="{ isLoading: isListLoading }"
-                :data="taskList"
-                :size="'small'"
-            >
-                <bk-table-column :label="$t(`m.task['顺序']`)" :width="60">
-                    <template slot-scope="props">
-                        <bk-input
-                            v-if="edittingOrderId === props.row.id"
-                            v-model="props.row.editOrder"
-                            v-bk-focus
-                            @blur="onEditOrderBlur(props.row)"
-                        ></bk-input>
-                        <span
-                            v-else
-                            class="task-order"
-                            @click="onTaskOrderClick(props.row)"
-                        >
-                            {{ props.row.order }}
-                        </span>
-                        <!-- <i class="bk-itsm-icon icon-itsm-icon-sops" v-if="props.row.component_type === 'SOPS'"></i> -->
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['任务名称']`)">
-                    <template slot-scope="props">
-                        <span
-                            v-bk-tooltips.top="props.row.name"
-                            class="task-name"
-                        >
-                            {{ props.row.name || "--" }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['处理人']`)">
-                    <template slot-scope="props">
-                        <span v-bk-tooltips.top="props.row.processor_users">
-                            {{ props.row.processor_users || "--" }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['任务类型']`)">
-                    <template slot-scope="props">
-                        <span v-bk-tooltips.top="props.row.processor_users">
-                            {{
-                                getTaskTypeName(props.row.component_type) ||
-                                    "--"
-                            }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
-                    <template slot-scope="props">
-                        <!-- 任务状态组件 -->
-                        <task-status :status="props.row.status"></task-status>
-                    </template>
-                </bk-table-column>
-                <bk-table-column :label="$t(`m.task['操作']`)" min-width="140">
-                    <template slot-scope="props">
-                        <template
-                            v-for="(opt, index) in operatingMap[
-                                props.row.status
-                            ]"
-                        >
-                            <bk-button
-                                v-if="opt === 'edit'"
-                                :key="index"
-                                theme="primary"
-                                text
-                                :disabled="!nodeInfo.can_create_task"
-                                @click="onTaskEditClick(props.row)"
-                            >
-                                {{ $t(`m.task['编辑']`) }}
-                            </bk-button>
-                            <bk-button
-                                v-if="opt === 'delete'"
-                                :key="index"
-                                theme="primary"
-                                text
-                                @click="onTaskDeleteClick(props.row)"
-                            >
-                                {{ $t(`m.user['删除']`) }}
-                            </bk-button>
-                            <bk-button
-                                v-if="opt === 'deal'"
-                                :key="index"
-                                theme="primary"
-                                text
-                                :disabled="
-                                    !nodeInfo.can_execute_task ||
-                                        !props.row.can_process ||
-                                        props.row.status === 'QUEUE'
-                                "
-                                @click="dealTaskSlider(props.row, 'OPERATE')"
-                            >
-                                <template v-if="!props.row.can_process">
-                                    <span
-                                        v-bk-tooltips.top="
-                                            $t(`m.task['无处理权限']`)
-                                        "
-                                    >
-                                        {{ $t(`m.task['处理']`) }}
-                                    </span>
-                                </template>
-                                <template
-                                    v-else-if="props.row.status === 'QUEUE'"
-                                >
-                                    <span
-                                        v-bk-tooltips.top="
-                                            $t(`m.task['请先处理前置任务']`)
-                                        "
-                                    >
-                                        {{ $t(`m.task['处理']`) }}
-                                    </span>
-                                </template>
-                                <template v-else>
-                                    {{ $t(`m.task['处理']`) }}
-                                </template>
-                            </bk-button>
-                            <bk-button
-                                v-if="
-                                    opt === 'to_deal_sops' &&
-                                        props.row.component_type === 'SOPS'
-                                "
-                                :key="index"
-                                theme="primary"
-                                text
-                                @click="onJumpToSopsClick(props.row)"
-                            >
-                                {{ $t(`m.task['处理']`) }}
-                            </bk-button>
-                            <bk-button
-                                v-if="opt === 'confiam'"
-                                :key="index"
-                                :disabled="!props.row.can_process"
-                                theme="primary"
-                                text
-                                @click="dealTaskSlider(props.row, 'CONFIRM')"
-                            >
-                                {{ $t(`m.task['总结']`) }}
-                            </bk-button>
-                            <bk-button
-                                v-if="opt === 'view'"
-                                :key="index"
-                                theme="primary"
-                                text
-                                @click="dealTaskSlider(props.row, 'SEE')"
-                            >
-                                {{ $t(`m.task['查看']`) }}
-                            </bk-button>
-                        </template>
-                        <i
-                            v-if="isShowJumpIcon(props.row)"
-                            v-bk-tooltips="
-                                props.row.component_type === 'DEVOPS'
-                                    ? $t(`m.tickets['前往蓝盾']`)
-                                    : $t(`m.tickets['前往标准运维']`)
-                            "
-                            class="bk-itsm-icon icon-itsm-icon-three-seven icon-open-sops"
-                            @click.stop="onJumpToSopsClick(props.row)"
-                        ></i>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <bk-sideslider
-            :is-show.sync="createInfo.isShow"
-            :title="
-                createInfo.isAdd
-                    ? $t(`m.task['创建任务']`)
-                    : this.$t(`m.task['编辑任务']`)
-            "
-            :quick-close="true"
-            :before-close="
-                () => {
-                    closeSideslider('newTask');
-                }
-            "
-            :width="800"
+  <div class="node-task-list">
+    <div class="task-header">
+      <span class="task-title">{{ $t(`m.task['任务列表']`) }}</span>
+      <template v-if="nodeInfo.can_create_task">
+        <bk-button
+          theme="primary"
+          :title="$t(`m.task['创建任务']`)"
+          icon="plus"
+          size="small"
+          class="ml20"
+          :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
+          @click="onCreateTaskClick"
         >
-            <div slot="content" style="min-height: 300px">
-                <new-task
-                    v-if="createInfo.isShow"
-                    ref="newTask"
-                    :node-info="nodeInfo"
-                    :basic-infomation="ticketInfo"
-                    :item-content="createInfo.taskInfo"
-                    @closeSlider="createInfo.isShow = false"
-                    @getTaskList="getTaskList"
-                ></new-task>
-            </div>
-        </bk-sideslider>
-        <bk-sideslider
-            :is-show.sync="dealTaskInfo.show"
-            :quick-close="true"
-            :width="800"
+          {{ $t(`m.task['创建任务']`) }}
+        </bk-button>
+        <bk-button
+          :title="$t(`m.task['从任务库创建']`)"
+          size="small"
+          class="ml10"
+          :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
+          @click="onCreateByTaskLibrary"
         >
-            <div slot="header">
-                <task-handle-trigger
-                    v-if="dealTaskInfo.show"
-                    :task-info="dealTaskInfo.itemContent"
-                    :title="dealTaskInfo.title"
-                    :show-status="true"
-                    @close-slider="dealTaskInfo.show = false"
-                >
-                    <div
-                        v-if="isShowJumpIcon(dealTaskInfo.itemContent)"
-                        slot="right-content"
-                        class="jump-to-other-system"
-                        @click.stop="
-                            onJumpToSopsClick(dealTaskInfo.itemContent)
-                        "
-                    >
-                        <i
-                            class="bk-itsm-icon icon-itsm-icon-three-seven icon-open-sops"
-                        ></i>
-                        <span
-                            v-if="
-                                dealTaskInfo.itemContent.component_type ===
-                                    'SOPS'
-                            "
-                        >
-                            {{ $t(`m.tickets['前往标准运维查看详情']`) }}
-                        </span>
-                        <span
-                            v-if="
-                                dealTaskInfo.itemContent.component_type ===
-                                    'DEVOPS'
-                            "
-                        >
-                            {{ $t(`m.tickets['前往蓝盾流水线查看详情']`) }}
-                        </span>
-                    </div>
-                </task-handle-trigger>
-            </div>
-            <div
-                slot="content"
-                v-bkloading="{ isLoading: dealTaskInfo.addLoading }"
-                style="height: 100%"
-            >
-                <template v-if="dealTaskInfo.show">
-                    <!-- 查看蓝盾任务执行信息 -->
-                    <devops-execut-info
-                        v-if="
-                            dealTaskInfo.itemContent.component_type ===
-                                'DEVOPS' &&
-                                ['RUNNING', 'FINISHED', 'FAILED'].includes(
-                                    dealTaskInfo.itemContent.status
-                                ) &&
-                                dealTaskInfo.type === 'SEE'
-                        "
-                        :task-info="dealTaskInfo.itemContent"
-                    ></devops-execut-info>
-                    <!-- 所有任务的处理、总结、查看 -->
-                    <deal-task
-                        v-else
-                        :deal-type="dealTaskInfo.type"
-                        :task-info="dealTaskInfo.itemContent"
-                        :basic-infomation="ticketInfo"
-                        @close="dealTaskInfo.show = false"
-                        @dealSuccess="dealSuccess"
-                    ></deal-task>
-                </template>
-            </div>
-        </bk-sideslider>
-        <!-- 任务库创建任务 -->
-        <bk-sideslider
-            :is-show.sync="taskLibrary.show"
-            :title="$t(`m.tickets['从任务库创建任务']`)"
-            :before-close="
-                () => {
-                    closeSideslider('taskLibrary');
-                }
-            "
-            :quick-close="true"
-            :width="800"
+          {{ $t(`m.task['从任务库创建']`) }}
+        </bk-button>
+      </template>
+      <span class="header-right-content">
+        <bk-popover
+          ref="taskLibraryPopover"
+          placement="bottom-start"
+          trigger="manual"
+          ext-cls="save-template-pop"
+          theme="light"
+          :tippy-options="{
+            hideOnClick: false
+          }"
         >
-            <div slot="content" style="min-height: 300px">
-                <task-library
-                    ref="taskLibrary"
-                    v-if="taskLibrary.show"
-                    :ticket-info="ticketInfo"
-                    :node-info="nodeInfo"
-                    @close="handleTaskLibraryClose"
-                ></task-library>
-            </div>
-        </bk-sideslider>
+          <bk-button
+            v-if="nodeInfo.can_create_task"
+            :title="$t(`m.tickets['存入任务库']`)"
+            size="small"
+            class="mr10"
+            :disabled="nodeInfo.action_type === 'DISTRIBUTE'"
+            @click="$refs.taskLibraryPopover.showHandler()"
+          >
+            {{ $t(`m.tickets['存入任务库']`) }}
+          </bk-button>
+          <div
+            slot="content"
+            style="width: 294px"
+            class="task-library-manage-panel"
+          >
+            <task-library-opt-panel
+              :task-list="taskList"
+              :ticket-info="ticketInfo"
+              @close="$refs.taskLibraryPopover.hideHandler()"
+            ></task-library-opt-panel>
+          </div>
+        </bk-popover>
+        <span
+          class="refresh-tasks-icon"
+          @click="refreshTaskList('refreshBtn')"
+        >
+          <i class="bk-icon icon-refresh"></i>
+        </span>
+      </span>
     </div>
+    <div class="task-list-content">
+      <bk-table
+        v-bkloading="{ isLoading: isListLoading }"
+        :data="taskList"
+        :size="'small'"
+      >
+        <bk-table-column :label="$t(`m.task['顺序']`)" :width="60">
+          <template slot-scope="props">
+            <bk-input
+              v-if="edittingOrderId === props.row.id"
+              v-model="props.row.editOrder"
+              v-bk-focus
+              @blur="onEditOrderBlur(props.row)"
+            ></bk-input>
+            <span
+              v-else
+              class="task-order"
+              @click="onTaskOrderClick(props.row)"
+            >
+              {{ props.row.order }}
+            </span>
+            <!-- <i class="bk-itsm-icon icon-itsm-icon-sops" v-if="props.row.component_type === 'SOPS'"></i> -->
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['任务名称']`)">
+          <template slot-scope="props">
+            <span
+              v-bk-tooltips.top="props.row.name"
+              class="task-name"
+            >
+              {{ props.row.name || "--" }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['处理人']`)">
+          <template slot-scope="props">
+            <span v-bk-tooltips.top="props.row.processor_users">
+              {{ props.row.processor_users || "--" }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['任务类型']`)">
+          <template slot-scope="props">
+            <span v-bk-tooltips.top="props.row.processor_users">
+              {{
+                getTaskTypeName(props.row.component_type) ||
+                  "--"
+              }}
+            </span>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
+          <template slot-scope="props">
+            <!-- 任务状态组件 -->
+            <task-status :status="props.row.status"></task-status>
+          </template>
+        </bk-table-column>
+        <bk-table-column :label="$t(`m.task['操作']`)" min-width="140">
+          <template slot-scope="props">
+            <template
+              v-for="(opt, index) in operatingMap[
+                props.row.status
+              ]"
+            >
+              <bk-button
+                v-if="opt === 'edit'"
+                :key="index"
+                theme="primary"
+                text
+                :disabled="!nodeInfo.can_create_task"
+                @click="onTaskEditClick(props.row)"
+              >
+                {{ $t(`m.task['编辑']`) }}
+              </bk-button>
+              <bk-button
+                v-if="opt === 'delete'"
+                :key="index"
+                theme="primary"
+                text
+                @click="onTaskDeleteClick(props.row)"
+              >
+                {{ $t(`m.user['删除']`) }}
+              </bk-button>
+              <bk-button
+                v-if="opt === 'deal'"
+                :key="index"
+                theme="primary"
+                text
+                :disabled="
+                  !nodeInfo.can_execute_task ||
+                    !props.row.can_process ||
+                    props.row.status === 'QUEUE'
+                "
+                @click="dealTaskSlider(props.row, 'OPERATE')"
+              >
+                <template v-if="!props.row.can_process">
+                  <span
+                    v-bk-tooltips.top="
+                      $t(`m.task['无处理权限']`)
+                    "
+                  >
+                    {{ $t(`m.task['处理']`) }}
+                  </span>
+                </template>
+                <template
+                  v-else-if="props.row.status === 'QUEUE'"
+                >
+                  <span
+                    v-bk-tooltips.top="
+                      $t(`m.task['请先处理前置任务']`)
+                    "
+                  >
+                    {{ $t(`m.task['处理']`) }}
+                  </span>
+                </template>
+                <template v-else>
+                  {{ $t(`m.task['处理']`) }}
+                </template>
+              </bk-button>
+              <bk-button
+                v-if="
+                  opt === 'to_deal_sops' &&
+                    props.row.component_type === 'SOPS'
+                "
+                :key="index"
+                theme="primary"
+                text
+                @click="onJumpToSopsClick(props.row)"
+              >
+                {{ $t(`m.task['处理']`) }}
+              </bk-button>
+              <bk-button
+                v-if="opt === 'confiam'"
+                :key="index"
+                :disabled="!props.row.can_process"
+                theme="primary"
+                text
+                @click="dealTaskSlider(props.row, 'CONFIRM')"
+              >
+                {{ $t(`m.task['总结']`) }}
+              </bk-button>
+              <bk-button
+                v-if="opt === 'view'"
+                :key="index"
+                theme="primary"
+                text
+                @click="dealTaskSlider(props.row, 'SEE')"
+              >
+                {{ $t(`m.task['查看']`) }}
+              </bk-button>
+            </template>
+            <i
+              v-if="isShowJumpIcon(props.row)"
+              v-bk-tooltips="
+                props.row.component_type === 'DEVOPS'
+                  ? $t(`m.tickets['前往蓝盾']`)
+                  : $t(`m.tickets['前往标准运维']`)
+              "
+              class="bk-itsm-icon icon-itsm-icon-three-seven icon-open-sops"
+              @click.stop="onJumpToSopsClick(props.row)"
+            ></i>
+          </template>
+        </bk-table-column>
+      </bk-table>
+    </div>
+    <bk-sideslider
+      :is-show.sync="createInfo.isShow"
+      :title="
+        createInfo.isAdd
+          ? $t(`m.task['创建任务']`)
+          : this.$t(`m.task['编辑任务']`)
+      "
+      :quick-close="true"
+      :before-close="
+        () => {
+          closeSideslider('newTask');
+        }
+      "
+      :width="800"
+    >
+      <div slot="content" style="min-height: 300px">
+        <new-task
+          v-if="createInfo.isShow"
+          ref="newTask"
+          :node-info="nodeInfo"
+          :basic-infomation="ticketInfo"
+          :item-content="createInfo.taskInfo"
+          @closeSlider="createInfo.isShow = false"
+          @getTaskList="getTaskList"
+        ></new-task>
+      </div>
+    </bk-sideslider>
+    <bk-sideslider
+      :is-show.sync="dealTaskInfo.show"
+      :quick-close="true"
+      :width="800"
+    >
+      <div slot="header">
+        <task-handle-trigger
+          v-if="dealTaskInfo.show"
+          :task-info="dealTaskInfo.itemContent"
+          :title="dealTaskInfo.title"
+          :show-status="true"
+          @close-slider="dealTaskInfo.show = false"
+        >
+          <div
+            v-if="isShowJumpIcon(dealTaskInfo.itemContent)"
+            slot="right-content"
+            class="jump-to-other-system"
+            @click.stop="
+              onJumpToSopsClick(dealTaskInfo.itemContent)
+            "
+          >
+            <i
+              class="bk-itsm-icon icon-itsm-icon-three-seven icon-open-sops"
+            ></i>
+            <span
+              v-if="
+                dealTaskInfo.itemContent.component_type ===
+                  'SOPS'
+              "
+            >
+              {{ $t(`m.tickets['前往标准运维查看详情']`) }}
+            </span>
+            <span
+              v-if="
+                dealTaskInfo.itemContent.component_type ===
+                  'DEVOPS'
+              "
+            >
+              {{ $t(`m.tickets['前往蓝盾流水线查看详情']`) }}
+            </span>
+          </div>
+        </task-handle-trigger>
+      </div>
+      <div
+        slot="content"
+        v-bkloading="{ isLoading: dealTaskInfo.addLoading }"
+        style="height: 100%"
+      >
+        <template v-if="dealTaskInfo.show">
+          <!-- 查看蓝盾任务执行信息 -->
+          <devops-execut-info
+            v-if="
+              dealTaskInfo.itemContent.component_type ===
+                'DEVOPS' &&
+                ['RUNNING', 'FINISHED', 'FAILED'].includes(
+                  dealTaskInfo.itemContent.status
+                ) &&
+                dealTaskInfo.type === 'SEE'
+            "
+            :task-info="dealTaskInfo.itemContent"
+          ></devops-execut-info>
+          <!-- 所有任务的处理、总结、查看 -->
+          <deal-task
+            v-else
+            :deal-type="dealTaskInfo.type"
+            :task-info="dealTaskInfo.itemContent"
+            :basic-infomation="ticketInfo"
+            @close="dealTaskInfo.show = false"
+            @dealSuccess="dealSuccess"
+          ></deal-task>
+        </template>
+      </div>
+    </bk-sideslider>
+    <!-- 任务库创建任务 -->
+    <bk-sideslider
+      :is-show.sync="taskLibrary.show"
+      :title="$t(`m.tickets['从任务库创建任务']`)"
+      :before-close="
+        () => {
+          closeSideslider('taskLibrary');
+        }
+      "
+      :quick-close="true"
+      :width="800"
+    >
+      <div slot="content" style="min-height: 300px">
+        <task-library
+          ref="taskLibrary"
+          v-if="taskLibrary.show"
+          :ticket-info="ticketInfo"
+          :node-info="nodeInfo"
+          @close="handleTaskLibraryClose"
+        ></task-library>
+      </div>
+    </bk-sideslider>
+  </div>
 </template>
 
 <script>

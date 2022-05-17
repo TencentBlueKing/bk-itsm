@@ -21,7 +21,7 @@
   -->
 
 <template>
-    <footer id="page-footer-wrapper" v-html="footer"></footer>
+  <footer id="page-footer-wrapper" v-html="footer"></footer>
 </template>
 <script>
     import { mapState } from 'vuex';
