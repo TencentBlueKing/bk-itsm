@@ -119,8 +119,8 @@
             },
             // 通过指定用户 id 获取自定义备选列表数据
             getCustomUserListByspecifyIdList() {
-                const ids = this.specifyIdList.map(id =>  // 去除人员id中的（）
-                    id.replace(/\(.*\)$/, ''));
+                // 去除人员id中的（）
+                const ids = this.specifyIdList.map(id => id.replace(/\(.*\)$/, ''));
                 this.getUserInfo(ids).then((results) => {
                     this.customUserList = results;
                 });

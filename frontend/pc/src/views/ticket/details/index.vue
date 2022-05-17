@@ -328,7 +328,7 @@
             getBacicInfoStatus(val) {
                 this.basicStatus = val;
             },
-            async getComments(page, page_size) {
+            async getComments(page, pageSize) {
                 this.commentLoading = true;
                 const commentList = [];
                 const commmentRes = await this.$store.dispatch(
@@ -341,7 +341,7 @@
                             ? 'ALL'
                             : 'PUBLIC',
                         page,
-                        page_size,
+                        page_size: pageSize,
                     }
                 );
                 commmentRes.data.items.forEach((item, index) => {
@@ -350,7 +350,7 @@
                     }
                 });
                 this.commentCount = commmentRes.data.count;
-                this.totalPages =                Math.ceil((commmentRes.data.count - 1) / page_size) || 1;
+                this.totalPages =                Math.ceil((commmentRes.data.count - 1) / pageSize) || 1;
                 commentList.push(...commmentRes.data.items);
                 commentList.sort((a, b) => b.id - a.id);
                 this.commentLoading = false;

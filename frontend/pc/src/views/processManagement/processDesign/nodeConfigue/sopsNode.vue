@@ -609,7 +609,7 @@
                                 formData.push(formTeamlate);
                             }
                         });
-                        const { value: processors, type: processors_type } = this.$refs.processors.getValue();
+                        const { value: processors, type: processorstype } = this.$refs.processors.getValue();
                         const params = {
                             extras: {
                                 sops_info: {
@@ -621,7 +621,7 @@
                                 },
                             },
                             processors: processors || '',
-                            processors_type,
+                            processors_type: processorstype,
                             is_draft: false,
                             is_terminable: false,
                             name: this.basicsFormData.name,

@@ -112,13 +112,13 @@
             // 处理基本信息字段
             tableFields() {
                 const tlist = []; // 表单表格类型的字段
-                const { service_type_name, sn, catalog_fullname, service_name, title } = this.basicInfomation;
+                const { service_type_name, sn, catalog_fullname: catalogFullname, service_name: serviceName, title } = this.basicInfomation;
                 const list = [
                     { name: '标题', display_value: title, type: 'STRING' },
                     { name: '单号', display_value: sn, type: 'STRING' },
                     { name: '工单类型', display_value: service_type_name, type: 'STRING' },
-                    { name: '服务目录', display_value: `${catalog_fullname}>${service_name}`, type: 'STRING' },
-                    { name: '关联服务', display_value: service_name, type: 'STRING' },
+                    { name: '服务目录', display_value: `${catalogFullname}>${serviceName}`, type: 'STRING' },
+                    { name: '关联服务', display_value: serviceName, type: 'STRING' },
                 ];
                 const fields = this.firstStateFields.map(item => item);
                 fields.forEach((ite) => {

@@ -281,6 +281,7 @@
                 if (typeof val === 'string') {
                     let newVal = [];
                     try {
+                        // eslint-disable-next-line
                         newVal = JSON.parse(val.replace(/\'/g, '"'));
                     } catch (error) {
                         console.error(val);

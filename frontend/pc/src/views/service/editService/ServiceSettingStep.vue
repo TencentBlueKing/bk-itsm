@@ -299,7 +299,7 @@
                     is_supervise_needed: isSuperviseNeeded,
                     notify_rule: notifyRule,
                     notify_freq: notifyFreq,
-                    supervise_type,
+                    supervise_type: superviseType,
                 } = this.serviceInfo;
                 try {
                     const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type);
@@ -326,7 +326,7 @@
                     this.formData.notify_freq = Number(notifyFreq) / 3600;
                 }
                 this.supervisePerson = {
-                    type: supervise_type === 'EMPTY' ? 'STARTER' : supervise_type,
+                    type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
                     value: supervisor,
                 };
             },

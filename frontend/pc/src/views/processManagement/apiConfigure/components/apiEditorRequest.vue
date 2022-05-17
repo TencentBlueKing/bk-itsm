@@ -230,7 +230,7 @@
             },
             recordParent(tree, parentInfo) {
                 tree.parentInfo = parentInfo;
-                if (tree.children == null || (tree.children && !tree.children.length)) {
+                if (tree.children === null || (tree.children && !tree.children.length)) {
                     return;
                 }
                 tree.children.forEach((item) => {

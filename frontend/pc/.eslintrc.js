@@ -71,12 +71,12 @@ module.exports = {
         'array-callback-return': 'off',
         // 三元表达式不应该嵌套
         'no-nested-ternary': 'off',
+        // 不要使用迭代器
         'no-restricted-syntax': 'off',
+        // 要对入参重新赋值，也不要给入参的属性赋值
         'no-param-reassign': 'off',
-        // 不强制使用驼峰
-        'camelcase': 'off',
+        // 代码单行长度超过 120 换行
         'max-len': [0, 120],
-        'no-useless-escape': 'off',
         // 可使用下滑线
         'no-underscore-dangle': 'off',
         // Use the rest parameters instead of 'arguments'

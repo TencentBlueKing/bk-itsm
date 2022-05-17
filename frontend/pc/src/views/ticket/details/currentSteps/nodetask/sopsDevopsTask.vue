@@ -222,12 +222,12 @@
                             name: item,
                             key: item,
                         }));
-                        const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
-                        const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
+                        const projectId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
+                        const pipelineId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
                         params.inputs = {
                             username: window.username,
-                            project_id,
-                            pipeline_id,
+                            project_id: projectId,
+                            pipeline_id: pipelineId,
                             constants,
                         };
                         this.retry(params);

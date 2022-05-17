@@ -156,6 +156,7 @@
                 transfer.forEach((item) => {
                     this.tempChoice.key += `${item}`;
                 });
+                // eslint-disable-next-line
                 this.tempChoice.key = this.tempChoice.key.toUpperCase().replace(/\ /g, '_');
                 if (this.tempChoice.key.length >= 32) {
                     this.tempChoice.key = this.tempChoice.key.substr(0, 32);

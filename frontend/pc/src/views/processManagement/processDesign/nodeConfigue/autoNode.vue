@@ -570,6 +570,7 @@
                         type: item.type,
                         expressions: [],
                     };
+                    /* eslint-disable */
                     objz.expressions = item.expressions.map((ite) => {
                         const obj = {
                             key: ite.key.split(',').map((it) => {
@@ -585,6 +586,7 @@
                         };
                         return obj;
                     });
+                    /* eslint-disable */
                     return objz;
                 });
                 if (!this.formInfo.api_info.end_conditions.poll_interval.toString()

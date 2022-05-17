@@ -35,20 +35,15 @@
                     v-if="nodeInfo.sla_task_status === 2"
                     :style="{
                         background: slaInfo.isTimeOut ? '#ffeded' : '#fafbfd'
-                    }"
-                >
-                    <span
-                        class="bk-operation-timeout"
-                        :style="'color: ' + slaInfo.color"
-                    >
+                    }">
+                    <span class="bk-operation-timeout" :style="'color: ' + slaInfo.color">
                         <i
                             :class="[
                                 'bk-itsm-icon',
                                 slaInfo.isTimeOut
                                     ? 'icon-itsm-icon-mark-eight'
                                     : 'icon-clock-new'
-                            ]"
-                        ></i>
+                            ]"></i>
                         <span style="margin-left: 8px">
                             {{
                                 slaInfo.isTimeOut
@@ -78,8 +73,7 @@
                     <span class="node-name">
                         {{
                             nodeAutoPass()
-                                ? `(${nodeInfo.name})` +
-                                    $t(`m['审批节点已自动处理']`)
+                                ? `(${nodeInfo.name})` + $t(`m['审批节点已自动处理']`)
                                 : nodeInfo.name
                         }}
                     </span>
@@ -93,21 +87,15 @@
                             content: '#processor-tips-content',
                             placement: 'top',
                             duration: 300
-                        }"
-                    >
+                        }">
                         {{ $t(`m.newCommon['处理人：']`)
                         }}{{
-                            !!currSignProcessorInfo
-                                ? signProcessors
-                                : nodeInfo.processors
+                            !!currSignProcessorInfo ? signProcessors : nodeInfo.processors
                         }}
                     </span>
                     <!-- 会签人员信息 -->
                     <bk-popover placement="top" theme="light" trigger="click">
-                        <span
-                            v-if="nodeInfo.type === 'SIGN'"
-                            class="bk-processor-check"
-                        >
+                        <span v-if="nodeInfo.type === 'SIGN'" class="bk-processor-check">
                             {{
                                 nodeInfo.is_sequential
                                     ? $t(`m.newCommon['点击查看']`)
@@ -118,15 +106,9 @@
                             <div
                                 v-for="(processor, pIndex) in nodeInfo.tasks"
                                 :key="pIndex"
-                                class="bk-processor-one"
-                            >
-                                <div
-                                    v-if="nodeInfo.is_sequential && pIndex"
-                                    class="bk-arrow"
-                                >
-                                    <i
-                                        class="bk-itsm-icon icon-arrow-long arrow-cus"
-                                    ></i>
+                                class="bk-processor-one">
+                                <div v-if="nodeInfo.is_sequential && pIndex" class="bk-arrow">
+                                    <i class="bk-itsm-icon icon-arrow-long arrow-cus"></i>
                                 </div>
                                 <div class="bk-processor-span">
                                     <span class="mr5 ml5">
@@ -134,26 +116,19 @@
                                     </span>
                                     <span>
                                         <i
-                                            v-if="
-                                                processor.status === 'FINISHED'
-                                            "
-                                            class="bk-itsm-icon icon-icon-finish icon-icon-finish-cus"
-                                        ></i>
+                                            v-if="processor.status === 'FINISHED'"
+                                            class="bk-itsm-icon icon-icon-finish icon-icon-finish-cus"></i>
                                         <span
                                             v-if="
                                                 nodeInfo.is_sequential &&
                                                     processor.status === 'WAIT' &&
                                                     ((nodeInfo.tasks[pIndex - 1] &&
-                                                    nodeInfo.tasks[pIndex - 1]
-                                                        .status ===
-                                                    'FINISHED') ||
+                                                    nodeInfo.tasks[pIndex - 1].status === 'FINISHED') ||
                                                     !pIndex)
                                             "
-                                            class="loading"
-                                        >
+                                            class="loading">
                                             <i
-                                                class="bk-itsm-icon icon-icon-loading icon-icon-loading-cus"
-                                            ></i>
+                                                class="bk-itsm-icon icon-icon-loading icon-icon-loading-cus"></i>
                                         </span>
                                     </span>
                                 </div>
@@ -169,19 +144,14 @@
                     <!-- 禁用遮罩 -->
                     <div
                         class="bk-node-disabled"
-                        v-if="nodeInfo.status === 'SUSPEND'"
-                    ></div>
+                        v-if="nodeInfo.status === 'SUSPEND'"></div>
                     <div class="bk-form bk-form-vertical" v-if="hasNodeOptAuth">
                         <!-- 节点任务 -->
                         <node-task-list
-                            v-if="
-                                nodeInfo.can_create_task ||
-                                    nodeInfo.can_execute_task
-                            "
+                            v-if="nodeInfo.can_create_task || nodeInfo.can_execute_task"
                             :node-info="nodeInfo"
                             :ticket-info="ticketInfo"
-                            @updateCurrentStep="successFn"
-                        ></node-task-list>
+                            @updateCurrentStep="successFn"></node-task-list>
                         <sops-and-devops-task
                             v-if="
                                 nodeInfo.status === 'FAILED' &&
@@ -199,37 +169,28 @@
                             :pipeline-stages="pipelineStages"
                             :pipeline-rules="pipelineRules"
                             @reloadTicket="reloadTicket"
-                            @onChangeHook="onChangeHook"
-                        ></sops-and-devops-task>
+                            @onChangeHook="onChangeHook"></sops-and-devops-task>
                         <!-- api 节点处理 -->
                         <api-node-handle-body
                             v-if="nodeInfo.type === 'TASK'"
                             :node-info="nodeInfo"
                             :basic-infomation="ticketInfo"
-                            @updateOrderStatus="successFn"
-                        >
+                            @updateOrderStatus="successFn">
                             <!-- 节点触发器 -->
                             <template
                                 #button-extend
-                                v-if="
-                                    triggers &&
-                                        triggers.length &&
-                                        nodeInfo.can_operate
-                                "
-                            >
+                                v-if="triggers && triggers.length && nodeInfo.can_operate">
                                 <bk-dropdown-menu
                                     ref="dropdown"
                                     class="bk-node-trigger"
                                     :align="'right'"
                                     :font-size="'medium'"
                                     @show="isDropdownShow = true"
-                                    @hide="isDropdownShow = false"
-                                >
+                                    @hide="isDropdownShow = false">
                                     <bk-button
                                         class="node-trigger-btn"
                                         slot="dropdown-trigger"
-                                        style="width: auto"
-                                    >
+                                        style="width: auto">
                                         <span>
                                             {{ $t('m.newCommon["更多操作"]') }}
                                         </span>
@@ -237,25 +198,13 @@
                                             :class="[
                                                 'bk-icon icon-angle-down',
                                                 { 'icon-flip': isDropdownShow }
-                                            ]"
-                                        ></i>
+                                            ]"></i>
                                     </bk-button>
-                                    <ul
-                                        class="bk-dropdown-list"
-                                        slot="dropdown-content"
-                                    >
-                                        <li
-                                            v-for="(
-                                                trigger, tIndex
-                                            ) in triggers"
-                                            :key="tIndex"
-                                        >
+                                    <ul class="bk-dropdown-list" slot="dropdown-content">
+                                        <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
                                             <a
                                                 href="javascript:;"
-                                                @click="
-                                                    openTriggerDialog(trigger)
-                                                "
-                                            >
+                                                @click="openTriggerDialog(trigger)">
                                                 {{ trigger.display_name }}
                                             </a>
                                         </li>
@@ -263,21 +212,13 @@
                                 </bk-dropdown-menu>
                             </template>
                         </api-node-handle-body>
-                        <div
-                            v-else-if="currSignProcessorInfo"
-                            class="bk-area-show-back"
-                        >
+                        <div v-else-if="currSignProcessorInfo" class="bk-area-show-back">
                             <!-- 静态展示 -->
-                            <template
-                                v-for="(
-                                    ite, fIndex
-                                ) in currSignProcessorInfo.fields"
-                            >
+                            <template v-for="(ite, fIndex) in currSignProcessorInfo.fields">
                                 <fields-done
                                     :key="fIndex"
                                     :item="ite"
-                                    origin="log"
-                                ></fields-done>
+                                    origin="log"></fields-done>
                             </template>
                         </div>
                         <!-- 字段列表 -->
@@ -285,42 +226,26 @@
                             v-else
                             ref="fieldInfo"
                             :fields="nodeInfo.fields"
-                            :all-field-list="allFieldList"
-                        ></field-info>
+                            :all-field-list="allFieldList"></field-info>
                     </div>
                     <div class="bk-form-btn" v-if="nodeInfo.type !== 'TASK'">
                         <!-- 响应后才能处理 -->
                         <template v-if="isShowDealBtns">
-                            <template
-                                v-for="(btn, btnIndex) in nodeInfo.operations"
-                            >
+                            <template v-for="(btn, btnIndex) in nodeInfo.operations">
                                 <bk-button
                                     class="mr10"
-                                    v-if="
-                                        ignoreOperations.indexOf(btn.key) === -1
-                                    "
+                                    v-if="ignoreOperations.indexOf(btn.key) === -1"
                                     :key="btn.key"
-                                    :theme="
-                                        btnIndex === 0 ? 'primary' : 'default'
-                                    "
+                                    :theme="btnIndex === 0 ? 'primary' : 'default'"
                                     :title="btn.name"
-                                    :disabled="
-                                        !btn.can_operate ||
-                                            !nodeInfo.is_schedule_ready
-                                    "
-                                    :loading="
-                                        isBtnLoading(nodeInfo) || submitting
-                                    "
-                                    @click="clickBtn(btn)"
-                                >
-                                    <template
-                                        v-if="!nodeInfo.is_schedule_ready"
-                                    >
+                                    :disabled="!btn.can_operate || !nodeInfo.is_schedule_ready"
+                                    :loading="isBtnLoading(nodeInfo) || submitting"
+                                    @click="clickBtn(btn)">
+                                    <template v-if="!nodeInfo.is_schedule_ready">
                                         <span
                                             v-bk-tooltips.top="
                                                 '请将任务列表中的任务全部处理完成之后再进行处理提交'
-                                            "
-                                        >
+                                            ">
                                             {{ btn.name }}
                                         </span>
                                     </template>
@@ -332,43 +257,27 @@
                         </template>
                         <!-- 节点触发器 -->
                         <bk-dropdown-menu
-                            v-if="
-                                triggers &&
-                                    triggers.length &&
-                                    nodeInfo.can_operate
-                            "
+                            v-if="triggers && triggers.length && nodeInfo.can_operate"
                             ref="dropdown"
                             class="bk-node-trigger"
                             :align="'right'"
                             :font-size="'medium'"
                             @show="isDropdownShow = true"
-                            @hide="isDropdownShow = false"
-                        >
+                            @hide="isDropdownShow = false">
                             <bk-button
                                 class="node-trigger-btn"
                                 slot="dropdown-trigger"
-                                style="width: auto"
-                            >
+                                style="width: auto">
                                 <span>{{ $t('m.newCommon["更多操作"]') }}</span>
                                 <i
                                     :class="[
                                         'bk-icon icon-angle-down',
                                         { 'icon-flip': isDropdownShow }
-                                    ]"
-                                ></i>
+                                    ]"></i>
                             </bk-button>
-                            <ul
-                                class="bk-dropdown-list"
-                                slot="dropdown-content"
-                            >
-                                <li
-                                    v-for="(trigger, tIndex) in triggers"
-                                    :key="tIndex"
-                                >
-                                    <a
-                                        href="javascript:;"
-                                        @click="openTriggerDialog(trigger)"
-                                    >
+                            <ul class="bk-dropdown-list" slot="dropdown-content">
+                                <li v-for="(trigger, tIndex) in triggers" :key="tIndex">
+                                    <a href="javascript:;" @click="openTriggerDialog(trigger)">
                                         {{ trigger.display_name }}
                                     </a>
                                 </li>
@@ -386,8 +295,7 @@
                         key: 'EXCEPTION_DISTRIBUTE',
                         name: '异常分派'
                     })
-                "
-            >
+                ">
                 异常分派
             </bk-button>
         </div>
@@ -396,8 +304,7 @@
             <div
                 class="bk-processor-one"
                 v-for="name in tipsProcessorsInfo.list"
-                :key="name"
-            >
+                :key="name">
                 <div class="bk-processor-span">{{ name }}</div>
             </div>
             <div v-if="tipsProcessorsInfo.extend" class="bk-processor-one">
@@ -408,16 +315,14 @@
         </div>
         <ticket-trigger-dialog
             ref="triggerDialog"
-            @init-info="successFn"
-        ></ticket-trigger-dialog>
+            @init-info="successFn"></ticket-trigger-dialog>
         <node-deal-dialog
             :node-info="nodeInfo"
             :submitting="submitting"
             :open-form-info="openFormInfo"
             :all-groups="allGroups"
             :ticket-info="ticketInfo"
-            @submitFormAjax="submitFormAjax"
-        ></node-deal-dialog>
+            @submitFormAjax="submitFormAjax"></node-deal-dialog>
     </div>
 </template>
 
@@ -550,7 +455,7 @@
             tipsProcessorsInfo() {
                 // 把 `(共2人, 已处理0人)` 字符串从处理人中提取出来
                 let completedStr = '';
-                const processors =                this.nodeInfo.processors_type === 'ORGANIZATION'
+                const processors =        this.nodeInfo.processors_type === 'ORGANIZATION'
                     ? this.nodeInfo.members
                     : this.nodeInfo.processors;
                 const replaceStr = processors.replace(
@@ -629,10 +534,7 @@
         },
         created() {
             this.initData();
-            this.$store.commit(
-                'ticket/setHasTicketNodeOptAuth',
-                this.hasNodeOptAuth
-            );
+            this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
         },
         methods: {
             initData() {
@@ -667,21 +569,21 @@
                         bk_biz_id,
                         template_id,
                         exclude_task_nodes_id,
-                        template_source,
+                        template_source: templateSource,
                     } = this.nodeInfo.contexts.task_params;
                     const params = {
                         bk_biz_id,
                         template_id,
                         exclude_task_nodes_id,
                     };
-                    const url =                    template_source === 'common'
+                    const url =          templateSource === 'common'
                         ? 'taskFlow/getSopsCommonPreview'
                         : 'taskFlow/getSopsPreview';
                     const res = await this.$store.dispatch(url, params);
                     const constants = Object.keys(res.data.pipeline_tree.constants).map((item) => {
                         this.$set(this.hookedVarList, item, false);
-                        this.constantDefaultValue[item] =                        this.nodeInfo.contexts.task_params.constants[item];
-                        res.data.pipeline_tree.constants[item].value =                        this.nodeInfo.contexts.task_params.constants[item];
+                        this.constantDefaultValue[item] =              this.nodeInfo.contexts.task_params.constants[item];
+                        res.data.pipeline_tree.constants[item].value =              this.nodeInfo.contexts.task_params.constants[item];
                         return res.data.pipeline_tree.constants[item];
                     });
                     this.constants = constants;
@@ -694,18 +596,15 @@
             // 获取流水线
             getpipelineDetail() {
                 if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.nodeInfo,
-                        'api_info'
-                    )
+                    Object.prototype.hasOwnProperty.call(this.nodeInfo, 'api_info')
                     && this.nodeInfo.type === 'TASK-DEVOPS'
                 ) {
-                    const project_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
-                    const pipeline_id = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
+                    const projectId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
+                    const pipelineId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
                     this.$store
                         .dispatch('ticket/getDevopsPipelineStartInfo', {
-                            project_id: project_id.value,
-                            pipeline_id: pipeline_id.value,
+                            project_id: projectId.value,
+                            pipeline_id: pipelineId.value,
                         })
                         .then((res) => {
                             this.pipelineList = res.data.properties;
@@ -714,7 +613,7 @@
                                     key: '',
                                     value: '',
                                 };
-                                const findKey =                                    this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id);
+                                const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id);
                                 if (findKey) {
                                     constants.key = findKey.key;
                                     constants.value = findKey.value;
@@ -733,8 +632,8 @@
                         });
                     this.$store
                         .dispatch('ticket/getDevopsPipelineDetail', {
-                            project_id: project_id.value,
-                            pipeline_id: pipeline_id.value,
+                            project_id: projectId.value,
+                            pipeline_id: pipelineId.value,
                         })
                         .then((res) => {
                             this.pipelineStages = res.data.stages;
@@ -779,13 +678,12 @@
                         CLAIM: this.$t('m.newCommon["执行认领操作后，单据将流入我的待办"]'),
                         UNSUSPEND: this.$t('m.newCommon["执行恢复操作后，单据将可以继续处理"]'),
                     };
-                    this.openSubmitInfo.content =                    contentMap[this.openFormInfo.btnInfo.key];
+                    this.openSubmitInfo.content = contentMap[this.openFormInfo.btnInfo.key];
                     this.$bkInfo({
                         type: 'warning',
                         title:
                             btn.key === 'TRANSITION'
-                                ? this.$t('m.memberSelect["是否"]')
-                                    + this.openFormInfo.title
+                                ? this.$t('m.memberSelect["是否"]') + this.openFormInfo.title
                                 : this.openFormInfo.title,
                         subTitle: this.openSubmitInfo.content,
                         confirmFn: () => {
@@ -906,9 +804,7 @@
                     .dispatch(`deployOrder/${type}`, valueParams)
                     .then(() => {
                         this.$bkMessage({
-                            message:
-                                this.openFormInfo.title
-                                + this.$t('m.newCommon["成功"]'),
+                            message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
                             theme: 'success',
                         });
                         this.cancelForm();
@@ -920,15 +816,8 @@
                     })
                     .finally(() => {
                         this.submitting = false;
-                        const typeList = [
-                            'TRANSITION',
-                            'SUSPEND',
-                            'UNSUSPEND',
-                            'CLAIM',
-                        ];
-                        if (
-                            typeList.some(item => item === this.openFormInfo.btnInfo.key)
-                        ) {
+                        const typeList = ['TRANSITION', 'SUSPEND', 'UNSUSPEND', 'CLAIM'];
+                        if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
                             this.cancelForm();
                         }
                     });
@@ -976,12 +865,9 @@
             // 提交按钮 loading 状态
             isBtnLoading(item) {
                 // 会签或审批节点提交后，当前处理人task 为 RUNNING|EXECUTED状态，则继续轮询 FINISHED
-                const currUserDealTask =                (item.tasks
+                const currUserDealTask =        (item.tasks
                     && item.tasks.find((task) => {
-                        const splitName = task.processor.replace(
-                            /\((.+?)\)/,
-                            ''
-                        );
+                        const splitName = task.processor.replace(/\((.+?)\)/, '');
                         return splitName === window.username;
                     }))
                     || {};
@@ -1000,310 +886,308 @@
                     this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000);
                 }
                 /* eslint-disable */
-            this.myInterval(() => {
-                this.slaInfo.isTimeOut ? slaTime++ : slaTime--;
-                if (slaTime <= 0) {
-                    this.slaInfo.isTimeOut = true;
-                    this.slaInfo.color = "#EA3536";
-                }
-                this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000);
-            }, 1000);
-            /* eslint-disable */
-        },
-        myInterval(fn, time) {
-            if (this._isDestroyed === true) return false;
-            const outTimeKey = setTimeout(() => {
-                fn();
-                clearTimeout(outTimeKey);
-                this.myInterval(fn, time);
-            }, time);
-        },
-        // 响应按钮
-        replyAssignDeliver() {
-            const ticketId = this.ticketInfo.id;
-            const stateId = this.nodeInfo.state_id;
-            const valueParams = {
-                params: {
-                    state_id: stateId,
-                },
-                id: ticketId,
-            };
-            this.replyBtnLoading = true;
-            this.$store
-                .dispatch("deployOrder/replyAssignDeliver", valueParams)
-                .then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["响应成功"]'),
-                        theme: "success",
-                    });
-                    this.cancelForm();
-                    this.successFn();
-                    this.$emit("closeSlider");
-                })
-                .catch((res) => {
-                    this.$bkMessage({
-                        message:
-                            res.data.msg ||
-                            this.$t('m.newCommon["响应失败！"]'),
-                        theme: "error",
-                        ellipsisLine: 0,
-                    });
-                })
-                .finally(() => {
-                    this.replyBtnLoading = false;
-                });
-        },
+      this.myInterval(() => {
+        this.slaInfo.isTimeOut ? slaTime++ : slaTime--;
+        if (slaTime <= 0) {
+          this.slaInfo.isTimeOut = true;
+          this.slaInfo.color = "#EA3536";
+        }
+        this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000);
+      }, 1000);
+      /* eslint-disable */
     },
+    myInterval(fn, time) {
+      if (this._isDestroyed === true) return false;
+      const outTimeKey = setTimeout(() => {
+        fn();
+        clearTimeout(outTimeKey);
+        this.myInterval(fn, time);
+      }, time);
+    },
+    // 响应按钮
+    replyAssignDeliver() {
+      const ticketId = this.ticketInfo.id;
+      const stateId = this.nodeInfo.state_id;
+      const valueParams = {
+        params: {
+          state_id: stateId,
+        },
+        id: ticketId,
+      };
+      this.replyBtnLoading = true;
+      this.$store
+        .dispatch("deployOrder/replyAssignDeliver", valueParams)
+        .then(() => {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["响应成功"]'),
+            theme: "success",
+          });
+          this.cancelForm();
+          this.successFn();
+          this.$emit("closeSlider");
+        })
+        .catch((res) => {
+          this.$bkMessage({
+            message: res.data.msg || this.$t('m.newCommon["响应失败！"]'),
+            theme: "error",
+            ellipsisLine: 0,
+          });
+        })
+        .finally(() => {
+          this.replyBtnLoading = false;
+        });
+    },
+  },
 };
 </script>
 <style lang="scss">
 .processors-tips {
-    .tippy-content {
-        word-break: break-all;
-    }
+  .tippy-content {
+    word-break: break-all;
+  }
 }
 </style>
 <style lang="scss" scoped>
 .bk-content-node {
-    padding-bottom: 28px;
-    margin-bottom: 2px;
+  padding-bottom: 28px;
+  margin-bottom: 2px;
+  position: relative;
+
+  .bk-node-circle {
+    position: absolute;
+    top: 16px;
+    left: -1px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #c4c6cc;
+    z-index: 1;
+  }
+
+  .bk-node-info {
     position: relative;
-
-    .bk-node-circle {
-        position: absolute;
-        top: 16px;
-        left: -1px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #c4c6cc;
-        z-index: 1;
+    font-size: 14px;
+    &.full-screen {
+      margin-left: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      z-index: 500;
+      background: #ffffff;
     }
+    .bk-node-title {
+      margin: 17px 10px;
+      outline: none;
+      background-color: #ffffff;
+      color: #737987;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-    .bk-node-info {
-        position: relative;
+      .node-title-processor {
+        display: inline-block;
+        max-width: 80%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        outline: none;
+        font-size: 12px;
+      }
+
+      .bk-processor-check {
+        cursor: pointer;
+        font-size: 12px;
+        color: #3a84ff;
+        margin-left: 10px;
+        outline: none;
+      }
+      .node-name {
+        margin: 0 15px 0 5px;
+        color: #333948;
         font-size: 14px;
-        &.full-screen {
-            margin-left: 0;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            z-index: 500;
-            background: #ffffff;
-        }
-        .bk-node-title {
-            margin: 17px 10px;
-            outline: none;
-            background-color: #ffffff;
-            color: #737987;
-            padding: 0;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-
-            .node-title-processor {
-                display: inline-block;
-                max-width: 80%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                outline: none;
-                font-size: 12px;
-            }
-
-            .bk-processor-check {
-                cursor: pointer;
-                font-size: 12px;
-                color: #3a84ff;
-                margin-left: 10px;
-                outline: none;
-            }
-            .node-name {
-                margin: 0 15px 0 5px;
-                color: #333948;
-                font-size: 14px;
-                font-weight: bold;
-            }
-        }
-        .bk-node-header {
-            position: relative;
-            padding: 8px 0;
-            width: 100%;
-            color: #737987;
-            background-color: #ffffff;
-            border-radius: 2px;
-            .icon-angle-down {
-                font-size: 22px;
-            }
-        }
-        .sla-time-info {
-            height: 32px;
-            font-size: 12px;
-            border: 1px solid #ffd2d2;
-            color: #63656e;
-        }
-        .icon-default {
-            font-size: 12px;
-            color: #979ba5;
-        }
-        .right-float {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            margin-left: auto;
-        }
-        .full-screen-wrap {
-            .icon-order-open {
-                font-size: 16px;
-                color: #979ba5;
-                z-index: 2;
-                cursor: pointer;
-                &:hover {
-                    color: #63656e;
-                }
-            }
-            .exit-full-screen {
-                padding: 0px 10px 0px 18px;
-                display: inline-block;
-                height: 40px;
-                line-height: 40px;
-                font-size: 16px;
-                color: #979ba5;
-                z-index: 2;
-                cursor: pointer;
-                .exit-text {
-                    font-size: 12px;
-                }
-                &:hover {
-                    background-color: #dcdee5;
-                }
-            }
-        }
-
-        .bk-node-cursor {
-            cursor: pointer;
-        }
-
-        .bk-node-form {
-            position: relative;
-            padding: 15px 5px 15px 15px;
-            transition: 0.3s height ease-in-out, 0.3s padding-top ease-in-out,
-                0.3s padding-bottom ease-in-out;
-            .bk-node-trigger {
-                display: inline-block;
-                vertical-align: middle;
-                .node-trigger-btn {
-                    width: auto;
-                }
-            }
-            .bk-form-btn {
-                display: flex;
-                margin-top: 10px;
-            }
-
-            .bk-form {
-                position: relative;
-            }
-        }
-
-        .bk-node-disabled {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            cursor: not-allowed;
-            z-index: 5;
-        }
+        font-weight: bold;
+      }
     }
-    .bk-content-line {
-        position: absolute;
-        top: 20px;
-        left: 2px;
-        height: 100%;
-        border-left: 2px solid #f0f3f6;
+    .bk-node-header {
+      position: relative;
+      padding: 8px 0;
+      width: 100%;
+      color: #737987;
+      background-color: #ffffff;
+      border-radius: 2px;
+      .icon-angle-down {
+        font-size: 22px;
+      }
     }
+    .sla-time-info {
+      height: 32px;
+      font-size: 12px;
+      border: 1px solid #ffd2d2;
+      color: #63656e;
+    }
+    .icon-default {
+      font-size: 12px;
+      color: #979ba5;
+    }
+    .right-float {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: auto;
+    }
+    .full-screen-wrap {
+      .icon-order-open {
+        font-size: 16px;
+        color: #979ba5;
+        z-index: 2;
+        cursor: pointer;
+        &:hover {
+          color: #63656e;
+        }
+      }
+      .exit-full-screen {
+        padding: 0px 10px 0px 18px;
+        display: inline-block;
+        height: 40px;
+        line-height: 40px;
+        font-size: 16px;
+        color: #979ba5;
+        z-index: 2;
+        cursor: pointer;
+        .exit-text {
+          font-size: 12px;
+        }
+        &:hover {
+          background-color: #dcdee5;
+        }
+      }
+    }
+
+    .bk-node-cursor {
+      cursor: pointer;
+    }
+
+    .bk-node-form {
+      position: relative;
+      padding: 15px 5px 15px 15px;
+      transition: 0.3s height ease-in-out, 0.3s padding-top ease-in-out,
+        0.3s padding-bottom ease-in-out;
+      .bk-node-trigger {
+        display: inline-block;
+        vertical-align: middle;
+        .node-trigger-btn {
+          width: auto;
+        }
+      }
+      .bk-form-btn {
+        display: flex;
+        margin-top: 10px;
+      }
+
+      .bk-form {
+        position: relative;
+      }
+    }
+
+    .bk-node-disabled {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: not-allowed;
+      z-index: 5;
+    }
+  }
+  .bk-content-line {
+    position: absolute;
+    top: 20px;
+    left: 2px;
+    height: 100%;
+    border-left: 2px solid #f0f3f6;
+  }
 }
 .bk-processor-content {
-    display: flex;
-    max-width: 600px;
-    flex-wrap: wrap;
+  display: flex;
+  max-width: 600px;
+  flex-wrap: wrap;
 
-    .bk-processor-one {
-        display: inline-flex;
-        align-items: center;
-        padding: 6px 0;
-
-        .bk-arrow {
-            display: inline-flex;
-            align-items: center;
-            position: relative;
-
-            .arrow-cus {
-                font-size: 12px;
-                transform: scale(0.6);
-            }
-        }
-    }
-    .bk-processor-span {
-        background: #f0f1f5;
-        display: inline-flex;
-        align-items: center;
-        height: 22px;
-        line-height: 22px;
-        margin-right: 5px;
-        padding: 0 5px;
-
-        .icon-icon-finish-cus {
-            &:before {
-                color: #737987;
-            }
-        }
-
-        .icon-icon-loading-cus {
-            &:before {
-                color: #3a84ff;
-            }
-        }
-    }
-}
-.loading {
+  .bk-processor-one {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    animation: loading 2s linear 0.2s infinite;
+    padding: 6px 0;
+
+    .bk-arrow {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+
+      .arrow-cus {
+        font-size: 12px;
+        transform: scale(0.6);
+      }
+    }
+  }
+  .bk-processor-span {
+    background: #f0f1f5;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    line-height: 22px;
+    margin-right: 5px;
+    padding: 0 5px;
+
+    .icon-icon-finish-cus {
+      &:before {
+        color: #737987;
+      }
+    }
+
+    .icon-icon-loading-cus {
+      &:before {
+        color: #3a84ff;
+      }
+    }
+  }
+}
+.loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: loading 2s linear 0.2s infinite;
 }
 
 @keyframes loading {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 .bk-operation-timeout {
-    display: block;
-    width: calc(100% - 26px);
-    margin-left: 16px;
-    margin-right: 10px;
-    margin-bottom: 17px;
-    color: #63656e;
-    line-height: 32px;
-    min-width: 265px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    .icon-clock-new {
-        vertical-align: 1px;
-    }
+  display: block;
+  width: calc(100% - 26px);
+  margin-left: 16px;
+  margin-right: 10px;
+  margin-bottom: 17px;
+  color: #63656e;
+  line-height: 32px;
+  min-width: 265px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 12px;
+  .icon-clock-new {
+    vertical-align: 1px;
+  }
 }
 </style>

@@ -201,7 +201,7 @@
                 //     return
                 // }
 
-                let newVal = parseInt(value);
+                let newVal = Number(value);
 
                 if (this.type === 'decimals') {
                     newVal = Number(value);
@@ -235,7 +235,7 @@
                 const value = this.value || 0;
                 if (typeof value !== 'number') return this.currentValue;
                 const power = this.getPower(value);
-                const newVal = parseInt(power * value - power * this.steps) / power;
+                const newVal = Number(power * value - power * this.steps) / power;
                 if (newVal < this.min) return;
                 this.setCurrentValue(newVal);
             },

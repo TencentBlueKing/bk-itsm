@@ -327,7 +327,7 @@
                         name: item,
                         key: item,
                     }));
-                    const { value: processors, type: processors_type } = this.$refs.processors.getValue();
+                    const { value: processors, type: processorsType } = this.$refs.processors.getValue();
                     const params = {
                         extras: {
                             devops_info: {
@@ -346,7 +346,7 @@
                             },
                         },
                         processors: processors || '',
-                        processors_type,
+                        processors_type: processorsType,
                         is_draft: false,
                         is_terminable: false,
                         name: this.basicInfo.nodeName,

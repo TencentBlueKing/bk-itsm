@@ -282,8 +282,10 @@
                 const jsondata = {};
                 if (listdata.length) {
                     listdata.forEach((item) => {
+                        /* eslint-disable */
                         jsondata[item.name] = item.source_type === 'CUSTOM' ? item.value
                             : `\$\{params\_${item.value_key}\}`;
+                        /* eslint-disable */
                     });
                 }
                 return jsondata;
@@ -374,16 +376,19 @@
                 }
                 // 参数拼接成后台所需的格式
                 this.apiInfo.rsp_data = selectKeyList.slice(0, selectArrayKeyNum).map((item) => {
+                    // eslint-disable-next-line
                     item = item.replace(/^\d+\_/, '');
                     return item;
                 })
                     .join('.');
                 this.kvRelation.key = selectKeyList.slice(selectArrayKeyNum + 1).map((item) => {
+                    // eslint-disable-next-line
                     item = item.replace(/^\d+\_/, '');
                     return item;
                 })
                     .join('.');
                 this.kvRelation.name = selectValueList.slice(selectArrayValueNum + 1).map((item) => {
+                    // eslint-disable-next-line
                     item = item.replace(/^\d+\_/, '');
                     return item;
                 })

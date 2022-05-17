@@ -907,6 +907,7 @@
                         this.formInfo.key = `${this.formInfo.key}${item}`;
                     });
                     this.formInfo.key = this.formInfo.key.toUpperCase();
+                    // eslint-disable-next-line
                     this.formInfo.key = this.formInfo.key.replace(/\ /g, '_');
                     if (this.formInfo.key.length >= 32) {
                         this.formInfo.key = this.formInfo.key.substr(0, 32);
