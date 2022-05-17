@@ -30,16 +30,16 @@ const ticketListMixins = {
          * @param {Array} originList 单据列表
          */
         //  @param {Array} exclude 排除字段（不需要去加载的字段）
-        asyncReplaceTicketListAttr(originList) {
+        __asyncReplaceTicketListAttr(originList) {
             if (originList.length === 0) {
                 return;
             }
-            this.getTicketsProcessors(originList);
-            this.getTicketsCreator(originList);
-            this.getTicketscanOperate(originList);
+            this.__getTicketsProcessors(originList);
+            this.__getTicketsCreator(originList);
+            this.__getTicketscanOperate(originList);
         },
         // 异步获取单据处理人
-        getTicketsProcessors(originList) {
+        __getTicketsProcessors(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 this.$set(ticket, 'current_processors', '加载中...');
@@ -60,7 +60,7 @@ const ticketListMixins = {
                 });
         },
         // 异步获取提单人
-        getTicketsCreator(originList) {
+        __getTicketsCreator(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 this.$set(ticket, 'creator', '加载中...');
@@ -81,7 +81,7 @@ const ticketListMixins = {
                 });
         },
         // 异步获取单据 can_operate
-        getTicketscanOperate(originList) {
+        __getTicketscanOperate(originList) {
             const copyList = deepClone(originList);
             originList.forEach((ticket) => {
                 // 开始是都不能操作

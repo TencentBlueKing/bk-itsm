@@ -636,12 +636,6 @@
                         this.pagination.count = res.data.count;
                     }
                 })
-                    .catch((res) => {
-                        this.$bkMessage({
-                            message: res.data.msg,
-                            theme: 'error',
-                        });
-                    })
                     .finally(() => {
                         this[`${type}Loading`] = false;
                         this.customTabLoading = false;
