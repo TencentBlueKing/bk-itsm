@@ -384,7 +384,7 @@
                     new_order: e.newIndex - 3,
                     tab_id: curDrag.id,
                 };
-                this.$store.dispatch('project/moveProjectTab', params).then((res) => {
+                this.$store.dispatch('project/moveProjectTab', params).then(() => {
 
                 })
                     .catch((res) => {
@@ -423,7 +423,7 @@
                 }
             },
             handleAddTabs() {
-                this.$refs.customFrom.validate().then((res) => {
+                this.$refs.customFrom.validate().then(() => {
                     const params = {
                         name: this.customTabForm.name,
                         desc: this.customTabForm.desc,
@@ -444,7 +444,7 @@
                     });
                     this.showCustomTabEdit = false;
                 })
-                    .finally((e) => {
+                    .finally(() => {
                         if (this.isEditTab) {
                             this.currentTab = this.customTabForm.name;
                             this.getAllTabTicketList(this.editTabId);
@@ -651,7 +651,7 @@
             getAllTabTicketList() {
                 this.loading = true;
                 const tableList = this.serviceList.map(item => this.getAllTicketList(item.key));
-                Promise.all(tableList).then((data) => {
+                Promise.all(tableList).then(() => {
                     this.loading = false;
                 });
             },

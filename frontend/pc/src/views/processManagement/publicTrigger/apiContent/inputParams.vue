@@ -328,7 +328,7 @@
                 const countChildrenStep = function (data) {
                     if (data.children && data.children.length) {
                         for (let i = 0; i < data.children.length; i++) {
-                            count++;
+                            count += 1;
                             countChildrenStep(data.children[i]);
                         }
                     }

@@ -354,7 +354,7 @@
         },
         watch: {
             'flowInfo.auth_actions': {
-                handler(val) {
+                handler() {
                     if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
                         this.formData.can_deploy = false;
                     }
@@ -483,7 +483,7 @@
                     });
             },
             // 督办选择
-            changeSupChildList(value, option) {
+            changeSupChildList(value) {
                 if (value !== 'EMPTY') {
                     this.noticeData.supervisor = '';
                     this.noticeData.personList = [];
@@ -511,7 +511,7 @@
                     return false;
                 }
                 let withdrawFormValid = false;
-                await this.$refs.withdrawForm.validate().then((validator) => {
+                await this.$refs.withdrawForm.validate().then(() => {
                     withdrawFormValid = true;
                 }, () => {});
                 if (withdrawFormValid) {
@@ -569,7 +569,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('cdeploy/changePartInfo', { params, id }).then((res) => {
+                this.$store.dispatch('cdeploy/changePartInfo', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',

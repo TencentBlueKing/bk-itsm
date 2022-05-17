@@ -221,7 +221,7 @@
 
                 const params = this.DetailInfo;
                 this.secondClick = true;
-                await this.$store.dispatch('apiRemote/put_remote_api', params).then((res) => {
+                await this.$store.dispatch('apiRemote/put_remote_api', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["更新成功"]'),
                         theme: 'success',

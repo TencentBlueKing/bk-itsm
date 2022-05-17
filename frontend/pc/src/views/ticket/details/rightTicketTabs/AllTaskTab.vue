@@ -25,30 +25,32 @@
         <bk-table
             v-bkloading="{ isLoading: isListLoading }"
             :data="taskList"
-            :size="'small'">
+            :size="'small'"
+        >
             <bk-table-column :label="$t(`m.task['顺序']`)" :width="60">
                 <template slot-scope="props">
-                    <span>{{ props.row.order || '--' }}</span>
-                    <!-- <i class="bk-itsm-icon icon-itsm-icon-sops" v-if="props.row.component_type !== 'NORMAL'"></i> -->
+                    <span>{{ props.row.order || "--" }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m.task['任务名称']`)">
                 <template slot-scope="props">
-                    <span
-                        v-bk-tooltips.top="props.row.name"
-                        class="task-name">
-                        {{props.row.name || '--'}}
+                    <span v-bk-tooltips.top="props.row.name" class="task-name">
+                        {{ props.row.name || "--" }}
                     </span>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m.task['处理人']`)">
                 <template slot-scope="props">
-                    <span v-bk-tooltips.top="props.row.processor_users">{{props.row.processor_users || '--'}}</span>
+                    <span v-bk-tooltips.top="props.row.processor_users">{{
+                        props.row.processor_users || "--"
+                    }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m.task['任务类型']`)">
                 <template slot-scope="props">
-                    <span v-bk-tooltips.top="props.row.processor_users">{{getTaskTypeName(props.row.component_type) || '--'}}</span>
+                    <span v-bk-tooltips.top="props.row.processor_users">{{
+                        getTaskTypeName(props.row.component_type) || "--"
+                    }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column :label="$t(`m.task['状态']`)" :wdith="120">
@@ -62,8 +64,9 @@
                     <bk-button
                         theme="primary"
                         text
-                        @click="onViewTask(props.row)">
-                        {{$t(`m.task['查看']`)}}
+                        @click="onViewTask(props.row)"
+                    >
+                        {{ $t(`m.task['查看']`) }}
                     </bk-button>
                 </template>
             </bk-table-column>
@@ -71,18 +74,24 @@
         <bk-sideslider
             :is-show.sync="dealTaskInfo.show"
             :quick-close="true"
-            :width="800">
+            :width="800"
+        >
             <div slot="header">
-                <task-handle-trigger v-if="dealTaskInfo.show" :task-info="dealTaskInfo.itemContent" :title="dealTaskInfo.title" @close-slider="dealTaskInfo.show = false"></task-handle-trigger>
+                <task-handle-trigger
+                    v-if="dealTaskInfo.show"
+                    :task-info="dealTaskInfo.itemContent"
+                    :title="dealTaskInfo.title"
+                    @close-slider="dealTaskInfo.show = false"
+                ></task-handle-trigger>
             </div>
-            <div slot="content"
-                style="min-height: 300px;">
+            <div slot="content" style="min-height: 300px">
                 <deal-task
                     v-if="dealTaskInfo.show"
                     :deal-type="dealTaskInfo.type"
                     :task-info="dealTaskInfo.itemContent"
                     :basic-infomation="ticketInfo"
-                    @close="dealTaskInfo.show = false">
+                    @close="dealTaskInfo.show = false"
+                >
                 </deal-task>
             </div>
         </bk-sideslider>
@@ -132,9 +141,11 @@
                 const params = {
                     ticket_id: this.ticketInfo.id,
                 };
-                return this.$store.dispatch('taskFlow/getTaskList', params).then((res) => {
-                    this.taskList = res.data;
-                })
+                return this.$store
+                    .dispatch('taskFlow/getTaskList', params)
+                    .then((res) => {
+                        this.taskList = res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -153,7 +164,7 @@
         },
     };
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .all-task-list {
     width: 100%;
     height: 100%;

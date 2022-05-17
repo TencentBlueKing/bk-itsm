@@ -353,7 +353,7 @@
                 this.dragLine.startX = e.pageX;
                 this.dragLine.canMove = true;
             },
-            handleMouseUp(e) {
+            handleMouseUp() {
                 document.removeEventListener('mouseup', this.handleMouseUp, false);
                 document.removeEventListener('mousemove', this.handleLineMouseMove, false);
                 this.dragLine.base = this.dragLine.move;
@@ -439,7 +439,7 @@
                 }).then((res) => {
                     res.data.forEach((item) => {
                         item.checkValue = false;
-                        item.val = item.hasOwnProperty('default') ? deepClone(item.default) : '';
+                        item.val = Object.prototype.hasOwnProperty.call(item, 'default') ? deepClone(item.default) : '';
                         item.showFeild = true;
                     });
                     this.ticketNodeForm = res.data;
@@ -665,7 +665,7 @@
                                 state_id: this.createTicketNodeId,
                             },
                         };
-                        this.$store.dispatch('deployCommon/deleteField', data).then((res) => {
+                        this.$store.dispatch('deployCommon/deleteField', data).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
@@ -688,7 +688,7 @@
                 const index = this.ticketNodeForm.findIndex(item => item.id === field.id);
                 field.checkValue = false;
                 field.showFeild = true;
-                field.val = field.hasOwnProperty('default') ? deepClone(field.default) : '';
+                field.val = Object.prototype.hasOwnProperty.call(field, 'default') ? deepClone(field.default) : '';
                 if (index > -1) { // 编辑
                     this.ticketNodeForm.splice(index, 1, field);
                 } else { // 新增
@@ -758,7 +758,7 @@
                     return this.$store.dispatch('deployCommon/updateNode', {
                         params: nodeDetail,
                         id: this.createTicketNodeId,
-                    }).then((res) => {
+                    }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',

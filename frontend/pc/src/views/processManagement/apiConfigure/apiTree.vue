@@ -325,7 +325,7 @@
             scrollEvent($event) {
                 this.styletranslateY.transform = `translate(40px,${-$event.target.scrollTop - 20}px)`;
             },
-            changeCode(code, option) {
+            changeCode(code) {
                 const dataItem = this.codeList.filter(item => item.code === code)[0];
                 this.dictDataTable.formInfo.name = dataItem.name;
                 this.dictDataTable.formInfo.system_id = dataItem.system_id;
@@ -334,12 +334,12 @@
                 this.searchWord = '';
             },
             // 展开/收起tree
-            showGroupChild(item, index) {
+            showGroupChild(item) {
                 item.showMore = !item.showMore;
                 this.treeList = [...JSON.parse(JSON.stringify(this.treeList))];
             },
             // 显示底色
-            showBackground(item, index, level) {
+            showBackground(item, level) {
                 if (!level) {
                     this.$parent.displayInfo.level_1 = {};
                     this.$parent.displayInfo.level_0 = item;
@@ -372,7 +372,7 @@
             },
             // 接入系统/修改系统
             submitDictionary() {
-                this.$refs.dictDataForm.validate().then((validator) => {
+                this.$refs.dictDataForm.validate().then(() => {
                     if (this.secondClick) {
                         return;
                     }
@@ -398,7 +398,7 @@
                     if (this.dictDataTable.title === this.$t('m.systemConfig["修改系统"]')) {
                         params.id = this.dictDataTable.formInfo.id;
                         this.secondClick = true;
-                        this.$store.dispatch('apiRemote/put_remote_system', params).then((res) => {
+                        this.$store.dispatch('apiRemote/put_remote_system', params).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["修改成功"]'),
                                 theme: 'success',
@@ -415,7 +415,7 @@
                         return;
                     }
                     this.secondClick = true;
-                    this.$store.dispatch('apiRemote/post_remote_system', params).then((res) => {
+                    this.$store.dispatch('apiRemote/post_remote_system', params).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.systemConfig["添加成功"]'),
                             theme: 'success',
@@ -493,7 +493,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('apiRemote/delete_remote_system', id).then((res) => {
+                        this.$store.dispatch('apiRemote/delete_remote_system', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',

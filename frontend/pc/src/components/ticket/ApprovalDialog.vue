@@ -94,7 +94,7 @@
                             opinion: this.formData.approvalNotice,
                             approval_list: this.approvalInfo.approvalList,
                         };
-                        await this.$store.dispatch('workbench/batchApproval', data).then((res) => {
+                        await this.$store.dispatch('workbench/batchApproval', data).then(() => {
                             this.$emit('cancel', true);
                         })
                             .catch((res) => {

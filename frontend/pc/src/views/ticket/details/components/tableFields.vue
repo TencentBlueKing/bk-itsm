@@ -131,7 +131,7 @@
             },
         },
         watch: {
-            'basicInfomation.table_fields'(newVal) {
+            'basicInfomation.table_fields'() {
                 this.initData();
             },
         },

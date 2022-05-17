@@ -178,7 +178,7 @@
                     this.getCreatedList(),
                     this.getAttentionList(),
                     this.getApprovalList(),
-                ]).then((data) => {
+                ]).then(() => {
                     this.loading = false;
                 });
             },

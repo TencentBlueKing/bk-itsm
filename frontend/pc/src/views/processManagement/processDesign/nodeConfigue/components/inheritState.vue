@@ -154,10 +154,10 @@
             handleSelectAll(selection) {
                 this.checkList = selection;
             },
-            handleSelect(selection, row) {
+            handleSelect(selection) {
                 this.checkList = selection;
             },
-            disabledFn(item, index) {
+            disabledFn(item) {
                 const disabledStatus = this.showTabList.some(tableItem => tableItem.key === item.key);
                 return !disabledStatus;
             },

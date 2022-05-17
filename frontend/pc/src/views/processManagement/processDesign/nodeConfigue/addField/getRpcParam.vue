@@ -121,7 +121,7 @@
         },
         computed: {},
         watch: {
-            prcTable(newVal, oldVal) {
+            prcTable() {
                 this.initData();
             },
         },

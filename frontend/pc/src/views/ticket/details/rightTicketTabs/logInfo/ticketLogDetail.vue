@@ -26,64 +26,107 @@
             :width="600"
             :is-show="show"
             :quick-close="true"
-            :before-close="() => {
-                $emit('close')
-            }">
+            :before-close="
+                () => {
+                    $emit('close');
+                }
+            "
+        >
             <template v-if="logInfo">
-                <div slot="header">{{ logInfo.from_state_name || logInfo.message }}</div>
+                <div slot="header">
+                    {{ logInfo.from_state_name || logInfo.message }}
+                </div>
                 <div class="p20" slot="content">
                     <div class="bk-timeline-user-content">
                         <div class="bk-area-show-back">
                             <!-- 基础信息 -->
                             <div class="bk-logs-basic">
-                                <h3 class="bk-basic-h3">{{ $t('m.newCommon["基本信息"]') }}</h3>
+                                <h3 class="bk-basic-h3">
+                                    {{ $t('m.newCommon["基本信息"]') }}
+                                </h3>
                                 <ul>
-                                    <li v-for="(baseItem, index) in basicList" :key="index">
-                                        <span class="bk-basic-title">{{baseItem.name}}：</span>
-                                        <span class="bk-basic-value" :title="logInfo[baseItem.key]">{{logInfo[baseItem.key] || '--'}}</span>
+                                    <li
+                                        v-for="(baseItem, index) in basicList"
+                                        :key="index"
+                                    >
+                                        <span class="bk-basic-title"
+                                        >{{ baseItem.name }}：</span
+                                        >
+                                        <span
+                                            class="bk-basic-value"
+                                            :title="logInfo[baseItem.key]"
+                                        >{{
+                                            logInfo[baseItem.key] || "--"
+                                        }}</span
+                                        >
                                     </li>
                                 </ul>
                             </div>
                             <!-- 节点信息 -->
                             <template v-if="logInfo.form_data.length">
                                 <!-- 普通节点 -->
-                                <template v-if="logInfo.from_state_type === 'NORMAL'">
-                                    <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
+                                <template
+                                    v-if="logInfo.from_state_type === 'NORMAL'"
+                                >
+                                    <h3 class="bk-basic-h3">
+                                        {{ $t('m.newCommon["节点信息"]') }}
+                                    </h3>
                                     <field-preview
                                         :comment-id="'fields-view'"
                                         :fields="logInfo.form_data"
                                         :ticket-id="logInfo.ticket_id"
-                                        :stated-id="logInfo.id">
+                                        :stated-id="logInfo.id"
+                                    >
                                     </field-preview>
                                 </template>
                                 <!-- 标准运维节点 -->
-                                <sops-node-log v-else-if="logInfo.from_state_type === 'TASK-SOPS'"
-                                    :sops-info="logInfo.form_data[0].value">
+                                <sops-node-log
+                                    v-else-if="
+                                        logInfo.from_state_type === 'TASK-SOPS'
+                                    "
+                                    :sops-info="logInfo.form_data[0].value"
+                                >
                                 </sops-node-log>
-                                <devops-node-log v-else-if="logInfo.from_state_type === 'TASK-DEVOPS'"
-                                    :node-info="logInfo.form_data[0].value">
+                                <devops-node-log
+                                    v-else-if="
+                                        logInfo.from_state_type ===
+                                            'TASK-DEVOPS'
+                                    "
+                                    :node-info="logInfo.form_data[0].value"
+                                >
                                 </devops-node-log>
                                 <!-- api 节点 -->
-                                <auto-node-info v-else-if="logInfo.from_state_type === 'TASK'"
+                                <auto-node-info
+                                    v-else-if="
+                                        logInfo.from_state_type === 'TASK'
+                                    "
                                     :node-info="{
                                         api_info: logInfo.form_data[0].value,
                                         name: logInfo.from_state_name,
                                         update_at: logInfo.operate_at
-                                    }">
+                                    }"
+                                >
                                 </auto-node-info>
                                 <template v-else>
-                                    <h3 class="bk-basic-h3">{{ $t('m.newCommon["节点信息"]') }}</h3>
-                                    <template v-for="(ite, inde) in logInfo.form_data">
+                                    <h3 class="bk-basic-h3">
+                                        {{ $t('m.newCommon["节点信息"]') }}
+                                    </h3>
+                                    <template
+                                        v-for="(ite, inde) in logInfo.form_data"
+                                    >
                                         <fields-done
                                             :key="inde"
                                             :item="ite"
-                                            :origin="'log'">
+                                            :origin="'log'"
+                                        >
                                         </fields-done>
                                     </template>
                                 </template>
                             </template>
                             <!-- 日志详情 -->
-                            <h3 class="bk-basic-h3 mt25 mb20 ">{{ $t('m.systemConfig["日志详情"]') }}</h3>
+                            <h3 class="bk-basic-h3 mt25 mb20">
+                                {{ $t('m.systemConfig["日志详情"]') }}
+                            </h3>
                             <p class="opt-info">{{ logInfo.message }}</p>
                         </div>
                     </div>
@@ -116,15 +159,27 @@
             },
             logInfo: {
                 type: Object,
-                default: () => (null),
+                default: () => null,
             },
         },
         data() {
             return {
                 basicList: [
-                    { name: this.$t('m.newCommon["节点名称"]'), value: '', key: 'from_state_name' },
-                    { name: this.$t('m.newCommon["处理人"]'), value: '', key: 'operator' },
-                    { name: this.$t('m.newCommon["处理时间"]'), value: '', key: 'operate_at' },
+                    {
+                        name: this.$t('m.newCommon["节点名称"]'),
+                        value: '',
+                        key: 'from_state_name',
+                    },
+                    {
+                        name: this.$t('m.newCommon["处理人"]'),
+                        value: '',
+                        key: 'operator',
+                    },
+                    {
+                        name: this.$t('m.newCommon["处理时间"]'),
+                        value: '',
+                        key: 'operate_at',
+                    },
                 ],
             };
         },
@@ -132,13 +187,13 @@
 </script>
 
 <style lang="scss" scoped>
-@import '../../../../../scss/mixins/clearfix.scss';
+@import "../../../../../scss/mixins/clearfix.scss";
 .bk-timeline-user-content {
     font-size: 12px;
     .bk-area-show-back {
         padding: 4px 8px;
         .opt-info {
-            color: #63656E;
+            color: #63656e;
         }
     }
     .bk-logs-basic {
@@ -153,7 +208,7 @@
             width: 50%;
             font-size: 14px;
             line-height: 27px;
-            color: #63656E;
+            color: #63656e;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -171,6 +226,6 @@
     }
 }
 .bk-basic-h3 {
-    color: #63656E;
+    color: #63656e;
 }
 </style>

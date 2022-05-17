@@ -164,7 +164,7 @@
                     });
                     this.$set(this.nodeInfo, `node_${item.id}`, item);
                 });
-                this.lineList.forEach((item, index) => {
+                this.lineList.forEach((item) => {
                     this.canvasData.lines.push({
                         source: {
                             arrow: item.axis.start || 'Right',
@@ -300,7 +300,7 @@
             submitNodeValue(node) {
                 this.currentNode = node;
             },
-            onNodeMoveStop(node, event) {
+            onNodeMoveStop(node) {
                 if (node.x === this.currentNode.x && node.y === this.currentNode.y) {
                     this.$parent.openNodeContent(node);
                 }

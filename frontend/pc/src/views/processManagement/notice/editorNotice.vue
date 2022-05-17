@@ -329,7 +329,7 @@
                     this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
                     return;
                 }
-                this.$refs.wechatForm.validate().then((validator) => {}, (validator) => {});
+                this.$refs.wechatForm.validate().then(() => {}, () => {});
                 if (this.checkNotice()) {
                     return;
                 }
@@ -344,7 +344,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('noticeConfigure/changeNotice', { params, id }).then((res) => {
+                this.$store.dispatch('noticeConfigure/changeNotice', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',

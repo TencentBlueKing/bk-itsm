@@ -138,7 +138,7 @@
                         this.isDataLoading = false;
                     });
             },
-            changeNotice(item, index) {
+            changeNotice(item) {
                 this.checkId = item.id;
                 this.getNoticeList();
             },

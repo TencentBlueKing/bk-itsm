@@ -270,7 +270,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
+                this.$store.dispatch('ticketStatus/endSubmitFlow', params).then(() => {
                     this.$bkMessage({
                         message: '保存成功',
                         theme: 'success',

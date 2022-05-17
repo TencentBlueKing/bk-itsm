@@ -614,8 +614,8 @@
             },
             // 保存、取消、草稿
             submitTrigger(type) {
-                this.$refs.triggerBasic.validate().then((validator) => {
-                    this.$refs.triggerMade.validate().then((validator) => {
+                this.$refs.triggerBasic.validate().then(() => {
+                    this.$refs.triggerMade.validate().then(() => {
                         if (this.checkInfo()) {
                             return;
                         }
@@ -635,7 +635,8 @@
                         };
                         if (this.originInfoToTrigger.id) {
                             params.source_type = this.originInfoToTrigger.source;
-                            params.source_id = params.sender = this.originInfoToTrigger.id;
+                            params.sender = this.originInfoToTrigger.id;
+                            params.source_id = params.sender;
                             params.sender = this.originInfoToTrigger.sender;
                         }
                         if (this.projectId) {
@@ -984,7 +985,7 @@
             createTriggerCondition() {
                 const params = this.conditionParams();
                 const { id } = this.backInfo.triggerInfo;
-                this.$store.dispatch('trigger/batchTriggerCondition', { params, id }).then((res) => {
+                this.$store.dispatch('trigger/batchTriggerCondition', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.triggerInfo.id ? this.$t('m.common[\'保存成功\']') : this.$t('m.trigger[\'创建成功\']'),
                         theme: 'success',
@@ -1002,7 +1003,7 @@
             conditionParams() {
                 const params = [];
                 let sum = 0;
-                this.rulesList.forEach((item, index) => {
+                this.rulesList.forEach((item) => {
                     const itemParam = {
                         condition: {},
                         name: item.name,

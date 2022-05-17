@@ -380,7 +380,7 @@
                     dst_source_type: this.sourceType,
                     dst_sender: this.senderId,
                 };
-                this.$store.dispatch('taskTemplate/patchCloneTriggers', params).then((res) => {
+                this.$store.dispatch('taskTemplate/patchCloneTriggers', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.taskTemplate[\'引用成功\']'),
                         theme: 'success',

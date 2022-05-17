@@ -53,7 +53,7 @@
             countDown() {
                 if (this.isStart) {
                     this.timer = setInterval(() => {
-                        this.time--;
+                        this.time -= 1;
                         if (this.time === 0) {
                             clearInterval(this.timer);
                             this.jumpPage();

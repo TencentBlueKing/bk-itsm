@@ -249,7 +249,7 @@
                     });
             },
             // 修改触发器
-            changeTrigger(item, index) {
+            changeTrigger(item) {
                 if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const { projectInfo } = this.$store.state.project;
                     const resourceData = {
@@ -273,7 +273,7 @@
                 this.sliderInfo.show = false;
             },
             // 删除触发器
-            deleteTrigger(item, index) {
+            deleteTrigger(item) {
                 if (!this.hasPermission(['triggers_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const { projectInfo } = this.$store.state.project;
                     const resourceData = {
@@ -295,7 +295,7 @@
                     subTitle: this.$t('m.trigger["触发器删除将不可使用"]'),
                     confirmFn: () => {
                         const { id } = item;
-                        this.$store.dispatch('trigger/deleteTrigger', id).then((res) => {
+                        this.$store.dispatch('trigger/deleteTrigger', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',

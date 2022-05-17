@@ -255,6 +255,7 @@
             /**
              * 拖拽时生成随机guid将节点暂存window['bkTreeDrag'][guid]上
              */
+            /* eslint-disable */
             gid() {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
                     const r = Math.random() * 16 | 0;
@@ -262,7 +263,7 @@
                     return v.toString(16);
                 });
             },
-
+            /* eslint-disable */
             /**
              * 设置拖拽节点
              */
@@ -282,7 +283,7 @@
              * 节点是否可拖拽到某个节点下的标识
              */
             hasInGenerations(root, node) {
-                if (root.hasOwnProperty('children') && root.children) {
+                if (Object.prototype.hasOwnProperty.call(root, 'children') && root.children) {
                     for (const rn of root.children) {
                         if (rn === node) return true;
                         if (rn.children) return this.hasInGenerations(rn, node);
@@ -297,7 +298,7 @@
              * @param {Object} node 当前节点
              */
             isDragSortHolder(target, node) {
-                if (target.hasOwnProperty('children') && target.children) {
+                if (Object.prototype.hasOwnProperty.call(target, 'children') && target.children) {
                     for (const rn of target.children) {
                         if (rn[this.nodeKey] === node[this.nodeKey]) return false;
                         if (rn.children) return this.isDragSortHolder(rn, node);
@@ -424,26 +425,26 @@
                 for (const node of this.data) {
                     this.$set(node, 'parent', this.parent);
                     if (node.children && node.children.length) {
-                        if (node.hasOwnProperty('disabled')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'disabled')) {
                             this.$delete(node, 'disabled');
                         }
-                        if (node.hasOwnProperty('icon')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'icon')) {
                             this.$delete(node, 'icon');
                         }
                     } else {
-                        if (node.hasOwnProperty('openedIcon')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'openedIcon')) {
                             this.$delete(node, 'openedIcon');
                         }
-                        if (node.hasOwnProperty('closedIcon')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'closedIcon')) {
                             this.$delete(node, 'closedIcon');
                         }
                     }
                     if (this.multiple) {
-                        if (node.hasOwnProperty('selected')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'selected')) {
                             this.$delete(node, 'selected');
                         }
                     } else {
-                        if (node.hasOwnProperty('checked')) {
+                        if (Object.prototype.hasOwnProperty.call(node, 'checked')) {
                             this.$delete(node, 'checked');
                         }
                     }
@@ -507,13 +508,13 @@
                 if (typeof newNode === 'undefined') {
                     throw new ReferenceError('newNode is required but undefined');
                 }
-                if (typeof newNode === 'object' && !newNode.hasOwnProperty('name')) {
+                if (typeof newNode === 'object' && !Object.prototype.hasOwnProperty(newNode, 'name')) {
                     throw new ReferenceError('the name property is missed');
                 }
-                if (typeof newNode === 'object' && !newNode.hasOwnProperty(this.nodeKey)) {
+                if (typeof newNode === 'object' && !Object.prototype.hasOwnProperty(newNode, this.nodeKey)) {
                     throw new ReferenceError('the nodeKey property is missed');
                 }
-                if (typeof newNode === 'object' && newNode.hasOwnProperty('name') && newNode.hasOwnProperty(this.nodeKey)) {
+                if (typeof newNode === 'object' && Object.prototype.hasOwnProperty(newNode, 'name') && Object.prototype.hasOwnProperty(newNode, this.nodeKey)) {
                     addnode = Object.assign({}, newNode);
                 }
                 if (this.isLeaf(parent)) {
@@ -681,7 +682,7 @@
                                 const n = {};
                                 if (Object.prototype.toString.call(keyValue) === '[object Array]') {
                                     for (let i = 0; i < keyValue.length; i++) {
-                                        if (node.hasOwnProperty(keyValue[i])) {
+                                        if (Object.prototype.hasOwnProperty.call(node, keyValue[i])) {
                                             n[keyValue[i]] = node[keyValue[i]];
                                         }
                                     }

@@ -32,24 +32,32 @@
             :auto-close="dialogSetting.autoClose"
             :mask-close="dialogSetting.autoClose"
             @confirm="submitValidate"
-            @cancel="cancelForm">
+            @cancel="cancelForm"
+        >
             <bk-form
                 :label-width="200"
                 form-type="vertical"
                 :model="formInfo"
                 ref="ticketForm"
-                :rules="rules">
+                :rules="rules"
+            >
                 <template v-if="ticketOperateType === 'suspend'">
                     <bk-form-item
                         :label="$t(`m.newCommon['挂起原因']`)"
-                        :desc="$t(`m.slaContent['挂起后单据流程将停止运行，且不计入SLA时长']`)"
+                        :desc="
+                            $t(
+                                `m.slaContent['挂起后单据流程将停止运行，且不计入SLA时长']`
+                            )
+                        "
                         :required="true"
-                        :property="'suspend_message'">
+                        :property="'suspend_message'"
+                    >
                         <bk-input
                             :placeholder="$t(`m.newCommon['请输入挂起原因']`)"
                             :type="'textarea'"
                             :rows="3"
-                            v-model="formInfo.suspend_message">
+                            v-model="formInfo.suspend_message"
+                        >
                         </bk-input>
                     </bk-form-item>
                 </template>
@@ -57,28 +65,34 @@
                     <bk-form-item
                         :label="$t(`m.newCommon['关闭状态']`)"
                         :required="true"
-                        :property="'closeState'">
+                        :property="'closeState'"
+                    >
                         <bk-select
                             v-model="formInfo.closeState"
                             searchable
                             :font-size="'medium'"
-                            :clearable="falseStatus">
-                            <bk-option v-for="option in endList"
+                            :clearable="falseStatus"
+                        >
+                            <bk-option
+                                v-for="option in endList"
                                 :key="option.key"
                                 :id="option.key"
-                                :name="option.name">
+                                :name="option.name"
+                            >
                             </bk-option>
                         </bk-select>
                     </bk-form-item>
                     <bk-form-item
                         :label="$t(`m.newCommon['关闭原因']`)"
                         :required="true"
-                        :property="'close_message'">
+                        :property="'close_message'"
+                    >
                         <bk-input
                             :placeholder="$t(`m.newCommon['请输入关闭原因']`)"
                             :type="'textarea'"
                             :rows="3"
-                            v-model="formInfo.close_message">
+                            v-model="formInfo.close_message"
+                        >
                         </bk-input>
                     </bk-form-item>
                 </template>
@@ -148,7 +162,9 @@
                     this.dialogSetting.title = this.$t('m.newCommon["挂起"]');
                 } else {
                     this.dialogSetting.title = this.$t('m.newCommon["是否恢复此单据？"]');
-                    this.dialogSetting.content = this.$t('m.newCommon["单据将恢复至【"]') + this.ticketInfo.pre_status_display + this.$t('m.newCommon["】"]');
+                    this.dialogSetting.content =                    this.$t('m.newCommon["单据将恢复至【"]')
+                        + this.ticketInfo.pre_status_display
+                        + this.$t('m.newCommon["】"]');
                     this.$bkInfo({
                         type: 'warning',
                         title: this.dialogSetting.title,
@@ -158,7 +174,10 @@
                         },
                     });
                 }
-                if (this.ticketOperateType === 'close' || this.ticketOperateType === 'suspend') {
+                if (
+                    this.ticketOperateType === 'close'
+                    || this.ticketOperateType === 'suspend'
+                ) {
                     this.dialogSetting.isShow = true;
                     this.$nextTick(() => {
                         this.getTypeStatus();
@@ -172,9 +191,11 @@
                 this.isDataLoading = true;
                 const type = this.ticketInfo.service_type;
                 const key = this.ticketInfo.current_status;
-                this.$store.dispatch('deployOrder/getEndStatus', { type, key }).then((res) => {
-                    this.endList = res.data;
-                })
+                this.$store
+                    .dispatch('deployOrder/getEndStatus', { type, key })
+                    .then((res) => {
+                        this.endList = res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -188,11 +209,14 @@
                 this.formInfo.close_message = '';
             },
             submitValidate() {
-                this.$refs.ticketForm.validate().then((validator) => {
-                    this.submitForm();
-                }, (validator) => {
-                    console.warn(validator);
-                });
+                this.$refs.ticketForm.validate().then(
+                    () => {
+                        this.submitForm();
+                    },
+                    (validator) => {
+                        console.warn(validator);
+                    }
+                );
             },
             submitForm() {
                 if (this.ticketOperateType === 'close') {
@@ -201,12 +225,14 @@
                         desc: this.formInfo.close_message,
                     };
                     const { id } = this.ticketInfo;
-                    this.$store.dispatch('deployOrder/closeTickets', { id, params }).then((res) => {
-                        this.$bkMessage({
-                            message: this.$t('m.newCommon["关单成功"]'),
-                            theme: 'success',
-                        });
-                    })
+                    this.$store
+                        .dispatch('deployOrder/closeTickets', { id, params })
+                        .then(() => {
+                            this.$bkMessage({
+                                message: this.$t('m.newCommon["关单成功"]'),
+                                theme: 'success',
+                            });
+                        })
                         .catch((res) => {
                             errorHandler(res, this);
                         })
@@ -221,12 +247,14 @@
                         desc: this.formInfo.suspend_message,
                     };
                     const { id } = this.ticketInfo;
-                    this.$store.dispatch('deployOrder/suspendTickets', { id, params }).then((res) => {
-                        this.$bkMessage({
-                            message: this.$t('m.newCommon["挂起成功"]'),
-                            theme: 'success',
-                        });
-                    })
+                    this.$store
+                        .dispatch('deployOrder/suspendTickets', { id, params })
+                        .then(() => {
+                            this.$bkMessage({
+                                message: this.$t('m.newCommon["挂起成功"]'),
+                                theme: 'success',
+                            });
+                        })
                         .catch((res) => {
                             errorHandler(res, this);
                         })
@@ -244,12 +272,14 @@
             },
             submitRestore() {
                 const { id } = this.ticketInfo;
-                this.$store.dispatch('deployOrder/restoreTickets', id).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["恢复成功"]'),
-                        theme: 'success',
-                    });
-                })
+                this.$store
+                    .dispatch('deployOrder/restoreTickets', id)
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.newCommon["恢复成功"]'),
+                            theme: 'success',
+                        });
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -262,6 +292,4 @@
     };
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

@@ -27,10 +27,14 @@
             form-type="vertical"
             :model="formData"
             ref="billForm"
-            :class="{ 'inline-form': isGetField }">
-            <bk-form-item :label="$t(`m.manageCommon['服务目录']`)" class="inline-item">
+            :class="{ 'inline-form': isGetField }"
+        >
+            <bk-form-item
+                :label="$t(`m.manageCommon['服务目录']`)"
+                class="inline-item"
+            >
                 <common-cascade
-                    style="width: 100%;"
+                    style="width: 100%"
                     ref="commoncascader"
                     v-model="formData.cascadeCheck"
                     :options="cascadeList"
@@ -40,27 +44,34 @@
                     :options-favorites="optionsFavorites"
                     @change="handleChange"
                     @collect="collect"
-                    @cancelcollect="cancelcollect">
+                    @cancelcollect="cancelcollect"
+                >
                 </common-cascade>
             </bk-form-item>
-            <bk-form-item :label="$t(`m.manageCommon['服务']`)" class="inline-item">
+            <bk-form-item
+                :label="$t(`m.manageCommon['服务']`)"
+                class="inline-item"
+            >
                 <bk-select
                     v-model="formData.service_id"
                     :clearable="false"
                     :loading="isSecondLoading"
                     searchable
                     :font-size="'medium'"
-                    @selected="selectedService">
-                    <bk-option v-for="option in billList"
+                    @selected="selectedService"
+                >
+                    <bk-option
+                        v-for="option in billList"
                         :key="option.id"
                         :id="option.id"
                         :name="option.name"
-                        :disabled="option.disabled">
+                        :disabled="option.disabled"
+                    >
                     </bk-option>
                 </bk-select>
             </bk-form-item>
             <bk-form-item :label="$t(`m.manageCommon['服务说明']`)">
-                <p class="bk-sevice-desc">{{billListInfo || '--'}}</p>
+                <p class="bk-sevice-desc">{{ billListInfo || "--" }}</p>
             </bk-form-item>
         </bk-form>
     </div>
@@ -128,10 +139,17 @@
                     show_deleted: false,
                     project_key: this.$store.state.project.id,
                 };
-                this.$store.dispatch('serviceCatalog/getTreeData', params).then((res) => {
-                    this.cascadeList = res.data.length ? res.data[0].children : [];
-                    this.$refs.commoncascader.settextinfo([this.cascadeList[0]], 'give_default');
-                })
+                this.$store
+                    .dispatch('serviceCatalog/getTreeData', params)
+                    .then((res) => {
+                        this.cascadeList = res.data.length
+                            ? res.data[0].children
+                            : [];
+                        this.$refs.commoncascader.settextinfo(
+                            [this.cascadeList[0]],
+                            'give_default'
+                        );
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -142,29 +160,32 @@
                 }
                 const params = {
                     catalog_id: this.formData.cascadeId,
-                    service_key: this.customId === 'all' ? 'globalview' : this.customId,
+                    service_key:
+                        this.customId === 'all' ? 'globalview' : this.customId,
                     is_valid: 1,
                     project_key: this.$store.state.project.id,
                 };
                 this.isSecondLoading = true;
-                this.$store.dispatch('catalogService/getServices', params).then((res) => {
-                    this.billList = res.data;
-                    this.billList.forEach((item) => {
-                        this.$set(item, 'disabled', !item.is_valid);
-                    });
-                    // 默认初始化选中一个
-                    if (this.billList.length) {
-                        this.formData.service_id = this.billList[0].id;
-                        this.billListInfo = this.billList[0].desc;
-                        this.formData.canAgency = this.billList[0].can_ticket_agency;
-                        this.formData.key = this.billList[0].key;
-                    } else {
-                        this.formData.service_id = '';
-                        this.billListInfo = '';
-                        this.formData.canAgency = '';
-                        this.formData.key = '';
-                    }
-                })
+                this.$store
+                    .dispatch('catalogService/getServices', params)
+                    .then((res) => {
+                        this.billList = res.data;
+                        this.billList.forEach((item) => {
+                            this.$set(item, 'disabled', !item.is_valid);
+                        });
+                        // 默认初始化选中一个
+                        if (this.billList.length) {
+                            this.formData.service_id = this.billList[0].id;
+                            this.billListInfo = this.billList[0].desc;
+                            this.formData.canAgency =                            this.billList[0].can_ticket_agency;
+                            this.formData.key = this.billList[0].key;
+                        } else {
+                            this.formData.service_id = '';
+                            this.billListInfo = '';
+                            this.formData.canAgency = '';
+                            this.formData.key = '';
+                        }
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -191,13 +212,15 @@
                 const params = {
                     service: this.customId,
                 };
-                this.$store.dispatch('service/getfavorites', params).then((res) => {
-                    if (res.data.length) {
-                        this.optionsFavorites = res.data[0].data.filter(item => item.is_deleted === false);
-                    } else {
-                        this.optionsFavorites = [];
-                    }
-                })
+                this.$store
+                    .dispatch('service/getfavorites', params)
+                    .then((res) => {
+                        if (res.data.length) {
+                            this.optionsFavorites = res.data[0].data.filter(item => item.is_deleted === false);
+                        } else {
+                            this.optionsFavorites = [];
+                        }
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -207,13 +230,15 @@
                 favorite.service = this.customId;
                 favorite.data = favoriteslist;
                 // 更新收藏分类
-                this.$store.dispatch('service/updatefavorites', favorite).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.manageCommon["收藏成功"]'),
-                        theme: 'success',
-                    });
-                    this.optionsFavorites = favoriteslist;
-                })
+                this.$store
+                    .dispatch('service/updatefavorites', favorite)
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.manageCommon["收藏成功"]'),
+                            theme: 'success',
+                        });
+                        this.optionsFavorites = favoriteslist;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -222,13 +247,15 @@
                 const favorite = {};
                 favorite.service = this.customId;
                 favorite.data = favoriteslist;
-                this.$store.dispatch('service/updatefavorites', favorite).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.manageCommon["取消成功"]'),
-                        theme: 'success',
-                    });
-                    this.optionsFavorites = favoriteslist;
-                })
+                this.$store
+                    .dispatch('service/updatefavorites', favorite)
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.manageCommon["取消成功"]'),
+                            theme: 'success',
+                        });
+                        this.optionsFavorites = favoriteslist;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -237,20 +264,20 @@
     };
 </script>
 
-<style lang='scss' scoped>
-    .bk-sevice-desc {
-        line-height: 30px;
-        color: #63656e;
-        font-size: 12px;
-    }
-    .inline-form {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
+<style lang="scss" scoped>
+.bk-sevice-desc {
+    line-height: 30px;
+    color: #63656e;
+    font-size: 12px;
+}
+.inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
-        .inline-item {
-            width: 49%;
-            margin-top: 0 !important;
-        }
+    .inline-item {
+        width: 49%;
+        margin-top: 0 !important;
     }
+}
 </style>

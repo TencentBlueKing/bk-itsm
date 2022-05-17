@@ -308,9 +308,9 @@
             // 保存
             submitAdd() {
                 // 校验
-                this.$refs.dynamicForm.validate().then((validator) => {
+                this.$refs.dynamicForm.validate().then(() => {
 
-                }, (validator) => {
+                }, () => {
 
                 });
                 if (!this.checkForm()) {
@@ -345,7 +345,7 @@
                     return;
                 }
                 this.clickSecond = true;
-                this.$store.dispatch('serviceEntry/createService', formInfo).then((res) => {
+                this.$store.dispatch('serviceEntry/createService', formInfo).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["添加成功"]'),
                         theme: 'success',
@@ -368,7 +368,7 @@
                 }
                 this.clickSecond = true;
                 const params = JSON.parse(JSON.stringify(this.directory.formInfo));
-                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
+                this.$store.dispatch('serviceEntry/updateService', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["修改成功"]'),
                         theme: 'success',

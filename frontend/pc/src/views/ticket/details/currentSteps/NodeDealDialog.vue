@@ -308,7 +308,7 @@
             },
             // 确认事件
             submitForm() {
-                this.$refs.dialogForm.validate().then((_) => {
+                this.$refs.dialogForm.validate().then(() => {
                     let person = {};
                     if (this.$refs.personSelect) {
                         const res = this.$refs.personSelect.verifyValue();

@@ -387,7 +387,7 @@
                 }
             },
             handleSetAgreement() {
-                this.$refs.agreementForm.validate().then((_) => {
+                this.$refs.agreementForm.validate().then(() => {
                     if (!this.isNodeClick && this.agreeType === 'add') {
                         this.serviceData.sla.push(this.agreementEditData);
                     }
@@ -471,10 +471,12 @@
                 let colorStr = '#';
                 let random = 0;
                 const aryNum = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+                /* eslint-disable */
                 for (i = 0; i < 6; i++) {
                     random = parseInt(Math.random() * 16);
                     colorStr += aryNum[random];
                 }
+                /* eslint-disable */
                 if (colorStr === '#FFFFFF')colorStr = '#87cb12';
                 return colorStr;
             },
@@ -520,7 +522,7 @@
                     return;
                 }
                 this.submitPending = true;
-                this.$store.dispatch('serviceEntry/updateService', params).then((_) => {
+                this.$store.dispatch('serviceEntry/updateService', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
@@ -548,9 +550,9 @@
             },
             // 校验
             async submitInfo() {
-                this.$refs.dynamicForm.validate().then((_) => {
+                this.$refs.dynamicForm.validate().then(() => {
 
-                }, (_) => {
+                }, () => {
                     this.$parent.$refs.agreement.scrollTop = 0;
                 });
             },

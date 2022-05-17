@@ -119,7 +119,7 @@
             checkEdit() {
                 return this.rowForms.find(item => item && item.id === this.crtForm);
             },
-            halfRowFormPut(to, from) {
+            halfRowFormPut(to) {
                 return to.el.children.length === 0;
             },
         },

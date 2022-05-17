@@ -244,7 +244,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('ticketStatus/endSubmitFlow', params).then((res) => {
+                this.$store.dispatch('ticketStatus/endSubmitFlow', params).then(() => {
                     this.$bkMessage({
                         message: '保存成功',
                         theme: 'success',
@@ -359,7 +359,7 @@
                     service_type: type,
                     transits,
                 };
-                await this.$store.dispatch('ticketStatus/saveTypeFlow', params).then((res) => {
+                await this.$store.dispatch('ticketStatus/saveTypeFlow', params).then(() => {
                 })
                     .catch((res) => {
                         errorHandler(res, this);
@@ -382,7 +382,7 @@
                                 return;
                             }
                             this.secondClick = true;
-                            this.$store.dispatch('ticketStatus/closeAutoFlow', id).then((res) => {
+                            this.$store.dispatch('ticketStatus/closeAutoFlow', id).then(() => {
                                 this.$bkMessage({
                                     message: this.$t('m.manageCommon["取消成功"]'),
                                     theme: 'success',
@@ -439,7 +439,7 @@
             },
             // 流转设定弹窗
             confirmFn() {
-                this.$refs.autoForm.validate().then((validator) => {
+                this.$refs.autoForm.validate().then(() => {
                     this.ajaxConfirmFn();
                 }, (validator) => {
                     console.warn(validator);
@@ -452,7 +452,7 @@
                     threshold_unit: this.isAutoTemp.info.timeSpace,
                 };
                 const { id } = this.isAutoTemp.item;
-                this.$store.dispatch('ticketStatus/setAutoFlow', { params, id }).then((res) => {
+                this.$store.dispatch('ticketStatus/setAutoFlow', { params, id }).then(() => {
                     this.$bkMessage({
                         message: '操作成功',
                         theme: 'success',

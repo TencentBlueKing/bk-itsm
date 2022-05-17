@@ -122,7 +122,7 @@
             },
         },
         watch: {
-            apiDetailInfo(newVal, oldVal) {
+            apiDetailInfo(newVal) {
                 this.apiDetailInfoCommon = JSON.parse(JSON.stringify(newVal));
                 this.initData();
             },

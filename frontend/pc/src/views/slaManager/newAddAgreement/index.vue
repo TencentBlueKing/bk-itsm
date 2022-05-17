@@ -286,7 +286,7 @@
             getReminderInfo(id) {
                 const priorList = [];
                 let priorObj = {};
-                this.$refs[`eventRemind${id}`].priorityList.map((prior, index) => {
+                this.$refs[`eventRemind${id}`].priorityList.map((prior) => {
                     priorObj = {
                         type: prior.type,
                         condition: {
@@ -346,7 +346,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch(`slaManagement/${urlValue}`, paramsValue).then((res) => {
+                this.$store.dispatch(`slaManagement/${urlValue}`, paramsValue).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',
@@ -388,7 +388,7 @@
                 const priorityConfigurCheck = await this.$refs.priorityConfigur.checkData();
                 const warningEventRemindCheck = await this.$refs.eventRemind1.checkData();
                 const timeOutEventRemindCheck = await this.$refs.eventRemind3.checkData();
-                this.$refs.dynamicForm.validate().then((validator) => {
+                this.$refs.dynamicForm.validate().then(() => {
                     if (!priorityConfigurCheck && !warningEventRemindCheck && !timeOutEventRemindCheck) {
                         if (this.changeInfo.info.id) {
                             this.$bkInfo({

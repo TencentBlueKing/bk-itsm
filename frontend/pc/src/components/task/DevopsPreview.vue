@@ -138,14 +138,17 @@
                     return false;
                 }
                 switch (runCondition) {
-                    case 'CUSTOM_VARIABLE_MATCH':
+                    case 'CUSTOM_VARIABLE_MATCH': {
                         const allVarCheck = customVariables.every(varible => !!varible.value);
                         return allVarCheck;
-                    case 'CUSTOM_VARIABLE_MATCH_NOT_RUN':
+                    }
+                    case 'CUSTOM_VARIABLE_MATCH_NOT_RUN': {
                         const allVarCheck2 = customVariables.every(varible => !!varible.value);
                         return !allVarCheck2;
-                    default:
+                    }
+                    default: {
                         return true;
+                    }
                 }
             },
         },

@@ -413,12 +413,12 @@
                 }
             },
             // 后期赋值响应
-            async options1(newvalue, oldvalue) {
+            async options1() {
                 if (this.currentTextinfo && this.currentTextinfo.length && (this.textinfo !== await this.currentTextinfo.map(item => item.name).join('/'))) {
                     this.assignment(this.currentTextinfo);
                 }
             },
-            async currentTextinfo(newvalue, oldvalue) {
+            async currentTextinfo(newvalue) {
                 if (!newvalue || !newvalue.length) {
                     this.reduction();
                 } else {
@@ -469,7 +469,7 @@
                 getSelections(listInfo);
                 return selections;
             },
-            handleSelectItem(item, index) {
+            handleSelectItem(item) {
                 if (item.disabled) {
                     return;
                 }
@@ -515,7 +515,7 @@
                 if (String(id) === String(tree.id)) {
                     this.searchItem = tree;
                 }
-                if (tree.children == null || (tree.children && !tree.children.length)) {
+                if (tree.children === null || (tree.children && !tree.children.length)) {
                     return;
                 }
                 tree.children.forEach((tree) => {
@@ -524,8 +524,8 @@
             },
             // 执行方法体
             performFn(optionsList, level, id) {
-                const itemIndex = optionsList.findIndex((node, index) => String(node.id) === String(id));
-                const optionsItem = optionsList.find((node, index) => String(node.id) === String(id));
+                const itemIndex = optionsList.findIndex(node => String(node.id) === String(id));
+                const optionsItem = optionsList.find(node => String(node.id) === String(id));
                 this.selectLevel(level, itemIndex, optionsItem);
             },
             // 从外向里赋值

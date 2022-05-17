@@ -344,7 +344,7 @@
                     item.checkValue = value;
                 });
             },
-            handleSelect(item, index) {
+            handleSelect(item) {
                 if (item.checkValue) {
                     this.checkList.push(item);
                 } else {
@@ -364,7 +364,7 @@
                     new_order: newOrderList,
                 };
                 const id = currentNode.bounded_relations[0].bond_id;
-                this.$store.dispatch('serviceCatalog/moveTableNode', { params, id }).then((res) => {
+                this.$store.dispatch('serviceCatalog/moveTableNode', { params, id }).then(() => {
                     // ...
                 })
                     .catch((res) => {
@@ -408,7 +408,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('catalogService/removeServices', params).then((res) => {
+                        this.$store.dispatch('catalogService/removeServices', params).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除成功"]'),
                                 theme: 'success',
@@ -445,7 +445,7 @@
                 }
                 this.secondClick = true;
                 // 批量添加服务
-                this.$store.dispatch('catalogService/addServices', params).then((res) => {
+                this.$store.dispatch('catalogService/addServices', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["添加成功"]'),
                         theme: 'success',
@@ -509,7 +509,7 @@
             addSelectAll(selection) {
                 this.entryInfo.checkList = selection;
             },
-            addSelect(selection, row) {
+            addSelect(selection) {
                 this.entryInfo.checkList = selection;
             },
         },

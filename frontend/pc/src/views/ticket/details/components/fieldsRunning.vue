@@ -176,7 +176,7 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('basicModule/edit_field', { params, id }).then((res) => {
+                this.$store.dispatch('basicModule/edit_field', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["修改成功"]'),
                         theme: 'success',

@@ -133,7 +133,7 @@
             this.changeInfo();
         },
         methods: {
-            itemSelect(val, option) {
+            itemSelect(val) {
                 const itemInfo = this.item.choice.filter(item => item.key === val)[0];
                 this.clickInfo = true;
                 this.firstShow = !!itemInfo.items;
@@ -143,7 +143,7 @@
                 this.secondInfo = '';
                 this.clickChange = true;
             },
-            changeFrist(val, option) {
+            changeFrist(val) {
                 this.secondInfo = val;
                 this.item.val = this.secondInfo;
             },

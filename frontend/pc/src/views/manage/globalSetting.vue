@@ -369,10 +369,13 @@
                     const tempObj = {};
                     res.data.forEach((item) => {
                         if (item.key === 'SYS_FILE_PATH') {
-                            this.moduleInfo.systemPath.formerValue = this.moduleInfo.systemPath.nowValue = tempObj.SYS_FILE_PATH = item.value;
+                            tempObj.SYS_FILE_PATH = item.value;
+                            this.moduleInfo.systemPath.nowValue = item.value;
+                            this.moduleInfo.systemPath.formerValue = item.value;
                             this.moduleInfo.systemPath.id = item.id || '';
                         } else if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {
-                            this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key] = item.value === 'on';
+                            tempObj[item.key] = item.value === 'on';
+                            this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key];
                             this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
                         }
                     });
@@ -408,7 +411,7 @@
                     params.type = 'PATH';
                 }
                 this.isAllStatusGetting = true;
-                await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then((res) => {
+                await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.home["更新成功"]'),
                         theme: 'success',
@@ -436,7 +439,7 @@
                     return;
                 }
                 this.issending = true;
-                this.$store.dispatch('attachmentStorage/clearStorage', {}).then((res) => {
+                this.$store.dispatch('attachmentStorage/clearStorage', {}).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.home["清除缓存成功"]'),
                         theme: 'success',
@@ -479,7 +482,7 @@
                     version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
                     version_to: this.updatedVersion,
                 };
-                await this.$store.dispatch('version/oneKeymigrate', params).then((res) => {
+                await this.$store.dispatch('version/oneKeymigrate', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.home["提交成功，后台执行升级中"]'),
                         theme: 'success',

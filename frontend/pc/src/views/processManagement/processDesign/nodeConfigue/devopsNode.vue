@@ -304,7 +304,7 @@
                     .catch((e) => {
                         console.log(e);
                     })
-                    .finally((_) => {
+                    .finally(() => {
                         this.pipeFormLoading = false;
                     });
             },
@@ -319,7 +319,7 @@
                 Promise.all([
                     this.$refs.basicInfo.validate(),
                     this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null,
-                ]).then((res) => {
+                ]).then(() => {
                     const basicData = this.businessList.filter(item => item.project_code === this.basicInfo.businessId)[0];
                     const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0];
                     const constants = Object.keys(this.pipelineData).map(item => ({
@@ -354,7 +354,7 @@
                         workflow: this.configur.workflow,
                     };
                     const stateId = this.configur.id;
-                    this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then((res) => {
+                    this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',

@@ -179,7 +179,7 @@
             moveFn() {
                 this.moveFlag = true;
             },
-            onNodeClick(node, event) {
+            onNodeClick(node) {
                 this.currentNode = node;
                 // 往数组中添加数据属性
                 const showValue = Boolean(node.showMore);
@@ -193,11 +193,11 @@
                 }
                 this.moveFlag = false;
             },
-            clickNode(node, event) {
+            clickNode() {
                 this.openconfigu();
             },
             // 右键事件
-            rightClickNode(node, event) {
+            rightClickNode(node) {
                 if (!node) {
                     return;
                 }

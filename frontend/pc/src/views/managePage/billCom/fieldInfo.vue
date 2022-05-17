@@ -223,7 +223,7 @@
                     it.checkValue = false;
                     let msg = ''; // 自定义校验报错内容
                     switch (it.type) {
-                        case 'TABLE':
+                        case 'TABLE': {
                             let allEmpty1 = true;
                             it.choice.forEach((item) => {
                                 if (it.value[0][item.key] !== '') {
@@ -237,7 +237,8 @@
                                 msg += this.$t('m.newCommon["为必填项！"]');
                             }
                             break;
-                        case 'CUSTOMTABLE':
+                        }
+                        case 'CUSTOMTABLE': {
                             let allEmpty2 = false;
                             it.meta.columns.forEach(column => it.value.forEach((row) => {
                                 if (column.required && isEmpty(row[column.key])) {
@@ -250,8 +251,10 @@
                                 msg += this.$t('m.newCommon["为必填项！"]');
                             }
                             break;
-                        default:
+                        }
+                        default: {
                             checkValue = isEmpty(it.value);
+                        }
                     }
                     if (msg) {
                         it.checkMessage = msg;

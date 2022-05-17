@@ -251,7 +251,7 @@
         watch: {
             'apiDetail.rsp_data':
                 {
-                    handler(newName, oldName) {
+                    handler() {
                         this.initData();
                     },
                     deep: true,
@@ -484,7 +484,7 @@
                     }
                 });
             },
-            changeType(item) {
+            changeType() {
                 // ...
             },
             // old table选中key
@@ -574,7 +574,7 @@
             },
             recordCheckFn(tree) {
                 tree.checkInfo = false;
-                if (tree.children == null || (tree.children && !tree.children.length)) {
+                if (tree.children === null || (tree.children && !tree.children.length)) {
                     return;
                 }
                 tree.children.forEach((item) => {

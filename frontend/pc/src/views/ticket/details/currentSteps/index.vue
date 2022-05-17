@@ -43,7 +43,12 @@
                 </template>
                 <template v-else>
                     <!-- 暂无内容 -->
-                    <bk-exception class="ui-empty" type="empty" scene="part">{{$t('m.newCommon["您暂无任务需要处理"]')}}</bk-exception>
+                    <bk-exception
+                        class="ui-empty"
+                        type="empty"
+                        scene="part">
+                        {{$t('m.newCommon["您暂无任务需要处理"]')}}
+                    </bk-exception>
                 </template>
             </template>
             <template v-else>
@@ -145,72 +150,6 @@
             loadData() {
                 this.getAllGroups();
             },
-            /**
-             * 初始化数据
-             * @param {Boolean} diffNode 开启新旧节点 diff
-             */
-            // initData (diffNode = false) {
-            //     const oldCurrentNodeList = deepClone(this.currentList)
-            //     const updateList = []
-            //     this.currentList = []
-            //     this.allFieldList = []
-            //     // 修改显示隐藏的数据
-            //     this.nodeList.forEach(item => {
-            //         // 过滤显示数据
-            //         if (['RUNNING', 'SUSPEND', 'FAILED', 'SUCCESS'].includes(item.status)) {
-            //             updateList.push(item)
-            //         }
-            //         this.allFieldList = this.allFieldList.concat(item.fields)
-            //     })
-            //     if (diffNode) {
-            //         // 刷新某个步骤，避免用户填写时突然刷新打断，新旧节点 diff，如果状态未当前节点状态未更新，不应该刷新
-            //         updateList.forEach(newNode => {
-            //             const oldNode = oldCurrentNodeList.find(old => old.state_id === newNode.state_id)
-            //             if (this.isSameStatusNode(newNode, oldNode) && oldNode.status === 'RUNNING') {
-            //                 this.currentList.push(oldNode)
-            //             } else {
-            //                 this.currentList.push(newNode)
-            //             }
-            //         })
-            //     } else {
-            //         this.currentList = updateList
-            //     }
-
-            //     // 隐藏字段显示隐藏判断逻辑
-            //     this.allFieldList.forEach(item => {
-            //         this.$set(item, 'showFeild', !!item.show_type)
-            //         this.$set(item, 'val', (item.value || ''))
-            //     })
-            //     // 关联数据展示的逻辑处理
-            //     this.allFieldList.forEach(item => {
-            //         this.conditionField(item, this.allFieldList)
-            //     })
-            //     this.currentList.forEach((item, index) => {
-            //         if (item.fields && item.fields.length) {
-            //             item.fields.forEach(node => {
-            //                 this.$set(node, 'service', this.basicInfomation.service_type)
-            //                 if (node.key === 'current_status') {
-            //                     this.$set(node, 'ticket_status', this.basicInfomation.current_status)
-            //                 }
-            //             })
-            //             this.isNecessaryToWatch(item, '', this.refreshComp)
-            //         }
-            //         if (item.type === 'SIGN' && !item.is_sequential) {
-            //             const finishedList = item.tasks.filter(task => task.status === 'FINISHED')
-            //             item.tasks = item.tasks.filter(task => finishedList.findIndex(finished => finished.processor === task.processor) === -1)
-            //             item.tasks = [...finishedList, ...item.tasks]
-            //         }
-            //         this.$nextTick(() => {
-            //             let processorsSpanWidth = 200
-            //             if (this.$refs['processorsSpan' + index]) {
-            //                 processorsSpanWidth = this.$refs['processorsSpan' + index].offsetWidth > 500 ? 500 : this.$refs['processorsSpan' + index].offsetWidth
-            //             }
-            //             this.$set(item, 'processorsSpanWidth', processorsSpanWidth)
-            //         })
-            //     })
-            //     this.$emit('updateStepNodeNumber', this.currentList.length)
-            // },
-            // 获取所有组
             getAllGroups() {
                 const params = 'is_processor=true';
                 this.$store.dispatch('deployCommon/getUser', { params }).then((res) => {

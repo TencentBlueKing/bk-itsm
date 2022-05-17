@@ -286,7 +286,7 @@
             },
             // 保存修改，新增
             submitUser() {
-                this.$refs.dynamicForm.validate().then((validator) => {
+                this.$refs.dynamicForm.validate().then(() => {
                     if (this.formData.staffInputValue.length === 0) {
                         this.$bkMessage({
                             message: this.$t('m.user["人员不能为空！"]'),
@@ -315,7 +315,7 @@
                 };
                 params.members = this.formData.staffInputValue.join(',');
                 params.owners = this.formData.ownersInputValue.join(',');
-                this.$store.dispatch('user/submit', params).then((res) => {
+                this.$store.dispatch('user/submit', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.user[\'新增成功\']'),
                         theme: 'success',
@@ -342,7 +342,7 @@
                 };
                 params.members = this.formData.staffInputValue.join(',');
                 params.owners = this.formData.ownersInputValue.join(',');
-                this.$store.dispatch('user/update', params).then((res) => {
+                this.$store.dispatch('user/update', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.user[\'保存成功\']'),
                         theme: 'success',
@@ -420,7 +420,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('user/delete', id).then((res) => {
+                        this.$store.dispatch('user/delete', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.user["删除成功"]'),
                                 theme: 'success',

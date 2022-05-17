@@ -205,16 +205,16 @@
                 }
                 this.jsonCheckIndex = index;
             },
-            editorInitAfter(val) {
+            editorInitAfter() {
                 // ...
             },
-            importEditorInitAfter(val) {
+            importEditorInitAfter() {
                 // ...
             },
-            importChange(val) {
+            importChange() {
                 // ...
             },
-            blur(content, $editor, $fn) {
+            blur(content) {
                 this.responseDetailConfig.value = content;
             },
             // 新增Body
@@ -266,7 +266,7 @@
             },
             recordParent(tree, parentInfo) {
                 tree.parentInfo = parentInfo;
-                if (tree.children == null || (tree.children && !tree.children.length)) {
+                if (tree.children === null || (tree.children && !tree.children.length)) {
                     return;
                 }
                 tree.children.forEach((item) => {

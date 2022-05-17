@@ -444,7 +444,7 @@
                         const { name } = this.templateList.find(template => template.id === this.tempalteId);
                         params.name = name;
 
-                        this.$store.dispatch('change/updateTemplate', { params, id }).then((res) => {
+                        this.$store.dispatch('change/updateTemplate', { params, id }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.common["模板更新成功"]'),
                                 theme: 'success',
@@ -475,9 +475,9 @@
                 if (this.submitting) {
                     return false;
                 }
-                this.$refs.templateForm.validate().then((validator) => {
+                this.$refs.templateForm.validate().then(() => {
                     this.submitting = true;
-                    this.$store.dispatch('change/submitTemplate', params).then((res) => {
+                    this.$store.dispatch('change/submitTemplate', params).then(() => {
                         this.getTemplateList();
                         this.$bkMessage({
                             message: this.$t('m.common["保存成功"]'),

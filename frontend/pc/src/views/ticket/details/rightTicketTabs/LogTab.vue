@@ -23,36 +23,62 @@
 <template>
     <div class="log-list" v-bkloading="{ isLoading: loading }">
         <div class="ticket-process-content">
-            <div class="ticket-process"><i class="bk-itsm-icon icon-basic-info" @click="viewProcess">  {{ $t(`m["查看完整流程"]`) }}</i></div>
+            <div class="ticket-process">
+                <i class="bk-itsm-icon icon-basic-info" @click="viewProcess">
+                    {{ $t(`m["查看完整流程"]`) }}</i
+                >
+            </div>
             <bk-timeline
                 data-test-id="ticket_timeline_viewLog"
                 ext-cls="log-time-line"
                 :list="list"
-                @select="handleSelect"></bk-timeline>
+                @select="handleSelect"
+            ></bk-timeline>
             <div v-if="isShowComment" class="process-detail">
                 <div class="process-content">
-                    <img :src="imgUrl" alt="单据结束">
-                    <template v-if="!ticketInfo.is_commented && ticketInfo.comment_id !== '-1'">
+                    <img :src="imgUrl" alt="单据结束" />
+                    <template
+                        v-if="
+                            !ticketInfo.is_commented &&
+                                ticketInfo.comment_id !== '-1'
+                        "
+                    >
                         <p>{{ $t(`m["当前流程已结束，快去评价吧"]`) }}</p>
-                        <span class="appraise" @click="$emit('ticketFinishAppraise')">{{ $t(`m["去评价"]`) }}</span>
+                        <span
+                            class="appraise"
+                            @click="$emit('ticketFinishAppraise')"
+                        >{{ $t(`m["去评价"]`) }}</span
+                        >
                     </template>
-                    <div v-else>{{ $t(`m["已完成评价"]`) }}
+                    <div v-else>
+                        {{ $t(`m["已完成评价"]`) }}
                         <div class="comment-content">
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["星级"]`) }}:</span>
-                                <bk-rate style="margin-top: 3px" :rate="commentInfo.stars" :edit="false"></bk-rate>
+                                <bk-rate
+                                    style="margin-top: 3px"
+                                    :rate="commentInfo.stars"
+                                    :edit="false"
+                                ></bk-rate>
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价人"]`) }}:</span>
-                                <p>{{commentInfo.creator || '--'}}</p>
+                                <p>{{ commentInfo.creator || "--" }}</p>
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价时间"]`) }}:</span>
-                                <p>{{commentInfo.create_at || '--'}}</p>
+                                <p>{{ commentInfo.create_at || "--" }}</p>
                             </div>
                             <div class="comment-content-item">
                                 <span>{{ $t(`m["评价内容"]`) }}:</span>
-                                <p>{{commentInfo.comments || $t('m.newCommon["这个朋友很懒，什么也没留下"]')}}</p>
+                                <p>
+                                    {{
+                                        commentInfo.comments ||
+                                            $t(
+                                                'm.newCommon["这个朋友很懒，什么也没留下"]'
+                                            )
+                                    }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -63,9 +89,12 @@
         <ticket-log-detail
             :log-info.sync="dispalyLogInfo"
             :show="!!dispalyLogInfo"
-            @close="() => {
-                dispalyLogInfo = null
-            }">
+            @close="
+                () => {
+                    dispalyLogInfo = null;
+                }
+            "
+        >
         </ticket-log-detail>
     </div>
 </template>
@@ -99,7 +128,10 @@
         },
         computed: {
             isShowComment() {
-                return this.ticketInfo.is_over && Number(this.ticketInfo.comment_id) !== -1;
+                return (
+                    this.ticketInfo.is_over
+                    && Number(this.ticketInfo.comment_id) !== -1
+                );
             },
             ...mapState({
                 nodeList: state => state.deployOrder.nodeList,
@@ -133,23 +165,25 @@
                 if (this.$route.query.token) {
                     params.token = this.$route.query.token;
                 }
-                this.$store.dispatch('change/getLog', params).then((res) => {
-                    this.list = [];
-                    res.data.forEach((item) => {
-                        const line = {};
-                        line.content = item.message;
-                        line.tag = item.operate_at;
-                        if (item.message !== this.flowStartText) {
-                            // item.content = item.message
-                            // item.tag = item.operate_at
-                            item.content = item.operate_at;
-                            item.tag = item.message;
-                            item.type = 'primary';
-                            item.showMore = false;
-                            this.list.push(JSON.parse(JSON.stringify(item)));
-                        }
-                    });
-                })
+                this.$store
+                    .dispatch('change/getLog', params)
+                    .then((res) => {
+                        this.list = [];
+                        res.data.forEach((item) => {
+                            const line = {};
+                            line.content = item.message;
+                            line.tag = item.operate_at;
+                            if (item.message !== this.flowStartText) {
+                                // item.content = item.message
+                                // item.tag = item.operate_at
+                                item.content = item.operate_at;
+                                item.tag = item.message;
+                                item.type = 'primary';
+                                item.showMore = false;
+                                this.list.push(JSON.parse(JSON.stringify(item)));
+                            }
+                        });
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -168,13 +202,17 @@
                         from_state_name: item.name || '',
                         from_state_type: '',
                         id: -1,
-                        message: `${this.$t('m["正在进行中"]')}  ${item.processors}`,
+                        message: `${this.$t('m["正在进行中"]')}  ${
+                            item.processors
+                        }`,
                         operate_at: item.update_at,
                         operator: item.processors,
                         processors: '',
                         processors_type: '',
                         showMore: false,
-                        tag: `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}` || '--',
+                        tag:
+                            `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}`
+                            || '--',
                         ticket: this.ticketInfo.id,
                         ticket_id: this.ticketInfo.id,
                         type: 'primary',
@@ -186,11 +224,13 @@
             },
             getTicktComment() {
                 if (!this.ticketInfo.is_over || !this.isShowComment) return;
-                this.$store.dispatch('ticket/getTicktComment', this.ticketInfo.comment_id).then((res) => {
-                    if (Object.keys(res.data).length !== 0) {
-                        this.commentInfo = res.data;
-                    }
-                });
+                this.$store
+                    .dispatch('ticket/getTicktComment', this.ticketInfo.comment_id)
+                    .then((res) => {
+                        if (Object.keys(res.data).length !== 0) {
+                            this.commentInfo = res.data;
+                        }
+                    });
             },
             handleSelect(item) {
                 const copyItem = JSON.parse(JSON.stringify(item));
@@ -211,15 +251,14 @@
     };
 </script>
 
-<style lang='scss' scoped>
-@import '../../../../scss/mixins/scroller.scss';
+<style lang="scss" scoped>
+@import "../../../../scss/mixins/scroller.scss";
 .ticket-process {
     margin-left: -5px;
     cursor: pointer;
     padding: 0px 0px 10px;
     font-size: 12px;
     color: #3a84ff;
-
 }
 .log-list {
     width: 100%;

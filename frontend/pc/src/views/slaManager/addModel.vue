@@ -518,7 +518,7 @@
             },
             // 添加时段弹窗按钮
             TimeFrameComfirm() {
-                this.$refs.dialogForm.validate().then((validator) => {
+                this.$refs.dialogForm.validate().then(() => {
                     const temp = {
                         name: this.tempTime.info.name,
                         changStatus: false,
@@ -562,9 +562,9 @@
             },
             // 保存服务模式
             saveSchedule() {
-                this.$refs.dynamicForm.validate().then((validator) => {
+                this.$refs.dynamicForm.validate().then(() => {
                     if (this.formInfo.holidays.length) {
-                        this.$refs.timeOutForm.validate().then((validator) => {
+                        this.$refs.timeOutForm.validate().then(() => {
                             if (this.isEdit) {
                                 this.$bkInfo({
                                     type: 'warning',
@@ -577,12 +577,12 @@
                             } else {
                                 this.ajaxSubmit();
                             }
-                        }, (validator) => {
+                        }, () => {
                         });
                     } else {
                         this.ajaxSubmit();
                     }
-                }, (validator) => {
+                }, () => {
                 });
             },
             ajaxSubmit() {
@@ -641,7 +641,7 @@
                 }
                 if (!this.isEdit) {
                     params.project_key = this.$store.state.project.id;
-                    this.$store.dispatch('sla/saveSchedule', params).then((res) => {
+                    this.$store.dispatch('sla/saveSchedule', params).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.slaContent["提交成功！"]'),
                             theme: 'success',
@@ -651,7 +651,7 @@
                         errorHandler(res, this);
                     });
                 } else {
-                    this.$store.dispatch('sla/updateSchedule', params).then((res) => {
+                    this.$store.dispatch('sla/updateSchedule', params).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.slaContent["修改成功！"]'),
                             theme: 'success',

@@ -754,7 +754,7 @@
                 this.formInfo.show_conditions = assignValue.show_conditions || {};
                 if (this.formInfo.type === 'CUSTOMTABLE') {
                     this.customTableInfo.list = [];
-                    if (assignValue.meta.hasOwnProperty('columns')) {
+                    if (Object.prototype.hasOwnProperty.call(assignValue.meta, 'columns')) {
                         assignValue.meta.columns.forEach((node) => {
                             const valChoice = [];
                             node.choice.forEach((vaule) => {
@@ -822,7 +822,7 @@
                 this.formInfo.regex_config.rule.expressions.splice(index, 1);
             },
             // 改变字段类型，需要进行操作
-            async changeType(val) {
+            async changeType() {
                 // 改变字段类型，清空正则规则表达式
                 this.formInfo.regex = 'EMPTY';
                 this.formInfo.customRegex = '';
@@ -992,7 +992,7 @@
                     if (this.changeInfo.project_key) {
                         params.project_key = this.changeInfo.project_key;
                     }
-                    this.$store.dispatch(url, { params, id }).then((res) => {
+                    this.$store.dispatch(url, { params, id }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["修改成功"]'),
                             theme: 'success',
@@ -1073,7 +1073,7 @@
             },
             // 字段校验
             checkInfo() {
-                this.$refs.fieldForm.validate().then((validator) => {
+                this.$refs.fieldForm.validate().then(() => {
                     // 数据源校验
                     if (this.$refs.dataSource && this.$refs.dataSource.checkSouce()) {
                         return;

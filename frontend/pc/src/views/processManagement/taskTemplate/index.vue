@@ -303,7 +303,7 @@
                 this.$bkInfo({
                     title: this.$t('m.taskTemplate["确定克隆该模板？"]'),
                     confirmFn: () => {
-                        this.$store.dispatch('taskTemplate/cloneTemplate', item.id).then((res) => {
+                        this.$store.dispatch('taskTemplate/cloneTemplate', item.id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.taskTemplate[\'克隆成功\']'),
                                 theme: 'success',
@@ -337,7 +337,7 @@
                     title: '确认删除数据？',
                     subTitle: '数据如果被删除，此数据在流程中不可用。',
                     confirmFn: () => {
-                        this.$store.dispatch('taskTemplate/deleteTemplate', item.id).then((res) => {
+                        this.$store.dispatch('taskTemplate/deleteTemplate', item.id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig[\'删除成功\']'),
                                 theme: 'success',
@@ -372,7 +372,8 @@
                     this.applyForPermission(['task_template_create'], [], {});
                     return;
                 }
-                this.firstStepInfo.name = this.firstStepInfo.desc = '';
+                this.firstStepInfo.desc = '';
+                this.firstStepInfo.name = this.firstStepInfo.desc;
                 this.firstStepInfo.ownersInputValue = [];
                 this.addDialogInfo.isShow = true;
             },

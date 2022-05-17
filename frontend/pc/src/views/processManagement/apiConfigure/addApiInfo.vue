@@ -245,7 +245,7 @@
             },
             // 添加
             submitAdd() {
-                this.$refs.addApiForm.validate().then((validator) => {
+                this.$refs.addApiForm.validate().then(() => {
                     this.addHandel();
                 }, (validator) => {
                     console.warn(validator);
@@ -276,7 +276,7 @@
                     req_body: {},
                 };
                 this.secondClick = true;
-                this.$store.dispatch('apiRemote/post_remote_api', params).then((res) => {
+                this.$store.dispatch('apiRemote/post_remote_api', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["添加成功"]'),
                         theme: 'success',
@@ -294,7 +294,7 @@
             switchChange(isActivated) {
                 this.directory.formInfo.is_activated = isActivated;
             },
-            changeMethod(path, option) {
+            changeMethod(path) {
                 const dataItem = this.pathList.filter(item => item.path === path)[0];
                 this.directory.formInfo.type = dataItem.method;
                 this.directory.formInfo.func_name = dataItem.func_name;
@@ -302,7 +302,7 @@
                 this.directory.formInfo.version = dataItem.version || 'v1';
                 this.directory.formInfo.category = dataItem.category;
             },
-            changeCode(id, ption) {
+            changeCode(id) {
                 // 切换 清空
                 this.directory.formInfo = {
                     name: '',
@@ -325,7 +325,7 @@
             dropdownHide() {
                 this.isDropdownShow = false;
             },
-            requestHandler(requestway, requestwayIndex) {
+            requestHandler(requestway) {
                 this.directory.formInfo.type = requestway.name;
                 this.$refs.requestwayDrop.hide();
             },

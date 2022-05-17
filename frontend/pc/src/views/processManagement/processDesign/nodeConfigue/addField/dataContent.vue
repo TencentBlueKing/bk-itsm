@@ -298,7 +298,7 @@
                     // 过滤
                     const necessaryVariableQuery = this.$refs.getParam.paramTableData.filter(ite => ite.is_necessary);
                     // 提示 标红
-                    necessaryVariableQuery.forEach((item, index) => {
+                    necessaryVariableQuery.forEach((item) => {
                         item.isCheck = true;
                         item.isSatisfied = item.source_type === 'CUSTOM' ? !!item.value : !!item.value_key;
                     });
@@ -322,7 +322,7 @@
                     // 过滤
                     const necessaryVariableBody = this.$refs.postParam.bodyTableData.filter(ite => ite.is_necessary && (ite.type !== 'object' && ite.type !== 'array'));
                     // 提示 标红 验证
-                    necessaryVariableBody.forEach((item, index) => {
+                    necessaryVariableBody.forEach((item) => {
                         item.isCheck = true;
                         item.isSatisfied = item.source_type === 'CUSTOM' ? item.value.toString() : !!item.value_key;
                     });

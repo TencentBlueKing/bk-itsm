@@ -262,7 +262,7 @@
             reloadCurPage() {
                 this.routerKey = +new Date();
             },
-            edit(item) {
+            edit() {
                 this.fields.forEach((ite) => {
                     ite.isEdit = false;
                 });

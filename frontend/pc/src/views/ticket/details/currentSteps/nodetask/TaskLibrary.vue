@@ -226,7 +226,7 @@
                     params.tasks.push(taskParams);
                 });
                 this.btnLoading = true;
-                this.$store.dispatch('taskFlow/createTask', { params }).then((res) => {
+                this.$store.dispatch('taskFlow/createTask', { params }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'新建任务成功\']'),
                         theme: 'success',
@@ -252,7 +252,7 @@
             },
             handleDeleteTaskLib(option) {
                 const { id } = option;
-                this.$store.dispatch('taskFlow/deleteLibrary', id).then((res) => {
+                this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["删除成功"]'),
                         theme: 'success',

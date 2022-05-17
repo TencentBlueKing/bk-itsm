@@ -245,7 +245,7 @@
         },
         computed: {},
         watch: {
-            apiDetailInfo(newVal, oldVal) {
+            apiDetailInfo() {
                 this.initDate();
             },
         },
@@ -275,7 +275,7 @@
                 this.bodyTableDataChange();
                 this.responseTableDataChange();
             },
-            editorInitAfter(val) {
+            editorInitAfter() {
                 // ...
             },
             changeState(item) {

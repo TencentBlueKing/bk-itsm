@@ -342,7 +342,7 @@
                     inputs,
                     state_id: this.nodeInfo.state_id,
                 };
-                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.basicInfomation.id }).then((res) => {
+                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.basicInfomation.id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["提交成功"]'),
                         theme: 'success',
@@ -366,7 +366,7 @@
                     state_id: this.nodeInfo.state_id,
                     is_direct: !fillParam,
                 };
-                this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.basicInfomation.id }).then((res) => {
+                this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.basicInfomation.id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["提交成功"]'),
                         theme: 'success',

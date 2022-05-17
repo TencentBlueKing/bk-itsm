@@ -160,7 +160,7 @@
             reqChangBlur(val) {
                 this.reqDataProcess.value = val;
             },
-            editorInitAfter(val) {
+            editorInitAfter() {
             },
             async updateApi() {
                 if (this.secondClick || !this.apiDetailInfoCommon.treeDataList || !this.apiDetailInfoCommon.responseTreeDataList) {
@@ -193,7 +193,7 @@
                 params.map_code = this.dataProcess.value;
                 params.before_req = this.reqDataProcess.value;
                 this.secondClick = true;
-                await this.$store.dispatch('apiRemote/put_remote_api', params).then((res) => {
+                await this.$store.dispatch('apiRemote/put_remote_api', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["更新成功"]'),
                         theme: 'success',

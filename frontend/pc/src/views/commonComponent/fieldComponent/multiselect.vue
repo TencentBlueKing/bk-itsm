@@ -80,7 +80,7 @@
             };
         },
         watch: {
-            'item.val'(newVal, oldVal) {
+            'item.val'() {
                 this.selectedItems = this.item.val === '' ? [] : this.item.val.split(',');
                 this.conditionField(this.item, this.fields);
             },
@@ -102,7 +102,8 @@
         },
         methods: {
             async getOption() {
-                this.options = this.item.choice = await this.getFieldOptions(this.item);
+                this.item.choice = await this.getFieldOptions(this.item);
+                this.options = this.item.choice;
             },
             selected(ids) {
                 this.item.val = ids.join(',');
@@ -110,7 +111,8 @@
                     this.item.related_fields.be_relied.forEach((ite) => {
                         this.fields.forEach((it) => {
                             if (ite === it.key) {
-                                it.val = it.value = '';
+                                it.value = '';
+                                it.val = it.value;
                             }
                         });
                     });

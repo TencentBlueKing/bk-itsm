@@ -204,7 +204,7 @@
         },
         methods: {
             // 提交
-            onSubmit(type) {
+            onSubmit() {
                 if (this.picked === 'One') {
                     this.postEvaluation();
                 } else if (this.picked === 'Two') {
@@ -242,7 +242,7 @@
                 const id = this.ticketInfo.comment_id;
 
                 this.$emit('beforeSubmit');
-                this.$store.dispatch('evaluation/postEvaluation', { params, id }).then((res) => {
+                this.$store.dispatch('evaluation/postEvaluation', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["评价成功"]'),
                         theme: 'success',
@@ -337,14 +337,14 @@
                 }
 
                 this.$emit('beforeSubmit');
-                this.$store.dispatch(url, { params, id }).then((res) => {
+                this.$store.dispatch(url, { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["发送成功"]'),
                         theme: 'success',
                     });
                     this.$emit('submitSuccess');
                 })
-                    .catch((res) => {
+                    .catch(() => {
                         errorHandler(this);
                     })
                     .finally(() => {

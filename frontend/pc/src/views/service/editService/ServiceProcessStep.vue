@@ -196,7 +196,7 @@
             saveProcess() {
                 const id = this.processId;
                 const params = [];
-                return this.$store.dispatch('cdeploy/submitChart', { params, id }).then((res) => {
+                return this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',

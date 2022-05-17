@@ -416,7 +416,7 @@
                     return;
                 }
                 this.clickSecond = true;
-                this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
+                this.$store.dispatch('deployCommon/updateNode', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',
@@ -482,7 +482,7 @@
                     });
             },
             // 选择api接口
-            async changeMethod(valueId, option) {
+            async changeMethod(valueId) {
                 this.lineInfo = {
                     // 关系模板
                     template: '',
@@ -538,7 +538,7 @@
                 this.apiDetail = await Object.assign({}, valueOption);
             },
             // 选择接口系统
-            changeCode(value, option) {
+            changeCode(value) {
                 this.formInfo.api_info.remote_api_id = '';
                 this.formInfo.api_info.req_params = {};
                 this.formInfo.api_info.req_body = {};
@@ -622,7 +622,7 @@
                     // 过滤
                     const necessaryVariableQuery = this.$refs.getParam.paramTableData.filter(ite => ite.is_necessary);
                     // 提示 标红
-                    necessaryVariableQuery.forEach((item, index) => {
+                    necessaryVariableQuery.forEach((item) => {
                         item.isCheck = true;
                         item.isSatisfied = item.source_type === 'CUSTOM' ? !!item.value : !!item.value_key;
                     });
@@ -646,7 +646,7 @@
                     // 过滤
                     const necessaryVariableBody = this.$refs.postParam.bodyTableData.filter(ite => ite.is_necessary && (ite.type !== 'object' && ite.type !== 'array'));
                     // 提示 标红 验证
-                    necessaryVariableBody.forEach((item, index) => {
+                    necessaryVariableBody.forEach((item) => {
                         item.isCheck = true;
                         item.isSatisfied = item.source_type === 'CUSTOM' ? item.value.toString() : !!item.value_key;
                     });
@@ -691,7 +691,7 @@
                         theme: 'warning',
                     });
                     // 标红
-                    selectKeyList.forEach((item, index) => {
+                    selectKeyList.forEach((item) => {
                         item.isCheck = true;
                         item.isSatisfied = item.isSelectedValue;
                     });

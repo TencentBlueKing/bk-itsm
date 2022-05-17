@@ -26,35 +26,48 @@
         <div class="bk-ticket-content">
             <bk-radio-group v-model="typeSelected" @change="clearFieldList">
                 <template v-for="radio in typeSelectRadio">
-                    <bk-radio :value="radio.key" :key="radio.key" class="mr20">{{radio.name}}</bk-radio>
+                    <bk-radio
+                        :value="radio.key"
+                        :key="radio.key"
+                        class="mr20"
+                    >{{ radio.name }}</bk-radio
+                    >
                 </template>
             </bk-radio-group>
         </div>
         <template v-if="typeSelected === 'associate'">
-            <p class="bk-ticket-title">{{ $t('m.manageCommon["可关联的列表"]') }}</p>
+            <p class="bk-ticket-title">
+                {{ $t('m.manageCommon["可关联的列表"]') }}
+            </p>
             <div class="bk-ticket-content">
                 <div class="bk-content-search">
-                    <bk-select style="width: 200px; float: left; margin-right: 10px;"
+                    <bk-select
+                        style="width: 200px; float: left; margin-right: 10px"
                         searchable
                         :font-size="'medium'"
                         multiple
                         :placeholder="$t(`m.serviceConfig['服务类型']`)"
                         v-model="searchInfo.serviceType"
                         @toggle="serviceSearch"
-                        @clear="clearSearch">
-                        <bk-option v-for="option in serviceTypeList"
+                        @clear="clearSearch"
+                    >
+                        <bk-option
+                            v-for="option in serviceTypeList"
                             :key="option.key"
                             :id="option.key"
-                            :name="option.name">
+                            :name="option.name"
+                        >
                         </bk-option>
                     </bk-select>
-                    <bk-input style="width: 200px; float: left;"
+                    <bk-input
+                        style="width: 200px; float: left"
                         :placeholder="$t(`m.manageCommon['请输入标题/单号']`)"
                         :clearable="true"
                         :right-icon="'bk-icon icon-search'"
                         v-model="searchInfo.keyword"
                         @enter="getList"
-                        @clear="clearInfo">
+                        @clear="clearInfo"
+                    >
                     </bk-input>
                 </div>
                 <bk-table
@@ -65,85 +78,122 @@
                     @page-change="handlePageChange"
                     @page-limit-change="handlePageLimitChange"
                     @select-all="handleSelectAll"
-                    @select="handleSelect">
-                    <bk-table-column type="selection"
+                    @select="handleSelect"
+                >
+                    <bk-table-column
+                        type="selection"
                         width="60"
                         align="center"
-                        :selectable="disabledFn">
+                        :selectable="disabledFn"
+                    >
                     </bk-table-column>
-                    <bk-table-column type="index" label="No." align="center" width="60"></bk-table-column>
-                    <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
+                    <bk-table-column
+                        type="index"
+                        label="No."
+                        align="center"
+                        width="60"
+                    ></bk-table-column>
+                    <bk-table-column
+                        :label="$t(`m.newCommon['单号']`)"
+                        min-width="140"
+                    >
                         <template slot-scope="props">
-                            <span class="bk-lable-primary" @click="checkOne(props.row)" :title="props.row.sn">
-                                {{props.row.sn}}
+                            <span
+                                class="bk-lable-primary"
+                                @click="checkOne(props.row)"
+                                :title="props.row.sn"
+                            >
+                                {{ props.row.sn }}
                             </span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.manageCommon['标题']`)" min-width="120">
+                    <bk-table-column
+                        :label="$t(`m.manageCommon['标题']`)"
+                        min-width="120"
+                    >
                         <template slot-scope="props">
                             <span :title="props.row.title">
-                                {{props.row.title || '--'}}
+                                {{ props.row.title || "--" }}
                             </span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.manageCommon['提单人']`)" prop="creator"></bk-table-column>
-                    <bk-table-column :label="$t(`m.manageCommon['提单时间']`)" prop="create_at"></bk-table-column>
-                    <bk-table-column :label="$t(`m.manageCommon['状态']`)" min-width="120">
+                    <bk-table-column
+                        :label="$t(`m.manageCommon['提单人']`)"
+                        prop="creator"
+                    ></bk-table-column>
+                    <bk-table-column
+                        :label="$t(`m.manageCommon['提单时间']`)"
+                        prop="create_at"
+                    ></bk-table-column>
+                    <bk-table-column
+                        :label="$t(`m.manageCommon['状态']`)"
+                        min-width="120"
+                    >
                         <template slot-scope="props">
-                            <span :title="props.row.current_status_display"
+                            <span
+                                :title="props.row.current_status_display"
                                 class="bk-status-color-info"
-                                :style="getstatusColor(props.row)">
-                                {{props.row.current_status_display || '--'}}
+                                :style="getstatusColor(props.row)"
+                            >
+                                {{ props.row.current_status_display || "--" }}
                             </span>
                         </template>
                     </bk-table-column>
                 </bk-table>
             </div>
             <div class="bk-ticket-button">
-                <bk-button class="mr10"
+                <bk-button
+                    class="mr10"
                     theme="primary"
                     :loading="buttonDisabled"
                     :disabled="!checkList.length"
                     :title="$t(`m.treeinfo['提交']`)"
-                    @click="bindTicket">
+                    @click="bindTicket"
+                >
                     {{ $t('m.treeinfo["提交"]') }}
                 </bk-button>
                 <bk-button
                     theme="default"
                     :disabled="buttonDisabled"
                     :title="$t(`m.treeinfo['取消']`)"
-                    @click="closeOpen">
+                    @click="closeOpen"
+                >
                     {{ $t('m.treeinfo["取消"]') }}
                 </bk-button>
             </div>
         </template>
         <template v-else>
-            <select-service ref="SelectService"
+            <select-service
+                ref="SelectService"
                 :custom-id="customId"
                 :is-get-field="isGetField"
-                @getFieldList="getFieldList">
+                @getFieldList="getFieldList"
+            >
             </select-service>
             <div v-bkloading="{ isLoading: showField || !fieldList.length }">
-                <p class="bk-ticket-title mt20">{{ $t('m.manageCommon["单据信息"]') }}</p>
-                <div class="bk-ticket-content" style="min-height: 50px;">
-                    <field-info
-                        ref="fieldInfo"
-                        :fields="fieldList">
+                <p class="bk-ticket-title mt20">
+                    {{ $t('m.manageCommon["单据信息"]') }}
+                </p>
+                <div class="bk-ticket-content" style="min-height: 50px">
+                    <field-info ref="fieldInfo" :fields="fieldList">
                     </field-info>
                 </div>
                 <div class="mt20">
-                    <bk-button class="mr10"
+                    <bk-button
+                        class="mr10"
                         theme="primary"
                         :loading="buttonDisabled"
                         :title="$t(`m.treeinfo['提交']`)"
-                        @click="setFields">
+                        @click="setFields"
+                    >
                         {{ $t('m.treeinfo["提交"]') }}
                     </bk-button>
                     <bk-button
                         theme="default"
                         :disabled="buttonDisabled"
                         :title="$t(`m.treeinfo['取消']`)"
-                        @click="closeOpen">
+                        @click="closeOpen"
+                    >
                         {{ $t('m.treeinfo["取消"]') }}
                     </bk-button>
                 </div>
@@ -257,15 +307,17 @@
                     resUrl += `${key}=${params[key]}`;
                 }
                 this.isTableLoading = true;
-                this.$store.dispatch('change/getList', params).then((res) => {
-                    if (resUrl !== this.getUrlInfo) {
-                        return;
-                    }
-                    this.tabShowList = res.data.items;
-                    // 分页
-                    this.pagination.current = res.data.page;
-                    this.pagination.count = res.data.count;
-                })
+                this.$store
+                    .dispatch('change/getList', params)
+                    .then((res) => {
+                        if (resUrl !== this.getUrlInfo) {
+                            return;
+                        }
+                        this.tabShowList = res.data.items;
+                        // 分页
+                        this.pagination.current = res.data.page;
+                        this.pagination.count = res.data.count;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -286,24 +338,30 @@
             handleSelectAll(selection) {
                 this.checkList = selection;
             },
-            handleSelect(selection, row) {
+            handleSelect(selection) {
                 this.checkList = selection;
             },
             disabledFn(item) {
                 return !item.has_relationships;
             },
             getstatusColor(row) {
-                const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type && item.key === row.current_status);
-                return statusColor.length ? {
-                    color: statusColor[0].color_hex, border: `1px solid ${statusColor[0].color_hex}`,
-                } : { color: '#3c96ff', border: '1px solid #3c96ff' };
+                const statusColor = this.colorHexList.filter(item => item.service_type === row.service_type
+                    && item.key === row.current_status);
+                return statusColor.length
+                    ? {
+                        color: statusColor[0].color_hex,
+                        border: `1px solid ${statusColor[0].color_hex}`,
+                    }
+                    : { color: '#3c96ff', border: '1px solid #3c96ff' };
             },
             getTypeStatus() {
                 const params = {};
                 const type = '';
-                this.$store.dispatch('ticketStatus/getTypeStatus', { type, params }).then((res) => {
-                    this.colorHexList = res.data;
-                })
+                this.$store
+                    .dispatch('ticketStatus/getTypeStatus', { type, params })
+                    .then((res) => {
+                        this.colorHexList = res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -332,24 +390,36 @@
                 const params = {
                     service_id: this.$refs.SelectService.formData.service_id,
                 };
-                axios.all([
-                    this.$store.dispatch('change/getSubmitFields', params),
-                    this.$store.dispatch('change/getAllFields', this.ticketInfo.id),
-                ]).then(axios.spread((firstResp, allResp) => {
-                    firstResp.data.forEach((item) => {
-                        this.$set(item, 'val', '');
-                        item.type = item.type === 'CASCADE' ? 'SELECT' : item.type;
-                        this.$set(item, 'showFeild', true);
-                        this.$set(item, 'service', this.$refs.SelectService.formData.key);
-                        allResp.data.forEach((tempResItem) => {
-                            if (item.key === tempResItem.key) {
-                                item.val = tempResItem.value || '';
-                            }
+                axios
+                    .all([
+                        this.$store.dispatch('change/getSubmitFields', params),
+                        this.$store.dispatch(
+                            'change/getAllFields',
+                            this.ticketInfo.id
+                        ),
+                    ])
+                    .then(axios.spread((firstResp, allResp) => {
+                        firstResp.data.forEach((item) => {
+                            this.$set(item, 'val', '');
+                            item.type =                                item.type === 'CASCADE' ? 'SELECT' : item.type;
+                            this.$set(item, 'showFeild', true);
+                            this.$set(
+                                item,
+                                'service',
+                                this.$refs.SelectService.formData.key
+                            );
+                            allResp.data.forEach((tempResItem) => {
+                                if (item.key === tempResItem.key) {
+                                    item.val = tempResItem.value || '';
+                                }
+                            });
                         });
-                    });
-                    this.fieldList = firstResp.data;
-                    this.isNecessaryToWatch({ fields: this.fieldList }, 'submit');
-                }))
+                        this.fieldList = firstResp.data;
+                        this.isNecessaryToWatch(
+                            { fields: this.fieldList },
+                            'submit'
+                        );
+                    }))
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -385,15 +455,17 @@
                     });
                 });
                 this.buttonDisabled = true;
-                this.$store.dispatch('change/submit', formData).then((res) => {
-                    if (res.code === 'OK') {
-                        this.$bkMessage({
-                            message: this.$t('m.common["提交成功！"]'),
-                            theme: 'success',
-                        });
-                        this.$emit('submitSuccess');
-                    }
-                })
+                this.$store
+                    .dispatch('change/submit', formData)
+                    .then((res) => {
+                        if (res.code === 'OK') {
+                            this.$bkMessage({
+                                message: this.$t('m.common["提交成功！"]'),
+                                theme: 'success',
+                            });
+                            this.$emit('submitSuccess');
+                        }
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -411,12 +483,14 @@
                     from_ticket: this.ticketInfo.id,
                     to_tickets: tempList,
                 };
-                this.$store.dispatch('change/bindTicket', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.manageCommon["关联成功"]'),
-                        theme: 'success',
-                    });
-                })
+                this.$store
+                    .dispatch('change/bindTicket', params)
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.manageCommon["关联成功"]'),
+                            theme: 'success',
+                        });
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -430,35 +504,35 @@
 </script>
 
 <style scoped lang="scss">
-    @import '../../../../../scss/mixins/clearfix.scss';
-    @import '../../../../../scss/mixins/scroller.scss';
-    .bk-ticket-title {
-        font-weight: bold;
-        font-size: 14px;
-        color: #666;
-        line-height: 30px;
-    }
-    .bk-ticket-content {
-        margin-bottom: 20px;
-        position: relative;
-    }
-    .bk-status-color-info {
-        margin-top: 3px;
-        padding: 0 6px;
-        display: inline-block;
-        text-align: center;
-        color: #3c96ff;
-        border-radius: 2px;
-        border: 1px solid #3c96ff;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        height: 22px;
-        line-height: 20px;
-    }
-    .bk-content-search {
-        position: absolute;
-        top: -40px;
-        right: 0;
-    }
+@import "../../../../../scss/mixins/clearfix.scss";
+@import "../../../../../scss/mixins/scroller.scss";
+.bk-ticket-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #666;
+    line-height: 30px;
+}
+.bk-ticket-content {
+    margin-bottom: 20px;
+    position: relative;
+}
+.bk-status-color-info {
+    margin-top: 3px;
+    padding: 0 6px;
+    display: inline-block;
+    text-align: center;
+    color: #3c96ff;
+    border-radius: 2px;
+    border: 1px solid #3c96ff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 22px;
+    line-height: 20px;
+}
+.bk-content-search {
+    position: absolute;
+    top: -40px;
+    right: 0;
+}
 </style>

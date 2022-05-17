@@ -215,7 +215,7 @@
                 }
             },
             // 修改信息/查看详情
-            changeLineInfo(item, index) {
+            changeLineInfo(item) {
                 if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const { projectInfo } = this.$store.state.project;
                     const resourceData = {
@@ -236,7 +236,7 @@
                 this.changeInfo.isShow = true;
             },
             // 删除
-            deleteModel(item, index) {
+            deleteModel(item) {
                 if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
                     const { projectInfo } = this.$store.state.project;
                     const resourceData = {
@@ -264,7 +264,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('sla/deleteSchedule', id).then((res) => {
+                        this.$store.dispatch('sla/deleteSchedule', id).then(() => {
                             this.getModelList();
                         })
                             .catch((res) => {

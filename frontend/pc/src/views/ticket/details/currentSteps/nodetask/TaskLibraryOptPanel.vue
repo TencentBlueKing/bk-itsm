@@ -141,7 +141,7 @@
                     service_id: this.ticketInfo.service_id,
                     tasks: this.taskList.map(item => item.id),
                 };
-                this.$store.dispatch('taskFlow/creatLibrary', params).then((res) => {
+                this.$store.dispatch('taskFlow/creatLibrary', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'任务库创建成功\']'),
                         theme: 'success',
@@ -158,7 +158,7 @@
                     tasks: this.taskList.map(item => item.id),
                 };
                 const id = this.formData.name;
-                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then((res) => {
+                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'更新成功\']'),
                         theme: 'success',

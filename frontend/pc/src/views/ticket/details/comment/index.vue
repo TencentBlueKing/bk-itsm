@@ -212,7 +212,7 @@
                     params.parent__id = this.curCommentId;
                     url = 'ticket/addTicketComment';
                 }
-                this.$store.dispatch(url, params).then((res) => {
+                this.$store.dispatch(url, params).then(() => {
                     this.refreshComment();
                     this.commentListDom.scrollTop = 0;
                 });
@@ -274,7 +274,7 @@
                     };
                     if (text) {
                         try {
-                            this.$store.dispatch('ticket/addTicketComment', params).then((res) => {
+                            this.$store.dispatch('ticket/addTicketComment', params).then(() => {
                                 this.replyCommnetId = '';
                                 this.refreshComment();
                                 this.commentListDom.scrollTop = 0;

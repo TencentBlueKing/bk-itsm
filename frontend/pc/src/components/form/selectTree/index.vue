@@ -93,7 +93,7 @@
             list() {
                 this.initData();
             },
-            value(val) {
+            value() {
                 this.initData();
             },
             loading() {

@@ -126,7 +126,7 @@
                 });
             },
             // 模糊搜索匹配值，有 dataList 时生效
-            fuzzySearchMethod(keyword, next) {
+            fuzzySearchMethod(keyword) {
                 const results = this.customUserList.filter((item) => {
                     const names = item.username + item.display_name;
                     return names.indexOf(keyword) > -1;

@@ -321,7 +321,7 @@
                     attention: !row.hasAttention,
                 };
                 let bkMessage = '';
-                this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
+                this.$store.dispatch('deployOrder/setAttention', { params, id }).then(() => {
                     if (row.hasAttention) {
                         row.hasAttention = false;
                         bkMessage = this.$t('m.manageCommon[\'取消关注成功~\']');
@@ -365,7 +365,7 @@
                     value: { fields: fieldIds, size },
                 });
             },
-            getRowStyle({ row, rowIndex }) {
+            getRowStyle({ row }) {
                 return `background-color: ${row.sla_color}`;
             },
         },

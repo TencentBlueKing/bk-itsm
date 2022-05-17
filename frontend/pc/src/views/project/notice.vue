@@ -198,7 +198,7 @@
             this.getNoticeList();
         },
         methods: {
-            changeNotice(item, index) {
+            changeNotice(item) {
                 this.acticeTab = item.id;
                 this.getNoticeList();
             },
@@ -246,7 +246,7 @@
                     });
             },
             submitNotice() {
-                Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then((res) => {
+                Promise.all([this.$refs.editorNotice.$refs.wechatForm.validate(), this.$refs.basicFrom.validate()]).then(() => {
                     const { title, message } = this.$refs.editorNotice.formInfo;
                     const params = {
                         title_template: title,
@@ -312,7 +312,7 @@
                     title: this.$t('m["确认要删除？"]'),
                     confirmLoading: true,
                     confirmFn: () => {
-                        this.$store.dispatch('project/deleteProjectNotice', row.id).then((res) => {
+                        this.$store.dispatch('project/deleteProjectNotice', row.id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m["删除成功"]'),
                                 theme: 'success',

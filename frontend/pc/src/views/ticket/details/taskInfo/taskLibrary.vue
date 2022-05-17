@@ -37,7 +37,10 @@
                             :id="option.id"
                             :name="option.name">
                             <span>{{option.name}}</span>
-                            <i class="bk-icon icon-close" style="font-size: 18px;" @click.stop="handleDeleteOption(option)"></i>
+                            <i class="bk-icon icon-close"
+                                style="font-size: 18px;"
+                                @click.stop="handleDeleteOption(option)">
+                            </i>
                         </bk-option>
                     </bk-select>
                 </div>
@@ -83,7 +86,9 @@
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['任务类型']`)">
                     <template slot-scope="props">
-                        <span>{{props.row.component_type === 'NORMAL' ? $t(`m.task['普通任务']`) : $t(`m.task['标准运维任务']`)}}</span>
+                        <span>
+                            {{props.row.component_type === 'NORMAL' ? $t(`m.task['普通任务']`) : $t(`m.task['标准运维任务']`)}}
+                        </span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.task['操作']`)" min-width="120">
@@ -201,11 +206,20 @@
         data() {
             return {
                 btnLoading: false,
-                excludeTypeList: ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION', 'IAM', 'STARTER_LEADER', 'API'],
+                excludeTypeList: [
+                    'OPEN',
+                    'STARTER',
+                    'BY_ASSIGNOR',
+                    'EMPTY',
+                    'VARIABLE',
+                    'CMDB',
+                    'ORGANIZATION',
+                    'IAM',
+                    'STARTER_LEADER',
+                    'API'],
                 formData: {
                     key: '',
                 },
-                excludeTypeList: ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION', 'IAM', 'STARTER_LEADER', 'API'],
                 libraryList: [],
                 // table数据
                 tableList: [],
@@ -243,7 +257,7 @@
             // 删除某个任务库
             handleDeleteOption(option) {
                 const { id } = option;
-                this.$store.dispatch('taskFlow/deleteLibrary', id).then((res) => {
+                this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
                     this.libraryList = this.libraryList.filter(item => item.id !== option.id);
                 })
                     .catch((res) => {
@@ -354,7 +368,7 @@
                     name: this.libraryList.filter(item => item.id === this.formData.key)[0].name,
                     tasks: this.tableList,
                 };
-                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then((res) => {
+                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'更新成功\']'),
                         theme: 'success',
@@ -382,13 +396,13 @@
                         order: node.order,
                         fields: {},
                     };
-                    node.fields.forEach((item, index) => {
+                    node.fields.forEach((item) => {
                         valueInfo.fields[item.key] = item.value;
                     });
                     params.tasks.push(valueInfo);
                 });
                 this.btnLoading = true;
-                this.$store.dispatch('taskFlow/createTask', params).then((res) => {
+                this.$store.dispatch('taskFlow/createTask', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.task[\'创建任务成功\']'),
                         theme: 'success',

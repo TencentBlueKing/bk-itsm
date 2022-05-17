@@ -233,7 +233,7 @@
             changeImport() {
                 this.itemInfo.referenceType = 'reference';
             },
-            changeMessagePanel(value, $event) {
+            changeMessagePanel(value) {
                 if (value && this.origin === 'message') {
                     this.$emit('change-panel-status');
                 }

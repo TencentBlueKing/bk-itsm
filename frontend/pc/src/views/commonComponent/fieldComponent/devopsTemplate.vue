@@ -249,7 +249,7 @@
                     this.pipelineVariableList = res.data.properties;
                     const { variables } = this.item.devopsContent;
                     res.data.properties.forEach((item) => {
-                        if (!variables.hasOwnProperty(item.id)) {
+                        if (!Object.prototype.hasOwnProperty.call(variables, item.id)) {
                             this.$set(variables, item.id, item.defaultValue || '');
                         }
                     });

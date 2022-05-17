@@ -26,7 +26,12 @@
         <div class="running-info" v-if="status === 'RUNNING'" v-bkloading="{ isLoading: taskStatusInfoLoading }">
             <i class="bk-itsm-icon icon-icon-loading"></i>
             <p class="run-info">{{ $t(`m.tickets['任务正在执行中，请稍等']`) }}</p>
-            <p class="run-time"> <span class="time-block">{{ $t(`m.tickets['已耗时：']`) }}{{ convertMStoString(taskStatusInfo.elapsed_time * 1000) }}</span> </p>
+            <p class="run-time">
+                <span class="time-block">
+                    {{ $t(`m.tickets['已耗时：']`) }}
+                    {{ convertMStoString(taskStatusInfo.elapsed_time * 1000) }}
+                </span>
+            </p>
         </div>
         <!-- 执行成功/执行失败 -->
         <div class="execut-info" v-else>
@@ -220,7 +225,11 @@
             // 构建状态信息
             getDevopsBuildStatus() {
                 this.buildStatusLoading = true;
-                const { project_id: projectId, sub_pipeline_id: pipelineId, sub_task_id: buildId } = this.taskStatusInfo;
+                const {
+                    project_id: projectId,
+                    sub_pipeline_id: pipelineId,
+                    sub_task_id: buildId,
+                } = this.taskStatusInfo;
                 const params = {
                     project_id: projectId,
                     pipeline_id: pipelineId,

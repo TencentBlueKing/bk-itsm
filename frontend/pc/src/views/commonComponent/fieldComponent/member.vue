@@ -82,7 +82,7 @@
                 this.conditionField(this.item, this.fields);
             },
             selectedItems: {
-                handler(newval, oldval) {
+                handler() {
                     this.item.val = this.selectedItems.join(',');
                 },
             },

@@ -61,8 +61,26 @@ module.exports = {
     },
     // add your custom rules here
     rules: {
+        // 避免搞混箭头函数符号 (=>) 和比较运算符 (<=, >=)
+        'no-confusing-arrow': 'off',
+        // 计算指数时，可以使用 ** 运算符
+        'no-restricted-properties': 'off',
+        // 在访问和使用对象的多个属性时使用对象解构
+        'prefer-destructuring': 'off',
+        // 在数组回调函数中使用 return 语句
+        'array-callback-return': 'off',
+        // 三元表达式不应该嵌套
+        'no-nested-ternary': 'off',
         'no-restricted-syntax': 'off',
         'no-param-reassign': 'off',
+        // 不强制使用驼峰
+        'camelcase': 'off',
+        'max-len': [0, 120],
+        'no-useless-escape': 'off',
+        // 可使用下滑线
+        'no-underscore-dangle': 'off',
+        // Use the rest parameters instead of 'arguments'
+        'prefer-rest-params': 'off',
         // https://eslint.org/docs/rules/brace-style
         // 'brace-style': ['error', '1tbs', {'allowSingleLine': false}],
 

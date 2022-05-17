@@ -644,7 +644,7 @@
                         return;
                     }
                     this.secondClick = true;
-                    this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
+                    this.$store.dispatch('deployCommon/updateNode', { params, id }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.treeinfo["保存成功"]'),
                             theme: 'success',
@@ -769,7 +769,7 @@
                 });
             },
             // 条件选择回调
-            selectCondition(val, condition, eIndex, gIndex) {
+            selectCondition(condition) {
                 this.changeCondition(condition);
                 // 不需要二次确认
                 // if (gIndex === 0 && eIndex === 0 && condition.meta.code === 'PROCESS_COUNT') {

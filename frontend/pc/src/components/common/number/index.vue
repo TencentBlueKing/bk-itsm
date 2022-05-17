@@ -132,11 +132,11 @@
                         return;
                     }
 
-                    let newVal = parseInt(value);
+                    // let newVal = parseInt(value);
 
-                    if (this.type === 'decimals') {
-                        newVal = Number(value);
-                    }
+                    // if (this.type === 'decimals') {
+                    //     newVal = Number(value);
+                    // }
 
                     this.currentValue = value;
                 },

@@ -260,7 +260,7 @@
                     .catch((res) => {
                         errorHandler(res, this);
                     })
-                    .finally((res) => {
+                    .finally(() => {
                         this.$parent.changeTemplateInfo(this.changedTemplateInfo);
                         this.initData();
                         this.buttonLoading = false;

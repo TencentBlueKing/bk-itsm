@@ -251,7 +251,7 @@
                 };
             },
             // 可以选中
-            canSelected(row, index) {
+            canSelected(row) {
                 return row.waiting_approve;
             },
             // 全选 半选

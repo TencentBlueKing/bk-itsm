@@ -163,14 +163,15 @@
                     }api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`);
                 }
             },
-            uploadErr(file, fileList) {
+            uploadErr() {
                 // ...
             },
             // 修改 附件优化 1031
-            uploadSuccess(file, fileList) {
+            uploadSuccess(fileList) {
                 this.datas = fileList;
                 this.uploadFileList = fileList;
-                this.item.val = this.item.value = '';
+                this.item.value = '';
+                this.item.val = this.item.value;
                 fileList.forEach((it) => {
                     if ((!it.errorMsg) && it.responseData.data) {
                         for (const key in it.responseData.data.succeed_files) {
@@ -188,13 +189,14 @@
                         };
                     });
                 }
-                this.item.val = this.item.value = JSON.stringify(this.tempObj);
+                this.item.value = JSON.stringify(this.tempObj);
+                this.item.val = this.item.value;
             },
             // 修改 附件优化 1031
-            uploadProgress(e, file, fileList) {
+            uploadProgress() {
                 this.$store.commit('changeFileStatus', true);
             },
-            uploadDone(fileList) {
+            uploadDone() {
                 this.$store.commit('changeFileStatus', false);
             },
             // 修改 附件优化 1031

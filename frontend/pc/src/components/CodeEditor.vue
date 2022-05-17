@@ -89,7 +89,7 @@
                     textareaEl.value = this.value;
                     this.$emit('input', textareaEl.value);
                 }
-                model.onDidChangeContent((event) => {
+                model.onDidChangeContent(() => {
                     const value = this.monacoInstance.getValue();
                     this.$emit('input', value);
                 });

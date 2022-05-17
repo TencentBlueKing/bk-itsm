@@ -214,7 +214,7 @@
                 const valueObject = Object.assign({}, optionObject);
                 this.$emit('changeApiInfo', valueObject);
             },
-            changeSource(val) {
+            changeSource() {
                 this.typeClass = this.formInfo.source_type === 'API' ? 'bk-threeline-item bk-halfline-margin' : 'bk-halfline-item bk-halfline-margin';
             },
             changeApiSystem(val) {

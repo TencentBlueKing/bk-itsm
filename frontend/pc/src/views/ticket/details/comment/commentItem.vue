@@ -121,7 +121,7 @@
                 return str.substr(0, 1).toLocaleUpperCase();
             },
             deleteComment(id) {
-                this.$store.dispatch('ticket/deleteTicketComment', id).then((res) => {
+                this.$store.dispatch('ticket/deleteTicketComment', id).then(() => {
                     this.$emit('refreshComment');
                     this.deleteCommentDialog = false;
                 });

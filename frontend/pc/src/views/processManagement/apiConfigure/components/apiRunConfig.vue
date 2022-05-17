@@ -208,7 +208,7 @@
                         this.secondClick = false;
                     });
             },
-            blur(content, $editor, $fn) {
+            blur(content) {
                 try {
                     this.bodyDetailConfig.value = JSON.stringify(JSON.parse(content), null, 4);
                 } catch (e) {

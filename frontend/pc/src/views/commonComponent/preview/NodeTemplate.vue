@@ -127,7 +127,7 @@
             moveFn() {
                 this.moveFlag = true;
             },
-            onNodeClick(node, event) {
+            onNodeClick(node) {
                 if (!this.moveFlag) {
                     // 对于开始，结束，网关，汇聚不弹出信息
                     if (node.type === 'START' || node.type === 'END' || node.type === 'ROUTER-P' || node.type === 'COVERAGE') {

@@ -229,7 +229,7 @@
                     });
                     this.$set(this.nodeInfo, `node_${item.id}`, item);
                 });
-                this.lineList.forEach((item, index) => {
+                this.lineList.forEach((item) => {
                     this.canvasData.lines.push({
                         source: {
                             arrow: item.axis.start || 'Right',
@@ -295,7 +295,7 @@
                 });
             },
             // 点击tool事件
-            onToolClick(tool) {
+            onToolClick() {
                 // ...
             },
             closeShow() {
@@ -304,7 +304,7 @@
                 });
             },
             // 单机连线
-            onConnectionClick(connection, event) {
+            onConnectionClick() {
                 // ...
             },
             onOverlayClick(overlay) {
@@ -314,7 +314,7 @@
                 const currentNode = this.canvasData.nodes.filter(item => item.id === currentLine[0].source.id);
                 const lineLists = this.$refs.jsFlow.getConnectorsByNodeId(currentNode[0].id);
                 this.customLine.lineInfo = lineLists.filter(item => (currentLine[0].source.id === item.sourceId && currentLine[0].target.id === item.targetId))[0];
-                this.canvasData.lines.forEach((item, index) => {
+                this.canvasData.lines.forEach((item) => {
                     if (item.source.id === this.customLine.lineInfo.sourceId && item.target.id === this.customLine.lineInfo.targetId) {
                         this.customLine.lineValue = item.lineInfo;
                     }
@@ -362,7 +362,7 @@
                     return;
                 }
                 this.clickSecond = true;
-                this.$store.dispatch('deployCommon/deleteLine', id).then((res) => {
+                this.$store.dispatch('deployCommon/deleteLine', id).then(() => {
                     // 删除线条更新数组
                     const valueInfo = [{
                         source: {
@@ -507,7 +507,7 @@
                     targetId: '',
                     sourceId: '',
                 };
-                this.canvasData.nodes.forEach((item, index) => {
+                this.canvasData.nodes.forEach((item) => {
                     if (item.id === params.sourceId) {
                         sourceId = item.nodeInfo.id;
                         errorId.sourceId = item.id;
@@ -586,7 +586,7 @@
                     });
                 } else if (type === 'update') {
                     params.forEach((node) => {
-                        this.canvasData.lines.forEach((item, index) => {
+                        this.canvasData.lines.forEach((item) => {
                             if (item.source.id === node.source.id && item.target.id === node.target.id) {
                                 item.lineInfo = node.lineInfo;
                             }
@@ -728,7 +728,7 @@
                     return;
                 }
                 this.clickSecond = true;
-                this.$store.dispatch('deployCommon/deleteNode', id).then((res) => {
+                this.$store.dispatch('deployCommon/deleteNode', id).then(() => {
                     if (this.deleteInfo.info.nodeInfo.is_draft) {
                         // ...
                     } else {
@@ -780,7 +780,7 @@
                     });
             },
             // 移动节点事件回调
-            onNodeMoveStop(node, event) {
+            onNodeMoveStop(node) {
                 // 如果节点没有移动，这触发点击事件
                 if (node.x === this.currentNode.x && node.y === this.currentNode.y) {
                     this.canvasData.nodes.forEach((item) => {
@@ -856,7 +856,7 @@
                 // this.getBestArrow(nodeValue, event)
             },
             // 最优连线
-            getBestArrow(node, event) {
+            getBestArrow(node) {
                 // 节点ID
                 const dataConten = {
                     parent: [],
@@ -1041,7 +1041,7 @@
                     },
                 };
                 const { id } = node.nodeInfo;
-                this.$store.dispatch('deployCommon/updateNodeAxis', { params, id }).then((res) => {
+                this.$store.dispatch('deployCommon/updateNodeAxis', { params, id }).then(() => {
                     // ...
                 })
                     .catch((res) => {

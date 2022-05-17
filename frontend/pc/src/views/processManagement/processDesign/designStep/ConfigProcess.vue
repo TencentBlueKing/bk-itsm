@@ -122,7 +122,7 @@
                     });
             },
             // 立即配置
-            configurNode(item, index) {
+            configurNode(item) {
                 this.statusList = [];
                 // 赋值配置信息
                 this.$parent.changeConfigur(item);
@@ -147,7 +147,7 @@
 
                 const id = this.processId;
                 const params = [];
-                this.$store.dispatch('cdeploy/submitChart', { params, id }).then((res) => {
+                this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功"]'),
                         theme: 'success',
@@ -189,10 +189,10 @@
                         },
                     });
                 });
-                this.$store.dispatch('deployCommon/updateFlowLine', { params }).then((res) => {
+                this.$store.dispatch('deployCommon/updateFlowLine', { params }).then(() => {
                     // ...
                 })
-                    .catch((res) => {
+                    .catch(() => {
                         console.log('error');
                     });
             },

@@ -23,82 +23,144 @@
 <template>
     <div class="bk-flowlog-inherit">
         <div class="mb20">
-            <bk-button :theme="'default'" class="mr10"
+            <bk-button
+                :theme="'default'"
+                class="mr10"
                 data-test-id="ticket_button_createInheritTicket"
-                :title="(ticketInfo.is_over || !ticketInfo.can_operate) ? $t(`m.newCommon['暂无权限或单据已结束']`) : $t(`m.newCommon['新建']`)"
+                :title="
+                    ticketInfo.is_over || !ticketInfo.can_operate
+                        ? $t(`m.newCommon['暂无权限或单据已结束']`)
+                        : $t(`m.newCommon['新建']`)
+                "
                 :disabled="ticketInfo.is_over || !ticketInfo.can_operate"
-                @click="openAddInheritSlider">
+                @click="openAddInheritSlider"
+            >
                 {{ $t('m.newCommon["新建"]') }}
             </bk-button>
-            <bk-button :theme="'default'" class="icon-cus"
+            <bk-button
+                :theme="'default'"
+                class="icon-cus"
                 data-test-id="ticket_button_InheritTicketBindingHistory"
-                :title="historyList.length ? $t(`m.newCommon['绑定历史']`) : $t(`m.newCommon['暂无关联历史']`)"
+                :title="
+                    historyList.length
+                        ? $t(`m.newCommon['绑定历史']`)
+                        : $t(`m.newCommon['暂无关联历史']`)
+                "
                 icon=" bk-itsm-icon icon-history"
                 :disabled="!historyList.length"
-                @click="showHistory">
+                @click="showHistory"
+            >
             </bk-button>
         </div>
-        <div class="mb20" v-if="masterOrSlave === 'slave' || !inheritStateList.length">
+        <div
+            class="mb20"
+            v-if="masterOrSlave === 'slave' || !inheritStateList.length"
+        >
             <p class="inherit-table-tittle">{{ $t('m.newCommon["母单"]') }}</p>
             <bk-table
                 v-bkloading="{ isLoading: tableLoading }"
                 :data="inheritStateList"
-                :size="'small'">
-                <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
+                :size="'small'"
+            >
+                <bk-table-column
+                    :label="$t(`m.newCommon['单号']`)"
+                    min-width="140"
+                >
                     <template slot-scope="props">
-                        <span class="bk-lable-primary" @click="checkOne(props.row)" :title="props.row.sn">
-                            {{props.row.sn}}
+                        <span
+                            class="bk-lable-primary"
+                            @click="checkOne(props.row)"
+                            :title="props.row.sn"
+                        >
+                            {{ props.row.sn }}
                         </span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
                     <template slot-scope="props">
-                        <span v-if="props.row.related_status === 'UNBIND_FAILED'" class="bk-failed-status"></span>
-                        <i v-if="props.row.related_status === 'RUNNING'"
-                            class="bk-itsm-icon icon-inherit-loading bk-running-status"></i>
-                        <span v-if="props.row.related_status === 'UNBIND_FAILED' || props.row.related_status === 'RUNNING'">{{props.row.status}}</span>
-                        <span v-else>{{props.row.bind_at}}</span>
+                        <span
+                            v-if="props.row.related_status === 'UNBIND_FAILED'"
+                            class="bk-failed-status"
+                        ></span>
+                        <i
+                            v-if="props.row.related_status === 'RUNNING'"
+                            class="bk-itsm-icon icon-inherit-loading bk-running-status"
+                        ></i>
+                        <span
+                            v-if="
+                                props.row.related_status === 'UNBIND_FAILED' ||
+                                    props.row.related_status === 'RUNNING'
+                            "
+                        >{{ props.row.status }}</span
+                        >
+                        <span v-else>{{ props.row.bind_at }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.newCommon['操作']`)" width="100">
                     <template slot-scope="props">
-                        <bk-button theme="primary"
+                        <bk-button
+                            theme="primary"
                             text
                             :disabled="props.row.related_status === 'RUNNING'"
-                            @click="giveUnbindInfo('one', props.row)">
+                            @click="giveUnbindInfo('one', props.row)"
+                        >
                             {{ $t('m.newCommon["取消关联"]') }}
                         </bk-button>
                     </template>
                 </bk-table-column>
             </bk-table>
         </div>
-        <div class="mb20" v-if="masterOrSlave === 'master' || !inheritStateList.length">
+        <div
+            class="mb20"
+            v-if="masterOrSlave === 'master' || !inheritStateList.length"
+        >
             <p class="inherit-table-tittle">{{ $t('m.newCommon["子单"]') }}</p>
             <bk-table
                 v-bkloading="{ isLoading: tableLoading }"
                 :data="inheritStateList"
                 :size="'small'"
                 @select-all="handleSelectAll"
-                @select="handleSelect">
-                <bk-table-column type="selection"
+                @select="handleSelect"
+            >
+                <bk-table-column
+                    type="selection"
                     width="60"
                     align="center"
-                    :selectable="disabledFn">
+                    :selectable="disabledFn"
+                >
                 </bk-table-column>
-                <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="140">
+                <bk-table-column
+                    :label="$t(`m.newCommon['单号']`)"
+                    min-width="140"
+                >
                     <template slot-scope="props">
-                        <span class="bk-lable-primary" @click="checkOne(props.row)" :title="props.row.sn">
-                            {{props.row.sn}}
+                        <span
+                            class="bk-lable-primary"
+                            @click="checkOne(props.row)"
+                            :title="props.row.sn"
+                        >
+                            {{ props.row.sn }}
                         </span>
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t(`m.newCommon['绑定时间']`)">
                     <template slot-scope="props">
-                        <span v-if="props.row.related_status === 'UNBIND_FAILED'" class="bk-failed-status"></span>
-                        <i v-if="props.row.related_status === 'RUNNING'"
-                            class="bk-itsm-icon icon-inherit-loading bk-running-status loading"></i>
-                        <span v-if="props.row.related_status === 'UNBIND_FAILED' || props.row.related_status === 'RUNNING'">{{props.row.status}}</span>
-                        <span v-else>{{props.row.bind_at}}</span>
+                        <span
+                            v-if="props.row.related_status === 'UNBIND_FAILED'"
+                            class="bk-failed-status"
+                        ></span>
+                        <i
+                            v-if="props.row.related_status === 'RUNNING'"
+                            class="bk-itsm-icon icon-inherit-loading bk-running-status loading"
+                        ></i>
+                        <span
+                            v-if="
+                                props.row.related_status === 'UNBIND_FAILED' ||
+                                    props.row.related_status === 'RUNNING'
+                            "
+                        >{{ props.row.status }}</span
+                        >
+                        <span v-else>{{ props.row.bind_at }}</span>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -109,7 +171,8 @@
                 theme="default"
                 :title="$t(`m.newCommon['批量解绑']`)"
                 :disabled="!checkList.length"
-                @click="giveUnbindInfo('batch')">
+                @click="giveUnbindInfo('batch')"
+            >
                 {{ $t('m.newCommon["批量解绑"]') }}
             </bk-button>
         </div>
@@ -121,32 +184,52 @@
             :header-position="historyInfo.headerPosition"
             :loading="secondClick"
             :auto-close="historyInfo.autoClose"
-            :mask-close="historyInfo.autoClose">
-            <div style="width: 100%; max-height: 347px;">
+            :mask-close="historyInfo.autoClose"
+        >
+            <div style="width: 100%; max-height: 347px">
                 <bk-table
                     v-bkloading="{ isLoading: historyTableLoading }"
                     :data="historyList"
-                    :size="'small'">
-                    <bk-table-column :label="$t(`m.newCommon['单号']`)" min-width="100">
+                    :size="'small'"
+                >
+                    <bk-table-column
+                        :label="$t(`m.newCommon['单号']`)"
+                        min-width="100"
+                    >
                         <template slot-scope="props">
-                            <span class="bk-lable-primary" @click="checkOne(props.row)" :title="props.row.sn">
-                                {{props.row.sn}}
+                            <span
+                                class="bk-lable-primary"
+                                @click="checkOne(props.row)"
+                                :title="props.row.sn"
+                            >
+                                {{ props.row.sn }}
                             </span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.newCommon['状态']`)" width="80">
+                    <bk-table-column
+                        :label="$t(`m.newCommon['状态']`)"
+                        width="80"
+                    >
                         <template slot-scope="props">
-                            {{props.row.related_type === 'master' ? $t('m.newCommon["母单"]') : $t('m.newCommon["子单"]') }}
+                            {{
+                                props.row.related_type === "master"
+                                    ? $t('m.newCommon["母单"]')
+                                    : $t('m.newCommon["子单"]')
+                            }}
                         </template>
                     </bk-table-column>
-                    <bk-table-column :label="$t(`m.newCommon['绑定时间']`)" prop="create_at"></bk-table-column>
-                    <bk-table-column :label="$t(`m.newCommon['解绑时间']`)" prop="end_at"></bk-table-column>
+                    <bk-table-column
+                        :label="$t(`m.newCommon['绑定时间']`)"
+                        prop="create_at"
+                    ></bk-table-column>
+                    <bk-table-column
+                        :label="$t(`m.newCommon['解绑时间']`)"
+                        prop="end_at"
+                    ></bk-table-column>
                 </bk-table>
             </div>
             <div slot="footer">
-                <bk-button
-                    theme="default"
-                    @click="closeHistory">
+                <bk-button theme="default" @click="closeHistory">
                     {{ $t('m.home["取消"]') }}
                 </bk-button>
             </div>
@@ -158,14 +241,16 @@
             :quick-close="true"
             :title="$t(`m.newCommon['新建母子单']`)"
             :before-close="closeSideslider"
-            :width="750">
+            :width="750"
+        >
             <div class="p20" slot="content">
                 <inherit-ticket-add-dialog
                     ref="addInheritTicket"
                     v-if="isShowAddInheritTicket"
                     :template-info="inheritStateInfo"
                     :ticket-info="ticketInfo"
-                    @close="isShowAddInheritTicket = false">
+                    @close="isShowAddInheritTicket = false"
+                >
                 </inherit-ticket-add-dialog>
             </div>
         </bk-sideslider>
@@ -287,33 +372,35 @@
                     params.token = this.$route.query.token;
                 }
                 this.tableLoading = true;
-                this.$store.dispatch('change/getInheritState', params).then((res) => {
-                    this.masterOrSlave = res.data.related_type;
+                this.$store
+                    .dispatch('change/getInheritState', params)
+                    .then((res) => {
+                        this.masterOrSlave = res.data.related_type;
 
-                    this.inheritStateList = res.data.master_slave_tickets.map((item) => {
-                        let tempStatusName = '';
-                        switch (item.related_status) {
-                            case 'BIND_SUCCESS':
-                                tempStatusName = this.$t('m.newCommon["已绑定"]');
-                                break;
-                            case 'BIND_FAILED':
-                                tempStatusName = this.$t('m.newCommon["绑定失败"]');
-                                break;
-                            case 'UNBIND_SUCCESS':
-                                tempStatusName = this.$t('m.newCommon["解绑成功"]');
-                                break;
-                            case 'RUNNING':
-                                tempStatusName = this.$t('m.newCommon["解绑中"]');
-                                break;
-                            case 'UNBIND_FAILED':
-                                tempStatusName = this.$t('m.newCommon["解绑失败"]');
-                                break;
-                            default:
-                                break;
-                        }
-                        return { ...item, status: tempStatusName };
-                    });
-                })
+                        this.inheritStateList = res.data.master_slave_tickets.map((item) => {
+                            let tempStatusName = '';
+                            switch (item.related_status) {
+                                case 'BIND_SUCCESS':
+                                    tempStatusName =                                        this.$t('m.newCommon["已绑定"]');
+                                    break;
+                                case 'BIND_FAILED':
+                                    tempStatusName = this.$t('m.newCommon["绑定失败"]');
+                                    break;
+                                case 'UNBIND_SUCCESS':
+                                    tempStatusName = this.$t('m.newCommon["解绑成功"]');
+                                    break;
+                                case 'RUNNING':
+                                    tempStatusName =                                        this.$t('m.newCommon["解绑中"]');
+                                    break;
+                                case 'UNBIND_FAILED':
+                                    tempStatusName = this.$t('m.newCommon["解绑失败"]');
+                                    break;
+                                default:
+                                    break;
+                            }
+                            return { ...item, status: tempStatusName };
+                        });
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -325,10 +412,10 @@
             handleSelectAll(selection) {
                 this.checkList = selection;
             },
-            handleSelect(selection, row) {
+            handleSelect(selection) {
                 this.checkList = selection;
             },
-            disabledFn(item, index) {
+            disabledFn() {
                 return this.masterOrSlave !== 'slave';
             },
             openAddInheritSlider() {
@@ -363,16 +450,18 @@
                     return;
                 }
                 this.secondClick = true;
-                this.$store.dispatch('change/unBindInherit', params).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["解绑成功"]'),
-                        theme: 'success',
-                    });
-                })
+                this.$store
+                    .dispatch('change/unBindInherit', params)
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.newCommon["解绑成功"]'),
+                            theme: 'success',
+                        });
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
-                    .finally((res) => {
+                    .finally(() => {
                         this.checkList = [];
                         this.secondClick = false;
                         this.getInheritStateList();
@@ -385,9 +474,11 @@
                     id: this.ticketInfo.id,
                     type: 'MASTER_SLAVE',
                 };
-                await this.$store.dispatch('change/getBindHistory', params).then((res) => {
-                    this.historyList = res.data;
-                })
+                await this.$store
+                    .dispatch('change/getBindHistory', params)
+                    .then((res) => {
+                        this.historyList = res.data;
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     });
@@ -400,47 +491,47 @@
 </script>
 
 <style scoped lang="scss">
-    .icon-cus{
-        font-size: 18px;
-        padding: 0 9px!important;
-        /deep/ .bk-itsm-icon{
-            top: 0;
-            width: auto;
-        }
+.icon-cus {
+    font-size: 18px;
+    padding: 0 9px !important;
+    /deep/ .bk-itsm-icon {
+        top: 0;
+        width: auto;
     }
-    .inherit-table-tittle {
-        font-size: 14px;
-        font-weight: bold;
-        display: inline-block;
-        line-height: 36px;
-        height: 36px;
-        color: #6e656e;
-    }
-    .bk-failed-status {
-        display: inline-block;
-        height: 8px;
-        width: 8px;
-        background-color: #FF5656;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-    .bk-running-status {
-        display: inline-block;
-        margin-right: 5px;
-    }
-    .loading{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        animation: loading 2s linear 0.2s infinite;
-    }
+}
+.inherit-table-tittle {
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 36px;
+    height: 36px;
+    color: #6e656e;
+}
+.bk-failed-status {
+    display: inline-block;
+    height: 8px;
+    width: 8px;
+    background-color: #ff5656;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+.bk-running-status {
+    display: inline-block;
+    margin-right: 5px;
+}
+.loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    animation: loading 2s linear 0.2s infinite;
+}
 
-    @keyframes loading{
-        0%{
-            transform: rotate(0deg);
-        }
-        100%{
-            transform: rotate(360deg);
-        }
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
     }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 </style>

@@ -159,7 +159,7 @@
             dropdownHide() {
                 this.isDropdownShow = false;
             },
-            requestHandler(requestway, requestwayIndex) {
+            requestHandler(requestway) {
                 this.$refs.requestwayDrop.hide();
                 this.$emit('changeRequest', requestway.name);
             },

@@ -1,41 +1,38 @@
 <template>
     <div class="left-ticket">
-        <div class="base-info-content " v-bkloading="{ isLoading: loading.nodeInfoLoading }">
+        <div
+            class="base-info-content"
+            v-bkloading="{ isLoading: loading.nodeInfoLoading }">
             <div class="ticket-base-info">
                 <div class="ticket-creator" @click="isShowBasicInfo = !isShowBasicInfo">
-                    <i :class="['bk-itsm-icon', isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou']"></i>
+                    <i
+                        :class="[
+                            'bk-itsm-icon',
+                            isShowBasicInfo ? 'icon-xiangxia' : 'icon-xiangyou'
+                        ]"></i>
                     <span class="ticket-title">{{ $t(`m['提单信息']`) }}</span>
-                    <span>{{ $t(`m['提单人']`) }}: {{ ticketInfo.creator}}</span>
-                    <span>{{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at}}</span>
+                    <span> {{ $t(`m['提单人']`) }}: {{ ticketInfo.creator }} </span>
+                    <span> {{ $t(`m['提单时间']`) }}: {{ ticketInfo.create_at }} </span>
                 </div>
                 <div :class="['basic-content', isShowBasicInfo ? '' : 'hide']">
                     <basic-information
                         ref="basicInfo"
-                        v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
+                        v-if="
+                            ticketId && !loading.ticketLoading && !loading.nodeInfoLoading
+                        "
                         :basic-infomation="ticketInfo"
-                        :first-state-fields="firstStateFields">
-                    </basic-information>
+                        :first-state-fields="firstStateFields"></basic-information>
                 </div>
-                <!-- <bk-collapse v-model="activeName">
-                    <bk-collapse-item name="ticket">
-                        <span class="ticket-title">提单信息</span>
-                        <div class="ticket-creator">
-                            <span>提单人: {{ ticketInfo.creator}}</span><span>提单时间: {{ ticketInfo.create_at}}</span>
-                        </div>
-                        <div slot="content" class="f13">
-                            <basic-information
-                                ref="basicInfo"
-                                v-if="ticketId && !loading.ticketLoading && !loading.nodeInfoLoading"
-                                :basic-infomation="ticketInfo"
-                                :first-state-fields="firstStateFields">
-                            </basic-information>
-                        </div>
-                    </bk-collapse-item>
-                </bk-collapse> -->
             </div>
         </div>
-        <div class="current-step-content" v-bkloading="{ isLoading: currentStepLoading }">
-            <bk-tab :active.sync="stepActiveTab" type="unborder-card" v-if="!currentStepLoading" :validate-active="true">
+        <div
+            class="current-step-content"
+            v-bkloading="{ isLoading: currentStepLoading }">
+            <bk-tab
+                :active.sync="stepActiveTab"
+                type="unborder-card"
+                v-if="!currentStepLoading"
+                :validate-active="true">
                 <!-- 当前步骤 -->
                 <bk-tab-panel
                     v-if="hasNodeOptAuth || isShowAssgin || currSetpIsIframe"
@@ -43,7 +40,9 @@
                     :label="$t(`m['单据处理']`)">
                     <!-- 当前节点 -->
                     <template slot="label">
-                        <span class="panel-name">{{ $t(`m['单据处理']`) }}</span>
+                        <span class="panel-name">
+                            {{ $t(`m['单据处理']`) }}
+                        </span>
                         <i class="panel-count">{{ currStepNodeNum }}</i>
                     </template>
                     <current-steps
@@ -56,8 +55,7 @@
                         :is-show-assgin="isShowAssgin"
                         :current-step-list="currentStepList"
                         :node-trigger-list="nodeTriggerList"
-                        @handlerSubmitSuccess="reloadTicket">
-                    </current-steps>
+                        @handlerSubmitSuccess="reloadTicket"></current-steps>
                 </bk-tab-panel>
                 <!-- 全部评论 TODO -->
                 <bk-tab-panel
@@ -65,7 +63,9 @@
                     name="allComments"
                     :label="$t(`m.newCommon['所有评论']`)">
                     <template v-slot:label>
-                        <span class="panel-name">{{ $t(`m.newCommon['所有评论']`) }}</span>
+                        <span class="panel-name">
+                            {{ $t(`m.newCommon['所有评论']`) }}
+                        </span>
                         <i class="panel-count">{{ commentList.length }}</i>
                     </template>
                     <wang-editor
@@ -81,8 +81,7 @@
                         :comment-loading="commentLoading"
                         :more-loading="moreLoading"
                         @addTargetComment="addTargetComment"
-                        @refreshComment="refreshComment"
-                    ></wang-editor>
+                        @refreshComment="refreshComment"></wang-editor>
                 </bk-tab-panel>
             </bk-tab>
         </div>
@@ -99,8 +98,7 @@
                 :basic-infomation="ticketInfo"
                 :node-list="nodeList"
                 :current-step-list="currentStepList"
-                @reloadTicket="reloadTicket">
-            </order-preview>
+                @reloadTicket="reloadTicket"></order-preview>
         </bk-dialog>
     </div>
 </template>
@@ -161,7 +159,8 @@
         },
         computed: {
             currStepNodeNum() {
-                if (this.ticketInfo.is_over) { // 已结束单不显示当前步骤
+                if (this.ticketInfo.is_over) {
+                    // 已结束单不显示当前步骤
                     return 0;
                 }
                 return this.currentStepList.length;
@@ -205,7 +204,10 @@
                 // 刷新某个步骤，避免用户填写时突然刷新打断，新旧节点 diff，如果状态未当前节点状态未更新，不应该刷新
                 updateList.forEach((newNode) => {
                     const oldNode = oldCurrentNodeList.find(old => old.state_id === newNode.state_id);
-                    if (this.isSameStatusNode(newNode, oldNode) && oldNode.status === 'RUNNING') {
+                    if (
+                        this.isSameStatusNode(newNode, oldNode)
+                        && oldNode.status === 'RUNNING'
+                    ) {
                         this.currentStepList.push(oldNode);
                     } else {
                         this.currentStepList.push(newNode);
@@ -215,13 +217,13 @@
                 // 隐藏字段显示隐藏判断逻辑
                 this.allFieldList.forEach((item) => {
                     this.$set(item, 'showFeild', !!item.show_type);
-                    this.$set(item, 'val', (item.value || ''));
+                    this.$set(item, 'val', item.value || '');
                 });
                 // 关联数据展示的逻辑处理
                 this.allFieldList.forEach((item) => {
                     this.conditionField(item, this.allFieldList);
                 });
-                this.currentStepList.forEach((item, index) => {
+                this.currentStepList.forEach((item) => {
                     if (item.fields && item.fields.length) {
                         item.fields.forEach((node) => {
                             this.$set(node, 'service', this.ticketInfo.service_type);
@@ -254,88 +256,88 @@
         },
     };
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .left-ticket {
-    display: flex;
-    flex-direction: column;
-    // height: 100%;
-    .base-info-content {
-        padding: 0 10px;
-        min-height: 54px;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        background: #ffffff;
-        /deep/ .bk-tab-section {
-            padding: 0;
-        }
-        .ticket-creator {
-            width: 100%;
-            cursor: pointer;
-            line-height: 52px;
-            display: inline-block;
-            color: #979BA5;
-            font-size: 12px;
-            .ticket-title {
-                font-weight: 700;
-                font-size: 14px;
-                color: #63656e;
-            }
-            i {
-                color: #c4c6cc;
-                font-size: 12px;
-                display: inline-block;
-                height: 12px;
-                width: 12px;
-                margin: 0 -22px 0 24px;
-            }
-            span{
-                margin-left: 30px;
-            }
-        }
-        .basic-content {
-            overflow: hidden;
-            transition: 1s all linear;
-        }
-        .hide{
-            height: 0;
-        }
-        /deep/ .bk-icon {
-            // line-height: 54px;
-        }
+  display: flex;
+  flex-direction: column;
+  // height: 100%;
+  .base-info-content {
+    padding: 0 10px;
+    min-height: 54px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    /deep/ .bk-tab-section {
+      padding: 0;
     }
-    .current-step-content {
-        flex: auto;
-        margin-top: 24px;
-        padding: 10px;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        background: #ffffff;
-        /deep/ .bk-tab-section {
-            padding: 0;
-        }
-        .panel-count {
-            display: inline-block;
-            min-width: 16px;
-            height: 16px;
-            padding: 0 4px;
-            line-height: 16px;
-            border-radius: 8px;
-            text-align: center;
-            font-style: normal;
-            font-size: 12px;
-            color: #fff;
-            background-color: #C4C6CC;
-        }
-        /deep/ .bk-tab-label-item.active {
-            .panel-count {
-                color: #3a84ff;
-                background: #e1ecff;
-            }
-        }
+    .ticket-creator {
+      width: 100%;
+      cursor: pointer;
+      line-height: 52px;
+      display: inline-block;
+      color: #979ba5;
+      font-size: 12px;
+      .ticket-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #63656e;
+      }
+      i {
+        color: #c4c6cc;
+        font-size: 12px;
+        display: inline-block;
+        height: 12px;
+        width: 12px;
+        margin: 0 -22px 0 24px;
+      }
+      span {
+        margin-left: 30px;
+      }
     }
+    .basic-content {
+      overflow: hidden;
+      transition: 1s all linear;
+    }
+    .hide {
+      height: 0;
+    }
+    /deep/ .bk-icon {
+      // line-height: 54px;
+    }
+  }
+  .current-step-content {
+    flex: auto;
+    margin-top: 24px;
+    padding: 10px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    /deep/ .bk-tab-section {
+      padding: 0;
+    }
+    .panel-count {
+      display: inline-block;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      line-height: 16px;
+      border-radius: 8px;
+      text-align: center;
+      font-style: normal;
+      font-size: 12px;
+      color: #fff;
+      background-color: #c4c6cc;
+    }
+    /deep/ .bk-tab-label-item.active {
+      .panel-count {
+        color: #3a84ff;
+        background: #e1ecff;
+      }
+    }
+  }
 }
 /deep/ .bk-dialog {
-    top: 120px;
+  top: 120px;
 }
 .bk-order-preview {
-    background-color: #f5f7fa;
+  background-color: #f5f7fa;
 }
 </style>

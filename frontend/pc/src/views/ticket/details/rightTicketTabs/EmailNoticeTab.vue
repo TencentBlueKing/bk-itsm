@@ -168,7 +168,7 @@
                     followers_type: personSelectValue.type,
                     message: this.followers.comments,
                 };
-                this.$store.dispatch('cdeploy/postFollowlogs', { params }).then((res) => {
+                this.$store.dispatch('cdeploy/postFollowlogs', { params }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.newCommon["发送成功"]'),
                         theme: 'success',

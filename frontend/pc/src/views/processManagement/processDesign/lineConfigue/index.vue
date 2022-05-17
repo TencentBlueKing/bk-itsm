@@ -361,7 +361,7 @@
         },
         watch: {
             fieldList: {
-                handler(newVal, oldVal) {
+                handler() {
                     this.dealList();
                 },
                 deep: true,
@@ -588,7 +588,7 @@
                     }
                 }
 
-                this.$refs.lineForm.validate().then((validator) => {
+                this.$refs.lineForm.validate().then(() => {
                     this.submitFn();
                 }, (validator) => {
                     console.warn(validator);
@@ -612,7 +612,7 @@
                     workflow: this.customLine.lineValue.workflow,
                 };
                 // 将choiceList的数据清空
-                this.lineInfo.expressions.forEach((item, index) => {
+                this.lineInfo.expressions.forEach((item) => {
                     lineParams.condition.expressions.push({
                         checkInfo: item.checkInfo,
                         expressions: [],
@@ -655,7 +655,7 @@
             },
             // 存为模板
             submitTemplate() {
-                this.lineInfo.expressions.forEach((item, index) => {
+                this.lineInfo.expressions.forEach((item) => {
                     item.expressions.forEach((node) => {
                         node.value = this.formattingData(node);
                     });
@@ -679,7 +679,7 @@
                 }
                 this.secondClick = true;
                 const templateUrl = this.lineInfo.template ? 'deployCommon/updateLineTemplate' : 'deployCommon/submitLineTemplate';
-                this.$store.dispatch(templateUrl, { params }).then((res) => {
+                this.$store.dispatch(templateUrl, { params }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.treeinfo["保存成功！"]'),
                         theme: 'success',

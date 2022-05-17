@@ -167,7 +167,7 @@
             },
             updateCurrServiceForm(params, actionName) {
                 this.loading = true;
-                this.$store.dispatch(`service/${actionName}`, params).then((res) => {
+                this.$store.dispatch(`service/${actionName}`, params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.systemConfig["更新成功"]'),
                         theme: 'success',

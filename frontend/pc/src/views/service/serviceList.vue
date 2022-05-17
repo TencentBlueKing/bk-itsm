@@ -471,7 +471,7 @@
             isImportServiceShow(val) {
                 if (!val) {
                     this.importFileNameList = [];
-                    this.$nextTick((_) => {
+                    this.$nextTick(() => {
                         this.$refs.importInput.value = '';
                     });
                 }
@@ -492,7 +492,7 @@
             cellMouseEnter(row) {
                 this.tableHoverId = row.id;
             },
-            cellMouseLeave(row) {
+            cellMouseLeave() {
                 this.tableHoverId = '';
             },
             handleChangeTree(val) {
@@ -586,7 +586,7 @@
                     project_key: curRow.project_key,
                     desc: '',
                 };
-                this.$store.dispatch('serviceEntry/updateService', params).then((res) => {
+                this.$store.dispatch('serviceEntry/updateService', params).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.serviceConfig["修改成功"]'),
                         theme: 'success',
@@ -624,7 +624,7 @@
                     if (res.data !== null) {
                         if (Object.keys(res.data).length > 0) {
                             this.dataList = res.data.items;
-                            this.dataList.forEach((item, index) => {
+                            this.dataList.forEach((item) => {
                                 this.$set(item, 'checkStatus', false);
                             });
                             // 分页
@@ -720,7 +720,7 @@
                         errorHandler(res, this);
                     });
             },
-            disabledFn(item, index) {
+            disabledFn(item) {
                 return !item.bounded_catalogs[0];
             },
             // 创建服务权限点击时校验
@@ -823,7 +823,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('serviceEntry/batchDeleteService', { id }).then((res) => {
+                        this.$store.dispatch('serviceEntry/batchDeleteService', { id }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除成功"]'),
                                 theme: 'success',
@@ -851,7 +851,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch('serviceEntry/deleteService', id).then((res) => {
+                        this.$store.dispatch('serviceEntry/deleteService', id).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.serviceConfig["删除成功"]'),
                                 theme: 'success',
@@ -914,7 +914,7 @@
                 // 选中有权限数据
                 this.checkList = selection.filter(item => this.hasPermission(['service_manage'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions]));
             },
-            handleSelect(selection, row) {
+            handleSelect(selection) {
                 this.checkList = selection;
             },
             // 流程预览

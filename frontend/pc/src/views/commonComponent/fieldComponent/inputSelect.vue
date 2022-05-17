@@ -129,14 +129,16 @@
         },
         methods: {
             async getOption() {
-                this.options = this.item.choice = await this.getFieldOptions(this.item);
+                this.item.choice = await this.getFieldOptions(this.item);
+                this.options = this.item.choice;
             },
             selected() {
                 if (this.item.related_fields && this.item.related_fields.be_relied) {
                     this.item.related_fields.be_relied.forEach((ite) => {
                         this.fields.forEach((it) => {
                             if (ite === it.key) {
-                                it.val = it.value = '';
+                                it.value = '';
+                                it.val = it.value;
                             }
                         });
                     });
@@ -166,11 +168,13 @@
                 this.addStatus = false;
                 this.options.push({ ...this.tempChoice, can_delete: true });
                 this.item.val = this.tempChoice.key;
-                this.tempChoice.name = this.tempChoice.key = '';
+                this.tempChoice.key = '';
+                this.tempChoice.name = this.tempChoice.key;
             },
             cancelAdd() {
                 this.addStatus = false;
-                this.tempChoice.name = this.tempChoice.key = '';
+                this.tempChoice.key = '';
+                this.tempChoice.name = this.tempChoice.key;
             },
             handleDeleteOption(deleteOption) {
                 if (deleteOption === this.item.val) {

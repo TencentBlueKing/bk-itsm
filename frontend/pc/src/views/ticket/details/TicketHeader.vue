@@ -26,32 +26,51 @@
         <span
             :style="{ backgroundColor: headerInfo.statusColor }"
             :title="ticketInfo.current_status_display"
-            class="ticket-status">
-            {{ localeCookie ? ticketInfo.current_status : ticketInfo.current_status_display}}
+            class="ticket-status"
+        >
+            {{
+                localeCookie
+                    ? ticketInfo.current_status
+                    : ticketInfo.current_status_display
+            }}
         </span>
-        <span class="ticket-status comments-info"
-            v-if="ticketInfo.is_commented || ticketInfo.can_commen">
-            <span v-if="ticketInfo.is_commented">{{ $t('m.newCommon["已评价"]') }}</span>
-            <span v-if="ticketInfo.can_comment">{{ $t('m.newCommon["待评论"]') }}</span>
+        <span
+            class="ticket-status comments-info"
+            v-if="ticketInfo.is_commented || ticketInfo.can_commen"
+        >
+            <span v-if="ticketInfo.is_commented">{{
+                $t('m.newCommon["已评价"]')
+            }}</span>
+            <span v-if="ticketInfo.can_comment">{{
+                $t('m.newCommon["待评论"]')
+            }}</span>
         </span>
         <!-- 关注 -->
         <span class="bk-operation-focus">
-            <bk-popover :content="!hasAttention ? $t(`m.manageCommon['关注单据']`) : $t(`m.manageCommon['取消关注']`)"
+            <bk-popover
+                :content="
+                    !hasAttention
+                        ? $t(`m.manageCommon['关注单据']`)
+                        : $t(`m.manageCommon['取消关注']`)
+                "
                 :interactive="false"
-                placement="top">
+                placement="top"
+            >
                 <i
-                    :class="['bk-itsm-icon', !hasAttention ? 'icon-rate' : 'icon-favorite']"
-                    @click="onAttention">
+                    :class="[
+                        'bk-itsm-icon',
+                        !hasAttention ? 'icon-rate' : 'icon-favorite'
+                    ]"
+                    @click="onAttention"
+                >
                 </i>
             </bk-popover>
         </span>
         <!-- SN单号 -->
         <span class="ticket-sn mr10">{{ ticketInfo.sn }}</span>
         <!-- 标题 -->
-        <span
-            class="ticket-title"
-            :title="ticketInfo.title">
-            {{ ticketInfo.title || '--'}}
+        <span class="ticket-title" :title="ticketInfo.title">
+            {{ ticketInfo.title || "--" }}
         </span>
         <div class="operation-group">
             <!-- 刷新 -->
@@ -59,43 +78,62 @@
                 data-test-id="ticket_button_refreshTicketDetail"
                 size="small"
                 class="mr10 operation-refresh"
-                :class="{ 'rotate': rotate, 'not-rotate': !rotate }"
+                :class="{ rotate: rotate, 'not-rotate': !rotate }"
                 icon="icon-refresh"
                 theme="default"
-                @click="onRefreshBtnClick">
+                @click="onRefreshBtnClick"
+            >
                 {{ $t(`m.newCommon["刷新"]`) }}
             </bk-button>
-            <bk-popover :content="$t(`m.tickets['单据当前不能被撤回']`)" :disabled="ticketInfo.can_withdraw">
+            <bk-popover
+                :content="$t(`m.tickets['单据当前不能被撤回']`)"
+                :disabled="ticketInfo.can_withdraw"
+            >
                 <bk-button
                     data-test-id="ticket_button_removeTicket"
                     size="small"
                     class="mr10"
                     theme="default"
                     :disabled="!ticketInfo.can_withdraw"
-                    @click="onTicketBtnClick('widthdraw')">
+                    @click="onTicketBtnClick('widthdraw')"
+                >
                     {{ $t(`m.newCommon["撤单"]`) }}
                 </bk-button>
             </bk-popover>
-            <bk-popover :content="disabledText" :disabled="ticketInfo.can_supervise">
+            <bk-popover
+                :content="disabledText"
+                :disabled="ticketInfo.can_supervise"
+            >
                 <bk-button
                     data-test-id="ticket_button_superviseTicket"
                     size="small"
                     class="mr10"
                     theme="default"
                     :disabled="!ticketInfo.can_supervise"
-                    @click="onTicketBtnClick('supervise')">
+                    @click="onTicketBtnClick('supervise')"
+                >
                     {{ $t(`m.newCommon["督办"]`) }}
                 </bk-button>
             </bk-popover>
-            <bk-popover :content="getDisabledContentText(ticketInfo.is_commented)" :disabled="!(ticketInfo.is_commented || !ticketInfo.can_comment)">
+            <bk-popover
+                :content="getDisabledContentText(ticketInfo.is_commented)"
+                :disabled="
+                    !(ticketInfo.is_commented || !ticketInfo.can_comment)
+                "
+            >
                 <bk-button
                     data-test-id="ticket_button_appraiseTicket"
                     v-if="Number(ticketInfo.comment_id) !== -1"
                     size="small"
                     class="mr10"
                     theme="default"
-                    :disabled="ticketInfo.is_commented || !ticketInfo.can_comment || ticketInfo.comment_id === -1"
-                    @click="onTicketBtnClick('comment')">
+                    :disabled="
+                        ticketInfo.is_commented ||
+                            !ticketInfo.can_comment ||
+                            ticketInfo.comment_id === -1
+                    "
+                    @click="onTicketBtnClick('comment')"
+                >
                     {{ $t(`m.newCommon["评价"]`) }}
                 </bk-button>
             </bk-popover>
@@ -105,10 +143,20 @@
                 :font-size="'medium'"
                 class="bk-dropdown-menu-cus mr10"
                 @show="isDropdownShow = true"
-                @hide="isDropdownShow = false">
-                <div class="dropdown-trigger-btn" slot="dropdown-trigger" style="width:auto;">
-                    <span>{{$t(`m.newCommon['更多操作']`)}}</span>
-                    <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                @hide="isDropdownShow = false"
+            >
+                <div
+                    class="dropdown-trigger-btn"
+                    slot="dropdown-trigger"
+                    style="width: auto"
+                >
+                    <span>{{ $t(`m.newCommon['更多操作']`) }}</span>
+                    <i
+                        :class="[
+                            'bk-icon icon-angle-down',
+                            { 'icon-flip': isDropdownShow }
+                        ]"
+                    ></i>
                 </div>
                 <ul class="bk-dropdown-list-cus" slot="dropdown-content">
                     <li>
@@ -117,65 +165,100 @@
                             class="bk-dropdown-list-btn"
                             theme="default"
                             :text="true"
-                            @click="onTicketBtnClick('print')">
+                            @click="onTicketBtnClick('print')"
+                        >
                             {{ $t(`m.newCommon["打印"]`) }}
                         </bk-button>
                     </li>
                     <li>
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_operate && ticketInfo.current_status !== 'SUSPENDED'"
-                            placement="left-end">
+                        <bk-popover
+                            :content="disabledText"
+                            :disabled="
+                                ticketInfo.can_operate &&
+                                    ticketInfo.current_status !== 'SUSPENDED'
+                            "
+                            placement="left-end"
+                        >
                             <bk-button
                                 data-test-id="ticket_button_ticketPending"
                                 class="bk-dropdown-list-btn"
                                 theme="default"
                                 :text="true"
-                                :disabled="!(ticketInfo.can_operate && ticketInfo.current_status !== 'SUSPENDED')"
-                                @click="onTicketBtnClick('suspend')">
+                                :disabled="
+                                    !(
+                                        ticketInfo.can_operate &&
+                                        ticketInfo.current_status !==
+                                        'SUSPENDED'
+                                    )
+                                "
+                                @click="onTicketBtnClick('suspend')"
+                            >
                                 {{ $t(`m.newCommon["挂起"]`) }}
                             </bk-button>
                         </bk-popover>
                     </li>
                     <li>
-                        <bk-popover :content="disabledText"
-                            :disabled="ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED'"
-                            placement="left-end">
+                        <bk-popover
+                            :content="disabledText"
+                            :disabled="
+                                ticketInfo.can_operate &&
+                                    ticketInfo.current_status === 'SUSPENDED'
+                            "
+                            placement="left-end"
+                        >
                             <bk-button
                                 data-test-id="ticket_button_ticketRecover"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
-                                :disabled="!(ticketInfo.can_operate && ticketInfo.current_status === 'SUSPENDED')"
-                                @click="onTicketBtnClick('restore')">
+                                :disabled="
+                                    !(
+                                        ticketInfo.can_operate &&
+                                        ticketInfo.current_status ===
+                                        'SUSPENDED'
+                                    )
+                                "
+                                @click="onTicketBtnClick('restore')"
+                            >
                                 {{ $t(`m.newCommon["恢复"]`) }}
                             </bk-button>
                         </bk-popover>
                     </li>
                     <li>
-                        <bk-popover :content="disabledText"
+                        <bk-popover
+                            :content="disabledText"
                             :disabled="ticketInfo.can_close"
-                            placement="left-end">
+                            placement="left-end"
+                        >
                             <bk-button
                                 data-test-id="ticket_button_ticketClose"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
                                 :disabled="!ticketInfo.can_close"
-                                @click="onTicketBtnClick('close')">
+                                @click="onTicketBtnClick('close')"
+                            >
                                 {{ $t(`m.newCommon["关单"]`) }}
                             </bk-button>
                         </bk-popover>
                     </li>
                     <!-- 触发器列表 -->
-                    <li v-for="(ticketTrigger, index) in ticketTriggerList"
-                        :key="index">
-                        <bk-popover :content="disabledText"
+                    <li
+                        v-for="(ticketTrigger, index) in ticketTriggerList"
+                        :key="index"
+                    >
+                        <bk-popover
+                            :content="disabledText"
                             :disabled="ticketInfo.can_operate"
-                            placement="left-end">
+                            placement="left-end"
+                        >
                             <bk-button
                                 data-test-id="ticket_button_trigger"
                                 class="bk-dropdown-list-btn"
                                 :text="true"
                                 :disabled="!ticketInfo.can_operate"
-                                @click="onTicketBtnClick('trigger', ticketTrigger)">
+                                @click="
+                                    onTicketBtnClick('trigger', ticketTrigger)
+                                "
+                            >
                                 {{ ticketTrigger.display_name }}
                             </bk-button>
                         </bk-popover>
@@ -186,20 +269,23 @@
         <!-- 单据触发器 dialog -->
         <ticket-trigger-dialog
             ref="ticketTriggerDialog"
-            @init-info="triggerSuccessCallback">
+            @init-info="triggerSuccessCallback"
+        >
         </ticket-trigger-dialog>
         <!-- 评价弹窗 -->
         <evaluation-ticket-modal
             ref="evaluationModal"
             :ticket-info="ticketInfo"
-            @submitSuccess="evaluationSubmitSuccess">
+            @submitSuccess="evaluationSubmitSuccess"
+        >
         </evaluation-ticket-modal>
         <!-- suspend|close|restore -->
         <step-submit-dialog
             ref="ticketOperate"
             :ticket-info="ticketInfo"
             :ticket-operate-type="ticketOperateType"
-            @submitSuccess="reloadTicket">
+            @submitSuccess="reloadTicket"
+        >
         </step-submit-dialog>
     </header>
 </template>
@@ -245,11 +331,13 @@
         },
         mounted() {
             this.initData();
-            this.localeCookie = cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+            this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
         },
         methods: {
             initData() {
-                this.hasAttention = this.ticketInfo.followers ? this.ticketInfo.followers.some(name => name === window.username) : false;
+                this.hasAttention = this.ticketInfo.followers
+                    ? this.ticketInfo.followers.some(name => name === window.username)
+                    : false;
             },
             // 关注
             onAttention() {
@@ -257,15 +345,19 @@
                 const params = {
                     attention: !this.hasAttention,
                 };
-                const bkMessage = this.hasAttention ? this.$t('m.manageCommon[\'取消关注成功~\']') : this.$t('m.manageCommon[\'添加关注成功~\']');
-                this.$store.dispatch('deployOrder/setAttention', { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: bkMessage,
-                        theme: 'success',
-                        ellipsisLine: 0,
-                    });
-                    this.hasAttention = !this.hasAttention;
-                })
+                const bkMessage = this.hasAttention
+                    ? this.$t('m.manageCommon[\'取消关注成功~\']')
+                    : this.$t('m.manageCommon[\'添加关注成功~\']');
+                this.$store
+                    .dispatch('deployOrder/setAttention', { params, id })
+                    .then(() => {
+                        this.$bkMessage({
+                            message: bkMessage,
+                            theme: 'success',
+                            ellipsisLine: 0,
+                        });
+                        this.hasAttention = !this.hasAttention;
+                    })
                     .catch((res) => {
                         this.$bkMessage({
                             message: res.data.msg,
@@ -279,20 +371,26 @@
                 this.$refs.dropdown.hide();
 
                 switch (type) {
-                    case 'print':
+                    case 'print': {
                         const { href } = this.$router.resolve({
                             path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
                         });
                         window.open(href, '_blank');
                         break;
+                    }
                     case 'trigger':
-                        this.openTriggerDialog(item);
+                        {
+                            this.openTriggerDialog(item);
+                        }
                         break;
                     case 'comment':
-                        this.$refs.evaluationModal.show();
+                        {
+                            this.$refs.evaluationModal.show();
+                        }
                         break;
-                    default:
+                    default: {
                         this.ticketOperatingHandler(type);
+                    }
                 }
             },
             // 单据操作
@@ -342,13 +440,15 @@
                 this.isSubmitting = true;
                 const { id } = this.ticketInfo;
                 const { dispatchAcationPath, params, successText } = infoMap[type];
-                this.$store.dispatch(dispatchAcationPath, { params, id }).then((res) => {
-                    this.$bkMessage({
-                        message: successText,
-                        theme: 'success',
-                    });
-                    this.reloadTicket();
-                })
+                this.$store
+                    .dispatch(dispatchAcationPath, { params, id })
+                    .then(() => {
+                        this.$bkMessage({
+                            message: successText,
+                            theme: 'success',
+                        });
+                        this.reloadTicket();
+                    })
                     .catch((res) => {
                         errorHandler(res, this);
                     })
@@ -376,7 +476,9 @@
                 this.reloadTicket();
             },
             getDisabledContentText(isCommented) {
-                return isCommented ? this.$t('m.newCommon["已评价"]') : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
+                return isCommented
+                    ? this.$t('m.newCommon["已评价"]')
+                    : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
             },
             onBackClick() {
                 const from = this.$route.query.from || '';
@@ -407,7 +509,7 @@
     align-items: center;
     padding: 0 19px 0 14px;
     height: 50px;
-    box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
     background: #ffffff;
     .ticket-status {
         margin-right: 10px;
@@ -437,7 +539,7 @@
             &:hover {
                 color: #ffb848;
                 &::before {
-                    content: "\E1F1"
+                    content: "\E1F1";
                 }
             }
         }
@@ -469,13 +571,13 @@
                 font-size: 14px;
                 vertical-align: 1px;
             }
-            &.rotate{
-                /deep/ .icon-refresh{
+            &.rotate {
+                /deep/ .icon-refresh {
                     transform: rotate(360deg);
                 }
             }
-            &.not-rotate{
-                /deep/ .icon-refresh{
+            &.not-rotate {
+                /deep/ .icon-refresh {
                     transform: rotate(0);
                 }
             }
@@ -490,7 +592,7 @@
             font-size: 12px;
             border-radius: 2px;
             padding: 0 15px;
-            color: #63656E;
+            color: #63656e;
         }
         .dropdown-trigger-btn.bk-icon {
             font-size: 16px;
@@ -506,24 +608,24 @@
             /deep/ .bk-dropdown-content {
                 overflow: visible;
             }
-        .bk-dropdown-list-cus {
-            max-height: 400px;
-            li {
-                padding: 4px 18px;
-                .bk-dropdown-list-btn {
-                    width: 100%;
-                    font-size: 12px;
-                    text-align: left;
-                    &:not(.is-disabled) {
-                        color: #63656E;
-                        &:hover {
-                            color: #3a84ff;
+            .bk-dropdown-list-cus {
+                max-height: 400px;
+                li {
+                    padding: 4px 18px;
+                    .bk-dropdown-list-btn {
+                        width: 100%;
+                        font-size: 12px;
+                        text-align: left;
+                        &:not(.is-disabled) {
+                            color: #63656e;
+                            &:hover {
+                                color: #3a84ff;
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }
 }
 </style>

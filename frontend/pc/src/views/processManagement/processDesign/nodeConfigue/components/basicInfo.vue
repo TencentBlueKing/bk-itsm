@@ -428,7 +428,7 @@
                 return basicForm;
             },
             checkBasic() {
-                this.$refs.basicForm.validate().then((validator) => {
+                this.$refs.basicForm.validate().then(() => {
 
                 }, (validator) => {
                     console.error(validator);

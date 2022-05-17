@@ -353,10 +353,10 @@
                     });
                 }
             },
-            importEditorInitAfter(val) {
+            importEditorInitAfter() {
                 // ...
             },
-            blur(content, $editor, $fn) {
+            blur(content) {
                 this.responseDetailConfig.value = content;
             },
         },

@@ -166,7 +166,7 @@
                 this.versionStatus = false;
             },
             // 切换table
-            changeTab(item, index) {
+            changeTab(item) {
                 if (this.priorityConten.editorStatus) {
                     this.$bkInfo({
                         type: 'warning',
@@ -232,7 +232,7 @@
                 const params = this.getChildInfo();
                 this.secondClick = true;
                 params.service_type = [this.checkType.key, ...this.serviceTypeList];
-                this.$store.dispatch('slaManagement/submitPriority', { params }).then((res) => {
+                this.$store.dispatch('slaManagement/submitPriority', { params }).then(() => {
                     this.$bkMessage({
                         message: this.$t('m.deployPage["保存成功"]'),
                         theme: 'success',

@@ -373,11 +373,11 @@
                 return false;
             },
             // 是否可以编辑
-            checkEditDisabled(item) {
+            checkEditDisabled() {
                 return this.configur.type === 'APPROVAL';
             },
             // 拖动结束后的数据
-            updateInfo(evt) {
+            updateInfo() {
                 this.cacheFieldsIndexInfo();
             },
             // 新增编辑弹窗
@@ -516,7 +516,7 @@
                             return;
                         }
                         this.secondClick = true;
-                        this.$store.dispatch(url, patch).then((res) => {
+                        this.$store.dispatch(url, patch).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.systemConfig["删除成功"]'),
                                 theme: 'success',
@@ -547,7 +547,7 @@
                         return;
                     }
                     this.secondClick = true;
-                    this.$store.dispatch('basicModule/add_fields_from_table', { params, id }).then((res) => {
+                    this.$store.dispatch('basicModule/add_fields_from_table', { params, id }).then(() => {
                         this.$bkMessage({
                             message: this.$t('m.systemConfig["添加成功"]'),
                             theme: 'success',

@@ -177,7 +177,7 @@
         },
         computed: {},
         watch: {
-            apiDetail(newVal, oldVal) {
+            apiDetail() {
                 this.initData();
             },
         },

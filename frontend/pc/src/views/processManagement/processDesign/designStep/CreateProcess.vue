@@ -201,7 +201,7 @@
             },
             // 数据校验
             changeText() {
-                this.$refs.stepOneForm.validate().then((validator) => {
+                this.$refs.stepOneForm.validate().then(() => {
                     this.stepNext();
                 });
             },

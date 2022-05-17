@@ -14,8 +14,8 @@
             :state-list="stateList"
             :is-static="isStatic"
             :constant-default-value="constantDefaultValue"
-            @onChangeHook="onChangeHook">
-        </sops-get-param>
+            @onChangeHook="onChangeHook"
+        ></sops-get-param>
         <!-- DEVOPS -->
         <bk-form
             v-if="nodeInfo.type === 'TASK-DEVOPS'"
@@ -24,27 +24,34 @@
             form-type="vertical"
             :model="pipelineData"
             :rules="pipelineRules"
-            :label-width="200">
-            <bk-form-item v-for="pipeline in pipelineList"
+            :label-width="200"
+        >
+            <bk-form-item
+                v-for="pipeline in pipelineList"
                 :key="pipeline.id"
                 :label="pipeline.id"
                 :property="pipeline.id"
                 :rules="pipelineRules[pipeline.id]"
-                :required="pipeline.required">
+                :required="pipeline.required"
+            >
                 <bk-input
                     :disabled="!changeBtn"
                     v-model="pipelineData[pipeline.id]"
-                    :clearable="true">
-                </bk-input>
+                    :clearable="true"
+                ></bk-input>
             </bk-form-item>
         </bk-form>
         <devops-preview
             v-if="nodeInfo.type === 'TASK-DEVOPS'"
-            :stages="pipelineStages">
-        </devops-preview>
+            :stages="pipelineStages"
+        ></devops-preview>
         <div class="submit-btn">
-            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">{{ $t(`m["提交"]`) }}</bk-button>
-            <bk-button :theme="'primary'" @click="reSetSopTask">{{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}</bk-button>
+            <bk-button v-if="changeBtn" :theme="'primary'" @click="submit">
+                {{ $t(`m["提交"]`) }}
+            </bk-button>
+            <bk-button :theme="'primary'" @click="reSetSopTask">
+                {{ changeBtn ? $t(`m["返回"]`) : $t(`m["重做"]`) }}
+            </bk-button>
             <bk-button @click="ignore">{{ $t(`m["忽略"]`) }}</bk-button>
         </div>
     </div>
@@ -67,7 +74,7 @@
             constantDefaultValue: Object,
             pipelineList: {
                 type: Array,
-                default: () => ([]),
+                default: () => [],
             },
             pipelineRules: Object,
             workflow: [Number, String],
@@ -112,14 +119,15 @@
                     state: this.nodeInfo.state_id,
                     field: '',
                 };
-                await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
-                    this.stateList = res.data;
-                })
+                await this.$store
+                    .dispatch('apiRemote/get_related_fields', params)
+                    .then((res) => {
+                        this.stateList = res.data;
+                    })
                     .catch((res) => {
                         console.log(res);
                     })
-                    .finally(() => {
-                    });
+                    .finally(() => {});
             },
             reSetSopTask() {
                 this.changeBtn = !this.changeBtn;
@@ -138,23 +146,33 @@
                     is_direct: true,
                     state_id: this.nodeInfo.state_id,
                 };
-                this.$store.dispatch('deployOrder/ignoreNode', { params, ticketId: this.nodeInfo.ticket_id }).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m["忽略完成"]'),
-                        theme: 'success',
+                this.$store
+                    .dispatch('deployOrder/ignoreNode', {
+                        params,
+                        ticketId: this.nodeInfo.ticket_id,
+                    })
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m["忽略完成"]'),
+                            theme: 'success',
+                        });
+                        this.$emit('reloadTicket');
                     });
-                    this.$emit('reloadTicket');
-                });
             },
             retry(params) {
-                this.$store.dispatch('deployOrder/retryNode', { params, ticketId: this.nodeInfo.ticket_id }).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["提交成功"]'),
-                        theme: 'success',
+                this.$store
+                    .dispatch('deployOrder/retryNode', {
+                        params,
+                        ticketId: this.nodeInfo.ticket_id,
+                    })
+                    .then(() => {
+                        this.$bkMessage({
+                            message: this.$t('m.newCommon["提交成功"]'),
+                            theme: 'success',
+                        });
+                        this.changeBtn = false;
+                        this.$emit('reloadTicket');
                     });
-                    this.changeBtn = false;
-                    this.$emit('reloadTicket');
-                });
             },
             submit() {
                 const params = {
@@ -169,14 +187,22 @@
                         key: 1,
                         value_type: 'custom',
                     };
-                    const { exclude_task_nodes_id, template_id, template_source } = this.nodeInfo.contexts.task_params;
+                    const { exclude_task_nodes_id, template_id, template_source } =                    this.nodeInfo.contexts.task_params;
                     const formData = this.constants.map((item) => {
                         const formKey = Object.keys(this.$refs.sopsGetParam.formData).filter(key => key === item.key);
-                        const vt = this.hookedVarList[formKey] ? 'variable' : 'custom';
+                        const vt = this.hookedVarList[formKey]
+                            ? 'variable'
+                            : 'custom';
                         return {
                             name: item.name,
                             key: item.key,
-                            value: this.hookedVarList[formKey] ? this.$refs.sopsGetParam.formData[formKey].slice(2, this.$refs.sopsGetParam.formData[formKey].length - 1) : this.$refs.sopsGetParam.formData[formKey],
+                            value: this.hookedVarList[formKey]
+                                ? this.$refs.sopsGetParam.formData[formKey].slice(
+                                    2,
+                                    this.$refs.sopsGetParam.formData[formKey]
+                                        .length - 1
+                                )
+                                : this.$refs.sopsGetParam.formData[formKey],
                             value_type: vt,
                             is_quoted: this.hookedVarList[formKey],
                         };
@@ -190,7 +216,7 @@
                     };
                     this.retry(params);
                 } else {
-                    this.$refs.devopsVariable.validate().then((res) => {
+                    this.$refs.devopsVariable.validate().then(() => {
                         const constants = Object.keys(this.$refs.devopsVariable.model).map(item => ({
                             value: this.$refs.devopsVariable.model[item],
                             name: item,
@@ -213,11 +239,11 @@
 </script>
 
 <style lang="scss" scoped>
-    .sops-form {
-        width: 100%;
-        min-height: 100px;
-    }
-    .submit-btn {
-        margin-top: 60px;
-    }
+.sops-form {
+    width: 100%;
+    min-height: 100px;
+}
+.submit-btn {
+    margin-top: 60px;
+}
 </style>

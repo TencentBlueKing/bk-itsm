@@ -499,7 +499,7 @@
                 constants.map((item) => {
                     this.$set(this.hookedVarList, item.key, false);
                 });
-                if (this.configur.extras.hasOwnProperty('sops_info')) {
+                if (Object.prototype.hasOwnProperty.call(this.configur.extras, 'sops_info')) {
                     constants.forEach((item) => {
                         const curConstant = this.configur.extras.sops_info.constants.find(ite => ite.key === item.key);
                         if (!curConstant) return;
@@ -583,7 +583,7 @@
                 } else {
                     this.renderFormValidate = true;
                 }
-                this.$refs.basicsForm.validate().then((_) => {
+                this.$refs.basicsForm.validate().then(() => {
                     if (this.renderFormValidate) {
                         const formData = [];
                         const biz = {
@@ -629,7 +629,7 @@
                             workflow: this.configur.workflow,
                         };
                         const stateId = this.configur.id;
-                        this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then((res) => {
+                        this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then(() => {
                             this.$bkMessage({
                                 message: this.$t('m.treeinfo["保存成功"]'),
                                 theme: 'success',

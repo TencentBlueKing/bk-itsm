@@ -44,7 +44,9 @@
             header-position="left"
             title="提示"
             @confirm="onNoticeConfirm">
-            {{$t(`m.newCommon['您要处理的节点已被']`)}} {{ noticeInfo.processed_user }} {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
+            {{$t(`m.newCommon['您要处理的节点已被']`)}}
+            {{ noticeInfo.processed_user }}
+            {{$t(`m.newCommon['处理完成，可在流转日志中查看详情。']`)}}
         </bk-dialog>
     </div>
 </template>
@@ -224,7 +226,8 @@
             updateNodeList(newNodeList) {
                 const copyList = deepClone(newNodeList);
                 if (this.openFunction.FIRST_STATE_SWITCH) {
-                    this.firstStateFields = copyList.find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields;
+                    this.firstStateFields = copyList
+                        .find(item => item.state_id === Number(this.ticketInfo.first_state_id)).fields;
                     this.firstStateFields.forEach((item) => {
                         this.$set(item, 'showFeild', !!item.show_type);
                         this.$set(item, 'val', (item.value || ''));
@@ -248,7 +251,8 @@
                 this.$store.dispatch('deployOrder/getNodeList', params).then(async (res) => {
                     const newNodeList = res.data;
                     const oldNodeList = this.nodeList;
-                    const nodeStatusHasUpdate = newNodeList.some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)));
+                    const nodeStatusHasUpdate = newNodeList
+                        .some(node => !oldNodeList.find(item => this.isSameStatusNode(node, item)));
                     if (nodeStatusHasUpdate) {
                         // 节点状态有更新
                         this.nodeList = newNodeList;
@@ -260,7 +264,7 @@
                 });
             },
             // 初始化当前步骤列表信息
-            initCurrentStepData(diffNode) {
+            initCurrentStepData() {
                 this.$refs.leftTicketContent && this.$refs.leftTicketContent.initCurrentStepData();
             },
             // 获取单据手动触发器
