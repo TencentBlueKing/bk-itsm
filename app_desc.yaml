@@ -42,7 +42,7 @@ modules:
                 plan: 4C1G5R
                 replicas: 1
             pworker:
-                command: python manage.py celery worker -n prefork@%h -c 4 -l info -O fair --maxtasksperchild=100
+                command: python manage.py celery worker -n prefork@%h -P threads -c 10 -l info -O fair --maxtasksperchild=100
                 plan: 4C2G5R
                 replicas: 5
             gworker:
