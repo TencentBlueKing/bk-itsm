@@ -221,296 +221,296 @@
 </template>
 
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js';
-    import memberSelect from '../../commonComponent/memberSelect';
-    import commonMix from '../../commonMix/common.js';
-    import { errorHandler } from '../../../utils/errorHandler.js';
-    import permission from '@/mixins/permission.js';
+  import collapseTransition from '@/utils/collapse-transition.js';
+  import memberSelect from '../../commonComponent/memberSelect';
+  import commonMix from '../../commonMix/common.js';
+  import { errorHandler } from '../../../utils/errorHandler.js';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'apiTree',
-        components: {
-            collapseTransition,
-            memberSelect,
+  export default {
+    name: 'apiTree',
+    components: {
+      collapseTransition,
+      memberSelect,
+    },
+    mixins: [commonMix, permission],
+    props: {
+      projectId: String,
+      treeListOri: {
+        type: Array,
+        default() {
+          return [];
         },
-        mixins: [commonMix, permission],
-        props: {
-            projectId: String,
-            treeListOri: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            codeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            allCodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      codeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                secondClick: false,
-                // 基本信息人员数组
-                basicPerson: {
-                    // 禁用数组
-                    disabledList: [],
-                },
-                styletranslateY: {
-                    transform: 'translate(40px,-20px)',
-                },
-                isTreeLoading: false,
-                searchWord: '',
-                // 接入系统
-                dictDataTable: {
-                    showDialog: false,
-                    width: 700,
-                    headerPosition: 'left',
-                    autoClose: false,
-                    precision: 0,
-                    formInfo: {
-                        addName: '',
-                        addCode: '',
-                        name: '',
-                        desc: '',
-                        code: '',
-                        domain: '',
-                        owners: '',
-                        personInCharge: [],
-                        contact_information: '',
-                        id: '',
-                        system_id: '',
-                        is_activated: true,
-                    },
-                },
-                isDropdownShow: false,
-                rules: {},
+      },
+      allCodeList: {
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+    },
+    data() {
+      return {
+        secondClick: false,
+        // 基本信息人员数组
+        basicPerson: {
+          // 禁用数组
+          disabledList: [],
+        },
+        styletranslateY: {
+          transform: 'translate(40px,-20px)',
+        },
+        isTreeLoading: false,
+        searchWord: '',
+        // 接入系统
+        dictDataTable: {
+          showDialog: false,
+          width: 700,
+          headerPosition: 'left',
+          autoClose: false,
+          precision: 0,
+          formInfo: {
+            addName: '',
+            addCode: '',
+            name: '',
+            desc: '',
+            code: '',
+            domain: '',
+            owners: '',
+            personInCharge: [],
+            contact_information: '',
+            id: '',
+            system_id: '',
+            is_activated: true,
+          },
+        },
+        isDropdownShow: false,
+        rules: {},
+      };
+    },
+    computed: {
+      treeList: {
+        // getter
+        get() {
+          const vm = this;
+          return this.treeListOri.filter(item => item.name.indexOf(vm.searchWord) !== -1);
+        },
+        // setter
+        set(newVal) {
+          newVal.forEach((item) => {
+            const ori = this.$parent.treeList.filter(ite => ite.system_id === item.system_id && ite.id === item.id);
+            if (ori.length) {
+              ori[0] = JSON.parse(JSON.stringify(item));
+            }
+          });
+        },
+      },
+    },
+    async mounted() {
+      await this.treeListOri;
+      // 获取所有系统
+      await this.showBackground(this.treeList[0], 0, 0);
+      // 校验
+      this.rules.code = this.checkCommonRules('select').select;
+      this.rules.addName = this.checkCommonRules('name').name;
+      this.rules.addCode = this.checkCommonRules('key').key;
+    },
+    methods: {
+      scrollEvent($event) {
+        this.styletranslateY.transform = `translate(40px,${-$event.target.scrollTop - 20}px)`;
+      },
+      changeCode(code) {
+        const dataItem = this.codeList.filter(item => item.code === code)[0];
+        this.dictDataTable.formInfo.name = dataItem.name;
+        this.dictDataTable.formInfo.system_id = dataItem.system_id;
+      },
+      clearInfo() {
+        this.searchWord = '';
+      },
+      // 展开/收起tree
+      showGroupChild(item) {
+        item.showMore = !item.showMore;
+        this.treeList = [...JSON.parse(JSON.stringify(this.treeList))];
+      },
+      // 显示底色
+      showBackground(item, level) {
+        if (!level) {
+          this.$parent.displayInfo.level_1 = {};
+          this.$parent.displayInfo.level_0 = item;
+          // 展示 api列表
+          // this.$parent.showContent = false
+          this.$parent.getTableList(item.id);
+          // this.$parent.getChannelPathList(item.system_id)
+        } else {
+          this.$parent.displayInfo.level_1 = item;
+          // 展示 单个api
+          // this.$parent.showContent = true
+          this.$parent.getRemoteApiDetail(item.id);
+        }
+        this.treeList.forEach((tree) => {
+          this.recordCheckFn(tree);
+        });
+        item.check = true;
+        this.treeList = [...JSON.parse(JSON.stringify(this.treeList))];
+      },
+      recordCheckFn(tree) {
+        tree.check = false;
+        if (tree.apis && tree.apis.length) {
+          tree.apis.forEach((node) => {
+            node.check = false;
+          });
+        }
+      },
+      getRemoteSystemData() {
+        this.$parent.getRemoteSystemData();
+      },
+      // 接入系统/修改系统
+      submitDictionary() {
+        this.$refs.dictDataForm.validate().then(() => {
+          if (this.secondClick) {
+            return;
+          }
+          this.dictDataTable.formInfo.owners = this.dictDataTable.formInfo.personInCharge.join(',');
+          const params = {
+            name: this.dictDataTable.formInfo.name,
+            desc: this.dictDataTable.formInfo.desc,
+            code: this.dictDataTable.formInfo.code,
+            domain: this.dictDataTable.formInfo.domain,
+            system_id: this.dictDataTable.formInfo.system_id,
+            owners: this.dictDataTable.formInfo.owners,
+            contact_information: this.dictDataTable.formInfo.contact_information,
+            is_activated: this.dictDataTable.formInfo.is_activated,
+            headers: [],
+            cookies: [],
+            variables: [],
+          };
+          if (this.dictDataTable.type === 'ADD') {
+            params.name = this.dictDataTable.formInfo.addName;
+            params.code = this.dictDataTable.formInfo.addCode;
+          }
+          params.project_key = !this.projectId ? 'public' : this.projectId;
+          if (this.dictDataTable.title === this.$t('m.systemConfig["修改系统"]')) {
+            params.id = this.dictDataTable.formInfo.id;
+            this.secondClick = true;
+            this.$store.dispatch('apiRemote/put_remote_system', params).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["修改成功"]'),
+                theme: 'success',
+              });
+              this.getRemoteSystemData();
+              this.closeDictionary();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+            return;
+          }
+          this.secondClick = true;
+          this.$store.dispatch('apiRemote/post_remote_system', params).then(() => {
+            this.$bkMessage({
+              message: this.$t('m.systemConfig["添加成功"]'),
+              theme: 'success',
+            });
+            this.getRemoteSystemData();
+            this.closeDictionary();
+          })
+            .catch((res) => {
+              errorHandler(res, this);
+            })
+            .finally(() => {
+              this.secondClick = false;
+            });
+        }, (validator) => {
+          console.warn(validator);
+        });
+      },
+      openDictionary(type, item) {
+        if (!this.projectId) {
+          let reqPerm = ['public_api_create'];
+          let crtPerm = [];
+          let resourceData = {};
+          if (!['JION', 'ADD'].includes(type)) {
+            reqPerm = ['public_api_manage'];
+            crtPerm = item.auth_actions;
+            resourceData = {
+              public_api: [{
+                id: item.id,
+                name: item.name,
+              }],
             };
-        },
-        computed: {
-            treeList: {
-                // getter
-                get() {
-                    const vm = this;
-                    return this.treeListOri.filter(item => item.name.indexOf(vm.searchWord) !== -1);
-                },
-                // setter
-                set(newVal) {
-                    newVal.forEach((item) => {
-                        const ori = this.$parent.treeList.filter(ite => ite.system_id === item.system_id && ite.id === item.id);
-                        if (ori.length) {
-                            ori[0] = JSON.parse(JSON.stringify(item));
-                        }
-                    });
-                },
-            },
-        },
-        async mounted() {
-            await this.treeListOri;
-            // 获取所有系统
-            await this.showBackground(this.treeList[0], 0, 0);
-            // 校验
-            this.rules.code = this.checkCommonRules('select').select;
-            this.rules.addName = this.checkCommonRules('name').name;
-            this.rules.addCode = this.checkCommonRules('key').key;
-        },
-        methods: {
-            scrollEvent($event) {
-                this.styletranslateY.transform = `translate(40px,${-$event.target.scrollTop - 20}px)`;
-            },
-            changeCode(code) {
-                const dataItem = this.codeList.filter(item => item.code === code)[0];
-                this.dictDataTable.formInfo.name = dataItem.name;
-                this.dictDataTable.formInfo.system_id = dataItem.system_id;
-            },
-            clearInfo() {
-                this.searchWord = '';
-            },
-            // 展开/收起tree
-            showGroupChild(item) {
-                item.showMore = !item.showMore;
-                this.treeList = [...JSON.parse(JSON.stringify(this.treeList))];
-            },
-            // 显示底色
-            showBackground(item, level) {
-                if (!level) {
-                    this.$parent.displayInfo.level_1 = {};
-                    this.$parent.displayInfo.level_0 = item;
-                    // 展示 api列表
-                    // this.$parent.showContent = false
-                    this.$parent.getTableList(item.id);
-                    // this.$parent.getChannelPathList(item.system_id)
-                } else {
-                    this.$parent.displayInfo.level_1 = item;
-                    // 展示 单个api
-                    // this.$parent.showContent = true
-                    this.$parent.getRemoteApiDetail(item.id);
-                }
-                this.treeList.forEach((tree) => {
-                    this.recordCheckFn(tree);
-                });
-                item.check = true;
-                this.treeList = [...JSON.parse(JSON.stringify(this.treeList))];
-            },
-            recordCheckFn(tree) {
-                tree.check = false;
-                if (tree.apis && tree.apis.length) {
-                    tree.apis.forEach((node) => {
-                        node.check = false;
-                    });
-                }
-            },
-            getRemoteSystemData() {
-                this.$parent.getRemoteSystemData();
-            },
-            // 接入系统/修改系统
-            submitDictionary() {
-                this.$refs.dictDataForm.validate().then(() => {
-                    if (this.secondClick) {
-                        return;
-                    }
-                    this.dictDataTable.formInfo.owners = this.dictDataTable.formInfo.personInCharge.join(',');
-                    const params = {
-                        name: this.dictDataTable.formInfo.name,
-                        desc: this.dictDataTable.formInfo.desc,
-                        code: this.dictDataTable.formInfo.code,
-                        domain: this.dictDataTable.formInfo.domain,
-                        system_id: this.dictDataTable.formInfo.system_id,
-                        owners: this.dictDataTable.formInfo.owners,
-                        contact_information: this.dictDataTable.formInfo.contact_information,
-                        is_activated: this.dictDataTable.formInfo.is_activated,
-                        headers: [],
-                        cookies: [],
-                        variables: [],
-                    };
-                    if (this.dictDataTable.type === 'ADD') {
-                        params.name = this.dictDataTable.formInfo.addName;
-                        params.code = this.dictDataTable.formInfo.addCode;
-                    }
-                    params.project_key = !this.projectId ? 'public' : this.projectId;
-                    if (this.dictDataTable.title === this.$t('m.systemConfig["修改系统"]')) {
-                        params.id = this.dictDataTable.formInfo.id;
-                        this.secondClick = true;
-                        this.$store.dispatch('apiRemote/put_remote_system', params).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["修改成功"]'),
-                                theme: 'success',
-                            });
-                            this.getRemoteSystemData();
-                            this.closeDictionary();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                        return;
-                    }
-                    this.secondClick = true;
-                    this.$store.dispatch('apiRemote/post_remote_system', params).then(() => {
-                        this.$bkMessage({
-                            message: this.$t('m.systemConfig["添加成功"]'),
-                            theme: 'success',
-                        });
-                        this.getRemoteSystemData();
-                        this.closeDictionary();
-                    })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        })
-                        .finally(() => {
-                            this.secondClick = false;
-                        });
-                }, (validator) => {
-                    console.warn(validator);
-                });
-            },
-            openDictionary(type, item) {
-                if (!this.projectId) {
-                    let reqPerm = ['public_api_create'];
-                    let crtPerm = [];
-                    let resourceData = {};
-                    if (!['JION', 'ADD'].includes(type)) {
-                        reqPerm = ['public_api_manage'];
-                        crtPerm = item.auth_actions;
-                        resourceData = {
-                            public_api: [{
-                                id: item.id,
-                                name: item.name,
-                            }],
-                        };
-                    }
-                    if (crtPerm && !this.hasPermission(reqPerm, crtPerm)) {
-                        this.applyForPermission(reqPerm, crtPerm, resourceData);
-                        return;
-                    }
-                }
-                this.dictDataTable.showDialog = true;
-                this.dictDataTable.type = type;
-                this.dictDataTable.title = type === 'ADD' ? this.$t('m.systemConfig["新增系统"]') : (item ? this.$t('m.systemConfig["修改系统"]') : this.$t('m.systemConfig["接入系统"]'));
-                this.dictDataTable.formInfo = {
-                    addName: '',
-                    addCode: '',
-                    name: item ? item.name : '',
-                    desc: item ? item.desc : '',
-                    domain: item ? item.domain : '',
-                    code: item ? item.code : '',
-                    owners: item ? item.owners : '',
-                    personInCharge: item ? item.owners.split(',') : [],
-                    contact_information: item ? item.contact_information : '',
-                    id: item ? item.id : '',
-                    system_id: item ? item.system_id : '',
-                    is_activated: item ? item.is_activated : true,
-                };
-                this.$refs.dropdown.hide();
-            },
-            closeDictionary() {
-                this.dictDataTable.showDialog = false;
-            },
-            dropdownShow() {
-                this.isDropdownShow = true;
-            },
-            dropdownHide() {
-                this.isDropdownShow = false;
-            },
-            // 二次弹窗确认
-            openDelete(item) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.systemConfig["确认移除系统？"]'),
-                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该系统，请谨慎操作"]'),
-                    confirmFn: () => {
-                        const { id } = item;
-                        if (this.secondClick) {
-                            return;
-                        }
-                        this.secondClick = true;
-                        this.$store.dispatch('apiRemote/delete_remote_system', id).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["删除成功"]'),
-                                theme: 'success',
-                            });
-                            this.getRemoteSystemData();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                    },
-                });
-            },
-        },
-    };
+          }
+          if (crtPerm && !this.hasPermission(reqPerm, crtPerm)) {
+            this.applyForPermission(reqPerm, crtPerm, resourceData);
+            return;
+          }
+        }
+        this.dictDataTable.showDialog = true;
+        this.dictDataTable.type = type;
+        this.dictDataTable.title = type === 'ADD' ? this.$t('m.systemConfig["新增系统"]') : (item ? this.$t('m.systemConfig["修改系统"]') : this.$t('m.systemConfig["接入系统"]'));
+        this.dictDataTable.formInfo = {
+          addName: '',
+          addCode: '',
+          name: item ? item.name : '',
+          desc: item ? item.desc : '',
+          domain: item ? item.domain : '',
+          code: item ? item.code : '',
+          owners: item ? item.owners : '',
+          personInCharge: item ? item.owners.split(',') : [],
+          contact_information: item ? item.contact_information : '',
+          id: item ? item.id : '',
+          system_id: item ? item.system_id : '',
+          is_activated: item ? item.is_activated : true,
+        };
+        this.$refs.dropdown.hide();
+      },
+      closeDictionary() {
+        this.dictDataTable.showDialog = false;
+      },
+      dropdownShow() {
+        this.isDropdownShow = true;
+      },
+      dropdownHide() {
+        this.isDropdownShow = false;
+      },
+      // 二次弹窗确认
+      openDelete(item) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.systemConfig["确认移除系统？"]'),
+          subTitle: this.$t('m.systemConfig["移除后，将无法使用该系统，请谨慎操作"]'),
+          confirmFn: () => {
+            const { id } = item;
+            if (this.secondClick) {
+              return;
+            }
+            this.secondClick = true;
+            this.$store.dispatch('apiRemote/delete_remote_system', id).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["删除成功"]'),
+                theme: 'success',
+              });
+              this.getRemoteSystemData();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+          },
+        });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

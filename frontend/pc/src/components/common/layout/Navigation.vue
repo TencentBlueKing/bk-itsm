@@ -188,306 +188,306 @@
   </bk-navigation>
 </template>
 <script>
-    import { mapState } from 'vuex';
-    import bus from '@/utils/bus.js';
-    import permission from '@/mixins/permission.js';
-    import ROUTER_LIST from '@/constants/routerList.js';
-    import VersionLog from '@/components/common/layout/VersionLog.vue';
-    import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue';
-    import EditProjectDialog from '@/views/project/editProjectDialog.vue';
-    import { errorHandler } from '../../../utils/errorHandler';
+  import { mapState } from 'vuex';
+  import bus from '@/utils/bus.js';
+  import permission from '@/mixins/permission.js';
+  import ROUTER_LIST from '@/constants/routerList.js';
+  import VersionLog from '@/components/common/layout/VersionLog.vue';
+  import CreateTicketDialog from '@/components/common/modal/CreateTicketDialog.vue';
+  import EditProjectDialog from '@/views/project/editProjectDialog.vue';
+  import { errorHandler } from '../../../utils/errorHandler';
 
-    export default {
-        name: 'Navigation',
-        components: {
-            VersionLog,
-            CreateTicketDialog,
-            EditProjectDialog,
+  export default {
+    name: 'Navigation',
+    components: {
+      VersionLog,
+      CreateTicketDialog,
+      EditProjectDialog,
+    },
+    inject: ['reload'],
+    mixins: [permission],
+    data() {
+      return {
+        appName: window.log_name || '流程服务管理',
+        userName: window.username || '--',
+        bkDocUrl: window.DOC_URL,
+        routerList: ROUTER_LIST.slice(0),
+        isSideOpen: true,
+        sideRouters: [],
+        activeNav: '',
+        activeSideRouter: '',
+        selectedProject: this.$store.state.project.id,
+        isEditDialogShow: false,
+        isVersionLogShow: false,
+        isCreateTicketDialogShow: false,
+        projectForm: {
+          name: '',
+          key: '',
+          desc: '',
+          color: '',
         },
-        inject: ['reload'],
-        mixins: [permission],
-        data() {
-            return {
-                appName: window.log_name || '流程服务管理',
-                userName: window.username || '--',
-                bkDocUrl: window.DOC_URL,
-                routerList: ROUTER_LIST.slice(0),
-                isSideOpen: true,
-                sideRouters: [],
-                activeNav: '',
-                activeSideRouter: '',
-                selectedProject: this.$store.state.project.id,
-                isEditDialogShow: false,
-                isVersionLogShow: false,
-                isCreateTicketDialogShow: false,
-                projectForm: {
-                    name: '',
-                    key: '',
-                    desc: '',
-                    color: '',
-                },
-                editDialogFormDisable: false,
-            };
-        },
-        computed: {
-            ...mapState({
-                openFunction: state => state.openFunction,
-                systemPermission: state => state.common.systemPermission,
-                projectList: state => state.project.projectList,
-                projectListLoading: state => state.project.projectListLoading,
-            }),
-            // 顶部导航项
-            topNav() {
-                return this.routerList.filter((item) => {
-                    if (item.id === 'wiki') { // 知识库只在全局配置中对应开关打开时显示
-                        return this.openFunction.WIKI_SWITCH;
-                    }
-                    if (item.id === 'manage') {
-                        return this.systemPermission.includes('platform_manage_access');
-                    }
-                    return true;
-                });
-            },
-            // 侧边栏导航项
-            sideNav() {
-                const list = [];
-                this.sideRouters.forEach((router) => {
-                    if (router.id === 'sla') {
-                        this.openFunction.SLA_SWITCH && list.push(router);
-                    } else if (router.id === 'processManage') {
-                        const subRouters = router.subRouters.filter((item) => {
-                            if (item.id === 'processManageTpl') {
-                                return this.openFunction.TASK_SWITCH;
-                            }
-                            if (item.id === 'processManageTrigger') {
-                                return this.openFunction.TRIGGER_SWITCH;
-                            }
-                            return true;
-                        });
-                        list.push(Object.assign({}, router, { subRouters }));
-                    } else {
-                        list.push(router);
-                    }
-                });
-                return list;
-            },
-        },
-        watch: {
-            '$route.fullPath'() {
-                this.setActive();
-            },
-            '$store.state.project.id'(val) {
-                if (val) {
-                    this.selectedProject = val;
-                }
-            },
-            isEditDialogShow(val) {
-                if (val) {
-                    this.getProjectList();
-                }
-            },
-        },
-        created() {
-            this.setActive();
-            this.getAccessService();
-            bus.$on('openCreateTicketDialog', () => {
-                this.isCreateTicketDialogShow = true;
+        editDialogFormDisable: false,
+      };
+    },
+    computed: {
+      ...mapState({
+        openFunction: state => state.openFunction,
+        systemPermission: state => state.common.systemPermission,
+        projectList: state => state.project.projectList,
+        projectListLoading: state => state.project.projectListLoading,
+      }),
+      // 顶部导航项
+      topNav() {
+        return this.routerList.filter((item) => {
+          if (item.id === 'wiki') { // 知识库只在全局配置中对应开关打开时显示
+            return this.openFunction.WIKI_SWITCH;
+          }
+          if (item.id === 'manage') {
+            return this.systemPermission.includes('platform_manage_access');
+          }
+          return true;
+        });
+      },
+      // 侧边栏导航项
+      sideNav() {
+        const list = [];
+        this.sideRouters.forEach((router) => {
+          if (router.id === 'sla') {
+            this.openFunction.SLA_SWITCH && list.push(router);
+          } else if (router.id === 'processManage') {
+            const subRouters = router.subRouters.filter((item) => {
+              if (item.id === 'processManageTpl') {
+                return this.openFunction.TASK_SWITCH;
+              }
+              if (item.id === 'processManageTrigger') {
+                return this.openFunction.TRIGGER_SWITCH;
+              }
+              return true;
             });
-            bus.$on('openCreateProjectDialog', () => {
-                this.handleCreateProject();
-            });
-        },
-        methods: {
-            async getProjectList() {
-                try {
-                    this.editDialogFormDisable = true;
-                    this.$store.commit('project/setProjectListLoading', true);
-                    const res = await this.$store.dispatch('project/getProjectAllList');
-                    this.$store.commit('project/setProjectList', res.data);
-                } catch (e) {
-                    errorHandler(e, this);
-                } finally {
-                    this.editDialogFormDisable = false;
-                    this.$store.commit('project/setProjectListLoading', false);
-                }
-            },
-            // 高亮顶部和侧边栏导航项
-            setActive() {
-                const hasMatched = this.routerList.some((nav) => {
-                    const navId = nav.id;
-                    this.getProjectList();
-                    if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
-                        const matched = this.traverseSubRouter(nav.subRouters, navId);
-                        if (matched.navId) {
-                            this.activeNav = matched.navId;
-                            this.activeSideRouter = matched.sideRouterId;
-                            this.sideRouters = nav.subRouters;
-                            if (this.$route.query.from !== 'projectTicket' && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
-                                this.sideRouters = [];
-                            }
-                            return true;
-                        } if (this.isMatchedByPrefix(nav.prefix)) {
-                            this.activeNav = nav.id;
-                            this.activeSideRouter = '';
-                            this.sideRouters = nav.subRouters;
-                            return true;
-                        }
-                    } else {
-                        if (this.$route.path === nav.path) {
-                            this.activeNav = nav.id;
-                            this.activeSideRouter = '';
-                            this.sideRouters = [];
-                            return true;
-                        }
-                    }
-                });
-                if (!hasMatched) {
-                    this.activeNav = this.$route.name;
-                    this.activeSideRouter = '';
-                    this.sideRouters = [];
-                }
-            },
-            traverseSubRouter(routers, navId) {
-                let matched = {};
-                routers.some((item) => {
-                    if (Array.isArray(item.subRouters) && item.subRouters.length > 0) {
-                        matched = this.traverseSubRouter(item.subRouters, navId);
-                    } else {
-                        if (this.$route.path === item.path || this.isMatchedByPrefix(item.prefix)) {
-                            matched = {
-                                navId,
-                                sideRouterId: item.id,
-                            };
-                        }
-                    }
-                    return !!matched.navId;
-                });
-                return matched;
-            },
-            isMatchedByPrefix(prefix) {
-                if (!prefix) {
-                    return false;
-                }
-                return prefix.some((path) => {
-                    if (typeof path === 'string') {
-                        return this.$route.path.indexOf(path) === 0;
-                    }
-                    if (typeof path === 'function') {
-                        const res = path(this.$route);
-                        return res && this.$route.path.indexOf(res) === 0;
-                    }
-                });
-            },
-            // @todo 获取可展示到页面的服务，工单管理改版后没有这些服务的导航项，应该去掉
-            getAccessService() {
-                return this.$store.dispatch('getCustom').then((res) => {
-                    const customList = res.data;
-                    this.$store.commit('changeMsg', customList);
-                    this.$store.commit('changeCustom', customList);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 头部导航点击
-            async handleTopNavClick(router) {
-                // if (router.id === 'manage') {
-                //     await this.$store.dispatch('project/getProjectInfo')
-                //     if (this.hasPermission(['project_view'])) {
-                //         bus.$emit('togglePermissionApplyPage', false)
-                //         this.$router.push(router.path)
-                //     } else {
-                //         const projectInfo = this.$store.state.project.projectInfo
-                //         const resourceData = {
-                //             project: [{
-                //                 id: projectInfo.resource_id,
-                //                 name: projectInfo.resource_name
-                //             }]
-                //         }
-                //         const data = this.applyForPermission(['project_view'], [], resourceData, true)
-                //         bus.$emit('togglePermissionApplyPage', true, 'other', data)
-                //         this.activeNav = 'manage'
-                //         this.sideRouters = []
-                //         return
-                //     }
-                // }
-                if (router.id === 'project') {
-                    this.$router.push({ name: 'projectTicket', query: { project_id: this.$store.state.project.id } });
-                } else {
-                    this.$router.push(router.path);
-                }
-                if (router.path === this.$route.path) {
-                    this.reload();
-                }
-            },
-            // 侧边栏导航点击
-            handleSideRouterClick(router) {
-                if (this.activeNav === 'project') {
-                    const query = {};
-                    if (this.$store.state.project.id) {
-                        query.project_id = this.$store.state.project.id;
-                    }
-                    this.$router.push({ name: router.id, query });
-                } else {
-                    this.$router.push(router.path);
-                }
-                if (router.path === this.$route.path) {
-                    this.reload();
-                }
-            },
-            onGoToProjectList() {
-                this.$router.push({ name: 'ProjectList' });
-            },
-            onLogOut() {
-                location.href = `${window.login_url}?c_url=${window.location.href}`;
-            },
-            // 切换项目
-            onSelectProject(val) {
-                this.selectedProject = val;
-                window.DEFAULT_PROJECT = val;
-                this.$store.commit('project/setProjectId', val);
-                this.$store.dispatch('project/changeDefaultProject', val);
-                // 申请权限页面新建项目跳到项目单据下
-                let path = this.$route.name;
-                if (this.$route.name === 'projectServiceEdit') {
-                    path = 'projectServiceList';
-                }
-                this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } });
-            },
-            applyForProjectViewPerm(project, perm) {
-                if (!this.hasPermission([perm], project.auth_actions)) {
-                    const resourceData = {
-                        project: [{
-                            id: project.key,
-                            name: project.name,
-                        }],
-                    };
-                    this.applyForPermission([perm], project.auth_actions, resourceData);
-                    return false;
-                }
-                return true;
-            },
-            handleCreateProject() {
-                if (!this.hasPermission(['project_create'])) {
-                    this.applyForPermission(['project_create'], [], {});
-                    return;
-                }
-                this.projectForm.color = ['#90a1ff', '#bb90ff', '#ffd990'][this.projectList.length % 3];
-                this.isEditDialogShow = true;
-            },
-            goToProjectManage() {
-                this.$router.push({ name: 'ProjectList' });
-            },
-            onProjectDialogConfirm(key) {
-                this.isEditDialogShow = false;
-                this.getProjectList();
-                this.onSelectProject(key);
-            },
-            onProjectDialogCancel() {
-                this.isEditDialogShow = false;
-            },
-        },
-    };
+            list.push(Object.assign({}, router, { subRouters }));
+          } else {
+            list.push(router);
+          }
+        });
+        return list;
+      },
+    },
+    watch: {
+      '$route.fullPath'() {
+        this.setActive();
+      },
+      '$store.state.project.id'(val) {
+        if (val) {
+          this.selectedProject = val;
+        }
+      },
+      isEditDialogShow(val) {
+        if (val) {
+          this.getProjectList();
+        }
+      },
+    },
+    created() {
+      this.setActive();
+      this.getAccessService();
+      bus.$on('openCreateTicketDialog', () => {
+        this.isCreateTicketDialogShow = true;
+      });
+      bus.$on('openCreateProjectDialog', () => {
+        this.handleCreateProject();
+      });
+    },
+    methods: {
+      async getProjectList() {
+        try {
+          this.editDialogFormDisable = true;
+          this.$store.commit('project/setProjectListLoading', true);
+          const res = await this.$store.dispatch('project/getProjectAllList');
+          this.$store.commit('project/setProjectList', res.data);
+        } catch (e) {
+          errorHandler(e, this);
+        } finally {
+          this.editDialogFormDisable = false;
+          this.$store.commit('project/setProjectListLoading', false);
+        }
+      },
+      // 高亮顶部和侧边栏导航项
+      setActive() {
+        const hasMatched = this.routerList.some((nav) => {
+          const navId = nav.id;
+          this.getProjectList();
+          if (Array.isArray(nav.subRouters) && nav.subRouters.length > 0) {
+            const matched = this.traverseSubRouter(nav.subRouters, navId);
+            if (matched.navId) {
+              this.activeNav = matched.navId;
+              this.activeSideRouter = matched.sideRouterId;
+              this.sideRouters = nav.subRouters;
+              if (this.$route.query.from !== 'projectTicket' && (this.$route.name === 'CreateTicket' || this.$route.name === 'TicketDetail')) {
+                this.sideRouters = [];
+              }
+              return true;
+            } if (this.isMatchedByPrefix(nav.prefix)) {
+              this.activeNav = nav.id;
+              this.activeSideRouter = '';
+              this.sideRouters = nav.subRouters;
+              return true;
+            }
+          } else {
+            if (this.$route.path === nav.path) {
+              this.activeNav = nav.id;
+              this.activeSideRouter = '';
+              this.sideRouters = [];
+              return true;
+            }
+          }
+        });
+        if (!hasMatched) {
+          this.activeNav = this.$route.name;
+          this.activeSideRouter = '';
+          this.sideRouters = [];
+        }
+      },
+      traverseSubRouter(routers, navId) {
+        let matched = {};
+        routers.some((item) => {
+          if (Array.isArray(item.subRouters) && item.subRouters.length > 0) {
+            matched = this.traverseSubRouter(item.subRouters, navId);
+          } else {
+            if (this.$route.path === item.path || this.isMatchedByPrefix(item.prefix)) {
+              matched = {
+                navId,
+                sideRouterId: item.id,
+              };
+            }
+          }
+          return !!matched.navId;
+        });
+        return matched;
+      },
+      isMatchedByPrefix(prefix) {
+        if (!prefix) {
+          return false;
+        }
+        return prefix.some((path) => {
+          if (typeof path === 'string') {
+            return this.$route.path.indexOf(path) === 0;
+          }
+          if (typeof path === 'function') {
+            const res = path(this.$route);
+            return res && this.$route.path.indexOf(res) === 0;
+          }
+        });
+      },
+      // @todo 获取可展示到页面的服务，工单管理改版后没有这些服务的导航项，应该去掉
+      getAccessService() {
+        return this.$store.dispatch('getCustom').then((res) => {
+          const customList = res.data;
+          this.$store.commit('changeMsg', customList);
+          this.$store.commit('changeCustom', customList);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 头部导航点击
+      async handleTopNavClick(router) {
+        // if (router.id === 'manage') {
+        //     await this.$store.dispatch('project/getProjectInfo')
+        //     if (this.hasPermission(['project_view'])) {
+        //         bus.$emit('togglePermissionApplyPage', false)
+        //         this.$router.push(router.path)
+        //     } else {
+        //         const projectInfo = this.$store.state.project.projectInfo
+        //         const resourceData = {
+        //             project: [{
+        //                 id: projectInfo.resource_id,
+        //                 name: projectInfo.resource_name
+        //             }]
+        //         }
+        //         const data = this.applyForPermission(['project_view'], [], resourceData, true)
+        //         bus.$emit('togglePermissionApplyPage', true, 'other', data)
+        //         this.activeNav = 'manage'
+        //         this.sideRouters = []
+        //         return
+        //     }
+        // }
+        if (router.id === 'project') {
+          this.$router.push({ name: 'projectTicket', query: { project_id: this.$store.state.project.id } });
+        } else {
+          this.$router.push(router.path);
+        }
+        if (router.path === this.$route.path) {
+          this.reload();
+        }
+      },
+      // 侧边栏导航点击
+      handleSideRouterClick(router) {
+        if (this.activeNav === 'project') {
+          const query = {};
+          if (this.$store.state.project.id) {
+            query.project_id = this.$store.state.project.id;
+          }
+          this.$router.push({ name: router.id, query });
+        } else {
+          this.$router.push(router.path);
+        }
+        if (router.path === this.$route.path) {
+          this.reload();
+        }
+      },
+      onGoToProjectList() {
+        this.$router.push({ name: 'ProjectList' });
+      },
+      onLogOut() {
+        location.href = `${window.login_url}?c_url=${window.location.href}`;
+      },
+      // 切换项目
+      onSelectProject(val) {
+        this.selectedProject = val;
+        window.DEFAULT_PROJECT = val;
+        this.$store.commit('project/setProjectId', val);
+        this.$store.dispatch('project/changeDefaultProject', val);
+        // 申请权限页面新建项目跳到项目单据下
+        let path = this.$route.name;
+        if (this.$route.name === 'projectServiceEdit') {
+          path = 'projectServiceList';
+        }
+        this.$router.push({ name: this.$route.name === 'ProjectGuide' ? 'projectTicket' : path, query: { project_id: val } });
+      },
+      applyForProjectViewPerm(project, perm) {
+        if (!this.hasPermission([perm], project.auth_actions)) {
+          const resourceData = {
+            project: [{
+              id: project.key,
+              name: project.name,
+            }],
+          };
+          this.applyForPermission([perm], project.auth_actions, resourceData);
+          return false;
+        }
+        return true;
+      },
+      handleCreateProject() {
+        if (!this.hasPermission(['project_create'])) {
+          this.applyForPermission(['project_create'], [], {});
+          return;
+        }
+        this.projectForm.color = ['#90a1ff', '#bb90ff', '#ffd990'][this.projectList.length % 3];
+        this.isEditDialogShow = true;
+      },
+      goToProjectManage() {
+        this.$router.push({ name: 'ProjectList' });
+      },
+      onProjectDialogConfirm(key) {
+        this.isEditDialogShow = false;
+        this.getProjectList();
+        this.onSelectProject(key);
+      },
+      onProjectDialogCancel() {
+        this.isEditDialogShow = false;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .logo-icon {

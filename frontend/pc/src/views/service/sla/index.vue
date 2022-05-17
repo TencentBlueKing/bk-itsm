@@ -213,265 +213,265 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import secondFlow from './slaJsflowCanvas/secondFlow.vue';
-    import commonMix from '../../commonMix/common.js';
-    import { ProcessTools } from '@/utils/process.js';
-    import { errorHandler } from '../../../utils/errorHandler';
+  import axios from 'axios';
+  import secondFlow from './slaJsflowCanvas/secondFlow.vue';
+  import commonMix from '../../commonMix/common.js';
+  import { ProcessTools } from '@/utils/process.js';
+  import { errorHandler } from '../../../utils/errorHandler';
 
-    export default {
-        name: 'ProjectServiceSla',
-        components: {
-            secondFlow,
+  export default {
+    name: 'ProjectServiceSla',
+    components: {
+      secondFlow,
+    },
+    mixins: [commonMix],
+    props: {
+      modelPriority: {
+        type: Array,
+        default() {
+          return [];
         },
-        mixins: [commonMix],
-        props: {
-            modelPriority: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        serviceLoading: true,
+        serviceData: {},
+        slaListLoading: true,
+        slaList: [],
+        isSlaActive: false,
+        nodeOption: [],
+        endNodeOption: [],
+        agreementEditData: {},
+        isNodeClick: false,
+        serviceAgreementIsShow: false,
+        viewAgreementIsShow: false,
+        endNodeSelectLoading: false,
+        addList: [],
+        lineList: [],
+        canvasDataLoading: false,
+        previewInfo: {
+          canClick: false,
+          narrowSize: 0.9,
         },
-        data() {
-            return {
-                serviceLoading: true,
-                serviceData: {},
-                slaListLoading: true,
-                slaList: [],
-                isSlaActive: false,
-                nodeOption: [],
-                endNodeOption: [],
-                agreementEditData: {},
-                isNodeClick: false,
-                serviceAgreementIsShow: false,
-                viewAgreementIsShow: false,
-                endNodeSelectLoading: false,
-                addList: [],
-                lineList: [],
-                canvasDataLoading: false,
-                previewInfo: {
-                    canClick: false,
-                    narrowSize: 0.9,
-                },
-                submitPending: false,
-                agreementRules: {
-                    start_node_id: [
-                        {
-                            message: '字段必填',
-                            required: true,
-                            trigger: 'blur',
-                            validator: v => !!v,
-                        },
-                    ],
-                    end_node_id: [
-                        {
-                            message: '字段必填',
-                            required: true,
-                            trigger: 'blur',
-                            validator: v => !!v,
-                        },
-                    ],
-                    sla_id: [
-                        {
-                            message: '字段必填',
-                            required: true,
-                            trigger: 'blur',
-                            validator: v => !!v,
-                        },
-                    ],
-                },
-                agreeType: 'add',
-                isStartSla: true,
-                processTools: null,
-            };
+        submitPending: false,
+        agreementRules: {
+          start_node_id: [
+            {
+              message: '字段必填',
+              required: true,
+              trigger: 'blur',
+              validator: v => !!v,
+            },
+          ],
+          end_node_id: [
+            {
+              message: '字段必填',
+              required: true,
+              trigger: 'blur',
+              validator: v => !!v,
+            },
+          ],
+          sla_id: [
+            {
+              message: '字段必填',
+              required: true,
+              trigger: 'blur',
+              validator: v => !!v,
+            },
+          ],
         },
-        computed: {
-            getTransitionLines() {
-                return {
-                    from_state: this.agreementEditData.start_node_id,
-                    to_state: this.agreementEditData.end_node_id,
-                };
-            },
-        },
-        watch: {
-            getTransitionLines(states) {
-                if (states.from_state && states.to_state) {
-                    const params = {
-                        id: this.serviceData.workflow,
-                        from_state_id: states.from_state,
-                        to_state_id: states.to_state,
-                    };
-                    this.$store.dispatch('workflowVersion/getTransitionLines', params).then((res) => {
-                        this.agreementEditData.lines = res.data.lines;
-                        this.agreementEditData.states = res.data.states;
-                    })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        });
-                }
-            },
-        },
-        mounted() {
-            this.initData();
-        },
-        methods: {
-            // 初始化数据
-            async initData() {
-                this.getSlaList();
-                await this.getServiceDetail();
-                this.getWorkflowCanvasData();
-            },
-            // 获取服务详情
-            getServiceDetail() {
-                this.serviceLoading = true;
-                return this.$store.dispatch('service/getServiceDetail', this.$route.params.id).then((res) => {
-                    this.serviceData = res.data;
-                    if (res.data.sla.length > 0) {
-                        this.isSlaActive = true;
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.serviceLoading = false;
-                    });
-            },
-            // 服务级别列表
-            getSlaList() {
-                this.slaListLoading = true;
-                const params = {
-                    is_enabled: true,
-                    project_key: this.$store.state.project.id,
-                };
-                this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
-                    this.slaList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.slaListLoading = false;
-                    });
-            },
-            getWorkflowCanvasData() {
-                this.canvasDataLoading = true;
-                axios.all([
-                    this.$store.dispatch('deployCommon/getNodeVersion', { id: this.serviceData.workflow }),
-                    this.$store.dispatch('deployCommon/getLineVersion', { id: this.serviceData.workflow }),
-                ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data;
-                    for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i;
-                    }
-                    this.$store.commit('cdeploy/getChart', this.addList);
+        agreeType: 'add',
+        isStartSla: true,
+        processTools: null,
+      };
+    },
+    computed: {
+      getTransitionLines() {
+        return {
+          from_state: this.agreementEditData.start_node_id,
+          to_state: this.agreementEditData.end_node_id,
+        };
+      },
+    },
+    watch: {
+      getTransitionLines(states) {
+        if (states.from_state && states.to_state) {
+          const params = {
+            id: this.serviceData.workflow,
+            from_state_id: states.from_state,
+            to_state_id: states.to_state,
+          };
+          this.$store.dispatch('workflowVersion/getTransitionLines', params).then((res) => {
+            this.agreementEditData.lines = res.data.lines;
+            this.agreementEditData.states = res.data.states;
+          })
+            .catch((res) => {
+              errorHandler(res, this);
+            });
+        }
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      // 初始化数据
+      async initData() {
+        this.getSlaList();
+        await this.getServiceDetail();
+        this.getWorkflowCanvasData();
+      },
+      // 获取服务详情
+      getServiceDetail() {
+        this.serviceLoading = true;
+        return this.$store.dispatch('service/getServiceDetail', this.$route.params.id).then((res) => {
+          this.serviceData = res.data;
+          if (res.data.sla.length > 0) {
+            this.isSlaActive = true;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.serviceLoading = false;
+          });
+      },
+      // 服务级别列表
+      getSlaList() {
+        this.slaListLoading = true;
+        const params = {
+          is_enabled: true,
+          project_key: this.$store.state.project.id,
+        };
+        this.$store.dispatch('slaManagement/getProtocolsList', { params }).then((res) => {
+          this.slaList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.slaListLoading = false;
+          });
+      },
+      getWorkflowCanvasData() {
+        this.canvasDataLoading = true;
+        axios.all([
+          this.$store.dispatch('deployCommon/getNodeVersion', { id: this.serviceData.workflow }),
+          this.$store.dispatch('deployCommon/getLineVersion', { id: this.serviceData.workflow }),
+        ]).then(axios.spread((userResp, reposResp) => {
+          this.addList = userResp.data;
+          for (let i = 0; i < this.addList.length; i++) {
+            this.addList[i].indexInfo = i;
+          }
+          this.$store.commit('cdeploy/getChart', this.addList);
 
-                    this.lineList = reposResp.data.items;
-                    this.nodeOption = userResp.data.filter(node => node.name !== '' && node.type !== 'START' && node.type !== 'END');
+          this.lineList = reposResp.data.items;
+          this.nodeOption = userResp.data.filter(node => node.name !== '' && node.type !== 'START' && node.type !== 'END');
 
-                    this.processTools = new ProcessTools(this.addList, this.lineList);
-                }))
-                    .finally(() => {
-                        this.canvasDataLoading = false;
-                    });
-            },
-            getPostNodes(startId) {
-                const afterNodes = this.processTools.getSlaAfterNodes(startId);
-                this.endNodeOption = afterNodes;
-            },
-            getProtocolName(protocol) {
-                const slaname = this.slaList.find(sla => sla.id === protocol);
-                if (slaname && slaname.name) {
-                    return protocol && slaname.name;
-                }
-            },
-            handleSetAgreement() {
-                this.$refs.agreementForm.validate().then(() => {
-                    if (!this.isNodeClick && this.agreeType === 'add') {
-                        this.serviceData.sla.push(this.agreementEditData);
-                    }
-                    this.isNodeClick = false;
-                    this.serviceAgreementIsShow = false;
-                });
-            },
-            agreementTextClick(agree, type) {
-                this.agreeType = type || 'add';
-                this.agreementEditData = agree;
-                this.serviceAgreementIsShow = true;
-                this.endNodeOption = [];
-                if (!agree.color) {
-                    this.$set(this.agreementEditData, 'color', this.getRendomColor());
-                }
-                if (this.agreementEditData.start_node_id) {
-                    this.getPostNodes(this.agreementEditData.start_node_id);
-                }
-                this.isNodeClick = false;
-            },
-            // 节点校验
-            nodeCheck(agree) {
-                const isError = agree.start_node_id === agree.end_node_id;
-                if (isError) {
-                    this.$bkMessage({
-                        message: this.$t('m.serviceConfig[\'添加协议失败，请重新选择正确结束节点！\']'),
-                        theme: 'error',
-                        ellipsisLine: 0,
-                    });
-                }
-                return isError;
-            },
-            agreementCloseClick(agree, agreeIndex) {
-                this.$bkInfo({
-                    extCls: 'agreement-close',
-                    type: 'warning',
-                    title: this.getProtocolName(agree.sla_id) ? `${this.$t('m.serviceConfig["确认删除服务协议"]')}<${this.getProtocolName(agree.sla_id)}>` : this.$t('m["当前服务协议配置未完成，确认要删除吗？"]'),
-                    confirmFn: () => {
-                        const lastIndex = this.serviceData.sla.length - 1;
-                        if (lastIndex === agreeIndex && !this.serviceData.sla[lastIndex].end_node_id) {
-                            this.isStartSla = true;
-                            this.isNodeClick = false;
-                        }
-                        this.serviceData.sla.splice(agreeIndex, 1);
-                    },
-                });
-            },
-            configuNode(value) {
-                const { sla } = this.serviceData;
-                if (this.isStartSla) {
-                    sla.push({
-                        start_node_id: value.id,
-                        color: this.getRendomColor(),
-                    });
-                } else {
-                    const len = sla.length - 1;
-                    const lastSlaItem = sla[len];
-                    const endOptions = this.processTools.getSlaAfterNodes(lastSlaItem.start_node_id);
-                    if (!endOptions.find(n => n.id === value.id)) {
-                        this.$bkMessage({
-                            message: '该节点不能作为 SLA 结束节点',
-                            theme: 'error',
-                            ellipsisLine: 0,
-                        });
-                        return false;
-                    }
+          this.processTools = new ProcessTools(this.addList, this.lineList);
+        }))
+          .finally(() => {
+            this.canvasDataLoading = false;
+          });
+      },
+      getPostNodes(startId) {
+        const afterNodes = this.processTools.getSlaAfterNodes(startId);
+        this.endNodeOption = afterNodes;
+      },
+      getProtocolName(protocol) {
+        const slaname = this.slaList.find(sla => sla.id === protocol);
+        if (slaname && slaname.name) {
+          return protocol && slaname.name;
+        }
+      },
+      handleSetAgreement() {
+        this.$refs.agreementForm.validate().then(() => {
+          if (!this.isNodeClick && this.agreeType === 'add') {
+            this.serviceData.sla.push(this.agreementEditData);
+          }
+          this.isNodeClick = false;
+          this.serviceAgreementIsShow = false;
+        });
+      },
+      agreementTextClick(agree, type) {
+        this.agreeType = type || 'add';
+        this.agreementEditData = agree;
+        this.serviceAgreementIsShow = true;
+        this.endNodeOption = [];
+        if (!agree.color) {
+          this.$set(this.agreementEditData, 'color', this.getRendomColor());
+        }
+        if (this.agreementEditData.start_node_id) {
+          this.getPostNodes(this.agreementEditData.start_node_id);
+        }
+        this.isNodeClick = false;
+      },
+      // 节点校验
+      nodeCheck(agree) {
+        const isError = agree.start_node_id === agree.end_node_id;
+        if (isError) {
+          this.$bkMessage({
+            message: this.$t('m.serviceConfig[\'添加协议失败，请重新选择正确结束节点！\']'),
+            theme: 'error',
+            ellipsisLine: 0,
+          });
+        }
+        return isError;
+      },
+      agreementCloseClick(agree, agreeIndex) {
+        this.$bkInfo({
+          extCls: 'agreement-close',
+          type: 'warning',
+          title: this.getProtocolName(agree.sla_id) ? `${this.$t('m.serviceConfig["确认删除服务协议"]')}<${this.getProtocolName(agree.sla_id)}>` : this.$t('m["当前服务协议配置未完成，确认要删除吗？"]'),
+          confirmFn: () => {
+            const lastIndex = this.serviceData.sla.length - 1;
+            if (lastIndex === agreeIndex && !this.serviceData.sla[lastIndex].end_node_id) {
+              this.isStartSla = true;
+              this.isNodeClick = false;
+            }
+            this.serviceData.sla.splice(agreeIndex, 1);
+          },
+        });
+      },
+      configuNode(value) {
+        const { sla } = this.serviceData;
+        if (this.isStartSla) {
+          sla.push({
+            start_node_id: value.id,
+            color: this.getRendomColor(),
+          });
+        } else {
+          const len = sla.length - 1;
+          const lastSlaItem = sla[len];
+          const endOptions = this.processTools.getSlaAfterNodes(lastSlaItem.start_node_id);
+          if (!endOptions.find(n => n.id === value.id)) {
+            this.$bkMessage({
+              message: '该节点不能作为 SLA 结束节点',
+              theme: 'error',
+              ellipsisLine: 0,
+            });
+            return false;
+          }
 
-                    lastSlaItem.end_node_id = value.id;
-                    this.$set(sla, len, sla[len]);
-                    if (this.nodeCheck(sla[len])) {
-                        sla[len].end_node_id = '';
-                        return;
-                    }
-                    this.agreementTextClick(sla[len]);
-                    this.isNodeClick = true;
-                }
-                this.isStartSla = !this.isStartSla;
-            },
-            getRendomColor() {
-                let i = 0;
-                let colorStr = '#';
-                let random = 0;
-                const aryNum = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
-                /* eslint-disable */
+          lastSlaItem.end_node_id = value.id;
+          this.$set(sla, len, sla[len]);
+          if (this.nodeCheck(sla[len])) {
+            sla[len].end_node_id = '';
+            return;
+          }
+          this.agreementTextClick(sla[len]);
+          this.isNodeClick = true;
+        }
+        this.isStartSla = !this.isStartSla;
+      },
+      getRendomColor() {
+        let i = 0;
+        let colorStr = '#';
+        let random = 0;
+        const aryNum = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+        /* eslint-disable */
                 for (i = 0; i < 6; i++) {
                     random = parseInt(Math.random() * 16);
                     colorStr += aryNum[random];

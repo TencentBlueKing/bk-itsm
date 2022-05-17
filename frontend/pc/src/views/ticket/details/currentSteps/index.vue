@@ -69,107 +69,107 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js';
-    import mixins from '@/views/commonMix/field.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import CurrentStepItem from './CurrentStepItem.vue';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import mixins from '@/views/commonMix/field.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import CurrentStepItem from './CurrentStepItem.vue';
 
-    export default {
-        name: 'CurrentSteps',
-        components: {
-            CurrentStepItem,
+  export default {
+    name: 'CurrentSteps',
+    components: {
+      CurrentStepItem,
+    },
+    mixins: [mixins, apiFieldsWatch],
+    props: {
+      // 单据信息
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins, apiFieldsWatch],
-        props: {
-            // 单据信息
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            currentStepList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            nodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            openStatus: {
-                type: Boolean,
-                default: false,
-            },
-            nodeTriggerList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            loading: {
-                type: Boolean,
-                default: false,
-            },
-            isShowBasicInfo: Boolean,
-            readOnly: Boolean,
-            isShowAssgin: Boolean,
+      },
+      currentStepList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                allGroups: [],
-                allFieldList: [],
-                // 组织架构
-                organizationList: [],
-                updateDate: +new Date(),
-                tooltipConfig: {
-                    allowHtml: true,
-                    trigger: 'click',
-                    theme: 'light',
-                    content: '#tooltipHtml',
-                    placement: 'top',
-                    extCls: 'bk-processor-wrapper',
-                },
-                // 手动触发器下拉框状态
-                isDropdownShow: false,
-                basicInDomHeight: 54, // 基本信息初始高度
-            };
+      },
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            isShowBasicInfo() {
-                this.getBasicHeight();
-            },
+      },
+      openStatus: {
+        type: Boolean,
+        default: false,
+      },
+      nodeTriggerList: {
+        type: Array,
+        default() {
+          return [];
         },
-        mounted() {
-            this.getBasicHeight();
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+      isShowBasicInfo: Boolean,
+      readOnly: Boolean,
+      isShowAssgin: Boolean,
+    },
+    data() {
+      return {
+        allGroups: [],
+        allFieldList: [],
+        // 组织架构
+        organizationList: [],
+        updateDate: +new Date(),
+        tooltipConfig: {
+          allowHtml: true,
+          trigger: 'click',
+          theme: 'light',
+          content: '#tooltipHtml',
+          placement: 'top',
+          extCls: 'bk-processor-wrapper',
         },
-        methods: {
-            loadData() {
-                this.getAllGroups();
-            },
-            getAllGroups() {
-                const params = 'is_processor=true';
-                this.$store.dispatch('deployCommon/getUser', { params }).then((res) => {
-                    const disabledList = ['VARIABLE', 'STARTER_LEADER', 'IAM'];
-                    this.allGroups = res.data.filter(item => !disabledList.includes(item.type));
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            getBasicHeight() {
-                const basicDom = document.querySelector('.base-info-content');
-                this.basicInDomHeight = basicDom.clientHeight;
-            },
-            // 成功后的回调事件
-            successFn() {
-                this.$emit('handlerSubmitSuccess');
-            },
-        },
-    };
+        // 手动触发器下拉框状态
+        isDropdownShow: false,
+        basicInDomHeight: 54, // 基本信息初始高度
+      };
+    },
+    watch: {
+      isShowBasicInfo() {
+        this.getBasicHeight();
+      },
+    },
+    mounted() {
+      this.getBasicHeight();
+    },
+    methods: {
+      loadData() {
+        this.getAllGroups();
+      },
+      getAllGroups() {
+        const params = 'is_processor=true';
+        this.$store.dispatch('deployCommon/getUser', { params }).then((res) => {
+          const disabledList = ['VARIABLE', 'STARTER_LEADER', 'IAM'];
+          this.allGroups = res.data.filter(item => !disabledList.includes(item.type));
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      getBasicHeight() {
+        const basicDom = document.querySelector('.base-info-content');
+        this.basicInDomHeight = basicDom.clientHeight;
+      },
+      // 成功后的回调事件
+      successFn() {
+        this.$emit('handlerSubmitSuccess');
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

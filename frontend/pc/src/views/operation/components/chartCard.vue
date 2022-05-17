@@ -48,46 +48,46 @@
   </div>
 </template>
 <script>
-    import debounce from 'lodash/debounce';
+  import debounce from 'lodash/debounce';
 
-    export default {
-        name: 'ChartCard',
-        props: {
-            title: {
-                type: String,
-                default: '',
-            },
-            desc: {
-                type: String,
-                default: '',
-            },
-            showSearch: {
-                type: Boolean,
-                default: false,
-            },
-            placeholder: {
-                type: String,
-                default: '',
-            },
-            loading: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        data() {
-            return {
-                searchStr: '',
-            };
-        },
-        created() {
-            this.onSearch = debounce(this.searchHandler, 500);
-        },
-        methods: {
-            searchHandler(val) {
-                this.$emit('search', val);
-            },
-        },
-    };
+  export default {
+    name: 'ChartCard',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      showSearch: {
+        type: Boolean,
+        default: false,
+      },
+      placeholder: {
+        type: String,
+        default: '',
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        searchStr: '',
+      };
+    },
+    created() {
+      this.onSearch = debounce(this.searchHandler, 500);
+    },
+    methods: {
+      searchHandler(val) {
+        this.$emit('search', val);
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .chart-card {

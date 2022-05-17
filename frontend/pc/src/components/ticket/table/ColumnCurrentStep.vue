@@ -46,15 +46,15 @@
 
 <script>
 
-    export default {
-        name: 'ColumnCurrentStep',
-        props: {
-            row: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-    };
+  export default {
+    name: 'ColumnCurrentStep',
+    props: {
+      row: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .current-steps-wrap /deep/ {

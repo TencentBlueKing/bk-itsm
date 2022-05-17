@@ -42,50 +42,50 @@
   </div>
 </template>
 <script>
-    function registerFields() {
-        const fieldComponents = {};
-        const fieldFiles = require.context(
-            '../../commonComponent/fieldComponent/',
-            false,
-            /\w+\.vue$/
-        );
-        fieldFiles.keys().forEach((key) => {
-            const componentConfig = fieldFiles(key);
-            const comp = componentConfig.default;
-            fieldComponents[`CW-${comp.name}`] = comp;
-        });
+  function registerFields() {
+    const fieldComponents = {};
+    const fieldFiles = require.context(
+      '../../commonComponent/fieldComponent/',
+      false,
+      /\w+\.vue$/
+    );
+    fieldFiles.keys().forEach((key) => {
+      const componentConfig = fieldFiles(key);
+      const comp = componentConfig.default;
+      fieldComponents[`CW-${comp.name}`] = comp;
+    });
 
-        return fieldComponents;
-    }
+    return fieldComponents;
+  }
 
-    export default {
-        name: 'FormViewItem',
-        props: {
-            fields: Array,
-            form: Object,
-            crtForm: [String, Number],
-            addFieldStatus: Boolean,
-        },
-        computed: {
-            deleteDisabled() {
-                const defaultField = ['impact', 'urgency', 'priority', 'current_status'];
-                return this.form.is_builtin && defaultField.indexOf(this.form.key) === -1;
-            },
-        },
-        beforeCreate() {
-            const fieldComponents = registerFields();
-            Object.keys(fieldComponents).forEach((name) => {
-                this.$options.components[name] = fieldComponents[name];
-            });
-        },
-        methods: {
-            onDeleteClick(form) {
-                if (!this.deleteDisabled) {
-                    this.$emit('onFormDeleteClick', form);
-                }
-            },
-        },
-    };
+  export default {
+    name: 'FormViewItem',
+    props: {
+      fields: Array,
+      form: Object,
+      crtForm: [String, Number],
+      addFieldStatus: Boolean,
+    },
+    computed: {
+      deleteDisabled() {
+        const defaultField = ['impact', 'urgency', 'priority', 'current_status'];
+        return this.form.is_builtin && defaultField.indexOf(this.form.key) === -1;
+      },
+    },
+    beforeCreate() {
+      const fieldComponents = registerFields();
+      Object.keys(fieldComponents).forEach((name) => {
+        this.$options.components[name] = fieldComponents[name];
+      });
+    },
+    methods: {
+      onDeleteClick(form) {
+        if (!this.deleteDisabled) {
+          this.$emit('onFormDeleteClick', form);
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .click-status {

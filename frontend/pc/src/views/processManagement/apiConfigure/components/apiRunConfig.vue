@@ -92,151 +92,151 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../utils/errorHandler.js';
-    import ace from '../../../commonComponent/aceEditor/index.js';
-    import mixins from '../../../commonMix/mixins_api.js';
+  import { errorHandler } from '../../../../utils/errorHandler.js';
+  import ace from '../../../commonComponent/aceEditor/index.js';
+  import mixins from '../../../commonMix/mixins_api.js';
 
-    export default {
-        components: {
-            ace,
+  export default {
+    components: {
+      ace,
+    },
+    mixins: [mixins],
+    props: {
+      apiDetailInfoCommon: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            apiDetailInfoCommon: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        trueStatus: true,
+        falseStatus: false,
+        bodyDetailConfig: {
+          value: '',
+          width: '100%',
+          height: 300,
+          readOnly: false,
+          fullScreen: true,
+          lang: 'json',
         },
-        data() {
-            return {
-                trueStatus: true,
-                falseStatus: false,
-                bodyDetailConfig: {
-                    value: '',
-                    width: '100%',
-                    height: 300,
-                    readOnly: false,
-                    fullScreen: true,
-                    lang: 'json',
-                },
-                DetailInfo: this.apiDetailInfoCommon,
-                // url数据
-                formInfo: {
-                    code: 'POST',
-                    poc: 'poc：https://paas-poc.o.qcloud.com',
-                    url: '/api/user/create',
-                },
-                // 显示隐藏
-                showInfo: {
-                    headers: false,
-                    query: false,
-                    body: false,
-                },
-                // headersList
-                headersList: [
-                    {
-                        key: 'id',
-                        value: '',
-                    },
-                ],
-                // queryList
-                queryList: [
-                    {
-                        key: '',
-                        is_necessary: false,
-                        value: '',
-                    },
-                ],
-                // body
-                bodyValue: '1415',
-                secondClick: false,
-                activeName: [],
-            };
+        DetailInfo: this.apiDetailInfoCommon,
+        // url数据
+        formInfo: {
+          code: 'POST',
+          poc: 'poc：https://paas-poc.o.qcloud.com',
+          url: '/api/user/create',
         },
-        async mounted() {
-            await this.apiDetailInfoCommon;
-            await this.DetailInfo;
-            this.initDate();
+        // 显示隐藏
+        showInfo: {
+          headers: false,
+          query: false,
+          body: false,
         },
-        methods: {
-            initDate() {
-                if (this.DetailInfo.bodyJsonData) {
-                    this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo.bodyJsonData.root, null, 4);
-                }
-                if (this.DetailInfo.req_params && this.DetailInfo.req_params.length) {
-                    this.DetailInfo.req_params.forEach((item) => {
-                        item.is_necessary = !!item.is_necessary;
-                    });
-                }
-            },
-            showConten(val) {
-                this.showInfo[val] = !this.showInfo[val];
-            },
-            async testUrl() {
-                this.showInfo = {
-                    headers: false,
-                    query: false,
-                    body: false,
-                };
-                if (this.secondClick) {
-                    return;
-                }
-                const params = {
-                    id: this.DetailInfo.id,
-                    req_headers: this.listTojson(this.DetailInfo.req_headers.filter(item => !!item.name)),
-                    req_params: this.listTojson(this.DetailInfo.req_params.filter(item => !!item.name)),
-                    req_body: JSON.parse(this.bodyDetailConfig.value),
-                    sys_headers: {},
-                    cookies: {},
-                    variables: {},
-                    map_code: this.$parent.dataProcess.value,
-                    before_req: this.$parent.reqDataProcess.value,
-                };
-                this.secondClick = true;
-                await this.$store.dispatch('apiRemote/run_remote_api', params).then((res) => {
-                    this.$parent.alarmDetailConfig.value = JSON.stringify(res.data, null, 4);
-                    if (res.data.result) {
-                        this.$parent.isSuccess = false;
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
-            },
-            blur(content) {
-                try {
-                    this.bodyDetailConfig.value = JSON.stringify(JSON.parse(content), null, 4);
-                } catch (e) {
-                    return;
-                }
+        // headersList
+        headersList: [
+          {
+            key: 'id',
+            value: '',
+          },
+        ],
+        // queryList
+        queryList: [
+          {
+            key: '',
+            is_necessary: false,
+            value: '',
+          },
+        ],
+        // body
+        bodyValue: '1415',
+        secondClick: false,
+        activeName: [],
+      };
+    },
+    async mounted() {
+      await this.apiDetailInfoCommon;
+      await this.DetailInfo;
+      this.initDate();
+    },
+    methods: {
+      initDate() {
+        if (this.DetailInfo.bodyJsonData) {
+          this.bodyDetailConfig.value = JSON.stringify(this.DetailInfo.bodyJsonData.root, null, 4);
+        }
+        if (this.DetailInfo.req_params && this.DetailInfo.req_params.length) {
+          this.DetailInfo.req_params.forEach((item) => {
+            item.is_necessary = !!item.is_necessary;
+          });
+        }
+      },
+      showConten(val) {
+        this.showInfo[val] = !this.showInfo[val];
+      },
+      async testUrl() {
+        this.showInfo = {
+          headers: false,
+          query: false,
+          body: false,
+        };
+        if (this.secondClick) {
+          return;
+        }
+        const params = {
+          id: this.DetailInfo.id,
+          req_headers: this.listTojson(this.DetailInfo.req_headers.filter(item => !!item.name)),
+          req_params: this.listTojson(this.DetailInfo.req_params.filter(item => !!item.name)),
+          req_body: JSON.parse(this.bodyDetailConfig.value),
+          sys_headers: {},
+          cookies: {},
+          variables: {},
+          map_code: this.$parent.dataProcess.value,
+          before_req: this.$parent.reqDataProcess.value,
+        };
+        this.secondClick = true;
+        await this.$store.dispatch('apiRemote/run_remote_api', params).then((res) => {
+          this.$parent.alarmDetailConfig.value = JSON.stringify(res.data, null, 4);
+          if (res.data.result) {
+            this.$parent.isSuccess = false;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      blur(content) {
+        try {
+          this.bodyDetailConfig.value = JSON.stringify(JSON.parse(content), null, 4);
+        } catch (e) {
+          return;
+        }
 
-                try {
-                    JSON.parse(this.bodyDetailConfig.value);
-                } catch (err) {
-                    // this.$bkMessage({
-                    //     message: err.message ? err.message : err,
-                    //     theme: 'error'
-                    // })
-                    return;
-                }
-                this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value));
-            },
-            listTojson(listdata) {
-                const jsondata = {};
-                if (listdata.length) {
-                    listdata.forEach((item) => {
-                        jsondata[item.name] = item.value;
-                    });
-                }
-                return jsondata;
-            },
-        },
-    };
+        try {
+          JSON.parse(this.bodyDetailConfig.value);
+        } catch (err) {
+          // this.$bkMessage({
+          //     message: err.message ? err.message : err,
+          //     theme: 'error'
+          // })
+          return;
+        }
+        this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.bodyDetailConfig.value));
+      },
+      listTojson(listdata) {
+        const jsondata = {};
+        if (listdata.length) {
+          listdata.forEach((item) => {
+            jsondata[item.name] = item.value;
+          });
+        }
+        return jsondata;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

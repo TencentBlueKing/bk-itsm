@@ -34,26 +34,26 @@
 </template>
 
 <script>
-    import fieldsDone from '../components/fieldsDone.vue';
+  import fieldsDone from '../components/fieldsDone.vue';
 
-    export default {
-        name: 'approvalNodeInfo',
-        components: {
-            fieldsDone,
+  export default {
+    name: 'approvalNodeInfo',
+    components: {
+      fieldsDone,
+    },
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            nodeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-        },
-        data() {
-            return {
-            };
-        },
-    };
+      },
+    },
+    data() {
+      return {
+      };
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

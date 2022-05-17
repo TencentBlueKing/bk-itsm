@@ -103,218 +103,218 @@
   </div>
 </template>
 <script>
-    import i18n from '@/i18n/index.js';
-    import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
-    import ticketListMixins from '@/mixins/ticketList.js';
-    import { errorHandler } from '../../utils/errorHandler';
+  import i18n from '@/i18n/index.js';
+  import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
+  import ticketListMixins from '@/mixins/ticketList.js';
+  import { errorHandler } from '../../utils/errorHandler';
 
-    const PANELS = [
-        {
-            name: 'todo',
-            id: 'myTodoTicket',
-            label: i18n.t('m.managePage[\'我的待办\']'),
-        },
-        {
-            name: 'approval',
-            id: 'myApprovalTicket',
-            label: i18n.t('m.home[\'待我审批\']'),
-        },
-        {
-            name: 'created',
-            id: 'myCreatedTicket',
-            label: i18n.t('m.home[\'我的申请\']'),
-        },
-        {
-            name: 'attention',
-            id: 'myAttentionTicket',
-            label: i18n.t('m.home[\'我的关注\']'),
-        },
-    ];
+  const PANELS = [
+    {
+      name: 'todo',
+      id: 'myTodoTicket',
+      label: i18n.t('m.managePage[\'我的待办\']'),
+    },
+    {
+      name: 'approval',
+      id: 'myApprovalTicket',
+      label: i18n.t('m.home[\'待我审批\']'),
+    },
+    {
+      name: 'created',
+      id: 'myCreatedTicket',
+      label: i18n.t('m.home[\'我的申请\']'),
+    },
+    {
+      name: 'attention',
+      id: 'myAttentionTicket',
+      label: i18n.t('m.home[\'我的关注\']'),
+    },
+  ];
 
-    export default {
-        name: 'TicketTable',
-        components: {
-            ApprovalDialog,
+  export default {
+    name: 'TicketTable',
+    components: {
+      ApprovalDialog,
+    },
+    mixins: [ticketListMixins],
+    data() {
+      return {
+        panels: PANELS,
+        activePanel: PANELS[0].name,
+        todoList: [],
+        createdList: [],
+        attentionList: [],
+        approvalList: [],
+        count: {},
+        loading: false,
+        todoListLoading: false,
+        createdListLoading: false,
+        attentionListLoading: false,
+        approvalListLoading: false,
+        isApprovalDialogShow: false,
+        approvalInfo: {
+          showAllOption: false,
+          result: true,
+          approvalList: [],
         },
-        mixins: [ticketListMixins],
-        data() {
-            return {
-                panels: PANELS,
-                activePanel: PANELS[0].name,
-                todoList: [],
-                createdList: [],
-                attentionList: [],
-                approvalList: [],
-                count: {},
-                loading: false,
-                todoListLoading: false,
-                createdListLoading: false,
-                attentionListLoading: false,
-                approvalListLoading: false,
-                isApprovalDialogShow: false,
-                approvalInfo: {
-                    showAllOption: false,
-                    result: true,
-                    approvalList: [],
-                },
-            };
-        },
-        computed: {
-            ticketList() {
-                return this[`${this.activePanel}List`];
-            },
-            tabLoading() {
-                return this[`${this.activePanel}ListLoading`];
-            },
-        },
-        created() {
-            this.getData();
-        },
-        methods: {
-            getData() {
-                this.loading = true;
-                Promise.all([
-                    this.getToDoList(),
-                    this.getCreatedList(),
-                    this.getAttentionList(),
-                    this.getApprovalList(),
-                ]).then(() => {
-                    this.loading = false;
-                });
-            },
-            // 待我处理的
-            getToDoList(ordering = '-create_at') {
-                this.todoListLoading = true;
-                return this.$store.dispatch('change/getList', {
-                    page_size: 10,
-                    page: 1,
-                    is_draft: 0,
-                    view_type: 'my_todo',
-                    ordering,
-                }).then((resp) => {
-                    if (resp.result) {
-                        this.todoList = resp.data.items;
-                        this.$set(this.count, 'todo', resp.data.count);
-                        // 异步加载列表中的某些字段信息
-                        this.__asyncReplaceTicketListAttr(this.todoList);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.todoListLoading = false;
-                    });
-            },
-            // 我创建的
-            getCreatedList(ordering = '-create_at') {
-                this.createdListLoading = true;
-                return this.$store.dispatch('change/getList', {
-                    page_size: 10,
-                    page: 1,
-                    is_draft: 0,
-                    view_type: 'my_created',
-                    ordering,
-                }).then((resp) => {
-                    if (resp.result) {
-                        this.createdList = resp.data.items;
-                        this.$set(this.count, 'created', resp.data.count);
-                        // 异步加载列表中的某些字段信息
-                        this.__asyncReplaceTicketListAttr(this.createdList);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.createdListLoading = false;
-                    });
-            },
-            // 我关注的
-            getAttentionList(ordering = '-create_at') {
-                this.attentionListLoading = true;
-                return this.$store.dispatch('change/getList', {
-                    page_size: 10,
-                    page: 1,
-                    is_draft: 0,
-                    view_type: 'my_attention',
-                    ordering,
-                }).then((resp) => {
-                    if (resp.result) {
-                        this.attentionList = resp.data.items;
-                        this.$set(this.count, 'attention', resp.data.count);
-                        // 异步加载列表中的某些字段信息
-                        this.__asyncReplaceTicketListAttr(this.attentionList);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.attentionListLoading = false;
-                    });
-            },
-            // 我审批的
-            getApprovalList(ordering = '-create_at') {
-                this.approvalListLoading = true;
-                return this.$store.dispatch('change/getList', {
-                    page_size: 10,
-                    page: 1,
-                    is_draft: 0,
-                    view_type: 'my_approval',
-                    ordering,
-                }).then((resp) => {
-                    if (resp.result) {
-                        this.approvalList = resp.data.items;
-                        this.$set(this.count, 'approval', resp.data.count);
-                        // 异步加载列表中的某些字段信息
-                        this.__asyncReplaceTicketListAttr(this.approvalList);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.approvalListLoading = false;
-                    });
-            },
-            onSortChange(data) {
-                const ordering = data.order ? (data.order === 'ascending' ? `-${data.prop}` : data.prop) : undefined;
-                switch (this.activePanel) {
-                    case 'todo':
-                        this.getToDoList(ordering);
-                        break;
-                    case 'created':
-                        this.getCreatedList(ordering);
-                        break;
-                    case 'attention':
-                        this.getAttentionList(ordering);
-                        break;
-                    case 'approval':
-                        this.getApprovalList(ordering);
-                        break;
-                }
-            },
-            onOpenApprovalDialog(id, result) {
-                this.isApprovalDialogShow = true;
-                this.approvalInfo.result = result;
-                this.approvalInfo.approvalList = [{ ticket_id: id }];
-            },
-            async onApprovalDialogHidden(result) {
-                this.isApprovalDialogShow = false;
-                this.approvalInfo = {
-                    result: true,
-                    showAllOption: false,
-                    approvalList: [],
-                };
-                if (result) {
-                    this.loading = true;
-                    await this.getApprovalList();
-                    this.loading = false;
-                }
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      ticketList() {
+        return this[`${this.activePanel}List`];
+      },
+      tabLoading() {
+        return this[`${this.activePanel}ListLoading`];
+      },
+    },
+    created() {
+      this.getData();
+    },
+    methods: {
+      getData() {
+        this.loading = true;
+        Promise.all([
+          this.getToDoList(),
+          this.getCreatedList(),
+          this.getAttentionList(),
+          this.getApprovalList(),
+        ]).then(() => {
+          this.loading = false;
+        });
+      },
+      // 待我处理的
+      getToDoList(ordering = '-create_at') {
+        this.todoListLoading = true;
+        return this.$store.dispatch('change/getList', {
+          page_size: 10,
+          page: 1,
+          is_draft: 0,
+          view_type: 'my_todo',
+          ordering,
+        }).then((resp) => {
+          if (resp.result) {
+            this.todoList = resp.data.items;
+            this.$set(this.count, 'todo', resp.data.count);
+            // 异步加载列表中的某些字段信息
+            this.__asyncReplaceTicketListAttr(this.todoList);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.todoListLoading = false;
+          });
+      },
+      // 我创建的
+      getCreatedList(ordering = '-create_at') {
+        this.createdListLoading = true;
+        return this.$store.dispatch('change/getList', {
+          page_size: 10,
+          page: 1,
+          is_draft: 0,
+          view_type: 'my_created',
+          ordering,
+        }).then((resp) => {
+          if (resp.result) {
+            this.createdList = resp.data.items;
+            this.$set(this.count, 'created', resp.data.count);
+            // 异步加载列表中的某些字段信息
+            this.__asyncReplaceTicketListAttr(this.createdList);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.createdListLoading = false;
+          });
+      },
+      // 我关注的
+      getAttentionList(ordering = '-create_at') {
+        this.attentionListLoading = true;
+        return this.$store.dispatch('change/getList', {
+          page_size: 10,
+          page: 1,
+          is_draft: 0,
+          view_type: 'my_attention',
+          ordering,
+        }).then((resp) => {
+          if (resp.result) {
+            this.attentionList = resp.data.items;
+            this.$set(this.count, 'attention', resp.data.count);
+            // 异步加载列表中的某些字段信息
+            this.__asyncReplaceTicketListAttr(this.attentionList);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.attentionListLoading = false;
+          });
+      },
+      // 我审批的
+      getApprovalList(ordering = '-create_at') {
+        this.approvalListLoading = true;
+        return this.$store.dispatch('change/getList', {
+          page_size: 10,
+          page: 1,
+          is_draft: 0,
+          view_type: 'my_approval',
+          ordering,
+        }).then((resp) => {
+          if (resp.result) {
+            this.approvalList = resp.data.items;
+            this.$set(this.count, 'approval', resp.data.count);
+            // 异步加载列表中的某些字段信息
+            this.__asyncReplaceTicketListAttr(this.approvalList);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.approvalListLoading = false;
+          });
+      },
+      onSortChange(data) {
+        const ordering = data.order ? (data.order === 'ascending' ? `-${data.prop}` : data.prop) : undefined;
+        switch (this.activePanel) {
+          case 'todo':
+            this.getToDoList(ordering);
+            break;
+          case 'created':
+            this.getCreatedList(ordering);
+            break;
+          case 'attention':
+            this.getAttentionList(ordering);
+            break;
+          case 'approval':
+            this.getApprovalList(ordering);
+            break;
+        }
+      },
+      onOpenApprovalDialog(id, result) {
+        this.isApprovalDialogShow = true;
+        this.approvalInfo.result = result;
+        this.approvalInfo.approvalList = [{ ticket_id: id }];
+      },
+      async onApprovalDialogHidden(result) {
+        this.isApprovalDialogShow = false;
+        this.approvalInfo = {
+          result: true,
+          showAllOption: false,
+          approvalList: [],
+        };
+        if (result) {
+          this.loading = true;
+          await this.getApprovalList();
+          this.loading = false;
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .ticket-table-section {

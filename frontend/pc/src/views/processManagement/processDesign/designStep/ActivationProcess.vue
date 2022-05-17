@@ -231,416 +231,416 @@
   </div>
 </template>
 <script>
-    import commonMix from '../../../commonMix/common.js';
-    import memberSelect from '../../../commonComponent/memberSelect';
-    import collapseTransition from '@/utils/collapse-transition.js';
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
-    import TaskConfigPanel from './components/TaskConfigPanel.vue';
-    import BasicCard from '@/components/common/layout/BasicCard.vue';
-    import permission from '@/mixins/permission.js';
-    import { errorHandler } from '../../../../utils/errorHandler.js';
+  import commonMix from '../../../commonMix/common.js';
+  import memberSelect from '../../../commonComponent/memberSelect';
+  import collapseTransition from '@/utils/collapse-transition.js';
+  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  import TaskConfigPanel from './components/TaskConfigPanel.vue';
+  import BasicCard from '@/components/common/layout/BasicCard.vue';
+  import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../../../utils/errorHandler.js';
 
-    export default {
-        name: 'ActivationProcess',
-        components: {
-            BasicCard,
-            memberSelect,
-            collapseTransition,
-            commonTriggerList,
-            TaskConfigPanel,
+  export default {
+    name: 'ActivationProcess',
+    components: {
+      BasicCard,
+      memberSelect,
+      collapseTransition,
+      commonTriggerList,
+      TaskConfigPanel,
+    },
+    mixins: [commonMix, permission],
+    props: {
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [commonMix, permission],
-        props: {
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            processId: {
-                type: [String, Number],
-                required: true,
-            },
-            business: {
-                type: Boolean,
-                default() {
-                    return false;
-                },
-            },
+      },
+      processId: {
+        type: [String, Number],
+        required: true,
+      },
+      business: {
+        type: Boolean,
+        default() {
+          return false;
         },
-        data() {
-            return {
-                isDataLoading: false,
-                secondClick: false,
-                // 启用设置
-                formData: {
-                    can_withdraw: true,
-                    can_deploy: true,
-                    deploy_name: '',
-                    revoke_config: {
-                        type: 2,
-                        state: '',
-                    },
-                    is_auto_approve: false,
-                },
-                revokeStateError: false,
-                nodeListLoading: false,
-                nodeList: [],
-                trueStatus: true,
-                falseStatus: false,
-                // 通知设置
-                noticeData: {
-                    can_notice: false,
-                    is_supervise_needed: false,
-                    supervise_type: 'EMPTY',
-                    supervisor: '',
-                    personList: [],
-                    notify_rule: '',
-                    notify_freq: '',
-                    notify: ['WEIXIN', 'EMAIL'],
-                },
-                // 督办角色
-                roles: {
-                    grouplist: [],
-                    supChildList: [],
-                },
-                notifyList: [
-                    { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
-                    { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
-                    { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
-                ],
-                frequencyList: [
-                    { id: 0, name: '00:00' },
-                    { id: 1, name: '01:00' },
-                    { id: 2, name: '02:00' },
-                    { id: 3, name: '03:00' },
-                    { id: 4, name: '04:00' },
-                    { id: 5, name: '05:00' },
-                    { id: 6, name: '06:00' },
-                    { id: 7, name: '07:00' },
-                    { id: 8, name: '08:00' },
-                    { id: 9, name: '09:00' },
-                    { id: 10, name: '10:00' },
-                    { id: 11, name: '11:00' },
-                    { id: 12, name: '12:00' },
-                    { id: 13, name: '13:00' },
-                    { id: 14, name: '14:00' },
-                    { id: 15, name: '15:00' },
-                    { id: 16, name: '16:00' },
-                    { id: 17, name: '17:00' },
-                    { id: 18, name: '18:00' },
-                    { id: 19, name: '19:00' },
-                    { id: 20, name: '20:00' },
-                    { id: 21, name: '21:00' },
-                    { id: 22, name: '22:00' },
-                    { id: 23, name: '23:00' },
-                ],
-                // 父组件传值
-                parentInfo: {
-                    status: 'success',
-                    index: 2,
-                },
-                // 校验
-                rules: {},
-                showMoreConfig: false,
-                qwIcon: require('../../../../images/qw.svg'),
-                emailIcon: require('../../../../images/email.svg'),
-            };
+      },
+    },
+    data() {
+      return {
+        isDataLoading: false,
+        secondClick: false,
+        // 启用设置
+        formData: {
+          can_withdraw: true,
+          can_deploy: true,
+          deploy_name: '',
+          revoke_config: {
+            type: 2,
+            state: '',
+          },
+          is_auto_approve: false,
         },
-        computed: {
-            openFunction() {
-                return this.$store.state.openFunction;
-            },
+        revokeStateError: false,
+        nodeListLoading: false,
+        nodeList: [],
+        trueStatus: true,
+        falseStatus: false,
+        // 通知设置
+        noticeData: {
+          can_notice: false,
+          is_supervise_needed: false,
+          supervise_type: 'EMPTY',
+          supervisor: '',
+          personList: [],
+          notify_rule: '',
+          notify_freq: '',
+          notify: ['WEIXIN', 'EMAIL'],
         },
-        watch: {
-            'flowInfo.auth_actions': {
-                handler() {
-                    if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
-                        this.formData.can_deploy = false;
-                    }
-                },
-                deep: true,
-                immediate: true,
-            },
-            'formData.revoke_config.type': {
-                handler(val) {
-                    if (val === 3 && !this.nodeList.length) {
-                        this.getNodeList();
-                    }
-                },
-            },
-            'flowInfo.id'() {
-                this.initData();
-            },
+        // 督办角色
+        roles: {
+          grouplist: [],
+          supChildList: [],
         },
-        mounted() {
-            this.initData();
+        notifyList: [
+          { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
+          { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
+          { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
+        ],
+        frequencyList: [
+          { id: 0, name: '00:00' },
+          { id: 1, name: '01:00' },
+          { id: 2, name: '02:00' },
+          { id: 3, name: '03:00' },
+          { id: 4, name: '04:00' },
+          { id: 5, name: '05:00' },
+          { id: 6, name: '06:00' },
+          { id: 7, name: '07:00' },
+          { id: 8, name: '08:00' },
+          { id: 9, name: '09:00' },
+          { id: 10, name: '10:00' },
+          { id: 11, name: '11:00' },
+          { id: 12, name: '12:00' },
+          { id: 13, name: '13:00' },
+          { id: 14, name: '14:00' },
+          { id: 15, name: '15:00' },
+          { id: 16, name: '16:00' },
+          { id: 17, name: '17:00' },
+          { id: 18, name: '18:00' },
+          { id: 19, name: '19:00' },
+          { id: 20, name: '20:00' },
+          { id: 21, name: '21:00' },
+          { id: 22, name: '22:00' },
+          { id: 23, name: '23:00' },
+        ],
+        // 父组件传值
+        parentInfo: {
+          status: 'success',
+          index: 2,
         },
-        methods: {
-            initData() {
-                this.getThirdInfo();
-                // 部署流程
-                this.formData.deploy_name = this.flowInfo.name;
-                // 审批节点：审批人为申请人
-                this.formData.is_auto_approve = this.flowInfo.is_auto_approve || false;
-                // 校验
-                this.rules.deploy_name = this.checkCommonRules('name').name;
-            },
-            // 通过ID获取数据
-            getThirdInfo() {
-                const params = this.flowInfo.id;
-                if (!params) {
-                    return;
-                }
-                this.isDataLoading = true;
-                this.$store.dispatch('design/getFlowDetail', { params }).then((res) => {
-                    const value = res.data;
-                    // 支持撤回
-                    this.formData.can_withdraw = !!value.is_revocable;
-                    const { state, type } = value.revoke_config;
-                    this.formData.revoke_config = {
-                        state: state === 0 ? '' : state,
-                        type,
-                    };
-                    // 通知
-                    this.noticeData.can_notice = (value.notify_rule !== 'NONE');
-                    if (this.noticeData.can_notice) {
-                        // 通知频率
-                        this.noticeData.notify_rule = value.notify_rule;
-                        this.noticeData.notify_freq = Number(value.notify_freq / 3600);
-                    }
-                    this.noticeData.notify = value.notify.map(notify => notify.type);
-                    // 督办
-                    this.noticeData.is_supervise_needed = value.is_supervise_needed;
-                    if (this.noticeData.is_supervise_needed) {
-                        this.noticeData.supervise_type = value.supervise_type;
-                        this.noticeData.supervisor = value.supervisor || '';
-                        this.noticeData.personList = this.noticeData.supervise_type === 'PERSON' ? value.supervisor.split(',') : '';
-                    }
-                    this.roleGroup();
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.showMoreConfig = (this.flowInfo.extras
-                            && this.flowInfo.extras.task_settings
-                            && this.flowInfo.extras.task_settings.length)
-                            || this.noticeData.can_notice;
-                        this.isDataLoading = false;
-                    });
-            },
-            // 获取流程节点
-            getNodeList() {
-                this.nodeListLoading = true;
-                this.$store.dispatch('deployCommon/getStates', { workflow: this.flowInfo.id }).then((res) => {
-                    this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.nodeListLoading = false;
-                    });
-            },
-            // 角色分组
-            roleGroup() {
-                const params = 'is_processor=true';
-                this.$store.dispatch('cdeploy/getUser', { params }).then((res) => {
-                    const selectgroup = ['CMDB', 'PERSON', 'GENERAL', 'EMPTY'];
-                    const grouplistorigin = res.data.filter(item => selectgroup.indexOf(item.type) !== -1);
-                    this.roles.grouplist = this.business ? grouplistorigin : grouplistorigin.filter(item => item.type !== 'CMDB');
-                    this.roles.grouplist.forEach((item) => {
-                        if (item.type === 'EMPTY') {
-                            item.name = '提单人';
-                        }
-                    });
-                    // 次级数据
-                    if (
-                        this.noticeData.is_supervise_needed
-                        && !['EMPTY', 'PERSON'].includes(this.noticeData.supervise_type)
-                    ) {
-                        this.roleUserList(this.noticeData.supervise_type);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 获取次级角色列表
-            roleUserList(type) {
-                this.$store.dispatch('cdeploy/getSecondUser', { role_type: type }).then((res) => {
-                    this.roles.supChildList = [];
-                    res.data.forEach((item) => {
-                        this.roles.supChildList.push({
-                            id: String(item.id),
-                            name: item.name,
-                        });
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 督办选择
-            changeSupChildList(value) {
-                if (value !== 'EMPTY') {
-                    this.noticeData.supervisor = '';
-                    this.noticeData.personList = [];
-                    this.roleUserList(value);
-                } else {
-                    this.noticeData.supervisor = '';
-                }
-            },
-            // 通知
-            handleNotice(val) {
-                if (val) {
-                    this.noticeData.is_supervise_needed = false;
-                    this.noticeData.supervise_type = 'EMPTY';
-                    this.noticeData.notify_rule = 'ONCE';
-                    this.noticeData.notify_freq = 0;
-                }
-            },
-            async backTab() {
-                if (this.$refs.taskConfigPanel) {
-                    await this.$refs.taskConfigPanel.validate();
-                }
-                this.revokeStateError = false;
-                if (this.formData.revoke_config.type === 3 && !this.formData.revoke_config.state) {
-                    this.revokeStateError = true;
-                    return false;
-                }
-                let withdrawFormValid = false;
-                await this.$refs.withdrawForm.validate().then(() => {
-                    withdrawFormValid = true;
-                }, () => {});
-                if (withdrawFormValid) {
-                    this.submitFn();
-                }
-            },
-            // 返回列表数据
-            submitFn() {
-                const id = this.processId;
-                const params = {
-                    partial: true,
-                    is_revocable: this.formData.can_withdraw,
-                    is_enabled: true,
-                    is_draft: false,
-                    deploy: this.formData.can_deploy,
-                    deploy_name: this.formData.can_deploy ? this.formData.deploy_name : '',
-                    is_auto_approve: this.formData.is_auto_approve,
-                };
-                if (this.formData.can_withdraw) {
-                    const revokeType = this.formData.revoke_config.type;
-                    params.revoke_config = {
-                        type: revokeType,
-                        state: revokeType === 3 ? this.formData.revoke_config.state : 0,
-                    };
-                }
-                // 任务配置
-                if (this.$refs.taskConfigPanel) {
-                    params.extras = {};
-                    params.extras.task_settings = this.$refs.taskConfigPanel.getPostParams();
-                }
-                // 通知
-                if (this.noticeData.can_notice) {
-                    params.notify_rule = this.noticeData.notify_rule;
-                    params.notify_freq = this.noticeData.notify_rule === 'ONCE' ? 0 : this.noticeData.notify_freq * 3600;
-                } else {
-                    params.notify_rule = 'NONE';
-                    params.notify_freq = 0;
-                }
-                // 通知方式
-                params.notify = this.notifyList.filter(notify => this.noticeData.notify.some(item => notify.type === item));
-                // 督办
-                params.is_supervise_needed = this.noticeData.is_supervise_needed;
-                params.supervise_type = this.noticeData.is_supervise_needed ? this.noticeData.supervise_type : 'EMPTY';
-                params.supervisor = this.noticeData.is_supervise_needed ? (this.noticeData.supervise_type === 'PERSON' ? this.noticeData.personList.join(',') : this.noticeData.supervisor) : '';
-                // 督办人的校验
-                if (params.is_supervise_needed && params.supervise_type !== 'EMPTY' && !params.supervisor) {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["督办人为必填"]'),
-                        theme: 'warning',
-                    });
-                    return;
-                }
+        // 校验
+        rules: {},
+        showMoreConfig: false,
+        qwIcon: require('../../../../images/qw.svg'),
+        emailIcon: require('../../../../images/email.svg'),
+      };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
+    },
+    watch: {
+      'flowInfo.auth_actions': {
+        handler() {
+          if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
+            this.formData.can_deploy = false;
+          }
+        },
+        deep: true,
+        immediate: true,
+      },
+      'formData.revoke_config.type': {
+        handler(val) {
+          if (val === 3 && !this.nodeList.length) {
+            this.getNodeList();
+          }
+        },
+      },
+      'flowInfo.id'() {
+        this.initData();
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      initData() {
+        this.getThirdInfo();
+        // 部署流程
+        this.formData.deploy_name = this.flowInfo.name;
+        // 审批节点：审批人为申请人
+        this.formData.is_auto_approve = this.flowInfo.is_auto_approve || false;
+        // 校验
+        this.rules.deploy_name = this.checkCommonRules('name').name;
+      },
+      // 通过ID获取数据
+      getThirdInfo() {
+        const params = this.flowInfo.id;
+        if (!params) {
+          return;
+        }
+        this.isDataLoading = true;
+        this.$store.dispatch('design/getFlowDetail', { params }).then((res) => {
+          const value = res.data;
+          // 支持撤回
+          this.formData.can_withdraw = !!value.is_revocable;
+          const { state, type } = value.revoke_config;
+          this.formData.revoke_config = {
+            state: state === 0 ? '' : state,
+            type,
+          };
+          // 通知
+          this.noticeData.can_notice = (value.notify_rule !== 'NONE');
+          if (this.noticeData.can_notice) {
+            // 通知频率
+            this.noticeData.notify_rule = value.notify_rule;
+            this.noticeData.notify_freq = Number(value.notify_freq / 3600);
+          }
+          this.noticeData.notify = value.notify.map(notify => notify.type);
+          // 督办
+          this.noticeData.is_supervise_needed = value.is_supervise_needed;
+          if (this.noticeData.is_supervise_needed) {
+            this.noticeData.supervise_type = value.supervise_type;
+            this.noticeData.supervisor = value.supervisor || '';
+            this.noticeData.personList = this.noticeData.supervise_type === 'PERSON' ? value.supervisor.split(',') : '';
+          }
+          this.roleGroup();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.showMoreConfig = (this.flowInfo.extras
+              && this.flowInfo.extras.task_settings
+              && this.flowInfo.extras.task_settings.length)
+              || this.noticeData.can_notice;
+            this.isDataLoading = false;
+          });
+      },
+      // 获取流程节点
+      getNodeList() {
+        this.nodeListLoading = true;
+        this.$store.dispatch('deployCommon/getStates', { workflow: this.flowInfo.id }).then((res) => {
+          this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.nodeListLoading = false;
+          });
+      },
+      // 角色分组
+      roleGroup() {
+        const params = 'is_processor=true';
+        this.$store.dispatch('cdeploy/getUser', { params }).then((res) => {
+          const selectgroup = ['CMDB', 'PERSON', 'GENERAL', 'EMPTY'];
+          const grouplistorigin = res.data.filter(item => selectgroup.indexOf(item.type) !== -1);
+          this.roles.grouplist = this.business ? grouplistorigin : grouplistorigin.filter(item => item.type !== 'CMDB');
+          this.roles.grouplist.forEach((item) => {
+            if (item.type === 'EMPTY') {
+              item.name = '提单人';
+            }
+          });
+          // 次级数据
+          if (
+            this.noticeData.is_supervise_needed
+            && !['EMPTY', 'PERSON'].includes(this.noticeData.supervise_type)
+          ) {
+            this.roleUserList(this.noticeData.supervise_type);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 获取次级角色列表
+      roleUserList(type) {
+        this.$store.dispatch('cdeploy/getSecondUser', { role_type: type }).then((res) => {
+          this.roles.supChildList = [];
+          res.data.forEach((item) => {
+            this.roles.supChildList.push({
+              id: String(item.id),
+              name: item.name,
+            });
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 督办选择
+      changeSupChildList(value) {
+        if (value !== 'EMPTY') {
+          this.noticeData.supervisor = '';
+          this.noticeData.personList = [];
+          this.roleUserList(value);
+        } else {
+          this.noticeData.supervisor = '';
+        }
+      },
+      // 通知
+      handleNotice(val) {
+        if (val) {
+          this.noticeData.is_supervise_needed = false;
+          this.noticeData.supervise_type = 'EMPTY';
+          this.noticeData.notify_rule = 'ONCE';
+          this.noticeData.notify_freq = 0;
+        }
+      },
+      async backTab() {
+        if (this.$refs.taskConfigPanel) {
+          await this.$refs.taskConfigPanel.validate();
+        }
+        this.revokeStateError = false;
+        if (this.formData.revoke_config.type === 3 && !this.formData.revoke_config.state) {
+          this.revokeStateError = true;
+          return false;
+        }
+        let withdrawFormValid = false;
+        await this.$refs.withdrawForm.validate().then(() => {
+          withdrawFormValid = true;
+        }, () => {});
+        if (withdrawFormValid) {
+          this.submitFn();
+        }
+      },
+      // 返回列表数据
+      submitFn() {
+        const id = this.processId;
+        const params = {
+          partial: true,
+          is_revocable: this.formData.can_withdraw,
+          is_enabled: true,
+          is_draft: false,
+          deploy: this.formData.can_deploy,
+          deploy_name: this.formData.can_deploy ? this.formData.deploy_name : '',
+          is_auto_approve: this.formData.is_auto_approve,
+        };
+        if (this.formData.can_withdraw) {
+          const revokeType = this.formData.revoke_config.type;
+          params.revoke_config = {
+            type: revokeType,
+            state: revokeType === 3 ? this.formData.revoke_config.state : 0,
+          };
+        }
+        // 任务配置
+        if (this.$refs.taskConfigPanel) {
+          params.extras = {};
+          params.extras.task_settings = this.$refs.taskConfigPanel.getPostParams();
+        }
+        // 通知
+        if (this.noticeData.can_notice) {
+          params.notify_rule = this.noticeData.notify_rule;
+          params.notify_freq = this.noticeData.notify_rule === 'ONCE' ? 0 : this.noticeData.notify_freq * 3600;
+        } else {
+          params.notify_rule = 'NONE';
+          params.notify_freq = 0;
+        }
+        // 通知方式
+        params.notify = this.notifyList.filter(notify => this.noticeData.notify.some(item => notify.type === item));
+        // 督办
+        params.is_supervise_needed = this.noticeData.is_supervise_needed;
+        params.supervise_type = this.noticeData.is_supervise_needed ? this.noticeData.supervise_type : 'EMPTY';
+        params.supervisor = this.noticeData.is_supervise_needed ? (this.noticeData.supervise_type === 'PERSON' ? this.noticeData.personList.join(',') : this.noticeData.supervisor) : '';
+        // 督办人的校验
+        if (params.is_supervise_needed && params.supervise_type !== 'EMPTY' && !params.supervisor) {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["督办人为必填"]'),
+            theme: 'warning',
+          });
+          return;
+        }
 
-                if (this.secondClick) {
-                    return;
-                }
-                this.secondClick = true;
-                this.$store.dispatch('cdeploy/changePartInfo', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["保存成功"]'),
-                        theme: 'success',
-                    });
-                    // 快捷部署成功弹窗提示是否去服务页面
-                    if (this.formData.can_deploy) {
-                        this.openService();
-                    } else {
-                        this.$router.push({
-                            name: 'ProcessHome',
-                        });
-                    }
-                }, (res) => {
-                    errorHandler(res, this);
-                })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
-            },
-            openService() {
-                this.$bkInfo({
-                    type: 'success',
-                    closeIcon: false,
-                    title: this.$t('m.treeinfo["保存成功"]'),
-                    subTitle: this.$t('m.treeinfo["流程部署成功，是否去服务页面关联此流程"]'),
-                    confirmFn: () => {
-                        this.$router.push({
-                            name: 'projectServiceList',
-                            query: {
-                                project_id: this.$store.state.project.id,
-                            },
-                        });
-                    },
-                    cancelFn: () => {
-                        this.$router.push({
-                            name: 'ProcessHome',
-                        });
-                    },
-                });
-            },
-            previousStep() {
-                this.$router.push({
-                    name: 'ProcessEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'pipelineDesign',
-                    },
-                    query: {
-                        processId: this.processId,
-                    },
-                });
-            },
-            // 验证流程部署权限
-            checkFlowDeployPerm() {
-                if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
-                    const { projectInfo } = this.$store.state.project;
-                    const resourceData = {
-                        project: [{
-                            id: projectInfo.key,
-                            name: projectInfo.name,
-                        }],
-                        workflow: [{
-                            id: this.flowInfo.id,
-                            name: this.flowInfo.name,
-                        }],
-                    };
-                    this.applyForPermission(['workflow_deploy'], this.flowInfo.auth_actions, resourceData);
-                }
-            },
-        },
-    };
+        if (this.secondClick) {
+          return;
+        }
+        this.secondClick = true;
+        this.$store.dispatch('cdeploy/changePartInfo', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["保存成功"]'),
+            theme: 'success',
+          });
+          // 快捷部署成功弹窗提示是否去服务页面
+          if (this.formData.can_deploy) {
+            this.openService();
+          } else {
+            this.$router.push({
+              name: 'ProcessHome',
+            });
+          }
+        }, (res) => {
+          errorHandler(res, this);
+        })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      openService() {
+        this.$bkInfo({
+          type: 'success',
+          closeIcon: false,
+          title: this.$t('m.treeinfo["保存成功"]'),
+          subTitle: this.$t('m.treeinfo["流程部署成功，是否去服务页面关联此流程"]'),
+          confirmFn: () => {
+            this.$router.push({
+              name: 'projectServiceList',
+              query: {
+                project_id: this.$store.state.project.id,
+              },
+            });
+          },
+          cancelFn: () => {
+            this.$router.push({
+              name: 'ProcessHome',
+            });
+          },
+        });
+      },
+      previousStep() {
+        this.$router.push({
+          name: 'ProcessEdit',
+          params: {
+            type: 'edit',
+            step: 'pipelineDesign',
+          },
+          query: {
+            processId: this.processId,
+          },
+        });
+      },
+      // 验证流程部署权限
+      checkFlowDeployPerm() {
+        if (!this.hasPermission(['workflow_deploy'], this.flowInfo.auth_actions)) {
+          const { projectInfo } = this.$store.state.project;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+            workflow: [{
+              id: this.flowInfo.id,
+              name: this.flowInfo.name,
+            }],
+          };
+          this.applyForPermission(['workflow_deploy'], this.flowInfo.auth_actions, resourceData);
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

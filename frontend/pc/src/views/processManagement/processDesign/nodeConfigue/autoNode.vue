@@ -170,407 +170,407 @@
   </div>
 </template>
 <script>
-    import getParam from './addField/getParam.vue';
-    import postParam from './addField/postParam.vue';
-    import responseDataNode from './autoComponents/responseDataNode.vue';
-    import nodeCondition from './autoComponents/nodeCondition.vue';
-    import addField from './addField/index.vue';
-    import mixins from '../../../commonMix/mixins_api.js';
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
-    import dealPerson from './components/dealPerson.vue';
-    import BasicCard from '@/components/common/layout/BasicCard.vue';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import getParam from './addField/getParam.vue';
+  import postParam from './addField/postParam.vue';
+  import responseDataNode from './autoComponents/responseDataNode.vue';
+  import nodeCondition from './autoComponents/nodeCondition.vue';
+  import addField from './addField/index.vue';
+  import mixins from '../../../commonMix/mixins_api.js';
+  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  import dealPerson from './components/dealPerson.vue';
+  import BasicCard from '@/components/common/layout/BasicCard.vue';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'autoNode',
-        components: {
-            getParam,
-            postParam,
-            responseDataNode,
-            nodeCondition,
-            addField,
-            commonTriggerList,
-            dealPerson,
-            BasicCard,
+  export default {
+    name: 'autoNode',
+    components: {
+      getParam,
+      postParam,
+      responseDataNode,
+      nodeCondition,
+      addField,
+      commonTriggerList,
+      dealPerson,
+      BasicCard,
+    },
+    mixins: [mixins],
+    props: {
+      // 流程信息
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            // 流程信息
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 节点信息
-            configur: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            state: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
+      },
+      // 节点信息
+      configur: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                isLoading: true,
-                lineInfo: {
-                    // 关系模板
-                    template: '',
-                    // 流转条件
-                    condition_type: '',
-                    // 关系名称
-                    name: '',
-                    checkName: false,
-                    // 关系
-                    between: 'and',
-                    // 条件组
-                    expressions: [
-                        {
-                            type: 'and',
-                            expressions: [
-                                {
-                                    condition: '',
-                                    key: '',
-                                    name: '',
-                                    value: '',
-                                    choiceList: '',
-                                    type: 'string',
-                                    // 组织架构
-                                    organization: {
-                                        assignorPerson: [],
-                                        assignorTree: {},
-                                    },
-                                    organizaInfo: {
-                                        assignorShow: false,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                },
-                formInfo: {
-                    workflow: '',
-                    name: '',
-                    type: 'TASK',
-                    api_info: {
-                        remote_system_id: '',
-                        remote_api_id: '',
-                        req_params: {},
-                        req_body: {},
-                        rsp_data: 'data.info,data.result',
-                        need_poll: false,
-                        succeed_conditions: {
-                            expressions: [],
-                            type: 'and',
-                        },
-                        end_conditions: {
-                            poll_interval: 1,
-                            poll_time: 3,
-                        },
-                    },
-                    variables: {
-                        inputs: [],
-                        outputs: [],
-                    },
-                    processors_type: '',
-                    processors: '',
-                },
-                processorsInfo: {
-                    type: '',
-                    value: '',
-                },
-                checkStatus: {
-                    processors: false,
-                },
-                organizaInfo: {
-                    processorsShow: false,
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
+        },
+      },
+    },
+    data() {
+      return {
+        isLoading: true,
+        lineInfo: {
+          // 关系模板
+          template: '',
+          // 流转条件
+          condition_type: '',
+          // 关系名称
+          name: '',
+          checkName: false,
+          // 关系
+          between: 'and',
+          // 条件组
+          expressions: [
+            {
+              type: 'and',
+              expressions: [
+                {
+                  condition: '',
+                  key: '',
+                  name: '',
+                  value: '',
+                  choiceList: '',
+                  type: 'string',
+                  // 组织架构
+                  organization: {
+                    assignorPerson: [],
+                    assignorTree: {},
+                  },
+                  organizaInfo: {
                     assignorShow: false,
+                  },
                 },
-                // 条件组数组
-                fieldList: [],
-                // 排除处理人类型
-                excludeRoleTypeList: [],
-                // API接口
-                apiDetail: {},
-                // 字段信息
-                apiList: [],
-                apiSysList: [],
-                secondClick: false,
-                stateList: [],
-                clickSecond: false,
-                sliderInfo: {
-                    title: this.$t('m.treeinfo["添加变量"]'),
-                    show: false,
-                    width: 700,
+              ],
+            },
+          ],
+        },
+        formInfo: {
+          workflow: '',
+          name: '',
+          type: 'TASK',
+          api_info: {
+            remote_system_id: '',
+            remote_api_id: '',
+            req_params: {},
+            req_body: {},
+            rsp_data: 'data.info,data.result',
+            need_poll: false,
+            succeed_conditions: {
+              expressions: [],
+              type: 'and',
+            },
+            end_conditions: {
+              poll_interval: 1,
+              poll_time: 3,
+            },
+          },
+          variables: {
+            inputs: [],
+            outputs: [],
+          },
+          processors_type: '',
+          processors: '',
+        },
+        processorsInfo: {
+          type: '',
+          value: '',
+        },
+        checkStatus: {
+          processors: false,
+        },
+        organizaInfo: {
+          processorsShow: false,
+          assignorShow: false,
+        },
+        // 条件组数组
+        fieldList: [],
+        // 排除处理人类型
+        excludeRoleTypeList: [],
+        // API接口
+        apiDetail: {},
+        // 字段信息
+        apiList: [],
+        apiSysList: [],
+        secondClick: false,
+        stateList: [],
+        clickSecond: false,
+        sliderInfo: {
+          title: this.$t('m.treeinfo["添加变量"]'),
+          show: false,
+          width: 700,
+        },
+        showTabData: {},
+        changeInfo: {
+          workflow: '',
+          id: '',
+          key: '',
+          name: '',
+          type: 'STRING',
+          desc: '',
+          layout: 'COL_12',
+          validate_type: 'REQUIRE',
+          choice: [],
+          is_builtin: false,
+          source_type: 'CUSTOM',
+          source_uri: '',
+          regex: 'EMPTY',
+          custom_regex: '',
+          is_tips: false,
+          tips: '',
+        },
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      async initData() {
+        await this.configur;
+        await this.flowInfo;
+        // 节点名称
+        this.formInfo.name = this.configur.name;
+        this.getRelatedFields();
+        this.getExcludeRoleTypeList();
+        // 处理人
+        if (this.configur.processors_type) {
+          this.formInfo.processors_type = this.configur.processors_type;
+          this.formInfo.processors = this.formInfo.processors_type === 'PERSON' ? this.configur.processors.split(',') : this.configur.processors;
+        }
+        // 处理人
+        this.processorsInfo = {
+          type: this.configur.processors_type,
+          value: this.configur.processors,
+        };
+        // API接口
+        if (this.configur.api_info) {
+          this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
+        }
+        await this.getRemoteSystemData();
+        await this.getApiTableList(this.formInfo.api_info.remote_system_id);
+      },
+      // 计算处理人类型需要排除的类型
+      getExcludeRoleTypeList() {
+        // 不显示的人员类型
+        let excludeRoleTypeList = [];
+        // 内置节点
+        if (this.configur.is_builtin) {
+          excludeRoleTypeList = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
+        } else {
+          excludeRoleTypeList = ['OPEN'];
+        }
+        // 是否使用权限中心角色
+        // if (!this.flowInfo.is_iam_used) {
+        //     excludeRoleTypeList.push('IAM')
+        // }
+        // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
+        if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
+          excludeRoleTypeList.push('BY_ASSIGNOR');
+        }
+        if (!this.flowInfo.is_biz_needed) {
+          excludeRoleTypeList.push('CMDB');
+        }
+        this.excludeRoleTypeList = [...['EMPTY', 'API'], ...excludeRoleTypeList];
+      },
+      // 确认
+      async submitNode() {
+        // api参数校验
+        const isre = await this.apiFz();
+        if (!isre) {
+          return;
+        }
+        if (!this.checkLineInfo()) {
+          return;
+        }
+        this.formInfo.workflow = this.flowInfo.id;
+        const params = JSON.parse(JSON.stringify(this.formInfo));
+        params.is_draft = false;
+        params.processors_type = '';
+        params.processors = '';
+        // 处理人为空校验
+        if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
+          this.checkStatus.processors = true;
+          return;
+        }
+        if (this.$refs.processors) {
+          const data = this.$refs.processors.getValue();
+          params.processors_type = data.type;
+          params.processors = data.value;
+        }
+        const { id } = this.configur;
+        if (this.clickSecond) {
+          return;
+        }
+        this.clickSecond = true;
+        this.$store.dispatch('deployCommon/updateNode', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["保存成功"]'),
+            theme: 'success',
+          });
+          this.$emit('closeConfigur', true);
+        }, (res) => {
+          errorHandler(res, this);
+        })
+          .finally(() => {
+            this.clickSecond = false;
+          });
+      },
+      // 获取以前的字段/引用变量
+      async getRelatedFields() {
+        const params = {
+          workflow: this.flowInfo.id,
+          state: this.configur.id,
+          field: '',
+        };
+        await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
+          this.stateList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 取消
+      closeNode() {
+        this.$emit('closeConfigur', false);
+      },
+      closeShade() {
+        this.sliderInfo.show = false;
+      },
+      // 获取Api系统列表
+      async getRemoteSystemData() {
+        const params = {
+          project_key: this.$store.state.project.id,
+        };
+        await this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
+          this.apiSysList = res.data.filter(item => item.is_activated);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 获取Api接口列表数据
+      async getApiTableList(id) {
+        const params = {
+          remote_system: id || '',
+        };
+        this.isLoading = true;
+        await this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
+          this.apiList = res.data.filter(ite => ite.is_activated);
+          if (this.configur.api_info) {
+            this.apiDetail = Object.assign({}, this.apiList.filter(ite => ite.id === this.configur.api_info.remote_api_id)[0]);
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      },
+      // 选择api接口
+      async changeMethod(valueId) {
+        this.lineInfo = {
+          // 关系模板
+          template: '',
+          // 流转条件
+          condition_type: '',
+          // 关系名称
+          name: '',
+          checkName: false,
+          // 关系
+          between: 'and',
+          // 条件组
+          expressions: [
+            {
+              type: 'and',
+              expressions: [
+                {
+                  condition: '',
+                  key: '',
+                  name: '',
+                  value: '',
+                  choiceList: '',
+                  type: 'string',
+                  // 组织架构
+                  organization: {
+                    assignorPerson: [],
+                    assignorTree: {},
+                  },
+                  organizaInfo: {
+                    assignorShow: false,
+                  },
                 },
-                showTabData: {},
-                changeInfo: {
-                    workflow: '',
-                    id: '',
-                    key: '',
-                    name: '',
-                    type: 'STRING',
-                    desc: '',
-                    layout: 'COL_12',
-                    validate_type: 'REQUIRE',
-                    choice: [],
-                    is_builtin: false,
-                    source_type: 'CUSTOM',
-                    source_uri: '',
-                    regex: 'EMPTY',
-                    custom_regex: '',
-                    is_tips: false,
-                    tips: '',
-                },
-            };
-        },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
+              ],
             },
-        },
-        mounted() {
-            this.initData();
-        },
-        methods: {
-            async initData() {
-                await this.configur;
-                await this.flowInfo;
-                // 节点名称
-                this.formInfo.name = this.configur.name;
-                this.getRelatedFields();
-                this.getExcludeRoleTypeList();
-                // 处理人
-                if (this.configur.processors_type) {
-                    this.formInfo.processors_type = this.configur.processors_type;
-                    this.formInfo.processors = this.formInfo.processors_type === 'PERSON' ? this.configur.processors.split(',') : this.configur.processors;
-                }
-                // 处理人
-                this.processorsInfo = {
-                    type: this.configur.processors_type,
-                    value: this.configur.processors,
-                };
-                // API接口
-                if (this.configur.api_info) {
-                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
-                }
-                await this.getRemoteSystemData();
-                await this.getApiTableList(this.formInfo.api_info.remote_system_id);
-            },
-            // 计算处理人类型需要排除的类型
-            getExcludeRoleTypeList() {
-                // 不显示的人员类型
-                let excludeRoleTypeList = [];
-                // 内置节点
-                if (this.configur.is_builtin) {
-                    excludeRoleTypeList = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
-                } else {
-                    excludeRoleTypeList = ['OPEN'];
-                }
-                // 是否使用权限中心角色
-                // if (!this.flowInfo.is_iam_used) {
-                //     excludeRoleTypeList.push('IAM')
-                // }
-                // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
-                if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
-                    excludeRoleTypeList.push('BY_ASSIGNOR');
-                }
-                if (!this.flowInfo.is_biz_needed) {
-                    excludeRoleTypeList.push('CMDB');
-                }
-                this.excludeRoleTypeList = [...['EMPTY', 'API'], ...excludeRoleTypeList];
-            },
-            // 确认
-            async submitNode() {
-                // api参数校验
-                const isre = await this.apiFz();
-                if (!isre) {
-                    return;
-                }
-                if (!this.checkLineInfo()) {
-                    return;
-                }
-                this.formInfo.workflow = this.flowInfo.id;
-                const params = JSON.parse(JSON.stringify(this.formInfo));
-                params.is_draft = false;
-                params.processors_type = '';
-                params.processors = '';
-                // 处理人为空校验
-                if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
-                    this.checkStatus.processors = true;
-                    return;
-                }
-                if (this.$refs.processors) {
-                    const data = this.$refs.processors.getValue();
-                    params.processors_type = data.type;
-                    params.processors = data.value;
-                }
-                const { id } = this.configur;
-                if (this.clickSecond) {
-                    return;
-                }
-                this.clickSecond = true;
-                this.$store.dispatch('deployCommon/updateNode', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["保存成功"]'),
-                        theme: 'success',
-                    });
-                    this.$emit('closeConfigur', true);
-                }, (res) => {
-                    errorHandler(res, this);
-                })
-                    .finally(() => {
-                        this.clickSecond = false;
-                    });
-            },
-            // 获取以前的字段/引用变量
-            async getRelatedFields() {
-                const params = {
-                    workflow: this.flowInfo.id,
-                    state: this.configur.id,
-                    field: '',
-                };
-                await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
-                    this.stateList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 取消
-            closeNode() {
-                this.$emit('closeConfigur', false);
-            },
-            closeShade() {
-                this.sliderInfo.show = false;
-            },
-            // 获取Api系统列表
-            async getRemoteSystemData() {
-                const params = {
-                    project_key: this.$store.state.project.id,
-                };
-                await this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
-                    this.apiSysList = res.data.filter(item => item.is_activated);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 获取Api接口列表数据
-            async getApiTableList(id) {
-                const params = {
-                    remote_system: id || '',
-                };
-                this.isLoading = true;
-                await this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
-                    this.apiList = res.data.filter(ite => ite.is_activated);
-                    if (this.configur.api_info) {
-                        this.apiDetail = Object.assign({}, this.apiList.filter(ite => ite.id === this.configur.api_info.remote_api_id)[0]);
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isLoading = false;
-                    });
-            },
-            // 选择api接口
-            async changeMethod(valueId) {
-                this.lineInfo = {
-                    // 关系模板
-                    template: '',
-                    // 流转条件
-                    condition_type: '',
-                    // 关系名称
-                    name: '',
-                    checkName: false,
-                    // 关系
-                    between: 'and',
-                    // 条件组
-                    expressions: [
-                        {
-                            type: 'and',
-                            expressions: [
-                                {
-                                    condition: '',
-                                    key: '',
-                                    name: '',
-                                    value: '',
-                                    choiceList: '',
-                                    type: 'string',
-                                    // 组织架构
-                                    organization: {
-                                        assignorPerson: [],
-                                        assignorTree: {},
-                                    },
-                                    organizaInfo: {
-                                        assignorShow: false,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                };
-                this.formInfo.variables = {
-                    inputs: [],
-                    outputs: [],
-                };
-                this.formInfo.api_info.need_poll = false;
-                this.formInfo.api_info.succeed_conditions = {
-                    expressions: [],
-                    type: 'and',
-                };
-                this.formInfo.api_info.end_conditions = {
-                    poll_interval: 1,
-                    poll_time: 3,
-                };
-                if (this.configur.api_info && (this.configur.api_info.remote_api_id === valueId)) {
-                    this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
-                }
-                const valueOption = this.apiList.filter(item => item.id === valueId)[0];
-                this.apiDetail = await Object.assign({}, valueOption);
-            },
-            // 选择接口系统
-            changeCode(value) {
-                this.formInfo.api_info.remote_api_id = '';
-                this.formInfo.api_info.req_params = {};
-                this.formInfo.api_info.req_body = {};
-                this.formInfo.api_info.rsp_data = '';
-                this.getApiTableList(value);
-            },
-            // 检验轮询配置条件是否填充完整
-            checkLineInfo() {
-                if (!this.formInfo.api_info.need_poll) {
-                    return true;
-                }
-                this.lineInfo.expressions.forEach((item) => {
-                    item.checkInfo = item.expressions.some(node => (!node.condition.toString() || !node.key.toString() || !node.value.toString()));
-                });
-                const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo);
-                if (checkStatus) {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["请完善轮询配置！"]'),
-                        theme: 'warning',
-                    });
-                    return false;
-                }
-                this.formInfo.api_info.succeed_conditions = {
-                    expressions: [],
-                    type: this.lineInfo.between,
-                };
-                this.formInfo.api_info.succeed_conditions.expressions = this.lineInfo.expressions.map((item) => {
-                    const objz = {
-                        type: item.type,
-                        expressions: [],
-                    };
-                    /* eslint-disable */
+          ],
+        };
+        this.formInfo.variables = {
+          inputs: [],
+          outputs: [],
+        };
+        this.formInfo.api_info.need_poll = false;
+        this.formInfo.api_info.succeed_conditions = {
+          expressions: [],
+          type: 'and',
+        };
+        this.formInfo.api_info.end_conditions = {
+          poll_interval: 1,
+          poll_time: 3,
+        };
+        if (this.configur.api_info && (this.configur.api_info.remote_api_id === valueId)) {
+          this.formInfo.api_info = JSON.parse(JSON.stringify(this.configur.api_info));
+        }
+        const valueOption = this.apiList.filter(item => item.id === valueId)[0];
+        this.apiDetail = await Object.assign({}, valueOption);
+      },
+      // 选择接口系统
+      changeCode(value) {
+        this.formInfo.api_info.remote_api_id = '';
+        this.formInfo.api_info.req_params = {};
+        this.formInfo.api_info.req_body = {};
+        this.formInfo.api_info.rsp_data = '';
+        this.getApiTableList(value);
+      },
+      // 检验轮询配置条件是否填充完整
+      checkLineInfo() {
+        if (!this.formInfo.api_info.need_poll) {
+          return true;
+        }
+        this.lineInfo.expressions.forEach((item) => {
+          item.checkInfo = item.expressions.some(node => (!node.condition.toString() || !node.key.toString() || !node.value.toString()));
+        });
+        const checkStatus = this.lineInfo.expressions.some(item => item.checkInfo);
+        if (checkStatus) {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["请完善轮询配置！"]'),
+            theme: 'warning',
+          });
+          return false;
+        }
+        this.formInfo.api_info.succeed_conditions = {
+          expressions: [],
+          type: this.lineInfo.between,
+        };
+        this.formInfo.api_info.succeed_conditions.expressions = this.lineInfo.expressions.map((item) => {
+          const objz = {
+            type: item.type,
+            expressions: [],
+          };
+          /* eslint-disable */
                     objz.expressions = item.expressions.map((ite) => {
                         const obj = {
                             key: ite.key.split(',').map((it) => {

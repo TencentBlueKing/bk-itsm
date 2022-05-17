@@ -41,52 +41,52 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
-    export default {
-        name: 'RADIO',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {},
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  import mixins from '../../commonMix/field.js';
+  export default {
+    name: 'RADIO',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {},
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {};
-        },
-        watch: {
-            'item.val'() {
-                this.conditionField(this.item, this.fields);
-            },
-        },
-        async mounted() {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-            this.item.choice = await this.getFieldOptions(this.item);
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
-            this.item.val = valueStatus ? this.item.val : '';
-            this.conditionField(this.item, this.fields);
-        },
-        methods: {
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    async mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+      this.item.choice = await this.getFieldOptions(this.item);
+      const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+      this.item.val = valueStatus ? this.item.val : '';
+      this.conditionField(this.item, this.fields);
+    },
+    methods: {
 
-        },
-    };
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

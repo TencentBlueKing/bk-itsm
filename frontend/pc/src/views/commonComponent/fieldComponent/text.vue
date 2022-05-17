@@ -40,49 +40,49 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
+  import mixins from '../../commonMix/field.js';
 
-    export default {
-        name: 'TEXT',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'TEXT',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        data() {
-            return {};
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val'() {
-                this.conditionField(this.item, this.fields);
-            },
-        },
-        mounted() {
-            this.conditionField(this.item, this.fields);
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-        },
-        methods: {},
-    };
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      this.conditionField(this.item, this.fields);
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+    methods: {},
+  };
 </script>
 
 <style lang='scss' scoped>

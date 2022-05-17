@@ -54,90 +54,90 @@
 </template>
 
 <script>
-    import dayjs from 'dayjs';
-    import relativeTime from 'dayjs/plugin/relativeTime';
-    export default {
-        name: 'commentItem',
-        props: {
-            curComment: Object,
-            commentList: Array,
+  import dayjs from 'dayjs';
+  import relativeTime from 'dayjs/plugin/relativeTime';
+  export default {
+    name: 'commentItem',
+    props: {
+      curComment: Object,
+      commentList: Array,
+    },
+    data() {
+      return {
+        isEditComment: false,
+        deleteCommentDialog: false,
+        isAgree: false,
+        timeFormat: {
+          'seconds ago': this.$t('m[\'秒钟前\']'),
+          'minutes ago': this.$t('m[\'分钟前\']'),
+          'minute ago': this.$t('m[\'分钟前\']'),
+          'hours ago': this.$t('m[\'小时前\']'),
+          'hour ago': this.$t('m[\'小时前\']'),
+          'days ago': this.$t('m[\'天前\']'),
+          'day ago': this.$t('m[\'天前\']'),
+          'months ago': this.$t('m[\'月前\']'),
+          'month ago': this.$t('m[\'月前\']'),
+          'years ago': this.$t('m[\'年前\']'),
+          'year ago': this.$t('m[\'年前\']'),
         },
-        data() {
-            return {
-                isEditComment: false,
-                deleteCommentDialog: false,
-                isAgree: false,
-                timeFormat: {
-                    'seconds ago': this.$t('m[\'秒钟前\']'),
-                    'minutes ago': this.$t('m[\'分钟前\']'),
-                    'minute ago': this.$t('m[\'分钟前\']'),
-                    'hours ago': this.$t('m[\'小时前\']'),
-                    'hour ago': this.$t('m[\'小时前\']'),
-                    'days ago': this.$t('m[\'天前\']'),
-                    'day ago': this.$t('m[\'天前\']'),
-                    'months ago': this.$t('m[\'月前\']'),
-                    'month ago': this.$t('m[\'月前\']'),
-                    'years ago': this.$t('m[\'年前\']'),
-                    'year ago': this.$t('m[\'年前\']'),
-                },
-            };
-        },
-        computed: {
-            // parentComment () {
-            //     const parentComment = this.commentList.find(item => item.id === this.curComment.parent)
-            //     if (parentComment && parentComment.remark_type === 'ROOT') {
-            //         return null
-            //     }
-            //     return parentComment
-            // },
-            createTime() {
-                dayjs.extend(relativeTime);
-                const timestamp = dayjs(this.curComment.create_at).unix() * 1000;
-                const time = dayjs(timestamp).fromNow();
-                // 0 to 44 seconds
-                const timeStr = time.split(' ')[1];
-                const timeType = time.split(' ').slice(1, 3)
-                    .join(' ');
-                if (timeStr === 'few') {
-                    return this.$t('m[\'刚刚\']');
-                }
-                if (time.split(' ')[0] === 'an' || time.split(' '[0] === 'a')) {
-                    return `${1} ${this.timeFormat[timeType]}`;
-                }
-                return `${time.split(' ')[0]} ${this.timeFormat[timeType]}`;
-            },
-        },
-        methods: {
-            randomHex() {
-                let authorbgc;
-                do {
-                    authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16)
-                        .padEnd(6, '0')}`;
-                }
-                while (authorbgc === '#ffffff');
-                return authorbgc;
-            },
-            avatar(str) {
-                return str.substr(0, 1).toLocaleUpperCase();
-            },
-            deleteComment(id) {
-                this.$store.dispatch('ticket/deleteTicketComment', id).then(() => {
-                    this.$emit('refreshComment');
-                    this.deleteCommentDialog = false;
-                });
-            },
-            endorse() {
-                this.isAgree = !this.isAgree;
-                console.log('agree', '暂不支持');
-            },
-            handleDeleteDialogShow(val) {
-                this.deleteCommentDialog = val;
-            },
-            jumpTargetComment(curComment) {
-                this.$emit('jumpTargetComment', curComment);
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      // parentComment () {
+      //     const parentComment = this.commentList.find(item => item.id === this.curComment.parent)
+      //     if (parentComment && parentComment.remark_type === 'ROOT') {
+      //         return null
+      //     }
+      //     return parentComment
+      // },
+      createTime() {
+        dayjs.extend(relativeTime);
+        const timestamp = dayjs(this.curComment.create_at).unix() * 1000;
+        const time = dayjs(timestamp).fromNow();
+        // 0 to 44 seconds
+        const timeStr = time.split(' ')[1];
+        const timeType = time.split(' ').slice(1, 3)
+          .join(' ');
+        if (timeStr === 'few') {
+          return this.$t('m[\'刚刚\']');
+        }
+        if (time.split(' ')[0] === 'an' || time.split(' '[0] === 'a')) {
+          return `${1} ${this.timeFormat[timeType]}`;
+        }
+        return `${time.split(' ')[0]} ${this.timeFormat[timeType]}`;
+      },
+    },
+    methods: {
+      randomHex() {
+        let authorbgc;
+        do {
+          authorbgc = `#${Math.floor(Math.random() * 0xffffff).toString(16)
+            .padEnd(6, '0')}`;
+        }
+        while (authorbgc === '#ffffff');
+        return authorbgc;
+      },
+      avatar(str) {
+        return str.substr(0, 1).toLocaleUpperCase();
+      },
+      deleteComment(id) {
+        this.$store.dispatch('ticket/deleteTicketComment', id).then(() => {
+          this.$emit('refreshComment');
+          this.deleteCommentDialog = false;
+        });
+      },
+      endorse() {
+        this.isAgree = !this.isAgree;
+        console.log('agree', '暂不支持');
+      },
+      handleDeleteDialogShow(val) {
+        this.deleteCommentDialog = val;
+      },
+      jumpTargetComment(curComment) {
+        this.$emit('jumpTargetComment', curComment);
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

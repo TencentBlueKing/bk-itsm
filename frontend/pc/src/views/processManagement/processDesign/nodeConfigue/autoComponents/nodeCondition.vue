@@ -171,222 +171,222 @@
 </template>
 
 <script>
-    import exportTree from '../../../../commonComponent/treeInfo/exportTree.vue';
-    import mixins from '../../../../commonMix/mixins_api.js';
+  import exportTree from '../../../../commonComponent/treeInfo/exportTree.vue';
+  import mixins from '../../../../commonMix/mixins_api.js';
 
-    export default {
-        name: 'nodeCondition',
-        components: {
-            exportTree,
+  export default {
+    name: 'nodeCondition',
+    components: {
+      exportTree,
+    },
+    mixins: [mixins],
+    props: {
+      lineInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            lineInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            formInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            apiDetail: {
-                type: Object,
-                default: () => {
-                },
-            },
-            workflow: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
-            state: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
-            stateList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                booleanList: [
-                    {
-                        id: '1',
-                        name: 'true',
-                    },
-                    {
-                        id: '0',
-                        name: 'false',
-                    },
-                ],
-                // 校验
-                checkInfo: {
-                    assignors_type: false,
-                    assignors: false,
-                    processors_type: false,
-                    processors: false,
-                },
-                scrollTopStatus: 0,
-            };
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
+      },
+      apiDetail: {
+        type: Object,
+        default: () => {
         },
-        watch: {
-            apiDetail() {
-                this.initData();
-            },
+      },
+      workflow: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        mounted() {
-            this.initData();
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        methods: {
-            async initData() {
+      },
+      stateList: {
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+    },
+    data() {
+      return {
+        booleanList: [
+          {
+            id: '1',
+            name: 'true',
+          },
+          {
+            id: '0',
+            name: 'false',
+          },
+        ],
+        // 校验
+        checkInfo: {
+          assignors_type: false,
+          assignors: false,
+          processors_type: false,
+          processors: false,
+        },
+        scrollTopStatus: 0,
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    watch: {
+      apiDetail() {
+        this.initData();
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      async initData() {
+      },
+      globalChoiseFilter(choiseMethods, type) {
+        return choiseMethods.filter((item) => {
+          const stringList = ['==', '!=', 'startswith', 'endswith', 'not contains', 'contains'];
+          const numberList = ['==', '!=', '>', '>=', '<', '<='];
+          const booleanList = ['==', '!='];
+          switch (type) {
+            case 'string':
+              return stringList.indexOf(item.typeName) !== -1;
+            case 'number':
+              return numberList.indexOf(item.typeName) !== -1;
+            case 'boolean':
+              return booleanList.indexOf(item.typeName) !== -1;
+            default:
+              return true;
+          }
+        });
+      },
+      // 新增关系组
+      addCondition() {
+        const value = {
+          type: 'and',
+          checkInfo: false,
+          expressions: [
+            {
+              condition: '',
+              key: '',
+              value: '',
+              name: '',
+              choiceList: '',
+              type: 'string',
+              // 组织架构
+              organization: {
+                assignorPerson: [],
+                assignorTree: {},
+              },
+              organizaInfo: {
+                assignorShow: false,
+              },
             },
-            globalChoiseFilter(choiseMethods, type) {
-                return choiseMethods.filter((item) => {
-                    const stringList = ['==', '!=', 'startswith', 'endswith', 'not contains', 'contains'];
-                    const numberList = ['==', '!=', '>', '>=', '<', '<='];
-                    const booleanList = ['==', '!='];
-                    switch (type) {
-                        case 'string':
-                            return stringList.indexOf(item.typeName) !== -1;
-                        case 'number':
-                            return numberList.indexOf(item.typeName) !== -1;
-                        case 'boolean':
-                            return booleanList.indexOf(item.typeName) !== -1;
-                        default:
-                            return true;
-                    }
-                });
-            },
-            // 新增关系组
-            addCondition() {
-                const value = {
-                    type: 'and',
-                    checkInfo: false,
-                    expressions: [
-                        {
-                            condition: '',
-                            key: '',
-                            value: '',
-                            name: '',
-                            choiceList: '',
-                            type: 'string',
-                            // 组织架构
-                            organization: {
-                                assignorPerson: [],
-                                assignorTree: {},
-                            },
-                            organizaInfo: {
-                                assignorShow: false,
-                            },
-                        },
-                    ],
-                };
-                value.expressions.forEach((item) => {
-                    item.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
-                });
-                this.lineInfo.expressions.push(value);
-            },
-            delteCondition(item, index) {
-                if (this.lineInfo.expressions.length === 1) {
-                    return;
-                }
-                this.lineInfo.expressions.splice(index, 1);
-            },
-            // 新增字段条件组
-            addNode(item, index) {
-                const value = {
-                    condition: '',
-                    key: '',
-                    value: '',
-                    name: '',
-                    choiceList: '',
-                    type: 'string',
-                    // 组织架构
-                    organization: {
-                        assignorPerson: [],
-                        assignorTree: {},
-                    },
-                    organizaInfo: {
-                        assignorShow: false,
-                    },
-                };
-                value.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
-                item.expressions.splice(index + 1, 0, value);
-            },
-            deleteNode(item, index) {
-                if (item.expressions.length === 1) {
-                    return;
-                }
-                item.expressions.splice(index, 1);
-            },
-            showTree(item) {
-                const assignorShow = !item.organizaInfo.assignorShow;
-                this.closeOther();
-                item.organizaInfo.assignorShow = assignorShow;
-            },
-            closeOther() {
-                this.lineInfo.expressions.forEach((item) => {
-                    item.expressions.forEach((ite) => {
-                        ite.organizaInfo.assignorShow = false;
-                    });
-                });
-            },
-            recordCheckFn(tree) {
-                tree.checkInfo = false;
-                if (tree.children === null || (tree.children && !tree.children.length)) {
-                    return;
-                }
-                tree.children.forEach((item) => {
-                    this.recordCheckFn(item);
-                });
-            },
-            assignorToggle() {
-                arguments[1].type = arguments[0].type;
-                arguments[1].name = arguments[0].name;
-                arguments[1].key = arguments[0].ancestorsList_str;
-                arguments[1].organization.assignorPerson.forEach((tree) => {
-                    this.recordCheckFn(tree);
-                });
-                arguments[0].checkInfo = true;
+          ],
+        };
+        value.expressions.forEach((item) => {
+          item.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
+        });
+        this.lineInfo.expressions.push(value);
+      },
+      delteCondition(item, index) {
+        if (this.lineInfo.expressions.length === 1) {
+          return;
+        }
+        this.lineInfo.expressions.splice(index, 1);
+      },
+      // 新增字段条件组
+      addNode(item, index) {
+        const value = {
+          condition: '',
+          key: '',
+          value: '',
+          name: '',
+          choiceList: '',
+          type: 'string',
+          // 组织架构
+          organization: {
+            assignorPerson: [],
+            assignorTree: {},
+          },
+          organizaInfo: {
+            assignorShow: false,
+          },
+        };
+        value.organization.assignorPerson = JSON.parse(JSON.stringify(this.lineInfo.expressions[0].expressions[0].organization.assignorPerson));
+        item.expressions.splice(index + 1, 0, value);
+      },
+      deleteNode(item, index) {
+        if (item.expressions.length === 1) {
+          return;
+        }
+        item.expressions.splice(index, 1);
+      },
+      showTree(item) {
+        const assignorShow = !item.organizaInfo.assignorShow;
+        this.closeOther();
+        item.organizaInfo.assignorShow = assignorShow;
+      },
+      closeOther() {
+        this.lineInfo.expressions.forEach((item) => {
+          item.expressions.forEach((ite) => {
+            ite.organizaInfo.assignorShow = false;
+          });
+        });
+      },
+      recordCheckFn(tree) {
+        tree.checkInfo = false;
+        if (tree.children === null || (tree.children && !tree.children.length)) {
+          return;
+        }
+        tree.children.forEach((item) => {
+          this.recordCheckFn(item);
+        });
+      },
+      assignorToggle() {
+        arguments[1].type = arguments[0].type;
+        arguments[1].name = arguments[0].name;
+        arguments[1].key = arguments[0].ancestorsList_str;
+        arguments[1].organization.assignorPerson.forEach((tree) => {
+          this.recordCheckFn(tree);
+        });
+        arguments[0].checkInfo = true;
 
-                // 选中的数据
-                arguments[1].organization.assignorTree = arguments[0];
+        // 选中的数据
+        arguments[1].organization.assignorTree = arguments[0];
 
-                this.checkInfo.assignors = false;
+        this.checkInfo.assignors = false;
 
-                // 关闭窗口
-                this.closeTree(arguments[1]);
-            },
-            closeTree(item) {
-                item.organizaInfo.assignorShow = false;
-            },
-            toggleChildren() {
-                arguments[0].showChildren = !arguments[0].showChildren;
-                arguments[1].organization.assignorPerson = JSON.parse(JSON.stringify(arguments[1].organization.assignorPerson));
-            },
-        },
-    };
+        // 关闭窗口
+        this.closeTree(arguments[1]);
+      },
+      closeTree(item) {
+        item.organizaInfo.assignorShow = false;
+      },
+      toggleChildren() {
+        arguments[0].showChildren = !arguments[0].showChildren;
+        arguments[1].organization.assignorPerson = JSON.parse(JSON.stringify(arguments[1].organization.assignorPerson));
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

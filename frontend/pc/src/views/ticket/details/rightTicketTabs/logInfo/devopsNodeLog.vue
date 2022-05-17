@@ -42,15 +42,15 @@
 
 <script>
 
-    export default {
-        name: 'devopsNodeLog',
-        props: {
-            nodeInfo: {
-                type: Array,
-                default: () => ({}),
-            },
-        },
-    };
+  export default {
+    name: 'devopsNodeLog',
+    props: {
+      nodeInfo: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

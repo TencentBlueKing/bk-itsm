@@ -104,157 +104,157 @@
 </template>
 
 <script>
-    import BasicInformation from './BasicInformation.vue';
-    import OrderPreview from './OrderPreview.vue';
-    import CurrentSteps from './currentSteps/index.vue';
-    import { deepClone } from '@/utils/util';
-    import commonMix from '@/views/commonMix/common.js';
-    import fieldMix from '@/views/commonMix/field.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import WangEditor from './comment/index.vue';
+  import BasicInformation from './BasicInformation.vue';
+  import OrderPreview from './OrderPreview.vue';
+  import CurrentSteps from './currentSteps/index.vue';
+  import { deepClone } from '@/utils/util';
+  import commonMix from '@/views/commonMix/common.js';
+  import fieldMix from '@/views/commonMix/field.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import WangEditor from './comment/index.vue';
 
-    export default {
-        name: 'LeftTicketContent',
-        components: {
-            BasicInformation,
-            OrderPreview,
-            CurrentSteps,
-            WangEditor,
+  export default {
+    name: 'LeftTicketContent',
+    components: {
+      BasicInformation,
+      OrderPreview,
+      CurrentSteps,
+      WangEditor,
+    },
+    mixins: [commonMix, fieldMix, apiFieldsWatch],
+    props: {
+      commentId: [Number, String],
+      commentList: Array,
+      loading: Object,
+      ticketInfo: Object,
+      nodeList: Array,
+      firstStateFields: Array,
+      nodeTriggerList: Array,
+      ticketId: [Number, String],
+      commentLoading: Boolean,
+      isPageOver: Boolean,
+      hasNodeOptAuth: Boolean,
+      isShowAssgin: Boolean,
+      moreLoading: Boolean,
+      isShowComment: {
+        type: Boolean,
+        default() {
+          return true;
         },
-        mixins: [commonMix, fieldMix, apiFieldsWatch],
-        props: {
-            commentId: [Number, String],
-            commentList: Array,
-            loading: Object,
-            ticketInfo: Object,
-            nodeList: Array,
-            firstStateFields: Array,
-            nodeTriggerList: Array,
-            ticketId: [Number, String],
-            commentLoading: Boolean,
-            isPageOver: Boolean,
-            hasNodeOptAuth: Boolean,
-            isShowAssgin: Boolean,
-            moreLoading: Boolean,
-            isShowComment: {
-                type: Boolean,
-                default() {
-                    return true;
-                },
-            },
-        },
-        inject: ['reloadTicket'],
-        data() {
-            return {
-                isShowBasicInfo: true,
-                baseActiveTab: 'base',
-                stepActiveTab: 'currentStep',
-                // 当前步骤
-                currentStepList: [],
-                allFieldList: [],
-                currentStepLoading: false,
-                activeName: ['ticket'],
-                isShow: false,
-            };
-        },
-        computed: {
-            currStepNodeNum() {
-                if (this.ticketInfo.is_over) {
-                    // 已结束单不显示当前步骤
-                    return 0;
-                }
-                return this.currentStepList.length;
-            },
-            currSetpIsIframe() {
-                return this.$route.name === 'TicketDetailIframe';
-            },
-        },
-        watch: {
-            hasNodeOptAuth(val) {
-                if (val) {
-                    this.stepActiveTab = 'currentStep';
-                } else {
-                    this.stepActiveTab = 'allComments';
-                }
-            },
-            isShowAssgin(val) {
-                if (val) {
-                    this.stepActiveTab = 'currentStep';
-                }
-            },
-            isShowBasicInfo(val) {
-                this.$emit('getBacicInfoStatus', val);
-            },
-        },
-        methods: {
-            initCurrentStepData() {
-                this.currentStepLoading = true;
-                const oldCurrentNodeList = deepClone(this.currentStepList);
-                const updateList = [];
-                this.currentStepList = [];
-                this.allFieldList = [];
-                // 修改显示隐藏的数据
-                this.nodeList.forEach((item) => {
-                    // 过滤显示数据
-                    if (['RUNNING', 'SUSPEND', 'FAILED', 'SUCCESS'].includes(item.status)) {
-                        updateList.push(item);
-                    }
-                    this.allFieldList = this.allFieldList.concat(item.fields);
-                });
-                // 刷新某个步骤，避免用户填写时突然刷新打断，新旧节点 diff，如果状态未当前节点状态未更新，不应该刷新
-                updateList.forEach((newNode) => {
-                    const oldNode = oldCurrentNodeList.find(old => old.state_id === newNode.state_id);
-                    if (
-                        this.isSameStatusNode(newNode, oldNode)
-                        && oldNode.status === 'RUNNING'
-                    ) {
-                        this.currentStepList.push(oldNode);
-                    } else {
-                        this.currentStepList.push(newNode);
-                    }
-                });
+      },
+    },
+    inject: ['reloadTicket'],
+    data() {
+      return {
+        isShowBasicInfo: true,
+        baseActiveTab: 'base',
+        stepActiveTab: 'currentStep',
+        // 当前步骤
+        currentStepList: [],
+        allFieldList: [],
+        currentStepLoading: false,
+        activeName: ['ticket'],
+        isShow: false,
+      };
+    },
+    computed: {
+      currStepNodeNum() {
+        if (this.ticketInfo.is_over) {
+          // 已结束单不显示当前步骤
+          return 0;
+        }
+        return this.currentStepList.length;
+      },
+      currSetpIsIframe() {
+        return this.$route.name === 'TicketDetailIframe';
+      },
+    },
+    watch: {
+      hasNodeOptAuth(val) {
+        if (val) {
+          this.stepActiveTab = 'currentStep';
+        } else {
+          this.stepActiveTab = 'allComments';
+        }
+      },
+      isShowAssgin(val) {
+        if (val) {
+          this.stepActiveTab = 'currentStep';
+        }
+      },
+      isShowBasicInfo(val) {
+        this.$emit('getBacicInfoStatus', val);
+      },
+    },
+    methods: {
+      initCurrentStepData() {
+        this.currentStepLoading = true;
+        const oldCurrentNodeList = deepClone(this.currentStepList);
+        const updateList = [];
+        this.currentStepList = [];
+        this.allFieldList = [];
+        // 修改显示隐藏的数据
+        this.nodeList.forEach((item) => {
+          // 过滤显示数据
+          if (['RUNNING', 'SUSPEND', 'FAILED', 'SUCCESS'].includes(item.status)) {
+            updateList.push(item);
+          }
+          this.allFieldList = this.allFieldList.concat(item.fields);
+        });
+        // 刷新某个步骤，避免用户填写时突然刷新打断，新旧节点 diff，如果状态未当前节点状态未更新，不应该刷新
+        updateList.forEach((newNode) => {
+          const oldNode = oldCurrentNodeList.find(old => old.state_id === newNode.state_id);
+          if (
+            this.isSameStatusNode(newNode, oldNode)
+            && oldNode.status === 'RUNNING'
+          ) {
+            this.currentStepList.push(oldNode);
+          } else {
+            this.currentStepList.push(newNode);
+          }
+        });
 
-                // 隐藏字段显示隐藏判断逻辑
-                this.allFieldList.forEach((item) => {
-                    this.$set(item, 'showFeild', !!item.show_type);
-                    this.$set(item, 'val', item.value || '');
-                });
-                // 关联数据展示的逻辑处理
-                this.allFieldList.forEach((item) => {
-                    this.conditionField(item, this.allFieldList);
-                });
-                this.currentStepList.forEach((item) => {
-                    if (item.fields && item.fields.length) {
-                        item.fields.forEach((node) => {
-                            this.$set(node, 'service', this.ticketInfo.service_type);
-                            if (node.key === 'current_status') {
-                                this.$set(node, 'ticket_status', this.ticketInfo.current_status);
-                            }
-                        });
-                        this.isNecessaryToWatch(item, '');
-                    }
-                    // 顺序会签
-                    if (item.type === 'SIGN' && !item.is_sequential) {
-                        const finishedList = item.tasks.filter(task => task.status === 'FINISHED');
-                        item.tasks = item.tasks.filter(task => finishedList.findIndex(finished => finished.processor === task.processor) === -1);
-                        item.tasks = [...finishedList, ...item.tasks];
-                    }
-                });
-                this.$nextTick(() => {
-                    this.currentStepLoading = false;
-                });
-            },
-            changeDialogStatus(val) {
-                this.isShow = val;
-            },
-            refreshComment() {
-                this.$emit('refreshComment');
-            },
-            addTargetComment(val) {
-                this.$emit('addTargetComment', val);
-            },
-        },
-    };
+        // 隐藏字段显示隐藏判断逻辑
+        this.allFieldList.forEach((item) => {
+          this.$set(item, 'showFeild', !!item.show_type);
+          this.$set(item, 'val', item.value || '');
+        });
+        // 关联数据展示的逻辑处理
+        this.allFieldList.forEach((item) => {
+          this.conditionField(item, this.allFieldList);
+        });
+        this.currentStepList.forEach((item) => {
+          if (item.fields && item.fields.length) {
+            item.fields.forEach((node) => {
+              this.$set(node, 'service', this.ticketInfo.service_type);
+              if (node.key === 'current_status') {
+                this.$set(node, 'ticket_status', this.ticketInfo.current_status);
+              }
+            });
+            this.isNecessaryToWatch(item, '');
+          }
+          // 顺序会签
+          if (item.type === 'SIGN' && !item.is_sequential) {
+            const finishedList = item.tasks.filter(task => task.status === 'FINISHED');
+            item.tasks = item.tasks.filter(task => finishedList.findIndex(finished => finished.processor === task.processor) === -1);
+            item.tasks = [...finishedList, ...item.tasks];
+          }
+        });
+        this.$nextTick(() => {
+          this.currentStepLoading = false;
+        });
+      },
+      changeDialogStatus(val) {
+        this.isShow = val;
+      },
+      refreshComment() {
+        this.$emit('refreshComment');
+      },
+      addTargetComment(val) {
+        this.$emit('addTargetComment', val);
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
 .left-ticket {

@@ -27,14 +27,14 @@
   </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle';
-    import AttentionList from '../ticket/AttentionList';
+  import NavTitle from '@/components/common/layout/NavTitle';
+  import AttentionList from '../ticket/AttentionList';
 
-    export default {
-        name: 'MyAttentionTicket',
-        components: {
-            NavTitle,
-            AttentionList,
-        },
-    };
+  export default {
+    name: 'MyAttentionTicket',
+    components: {
+      NavTitle,
+      AttentionList,
+    },
+  };
 </script>

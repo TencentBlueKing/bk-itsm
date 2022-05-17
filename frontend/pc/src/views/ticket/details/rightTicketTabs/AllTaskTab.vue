@@ -99,70 +99,70 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler';
-    import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue';
-    import dealTask from '../taskInfo/dealTask.vue';
-    import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue';
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
+  import { errorHandler } from '@/utils/errorHandler';
+  import TaskStatus from '../currentSteps/nodetask/TaskStatus.vue';
+  import dealTask from '../taskInfo/dealTask.vue';
+  import taskHandleTrigger from '../taskInfo/taskHandleTrigger.vue';
+  import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
 
-    export default {
-        name: '',
-        components: {
-            dealTask,
-            TaskStatus,
-            taskHandleTrigger,
+  export default {
+    name: '',
+    components: {
+      dealTask,
+      TaskStatus,
+      taskHandleTrigger,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        isListLoading: false,
+        taskList: [],
+        dealTaskInfo: {
+          show: false,
+          itemContent: {},
+          title: this.$t('m.task[\'查看任务\']'),
+          type: 'SEE',
         },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        data() {
-            return {
-                isListLoading: false,
-                taskList: [],
-                dealTaskInfo: {
-                    show: false,
-                    itemContent: {},
-                    title: this.$t('m.task[\'查看任务\']'),
-                    type: 'SEE',
-                },
-                taskTemplateTypes: TASK_TEMPLATE_TYPES,
-            };
-        },
-        mounted() {
-            this.getTaskList();
-        },
-        methods: {
-            // 获取任务列表
-            getTaskList() {
-                this.isListLoading = true;
-                const params = {
-                    ticket_id: this.ticketInfo.id,
-                };
-                return this.$store
-                    .dispatch('taskFlow/getTaskList', params)
-                    .then((res) => {
-                        this.taskList = res.data;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isListLoading = false;
-                    });
-            },
-            onViewTask(row) {
-                this.dealTaskInfo.show = true;
-                this.dealTaskInfo.itemContent = row;
-            },
-            getTaskTypeName(type) {
-                const target = this.taskTemplateTypes.find(m => m.type === type);
-                return target ? target.name : type;
-            },
-        },
-    };
+        taskTemplateTypes: TASK_TEMPLATE_TYPES,
+      };
+    },
+    mounted() {
+      this.getTaskList();
+    },
+    methods: {
+      // 获取任务列表
+      getTaskList() {
+        this.isListLoading = true;
+        const params = {
+          ticket_id: this.ticketInfo.id,
+        };
+        return this.$store
+          .dispatch('taskFlow/getTaskList', params)
+          .then((res) => {
+            this.taskList = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isListLoading = false;
+          });
+      },
+      onViewTask(row) {
+        this.dealTaskInfo.show = true;
+        this.dealTaskInfo.itemContent = row;
+      },
+      getTaskTypeName(type) {
+        const target = this.taskTemplateTypes.find(m => m.type === type);
+        return target ? target.name : type;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
 .all-task-list {

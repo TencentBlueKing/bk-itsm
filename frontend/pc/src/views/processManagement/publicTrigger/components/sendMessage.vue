@@ -63,68 +63,68 @@
   </div>
 </template>
 <script>
-    import changeConductor from './changeConductor.vue';
+  import changeConductor from './changeConductor.vue';
 
-    export default {
-        name: 'sendMessage',
-        components: {
-            changeConductor,
+  export default {
+    name: 'sendMessage',
+    components: {
+      changeConductor,
+    },
+    props: {
+      itemInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            itemInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-        },
-        data() {
-            return {
-                trueStatus: true,
-                falseStatus: false,
-                activeName: 'send_email_message',
-                show: true,
-            };
-        },
-        computed: {
+      },
+    },
+    data() {
+      return {
+        trueStatus: true,
+        falseStatus: false,
+        activeName: 'send_email_message',
+        show: true,
+      };
+    },
+    computed: {
 
-        },
-        created() {
-            this.itemInfo.sub_components.forEach((item) => {
-                this.$set(item, 'checked', (item.checked || false));
-                this.$set(item, 'label', item.name);
-                this.$set(item, 'icon', '');
-                switch (item.key) {
-                    case 'send_email_message':
-                        item.icon = 'icon-email';
-                        break;
-                    case 'send_sms_message':
-                        item.icon = 'icon-mobile';
-                        break;
-                    case 'send_wechat_message':
-                        item.icon = 'icon-weixin';
-                        break;
-                }
-                item.name = item.key;
-            });
-        },
-        mounted() {
+    },
+    created() {
+      this.itemInfo.sub_components.forEach((item) => {
+        this.$set(item, 'checked', (item.checked || false));
+        this.$set(item, 'label', item.name);
+        this.$set(item, 'icon', '');
+        switch (item.key) {
+          case 'send_email_message':
+            item.icon = 'icon-email';
+            break;
+          case 'send_sms_message':
+            item.icon = 'icon-mobile';
+            break;
+          case 'send_wechat_message':
+            item.icon = 'icon-weixin';
+            break;
+        }
+        item.name = item.key;
+      });
+    },
+    mounted() {
 
-        },
-        methods: {
-            changPanel(name) {
-                this.activeName = name;
-            },
-            changePanelStatus(panel, pIndex) {
-                this.show = false;
-                this.$nextTick(() => {
-                    panel.checked = true;
-                    this.itemInfo.sub_components.splice(pIndex, 1, panel);
-                    this.show = true;
-                });
-            },
-        },
-    };
+    },
+    methods: {
+      changPanel(name) {
+        this.activeName = name;
+      },
+      changePanelStatus(panel, pIndex) {
+        this.show = false;
+        this.$nextTick(() => {
+          panel.checked = true;
+          this.itemInfo.sub_components.splice(pIndex, 1, panel);
+          this.show = true;
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

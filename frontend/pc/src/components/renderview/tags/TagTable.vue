@@ -44,67 +44,67 @@
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins';
-    const tableAttrs = {
-        column: {
-            type: Array,
-            default: () => ([
-                {
-                    name: '操作',
-                    type: 'text',
-                    key: 'column1',
-                },
-                {
-                    name: '关联相关内容',
-                    key: 'column2',
-                    scheme: 'table_text_scheme',
-                    attrs: {
-                    },
-                },
-                {
-                    name: '申请期限',
-                    type: 'text',
-                    key: 'column3',
-                    attrs: {
-                        sort: true,
-                    },
-                },
-            ]),
+  import { getFormMixins } from '../formMixins';
+  const tableAttrs = {
+    column: {
+      type: Array,
+      default: () => ([
+        {
+          name: '操作',
+          type: 'text',
+          key: 'column1',
         },
-        value: {
-            type: Array,
-            default: () => ([]),
+        {
+          name: '关联相关内容',
+          key: 'column2',
+          scheme: 'table_text_scheme',
+          attrs: {
+          },
         },
-    };
-    export default {
-        name: 'TagTable',
-        components: {
-            ViewItem: () => import('../ViewItem.vue'),
+        {
+          name: '申请期限',
+          type: 'text',
+          key: 'column3',
+          attrs: {
+            sort: true,
+          },
         },
-        mixins: [getFormMixins(tableAttrs)],
-        methods: {
-            /**
-             * scheme 优先级：from.scheme > item.scheme > item.type
-             */
-            getScheme(item, form) {
-                const { schemes } = this.getContext();
-                if (form && form.scheme && schemes[form.scheme]) {
-                    return schemes[form.scheme];
-                }
-                if (item.scheme) {
-                    return schemes[item.scheme];
-                }
-                if (form && form.type) {
-                    return {
-                        type: form.type,
-                    };
-                }
-                return {
-                    type: item.type,
-                };
-            },
-        },
-    };
+      ]),
+    },
+    value: {
+      type: Array,
+      default: () => ([]),
+    },
+  };
+  export default {
+    name: 'TagTable',
+    components: {
+      ViewItem: () => import('../ViewItem.vue'),
+    },
+    mixins: [getFormMixins(tableAttrs)],
+    methods: {
+      /**
+       * scheme 优先级：from.scheme > item.scheme > item.type
+       */
+      getScheme(item, form) {
+        const { schemes } = this.getContext();
+        if (form && form.scheme && schemes[form.scheme]) {
+          return schemes[form.scheme];
+        }
+        if (item.scheme) {
+          return schemes[item.scheme];
+        }
+        if (form && form.type) {
+          return {
+            type: form.type,
+          };
+        }
+        return {
+          type: item.type,
+        };
+      },
+    },
+  };
 </script>
 <style lang="scss">
 .tag-data-table {

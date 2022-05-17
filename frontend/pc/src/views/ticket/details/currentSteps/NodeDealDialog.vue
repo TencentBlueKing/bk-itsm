@@ -139,196 +139,196 @@
 </template>
 
 <script>
-    import commonMix from '@/views/commonMix/common.js';
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+  import commonMix from '@/views/commonMix/common.js';
+  import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
 
-    export default {
-        name: 'NodeDealDialog',
-        components: {
-            DealPerson,
+  export default {
+    name: 'NodeDealDialog',
+    components: {
+      DealPerson,
+    },
+    mixins: [commonMix],
+    props: {
+      openFormInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      nodeInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      submitting: {
+        type: Boolean,
+        default: false,
+      },
+      allGroups: {
+        type: Array,
+        default: () => ([]),
+      },
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        falseStatus: false,
+        formData: {
+          terminate_message: '', // 终止原因
+          suspend_message: '', // 挂起原因
+          deliverReason: '', // 转单原因
         },
-        mixins: [commonMix],
-        props: {
-            openFormInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            nodeInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            submitting: {
-                type: Boolean,
-                default: false,
-            },
-            allGroups: {
-                type: Array,
-                default: () => ([]),
-            },
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
+        // 校验
+        rules: {},
+        // 派单人
+        distribution: {
+          excludeTypeList: [],
+          includeTypeList: [],
+          specifyIdList: [],
+          type: '',
+          value: '',
         },
-        data() {
-            return {
-                falseStatus: false,
-                formData: {
-                    terminate_message: '', // 终止原因
-                    suspend_message: '', // 挂起原因
-                    deliverReason: '', // 转单原因
-                },
-                // 校验
-                rules: {},
-                // 派单人
-                distribution: {
-                    excludeTypeList: [],
-                    includeTypeList: [],
-                    specifyIdList: [],
-                    type: '',
-                    value: '',
-                },
-                // 转单人
-                deliverInfo: {
-                    excludeTypeList: [], // 排除类型
-                    includeTypeList: [], // 包含类型
-                    specifyIdList: [], // 包含人员 id 列表
-                    type: '',
-                    value: '',
-                },
-                excludeAssignList: [
-                    'CMDB',
-                    'VARIABLE',
-                    'EMPTY',
-                    'STARTER_LEADER',
-                    'OPEN',
-                    'STARTER',
-                    'BY_ASSIGNOR',
-                    'ASSIGN_LEADER',
-                    'IAM',
-                    'API',
-                    'ORGANIZATION',
-                ],
-            };
+        // 转单人
+        deliverInfo: {
+          excludeTypeList: [], // 排除类型
+          includeTypeList: [], // 包含类型
+          specifyIdList: [], // 包含人员 id 列表
+          type: '',
+          value: '',
         },
-        computed: {
-            //  转单 or 异常分派
-            type() {
-                return this.openFormInfo.btnInfo.key === 'DELIVER' ? '转单' : '分派';
-            },
-        },
-        watch: {
-            'openFormInfo.isShow'() {
-                this.clearFormData();
-                this.initData();
-            },
-        },
-        methods: {
-            initData() {
-                // 校验
-                this.rules.terminate_message = this.checkCommonRules('select').select;
-                this.rules.suspend_message = this.checkCommonRules('select').select;
-                this.rules.deliverReason = this.checkCommonRules('select').select;
+        excludeAssignList: [
+          'CMDB',
+          'VARIABLE',
+          'EMPTY',
+          'STARTER_LEADER',
+          'OPEN',
+          'STARTER',
+          'BY_ASSIGNOR',
+          'ASSIGN_LEADER',
+          'IAM',
+          'API',
+          'ORGANIZATION',
+        ],
+      };
+    },
+    computed: {
+      //  转单 or 异常分派
+      type() {
+        return this.openFormInfo.btnInfo.key === 'DELIVER' ? '转单' : '分派';
+      },
+    },
+    watch: {
+      'openFormInfo.isShow'() {
+        this.clearFormData();
+        this.initData();
+      },
+    },
+    methods: {
+      initData() {
+        // 校验
+        this.rules.terminate_message = this.checkCommonRules('select').select;
+        this.rules.suspend_message = this.checkCommonRules('select').select;
+        this.rules.deliverReason = this.checkCommonRules('select').select;
 
-                // 初始化 分派/转单 类型
-                const isDelive = this.openFormInfo.btnInfo.key === 'DELIVER';
-                const specialType = ['OPEN', 'BY_ASSIGNOR'];
-                const {
-                    assignors, // 分派人（username + display_name）
-                    assignors_type: assignorsType, // 分派类型
-                    origin_assignors: originAssignors, // 原始分派人(id)
-                    delivers,
-                    delivers_type: deliversType,
-                    origin_delivers: originDelivers,
-                } = this.nodeInfo;
+        // 初始化 分派/转单 类型
+        const isDelive = this.openFormInfo.btnInfo.key === 'DELIVER';
+        const specialType = ['OPEN', 'BY_ASSIGNOR'];
+        const {
+          assignors, // 分派人（username + display_name）
+          assignors_type: assignorsType, // 分派类型
+          origin_assignors: originAssignors, // 原始分派人(id)
+          delivers,
+          delivers_type: deliversType,
+          origin_delivers: originDelivers,
+        } = this.nodeInfo;
 
-                const handler = isDelive ? delivers : assignors;
-                const originHandler = isDelive ? originDelivers : originAssignors;
-                const handlerType = isDelive ? deliversType : assignorsType;
+        const handler = isDelive ? delivers : assignors;
+        const originHandler = isDelive ? originDelivers : originAssignors;
+        const handlerType = isDelive ? deliversType : assignorsType;
 
-                let includeTypeList = [];
-                let specifyIdList = [];
-                if (specialType.includes(handlerType)) { // 特殊类型, 不限制选择
-                    includeTypeList = ['PERSON', 'GENERAL', 'ORGANIZATION'];
-                    specifyIdList = [];
-                    if (!isDelive) { // 分派时
-                        includeTypeList.push('STARTER');
-                    }
-                    if (this.ticketInfo.is_biz_need) { // 有关联业务才能显示
-                        includeTypeList.push('CMDB');
-                    }
-                } else if (handlerType === 'PERSON') { // 类型为个人, 只能在 originHandler 中选
-                    includeTypeList = ['PERSON'];
-                    specifyIdList = [{ type: 'PERSON', list: originHandler.split(',').filter(id => !!id) }];
-                } else {
-                    // 其他默认类型（通用角色、组织架构、cmdb 角色...）
-                    // PERSON 只能在 handler 中选，`handlerType` 只能在 originHandler 中选
-                    includeTypeList = ['PERSON', handlerType];
-                    const includePerson = handler.split(',').map(fullName => fullName.replace(/\(.+\)/g, ''));
-                    specifyIdList = [
-                        { type: 'PERSON', list: includePerson },
-                        { type: handlerType, list: originHandler.split(',') },
-                    ];
-                }
+        let includeTypeList = [];
+        let specifyIdList = [];
+        if (specialType.includes(handlerType)) { // 特殊类型, 不限制选择
+          includeTypeList = ['PERSON', 'GENERAL', 'ORGANIZATION'];
+          specifyIdList = [];
+          if (!isDelive) { // 分派时
+            includeTypeList.push('STARTER');
+          }
+          if (this.ticketInfo.is_biz_need) { // 有关联业务才能显示
+            includeTypeList.push('CMDB');
+          }
+        } else if (handlerType === 'PERSON') { // 类型为个人, 只能在 originHandler 中选
+          includeTypeList = ['PERSON'];
+          specifyIdList = [{ type: 'PERSON', list: originHandler.split(',').filter(id => !!id) }];
+        } else {
+          // 其他默认类型（通用角色、组织架构、cmdb 角色...）
+          // PERSON 只能在 handler 中选，`handlerType` 只能在 originHandler 中选
+          includeTypeList = ['PERSON', handlerType];
+          const includePerson = handler.split(',').map(fullName => fullName.replace(/\(.+\)/g, ''));
+          specifyIdList = [
+            { type: 'PERSON', list: includePerson },
+            { type: handlerType, list: originHandler.split(',') },
+          ];
+        }
 
-                if (isDelive) {
-                    this.deliverInfo.includeTypeList = includeTypeList;
-                    this.deliverInfo.specifyIdList = specifyIdList;
-                    if (includeTypeList.length === 1) {
-                        this.deliverInfo.type = includeTypeList[0];
-                    }
-                } else {
-                    this.distribution.includeTypeList = includeTypeList;
-                    this.distribution.specifyIdList = specifyIdList;
-                    if (includeTypeList.length === 1) {
-                        this.distribution.type = includeTypeList[0];
-                    }
-                }
-            },
-            clearFormData() {
-                this.deliverInfo = {
-                    excludeTypeList: [],
-                    includeTypeList: [],
-                    specifyIdList: [],
-                    type: '',
-                    value: '',
-                };
-                this.distribution = {
-                    excludeTypeList: [],
-                    includeTypeList: [],
-                    specifyIdList: [],
-                    type: '',
-                    value: '',
-                };
-                this.formData = {
-                    terminate_message: '',
-                    suspend_message: '',
-                    deliverReason: '',
-                };
-            },
-            // 确认事件
-            submitForm() {
-                this.$refs.dialogForm.validate().then(() => {
-                    let person = {};
-                    if (this.$refs.personSelect) {
-                        const res = this.$refs.personSelect.verifyValue();
-                        if (!res) {
-                            return false;
-                        }
-                        person = this.$refs.personSelect.getValue();
-                    }
+        if (isDelive) {
+          this.deliverInfo.includeTypeList = includeTypeList;
+          this.deliverInfo.specifyIdList = specifyIdList;
+          if (includeTypeList.length === 1) {
+            this.deliverInfo.type = includeTypeList[0];
+          }
+        } else {
+          this.distribution.includeTypeList = includeTypeList;
+          this.distribution.specifyIdList = specifyIdList;
+          if (includeTypeList.length === 1) {
+            this.distribution.type = includeTypeList[0];
+          }
+        }
+      },
+      clearFormData() {
+        this.deliverInfo = {
+          excludeTypeList: [],
+          includeTypeList: [],
+          specifyIdList: [],
+          type: '',
+          value: '',
+        };
+        this.distribution = {
+          excludeTypeList: [],
+          includeTypeList: [],
+          specifyIdList: [],
+          type: '',
+          value: '',
+        };
+        this.formData = {
+          terminate_message: '',
+          suspend_message: '',
+          deliverReason: '',
+        };
+      },
+      // 确认事件
+      submitForm() {
+        this.$refs.dialogForm.validate().then(() => {
+          let person = {};
+          if (this.$refs.personSelect) {
+            const res = this.$refs.personSelect.verifyValue();
+            if (!res) {
+              return false;
+            }
+            person = this.$refs.personSelect.getValue();
+          }
 
-                    this.$emit('submitFormAjax', Object.assign(this.formData, { person }));
-                }, (validator) => {
-                    console.warn(validator);
-                });
-            },
-            // 取消事件
-            cancelForm() {
-                this.openFormInfo.isShow = false;
-            },
-        },
-    };
+          this.$emit('submitFormAjax', Object.assign(this.formData, { person }));
+        }, (validator) => {
+          console.warn(validator);
+        });
+      },
+      // 取消事件
+      cancelForm() {
+        this.openFormInfo.isShow = false;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

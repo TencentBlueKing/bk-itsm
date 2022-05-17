@@ -26,9 +26,9 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'OperationData',
-    };
+  export default {
+    name: 'OperationData',
+  };
 </script>
 <style lang="scss" scoped>
     .operation-data-page {

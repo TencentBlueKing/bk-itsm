@@ -410,380 +410,380 @@
 </template>
 
 <script>
-    import newTask from './newTask.vue';
-    import dealTask from './dealTask.vue';
-    import taskLibrary from './taskLibrary.vue';
-    import taskHandleTrigger from './taskHandleTrigger';
-    import { errorHandler } from '@/utils/errorHandler';
+  import newTask from './newTask.vue';
+  import dealTask from './dealTask.vue';
+  import taskLibrary from './taskLibrary.vue';
+  import taskHandleTrigger from './taskHandleTrigger';
+  import { errorHandler } from '@/utils/errorHandler';
 
-    export default {
-        name: 'task',
-        components: {
-            newTask,
-            dealTask,
-            taskLibrary,
-            taskHandleTrigger,
+  export default {
+    name: 'task',
+    components: {
+      newTask,
+      dealTask,
+      taskLibrary,
+      taskHandleTrigger,
+    },
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            nodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                trueStatus: true,
-                falseStatus: false,
-                firstInitPage: true,
-                precision: 0,
-                minWidth: 180,
-                // 新建任务
-                taskInfo: {
-                    show: false,
-                    title: this.$t('m.task[\'新建任务\']'),
-                    addLoading: false,
-                    width: 660,
-                    itemContent: {},
-                },
-                // 头部数据
-                dropdownShow: false,
-                myTask: false,
-                // 数据列表
-                listLoading: false,
-                taskList: [],
-                // 状态列表
-                statusList: [
-                    { key: 'NEW', name: this.$t('m.task[\'新\']') },
-                    { key: 'QUEUE', name: this.$t('m.task[\'待处理\']') },
-                    {
-                        key: 'WAITING_FOR_OPERATE',
-                        name: this.$t('m.task[\'待处理\']'),
-                    },
-                    {
-                        key: 'WAITING_FOR_BACKEND',
-                        name: this.$t('m.task[\'后台处理中\']'),
-                    },
-                    { key: 'RUNNING', name: this.$t('m.task[\'执行中\']') },
-                    {
-                        key: 'WAITING_FOR_CONFIRM',
-                        name: this.$t('m.task[\'待总结\']'),
-                    },
-                    { key: 'FINISHED', name: this.$t('m.task[\'已完成\']') },
-                    { key: 'FAILED', name: this.$t('m.deployPage[\'失败\']') },
-                ],
-                // 处理任务
-                dealTaskInfo: {
-                    show: false,
-                    title: this.$t('m.task[\'处理任务\']'),
-                    loading: false,
-                    width: 660,
-                    itemContent: {},
-                    type: '',
-                },
-                // 任务库弹窗
-                libraryList: [],
-                libraryInfo: {
-                    show: false,
-                    title: this.$t('m.task[\'从任务库创建\']'),
-                    loading: false,
-                    width: 660,
-                },
-                libraryName: '',
-                libraryShow: false,
-            };
+      },
+    },
+    data() {
+      return {
+        trueStatus: true,
+        falseStatus: false,
+        firstInitPage: true,
+        precision: 0,
+        minWidth: 180,
+        // 新建任务
+        taskInfo: {
+          show: false,
+          title: this.$t('m.task[\'新建任务\']'),
+          addLoading: false,
+          width: 660,
+          itemContent: {},
         },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
-            refreshTask() {
-                return this.$store.state.taskFlow.refreshTask;
-            },
+        // 头部数据
+        dropdownShow: false,
+        myTask: false,
+        // 数据列表
+        listLoading: false,
+        taskList: [],
+        // 状态列表
+        statusList: [
+          { key: 'NEW', name: this.$t('m.task[\'新\']') },
+          { key: 'QUEUE', name: this.$t('m.task[\'待处理\']') },
+          {
+            key: 'WAITING_FOR_OPERATE',
+            name: this.$t('m.task[\'待处理\']'),
+          },
+          {
+            key: 'WAITING_FOR_BACKEND',
+            name: this.$t('m.task[\'后台处理中\']'),
+          },
+          { key: 'RUNNING', name: this.$t('m.task[\'执行中\']') },
+          {
+            key: 'WAITING_FOR_CONFIRM',
+            name: this.$t('m.task[\'待总结\']'),
+          },
+          { key: 'FINISHED', name: this.$t('m.task[\'已完成\']') },
+          { key: 'FAILED', name: this.$t('m.deployPage[\'失败\']') },
+        ],
+        // 处理任务
+        dealTaskInfo: {
+          show: false,
+          title: this.$t('m.task[\'处理任务\']'),
+          loading: false,
+          width: 660,
+          itemContent: {},
+          type: '',
         },
-        watch: {
-            refreshTask() {
-                if (this.refreshTask) {
-                    this.getTaskList();
-                    this.getLibraryList();
+        // 任务库弹窗
+        libraryList: [],
+        libraryInfo: {
+          show: false,
+          title: this.$t('m.task[\'从任务库创建\']'),
+          loading: false,
+          width: 660,
+        },
+        libraryName: '',
+        libraryShow: false,
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+      refreshTask() {
+        return this.$store.state.taskFlow.refreshTask;
+      },
+    },
+    watch: {
+      refreshTask() {
+        if (this.refreshTask) {
+          this.getTaskList();
+          this.getLibraryList();
+        }
+      },
+    },
+    mounted() {
+      this.getTaskList();
+      this.getLibraryList();
+      // 轮询单据详情的数据
+      clearInterval(this.$store.state.taskFlow.intervalInfo);
+      this.$store.state.taskFlow.intervalInfo = setInterval(() => {
+        this.intervalTask();
+      }, 5000);
+    },
+    methods: {
+      orderingClick(value) {
+        this.taskList.sort(this.sortCompare('order', value.order));
+      },
+      sortCompare(prop, type) {
+        return (obj1, obj2) => {
+          let val1 = obj1[prop];
+          let val2 = obj2[prop];
+          if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+            val1 = Number(val1);
+            val2 = Number(val2);
+          }
+          if (val1 < val2) {
+            return type === 'ascending' ? -1 : 1;
+          }
+          if (val1 > val2) {
+            return type === 'ascending' ? 1 : -1;
+          }
+          return 0;
+        };
+      },
+      // 修改task任务（new）
+      newTaskSlider(item) {
+        if (!this.basicInfomation.can_create_task) {
+          return;
+        }
+        this.taskInfo.itemContent = item;
+        this.taskInfo.title = item.id
+          ? this.$t('m.task[\'编辑任务\']')
+          : this.$t('m.task[\'新建任务\']');
+        this.taskInfo.show = true;
+      },
+      closeSlider() {
+        this.taskInfo.show = false;
+      },
+      // 处理任务
+      dealTaskSlider(item, type) {
+        this.dealTaskInfo.itemContent = item;
+        this.dealTaskInfo.type = type;
+        const typeObject = {
+          SEE: this.$t('m.task[\'查看任务\']'),
+          OPERATE: this.$t('m.task[\'处理任务\']'),
+          CONFIRM: this.$t('m.task[\'总结任务\']'),
+          RETRY: this.$t('m.task[\'重试任务\']'),
+        };
+        this.dealTaskInfo.title = typeObject[type];
+        this.dealTaskInfo.show = true;
+      },
+      closeTask() {
+        this.dealTaskInfo.show = false;
+      },
+      // 获取任务列表表格
+      getTaskList() {
+        const params = {
+          ticket_id: this.basicInfomation.id,
+          username: this.myTask ? window.username : '',
+        };
+        this.listLoading = true;
+        this.$store
+          .dispatch('taskFlow/getTaskList', params)
+          .then((res) => {
+            this.taskList = res.data;
+            this.taskList.forEach((item) => {
+              this.$set(item, 'orderStatus', true);
+              this.$set(item, 'orderInfo', item.order);
+            });
+            this.minWidth = 80;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.listLoading = false;
+            this.$store.commit('taskFlow/changeTaskStatus', false);
+          });
+      },
+      intervalTask() {
+        const params = {
+          ticket_id: this.basicInfomation.id,
+          username: this.myTask ? window.username : '',
+        };
+        this.$store
+          .dispatch('taskFlow/getTaskList', params)
+          .then((res) => {
+            this.taskList.forEach((item) => {
+              res.data.forEach((node) => {
+                if (item.id === node.id) {
+                  item.status = node.status;
                 }
-            },
-        },
-        mounted() {
-            this.getTaskList();
-            this.getLibraryList();
-            // 轮询单据详情的数据
-            clearInterval(this.$store.state.taskFlow.intervalInfo);
-            this.$store.state.taskFlow.intervalInfo = setInterval(() => {
-                this.intervalTask();
-            }, 5000);
-        },
-        methods: {
-            orderingClick(value) {
-                this.taskList.sort(this.sortCompare('order', value.order));
-            },
-            sortCompare(prop, type) {
-                return (obj1, obj2) => {
-                    let val1 = obj1[prop];
-                    let val2 = obj2[prop];
-                    if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
-                        val1 = Number(val1);
-                        val2 = Number(val2);
-                    }
-                    if (val1 < val2) {
-                        return type === 'ascending' ? -1 : 1;
-                    }
-                    if (val1 > val2) {
-                        return type === 'ascending' ? 1 : -1;
-                    }
-                    return 0;
-                };
-            },
-            // 修改task任务（new）
-            newTaskSlider(item) {
-                if (!this.basicInfomation.can_create_task) {
-                    return;
-                }
-                this.taskInfo.itemContent = item;
-                this.taskInfo.title = item.id
-                    ? this.$t('m.task[\'编辑任务\']')
-                    : this.$t('m.task[\'新建任务\']');
-                this.taskInfo.show = true;
-            },
-            closeSlider() {
-                this.taskInfo.show = false;
-            },
-            // 处理任务
-            dealTaskSlider(item, type) {
-                this.dealTaskInfo.itemContent = item;
-                this.dealTaskInfo.type = type;
-                const typeObject = {
-                    SEE: this.$t('m.task[\'查看任务\']'),
-                    OPERATE: this.$t('m.task[\'处理任务\']'),
-                    CONFIRM: this.$t('m.task[\'总结任务\']'),
-                    RETRY: this.$t('m.task[\'重试任务\']'),
-                };
-                this.dealTaskInfo.title = typeObject[type];
-                this.dealTaskInfo.show = true;
-            },
-            closeTask() {
-                this.dealTaskInfo.show = false;
-            },
-            // 获取任务列表表格
-            getTaskList() {
-                const params = {
-                    ticket_id: this.basicInfomation.id,
-                    username: this.myTask ? window.username : '',
-                };
-                this.listLoading = true;
-                this.$store
-                    .dispatch('taskFlow/getTaskList', params)
-                    .then((res) => {
-                        this.taskList = res.data;
-                        this.taskList.forEach((item) => {
-                            this.$set(item, 'orderStatus', true);
-                            this.$set(item, 'orderInfo', item.order);
-                        });
-                        this.minWidth = 80;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.listLoading = false;
-                        this.$store.commit('taskFlow/changeTaskStatus', false);
-                    });
-            },
-            intervalTask() {
-                const params = {
-                    ticket_id: this.basicInfomation.id,
-                    username: this.myTask ? window.username : '',
-                };
-                this.$store
-                    .dispatch('taskFlow/getTaskList', params)
-                    .then((res) => {
-                        this.taskList.forEach((item) => {
-                            res.data.forEach((node) => {
-                                if (item.id === node.id) {
-                                    item.status = node.status;
-                                }
-                            });
-                        });
-                        // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询
-                        const listInfo = [
-                            'QUEUE',
-                            'RUNNING',
-                            'WAITING_FOR_OPERATE',
-                            'WAITING_FOR_BACKEND',
-                            'WAITING_FOR_CONFIRM',
-                        ];
-                        if (
-                            !res.data.some(item => listInfo.some(node => node === item.status))
-                        ) {
-                            clearInterval(this.$store.state.taskFlow.intervalInfo);
-                            // 处理完成刷新工单状态
-                            if (res.data.length && !this.firstInitPage) {
-                                this.$emit('updateCurrentStep');
-                            }
-                        }
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.firstInitPage = false;
-                    });
-            },
-            // 删除列表数据
-            deleteTask(item) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.task[\'确认删除任务？\']'),
-                    subTitle: this.$t('m.task[\'任务如果被删除，与任务相关的触发动作将会一并删除。\']'),
-                    confirmFn: () => {
-                        const { id } = item;
-                        this.$store
-                            .dispatch('taskFlow/deleteTask', id)
-                            .then(() => {
-                                this.$bkMessage({
-                                    message: this.$t('m.task[\'删除成功\']'),
-                                    theme: 'success',
-                                });
-                                this.getTaskList();
-                            })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {});
-                    },
-                });
-            },
-            // 处理任务成功回调
-            dealSuccess() {
-                this.dealTaskInfo.show = false;
-                this.getTaskList();
+              });
+            });
+            // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询
+            const listInfo = [
+              'QUEUE',
+              'RUNNING',
+              'WAITING_FOR_OPERATE',
+              'WAITING_FOR_BACKEND',
+              'WAITING_FOR_CONFIRM',
+            ];
+            if (
+              !res.data.some(item => listInfo.some(node => node === item.status))
+            ) {
+              clearInterval(this.$store.state.taskFlow.intervalInfo);
+              // 处理完成刷新工单状态
+              if (res.data.length && !this.firstInitPage) {
                 this.$emit('updateCurrentStep');
-            },
-            // 忽略任务数据
-            ignoreTask(item) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.task[\'确认忽略任务？\']'),
-                    confirmFn: () => {
-                        const { id } = item;
-                        this.$store
-                            .dispatch('taskFlow/ignoreTask', id)
-                            .then(() => {
-                                this.$bkMessage({
-                                    message: this.$t('m.newCommon[\'成功\']'),
-                                    theme: 'success',
-                                });
-                                this.getTaskList();
-                            })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {});
-                    },
+              }
+            }
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.firstInitPage = false;
+          });
+      },
+      // 删除列表数据
+      deleteTask(item) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.task[\'确认删除任务？\']'),
+          subTitle: this.$t('m.task[\'任务如果被删除，与任务相关的触发动作将会一并删除。\']'),
+          confirmFn: () => {
+            const { id } = item;
+            this.$store
+              .dispatch('taskFlow/deleteTask', id)
+              .then(() => {
+                this.$bkMessage({
+                  message: this.$t('m.task[\'删除成功\']'),
+                  theme: 'success',
                 });
-            },
-            // 改变处理顺序
-            changeOrderStatus(value) {
-                this.taskList.forEach((item) => {
-                    item.orderStatus = true;
+                this.getTaskList();
+              })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {});
+          },
+        });
+      },
+      // 处理任务成功回调
+      dealSuccess() {
+        this.dealTaskInfo.show = false;
+        this.getTaskList();
+        this.$emit('updateCurrentStep');
+      },
+      // 忽略任务数据
+      ignoreTask(item) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.task[\'确认忽略任务？\']'),
+          confirmFn: () => {
+            const { id } = item;
+            this.$store
+              .dispatch('taskFlow/ignoreTask', id)
+              .then(() => {
+                this.$bkMessage({
+                  message: this.$t('m.newCommon[\'成功\']'),
+                  theme: 'success',
                 });
-                value.orderStatus = false;
-                this.minWidth = 180;
-            },
-            submitOrder(value) {
-                const { id } = value;
-                const params = {
-                    order: Number(value.orderInfo),
-                };
-                this.$store
-                    .dispatch('taskFlow/editorTask', { params, id })
-                    .then(() => {
-                        value.order = Number(value.orderInfo);
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        value.orderStatus = true;
-                        this.minWidth = 80;
-                    });
-            },
-            closeOrder(value) {
-                const orderValue = this.taskList.filter(item => item.id === value.id)[0].order;
-                value.orderInfo = orderValue;
-                value.orderStatus = true;
-                this.minWidth = 80;
-            },
-            // 从任务库创建
-            newTaskLibrary() {
-                if (!this.libraryList.length) {
-                    return;
-                }
-                this.libraryInfo.show = true;
-            },
-            closeTaskLibrary() {
-                this.libraryInfo.show = false;
-            },
-            // 任务库名称
-            openLibrary() {
-                if (!this.taskList.length) {
-                    return;
-                }
-                this.libraryShow = true;
-            },
-            submitLibrary() {
-                if (!this.libraryName) {
-                    return;
-                }
-                const params = {
-                    name: this.libraryName,
-                    tasks: this.taskList,
-                };
-                this.$store
-                    .dispatch('taskFlow/creatLibrary', params)
-                    .then(() => {
-                        this.$bkMessage({
-                            message: this.$t('m.task[\'任务库创建成功\']'),
-                            theme: 'success',
-                        });
-                        this.closeLibrary();
-                        this.getLibraryList();
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {});
-            },
-            closeLibrary() {
-                this.libraryName = '';
-                this.libraryShow = false;
-            },
-            // 获取任务库列表数据
-            getLibraryList() {
-                this.$store
-                    .dispatch('taskFlow/getLibraryList')
-                    .then((res) => {
-                        this.libraryList = res.data;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {});
-            },
-        },
-    };
+                this.getTaskList();
+              })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {});
+          },
+        });
+      },
+      // 改变处理顺序
+      changeOrderStatus(value) {
+        this.taskList.forEach((item) => {
+          item.orderStatus = true;
+        });
+        value.orderStatus = false;
+        this.minWidth = 180;
+      },
+      submitOrder(value) {
+        const { id } = value;
+        const params = {
+          order: Number(value.orderInfo),
+        };
+        this.$store
+          .dispatch('taskFlow/editorTask', { params, id })
+          .then(() => {
+            value.order = Number(value.orderInfo);
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            value.orderStatus = true;
+            this.minWidth = 80;
+          });
+      },
+      closeOrder(value) {
+        const orderValue = this.taskList.filter(item => item.id === value.id)[0].order;
+        value.orderInfo = orderValue;
+        value.orderStatus = true;
+        this.minWidth = 80;
+      },
+      // 从任务库创建
+      newTaskLibrary() {
+        if (!this.libraryList.length) {
+          return;
+        }
+        this.libraryInfo.show = true;
+      },
+      closeTaskLibrary() {
+        this.libraryInfo.show = false;
+      },
+      // 任务库名称
+      openLibrary() {
+        if (!this.taskList.length) {
+          return;
+        }
+        this.libraryShow = true;
+      },
+      submitLibrary() {
+        if (!this.libraryName) {
+          return;
+        }
+        const params = {
+          name: this.libraryName,
+          tasks: this.taskList,
+        };
+        this.$store
+          .dispatch('taskFlow/creatLibrary', params)
+          .then(() => {
+            this.$bkMessage({
+              message: this.$t('m.task[\'任务库创建成功\']'),
+              theme: 'success',
+            });
+            this.closeLibrary();
+            this.getLibraryList();
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {});
+      },
+      closeLibrary() {
+        this.libraryName = '';
+        this.libraryShow = false;
+      },
+      // 获取任务库列表数据
+      getLibraryList() {
+        this.$store
+          .dispatch('taskFlow/getLibraryList')
+          .then((res) => {
+            this.libraryList = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {});
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

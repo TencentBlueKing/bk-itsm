@@ -26,14 +26,14 @@
   </div>
 </template>
 <script>
-    import PublicField from '../../views/processManagement/publicField';
+  import PublicField from '../../views/processManagement/publicField';
 
-    export default {
-        name: 'FieldsPage',
-        components: {
-            PublicField,
-        },
-    };
+  export default {
+    name: 'FieldsPage',
+    components: {
+      PublicField,
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .fields-page {

@@ -64,118 +64,118 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler';
+  import { errorHandler } from '../../../../../utils/errorHandler';
 
-    export default {
-        name: 'TaskLibraryOptPanel',
-        props: {
-            taskList: {
-                type: Array,
-                default: () => ([]),
-            },
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
+  export default {
+    name: 'TaskLibraryOptPanel',
+    props: {
+      taskList: {
+        type: Array,
+        default: () => ([]),
+      },
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        templateListLoading: false,
+        type: 'new',
+        formData: {
+          name: '',
         },
-        data() {
-            return {
-                templateListLoading: false,
-                type: 'new',
-                formData: {
-                    name: '',
-                },
-                rules: { name: [
-                    {
-                        required: true,
-                        message: this.$t('m.task[\'任务库名称\']') + this.$t('m.newCommon["为必填项！"]'),
-                        trigger: 'blur',
-                    },
-                ] },
-                templateList: [],
-            };
-        },
-        methods: {
-            getLibraryList() {
-                this.templateListLoading = true;
-                this.$store.dispatch('taskFlow/getLibraryList', {
-                    service_id: this.ticketInfo.service_id,
-                }).then((res) => {
-                    this.templateList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.templateListLoading = false;
-                    });
-            },
-            onSwitchType(type) {
-                this.type = type;
-                this.formData.name = '';
-                if (type === 'update') {
-                    this.getLibraryList();
-                }
-            },
-            async onSbumit() {
-                const result = await this.$refs.taskForm.validate();
-                if (!result) {
-                    return;
-                }
-                if (!this.taskList.length) {
-                    this.$bkMessage({
-                        message: this.$t('m.tickets[\'没有任务可以存入任务库\']'),
-                        theme: 'error',
-                    });
-                    return false;
-                }
-                if (this.type === 'new') {
-                    this.newTaskLibrary();
-                } else {
-                    this.updataLibrary();
-                }
-            },
-            newTaskLibrary() {
-                const params = {
-                    name: this.formData.name,
-                    service_id: this.ticketInfo.service_id,
-                    tasks: this.taskList.map(item => item.id),
-                };
-                this.$store.dispatch('taskFlow/creatLibrary', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.task[\'任务库创建成功\']'),
-                        theme: 'success',
-                    });
-                    this.$emit('close');
-                    this.resetForm();
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            updataLibrary() {
-                const params = {
-                    tasks: this.taskList.map(item => item.id),
-                };
-                const id = this.formData.name;
-                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.task[\'更新成功\']'),
-                        theme: 'success',
-                    });
-                    this.$emit('close');
-                    this.resetForm();
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            resetForm() {
-                this.formData.name = '';
-                this.type = 'new';
-            },
-        },
-    };
+        rules: { name: [
+          {
+            required: true,
+            message: this.$t('m.task[\'任务库名称\']') + this.$t('m.newCommon["为必填项！"]'),
+            trigger: 'blur',
+          },
+        ] },
+        templateList: [],
+      };
+    },
+    methods: {
+      getLibraryList() {
+        this.templateListLoading = true;
+        this.$store.dispatch('taskFlow/getLibraryList', {
+          service_id: this.ticketInfo.service_id,
+        }).then((res) => {
+          this.templateList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.templateListLoading = false;
+          });
+      },
+      onSwitchType(type) {
+        this.type = type;
+        this.formData.name = '';
+        if (type === 'update') {
+          this.getLibraryList();
+        }
+      },
+      async onSbumit() {
+        const result = await this.$refs.taskForm.validate();
+        if (!result) {
+          return;
+        }
+        if (!this.taskList.length) {
+          this.$bkMessage({
+            message: this.$t('m.tickets[\'没有任务可以存入任务库\']'),
+            theme: 'error',
+          });
+          return false;
+        }
+        if (this.type === 'new') {
+          this.newTaskLibrary();
+        } else {
+          this.updataLibrary();
+        }
+      },
+      newTaskLibrary() {
+        const params = {
+          name: this.formData.name,
+          service_id: this.ticketInfo.service_id,
+          tasks: this.taskList.map(item => item.id),
+        };
+        this.$store.dispatch('taskFlow/creatLibrary', params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.task[\'任务库创建成功\']'),
+            theme: 'success',
+          });
+          this.$emit('close');
+          this.resetForm();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      updataLibrary() {
+        const params = {
+          tasks: this.taskList.map(item => item.id),
+        };
+        const id = this.formData.name;
+        this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.task[\'更新成功\']'),
+            theme: 'success',
+          });
+          this.$emit('close');
+          this.resetForm();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      resetForm() {
+        this.formData.name = '';
+        this.type = 'new';
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .task-library-opt-panel {

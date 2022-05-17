@@ -100,155 +100,155 @@
 </template>
 
 <script>
-    import ticketLogDetail from './logInfo/ticketLogDetail';
-    import { errorHandler } from '@/utils/errorHandler';
-    import fieldMix from '@/views/commonMix/field.js';
-    import { mapState } from 'vuex';
+  import ticketLogDetail from './logInfo/ticketLogDetail';
+  import { errorHandler } from '@/utils/errorHandler';
+  import fieldMix from '@/views/commonMix/field.js';
+  import { mapState } from 'vuex';
 
-    export default {
-        name: 'LogTab',
-        components: {
-            ticketLogDetail,
-        },
-        mixins: [fieldMix],
-        props: {
-            ticketInfo: Object,
-        },
-        data() {
-            return {
-                dispalyLogInfo: null,
-                flowStartText: this.$t('m.newCommon["流程开始"]'),
-                loading: false,
-                list: [],
-                isShowDetail: false,
-                imgUrl: require('@/images/orderFinished.png'),
-                commentInfo: {},
-                processorList: [],
-            };
-        },
-        computed: {
-            isShowComment() {
-                return (
-                    this.ticketInfo.is_over
-                    && Number(this.ticketInfo.comment_id) !== -1
-                );
-            },
-            ...mapState({
-                nodeList: state => state.deployOrder.nodeList,
-            }),
-            token() {
-                return this.$route.query.token;
-            },
-        },
-        watch: {
-            nodeList(val) {
-                if (val.length !== 0) {
-                    this.getCurrentProcess();
-                }
-            },
-        },
-        created() {
-            this.getOperationLogList();
-            this.getTicktComment();
-        },
-        // 方法集合
-        methods: {
-            // 获取流转日志-操作日志
-            getOperationLogList() {
-                const { id } = this.$route.query;
-                if (!id) {
-                    return;
-                }
-                this.loading = true;
-                const params = {};
-                params.ticket = id;
-                if (this.$route.query.token) {
-                    params.token = this.$route.query.token;
-                }
-                this.$store
-                    .dispatch('change/getLog', params)
-                    .then((res) => {
-                        this.list = [];
-                        res.data.forEach((item) => {
-                            const line = {};
-                            line.content = item.message;
-                            line.tag = item.operate_at;
-                            if (item.message !== this.flowStartText) {
-                                // item.content = item.message
-                                // item.tag = item.operate_at
-                                item.content = item.operate_at;
-                                item.tag = item.message;
-                                item.type = 'primary';
-                                item.showMore = false;
-                                this.list.push(JSON.parse(JSON.stringify(item)));
-                            }
-                        });
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            getCurrentProcess() {
-                this.nodeList.forEach((item) => {
-                    const processor = {
-                        action: '',
-                        // content: this.ticketInfo.current_processors || '--',
-                        deal_time: '',
-                        detail_message: '',
-                        form_data: [],
-                        from_state_name: item.name || '',
-                        from_state_type: '',
-                        id: -1,
-                        message: `${this.$t('m["正在进行中"]')}  ${
-                            item.processors
-                        }`,
-                        operate_at: item.update_at,
-                        operator: item.processors,
-                        processors: '',
-                        processors_type: '',
-                        showMore: false,
-                        tag:
-                            `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}`
-                            || '--',
-                        ticket: this.ticketInfo.id,
-                        ticket_id: this.ticketInfo.id,
-                        type: 'primary',
-                    };
-                    if (item.status === 'RUNNING') {
-                        this.list.push(processor);
-                    }
-                });
-            },
-            getTicktComment() {
-                if (!this.ticketInfo.is_over || !this.isShowComment) return;
-                this.$store
-                    .dispatch('ticket/getTicktComment', this.ticketInfo.comment_id)
-                    .then((res) => {
-                        if (Object.keys(res.data).length !== 0) {
-                            this.commentInfo = res.data;
-                        }
-                    });
-            },
-            handleSelect(item) {
-                const copyItem = JSON.parse(JSON.stringify(item));
-                copyItem.form_data.forEach((form) => {
-                    form.val = form.value;
-                    this.conditionField(form, copyItem.form_data);
-                });
-                copyItem.form_data = copyItem.form_data.filter(form => form.showFeild);
-                this.dispalyLogInfo = copyItem;
-            },
-            viewProcess() {
-                this.$emit('viewProcess', true);
-            },
-            handleEvaluate() {
-                console.log('去评价');
-            },
-        },
-    };
+  export default {
+    name: 'LogTab',
+    components: {
+      ticketLogDetail,
+    },
+    mixins: [fieldMix],
+    props: {
+      ticketInfo: Object,
+    },
+    data() {
+      return {
+        dispalyLogInfo: null,
+        flowStartText: this.$t('m.newCommon["流程开始"]'),
+        loading: false,
+        list: [],
+        isShowDetail: false,
+        imgUrl: require('@/images/orderFinished.png'),
+        commentInfo: {},
+        processorList: [],
+      };
+    },
+    computed: {
+      isShowComment() {
+        return (
+          this.ticketInfo.is_over
+          && Number(this.ticketInfo.comment_id) !== -1
+        );
+      },
+      ...mapState({
+        nodeList: state => state.deployOrder.nodeList,
+      }),
+      token() {
+        return this.$route.query.token;
+      },
+    },
+    watch: {
+      nodeList(val) {
+        if (val.length !== 0) {
+          this.getCurrentProcess();
+        }
+      },
+    },
+    created() {
+      this.getOperationLogList();
+      this.getTicktComment();
+    },
+    // 方法集合
+    methods: {
+      // 获取流转日志-操作日志
+      getOperationLogList() {
+        const { id } = this.$route.query;
+        if (!id) {
+          return;
+        }
+        this.loading = true;
+        const params = {};
+        params.ticket = id;
+        if (this.$route.query.token) {
+          params.token = this.$route.query.token;
+        }
+        this.$store
+          .dispatch('change/getLog', params)
+          .then((res) => {
+            this.list = [];
+            res.data.forEach((item) => {
+              const line = {};
+              line.content = item.message;
+              line.tag = item.operate_at;
+              if (item.message !== this.flowStartText) {
+                // item.content = item.message
+                // item.tag = item.operate_at
+                item.content = item.operate_at;
+                item.tag = item.message;
+                item.type = 'primary';
+                item.showMore = false;
+                this.list.push(JSON.parse(JSON.stringify(item)));
+              }
+            });
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      getCurrentProcess() {
+        this.nodeList.forEach((item) => {
+          const processor = {
+            action: '',
+            // content: this.ticketInfo.current_processors || '--',
+            deal_time: '',
+            detail_message: '',
+            form_data: [],
+            from_state_name: item.name || '',
+            from_state_type: '',
+            id: -1,
+            message: `${this.$t('m["正在进行中"]')}  ${
+              item.processors
+            }`,
+            operate_at: item.update_at,
+            operator: item.processors,
+            processors: '',
+            processors_type: '',
+            showMore: false,
+            tag:
+              `【${item.name}】${this.$t('m["正在进行中"]')}, ${this.$t('m["当前处理人"]')}${item.processors}`
+              || '--',
+            ticket: this.ticketInfo.id,
+            ticket_id: this.ticketInfo.id,
+            type: 'primary',
+          };
+          if (item.status === 'RUNNING') {
+            this.list.push(processor);
+          }
+        });
+      },
+      getTicktComment() {
+        if (!this.ticketInfo.is_over || !this.isShowComment) return;
+        this.$store
+          .dispatch('ticket/getTicktComment', this.ticketInfo.comment_id)
+          .then((res) => {
+            if (Object.keys(res.data).length !== 0) {
+              this.commentInfo = res.data;
+            }
+          });
+      },
+      handleSelect(item) {
+        const copyItem = JSON.parse(JSON.stringify(item));
+        copyItem.form_data.forEach((form) => {
+          form.val = form.value;
+          this.conditionField(form, copyItem.form_data);
+        });
+        copyItem.form_data = copyItem.form_data.filter(form => form.showFeild);
+        this.dispalyLogInfo = copyItem;
+      },
+      viewProcess() {
+        this.$emit('viewProcess', true);
+      },
+      handleEvaluate() {
+        console.log('去评价');
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

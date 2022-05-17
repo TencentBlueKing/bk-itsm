@@ -163,488 +163,488 @@
   </div>
 </template>
 <script>
-    import dealPerson from './components/dealPerson.vue';
-    import NoData from '../../../../components/common/NoData.vue';
-    import sopsGetParam from './components/sopsGetParam.vue';
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
-    import BasicCard from '@/components/common/layout/BasicCard.vue';
-    import { errorHandler } from '../../../../utils/errorHandler';
-    import { deepClone } from '@/utils/util.js';
+  import dealPerson from './components/dealPerson.vue';
+  import NoData from '../../../../components/common/NoData.vue';
+  import sopsGetParam from './components/sopsGetParam.vue';
+  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  import BasicCard from '@/components/common/layout/BasicCard.vue';
+  import { errorHandler } from '../../../../utils/errorHandler';
+  import { deepClone } from '@/utils/util.js';
 
-    export default {
-        name: 'sopsDevopsTask',
-        components: {
-            BasicCard,
-            sopsGetParam,
-            commonTriggerList,
-            NoData,
-            dealPerson,
+  export default {
+    name: 'sopsDevopsTask',
+    components: {
+      BasicCard,
+      sopsGetParam,
+      commonTriggerList,
+      NoData,
+      dealPerson,
+    },
+    props: {
+      // 流程信息
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            // 流程信息
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 节点信息
-            configur: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            state: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
+      },
+      // 节点信息
+      configur: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                quoteVars: [],
-                hookedVarList: {},
-                constantDefaultValue: {},
-                basicsFormData: {
-                    name: '',
-                    templateId: '',
-                    projectId: '',
-                    planId: [],
-                    processType: '',
-                    processors: [],
-                },
-                processOptions: [
-                    {
-                        id: 'business',
-                        name: '项目流程',
-                    },
-                    {
-                        id: 'common',
-                        name: '公共流程',
-                    },
-                ],
-                isLoading: false,
-                excludeTaskNodesId: [],
-                projectList: [],
-                templateList: [],
-                paramTableData: [],
-                stateList: [],
-                fieldList: [],
-                constants: [],
-                context: {
-                    project: {
-                        id: '',
-                        bk_biz_id: '',
-                        name: '',
-                        from_cmdb: true,
-                    },
-                    bk_biz_id: '',
-                    site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS,
-                },
-                sopsFormLoading: false,
-                processesLoading: false,
-                planLoading: false,
-                planList: [],
-                optionalNodeIdList: [],
-                templateDisable: false,
-                planDisable: false,
-                processDisable: false,
-                renderFormValidate: false,
-                biz: [
-                    {
-                        name: this.$t('m.treeinfo["业务"]'),
-                        custom_type: '',
-                        source_type: 'custom',
-                        value: '--',
-                        key: 1,
-                    },
-                ],
-                rules: {
-                    name: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                        {
-                            max: 50,
-                            message: '不能多于50个字符',
-                            trigger: 'blur',
-                        },
-                    ],
-                    processType: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                    ],
-                    projectId: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                    ],
-                    templateId: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                    ],
-                },
-                checkStatus: {
-                    delivers: false,
-                    processors: false,
-                },
-                excludeProcessor: [],
-                processorsInfo: {
-                    type: '',
-                    value: '',
-                },
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
+        },
+      },
+    },
+    data() {
+      return {
+        quoteVars: [],
+        hookedVarList: {},
+        constantDefaultValue: {},
+        basicsFormData: {
+          name: '',
+          templateId: '',
+          projectId: '',
+          planId: [],
+          processType: '',
+          processors: [],
+        },
+        processOptions: [
+          {
+            id: 'business',
+            name: '项目流程',
+          },
+          {
+            id: 'common',
+            name: '公共流程',
+          },
+        ],
+        isLoading: false,
+        excludeTaskNodesId: [],
+        projectList: [],
+        templateList: [],
+        paramTableData: [],
+        stateList: [],
+        fieldList: [],
+        constants: [],
+        context: {
+          project: {
+            id: '',
+            bk_biz_id: '',
+            name: '',
+            from_cmdb: true,
+          },
+          bk_biz_id: '',
+          site_url: window.SITE_URL_SOPS + window.PREFIX_SOPS,
+        },
+        sopsFormLoading: false,
+        processesLoading: false,
+        planLoading: false,
+        planList: [],
+        optionalNodeIdList: [],
+        templateDisable: false,
+        planDisable: false,
+        processDisable: false,
+        renderFormValidate: false,
+        biz: [
+          {
+            name: this.$t('m.treeinfo["业务"]'),
+            custom_type: '',
+            source_type: 'custom',
+            value: '--',
+            key: 1,
+          },
+        ],
+        rules: {
+          name: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+            {
+              max: 50,
+              message: '不能多于50个字符',
+              trigger: 'blur',
+            },
+          ],
+          processType: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+          ],
+          projectId: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+          ],
+          templateId: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+          ],
+        },
+        checkStatus: {
+          delivers: false,
+          processors: false,
+        },
+        excludeProcessor: [],
+        processorsInfo: {
+          type: '',
+          value: '',
+        },
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    created() {
+
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      async initData() {
+        this.isLoading = true;
+        this.getRelatedFields();
+        const userProjectList = await this.$store.dispatch('apiRemote/get_user_project_list');
+        if (userProjectList) this.projectList = userProjectList.data;
+        if (Object.keys(this.configur.extras).length !== 0) {
+          this.basicsFormData.name = this.configur.name;
+          // 流程类型
+          this.basicsFormData.processType = this.configur.extras.sops_info.template_source;
+          // 跳过执行任务ID
+          this.excludeTaskNodesId = this.configur.extras.sops_info.exclude_task_nodes_id || [];
+          // 项目ID
+          this.basicsFormData.projectId = this.configur.extras.sops_info.bk_biz_id.value;
+          if (this.basicsFormData.processType === 'common') {
+            await this.getTemplateList(this.basicsFormData.processType);
+          } else {
+            await this.getProjectTemplateList(this.basicsFormData.projectId);
+          }
+          await this.getTemplateDetail(this.configur.extras.sops_info.template_id);
+          this.basicsFormData.templateId = this.configur.extras.sops_info.template_id;
+          this.processorsInfo = {
+            type: this.configur.processors_type,
+            value: this.configur.processors,
+          };
+        }
+        this.getExcludeRoleTypeList();
+        this.isLoading = false;
+      },
+      // 获取common流程类型
+      async getTemplateList(key) {
+        const isCommonProcess = key === 'common';
+        const params = isCommonProcess ? {} : { bk_biz_id: this.basicsFormData.projectId };
+        if (!isCommonProcess) this.basicsFormData.projectId = '';
+        this.basicsFormData.templateId = '';
+        this.basicsFormData.planId = [];
+        this.templateDisable = !isCommonProcess;
+        this.planDisable = !isCommonProcess;
+        if (isCommonProcess) {
+          this.processesLoading = true;
+          // 获取流程模板
+          await this.$store.dispatch('getTemplateList', params).then((res) => {
+            this.templateList = res.data;
+          })
+            .catch((res) => {
+              errorHandler(res, this);
+            })
+            .finally(() => {
+              this.processesLoading = false;
+            });
+        }
+      },
+      // 获取项目模板列表
+      async getProjectTemplateList(id) {
+        const params = {
+          bk_biz_id: id,
+        };
+        if (this.basicsFormData.processType !== 'common') {
+          this.processesLoading = true;
+          this.basicsFormData.templateId = '';
+          const res = await this.$store.dispatch('getTemplateList', params);
+          if (res.result) {
+            this.templateList = res.data;
+            this.templateDisable = false;
+            this.planDisable = false;
+            this.processesLoading = false;
+          }
+        }
+      },
+      // 获取标准运维模板
+      async getTemplateDetail(id) {
+        const params = {
+          bk_biz_id: this.basicsFormData.processType === 'common' ? '' : this.basicsFormData.projectId,
+          template_id: id,
+        };
+        const templateInfo = this.templateList.find(item => item.id === id);
+        if (templateInfo !== undefined) {
+          this.context.project.bk_biz_id = templateInfo.bk_biz_id;
+          this.context.project.id = this.template;
+        }
+        this.constants = [];
+        this.hookedVarList = {};
+        this.sopsFormLoading = true;
+        this.basicsFormData.planId = [];
+        await this.$store.dispatch('getTemplateDetail', params).then((res) => {
+          this.processingVariables(res.data.constants);
+          this.optionalNodeIdList = res.data.all_ids || [];
+          this.getTempaltePlanList(id);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.sopsFormLoading = false;
+          });
+      },
+      // 获取模板任务列表
+      getTempaltePlanList(id) {
+        const template = this.templateList.find(template => template.id === id);
+        this.planList = [];
+        const params = {
+          bk_biz_id: template.bk_biz_id,
+          template_id: template.id,
+        };
+        this.planLoading = true;
+        this.$store.dispatch('getTemplatePlanList', params).then((res) => {
+          this.planList = res.data;
+          if (this.excludeTaskNodesId.length !== 0) {
+            res.data.forEach((item) => {
+              if (item.data) {
+                const ids = this.optionalNodeIdList.filter(nodeId => !JSON.parse(item.data).includes(nodeId));
+                const result = ids.filter(ite => !this.excludeTaskNodesId.includes(ite));
+                if (result.length === 0 && this.excludeTaskNodesId.length === ids.length) {
+                  this.basicsFormData.planId.push(item.id);
+                }
+              }
+            });
+          }
+          this.onplanSelect(this.basicsFormData.planId);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.planLoading = false;
+          });
+      },
+      async onplanSelect(ids) {
+        const planList = [];
+        if (ids.length > 0) {
+          ids.forEach((item) => {
+            const plan = this.planList.find(plan => plan.id === item);
+            if (plan.data) {
+              const twPlanList = JSON.parse(plan.data);
+              for (let index = 0; index < twPlanList.length; index++) {
+                if (planList.indexOf(twPlanList[index]) === -1) {
+                  planList.push(twPlanList[index]);
+                }
+              }
+            }
+          });
+          this.excludeTaskNodesId = this.optionalNodeIdList.filter(nodeId => !planList.includes(nodeId));
+        } else {
+          this.excludeTaskNodesId = [];
+        }
+        const template = this.templateList.find(item => item.id === this.basicsFormData.templateId);
+        try {
+          this.sopsFormLoading = true;
+          const isCommon = this.basicsFormData.processType === 'common';
+          const res = !isCommon ? await this.$store.dispatch('taskFlow/getSopsPreview', {
+            bk_biz_id: template.bk_biz_id,
+            template_id: template.id,
+            exclude_task_nodes_id: this.excludeTaskNodesId,
+          }) : deepClone(this.constants);
+          const constants = [];
+          if (!isCommon) {
+            for (const key in res.data.pipeline_tree.constants) {
+              if (res.data.pipeline_tree.constants[key].show_type === 'show') {
+                constants.push(res.data.pipeline_tree.constants[key]);
+              }
+            }
+          } else {
+            constants.push(...res);
+          }
+          this.processingVariables(constants);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          this.sopsFormLoading = false;
+        }
+      },
+      onChangeHook(key, value) {
+        this.hookedVarList[key] = value;
+      },
+      processingVariables(vars) {
+        const constants = vars;
+        constants.sort((a, b) => a.index - b.index);
+        // 设置每个变量的hook
+        constants.map((item) => {
+          this.$set(this.hookedVarList, item.key, false);
+        });
+        if (Object.prototype.hasOwnProperty.call(this.configur.extras, 'sops_info')) {
+          constants.forEach((item) => {
+            const curConstant = this.configur.extras.sops_info.constants.find(ite => ite.key === item.key);
+            if (!curConstant) return;
+            this.constantDefaultValue[item.key] = deepClone(curConstant.value);
+            if (curConstant.is_quoted) {
+              this.$set(this.hookedVarList, item.key, true);
+              item.value = `\${${curConstant.value}}`;
+            } else {
+              item.value = curConstant.value;
+            }
+          });
+        }
+        this.constants = constants;
+      },
+      async getRelatedFields() {
+        const params = {
+          workflow: this.flowInfo.id,
+          state: this.configur.id,
+          field: '',
+        };
+        await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
+          this.stateList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+          });
+      },
+      // 计算处理人类型需要排除的类型
+      getExcludeRoleTypeList() {
+        // 不显示的人员类型
+        let excludeProcessor = [];
+        // 内置节点
+        if (this.configur.is_builtin) {
+          excludeProcessor = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
+        } else {
+          excludeProcessor = ['OPEN'];
+        }
+        // 是否使用权限中心角色
+        if (!this.flowInfo.is_iam_used) {
+          // excludeProcessor.push('IAM')
+        }
+        // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
+        if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
+          excludeProcessor.push('BY_ASSIGNOR');
+        }
+        if (!this.flowInfo.is_biz_needed) {
+          excludeProcessor.push('CMDB');
+        }
+        this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
+      },
+      onClearProcess() {
+        if (this.basicsFormData.processType !== 'common') {
+          this.templateDisable = true;
+          this.planDisable = true;
+          this.constants = [];
+        }
+        this.templateList = [];
+        this.basicsFormData.templateId = '';
+        this.planList = [];
+      },
+      onClearTemplate() {
+        this.basicsFormData.planId = [];
+        this.basicsFormData.templateId = '';
+        this.constants = [];
+        this.planList = [];
+      },
+      closeNode() {
+        this.$parent.closeConfigur();
+      },
+      submit() {
+        console.log(this.$refs.processors.getValue());
+        // 处理人为空校验
+        if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
+          this.checkStatus.processors = true;
+          return;
+        }
+        if (this.$refs.getParam) {
+          this.renderFormValidate = this.$refs.getParam.getRenderFormValidate();
+        } else {
+          this.renderFormValidate = true;
+        }
+        this.$refs.basicsForm.validate().then(() => {
+          if (this.renderFormValidate) {
+            const formData = [];
+            const biz = {
+              name: this.$t('m.treeinfo["业务"]'),
+              value: this.basicsFormData.projectId,
+              key: 1,
+              value_type: 'custom',
             };
-        },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
-        },
-        created() {
-
-        },
-        mounted() {
-            this.initData();
-        },
-        methods: {
-            async initData() {
-                this.isLoading = true;
-                this.getRelatedFields();
-                const userProjectList = await this.$store.dispatch('apiRemote/get_user_project_list');
-                if (userProjectList) this.projectList = userProjectList.data;
-                if (Object.keys(this.configur.extras).length !== 0) {
-                    this.basicsFormData.name = this.configur.name;
-                    // 流程类型
-                    this.basicsFormData.processType = this.configur.extras.sops_info.template_source;
-                    // 跳过执行任务ID
-                    this.excludeTaskNodesId = this.configur.extras.sops_info.exclude_task_nodes_id || [];
-                    // 项目ID
-                    this.basicsFormData.projectId = this.configur.extras.sops_info.bk_biz_id.value;
-                    if (this.basicsFormData.processType === 'common') {
-                        await this.getTemplateList(this.basicsFormData.processType);
-                    } else {
-                        await this.getProjectTemplateList(this.basicsFormData.projectId);
-                    }
-                    await this.getTemplateDetail(this.configur.extras.sops_info.template_id);
-                    this.basicsFormData.templateId = this.configur.extras.sops_info.template_id;
-                    this.processorsInfo = {
-                        type: this.configur.processors_type,
-                        value: this.configur.processors,
-                    };
-                }
-                this.getExcludeRoleTypeList();
-                this.isLoading = false;
-            },
-            // 获取common流程类型
-            async getTemplateList(key) {
-                const isCommonProcess = key === 'common';
-                const params = isCommonProcess ? {} : { bk_biz_id: this.basicsFormData.projectId };
-                if (!isCommonProcess) this.basicsFormData.projectId = '';
-                this.basicsFormData.templateId = '';
-                this.basicsFormData.planId = [];
-                this.templateDisable = !isCommonProcess;
-                this.planDisable = !isCommonProcess;
-                if (isCommonProcess) {
-                    this.processesLoading = true;
-                    // 获取流程模板
-                    await this.$store.dispatch('getTemplateList', params).then((res) => {
-                        this.templateList = res.data;
-                    })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        })
-                        .finally(() => {
-                            this.processesLoading = false;
-                        });
-                }
-            },
-            // 获取项目模板列表
-            async getProjectTemplateList(id) {
-                const params = {
-                    bk_biz_id: id,
+            this.constants.map((item) => {
+              // renderForm的formData与constant匹配的key
+              const formKey = Object.keys(this.$refs.getParam.formData).filter(key => key === item.key);
+              const { name, key } = item;
+              const vt = this.hookedVarList[formKey] ? 'variable' : 'custom';
+              if (item.show_type === 'show') {
+                const formTeamlate = {
+                  value: this.hookedVarList[formKey] ? this.$refs.getParam.formData[formKey].slice(2, this.$refs.getParam.formData[formKey].length - 1) : this.$refs.getParam.formData[formKey],
+                  name,
+                  key: key || 1,
+                  value_type: vt,
+                  type: item.custom_type,
+                  is_quoted: this.hookedVarList[formKey],
                 };
-                if (this.basicsFormData.processType !== 'common') {
-                    this.processesLoading = true;
-                    this.basicsFormData.templateId = '';
-                    const res = await this.$store.dispatch('getTemplateList', params);
-                    if (res.result) {
-                        this.templateList = res.data;
-                        this.templateDisable = false;
-                        this.planDisable = false;
-                        this.processesLoading = false;
-                    }
-                }
-            },
-            // 获取标准运维模板
-            async getTemplateDetail(id) {
-                const params = {
-                    bk_biz_id: this.basicsFormData.processType === 'common' ? '' : this.basicsFormData.projectId,
-                    template_id: id,
-                };
-                const templateInfo = this.templateList.find(item => item.id === id);
-                if (templateInfo !== undefined) {
-                    this.context.project.bk_biz_id = templateInfo.bk_biz_id;
-                    this.context.project.id = this.template;
-                }
-                this.constants = [];
-                this.hookedVarList = {};
-                this.sopsFormLoading = true;
-                this.basicsFormData.planId = [];
-                await this.$store.dispatch('getTemplateDetail', params).then((res) => {
-                    this.processingVariables(res.data.constants);
-                    this.optionalNodeIdList = res.data.all_ids || [];
-                    this.getTempaltePlanList(id);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.sopsFormLoading = false;
-                    });
-            },
-            // 获取模板任务列表
-            getTempaltePlanList(id) {
-                const template = this.templateList.find(template => template.id === id);
-                this.planList = [];
-                const params = {
-                    bk_biz_id: template.bk_biz_id,
-                    template_id: template.id,
-                };
-                this.planLoading = true;
-                this.$store.dispatch('getTemplatePlanList', params).then((res) => {
-                    this.planList = res.data;
-                    if (this.excludeTaskNodesId.length !== 0) {
-                        res.data.forEach((item) => {
-                            if (item.data) {
-                                const ids = this.optionalNodeIdList.filter(nodeId => !JSON.parse(item.data).includes(nodeId));
-                                const result = ids.filter(ite => !this.excludeTaskNodesId.includes(ite));
-                                if (result.length === 0 && this.excludeTaskNodesId.length === ids.length) {
-                                    this.basicsFormData.planId.push(item.id);
-                                }
-                            }
-                        });
-                    }
-                    this.onplanSelect(this.basicsFormData.planId);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.planLoading = false;
-                    });
-            },
-            async onplanSelect(ids) {
-                const planList = [];
-                if (ids.length > 0) {
-                    ids.forEach((item) => {
-                        const plan = this.planList.find(plan => plan.id === item);
-                        if (plan.data) {
-                            const twPlanList = JSON.parse(plan.data);
-                            for (let index = 0; index < twPlanList.length; index++) {
-                                if (planList.indexOf(twPlanList[index]) === -1) {
-                                    planList.push(twPlanList[index]);
-                                }
-                            }
-                        }
-                    });
-                    this.excludeTaskNodesId = this.optionalNodeIdList.filter(nodeId => !planList.includes(nodeId));
-                } else {
-                    this.excludeTaskNodesId = [];
-                }
-                const template = this.templateList.find(item => item.id === this.basicsFormData.templateId);
-                try {
-                    this.sopsFormLoading = true;
-                    const isCommon = this.basicsFormData.processType === 'common';
-                    const res = !isCommon ? await this.$store.dispatch('taskFlow/getSopsPreview', {
-                        bk_biz_id: template.bk_biz_id,
-                        template_id: template.id,
-                        exclude_task_nodes_id: this.excludeTaskNodesId,
-                    }) : deepClone(this.constants);
-                    const constants = [];
-                    if (!isCommon) {
-                        for (const key in res.data.pipeline_tree.constants) {
-                            if (res.data.pipeline_tree.constants[key].show_type === 'show') {
-                                constants.push(res.data.pipeline_tree.constants[key]);
-                            }
-                        }
-                    } else {
-                        constants.push(...res);
-                    }
-                    this.processingVariables(constants);
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    this.sopsFormLoading = false;
-                }
-            },
-            onChangeHook(key, value) {
-                this.hookedVarList[key] = value;
-            },
-            processingVariables(vars) {
-                const constants = vars;
-                constants.sort((a, b) => a.index - b.index);
-                // 设置每个变量的hook
-                constants.map((item) => {
-                    this.$set(this.hookedVarList, item.key, false);
-                });
-                if (Object.prototype.hasOwnProperty.call(this.configur.extras, 'sops_info')) {
-                    constants.forEach((item) => {
-                        const curConstant = this.configur.extras.sops_info.constants.find(ite => ite.key === item.key);
-                        if (!curConstant) return;
-                        this.constantDefaultValue[item.key] = deepClone(curConstant.value);
-                        if (curConstant.is_quoted) {
-                            this.$set(this.hookedVarList, item.key, true);
-                            item.value = `\${${curConstant.value}}`;
-                        } else {
-                            item.value = curConstant.value;
-                        }
-                    });
-                }
-                this.constants = constants;
-            },
-            async getRelatedFields() {
-                const params = {
-                    workflow: this.flowInfo.id,
-                    state: this.configur.id,
-                    field: '',
-                };
-                await this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
-                    this.stateList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                    });
-            },
-            // 计算处理人类型需要排除的类型
-            getExcludeRoleTypeList() {
-                // 不显示的人员类型
-                let excludeProcessor = [];
-                // 内置节点
-                if (this.configur.is_builtin) {
-                    excludeProcessor = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
-                } else {
-                    excludeProcessor = ['OPEN'];
-                }
-                // 是否使用权限中心角色
-                if (!this.flowInfo.is_iam_used) {
-                    // excludeProcessor.push('IAM')
-                }
-                // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
-                if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
-                    excludeProcessor.push('BY_ASSIGNOR');
-                }
-                if (!this.flowInfo.is_biz_needed) {
-                    excludeProcessor.push('CMDB');
-                }
-                this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
-            },
-            onClearProcess() {
-                if (this.basicsFormData.processType !== 'common') {
-                    this.templateDisable = true;
-                    this.planDisable = true;
-                    this.constants = [];
-                }
-                this.templateList = [];
-                this.basicsFormData.templateId = '';
-                this.planList = [];
-            },
-            onClearTemplate() {
-                this.basicsFormData.planId = [];
-                this.basicsFormData.templateId = '';
-                this.constants = [];
-                this.planList = [];
-            },
-            closeNode() {
-                this.$parent.closeConfigur();
-            },
-            submit() {
-                console.log(this.$refs.processors.getValue());
-                // 处理人为空校验
-                if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
-                    this.checkStatus.processors = true;
-                    return;
-                }
-                if (this.$refs.getParam) {
-                    this.renderFormValidate = this.$refs.getParam.getRenderFormValidate();
-                } else {
-                    this.renderFormValidate = true;
-                }
-                this.$refs.basicsForm.validate().then(() => {
-                    if (this.renderFormValidate) {
-                        const formData = [];
-                        const biz = {
-                            name: this.$t('m.treeinfo["业务"]'),
-                            value: this.basicsFormData.projectId,
-                            key: 1,
-                            value_type: 'custom',
-                        };
-                        this.constants.map((item) => {
-                            // renderForm的formData与constant匹配的key
-                            const formKey = Object.keys(this.$refs.getParam.formData).filter(key => key === item.key);
-                            const { name, key } = item;
-                            const vt = this.hookedVarList[formKey] ? 'variable' : 'custom';
-                            if (item.show_type === 'show') {
-                                const formTeamlate = {
-                                    value: this.hookedVarList[formKey] ? this.$refs.getParam.formData[formKey].slice(2, this.$refs.getParam.formData[formKey].length - 1) : this.$refs.getParam.formData[formKey],
-                                    name,
-                                    key: key || 1,
-                                    value_type: vt,
-                                    type: item.custom_type,
-                                    is_quoted: this.hookedVarList[formKey],
-                                };
-                                formData.push(formTeamlate);
-                            }
-                        });
-                        const { value: processors, type: processorstype } = this.$refs.processors.getValue();
-                        const params = {
-                            extras: {
-                                sops_info: {
-                                    bk_biz_id: biz,
-                                    template_id: this.basicsFormData.templateId,
-                                    constants: formData,
-                                    exclude_task_nodes_id: this.excludeTaskNodesId,
-                                    template_source: this.basicsFormData.processType,
-                                },
-                            },
-                            processors: processors || '',
-                            processors_type: processorstype,
-                            is_draft: false,
-                            is_terminable: false,
-                            name: this.basicsFormData.name,
-                            type: 'TASK-SOPS',
-                            workflow: this.configur.workflow,
-                        };
-                        const stateId = this.configur.id;
-                        this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.treeinfo["保存成功"]'),
-                                theme: 'success',
-                            });
-                            this.$parent.closeConfigur();
-                        }, (res) => {
-                            errorHandler(res, this);
-                        })
-                            .finally(() => {
-                            });
-                    }
-                });
-            },
-        },
-    };
+                formData.push(formTeamlate);
+              }
+            });
+            const { value: processors, type: processorstype } = this.$refs.processors.getValue();
+            const params = {
+              extras: {
+                sops_info: {
+                  bk_biz_id: biz,
+                  template_id: this.basicsFormData.templateId,
+                  constants: formData,
+                  exclude_task_nodes_id: this.excludeTaskNodesId,
+                  template_source: this.basicsFormData.processType,
+                },
+              },
+              processors: processors || '',
+              processors_type: processorstype,
+              is_draft: false,
+              is_terminable: false,
+              name: this.basicsFormData.name,
+              type: 'TASK-SOPS',
+              workflow: this.configur.workflow,
+            };
+            const stateId = this.configur.id;
+            this.$store.dispatch('cdeploy/putSopsInfo', { params, stateId }).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.treeinfo["保存成功"]'),
+                theme: 'success',
+              });
+              this.$parent.closeConfigur();
+            }, (res) => {
+              errorHandler(res, this);
+            })
+              .finally(() => {
+              });
+          }
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

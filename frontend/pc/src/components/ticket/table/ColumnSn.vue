@@ -104,80 +104,80 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler';
-    export default {
-        name: 'ColumnSn',
-        props: {
-            row: {
-                type: Object,
-                default: () => ({}),
-            },
-            from: {
-                type: String,
-                default: '',
-            },
-        },
-        data() {
-            return {
-                fromRouter: this.from || this.$route.name,
-                parent: {},
-                children: [],
-                associates: [], // 关联单
-                inheritLoading: false,
-                associateLoading: false,
-            };
-        },
-        computed: {
-            openFunction() {
-                return this.$store.state.openFunction;
-            },
-        },
-        methods: {
-            // 获取母子单
-            getInheritTicket() {
-                if (this.parent.id || this.children.length) {
-                    return;
-                }
-                this.inheritLoading = true;
-                const params = {
-                    id: this.row.id,
-                };
-                this.$store.dispatch('change/getInheritState', params).then((res) => {
-                    if (res.data.related_type === 'slave') {
-                        this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]));
-                    } else {
-                        this.children = res.data.master_slave_tickets;
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res);
-                    })
-                    .finally(() => {
-                        this.inheritLoading = false;
-                    });
-            },
-            // 获取关联单
-            getAssociatedTickets() {
-                if (this.associates.length) {
-                    return;
-                }
-                this.associateLoading = true;
-                const params = {
-                    id: this.row.id,
-                };
-                this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
-                    this.associates = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.associateLoading = false;
-                    });
-            },
+  import { errorHandler } from '../../../utils/errorHandler';
+  export default {
+    name: 'ColumnSn',
+    props: {
+      row: {
+        type: Object,
+        default: () => ({}),
+      },
+      from: {
+        type: String,
+        default: '',
+      },
+    },
+    data() {
+      return {
+        fromRouter: this.from || this.$route.name,
+        parent: {},
+        children: [],
+        associates: [], // 关联单
+        inheritLoading: false,
+        associateLoading: false,
+      };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
+    },
+    methods: {
+      // 获取母子单
+      getInheritTicket() {
+        if (this.parent.id || this.children.length) {
+          return;
+        }
+        this.inheritLoading = true;
+        const params = {
+          id: this.row.id,
+        };
+        this.$store.dispatch('change/getInheritState', params).then((res) => {
+          if (res.data.related_type === 'slave') {
+            this.parent = JSON.parse(JSON.stringify(res.data.master_slave_tickets[0]));
+          } else {
+            this.children = res.data.master_slave_tickets;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res);
+          })
+          .finally(() => {
+            this.inheritLoading = false;
+          });
+      },
+      // 获取关联单
+      getAssociatedTickets() {
+        if (this.associates.length) {
+          return;
+        }
+        this.associateLoading = true;
+        const params = {
+          id: this.row.id,
+        };
+        this.$store.dispatch('deployOrder/getAssociatedTickets', params).then((res) => {
+          this.associates = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.associateLoading = false;
+          });
+      },
 
-        },
-    };
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .table-link {

@@ -29,22 +29,22 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'NoTicketContent',
-        props: {
-            message: {
-                type: String,
-                default() {
-                    return this.$t('m.wiki["您没有权限访问"]');
-                },
-            },
+  export default {
+    name: 'NoTicketContent',
+    props: {
+      message: {
+        type: String,
+        default() {
+          return this.$t('m.wiki["您没有权限访问"]');
         },
-        data() {
-            return {
+      },
+    },
+    data() {
+      return {
 
-            };
-        },
-    };
+      };
+    },
+  };
 </script>
 <style scoped lang="scss">
     .exception-box {

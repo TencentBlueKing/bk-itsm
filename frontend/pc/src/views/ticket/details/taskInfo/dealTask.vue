@@ -275,336 +275,336 @@
 </template>
 
 <script>
-    import i18n from '@/i18n/index.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
-    import { errorHandler } from '../../../../utils/errorHandler';
-    import taskStatus from '../currentSteps/nodetask/TaskStatus.vue';
-    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
-    import fieldPreview from '@/views/commonComponent/fieldPreview/index.vue';
+  import i18n from '@/i18n/index.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
+  import { errorHandler } from '../../../../utils/errorHandler';
+  import taskStatus from '../currentSteps/nodetask/TaskStatus.vue';
+  import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+  import fieldPreview from '@/views/commonComponent/fieldPreview/index.vue';
 
-    // 任务基础信息
-    const baseTaskInfoList = [
-        { key: 'component_type', name: i18n.t('m.task[\'任务类型\']'), value: '' },
-        { key: 'name', name: i18n.t('m.task[\'任务名称\']'), value: '' },
-        { key: 'status', name: i18n.t('m.task[\'状态\']'), value: '' },
-        { key: 'processor_users', name: i18n.t('m.task[\'处理人\']'), value: '' },
-        { key: 'create_at', name: i18n.t('m.task[\'创建时间\']'), value: '' },
-    ];
-    // 标准运维基础信息
-    const sopsBaseList = [
-        { key: 'task_name', name: i18n.t('m.task[\'任务名\']') },
-        { key: 'state', name: i18n.t('m.task[\'状态\']') },
-        { key: 'bk_biz_id', name: i18n.t('m.task[\'业务\']') },
-        { key: 'creator', name: i18n.t('m.task[\'创建人\']') },
-        { key: 'executor', name: i18n.t('m.task[\'执行人\']') },
-        { key: 'create_time', name: i18n.t('m.task[\'创建时间\']') },
-        { key: 'start_time', name: i18n.t('m.task[\'执行时间\']') },
-        { key: 'finish_time', name: i18n.t('m.task[\'完成时间\']') },
-    ];
-    // 标准运维状态列表
-    const sopsStateList = [
-        {
-            key: 'NOT_CREATED',
-            name: i18n.t('m.task[\'未创建\']'),
-            color: 'bk-status-over',
-        },
-        {
-            key: 'CREATE_FAILED',
-            name: i18n.t('m.task[\'创建失败\']'),
-            color: 'bk-status-error',
-        },
-        {
-            key: 'CREATED',
-            name: i18n.t('m.task[\'创建成功\']'),
-            color: 'bk-status-normal',
-        },
-        {
-            key: 'START_FAILED',
-            name: i18n.t('m.task[\'启动失败\']'),
-            color: 'bk-status-error',
-        },
-        {
-            key: 'RUNNING',
-            name: i18n.t('m.task[\'执行中\']'),
-            color: 'bk-status-normal',
-        },
-        {
-            key: 'FAILED',
-            name: i18n.t('m.task[\'执行失败\']'),
-            color: 'bk-status-error',
-        },
-        {
-            key: 'FINISHED',
-            name: i18n.t('m.task[\'执行成功\']'),
-            color: 'bk-status-summary',
-        },
-        {
-            key: 'REVOKED',
-            name: i18n.t('m.task[\'已撤销\']'),
-            color: 'bk-status-over',
-        },
-        {
-            key: 'SUSPENDED',
-            name: i18n.t('m.task[\'已暂停\']'),
-            color: 'bk-status-normal',
-        },
-    ];
+  // 任务基础信息
+  const baseTaskInfoList = [
+    { key: 'component_type', name: i18n.t('m.task[\'任务类型\']'), value: '' },
+    { key: 'name', name: i18n.t('m.task[\'任务名称\']'), value: '' },
+    { key: 'status', name: i18n.t('m.task[\'状态\']'), value: '' },
+    { key: 'processor_users', name: i18n.t('m.task[\'处理人\']'), value: '' },
+    { key: 'create_at', name: i18n.t('m.task[\'创建时间\']'), value: '' },
+  ];
+  // 标准运维基础信息
+  const sopsBaseList = [
+    { key: 'task_name', name: i18n.t('m.task[\'任务名\']') },
+    { key: 'state', name: i18n.t('m.task[\'状态\']') },
+    { key: 'bk_biz_id', name: i18n.t('m.task[\'业务\']') },
+    { key: 'creator', name: i18n.t('m.task[\'创建人\']') },
+    { key: 'executor', name: i18n.t('m.task[\'执行人\']') },
+    { key: 'create_time', name: i18n.t('m.task[\'创建时间\']') },
+    { key: 'start_time', name: i18n.t('m.task[\'执行时间\']') },
+    { key: 'finish_time', name: i18n.t('m.task[\'完成时间\']') },
+  ];
+  // 标准运维状态列表
+  const sopsStateList = [
+    {
+      key: 'NOT_CREATED',
+      name: i18n.t('m.task[\'未创建\']'),
+      color: 'bk-status-over',
+    },
+    {
+      key: 'CREATE_FAILED',
+      name: i18n.t('m.task[\'创建失败\']'),
+      color: 'bk-status-error',
+    },
+    {
+      key: 'CREATED',
+      name: i18n.t('m.task[\'创建成功\']'),
+      color: 'bk-status-normal',
+    },
+    {
+      key: 'START_FAILED',
+      name: i18n.t('m.task[\'启动失败\']'),
+      color: 'bk-status-error',
+    },
+    {
+      key: 'RUNNING',
+      name: i18n.t('m.task[\'执行中\']'),
+      color: 'bk-status-normal',
+    },
+    {
+      key: 'FAILED',
+      name: i18n.t('m.task[\'执行失败\']'),
+      color: 'bk-status-error',
+    },
+    {
+      key: 'FINISHED',
+      name: i18n.t('m.task[\'执行成功\']'),
+      color: 'bk-status-summary',
+    },
+    {
+      key: 'REVOKED',
+      name: i18n.t('m.task[\'已撤销\']'),
+      color: 'bk-status-over',
+    },
+    {
+      key: 'SUSPENDED',
+      name: i18n.t('m.task[\'已暂停\']'),
+      color: 'bk-status-normal',
+    },
+  ];
 
-    const specialFieldTypes = [
-        'COMPLEX-MEMBERS', // 人员类型选择
-        'SOPS_TEMPLATE', // 标准运维
-        'DEVOPS_TEMPLATE', // 蓝盾
-    ];
-    export default {
-        name: 'DealTask',
-        components: {
-            taskStatus,
-            fieldInfo,
-            fieldPreview,
+  const specialFieldTypes = [
+    'COMPLEX-MEMBERS', // 人员类型选择
+    'SOPS_TEMPLATE', // 标准运维
+    'DEVOPS_TEMPLATE', // 蓝盾
+  ];
+  export default {
+    name: 'DealTask',
+    components: {
+      taskStatus,
+      fieldInfo,
+      fieldPreview,
+    },
+    mixins: [apiFieldsWatch],
+    props: {
+      taskInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      dealType: {
+        type: String,
+        default: '',
+      },
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [apiFieldsWatch],
-        props: {
-            taskInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            dealType: {
-                type: String,
-                default: '',
-            },
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-        },
-        data() {
-            return {
-                baseTaskInfoList,
-                sopsBaseList,
-                sopsStateList,
-                specialFieldTypes,
-                btnLoading: false,
-                taskStatusInfoLoading: false,
-                taskDetailLoading: false,
-                taskStatusInfo: {}, // 标准运维信息
-                taskDetail: {}, // 任务详情信息
-                createFields: [], // 创建-字段
-                createTaskTemplateFields: [], // 创建-任务模板特有字段
-                dealFields: [], // 执行-字段
-                confirmFields: [], // 总结-字段
-                confirmTaskTemplateFields: [], // 总结-任务模板特有字段
-            };
-        },
-        computed: {
-            taskType() {
-                return this.taskInfo.component_type;
-            },
-            taskInfoList() {
-                const list = this.baseTaskInfoList.map((item) => {
-                    if (item.key === 'component_type') {
-                        item.value = TASK_TEMPLATE_TYPES.find(m => m.type === this.taskType).name;
-                    } else {
-                        item.value = this.taskInfo[item.key];
-                    }
-                    return item;
-                });
-                if (['SOPS', 'DEVOPS'].includes(this.taskType)) {
-                    list.push({
-                        name: this.$t('m.task[\'任务模板\']'),
-                        value: this.taskInfo.task_schema_id,
-                    });
-                }
-                if (this.taskType === 'DEVOPS') {
-                    list.push({
-                        name: this.$t('m.tickets[\'流水线\']'),
-                        value: '',
-                    });
-                }
-                return list;
-            },
-            isShowSopsExecInfo() {
-                return (
-                    this.taskType === 'SOPS'
-                    && (this.dealType === 'SEE'
-                    || this.taskInfo.status === 'WAITING_FOR_CONFIRM')
-                );
-            },
-            confirmText() {
-                return this.taskInfo.status === 'WAITING_FOR_OPERATE'
-                    && ['DEVOPS', 'SOPS'].includes(this.taskType)
-                    ? this.$t('m.tickets[\'执行\']')
-                    : this.$t('m.task[\'确认\']');
-            },
-        },
-        created() {
-            this.initData();
-        },
-        mounted() {},
-        methods: {
-            initData() {
-                this.getTaskDetail();
-                if (this.isShowSopsExecInfo) {
-                    this.getTaskStatusInfo();
-                }
-            },
-            // 获取任务详情
-            getTaskDetail() {
-                this.taskDetailLoading = true;
-                const { id } = this.taskInfo;
-                this.$store
-                    .dispatch('taskFlow/getTaskInfo', id)
-                    .then((res) => {
-                        this.taskDetail = res.data;
-                        // 创建信息
-                        this.createFields = res.data.fields.create_fields.filter(item => !this.specialFieldTypes.includes(item.type));
-                        this.createTaskTemplateFields =                        res.data.fields.create_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
-                        this.createTaskTemplateFields.forEach((item) => {
-                            this.$set(item, 'showFeild', true);
-                            this.$set(item, 'val', item.value || '');
-                        });
-                        this.isNecessaryToWatch(
-                            { fields: this.createFields },
-                            'submit'
-                        );
+      },
+    },
+    data() {
+      return {
+        baseTaskInfoList,
+        sopsBaseList,
+        sopsStateList,
+        specialFieldTypes,
+        btnLoading: false,
+        taskStatusInfoLoading: false,
+        taskDetailLoading: false,
+        taskStatusInfo: {}, // 标准运维信息
+        taskDetail: {}, // 任务详情信息
+        createFields: [], // 创建-字段
+        createTaskTemplateFields: [], // 创建-任务模板特有字段
+        dealFields: [], // 执行-字段
+        confirmFields: [], // 总结-字段
+        confirmTaskTemplateFields: [], // 总结-任务模板特有字段
+      };
+    },
+    computed: {
+      taskType() {
+        return this.taskInfo.component_type;
+      },
+      taskInfoList() {
+        const list = this.baseTaskInfoList.map((item) => {
+          if (item.key === 'component_type') {
+            item.value = TASK_TEMPLATE_TYPES.find(m => m.type === this.taskType).name;
+          } else {
+            item.value = this.taskInfo[item.key];
+          }
+          return item;
+        });
+        if (['SOPS', 'DEVOPS'].includes(this.taskType)) {
+          list.push({
+            name: this.$t('m.task[\'任务模板\']'),
+            value: this.taskInfo.task_schema_id,
+          });
+        }
+        if (this.taskType === 'DEVOPS') {
+          list.push({
+            name: this.$t('m.tickets[\'流水线\']'),
+            value: '',
+          });
+        }
+        return list;
+      },
+      isShowSopsExecInfo() {
+        return (
+          this.taskType === 'SOPS'
+          && (this.dealType === 'SEE'
+          || this.taskInfo.status === 'WAITING_FOR_CONFIRM')
+        );
+      },
+      confirmText() {
+        return this.taskInfo.status === 'WAITING_FOR_OPERATE'
+          && ['DEVOPS', 'SOPS'].includes(this.taskType)
+          ? this.$t('m.tickets[\'执行\']')
+          : this.$t('m.task[\'确认\']');
+      },
+    },
+    created() {
+      this.initData();
+    },
+    mounted() {},
+    methods: {
+      initData() {
+        this.getTaskDetail();
+        if (this.isShowSopsExecInfo) {
+          this.getTaskStatusInfo();
+        }
+      },
+      // 获取任务详情
+      getTaskDetail() {
+        this.taskDetailLoading = true;
+        const { id } = this.taskInfo;
+        this.$store
+          .dispatch('taskFlow/getTaskInfo', id)
+          .then((res) => {
+            this.taskDetail = res.data;
+            // 创建信息
+            this.createFields = res.data.fields.create_fields.filter(item => !this.specialFieldTypes.includes(item.type));
+            this.createTaskTemplateFields =                        res.data.fields.create_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
+            this.createTaskTemplateFields.forEach((item) => {
+              this.$set(item, 'showFeild', true);
+              this.$set(item, 'val', item.value || '');
+            });
+            this.isNecessaryToWatch(
+              { fields: this.createFields },
+              'submit'
+            );
 
-                        // 处理信息
-                        this.dealFields = res.data.fields.operate_fields.filter(item => !this.specialFieldTypes.includes(item.type));
-                        this.dealFields.forEach((item) => {
-                            if (item.type === 'CASCADE') {
-                                item.type = 'SELECT';
-                            }
-                            this.$set(item, 'showFeild', true);
-                            this.$set(item, 'val', item.value || '');
-                        });
-                        this.isNecessaryToWatch(
-                            { fields: this.dealFields },
-                            'submit'
-                        );
+            // 处理信息
+            this.dealFields = res.data.fields.operate_fields.filter(item => !this.specialFieldTypes.includes(item.type));
+            this.dealFields.forEach((item) => {
+              if (item.type === 'CASCADE') {
+                item.type = 'SELECT';
+              }
+              this.$set(item, 'showFeild', true);
+              this.$set(item, 'val', item.value || '');
+            });
+            this.isNecessaryToWatch(
+              { fields: this.dealFields },
+              'submit'
+            );
 
-                        // 总结信息
-                        if (this.taskInfo.status === 'FINISHED') {
-                            this.confirmFields =                            res.data.fields.confirm_fields.filter(item => !this.specialFieldTypes.includes(item.type));
-                            this.confirmTaskTemplateFields =                            res.data.fields.confirm_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
-                        } else {
-                            this.confirmFields =                            res.data.fields.confirm_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
-                        }
-                        this.confirmFields.forEach((item) => {
-                            if (item.type === 'CASCADE') {
-                                item.type = 'SELECT';
-                            }
-                            this.$set(item, 'showFeild', true);
-                            this.$set(item, 'val', item.value || '');
-                        });
-                        this.isNecessaryToWatch(
-                            { fields: this.confirmFields },
-                            'submit'
-                        );
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.taskDetailLoading = false;
-                    });
-            },
-            // 获取任务状态信息
-            getTaskStatusInfo() {
-                this.taskStatusInfoLoading = true;
-                const { id } = this.taskInfo;
-                this.$store
-                    .dispatch('taskFlow/getTaskStatusInfo', id)
-                    .then((res) => {
-                        this.taskStatusInfo = res.data;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.taskStatusInfoLoading = false;
-                    });
-            },
-            getSopsStatusInfo(state) {
-                const target = this.sopsStateList.find(m => m.key === state);
-                return target || {};
-            },
-            closeSideslider() {
-                this.$emit('close');
-            },
-            // 处理/总结 任务
-            submitDeal() {
-                if (this.$refs.fieldInfo && !this.$refs.fieldInfo.checkValue()) {
-                    return false;
-                }
+            // 总结信息
+            if (this.taskInfo.status === 'FINISHED') {
+              this.confirmFields =                            res.data.fields.confirm_fields.filter(item => !this.specialFieldTypes.includes(item.type));
+              this.confirmTaskTemplateFields =                            res.data.fields.confirm_fields.filter(item => ['SOPS_TEMPLATE', 'DEVOPS_TEMPLATE'].includes(item.type));
+            } else {
+              this.confirmFields =                            res.data.fields.confirm_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
+            }
+            this.confirmFields.forEach((item) => {
+              if (item.type === 'CASCADE') {
+                item.type = 'SELECT';
+              }
+              this.$set(item, 'showFeild', true);
+              this.$set(item, 'val', item.value || '');
+            });
+            this.isNecessaryToWatch(
+              { fields: this.confirmFields },
+              'submit'
+            );
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.taskDetailLoading = false;
+          });
+      },
+      // 获取任务状态信息
+      getTaskStatusInfo() {
+        this.taskStatusInfoLoading = true;
+        const { id } = this.taskInfo;
+        this.$store
+          .dispatch('taskFlow/getTaskStatusInfo', id)
+          .then((res) => {
+            this.taskStatusInfo = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.taskStatusInfoLoading = false;
+          });
+      },
+      getSopsStatusInfo(state) {
+        const target = this.sopsStateList.find(m => m.key === state);
+        return target || {};
+      },
+      closeSideslider() {
+        this.$emit('close');
+      },
+      // 处理/总结 任务
+      submitDeal() {
+        if (this.$refs.fieldInfo && !this.$refs.fieldInfo.checkValue()) {
+          return false;
+        }
 
-                const params = {
-                    action: this.dealType === 'OPERATE' ? 'operate' : 'confirm',
-                    fields: [],
-                };
-                let submitField = [];
+        const params = {
+          action: this.dealType === 'OPERATE' ? 'operate' : 'confirm',
+          fields: [],
+        };
+        let submitField = [];
 
-                if (
-                    ['QUEUE', 'WAITING_FOR_OPERATE', 'RUNNING'].includes(this.taskInfo.status)
-                ) {
-                    submitField = this.dealFields;
-                } else if (this.taskInfo.status === 'WAITING_FOR_CONFIRM') {
-                    submitField = this.confirmFields;
-                }
+        if (
+          ['QUEUE', 'WAITING_FOR_OPERATE', 'RUNNING'].includes(this.taskInfo.status)
+        ) {
+          submitField = this.dealFields;
+        } else if (this.taskInfo.status === 'WAITING_FOR_CONFIRM') {
+          submitField = this.confirmFields;
+        }
 
-                submitField.forEach((item) => {
-                    if (item.type === 'SOPS_TEMPLATE') {
-                        item.sopsContent.constants.forEach((contentItem) => {
-                            this.$set(
-                                contentItem,
-                                'value',
-                                item.sopsContent.formData[contentItem.key]
-                            );
-                        });
-                        params.fields.push({
-                            key: item.key,
-                            value: {
-                                id: item.sopsContent.id,
-                                template_source: item.sopsContent.context.project
-                                    .bk_biz_id
-                                    ? 'business'
-                                    : 'common',
-                                bk_biz_id:
-                                    this.basicInfomation.bk_biz_id !== -1
-                                        ? this.basicInfomation.bk_biz_id
-                                        : '',
-                                constants: item.sopsContent.constants,
-                            },
-                        });
-                    } else {
-                        params.fields.push({
-                            key: item.key,
-                            value: item.value,
-                        });
-                    }
-                });
-                this.btnLoading = true;
-                const { id } = this.taskInfo;
-                this.$store
-                    .dispatch('taskFlow/dealTask', { params, id })
-                    .then(() => {
-                        this.$bkMessage({
-                            message: this.$t('m.task[\'操作任务成功\']'),
-                            theme: 'success',
-                        });
-                        // 刷新数据
-                        this.$emit('dealSuccess');
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.btnLoading = false;
-                    });
-            },
-        },
-    };
+        submitField.forEach((item) => {
+          if (item.type === 'SOPS_TEMPLATE') {
+            item.sopsContent.constants.forEach((contentItem) => {
+              this.$set(
+                contentItem,
+                'value',
+                item.sopsContent.formData[contentItem.key]
+              );
+            });
+            params.fields.push({
+              key: item.key,
+              value: {
+                id: item.sopsContent.id,
+                template_source: item.sopsContent.context.project
+                  .bk_biz_id
+                  ? 'business'
+                  : 'common',
+                bk_biz_id:
+                  this.basicInfomation.bk_biz_id !== -1
+                    ? this.basicInfomation.bk_biz_id
+                    : '',
+                constants: item.sopsContent.constants,
+              },
+            });
+          } else {
+            params.fields.push({
+              key: item.key,
+              value: item.value,
+            });
+          }
+        });
+        this.btnLoading = true;
+        const { id } = this.taskInfo;
+        this.$store
+          .dispatch('taskFlow/dealTask', { params, id })
+          .then(() => {
+            this.$bkMessage({
+              message: this.$t('m.task[\'操作任务成功\']'),
+              theme: 'success',
+            });
+            // 刷新数据
+            this.$emit('dealSuccess');
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.btnLoading = false;
+          });
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
 @import "~@/scss/mixins/form.scss";

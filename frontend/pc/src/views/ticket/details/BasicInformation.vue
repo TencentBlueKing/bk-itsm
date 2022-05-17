@@ -38,100 +38,100 @@
 </template>
 
 <script>
-    import tableFields from './components/tableFields.vue';
-    // import fieldsDone from './components/fieldsDone.vue'
-    export default {
-        name: 'BasicInformation',
-        components: {
-            // fieldsDone,
-            tableFields,
+  import tableFields from './components/tableFields.vue';
+  // import fieldsDone from './components/fieldsDone.vue'
+  export default {
+    name: 'BasicInformation',
+    components: {
+      // fieldsDone,
+      tableFields,
+    },
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            firstStateFields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      firstStateFields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                showMore: false,
-                showInfo: true,
-                displayMoreIcon: true,
-                basicInfomationList: [],
-                basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE'],
-            };
-        },
-        computed: {
-            profile() {
-                if (!this.basicInfomation) {
-                    return;
-                }
-                return {
-                    name: this.basicInfomation.profile.name,
-                    phone: this.basicInfomation.profile.phone,
-                    department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
-                };
-            },
-        },
-        mounted() {
-            this.tableFields();
-            // 这里是为了等 dom 加载完后计算真实高度
-            setTimeout(() => {
-                const contentsDom = document.querySelectorAll('.basic-info-wrap > .bk-basic-info > .bk-basic-form');
-                let height = 0;
-                Array.prototype.forEach.call(contentsDom, (node) => {
-                    height += node.offsetHeight;
-                });
-                this.displayMoreIcon = height >= 300;
-            }, 100);
-        },
-        methods: {
-            // 处理人栏显示处理
-            processtrans(item) {
-                switch (item.current_status) {
-                    case 'DISTRIBUTING':
-                        return item.current_assignors;
-                    case 'DISTRIBUTING-RECEIVING':
-                        return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join()
-                            .replace(/(^,*)|(,$)/g, ''));
-                    default :
-                        return item.current_processors || '--';
-                }
-            },
-            changeShow() {
-                this.showMore = !this.showMore;
-            },
-            // 处理基本信息字段
-            tableFields() {
-                const tlist = []; // 表单表格类型的字段
-                const { service_type_name, sn, catalog_fullname: catalogFullname, service_name: serviceName, title } = this.basicInfomation;
-                const list = [
-                    { name: '标题', display_value: title, type: 'STRING' },
-                    { name: '单号', display_value: sn, type: 'STRING' },
-                    { name: '工单类型', display_value: service_type_name, type: 'STRING' },
-                    { name: '服务目录', display_value: `${catalogFullname}>${serviceName}`, type: 'STRING' },
-                    { name: '关联服务', display_value: serviceName, type: 'STRING' },
-                ];
-                const fields = this.firstStateFields.map(item => item);
-                fields.forEach((ite) => {
-                    if (!this.basicInfoType.includes(ite.type)) {
-                        tlist.push(ite);
-                    } else {
-                        tlist.unshift(ite);
-                    }
-                });
-                this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'));
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        showMore: false,
+        showInfo: true,
+        displayMoreIcon: true,
+        basicInfomationList: [],
+        basicInfoType: ['STRING', 'TEXT', 'SELECT', 'INT', 'DATE'],
+      };
+    },
+    computed: {
+      profile() {
+        if (!this.basicInfomation) {
+          return;
+        }
+        return {
+          name: this.basicInfomation.profile.name,
+          phone: this.basicInfomation.profile.phone,
+          department: this.basicInfomation.profile.departments ? this.basicInfomation.profile.departments : [],
+        };
+      },
+    },
+    mounted() {
+      this.tableFields();
+      // 这里是为了等 dom 加载完后计算真实高度
+      setTimeout(() => {
+        const contentsDom = document.querySelectorAll('.basic-info-wrap > .bk-basic-info > .bk-basic-form');
+        let height = 0;
+        Array.prototype.forEach.call(contentsDom, (node) => {
+          height += node.offsetHeight;
+        });
+        this.displayMoreIcon = height >= 300;
+      }, 100);
+    },
+    methods: {
+      // 处理人栏显示处理
+      processtrans(item) {
+        switch (item.current_status) {
+          case 'DISTRIBUTING':
+            return item.current_assignors;
+          case 'DISTRIBUTING-RECEIVING':
+            return (Array.from(new Set([...item.current_processors.split(','), ...item.current_assignors.split(',')])).join()
+              .replace(/(^,*)|(,$)/g, ''));
+          default :
+            return item.current_processors || '--';
+        }
+      },
+      changeShow() {
+        this.showMore = !this.showMore;
+      },
+      // 处理基本信息字段
+      tableFields() {
+        const tlist = []; // 表单表格类型的字段
+        const { service_type_name, sn, catalog_fullname: catalogFullname, service_name: serviceName, title } = this.basicInfomation;
+        const list = [
+          { name: '标题', display_value: title, type: 'STRING' },
+          { name: '单号', display_value: sn, type: 'STRING' },
+          { name: '工单类型', display_value: service_type_name, type: 'STRING' },
+          { name: '服务目录', display_value: `${catalogFullname}>${serviceName}`, type: 'STRING' },
+          { name: '关联服务', display_value: serviceName, type: 'STRING' },
+        ];
+        const fields = this.firstStateFields.map(item => item);
+        fields.forEach((ite) => {
+          if (!this.basicInfoType.includes(ite.type)) {
+            tlist.push(ite);
+          } else {
+            tlist.unshift(ite);
+          }
+        });
+        this.basicInfomationList = list.concat(tlist.filter(ite => ite.key !== 'title'));
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

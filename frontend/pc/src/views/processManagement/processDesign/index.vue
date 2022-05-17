@@ -24,7 +24,7 @@
   <router-view></router-view>
 </template>
 <script>
-    export default {
-        name: 'layoutContent',
-    };
+  export default {
+    name: 'layoutContent',
+  };
 </script>

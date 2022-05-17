@@ -30,19 +30,19 @@
 </template>
 
 <script>
-    export default {
-        name: 'NoData',
-        props: {
-            text: {
-                type: String,
-            },
-        },
-        data() {
-            return {
-                imgUrl: require('@/images/box.png'),
-            };
-        },
-    };
+  export default {
+    name: 'NoData',
+    props: {
+      text: {
+        type: String,
+      },
+    },
+    data() {
+      return {
+        imgUrl: require('@/images/box.png'),
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

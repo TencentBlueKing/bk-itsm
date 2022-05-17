@@ -36,24 +36,24 @@
 </template>
 
 <script>
-    export default {
-        name: 'navTitle',
-        props: {
-            showIcon: {
-                type: Boolean,
-                default: false,
-            },
-            titleName: {
-                type: String,
-                default: '--',
-            },
-        },
-        methods: {
-            goBack() {
-                this.$emit('goBack');
-            },
-        },
-    };
+  export default {
+    name: 'navTitle',
+    props: {
+      showIcon: {
+        type: Boolean,
+        default: false,
+      },
+      titleName: {
+        type: String,
+        default: '--',
+      },
+    },
+    methods: {
+      goBack() {
+        this.$emit('goBack');
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

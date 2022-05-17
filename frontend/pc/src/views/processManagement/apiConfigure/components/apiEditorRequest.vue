@@ -126,241 +126,241 @@
 </template>
 
 <script>
-    import apiRequestBody from './apiRequestBody.vue';
-    import ace from '../../../commonComponent/aceEditor/index.js';
-    import mixins from '../../../commonMix/mixins_api.js';
+  import apiRequestBody from './apiRequestBody.vue';
+  import ace from '../../../commonComponent/aceEditor/index.js';
+  import mixins from '../../../commonMix/mixins_api.js';
 
-    export default {
-        components: {
-            apiRequestBody,
-            ace,
+  export default {
+    components: {
+      apiRequestBody,
+      ace,
+    },
+    mixins: [mixins],
+    props: {
+      detailInfoOri: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            detailInfoOri: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        secondClick: false,
+        responseDetailConfig: {
+          value: '',
+          width: '100%',
+          height: 200,
+          readOnly: false,
+          fullScreen: true,
+          lang: 'json',
         },
-        data() {
-            return {
-                secondClick: false,
-                responseDetailConfig: {
-                    value: '',
-                    width: '100%',
-                    height: 200,
-                    readOnly: false,
-                    fullScreen: true,
-                    lang: 'json',
-                },
-                // 导入JSON
-                dictDataTable: {
-                    showDialog: false,
-                    width: 700,
-                    headerPosition: 'left',
-                    autoClose: false,
-                    precision: 0,
-                    formInfo: {
-                        name: '',
-                        desc: '',
-                        id: '',
-                        code: '',
-                    },
-                    checkout: {
-                        name: '',
-                    },
-                },
-                // tag
-                titleList: [
-                    { name: 'Query' },
-                    { name: 'Body' },
-                ],
-                checkIndex: 1,
-                necessaryList: [
-                    { id: 1, name: this.$t('m.systemConfig["必选"]') },
-                    { id: 0, name: this.$t('m.systemConfig["可选"]') },
-                ],
-                // body
-                bodyInfo: {
-                    checkInfo: {},
-                },
-            };
+        // 导入JSON
+        dictDataTable: {
+          showDialog: false,
+          width: 700,
+          headerPosition: 'left',
+          autoClose: false,
+          precision: 0,
+          formInfo: {
+            name: '',
+            desc: '',
+            id: '',
+            code: '',
+          },
+          checkout: {
+            name: '',
+          },
         },
-        computed: {
-            // 基本设置
-            basicInfo: {
-                // getter
-                get() {
-                    return this.detailInfoOri;
-                },
-                // setter
-                set(newVal) {
-                    this.$parent.DetailInfo = newVal;
-                },
-            },
-            treeDataList: {
-                // getter
-                get() {
-                    const treeDataList = this.basicInfo.treeDataList ? [...this.basicInfo.treeDataList] : [];
-                    treeDataList.forEach((item) => {
-                        this.recordParent(item, '');
-                    });
-                    return treeDataList;
-                },
-                // setter
-                set(newVal) {
-                    this.$set(this.$parent.DetailInfo, 'treeDataList', newVal);
-                },
-            },
+        // tag
+        titleList: [
+          { name: 'Query' },
+          { name: 'Body' },
+        ],
+        checkIndex: 1,
+        necessaryList: [
+          { id: 1, name: this.$t('m.systemConfig["必选"]') },
+          { id: 0, name: this.$t('m.systemConfig["可选"]') },
+        ],
+        // body
+        bodyInfo: {
+          checkInfo: {},
         },
-        created() {
-            if (this.basicInfo.req_params && this.basicInfo.req_params.length) {
-                this.basicInfo.req_params.forEach((item) => {
-                    item.is_necessary = item.is_necessary ? 1 : 0;
-                });
-            }
+      };
+    },
+    computed: {
+      // 基本设置
+      basicInfo: {
+        // getter
+        get() {
+          return this.detailInfoOri;
         },
-        methods: {
-            initDate() {
-                this.treeDataList.forEach((item) => {
-                    this.recordParent(item, '');
-                });
-            },
-            recordParent(tree, parentInfo) {
-                tree.parentInfo = parentInfo;
-                if (tree.children === null || (tree.children && !tree.children.length)) {
-                    return;
-                }
-                tree.children.forEach((item) => {
-                    this.recordParent(item, tree);
-                });
-            },
-            changTitle(item, index) {
-                this.checkIndex = index;
-            },
-            // 新增Headers
-            addLine(oriData, index) {
-                const value = {
-                    name: '',
-                    value: '',
-                    sample: '',
-                    desc: '',
-                };
-                oriData.splice(index + 1, 0, value);
-            },
-            deleteLine(oriData, index) {
-                if (oriData.length === 1) {
-                    return;
-                }
-                oriData.splice(index, 1);
-            },
-            // 新增Query
-            addQuery(oriData, index) {
-                const value = {
-                    name: '',
-                    is_necessary: 0,
-                    sample: '',
-                    desc: '',
-                    value: '',
-                };
-                oriData.splice(index + 1, 0, value);
-            },
-            deleteQuery(oriData, index) {
-                if (oriData.length === 1) {
-                    return;
-                }
-                oriData.splice(index, 1);
-            },
-            // 新增Body
-            addBodyLine(node) {
-                this.bodyInfo.checkInfo = node;
-                if (!node.parentInfo) {
-                    return;
-                }
-                const addnode = {
-                    has_children: false,
-                    showChildren: false,
-                    checkInfo: false,
-                    key: '',
-                    is_necessary: false,
-                    default: '',
-                    type: 'string',
-                    desc: '',
-                    parentInfo: node.parentInfo,
-                };
-                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node) + 1, 0, addnode);
-            },
-            addBodyChild(node) {
-                this.bodyInfo.checkInfo = node;
-                const addnode = {
-                    has_children: false,
-                    showChildren: false,
-                    checkInfo: false,
-                    key: node.type === 'array' ? 'items' : '',
-                    is_necessary: false,
-                    default: '',
-                    type: 'string',
-                    desc: '',
-                    parentInfo: this.bodyInfo.checkInfo,
-                };
-                if (!node.children || !node.children.length) {
-                    this.$set(node, 'children', []);
-                    node.children = node.children.splice(0, node.children.length);
-                    node.has_children = true;
-                    node.showChildren = true;
-                }
-                node.children.push(addnode);
-            },
-            // 删除
-            deleteBodyLine(node) {
-                this.bodyInfo.checkInfo = node;
-                if (!node.parentInfo) {
-                    return;
-                }
-                node.parentInfo.children.splice(node.parentInfo.children.indexOf(node), 1);
-            },
-            closeDictionary(e, id) {
-                this.dictDataTable = Object.assign({}, {
-                    showDialog: !this.dictDataTable.showDialog,
-                    formInfo: {
-                        name: '',
-                        desc: '',
-                        id: id || '',
-                        code: '',
-                    },
-                    checkout: {
-                        name: '',
-                    },
-                    width: 700,
-                    headerPosition: 'left',
-                    autoClose: false,
-                    precision: 0,
-                });
-            },
-            // 导入JSON
-            async submitDictionary() {
-                let rootJsonschemaData = {};
-                try {
-                    rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value));
-                    this.basicInfo.treeDataList = this.jsonschemaToList(rootJsonschemaData);
-                    this.closeDictionary();
-                } catch (err) {
-                    this.$bkMessage({
-                        message: err.message ? err.message : err,
-                        theme: 'error',
-                    });
-                }
-            },
-            importEditorInitAfter() {
-                // ...
-            },
-            blur(content) {
-                this.responseDetailConfig.value = content;
-            },
+        // setter
+        set(newVal) {
+          this.$parent.DetailInfo = newVal;
         },
-    };
+      },
+      treeDataList: {
+        // getter
+        get() {
+          const treeDataList = this.basicInfo.treeDataList ? [...this.basicInfo.treeDataList] : [];
+          treeDataList.forEach((item) => {
+            this.recordParent(item, '');
+          });
+          return treeDataList;
+        },
+        // setter
+        set(newVal) {
+          this.$set(this.$parent.DetailInfo, 'treeDataList', newVal);
+        },
+      },
+    },
+    created() {
+      if (this.basicInfo.req_params && this.basicInfo.req_params.length) {
+        this.basicInfo.req_params.forEach((item) => {
+          item.is_necessary = item.is_necessary ? 1 : 0;
+        });
+      }
+    },
+    methods: {
+      initDate() {
+        this.treeDataList.forEach((item) => {
+          this.recordParent(item, '');
+        });
+      },
+      recordParent(tree, parentInfo) {
+        tree.parentInfo = parentInfo;
+        if (tree.children === null || (tree.children && !tree.children.length)) {
+          return;
+        }
+        tree.children.forEach((item) => {
+          this.recordParent(item, tree);
+        });
+      },
+      changTitle(item, index) {
+        this.checkIndex = index;
+      },
+      // 新增Headers
+      addLine(oriData, index) {
+        const value = {
+          name: '',
+          value: '',
+          sample: '',
+          desc: '',
+        };
+        oriData.splice(index + 1, 0, value);
+      },
+      deleteLine(oriData, index) {
+        if (oriData.length === 1) {
+          return;
+        }
+        oriData.splice(index, 1);
+      },
+      // 新增Query
+      addQuery(oriData, index) {
+        const value = {
+          name: '',
+          is_necessary: 0,
+          sample: '',
+          desc: '',
+          value: '',
+        };
+        oriData.splice(index + 1, 0, value);
+      },
+      deleteQuery(oriData, index) {
+        if (oriData.length === 1) {
+          return;
+        }
+        oriData.splice(index, 1);
+      },
+      // 新增Body
+      addBodyLine(node) {
+        this.bodyInfo.checkInfo = node;
+        if (!node.parentInfo) {
+          return;
+        }
+        const addnode = {
+          has_children: false,
+          showChildren: false,
+          checkInfo: false,
+          key: '',
+          is_necessary: false,
+          default: '',
+          type: 'string',
+          desc: '',
+          parentInfo: node.parentInfo,
+        };
+        node.parentInfo.children.splice(node.parentInfo.children.indexOf(node) + 1, 0, addnode);
+      },
+      addBodyChild(node) {
+        this.bodyInfo.checkInfo = node;
+        const addnode = {
+          has_children: false,
+          showChildren: false,
+          checkInfo: false,
+          key: node.type === 'array' ? 'items' : '',
+          is_necessary: false,
+          default: '',
+          type: 'string',
+          desc: '',
+          parentInfo: this.bodyInfo.checkInfo,
+        };
+        if (!node.children || !node.children.length) {
+          this.$set(node, 'children', []);
+          node.children = node.children.splice(0, node.children.length);
+          node.has_children = true;
+          node.showChildren = true;
+        }
+        node.children.push(addnode);
+      },
+      // 删除
+      deleteBodyLine(node) {
+        this.bodyInfo.checkInfo = node;
+        if (!node.parentInfo) {
+          return;
+        }
+        node.parentInfo.children.splice(node.parentInfo.children.indexOf(node), 1);
+      },
+      closeDictionary(e, id) {
+        this.dictDataTable = Object.assign({}, {
+          showDialog: !this.dictDataTable.showDialog,
+          formInfo: {
+            name: '',
+            desc: '',
+            id: id || '',
+            code: '',
+          },
+          checkout: {
+            name: '',
+          },
+          width: 700,
+          headerPosition: 'left',
+          autoClose: false,
+          precision: 0,
+        });
+      },
+      // 导入JSON
+      async submitDictionary() {
+        let rootJsonschemaData = {};
+        try {
+          rootJsonschemaData = this.jsonToJsonschema(JSON.parse(this.responseDetailConfig.value));
+          this.basicInfo.treeDataList = this.jsonschemaToList(rootJsonschemaData);
+          this.closeDictionary();
+        } catch (err) {
+          this.$bkMessage({
+            message: err.message ? err.message : err,
+            theme: 'error',
+          });
+        }
+      },
+      importEditorInitAfter() {
+        // ...
+      },
+      blur(content) {
+        this.responseDetailConfig.value = content;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

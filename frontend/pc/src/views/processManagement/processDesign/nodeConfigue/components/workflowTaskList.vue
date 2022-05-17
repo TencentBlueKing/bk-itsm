@@ -184,192 +184,192 @@
   </div>
 </template>
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler';
-    export default {
-        name: 'workflowTaskList',
-        props: {
-            workflowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  import { errorHandler } from '../../../../../utils/errorHandler';
+  export default {
+    name: 'workflowTaskList',
+    props: {
+      workflowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                loading: false,
-                boundTaskList: [],
-                taskDialogInfo: {
-                    isShow: false,
-                    searchKey: '',
-                    list: [],
-                    listLoading: false,
-                },
-                taskConfig: {
-                    createId: '',
-                    handleId: '',
-                    waitTask: true,
-                    execute_can_create: true,
-                },
-                taskConfigRule: {
-                    createId: [
-                        {
-                            required: true,
-                            message: this.$t('m.taskTemplate[\'请选择节点\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                    handleId: [
-                        {
-                            required: true,
-                            message: this.$t('m.taskTemplate[\'请选择节点\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                },
-                createList: [],
-                handleList: [],
-                handleListLoading: false,
-            };
+      },
+    },
+    data() {
+      return {
+        loading: false,
+        boundTaskList: [],
+        taskDialogInfo: {
+          isShow: false,
+          searchKey: '',
+          list: [],
+          listLoading: false,
         },
-        computed: {
-            citeList() {
-                return this.taskDialogInfo.list.filter(trigger => trigger.checked);
-            },
+        taskConfig: {
+          createId: '',
+          handleId: '',
+          waitTask: true,
+          execute_can_create: true,
         },
-        async mounted() {
-            await this.initData();
+        taskConfigRule: {
+          createId: [
+            {
+              required: true,
+              message: this.$t('m.taskTemplate[\'请选择节点\']'),
+              trigger: 'blur',
+            },
+          ],
+          handleId: [
+            {
+              required: true,
+              message: this.$t('m.taskTemplate[\'请选择节点\']'),
+              trigger: 'blur',
+            },
+          ],
         },
-        methods: {
-            async initData() {
-                this.loading = true;
-                await this.getPublicTaskList();
-                await this.getNodeList();
-                if (this.workflowInfo.extras && this.workflowInfo.extras.task_settings) {
-                    const temp = this.workflowInfo.extras.task_settings;
-                    temp.task_schema_ids.forEach((task) => {
-                        const flag = this.taskDialogInfo.list.find(module => task === module.id);
-                        if (flag) {
-                            this.boundTaskList.push(flag);
-                        }
-                    });
-                    this.taskConfig.createId = temp.create_task_state;
-                    await this.getPostNodes();
-                    this.taskConfig.handleId = temp.execute_task_state;
-                    this.taskConfig.waitTask = temp.need_task_finished;
-                }
-            },
-            // 获取流程节点
-            async getNodeList() {
-                await this.$store.dispatch('deployCommon/getStates', { workflow: this.workflowInfo.id }).then((res) => {
-                    this.createList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            // 选择创建节点的回调
-            async getPostNodes() {
-                if (!this.taskConfig.createId) {
-                    this.taskConfig.handleId = '';
-                    this.handleList = JSON.parse(JSON.stringify(this.createList));
-                    return;
-                }
-                this.handleListLoading = true;
-                this.taskConfig.handleId = '';
-                await this.$store.dispatch('deployCommon/getOrderedStates', { id: this.taskConfig.createId }).then((res) => {
-                    this.handleList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.handleListLoading = false;
-                    });
-            },
-            // 全选函数
-            selectAllFn() {
-                const flag = this.taskDialogInfo.list.length !== this.citeList.length;
-                this.taskDialogInfo.list.forEach((trigger) => {
-                    trigger.checked = flag;
-                });
-            },
-            openCite() {
-                this.boundTaskList.forEach((task) => {
-                    const temp = this.taskDialogInfo.list.find(pubTask => pubTask.id === task.id);
-                    if (temp) {
-                        temp.checked = true;
-                    }
-                });
-                this.taskDialogInfo.isShow = true;
-            },
-            citeTask() {
-                this.boundTaskList = JSON.parse(JSON.stringify(this.citeList));
-                this.taskDialogInfo.isShow = false;
-            },
-            // 删除模板
-            delTask(index) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.taskTemplate[\'确认删除该任务？\']'),
-                    subTitle: this.$t('m.taskTemplate[\'一旦删除，与任务相关的触发动作将会一并删除。\']'),
-                    confirmFn: () => {
-                        this.boundTaskList.splice(index, 1);
-                    },
-                });
-            },
-            async getPublicTaskList() {
-                const params = {
-                    name__icontains: this.taskDialogInfo.searchKey,
-                    // component_type: 'NORMAL',
-                    is_draft: false,
-                };
-                this.taskDialogInfo.listLoading = true;
-                await this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
-                    this.taskDialogInfo.list = res.data.map(pubTask => ({
-                        ...pubTask,
-                        checked: false,
-                    }));
-                    // 流程未关联业务，则不显示标准运维模板
-                    if (!this.workflowInfo.is_biz_needed) {
-                        this.taskDialogInfo.list = this.taskDialogInfo.list.filter(template => template.component_type !== 'SOPS');
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.taskDialogInfo.listLoading = false;
-                    });
-            },
-            toTaskPage() {
-                this.$router.push({ name: 'TaskTemplate' });
-            },
-            initDialogInfo() {
-                this.taskDialogInfo.isShow = false;
-                this.taskDialogInfo.searchKey = '';
-            },
-            searchInfo() {
-                this.getPublicTaskList();
-            },
-            clearSearch() {
-                this.taskDialogInfo.searchKey = '';
-                this.getPublicTaskList();
-            },
-            async checkData() {
-                let valid = true;
-                if (this.$refs.taskForm) {
-                    await this.$refs.taskForm.validate().then(() => {}, () => {
-                        valid = false;
-                    });
-                }
-                return valid;
-            },
-        },
-    };
+        createList: [],
+        handleList: [],
+        handleListLoading: false,
+      };
+    },
+    computed: {
+      citeList() {
+        return this.taskDialogInfo.list.filter(trigger => trigger.checked);
+      },
+    },
+    async mounted() {
+      await this.initData();
+    },
+    methods: {
+      async initData() {
+        this.loading = true;
+        await this.getPublicTaskList();
+        await this.getNodeList();
+        if (this.workflowInfo.extras && this.workflowInfo.extras.task_settings) {
+          const temp = this.workflowInfo.extras.task_settings;
+          temp.task_schema_ids.forEach((task) => {
+            const flag = this.taskDialogInfo.list.find(module => task === module.id);
+            if (flag) {
+              this.boundTaskList.push(flag);
+            }
+          });
+          this.taskConfig.createId = temp.create_task_state;
+          await this.getPostNodes();
+          this.taskConfig.handleId = temp.execute_task_state;
+          this.taskConfig.waitTask = temp.need_task_finished;
+        }
+      },
+      // 获取流程节点
+      async getNodeList() {
+        await this.$store.dispatch('deployCommon/getStates', { workflow: this.workflowInfo.id }).then((res) => {
+          this.createList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      // 选择创建节点的回调
+      async getPostNodes() {
+        if (!this.taskConfig.createId) {
+          this.taskConfig.handleId = '';
+          this.handleList = JSON.parse(JSON.stringify(this.createList));
+          return;
+        }
+        this.handleListLoading = true;
+        this.taskConfig.handleId = '';
+        await this.$store.dispatch('deployCommon/getOrderedStates', { id: this.taskConfig.createId }).then((res) => {
+          this.handleList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.handleListLoading = false;
+          });
+      },
+      // 全选函数
+      selectAllFn() {
+        const flag = this.taskDialogInfo.list.length !== this.citeList.length;
+        this.taskDialogInfo.list.forEach((trigger) => {
+          trigger.checked = flag;
+        });
+      },
+      openCite() {
+        this.boundTaskList.forEach((task) => {
+          const temp = this.taskDialogInfo.list.find(pubTask => pubTask.id === task.id);
+          if (temp) {
+            temp.checked = true;
+          }
+        });
+        this.taskDialogInfo.isShow = true;
+      },
+      citeTask() {
+        this.boundTaskList = JSON.parse(JSON.stringify(this.citeList));
+        this.taskDialogInfo.isShow = false;
+      },
+      // 删除模板
+      delTask(index) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.taskTemplate[\'确认删除该任务？\']'),
+          subTitle: this.$t('m.taskTemplate[\'一旦删除，与任务相关的触发动作将会一并删除。\']'),
+          confirmFn: () => {
+            this.boundTaskList.splice(index, 1);
+          },
+        });
+      },
+      async getPublicTaskList() {
+        const params = {
+          name__icontains: this.taskDialogInfo.searchKey,
+          // component_type: 'NORMAL',
+          is_draft: false,
+        };
+        this.taskDialogInfo.listLoading = true;
+        await this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
+          this.taskDialogInfo.list = res.data.map(pubTask => ({
+            ...pubTask,
+            checked: false,
+          }));
+          // 流程未关联业务，则不显示标准运维模板
+          if (!this.workflowInfo.is_biz_needed) {
+            this.taskDialogInfo.list = this.taskDialogInfo.list.filter(template => template.component_type !== 'SOPS');
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.taskDialogInfo.listLoading = false;
+          });
+      },
+      toTaskPage() {
+        this.$router.push({ name: 'TaskTemplate' });
+      },
+      initDialogInfo() {
+        this.taskDialogInfo.isShow = false;
+        this.taskDialogInfo.searchKey = '';
+      },
+      searchInfo() {
+        this.getPublicTaskList();
+      },
+      clearSearch() {
+        this.taskDialogInfo.searchKey = '';
+        this.getPublicTaskList();
+      },
+      async checkData() {
+        let valid = true;
+        if (this.$refs.taskForm) {
+          await this.$refs.taskForm.validate().then(() => {}, () => {
+            valid = false;
+          });
+        }
+        return valid;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

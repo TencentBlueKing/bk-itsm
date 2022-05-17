@@ -237,283 +237,283 @@
   </div>
 </template>
 <script>
-    import draggable from 'vuedraggable';
-    import { errorHandler } from '../../../utils/errorHandler';
-    export default {
-        components: {
-            draggable,
+  import draggable from 'vuedraggable';
+  import { errorHandler } from '../../../utils/errorHandler';
+  export default {
+    components: {
+      draggable,
+    },
+    props: {
+      treeInfo: {
+        type: Object,
+        default() {
+          return { node: {} };
         },
-        props: {
-            treeInfo: {
-                type: Object,
-                default() {
-                    return { node: {} };
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        isDataLoading: false,
+        isTableLoading: false,
+        trueStatus: true,
+        falseStatus: false,
+        allCheck: false,
+        // 二次点击
+        secondClick: false,
+        // 模糊查询
+        searchInfo: {
+          key: '',
         },
-        data() {
-            return {
-                isDataLoading: false,
-                isTableLoading: false,
-                trueStatus: true,
-                falseStatus: false,
-                allCheck: false,
-                // 二次点击
-                secondClick: false,
-                // 模糊查询
-                searchInfo: {
-                    key: '',
-                },
-                serviceTypesMap: {},
-                // 选择
-                checkList: [],
-                listInfo: [],
-                // 新增服务
-                entryInfo: {
-                    show: false,
-                    title: this.$t('m.serviceConfig["添加服务"]'),
-                    width: 700,
-                    listInfo: [],
-                    pagination: {
-                        current: 1,
-                        count: 10,
-                        limit: 10,
-                    },
-                    checkList: [],
-                },
-                nameInfo: '',
-            };
+        serviceTypesMap: {},
+        // 选择
+        checkList: [],
+        listInfo: [],
+        // 新增服务
+        entryInfo: {
+          show: false,
+          title: this.$t('m.serviceConfig["添加服务"]'),
+          width: 700,
+          listInfo: [],
+          pagination: {
+            current: 1,
+            count: 10,
+            limit: 10,
+          },
+          checkList: [],
         },
-        watch: {
-            'treeInfo.node'() {
-                this.getTableList();
-            },
-        },
-        mounted() {
-            this.getServiceTypes();
-            this.getTableList();
-        },
-        methods: {
-            // 服务类型
-            getServiceTypes() {
-                this.$store.dispatch('getCustom').then((res) => {
-                    this.serviceTypesMap = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 获取表格数据
-            getTableList() {
-                const nameList = [];
-                if (this.treeInfo.node.route && this.treeInfo.node.route.length) {
-                    this.treeInfo.node.route.forEach((node) => {
-                        nameList.push(node.name);
-                    });
-                }
-                nameList.push(this.treeInfo.node.name);
-                this.nameInfo = nameList.join(' / ');
-                // 状态复位
-                this.isTableLoading = true;
-                this.checkList = [];
-                const params = {
-                    catalog_id: this.treeInfo.node.id,
-                    name: this.searchInfo.key,
-                    project_key: this.$store.state.project.id,
-                };
-                if (!this.treeInfo.node.id) {
-                    return;
-                }
-                this.$store.dispatch('catalogService/getServices', params).then((res) => {
-                    this.listInfo = res.data;
-                    this.listInfo.forEach((item) => {
-                        this.$set(item, 'checkValue', false);
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isTableLoading = false;
-                    });
-            },
-            // 全选 半选
-            handleSelectAll(value) {
-                this.checkList = value ? this.listInfo : [];
-                this.listInfo.forEach((item) => {
-                    item.checkValue = value;
-                });
-            },
-            handleSelect(item) {
-                if (item.checkValue) {
-                    this.checkList.push(item);
-                } else {
-                    this.checkList = this.checkList.filter(node => node.id !== item.id);
-                }
-                this.allCheck = this.checkList.length === this.listInfo.length;
-            },
-            // 拖动结束后的数据
-            updateInfo(evt) {
-                const currentNode = this.listInfo[evt.newIndex];
-                const newOrderList = this.listInfo.map(node => node.id);
-                if (this.secondClick || !currentNode.bounded_relations[0]) {
-                    return;
-                }
-                this.secondClick = true;
-                const params = {
-                    new_order: newOrderList,
-                };
-                const id = currentNode.bounded_relations[0].bond_id;
-                this.$store.dispatch('serviceCatalog/moveTableNode', { params, id }).then(() => {
-                    // ...
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
-            },
-            // 模糊查询
-            serchEntry() {
-                this.getTableList();
-            },
-            clearInfo() {
-                this.searchInfo.key = '';
-                this.getTableList();
-            },
-            // 删除
-            deleteOne(item) {
-                const params = {
-                    catalog_id: this.treeInfo.node.id,
-                    services: [item.id],
-                };
-                this.deleteSubmit(params);
-            },
-            deleteCheck() {
-                const idList = this.checkList.map(item => item.id);
-                const params = {
-                    catalog_id: this.treeInfo.node.id,
-                    services: idList,
-                };
-                this.deleteSubmit(params);
-            },
-            deleteSubmit(params) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.serviceConfig["确认移除服务？"]'),
-                    subTitle: this.$t('m.serviceConfig["移除后，将无法在该目录下找到该服务，请谨慎操作"]'),
-                    confirmFn: () => {
-                        if (this.secondClick) {
-                            return;
-                        }
-                        this.secondClick = true;
-                        this.$store.dispatch('catalogService/removeServices', params).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.serviceConfig["删除成功"]'),
-                                theme: 'success',
-                            });
-                            this.getTableList();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                    },
-                });
-            },
-            // 新增服务
-            openShade() {
-                this.getEntryList();
-                this.closeShade();
-            },
-            closeShade() {
-                this.entryInfo.show = !this.entryInfo.show;
-                this.entryInfo.allCheck = false;
-            },
-            submitEntry() {
-                // 添加服务
-                const params = {
-                    catalog_id: this.treeInfo.node.id,
-                    services: this.entryInfo.checkList.map(item => item.id),
-                    project_key: this.$store.state.project.id,
-                };
-                if (this.secondClick) {
-                    return;
-                }
-                this.secondClick = true;
-                // 批量添加服务
-                this.$store.dispatch('catalogService/addServices', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.serviceConfig["添加成功"]'),
-                        theme: 'success',
-                    });
-                    this.getTableList();
-                    this.closeShade();
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
-            },
-            // 调转到服务进行添加
-            addEntry() {
-                this.$router.push({
-                    name: 'projectServiceList',
-                    query: {
-                        project_id: this.$store.state.project.id,
-                    },
-                });
-            },
-            // 获取服务数据
-            getEntryList(page) {
-                if (page !== undefined) {
-                    this.entryInfo.pagination.current = page;
-                }
-                this.entryInfo.checkList = [];
-                const params = {
-                    page: this.entryInfo.pagination.current,
-                    page_size: this.entryInfo.pagination.limit,
-                    no_classified: true,
-                    is_valid: true,
-                    project_key: this.$store.state.project.id,
-                };
-                this.isDataLoading = true;
-                this.$store.dispatch('serviceEntry/getList', params).then((res) => {
-                    this.entryInfo.listInfo = res.data.items;
-                    // 分页
-                    this.entryInfo.pagination.current = res.data.page;
-                    this.entryInfo.pagination.count = res.data.count;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            // 分页过滤数据
-            addPageLimitChange() {
-                this.entryInfo.pagination.limit = arguments[0];
-                this.getEntryList();
-            },
-            addPageChange(page) {
-                this.entryInfo.pagination.current = page;
-                this.getEntryList();
-            },
-            // 全选 半选
-            addSelectAll(selection) {
-                this.entryInfo.checkList = selection;
-            },
-            addSelect(selection) {
-                this.entryInfo.checkList = selection;
-            },
-        },
-    };
+        nameInfo: '',
+      };
+    },
+    watch: {
+      'treeInfo.node'() {
+        this.getTableList();
+      },
+    },
+    mounted() {
+      this.getServiceTypes();
+      this.getTableList();
+    },
+    methods: {
+      // 服务类型
+      getServiceTypes() {
+        this.$store.dispatch('getCustom').then((res) => {
+          this.serviceTypesMap = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 获取表格数据
+      getTableList() {
+        const nameList = [];
+        if (this.treeInfo.node.route && this.treeInfo.node.route.length) {
+          this.treeInfo.node.route.forEach((node) => {
+            nameList.push(node.name);
+          });
+        }
+        nameList.push(this.treeInfo.node.name);
+        this.nameInfo = nameList.join(' / ');
+        // 状态复位
+        this.isTableLoading = true;
+        this.checkList = [];
+        const params = {
+          catalog_id: this.treeInfo.node.id,
+          name: this.searchInfo.key,
+          project_key: this.$store.state.project.id,
+        };
+        if (!this.treeInfo.node.id) {
+          return;
+        }
+        this.$store.dispatch('catalogService/getServices', params).then((res) => {
+          this.listInfo = res.data;
+          this.listInfo.forEach((item) => {
+            this.$set(item, 'checkValue', false);
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isTableLoading = false;
+          });
+      },
+      // 全选 半选
+      handleSelectAll(value) {
+        this.checkList = value ? this.listInfo : [];
+        this.listInfo.forEach((item) => {
+          item.checkValue = value;
+        });
+      },
+      handleSelect(item) {
+        if (item.checkValue) {
+          this.checkList.push(item);
+        } else {
+          this.checkList = this.checkList.filter(node => node.id !== item.id);
+        }
+        this.allCheck = this.checkList.length === this.listInfo.length;
+      },
+      // 拖动结束后的数据
+      updateInfo(evt) {
+        const currentNode = this.listInfo[evt.newIndex];
+        const newOrderList = this.listInfo.map(node => node.id);
+        if (this.secondClick || !currentNode.bounded_relations[0]) {
+          return;
+        }
+        this.secondClick = true;
+        const params = {
+          new_order: newOrderList,
+        };
+        const id = currentNode.bounded_relations[0].bond_id;
+        this.$store.dispatch('serviceCatalog/moveTableNode', { params, id }).then(() => {
+          // ...
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      // 模糊查询
+      serchEntry() {
+        this.getTableList();
+      },
+      clearInfo() {
+        this.searchInfo.key = '';
+        this.getTableList();
+      },
+      // 删除
+      deleteOne(item) {
+        const params = {
+          catalog_id: this.treeInfo.node.id,
+          services: [item.id],
+        };
+        this.deleteSubmit(params);
+      },
+      deleteCheck() {
+        const idList = this.checkList.map(item => item.id);
+        const params = {
+          catalog_id: this.treeInfo.node.id,
+          services: idList,
+        };
+        this.deleteSubmit(params);
+      },
+      deleteSubmit(params) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.serviceConfig["确认移除服务？"]'),
+          subTitle: this.$t('m.serviceConfig["移除后，将无法在该目录下找到该服务，请谨慎操作"]'),
+          confirmFn: () => {
+            if (this.secondClick) {
+              return;
+            }
+            this.secondClick = true;
+            this.$store.dispatch('catalogService/removeServices', params).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.serviceConfig["删除成功"]'),
+                theme: 'success',
+              });
+              this.getTableList();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+          },
+        });
+      },
+      // 新增服务
+      openShade() {
+        this.getEntryList();
+        this.closeShade();
+      },
+      closeShade() {
+        this.entryInfo.show = !this.entryInfo.show;
+        this.entryInfo.allCheck = false;
+      },
+      submitEntry() {
+        // 添加服务
+        const params = {
+          catalog_id: this.treeInfo.node.id,
+          services: this.entryInfo.checkList.map(item => item.id),
+          project_key: this.$store.state.project.id,
+        };
+        if (this.secondClick) {
+          return;
+        }
+        this.secondClick = true;
+        // 批量添加服务
+        this.$store.dispatch('catalogService/addServices', params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.serviceConfig["添加成功"]'),
+            theme: 'success',
+          });
+          this.getTableList();
+          this.closeShade();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      // 调转到服务进行添加
+      addEntry() {
+        this.$router.push({
+          name: 'projectServiceList',
+          query: {
+            project_id: this.$store.state.project.id,
+          },
+        });
+      },
+      // 获取服务数据
+      getEntryList(page) {
+        if (page !== undefined) {
+          this.entryInfo.pagination.current = page;
+        }
+        this.entryInfo.checkList = [];
+        const params = {
+          page: this.entryInfo.pagination.current,
+          page_size: this.entryInfo.pagination.limit,
+          no_classified: true,
+          is_valid: true,
+          project_key: this.$store.state.project.id,
+        };
+        this.isDataLoading = true;
+        this.$store.dispatch('serviceEntry/getList', params).then((res) => {
+          this.entryInfo.listInfo = res.data.items;
+          // 分页
+          this.entryInfo.pagination.current = res.data.page;
+          this.entryInfo.pagination.count = res.data.count;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      // 分页过滤数据
+      addPageLimitChange() {
+        this.entryInfo.pagination.limit = arguments[0];
+        this.getEntryList();
+      },
+      addPageChange(page) {
+        this.entryInfo.pagination.current = page;
+        this.getEntryList();
+      },
+      // 全选 半选
+      addSelectAll(selection) {
+        this.entryInfo.checkList = selection;
+      },
+      addSelect(selection) {
+        this.entryInfo.checkList = selection;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

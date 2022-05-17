@@ -327,565 +327,565 @@
 </template>
 
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js';
-    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
-    import fieldsDone from '../components/fieldsDone.vue';
-    import TaskStatus from '@/components/task/TaskStatus.vue';
-    import apiNodeHandleBody from './apiNodeHandleBody.vue';
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
-    import NodeDealDialog from './NodeDealDialog.vue';
-    import NodeTaskList from './nodetask/NodeTaskList.vue';
-    import sopsAndDevopsTask from './nodetask/sopsDevopsTask.vue';
-    import commonMix from '@/views/commonMix/common.js';
-    import { errorHandler } from '@/utils/errorHandler.js';
-    import {
-        convertTimeArrToMS,
-        convertTimeArrToString,
-        convertMStoString,
-    } from '@/utils/util.js';
-    import i18n from '@/i18n/index.js';
+  import collapseTransition from '@/utils/collapse-transition.js';
+  import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+  import fieldsDone from '../components/fieldsDone.vue';
+  import TaskStatus from '@/components/task/TaskStatus.vue';
+  import apiNodeHandleBody from './apiNodeHandleBody.vue';
+  import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+  import NodeDealDialog from './NodeDealDialog.vue';
+  import NodeTaskList from './nodetask/NodeTaskList.vue';
+  import sopsAndDevopsTask from './nodetask/sopsDevopsTask.vue';
+  import commonMix from '@/views/commonMix/common.js';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import {
+    convertTimeArrToMS,
+    convertTimeArrToString,
+    convertMStoString,
+  } from '@/utils/util.js';
+  import i18n from '@/i18n/index.js';
 
-    export default {
-        name: 'CurrentStepItem',
-        components: {
-            fieldsDone,
-            fieldInfo,
-            collapseTransition,
-            TaskStatus,
-            apiNodeHandleBody,
-            TicketTriggerDialog,
-            NodeDealDialog,
-            NodeTaskList,
-            sopsAndDevopsTask,
+  export default {
+    name: 'CurrentStepItem',
+    components: {
+      fieldsDone,
+      fieldInfo,
+      collapseTransition,
+      TaskStatus,
+      apiNodeHandleBody,
+      TicketTriggerDialog,
+      NodeDealDialog,
+      NodeTaskList,
+      sopsAndDevopsTask,
+    },
+    mixins: [commonMix],
+    inject: ['reload'],
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      nodeInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      index: {
+        type: Number,
+      },
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        mixins: [commonMix],
-        inject: ['reload'],
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            nodeInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            index: {
-                type: Number,
-            },
-            nodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            allFieldList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            allGroups: {
-                type: Array,
-                default: () => [],
-            },
-            nodeTriggerList: {
-                type: Array,
-                default: () => [],
-            },
-            isLastNode: {
-                type: Boolean,
-                default: false,
-            },
-            readOnly: {
-                type: Boolean,
-                default: false,
-            },
-            isShowAssgin: Boolean,
+      },
+      allFieldList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                constants: [],
-                hookedVarList: {},
-                pipelineList: [],
-                pipelineRules: {},
-                pipelineStages: [],
-                pipelineConstants: [],
-                constantDefaultValue: {},
-                convertTimeArrToString,
-                replyBtnLoading: false,
-                unfold: false, // 是否展开
-                isFullScreen: false,
-                submitting: false,
-                ignoreOperations: ['SUSPEND', 'TERMINATE'],
-                validatePopInfo: {
-                    openShow: false,
-                    content: '',
-                    title: this.$t('m.newCommon["缺少必填信息"]'),
-                },
-                // 弹窗处理信息(填写表单)
-                openFormInfo: {
-                    isShow: false,
-                    title: '',
-                    width: 700,
-                    headerPosition: 'left',
-                    autoClose: false,
-                    precision: 0,
-                    btnInfo: {},
-                },
-                openSubmitInfo: {
-                    openShow: false,
-                    content: '',
-                },
-                slaInfo: {
-                    color: '',
-                    isTimeOut: false,
-                },
-                workflow: '',
-            };
+      },
+      allGroups: {
+        type: Array,
+        default: () => [],
+      },
+      nodeTriggerList: {
+        type: Array,
+        default: () => [],
+      },
+      isLastNode: {
+        type: Boolean,
+        default: false,
+      },
+      readOnly: {
+        type: Boolean,
+        default: false,
+      },
+      isShowAssgin: Boolean,
+    },
+    data() {
+      return {
+        constants: [],
+        hookedVarList: {},
+        pipelineList: [],
+        pipelineRules: {},
+        pipelineStages: [],
+        pipelineConstants: [],
+        constantDefaultValue: {},
+        convertTimeArrToString,
+        replyBtnLoading: false,
+        unfold: false, // 是否展开
+        isFullScreen: false,
+        submitting: false,
+        ignoreOperations: ['SUSPEND', 'TERMINATE'],
+        validatePopInfo: {
+          openShow: false,
+          content: '',
+          title: this.$t('m.newCommon["缺少必填信息"]'),
         },
-        computed: {
-            // 会签人信息
-            currSignProcessorInfo() {
-                if (!this.nodeInfo.can_operate && this.nodeInfo.type === 'SIGN') {
-                    return this.nodeInfo.tasks.find(task => task.can_view);
+        // 弹窗处理信息(填写表单)
+        openFormInfo: {
+          isShow: false,
+          title: '',
+          width: 700,
+          headerPosition: 'left',
+          autoClose: false,
+          precision: 0,
+          btnInfo: {},
+        },
+        openSubmitInfo: {
+          openShow: false,
+          content: '',
+        },
+        slaInfo: {
+          color: '',
+          isTimeOut: false,
+        },
+        workflow: '',
+      };
+    },
+    computed: {
+      // 会签人信息
+      currSignProcessorInfo() {
+        if (!this.nodeInfo.can_operate && this.nodeInfo.type === 'SIGN') {
+          return this.nodeInfo.tasks.find(task => task.can_view);
+        }
+        return undefined;
+      },
+      // tips 显示的处理人列表
+      tipsProcessorsInfo() {
+        // 把 `(共2人, 已处理0人)` 字符串从处理人中提取出来
+        let completedStr = '';
+        const processors =        this.nodeInfo.processors_type === 'ORGANIZATION'
+          ? this.nodeInfo.members
+          : this.nodeInfo.processors;
+        const replaceStr = processors.replace(
+          / \(共\d+人, 已处理\d+人\)/,
+          (match) => {
+            completedStr = match;
+            return '';
+          }
+        );
+        const list = replaceStr.split(',').filter(name => !!name);
+        if (
+          list.length >= 30
+          && this.nodeInfo.processors_type === 'ORGANIZATION'
+        ) {
+          list.push('...');
+        }
+        return {
+          list,
+          extend: completedStr,
+        };
+      },
+      // 会签完成信息
+      signProcessors() {
+        const { tasks } = this.nodeInfo;
+        if (this.currSignProcessorInfo) {
+          return (
+            this.currSignProcessorInfo.processor
+            + this.$t('m.newCommon["(共"]')
+            + tasks.length
+            + this.$t('m.newCommon["人，已处理"]')
+            + tasks.filter(task => task.status === 'FINISHED').length
+            + this.$t('m.newCommon["人)"]')
+          );
+        }
+        return '';
+      },
+      // 当前节点触发器列表
+      triggers() {
+        return this.nodeTriggerList.filter(trigger => Number(trigger.sender) === Number(this.nodeInfo.state_id));
+      },
+      // 节点操作权限
+      hasNodeOptAuth() {
+        return (
+          this.nodeInfo.can_operate
+          || !!this.currSignProcessorInfo
+          || this.nodeInfo.can_execute_task
+        );
+      },
+      // 是否显示处理按钮
+      isShowDealBtns() {
+        // 失败任务（主要是标准运维失败时），有单独处理
+        if (this.nodeInfo.status === 'FAILED') {
+          return false;
+        }
+        // SLA 需要响应后才显示处理按钮
+        if (
+          this.nodeInfo.sla_task_status === 2
+          && this.nodeInfo.is_reply_need === true
+        ) {
+          return false;
+        }
+        if (
+          this.nodeInfo.type === 'TASK-SOPS'
+          && this.nodeInfo.status === 'RUNNING'
+        ) {
+          return false;
+        }
+        if (
+          this.nodeInfo.type === 'TASK-DEVOPS'
+          && this.nodeInfo.status === 'RUNNING'
+        ) {
+          return false;
+        }
+        return true;
+      },
+    },
+    created() {
+      this.initData();
+      this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
+    },
+    methods: {
+      initData() {
+        this.unfold = !this.nodeAutoPass();
+        const item = this.nodeInfo;
+        if (item.sla_task_status === 2) {
+          if (item.sla_status === 2) {
+            this.slaInfo.color = '#FE9C00';
+          }
+          if (item.sla_status === 4) {
+            this.slaInfo.color = '#EA3536';
+            this.slaInfo.isTimeOut = true;
+          }
+          this.runTime();
+        }
+        this.workflow = this.ticketInfo.table_fields[0].workflow_id;
+        this.getSopsPreview();
+        this.getpipelineDetail();
+      },
+      reloadTicket() {
+        this.reload();
+      },
+      // 获取sops Constants
+      async getSopsPreview() {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            this.nodeInfo.contexts,
+            'task_params'
+          )
+        ) {
+          const {
+            bk_biz_id,
+            template_id,
+            exclude_task_nodes_id,
+            template_source: templateSource,
+          } = this.nodeInfo.contexts.task_params;
+          const params = {
+            bk_biz_id,
+            template_id,
+            exclude_task_nodes_id,
+          };
+          const url =          templateSource === 'common'
+            ? 'taskFlow/getSopsCommonPreview'
+            : 'taskFlow/getSopsPreview';
+          const res = await this.$store.dispatch(url, params);
+          const constants = Object.keys(res.data.pipeline_tree.constants).map((item) => {
+            this.$set(this.hookedVarList, item, false);
+            this.constantDefaultValue[item] =              this.nodeInfo.contexts.task_params.constants[item];
+            res.data.pipeline_tree.constants[item].value =              this.nodeInfo.contexts.task_params.constants[item];
+            return res.data.pipeline_tree.constants[item];
+          });
+          this.constants = constants;
+        }
+      },
+      // 改变hook
+      onChangeHook(key, value) {
+        this.hookedVarList[key] = value;
+      },
+      // 获取流水线
+      getpipelineDetail() {
+        if (
+          Object.prototype.hasOwnProperty.call(this.nodeInfo, 'api_info')
+          && this.nodeInfo.type === 'TASK-DEVOPS'
+        ) {
+          const projectId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
+          const pipelineId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
+          this.$store
+            .dispatch('ticket/getDevopsPipelineStartInfo', {
+              project_id: projectId.value,
+              pipeline_id: pipelineId.value,
+            })
+            .then((res) => {
+              this.pipelineList = res.data.properties;
+              this.pipelineConstants = res.data.properties.map((item) => {
+                const constants = {
+                  key: '',
+                  value: '',
+                };
+                const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id);
+                if (findKey) {
+                  constants.key = findKey.key;
+                  constants.value = findKey.value;
                 }
-                return undefined;
+                return constants;
+              });
+              res.data.properties.forEach((item) => {
+                this.pipelineRules[item.id] = [
+                  {
+                    required: item.required,
+                    message: i18n.t('m.treeinfo["字段必填"]'),
+                    trigger: 'blur',
+                  },
+                ];
+              });
+            });
+          this.$store
+            .dispatch('ticket/getDevopsPipelineDetail', {
+              project_id: projectId.value,
+              pipeline_id: pipelineId.value,
+            })
+            .then((res) => {
+              this.pipelineStages = res.data.stages;
+            });
+        }
+      },
+      // 自动通过
+      nodeAutoPass() {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            this.ticketInfo,
+            'is_auto_approve'
+          )
+          && this.nodeInfo.type === 'APPROVAL'
+        ) {
+          return (
+            this.ticketInfo.is_auto_approve
+            && window.username === this.ticketInfo.creator.split('(')[0]
+            && this.nodeInfo.tasks.some(item => item.processor === this.ticketInfo.creator)
+          );
+        }
+        return false;
+      },
+      // 按钮操作
+      clickBtn(btn) {
+        // 字段校验
+        if (
+          btn.key === 'TRANSITION'
+          && this.$refs.fieldInfo
+          && !this.$refs.fieldInfo.checkValue()
+        ) {
+          return;
+        }
+        this.openFormInfo.btnInfo = btn;
+        this.openFormInfo.title = btn.name;
+        // 二次确认弹窗的样式不同
+        if (
+          ['TRANSITION', 'CLAIM', 'UNSUSPEND'].includes(this.openFormInfo.btnInfo.key)
+        ) {
+          const contentMap = {
+            TRANSITION: this.$t('m.newCommon["提交后，流程将转入下一环节，当前提交的部分内容将无法修改"]'),
+            CLAIM: this.$t('m.newCommon["执行认领操作后，单据将流入我的待办"]'),
+            UNSUSPEND: this.$t('m.newCommon["执行恢复操作后，单据将可以继续处理"]'),
+          };
+          this.openSubmitInfo.content = contentMap[this.openFormInfo.btnInfo.key];
+          this.$bkInfo({
+            type: 'warning',
+            title:
+              btn.key === 'TRANSITION'
+                ? this.$t('m.memberSelect["是否"]') + this.openFormInfo.title
+                : this.openFormInfo.title,
+            subTitle: this.openSubmitInfo.content,
+            confirmFn: () => {
+              this.submitFormAjax();
             },
-            // tips 显示的处理人列表
-            tipsProcessorsInfo() {
-                // 把 `(共2人, 已处理0人)` 字符串从处理人中提取出来
-                let completedStr = '';
-                const processors =        this.nodeInfo.processors_type === 'ORGANIZATION'
-                    ? this.nodeInfo.members
-                    : this.nodeInfo.processors;
-                const replaceStr = processors.replace(
-                    / \(共\d+人, 已处理\d+人\)/,
-                    (match) => {
-                        completedStr = match;
-                        return '';
-                    }
-                );
-                const list = replaceStr.split(',').filter(name => !!name);
-                if (
-                    list.length >= 30
-                    && this.nodeInfo.processors_type === 'ORGANIZATION'
-                ) {
-                    list.push('...');
+          });
+        } else {
+          this.openFormInfo.isShow = true;
+          this.openFormInfo.title = btn.name;
+        }
+      },
+      submitFormAjax(submitFormData) {
+        console.log(submitFormData);
+        const id = this.nodeInfo.ticket_id;
+        // 终止
+        if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
+          const params = {
+            state_id: this.nodeInfo.state_id,
+            terminate_message: submitFormData.terminate_message,
+          };
+          this.submitAjax('terminableOrder', params, id);
+        }
+        // 审批、通过
+        if (this.openFormInfo.btnInfo.key === 'TRANSITION') {
+          // 将字段中的时间转换一遍
+          this.fieldFormatting(this.nodeInfo.fields);
+          const params = {
+            state_id: this.nodeInfo.state_id,
+            fields: this.nodeInfo.fields
+              .filter(ite => !ite.is_readonly && ite.showFeild)
+              .map((item) => {
+                if (item.type === 'FILE') {
+                  item.value = item.value.toString();
                 }
                 return {
-                    list,
-                    extend: completedStr,
+                  id: item.id,
+                  key: item.key,
+                  type: item.type,
+                  choice: item.choice,
+                  value: item.showFeild ? item.value : '',
                 };
-            },
-            // 会签完成信息
-            signProcessors() {
-                const { tasks } = this.nodeInfo;
-                if (this.currSignProcessorInfo) {
-                    return (
-                        this.currSignProcessorInfo.processor
-                        + this.$t('m.newCommon["(共"]')
-                        + tasks.length
-                        + this.$t('m.newCommon["人，已处理"]')
-                        + tasks.filter(task => task.status === 'FINISHED').length
-                        + this.$t('m.newCommon["人)"]')
-                    );
-                }
-                return '';
-            },
-            // 当前节点触发器列表
-            triggers() {
-                return this.nodeTriggerList.filter(trigger => Number(trigger.sender) === Number(this.nodeInfo.state_id));
-            },
-            // 节点操作权限
-            hasNodeOptAuth() {
-                return (
-                    this.nodeInfo.can_operate
-                    || !!this.currSignProcessorInfo
-                    || this.nodeInfo.can_execute_task
-                );
-            },
-            // 是否显示处理按钮
-            isShowDealBtns() {
-                // 失败任务（主要是标准运维失败时），有单独处理
-                if (this.nodeInfo.status === 'FAILED') {
-                    return false;
-                }
-                // SLA 需要响应后才显示处理按钮
-                if (
-                    this.nodeInfo.sla_task_status === 2
-                    && this.nodeInfo.is_reply_need === true
-                ) {
-                    return false;
-                }
-                if (
-                    this.nodeInfo.type === 'TASK-SOPS'
-                    && this.nodeInfo.status === 'RUNNING'
-                ) {
-                    return false;
-                }
-                if (
-                    this.nodeInfo.type === 'TASK-DEVOPS'
-                    && this.nodeInfo.status === 'RUNNING'
-                ) {
-                    return false;
-                }
-                return true;
-            },
-        },
-        created() {
-            this.initData();
-            this.$store.commit('ticket/setHasTicketNodeOptAuth', this.hasNodeOptAuth);
-        },
-        methods: {
-            initData() {
-                this.unfold = !this.nodeAutoPass();
-                const item = this.nodeInfo;
-                if (item.sla_task_status === 2) {
-                    if (item.sla_status === 2) {
-                        this.slaInfo.color = '#FE9C00';
-                    }
-                    if (item.sla_status === 4) {
-                        this.slaInfo.color = '#EA3536';
-                        this.slaInfo.isTimeOut = true;
-                    }
-                    this.runTime();
-                }
-                this.workflow = this.ticketInfo.table_fields[0].workflow_id;
-                this.getSopsPreview();
-                this.getpipelineDetail();
-            },
-            reloadTicket() {
-                this.reload();
-            },
-            // 获取sops Constants
-            async getSopsPreview() {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.nodeInfo.contexts,
-                        'task_params'
-                    )
-                ) {
-                    const {
-                        bk_biz_id,
-                        template_id,
-                        exclude_task_nodes_id,
-                        template_source: templateSource,
-                    } = this.nodeInfo.contexts.task_params;
-                    const params = {
-                        bk_biz_id,
-                        template_id,
-                        exclude_task_nodes_id,
-                    };
-                    const url =          templateSource === 'common'
-                        ? 'taskFlow/getSopsCommonPreview'
-                        : 'taskFlow/getSopsPreview';
-                    const res = await this.$store.dispatch(url, params);
-                    const constants = Object.keys(res.data.pipeline_tree.constants).map((item) => {
-                        this.$set(this.hookedVarList, item, false);
-                        this.constantDefaultValue[item] =              this.nodeInfo.contexts.task_params.constants[item];
-                        res.data.pipeline_tree.constants[item].value =              this.nodeInfo.contexts.task_params.constants[item];
-                        return res.data.pipeline_tree.constants[item];
-                    });
-                    this.constants = constants;
-                }
-            },
-            // 改变hook
-            onChangeHook(key, value) {
-                this.hookedVarList[key] = value;
-            },
-            // 获取流水线
-            getpipelineDetail() {
-                if (
-                    Object.prototype.hasOwnProperty.call(this.nodeInfo, 'api_info')
-                    && this.nodeInfo.type === 'TASK-DEVOPS'
-                ) {
-                    const projectId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'project_id');
-                    const pipelineId = this.nodeInfo.api_info.devops_info.find(item => item.key === 'pipeline_id');
-                    this.$store
-                        .dispatch('ticket/getDevopsPipelineStartInfo', {
-                            project_id: projectId.value,
-                            pipeline_id: pipelineId.value,
-                        })
-                        .then((res) => {
-                            this.pipelineList = res.data.properties;
-                            this.pipelineConstants = res.data.properties.map((item) => {
-                                const constants = {
-                                    key: '',
-                                    value: '',
-                                };
-                                const findKey = this.nodeInfo.api_info.devops_info.find(ite => ite.key === item.id);
-                                if (findKey) {
-                                    constants.key = findKey.key;
-                                    constants.value = findKey.value;
-                                }
-                                return constants;
-                            });
-                            res.data.properties.forEach((item) => {
-                                this.pipelineRules[item.id] = [
-                                    {
-                                        required: item.required,
-                                        message: i18n.t('m.treeinfo["字段必填"]'),
-                                        trigger: 'blur',
-                                    },
-                                ];
-                            });
-                        });
-                    this.$store
-                        .dispatch('ticket/getDevopsPipelineDetail', {
-                            project_id: projectId.value,
-                            pipeline_id: pipelineId.value,
-                        })
-                        .then((res) => {
-                            this.pipelineStages = res.data.stages;
-                        });
-                }
-            },
-            // 自动通过
-            nodeAutoPass() {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.ticketInfo,
-                        'is_auto_approve'
-                    )
-                    && this.nodeInfo.type === 'APPROVAL'
-                ) {
-                    return (
-                        this.ticketInfo.is_auto_approve
-                        && window.username === this.ticketInfo.creator.split('(')[0]
-                        && this.nodeInfo.tasks.some(item => item.processor === this.ticketInfo.creator)
-                    );
-                }
-                return false;
-            },
-            // 按钮操作
-            clickBtn(btn) {
-                // 字段校验
-                if (
-                    btn.key === 'TRANSITION'
-                    && this.$refs.fieldInfo
-                    && !this.$refs.fieldInfo.checkValue()
-                ) {
-                    return;
-                }
-                this.openFormInfo.btnInfo = btn;
-                this.openFormInfo.title = btn.name;
-                // 二次确认弹窗的样式不同
-                if (
-                    ['TRANSITION', 'CLAIM', 'UNSUSPEND'].includes(this.openFormInfo.btnInfo.key)
-                ) {
-                    const contentMap = {
-                        TRANSITION: this.$t('m.newCommon["提交后，流程将转入下一环节，当前提交的部分内容将无法修改"]'),
-                        CLAIM: this.$t('m.newCommon["执行认领操作后，单据将流入我的待办"]'),
-                        UNSUSPEND: this.$t('m.newCommon["执行恢复操作后，单据将可以继续处理"]'),
-                    };
-                    this.openSubmitInfo.content = contentMap[this.openFormInfo.btnInfo.key];
-                    this.$bkInfo({
-                        type: 'warning',
-                        title:
-                            btn.key === 'TRANSITION'
-                                ? this.$t('m.memberSelect["是否"]') + this.openFormInfo.title
-                                : this.openFormInfo.title,
-                        subTitle: this.openSubmitInfo.content,
-                        confirmFn: () => {
-                            this.submitFormAjax();
-                        },
-                    });
-                } else {
-                    this.openFormInfo.isShow = true;
-                    this.openFormInfo.title = btn.name;
-                }
-            },
-            submitFormAjax(submitFormData) {
-                console.log(submitFormData);
-                const id = this.nodeInfo.ticket_id;
-                // 终止
-                if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
-                    const params = {
-                        state_id: this.nodeInfo.state_id,
-                        terminate_message: submitFormData.terminate_message,
-                    };
-                    this.submitAjax('terminableOrder', params, id);
-                }
-                // 审批、通过
-                if (this.openFormInfo.btnInfo.key === 'TRANSITION') {
-                    // 将字段中的时间转换一遍
-                    this.fieldFormatting(this.nodeInfo.fields);
-                    const params = {
-                        state_id: this.nodeInfo.state_id,
-                        fields: this.nodeInfo.fields
-                            .filter(ite => !ite.is_readonly && ite.showFeild)
-                            .map((item) => {
-                                if (item.type === 'FILE') {
-                                    item.value = item.value.toString();
-                                }
-                                return {
-                                    id: item.id,
-                                    key: item.key,
-                                    type: item.type,
-                                    choice: item.choice,
-                                    value: item.showFeild ? item.value : '',
-                                };
-                            }),
-                    };
-                    this.submitAjax('proceedOrder', params, id);
-                }
-                // 转单，挂起，恢复，分派，认领
-                if (
-                    this.openFormInfo.btnInfo.key === 'SUSPEND'
-                    || this.openFormInfo.btnInfo.key === 'UNSUSPEND'
-                    || this.openFormInfo.btnInfo.key === 'CLAIM'
-                ) {
-                    const params = {
-                        state_id: this.nodeInfo.state_id,
-                        processors: '',
-                        processors_type: '',
-                        action_type: this.openFormInfo.btnInfo.key,
-                    };
-                    // 挂起
-                    if (this.openFormInfo.btnInfo.key === 'SUSPEND') {
-                        params.processors = window.username;
-                        params.processors_type = 'PERSON';
-                        params.action_message = submitFormData.suspend_message;
-                    }
-                    // 恢复，认领
-                    if (
-                        this.openFormInfo.btnInfo.key === 'UNSUSPEND'
-                        || this.openFormInfo.btnInfo.key === 'CLAIM'
-                    ) {
-                        params.processors = window.username;
-                        params.processors_type = 'PERSON';
-                    }
-                    this.submitAjax('distributeOrder', params, id);
-                }
-                if (
-                    this.openFormInfo.btnInfo.key === 'DELIVER'
-                    || this.openFormInfo.btnInfo.key === 'DISTRIBUTE'
-                ) {
-                    const params = {
-                        state_id: this.nodeInfo.state_id,
-                        action_type: this.openFormInfo.btnInfo.key,
-                        processors: '',
-                        processors_type: '',
-                    };
-                    // 转单
-                    if (this.openFormInfo.btnInfo.key === 'DELIVER') {
-                        params.processors = submitFormData.person.value;
-                        params.processors_type = submitFormData.person.type;
-                        params.action_message = submitFormData.deliverReason;
-                    }
-                    // 分派
-                    if (this.openFormInfo.btnInfo.key === 'DISTRIBUTE') {
-                        params.processors = submitFormData.person.value;
-                        params.processors_type = submitFormData.person.type;
-                    }
-                    this.submitAjax('newAssignDeliver', params, id);
-                }
-                console.log(this.openFormInfo.btnInfo.key);
-                if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
-                    const params = {
-                        state_id: this.nodeInfo.state_id,
-                        processors: submitFormData.person.value,
-                        processors_type: submitFormData.person.type,
-                        action_type: this.openFormInfo.btnInfo.key,
-                    };
-                    this.submitAjax('exceptionDistribute', params, id);
-                }
-            },
-            submitAjax(type, params, id) {
-                if (this.submitting) {
-                    return;
-                }
-                this.submitting = true;
-                const valueParams = {
-                    params,
-                    id,
-                };
-                this.$store
-                    .dispatch(`deployOrder/${type}`, valueParams)
-                    .then(() => {
-                        this.$bkMessage({
-                            message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
-                            theme: 'success',
-                        });
-                        this.cancelForm();
-                        this.successFn();
-                        this.$emit('closeSlider');
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.submitting = false;
-                        const typeList = ['TRANSITION', 'SUSPEND', 'UNSUSPEND', 'CLAIM'];
-                        if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
-                            this.cancelForm();
-                        }
-                    });
-            },
-            // 当前操作节点打开全屏
-            openFullScreen() {
-                this.isFullScreen = true;
-                this.$bkMessage({
-                    message: this.$t('m.common["按 ESC 键退出全屏"]'),
-                });
-                document.addEventListener('keydown', this.handlerKeyDown);
-            },
-            // 关闭全屏
-            onCloseFullScreen() {
-                this.isFullScreen = false;
-            },
-            // 关闭全屏 - esc
-            handlerKeyDown(event) {
-                if (event.keyCode === 27) {
-                    this.onCloseFullScreen();
-                    document.removeEventListener('keydown', this.handlerKeyDown);
-                }
-            },
-            // 展开收起
-            closeUnflod(e) {
-                // 禁止冒泡
-                if (this.nodeAutoPass()) return;
-                if (e.target.className.indexOf('bk-processor-check') === -1) {
-                    if (!this.nodeInfo.can_operate && !this.currSignProcessorInfo) {
-                        return;
-                    }
-                    this.unfold = !this.unfold;
-                }
-            },
-            // 操作成功
-            successFn() {
-                this.$emit('successFn');
-            },
-            cancelForm() {
-                this.openFormInfo.isShow = false;
-            },
-            openTriggerDialog(trigger) {
-                this.$refs.triggerDialog.openDialog(trigger);
-            },
-            // 提交按钮 loading 状态
-            isBtnLoading(item) {
-                // 会签或审批节点提交后，当前处理人task 为 RUNNING|EXECUTED状态，则继续轮询 FINISHED
-                const currUserDealTask =        (item.tasks
-                    && item.tasks.find((task) => {
-                        const splitName = task.processor.replace(/\((.+?)\)/, '');
-                        return splitName === window.username;
-                    }))
-                    || {};
-                if (
-                    ['SIGN', 'APPROVAL'].includes(item.type)
-                    && ['RUNNING', 'EXECUTED'].includes(currUserDealTask.status)
-                ) {
-                    return true;
-                }
-                return false;
-            },
-            runTime() {
-                let { slaTime } = this.slaInfo;
-                if (!slaTime) {
-                    slaTime = convertTimeArrToMS(this.nodeInfo.sla_timeout.map(num => Math.abs(num)));
-                    this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000);
-                }
-                /* eslint-disable */
+              }),
+          };
+          this.submitAjax('proceedOrder', params, id);
+        }
+        // 转单，挂起，恢复，分派，认领
+        if (
+          this.openFormInfo.btnInfo.key === 'SUSPEND'
+          || this.openFormInfo.btnInfo.key === 'UNSUSPEND'
+          || this.openFormInfo.btnInfo.key === 'CLAIM'
+        ) {
+          const params = {
+            state_id: this.nodeInfo.state_id,
+            processors: '',
+            processors_type: '',
+            action_type: this.openFormInfo.btnInfo.key,
+          };
+          // 挂起
+          if (this.openFormInfo.btnInfo.key === 'SUSPEND') {
+            params.processors = window.username;
+            params.processors_type = 'PERSON';
+            params.action_message = submitFormData.suspend_message;
+          }
+          // 恢复，认领
+          if (
+            this.openFormInfo.btnInfo.key === 'UNSUSPEND'
+            || this.openFormInfo.btnInfo.key === 'CLAIM'
+          ) {
+            params.processors = window.username;
+            params.processors_type = 'PERSON';
+          }
+          this.submitAjax('distributeOrder', params, id);
+        }
+        if (
+          this.openFormInfo.btnInfo.key === 'DELIVER'
+          || this.openFormInfo.btnInfo.key === 'DISTRIBUTE'
+        ) {
+          const params = {
+            state_id: this.nodeInfo.state_id,
+            action_type: this.openFormInfo.btnInfo.key,
+            processors: '',
+            processors_type: '',
+          };
+          // 转单
+          if (this.openFormInfo.btnInfo.key === 'DELIVER') {
+            params.processors = submitFormData.person.value;
+            params.processors_type = submitFormData.person.type;
+            params.action_message = submitFormData.deliverReason;
+          }
+          // 分派
+          if (this.openFormInfo.btnInfo.key === 'DISTRIBUTE') {
+            params.processors = submitFormData.person.value;
+            params.processors_type = submitFormData.person.type;
+          }
+          this.submitAjax('newAssignDeliver', params, id);
+        }
+        console.log(this.openFormInfo.btnInfo.key);
+        if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
+          const params = {
+            state_id: this.nodeInfo.state_id,
+            processors: submitFormData.person.value,
+            processors_type: submitFormData.person.type,
+            action_type: this.openFormInfo.btnInfo.key,
+          };
+          this.submitAjax('exceptionDistribute', params, id);
+        }
+      },
+      submitAjax(type, params, id) {
+        if (this.submitting) {
+          return;
+        }
+        this.submitting = true;
+        const valueParams = {
+          params,
+          id,
+        };
+        this.$store
+          .dispatch(`deployOrder/${type}`, valueParams)
+          .then(() => {
+            this.$bkMessage({
+              message: this.openFormInfo.title + this.$t('m.newCommon["成功"]'),
+              theme: 'success',
+            });
+            this.cancelForm();
+            this.successFn();
+            this.$emit('closeSlider');
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.submitting = false;
+            const typeList = ['TRANSITION', 'SUSPEND', 'UNSUSPEND', 'CLAIM'];
+            if (typeList.some(item => item === this.openFormInfo.btnInfo.key)) {
+              this.cancelForm();
+            }
+          });
+      },
+      // 当前操作节点打开全屏
+      openFullScreen() {
+        this.isFullScreen = true;
+        this.$bkMessage({
+          message: this.$t('m.common["按 ESC 键退出全屏"]'),
+        });
+        document.addEventListener('keydown', this.handlerKeyDown);
+      },
+      // 关闭全屏
+      onCloseFullScreen() {
+        this.isFullScreen = false;
+      },
+      // 关闭全屏 - esc
+      handlerKeyDown(event) {
+        if (event.keyCode === 27) {
+          this.onCloseFullScreen();
+          document.removeEventListener('keydown', this.handlerKeyDown);
+        }
+      },
+      // 展开收起
+      closeUnflod(e) {
+        // 禁止冒泡
+        if (this.nodeAutoPass()) return;
+        if (e.target.className.indexOf('bk-processor-check') === -1) {
+          if (!this.nodeInfo.can_operate && !this.currSignProcessorInfo) {
+            return;
+          }
+          this.unfold = !this.unfold;
+        }
+      },
+      // 操作成功
+      successFn() {
+        this.$emit('successFn');
+      },
+      cancelForm() {
+        this.openFormInfo.isShow = false;
+      },
+      openTriggerDialog(trigger) {
+        this.$refs.triggerDialog.openDialog(trigger);
+      },
+      // 提交按钮 loading 状态
+      isBtnLoading(item) {
+        // 会签或审批节点提交后，当前处理人task 为 RUNNING|EXECUTED状态，则继续轮询 FINISHED
+        const currUserDealTask =        (item.tasks
+          && item.tasks.find((task) => {
+            const splitName = task.processor.replace(/\((.+?)\)/, '');
+            return splitName === window.username;
+          }))
+          || {};
+        if (
+          ['SIGN', 'APPROVAL'].includes(item.type)
+          && ['RUNNING', 'EXECUTED'].includes(currUserDealTask.status)
+        ) {
+          return true;
+        }
+        return false;
+      },
+      runTime() {
+        let { slaTime } = this.slaInfo;
+        if (!slaTime) {
+          slaTime = convertTimeArrToMS(this.nodeInfo.sla_timeout.map(num => Math.abs(num)));
+          this.nodeInfo.sla_timeout = convertMStoString(slaTime * 1000);
+        }
+        /* eslint-disable */
       this.myInterval(() => {
         this.slaInfo.isTimeOut ? slaTime++ : slaTime--;
         if (slaTime <= 0) {

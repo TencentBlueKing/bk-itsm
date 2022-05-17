@@ -66,89 +66,89 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'TableChart',
-        props: {
-            title: {
-                type: String,
-                default: '',
-            },
-            desc: {
-                type: String,
-                default: '',
-            },
-            showSearchInput: {
-                type: Boolean,
-                default: false,
-            },
-            showPagination: {
-                type: Boolean,
-                default: false,
-            },
-            pagination: {
-                type: Object,
-                default() {
-                    return {
-                        current: 1,
-                        count: 0,
-                        limit: 10,
-                    };
-                },
-            },
-            showTop3Color: {
-                type: Boolean,
-                default: true,
-            },
-            columns: {
-                type: Array,
-                default: () => ([]),
-            },
-            chartData: {
-                type: Array,
-                default: () => ([]),
-            },
-            loading: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'TableChart',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      desc: {
+        type: String,
+        default: '',
+      },
+      showSearchInput: {
+        type: Boolean,
+        default: false,
+      },
+      showPagination: {
+        type: Boolean,
+        default: false,
+      },
+      pagination: {
+        type: Object,
+        default() {
+          return {
+            current: 1,
+            count: 0,
+            limit: 10,
+          };
         },
-        methods: {
-            getRowOrder(index) {
-                return index + (this.pagination.current - 1) * this.pagination.limit + 1;
-            },
-            getOrderCls(index) {
-                let cls = '';
-                if (this.pagination.current === 1 && index <= 2) {
-                    if (index === 0) {
-                        cls = 'first-order';
-                    } else if (index === 1) {
-                        cls = 'second-order';
-                    } else {
-                        cls = 'third-order';
-                    }
-                }
-                return cls;
-            },
-            handleSortChange(data) {
-                const { prop, order } = data;
-                let sortCondition;
-                if (order === 'ascending') {
-                    sortCondition = prop;
-                } else if (order === 'descending') {
-                    sortCondition = `-${prop}`;
-                }
-                this.$emit('onOrderChange', sortCondition);
-            },
-            handlePageChange(page) {
-                this.$emit('onPageChange', page);
-            },
-            handlerCellClick(col, data) {
-                if (typeof col.handler === 'function') {
-                    col.handler.call(this, data);
-                }
-            },
-        },
-    };
+      },
+      showTop3Color: {
+        type: Boolean,
+        default: true,
+      },
+      columns: {
+        type: Array,
+        default: () => ([]),
+      },
+      chartData: {
+        type: Array,
+        default: () => ([]),
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    methods: {
+      getRowOrder(index) {
+        return index + (this.pagination.current - 1) * this.pagination.limit + 1;
+      },
+      getOrderCls(index) {
+        let cls = '';
+        if (this.pagination.current === 1 && index <= 2) {
+          if (index === 0) {
+            cls = 'first-order';
+          } else if (index === 1) {
+            cls = 'second-order';
+          } else {
+            cls = 'third-order';
+          }
+        }
+        return cls;
+      },
+      handleSortChange(data) {
+        const { prop, order } = data;
+        let sortCondition;
+        if (order === 'ascending') {
+          sortCondition = prop;
+        } else if (order === 'descending') {
+          sortCondition = `-${prop}`;
+        }
+        this.$emit('onOrderChange', sortCondition);
+      },
+      handlePageChange(page) {
+        this.$emit('onPageChange', page);
+      },
+      handlerCellClick(col, data) {
+        if (typeof col.handler === 'function') {
+          col.handler.call(this, data);
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .order {

@@ -88,39 +88,39 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
+  import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
 
-    export default {
-        name: 'sopsNodeInfo',
-        components: {
-            getParam,
+  export default {
+    name: 'sopsNodeInfo',
+    components: {
+      getParam,
+    },
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            nodeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 自动节点信息
-            apiInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+      // 自动节点信息
+      apiInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                status: '',
-                errorLength: '',
-            };
-        },
-        mounted() {
-            this.status = this.nodeInfo.api_info.sops_result;
-            this.errorLength = this.nodeInfo.api_info.error_message ? this.nodeInfo.api_info.error_message.length : 0;
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        status: '',
+        errorLength: '',
+      };
+    },
+    mounted() {
+      this.status = this.nodeInfo.api_info.sops_result;
+      this.errorLength = this.nodeInfo.api_info.error_message ? this.nodeInfo.api_info.error_message.length : 0;
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

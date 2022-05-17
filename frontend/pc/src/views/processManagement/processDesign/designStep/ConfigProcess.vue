@@ -49,167 +49,167 @@
   </div>
 </template>
 <script>
-    import axios from 'axios';
-    import secondFlow from '../jsflowCanvas/secondFlow.vue';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import axios from 'axios';
+  import secondFlow from '../jsflowCanvas/secondFlow.vue';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'ConfigProcess',
-        components: {
-            secondFlow,
+  export default {
+    name: 'ConfigProcess',
+    components: {
+      secondFlow,
+    },
+    props: {
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            isNewFlow: {
-                type: Boolean,
-                default: false,
-            },
-            isSaveing: {
-                type: Boolean,
-                default: false,
-            },
-            processId: {
-                type: [String, Number],
-                required: true,
-            },
-        },
-        data() {
-            return {
-                isDataLoading: true,
-                // 二次点击
-                secondClick: false,
-                // 流程图数据
-                addList: [],
-                lineList: [],
-                errorList: [],
-                // 配置判断
-                statusList: [],
-            };
-        },
-        mounted() {
-            this.getFlowChart();
-        },
-        methods: {
-            // 清空数据
-            clearInfo() {
-                this.addList = [];
-            },
-            // 获取流程图
-            getFlowChart() {
-                this.isDataLoading = true;
-                axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
-                    this.$store.dispatch('deployCommon/getChartLink', {
-                        workflow: this.processId,
-                        page_size: 1000,
-                    }),
-                ]).then(axios.spread((userResp, reposResp) => {
-                    this.addList = userResp.data;
-                    for (let i = 0; i < this.addList.length; i++) {
-                        this.addList[i].indexInfo = i;
-                    }
-                    this.$store.commit('cdeploy/getChart', this.addList);
+      },
+      isNewFlow: {
+        type: Boolean,
+        default: false,
+      },
+      isSaveing: {
+        type: Boolean,
+        default: false,
+      },
+      processId: {
+        type: [String, Number],
+        required: true,
+      },
+    },
+    data() {
+      return {
+        isDataLoading: true,
+        // 二次点击
+        secondClick: false,
+        // 流程图数据
+        addList: [],
+        lineList: [],
+        errorList: [],
+        // 配置判断
+        statusList: [],
+      };
+    },
+    mounted() {
+      this.getFlowChart();
+    },
+    methods: {
+      // 清空数据
+      clearInfo() {
+        this.addList = [];
+      },
+      // 获取流程图
+      getFlowChart() {
+        this.isDataLoading = true;
+        axios.all([
+          this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
+          this.$store.dispatch('deployCommon/getChartLink', {
+            workflow: this.processId,
+            page_size: 1000,
+          }),
+        ]).then(axios.spread((userResp, reposResp) => {
+          this.addList = userResp.data;
+          for (let i = 0; i < this.addList.length; i++) {
+            this.addList[i].indexInfo = i;
+          }
+          this.$store.commit('cdeploy/getChart', this.addList);
 
-                    this.lineList = reposResp.data.items;
-                }))
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            // 立即配置
-            configurNode(item) {
-                this.statusList = [];
-                // 赋值配置信息
-                this.$parent.changeConfigur(item);
-            },
-            showToops(item, index) {
-                this.statusList = [];
-                if (item.type === 'ROUTER') {
-                    for (let i = index; i < this.addList.length; i++) {
-                        if (!this.addList[i].is_draft && this.addList[i].type !== 'END') {
-                            this.statusList.push(this.addList[i]);
-                        }
-                    }
-                }
-            },
-            // 下一步操作or保存流程
-            submitChart() {
-                this.submitFlow();
-                if (this.secondClick) {
-                    return;
-                }
-                this.secondClick = true;
+          this.lineList = reposResp.data.items;
+        }))
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      // 立即配置
+      configurNode(item) {
+        this.statusList = [];
+        // 赋值配置信息
+        this.$parent.changeConfigur(item);
+      },
+      showToops(item, index) {
+        this.statusList = [];
+        if (item.type === 'ROUTER') {
+          for (let i = index; i < this.addList.length; i++) {
+            if (!this.addList[i].is_draft && this.addList[i].type !== 'END') {
+              this.statusList.push(this.addList[i]);
+            }
+          }
+        }
+      },
+      // 下一步操作or保存流程
+      submitChart() {
+        this.submitFlow();
+        if (this.secondClick) {
+          return;
+        }
+        this.secondClick = true;
 
-                const id = this.processId;
-                const params = [];
-                this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["保存成功"]'),
-                        theme: 'success',
-                    });
-                    this.$router.push({
-                        name: 'ProcessEdit',
-                        params: {
-                            type: 'edit',
-                            step: 'processCreate',
-                        },
-                        query: {
-                            processId: this.processId,
-                        },
-                    });
-                }, (res) => {
-                    if (res.data && res.data.data) {
-                        this.errorList = res.data.data.invalid_state_ids;
-                        this.$refs.flowInfo.errorNodes(this.errorList);
-                    }
-                    errorHandler(res, this);
-                })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
+        const id = this.processId;
+        const params = [];
+        this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["保存成功"]'),
+            theme: 'success',
+          });
+          this.$router.push({
+            name: 'ProcessEdit',
+            params: {
+              type: 'edit',
+              step: 'processCreate',
             },
-            // 保存节点位置
-            submitFlow() {
-                const lineInfoList = this.$refs.flowInfo.canvasData;
-                const params = {
-                    workflow_id: this.processId,
-                    transitions: [],
-                };
-                lineInfoList.lines.forEach((item) => {
-                    params.transitions.push({
-                        id: item.lineInfo.id,
-                        axis: {
-                            start: item.source.arrow,
-                            end: item.target.arrow,
-                        },
-                    });
-                });
-                this.$store.dispatch('deployCommon/updateFlowLine', { params }).then(() => {
-                    // ...
-                })
-                    .catch(() => {
-                        console.log('error');
-                    });
+            query: {
+              processId: this.processId,
             },
-            previousStep() {
-                this.$router.push({
-                    name: 'ProcessEdit',
-                    params: {
-                        type: 'edit',
-                        step: 'processInfo',
-                    },
-                    query: {
-                        processId: this.processId,
-                    },
-                });
+          });
+        }, (res) => {
+          if (res.data && res.data.data) {
+            this.errorList = res.data.data.invalid_state_ids;
+            this.$refs.flowInfo.errorNodes(this.errorList);
+          }
+          errorHandler(res, this);
+        })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      // 保存节点位置
+      submitFlow() {
+        const lineInfoList = this.$refs.flowInfo.canvasData;
+        const params = {
+          workflow_id: this.processId,
+          transitions: [],
+        };
+        lineInfoList.lines.forEach((item) => {
+          params.transitions.push({
+            id: item.lineInfo.id,
+            axis: {
+              start: item.source.arrow,
+              end: item.target.arrow,
             },
-        },
-    };
+          });
+        });
+        this.$store.dispatch('deployCommon/updateFlowLine', { params }).then(() => {
+          // ...
+        })
+          .catch(() => {
+            console.log('error');
+          });
+      },
+      previousStep() {
+        this.$router.push({
+          name: 'ProcessEdit',
+          params: {
+            type: 'edit',
+            step: 'processInfo',
+          },
+          query: {
+            processId: this.processId,
+          },
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

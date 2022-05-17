@@ -43,55 +43,55 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
-    import memberSelect from '../memberSelect';
-    import businessCard from '@/components/common/BusinessCard.vue';
+  import mixins from '../../commonMix/field.js';
+  import memberSelect from '../memberSelect';
+  import businessCard from '@/components/common/BusinessCard.vue';
 
-    export default {
-        name: 'MEMBER',
-        components: { memberSelect, businessCard },
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'MEMBER',
+    components: { memberSelect, businessCard },
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                selectedItems: [],
-            };
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val'() {
-                if (this.item.val) {
-                    this.selectedItems = this.item.val ? [this.item.val] : [];
-                }
-                this.conditionField(this.item, this.fields);
-            },
-            selectedItems: {
-                handler() {
-                    this.item.val = this.selectedItems.join(',');
-                },
-            },
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        selectedItems: [],
+      };
+    },
+    watch: {
+      'item.val'() {
+        if (this.item.val) {
+          this.selectedItems = this.item.val ? [this.item.val] : [];
+        }
+        this.conditionField(this.item, this.fields);
+      },
+      selectedItems: {
+        handler() {
+          this.item.val = this.selectedItems.join(',');
         },
-        async mounted() {
-            this.selectedItems = this.item.val ? [this.item.val] : [];
-            this.conditionField(this.item, this.fields);
-        },
-    };
+      },
+    },
+    async mounted() {
+      this.selectedItems = this.item.val ? [this.item.val] : [];
+      this.conditionField(this.item, this.fields);
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

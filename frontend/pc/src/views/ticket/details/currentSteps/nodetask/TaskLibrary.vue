@@ -108,184 +108,184 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler';
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+  import { errorHandler } from '../../../../../utils/errorHandler';
+  import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+  import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
 
-    export default {
-        name: 'TaskLibrary',
-        components: {
-            fieldInfo,
-            DealPerson,
+  export default {
+    name: 'TaskLibrary',
+    components: {
+      fieldInfo,
+      DealPerson,
+    },
+    mixins: [apiFieldsWatch],
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      nodeInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        btnLoading: false,
+        taskListLoading: false,
+        templateListLoading: false,
+        formData: {
+          templateId: '',
+          selectedTask: '',
         },
-        mixins: [apiFieldsWatch],
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            nodeInfo: {
-                type: Object,
-                default: () => ({}),
-            },
+        templateList: [],
+        taskList: [],
+        selectedTasks: [],
+        viewTaskInfo: {
+          show: false,
+          item: null,
+          dealPerson: {
+            type: 'PERSON',
+            value: '',
+          },
         },
-        data() {
-            return {
-                btnLoading: false,
-                taskListLoading: false,
-                templateListLoading: false,
-                formData: {
-                    templateId: '',
-                    selectedTask: '',
-                },
-                templateList: [],
-                taskList: [],
-                selectedTasks: [],
-                viewTaskInfo: {
-                    show: false,
-                    item: null,
-                    dealPerson: {
-                        type: 'PERSON',
-                        value: '',
-                    },
-                },
-            };
-        },
-        mounted() {
-            this.getLibraryList();
-        },
-        methods: {
-            // 获取任务库列表
-            getLibraryList() {
-                this.templateListLoading = true;
-                this.$store.dispatch('taskFlow/getLibraryList', {
-                    service_id: this.ticketInfo.service_id,
-                }).then((res) => {
-                    this.templateList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.templateListLoading = false;
-                    });
-            },
-            // 获取任务库下的任务
-            getLibraryTasks(id) {
-                this.taskListLoading = true;
-                const params = {
-                    task_lib_id: id,
-                };
-                this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
-                    this.taskList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.taskListLoading = false;
-                    });
-            },
-            handleSubmitClick() {
-                if (!this.selectedTasks.length) {
-                    return false;
-                }
-                const params = {
-                    batch_create: true,
-                    ticket_id: this.ticketInfo.id,
-                    tasks: [],
-                };
-                this.selectedTasks.forEach((task) => {
-                    const taskParams = {
-                        processors: task.processors,
-                        processors_type: task.processors_type,
-                        fields: {},
-                        need_start: this.nodeInfo.can_execute_task, // 执行节点创建的任务需要立即启动
-                        state_id: this.nodeInfo.state_id,
-                        ticket_id: this.ticketInfo.id,
-                        task_schema_id: task.task_schema_id,
-                        source: 'template',
-                    };
-                    task.fields.forEach((field) => {
-                        if (task.type === 'SOPS_TEMPLATE') {
-                            taskParams.fields[field.key] = {
-                                id: field.value.id,
-                                template_source: field.value.template_source,
-                                bk_biz_id: field.value.bk_biz_id,
-                                constants: field.value.constants,
-                            };
-                            taskParams.exclude_task_nodes_id = [];
-                        } else if (task.type === 'DEVOPS_TEMPLATE') {
-                            taskParams.fields.sub_task_params = field.value;
-                        } else {
-                            taskParams.fields[field.key] = field.value;
-                        }
-                    });
-                    params.tasks.push(taskParams);
-                });
-                this.btnLoading = true;
-                this.$store.dispatch('taskFlow/createTask', { params }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.task[\'新建任务成功\']'),
-                        theme: 'success',
-                    });
-                    this.$emit('close', true);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.btnLoading = false;
-                    });
-            },
-            onTaskLibChange(id) {
-                this.getLibraryTasks(id);
-            },
-            getTaskZhName(key) {
-                return TASK_TEMPLATE_TYPES.find(item => item.type === key).name;
-            },
-            handleSelectedTaskChange(selection) {
-                this.selectedTasks = selection;
-                console.log(selection, 'selection');
-            },
-            handleDeleteTaskLib(option) {
-                const { id } = option;
-                this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.serviceConfig["删除成功"]'),
-                        theme: 'success',
-                    });
-                    this.getLibraryList();
-                    // 删除了已选中任务库
-                    if (id === this.formData.templateId) {
-                        this.formData.templateId = '';
-                        this.taskList = [];
-                        this.selectedTasks = [];
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            onTaskNameClick(row) {
-                this.viewTaskInfo.show = true;
-                this.viewTaskInfo.item = row;
-                this.viewTaskInfo.dealPerson = {
-                    type: row.processors_type,
-                    value: row.processors,
-                };
-                const fields = row.fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
-                fields.forEach((item) => {
-                    this.$set(item, 'showFeild', true);
-                    this.$set(item, 'val', item.value || '');
-                });
-                this.isNecessaryToWatch({ fields }, 'submit');
-                this.viewTaskInfo.item.fields = fields;
-            },
-        },
-    };
+      };
+    },
+    mounted() {
+      this.getLibraryList();
+    },
+    methods: {
+      // 获取任务库列表
+      getLibraryList() {
+        this.templateListLoading = true;
+        this.$store.dispatch('taskFlow/getLibraryList', {
+          service_id: this.ticketInfo.service_id,
+        }).then((res) => {
+          this.templateList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.templateListLoading = false;
+          });
+      },
+      // 获取任务库下的任务
+      getLibraryTasks(id) {
+        this.taskListLoading = true;
+        const params = {
+          task_lib_id: id,
+        };
+        this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
+          this.taskList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.taskListLoading = false;
+          });
+      },
+      handleSubmitClick() {
+        if (!this.selectedTasks.length) {
+          return false;
+        }
+        const params = {
+          batch_create: true,
+          ticket_id: this.ticketInfo.id,
+          tasks: [],
+        };
+        this.selectedTasks.forEach((task) => {
+          const taskParams = {
+            processors: task.processors,
+            processors_type: task.processors_type,
+            fields: {},
+            need_start: this.nodeInfo.can_execute_task, // 执行节点创建的任务需要立即启动
+            state_id: this.nodeInfo.state_id,
+            ticket_id: this.ticketInfo.id,
+            task_schema_id: task.task_schema_id,
+            source: 'template',
+          };
+          task.fields.forEach((field) => {
+            if (task.type === 'SOPS_TEMPLATE') {
+              taskParams.fields[field.key] = {
+                id: field.value.id,
+                template_source: field.value.template_source,
+                bk_biz_id: field.value.bk_biz_id,
+                constants: field.value.constants,
+              };
+              taskParams.exclude_task_nodes_id = [];
+            } else if (task.type === 'DEVOPS_TEMPLATE') {
+              taskParams.fields.sub_task_params = field.value;
+            } else {
+              taskParams.fields[field.key] = field.value;
+            }
+          });
+          params.tasks.push(taskParams);
+        });
+        this.btnLoading = true;
+        this.$store.dispatch('taskFlow/createTask', { params }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.task[\'新建任务成功\']'),
+            theme: 'success',
+          });
+          this.$emit('close', true);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.btnLoading = false;
+          });
+      },
+      onTaskLibChange(id) {
+        this.getLibraryTasks(id);
+      },
+      getTaskZhName(key) {
+        return TASK_TEMPLATE_TYPES.find(item => item.type === key).name;
+      },
+      handleSelectedTaskChange(selection) {
+        this.selectedTasks = selection;
+        console.log(selection, 'selection');
+      },
+      handleDeleteTaskLib(option) {
+        const { id } = option;
+        this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.serviceConfig["删除成功"]'),
+            theme: 'success',
+          });
+          this.getLibraryList();
+          // 删除了已选中任务库
+          if (id === this.formData.templateId) {
+            this.formData.templateId = '';
+            this.taskList = [];
+            this.selectedTasks = [];
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      onTaskNameClick(row) {
+        this.viewTaskInfo.show = true;
+        this.viewTaskInfo.item = row;
+        this.viewTaskInfo.dealPerson = {
+          type: row.processors_type,
+          value: row.processors,
+        };
+        const fields = row.fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
+        fields.forEach((item) => {
+          this.$set(item, 'showFeild', true);
+          this.$set(item, 'val', item.value || '');
+        });
+        this.isNecessaryToWatch({ fields }, 'submit');
+        this.viewTaskInfo.item.fields = fields;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .task-library {

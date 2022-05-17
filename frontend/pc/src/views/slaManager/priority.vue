@@ -104,169 +104,169 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler';
-    import priorityTable from './priorityTable/priorityTable.vue';
-    import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../utils/errorHandler';
+  import priorityTable from './priorityTable/priorityTable.vue';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'priority',
-        components: {
-            priorityTable,
+  export default {
+    name: 'priority',
+    components: {
+      priorityTable,
+    },
+    mixins: [permission],
+    data() {
+      return {
+        serviceTypeList: [],
+        isDataLoading: true,
+        versionStatus: true,
+        secondClick: false,
+        checkType: {
+          key: 'request',
         },
-        mixins: [permission],
-        data() {
-            return {
-                serviceTypeList: [],
-                isDataLoading: true,
-                versionStatus: true,
-                secondClick: false,
-                checkType: {
-                    key: 'request',
-                },
-                priorityConten: {
-                    editorStatus: false,
-                    info: {},
-                },
-            };
+        priorityConten: {
+          editorStatus: false,
+          info: {},
         },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
-            },
-            choiceTypeList() {
-                return this.$store.state.choice_type_list;
-            },
-            serviceTypeOptions() {
-                return this.$store.state.choice_type_list.filter(type => type.key !== this.checkType.key);
-            },
-        },
-        watch: {
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+      choiceTypeList() {
+        return this.$store.state.choice_type_list;
+      },
+      serviceTypeOptions() {
+        return this.$store.state.choice_type_list.filter(type => type.key !== this.checkType.key);
+      },
+    },
+    watch: {
 
-        },
-        mounted() {
+    },
+    mounted() {
+      this.getModelList();
+    },
+    methods: {
+      getModelList() {
+        this.isDataLoading = true;
+        const params = {
+          service_type: this.checkType.key,
+        };
+        this.$store.dispatch('slaManagement/getPriorityList', { params }).then((res) => {
+          this.priorityConten.info = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      closeVersion() {
+        this.versionStatus = false;
+      },
+      // 切换table
+      changeTab(item) {
+        if (this.priorityConten.editorStatus) {
+          this.$bkInfo({
+            type: 'warning',
+            title: this.$t('m.slaContent["确认退出？"]'),
+            subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
+            confirmFn: () => {
+              this.checkType.key = item.key;
+              this.getModelList();
+              this.priorityConten.editorStatus = false;
+            },
+          });
+          return;
+        }
+        this.checkType.key = item.key;
+        this.getModelList();
+      },
+      // 编辑
+      editorPriority() {
+        if (!this.hasPermission(['sla_priority_manage'])) {
+          this.applyForPermission(['sla_priority_manage'], this.$store.state.project.projectAuthActions, {});
+          return;
+        }
+        this.priorityConten.editorStatus = true;
+      },
+      // 取消
+      closeEditor() {
+        // 取消操作还原操作数据
+        const childInfo = this.getChildInfo();
+        if (JSON.stringify(childInfo.priority_matrix) !== JSON.stringify(this.priorityConten.info.priority_matrix)) {
+          this.$bkInfo({
+            type: 'warning',
+            title: this.$t('m.slaContent["确认退出？"]'),
+            subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
+            confirmFn: () => {
+              this.$refs.priorityTable.initDate();
+              this.priorityConten.editorStatus = false;
+            },
+          });
+        } else {
+          this.priorityConten.editorStatus = false;
+        }
+        this.getModelList();
+      },
+      // 保存
+      submitEditor() {
+        // 校验
+        if (this.$refs.priorityTable) {
+          this.$refs.priorityTable.isSub = true;
+        }
+        let hasWrong = false;
+        this.$refs.priorityTable.scopeList.forEach((scopeItem) => {
+          this.$refs.priorityTable.degreeList.forEach((degreeItem) => {
+            this.$refs.priorityTable.contentList.forEach((contentItem) => {
+              if (contentItem.impact === scopeItem.key && contentItem.urgency === degreeItem.key && scopeItem.is_enabled && degreeItem.is_enabled && !contentItem.priority) {
+                hasWrong = true;
+              }
+            });
+          });
+        });
+        if (hasWrong) {
+          return false;
+        }
+        const params = this.getChildInfo();
+        this.secondClick = true;
+        params.service_type = [this.checkType.key, ...this.serviceTypeList];
+        this.$store.dispatch('slaManagement/submitPriority', { params }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.deployPage["保存成功"]'),
+            theme: 'success',
+          });
+          this.priorityConten.editorStatus = false;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
             this.getModelList();
-        },
-        methods: {
-            getModelList() {
-                this.isDataLoading = true;
-                const params = {
-                    service_type: this.checkType.key,
-                };
-                this.$store.dispatch('slaManagement/getPriorityList', { params }).then((res) => {
-                    this.priorityConten.info = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            closeVersion() {
-                this.versionStatus = false;
-            },
-            // 切换table
-            changeTab(item) {
-                if (this.priorityConten.editorStatus) {
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: this.$t('m.slaContent["确认退出？"]'),
-                        subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
-                        confirmFn: () => {
-                            this.checkType.key = item.key;
-                            this.getModelList();
-                            this.priorityConten.editorStatus = false;
-                        },
-                    });
-                    return;
-                }
-                this.checkType.key = item.key;
-                this.getModelList();
-            },
-            // 编辑
-            editorPriority() {
-                if (!this.hasPermission(['sla_priority_manage'])) {
-                    this.applyForPermission(['sla_priority_manage'], this.$store.state.project.projectAuthActions, {});
-                    return;
-                }
-                this.priorityConten.editorStatus = true;
-            },
-            // 取消
-            closeEditor() {
-                // 取消操作还原操作数据
-                const childInfo = this.getChildInfo();
-                if (JSON.stringify(childInfo.priority_matrix) !== JSON.stringify(this.priorityConten.info.priority_matrix)) {
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: this.$t('m.slaContent["确认退出？"]'),
-                        subTitle: this.$t('m.slaContent["表格正在编辑，确认退出编辑状态将不会保存数据！"]'),
-                        confirmFn: () => {
-                            this.$refs.priorityTable.initDate();
-                            this.priorityConten.editorStatus = false;
-                        },
-                    });
-                } else {
-                    this.priorityConten.editorStatus = false;
-                }
-                this.getModelList();
-            },
-            // 保存
-            submitEditor() {
-                // 校验
-                if (this.$refs.priorityTable) {
-                    this.$refs.priorityTable.isSub = true;
-                }
-                let hasWrong = false;
-                this.$refs.priorityTable.scopeList.forEach((scopeItem) => {
-                    this.$refs.priorityTable.degreeList.forEach((degreeItem) => {
-                        this.$refs.priorityTable.contentList.forEach((contentItem) => {
-                            if (contentItem.impact === scopeItem.key && contentItem.urgency === degreeItem.key && scopeItem.is_enabled && degreeItem.is_enabled && !contentItem.priority) {
-                                hasWrong = true;
-                            }
-                        });
-                    });
-                });
-                if (hasWrong) {
-                    return false;
-                }
-                const params = this.getChildInfo();
-                this.secondClick = true;
-                params.service_type = [this.checkType.key, ...this.serviceTypeList];
-                this.$store.dispatch('slaManagement/submitPriority', { params }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.deployPage["保存成功"]'),
-                        theme: 'success',
-                    });
-                    this.priorityConten.editorStatus = false;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                        this.getModelList();
-                    });
-            },
-            // 获取子组件的数据
-            getChildInfo() {
-                let childInfo = {};
-                if (this.$refs.priorityTable) {
-                    childInfo = {
-                        impact: this.$refs.priorityTable.scopeList,
-                        urgency: this.$refs.priorityTable.degreeList,
-                        priority_matrix: this.$refs.priorityTable.contentList,
-                    };
-                }
-                return childInfo;
-            },
-            // 前往数据字典页面
-            gotoDataDictionary() {
-                this.$router.push({
-                    path: '/dataDictionary',
-                });
-            },
-        },
-    };
+          });
+      },
+      // 获取子组件的数据
+      getChildInfo() {
+        let childInfo = {};
+        if (this.$refs.priorityTable) {
+          childInfo = {
+            impact: this.$refs.priorityTable.scopeList,
+            urgency: this.$refs.priorityTable.degreeList,
+            priority_matrix: this.$refs.priorityTable.contentList,
+          };
+        }
+        return childInfo;
+      },
+      // 前往数据字典页面
+      gotoDataDictionary() {
+        this.$router.push({
+          path: '/dataDictionary',
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

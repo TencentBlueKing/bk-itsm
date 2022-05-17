@@ -73,165 +73,165 @@
 </template>
 
 <script>
-    import customUpload from '../customUpload/upload';
+  import customUpload from '../customUpload/upload';
 
-    export default {
-        name: 'FILE',
-        components: {
-            customUpload,
+  export default {
+    name: 'FILE',
+    components: {
+      customUpload,
+    },
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                },
-            },
-            idInfo: {
-                type: Object,
-                required: false,
-                default: () => null,
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            isFilePreview: {
-                type: Boolean,
-                default: false,
-            },
-            isBuild: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        data() {
-            return {
-                datas: [],
-                uploadFileList: [],
-                tempFileList: [],
-                historyList: [],
-                url: this.isFilePreview ? '' : `${window.SITE_URL}api/misc/upload_file/`,
-                // downloadUrl: window.site + `workflow/fields/`,
-                // 记录上传文件值
-                tempObj: {},
+      },
+      idInfo: {
+        type: Object,
+        required: false,
+        default: () => null,
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      isFilePreview: {
+        type: Boolean,
+        default: false,
+      },
+      isBuild: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        datas: [],
+        uploadFileList: [],
+        tempFileList: [],
+        historyList: [],
+        url: this.isFilePreview ? '' : `${window.SITE_URL}api/misc/upload_file/`,
+        // downloadUrl: window.site + `workflow/fields/`,
+        // 记录上传文件值
+        tempObj: {},
+      };
+    },
+    mounted() {
+      this.item.val = [];
+      this.choiceToList();
+    },
+    methods: {
+      choiceToList() {
+        for (const key in this.item.choice) {
+          this.tempFileList.push({ ...this.item.choice[key], key });
+        }
+        if (this.item.value) {
+          const tempObj = JSON.parse(this.item.value);
+          for (const key in tempObj) {
+            this.historyList.push({ ...tempObj[key], key });
+          }
+          this.datas = this.historyList.concat([]);
+          this.item.val = '';
+          const valueList = [];
+          this.datas.forEach((node) => {
+            const nodeValue = {};
+            nodeValue[node.key] = {
+              path: node.path,
+              name: node.name,
             };
-        },
-        mounted() {
-            this.item.val = [];
-            this.choiceToList();
-        },
-        methods: {
-            choiceToList() {
-                for (const key in this.item.choice) {
-                    this.tempFileList.push({ ...this.item.choice[key], key });
-                }
-                if (this.item.value) {
-                    const tempObj = JSON.parse(this.item.value);
-                    for (const key in tempObj) {
-                        this.historyList.push({ ...tempObj[key], key });
-                    }
-                    this.datas = this.historyList.concat([]);
-                    this.item.val = '';
-                    const valueList = [];
-                    this.datas.forEach((node) => {
-                        const nodeValue = {};
-                        nodeValue[node.key] = {
-                            path: node.path,
-                            name: node.name,
-                        };
-                        valueList.push(JSON.stringify(nodeValue));
-                    });
-                    this.item.val = valueList.join(',');
-                }
-            },
-            // 修改 附件优化 1031
-            downloadFile(file) {
-                const tempKey = file.key;
-                if (this.isBuild) {
-                    window.open(`${window.SITE_URL
-                    }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`);
-                } else if (this.isCurrent) {
-                    window.open(`${window.SITE_URL
-                    }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`);
-                } else {
-                    window.open(`${window.SITE_URL
-                    }api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`);
-                }
-            },
-            uploadErr() {
-                // ...
-            },
-            // 修改 附件优化 1031
-            uploadSuccess(fileList) {
-                this.datas = fileList;
-                this.uploadFileList = fileList;
-                this.item.value = '';
-                this.item.val = this.item.value;
-                fileList.forEach((it) => {
-                    if ((!it.errorMsg) && it.responseData.data) {
-                        for (const key in it.responseData.data.succeed_files) {
-                            this.$set(this.tempObj, key, it.responseData.data.succeed_files[key]);
-                        }
-                    }
-                });
-                // 如果存在历史数据则将历史数据保存
-                if (this.historyList.length) {
-                    this.datas = this.datas.concat(this.historyList);
-                    this.historyList.forEach((node) => {
-                        this.tempObj[node.key] = {
-                            path: node.path,
-                            name: node.name,
-                        };
-                    });
-                }
-                this.item.value = JSON.stringify(this.tempObj);
-                this.item.val = this.item.value;
-            },
-            // 修改 附件优化 1031
-            uploadProgress() {
-                this.$store.commit('changeFileStatus', true);
-            },
-            uploadDone() {
-                this.$store.commit('changeFileStatus', false);
-            },
-            // 修改 附件优化 1031
-            deleteFile(file) {
-                this.datas.splice(this.datas.indexOf(file), 1);
-                // 如果删除的是历史数据，则将对于的历史数据清空
-                if (this.historyList.length && this.historyList.some(node => node.key === file.key)) {
-                    this.historyList = this.historyList.filter(node => node.key !== file.key);
-                    for (const key in this.tempObj) {
-                        if (key === file.key) {
-                            delete this.tempObj[key];
-                        }
-                    }
-                } else {
-                    for (const key in this.tempObj) {
-                        for (const fileKey in file.responseData.data.succeed_files) {
-                            if (key === fileKey) {
-                                delete this.tempObj[key];
-                            }
-                        }
-                    }
-                }
-                // 删除附件的时候也应该清空upload内的数据
-                const fileIndex = this.uploadFileList.indexOf(file);
-                if (fileIndex !== -1) {
-                    this.$refs.upload.deleteFile(fileIndex, file);
-                }
-                if (!Object.keys(this.tempObj).length) {
-                    this.item.val = '';
-                } else {
-                    this.item.val = JSON.stringify(this.tempObj);
-                }
-            },
-        },
-    };
+            valueList.push(JSON.stringify(nodeValue));
+          });
+          this.item.val = valueList.join(',');
+        }
+      },
+      // 修改 附件优化 1031
+      downloadFile(file) {
+        const tempKey = file.key;
+        if (this.isBuild) {
+          window.open(`${window.SITE_URL
+          }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=version&flow_id=${this.item.version_id}`);
+        } else if (this.isCurrent) {
+          window.open(`${window.SITE_URL
+          }api/ticket/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`);
+        } else {
+          window.open(`${window.SITE_URL
+          }api/workflow/fields/${this.item.id}/download_file/?unique_key=${tempKey}&file_type=template`);
+        }
+      },
+      uploadErr() {
+        // ...
+      },
+      // 修改 附件优化 1031
+      uploadSuccess(fileList) {
+        this.datas = fileList;
+        this.uploadFileList = fileList;
+        this.item.value = '';
+        this.item.val = this.item.value;
+        fileList.forEach((it) => {
+          if ((!it.errorMsg) && it.responseData.data) {
+            for (const key in it.responseData.data.succeed_files) {
+              this.$set(this.tempObj, key, it.responseData.data.succeed_files[key]);
+            }
+          }
+        });
+        // 如果存在历史数据则将历史数据保存
+        if (this.historyList.length) {
+          this.datas = this.datas.concat(this.historyList);
+          this.historyList.forEach((node) => {
+            this.tempObj[node.key] = {
+              path: node.path,
+              name: node.name,
+            };
+          });
+        }
+        this.item.value = JSON.stringify(this.tempObj);
+        this.item.val = this.item.value;
+      },
+      // 修改 附件优化 1031
+      uploadProgress() {
+        this.$store.commit('changeFileStatus', true);
+      },
+      uploadDone() {
+        this.$store.commit('changeFileStatus', false);
+      },
+      // 修改 附件优化 1031
+      deleteFile(file) {
+        this.datas.splice(this.datas.indexOf(file), 1);
+        // 如果删除的是历史数据，则将对于的历史数据清空
+        if (this.historyList.length && this.historyList.some(node => node.key === file.key)) {
+          this.historyList = this.historyList.filter(node => node.key !== file.key);
+          for (const key in this.tempObj) {
+            if (key === file.key) {
+              delete this.tempObj[key];
+            }
+          }
+        } else {
+          for (const key in this.tempObj) {
+            for (const fileKey in file.responseData.data.succeed_files) {
+              if (key === fileKey) {
+                delete this.tempObj[key];
+              }
+            }
+          }
+        }
+        // 删除附件的时候也应该清空upload内的数据
+        const fileIndex = this.uploadFileList.indexOf(file);
+        if (fileIndex !== -1) {
+          this.$refs.upload.deleteFile(fileIndex, file);
+        }
+        if (!Object.keys(this.tempObj).length) {
+          this.item.val = '';
+        } else {
+          this.item.val = JSON.stringify(this.tempObj);
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

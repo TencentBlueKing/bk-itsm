@@ -43,58 +43,58 @@
 </template>
 
 <script>
-    export default {
-        name: 'TaskStatus',
-        props: {
-            status: {
-                type: String,
-            },
-            extCls: {
-                type: String,
-                default: '',
-            },
-            type: {
-                type: String,
-                default: '',
-            },
+  export default {
+    name: 'TaskStatus',
+    props: {
+      status: {
+        type: String,
+      },
+      extCls: {
+        type: String,
+        default: '',
+      },
+      type: {
+        type: String,
+        default: '',
+      },
+    },
+    data() {
+      return {
+        // 状态列表
+        statusMap: {
+          NEW: { name: this.$t('m.task[\'新\']') },
+          QUEUE: { name: this.$t('m.task[\'待处理\']') },
+          WAITING_FOR_OPERATE: { name: this.$t('m.task[\'待处理\']'), cls: 'blue' },
+          WAITING_FOR_BACKEND: { name: this.$t('m.task[\'后台处理中\']') },
+          RUNNING: { name: this.$t('m.task[\'执行中\']'), cls: 'blue' },
+          WAITING_FOR_CONFIRM: { name: this.$t('m.task[\'待总结\']'), cls: 'blue' },
+          FINISHED: { name: this.$t('m.task[\'已完成\']'), cls: 'green' },
+          FAILED: { name: this.$t('m.deployPage[\'失败\']'), cls: 'red' },
+          DELETED: { name: this.$t('m.task[\'已删除\']') },
+          REVOKED: { name: this.$t('m.task[\'已撤销\']'), cls: 'red' },
+          SUSPENDED: { name: this.$t('m.task[\'已暂停\']'), cls: 'blue' },
         },
-        data() {
-            return {
-                // 状态列表
-                statusMap: {
-                    NEW: { name: this.$t('m.task[\'新\']') },
-                    QUEUE: { name: this.$t('m.task[\'待处理\']') },
-                    WAITING_FOR_OPERATE: { name: this.$t('m.task[\'待处理\']'), cls: 'blue' },
-                    WAITING_FOR_BACKEND: { name: this.$t('m.task[\'后台处理中\']') },
-                    RUNNING: { name: this.$t('m.task[\'执行中\']'), cls: 'blue' },
-                    WAITING_FOR_CONFIRM: { name: this.$t('m.task[\'待总结\']'), cls: 'blue' },
-                    FINISHED: { name: this.$t('m.task[\'已完成\']'), cls: 'green' },
-                    FAILED: { name: this.$t('m.deployPage[\'失败\']'), cls: 'red' },
-                    DELETED: { name: this.$t('m.task[\'已删除\']') },
-                    REVOKED: { name: this.$t('m.task[\'已撤销\']'), cls: 'red' },
-                    SUSPENDED: { name: this.$t('m.task[\'已暂停\']'), cls: 'blue' },
-                },
-                statusIconMap: {
-                    loading: ['QUEUE', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'RUNNING', 'WAITING_FOR_CONFIRM'],
-                    success: ['FINISHED'],
-                    failed: ['FAILED', 'DELETED', 'REVOKED', 'SUSPENDED'],
-                    default: [],
-                },
-            };
+        statusIconMap: {
+          loading: ['QUEUE', 'WAITING_FOR_OPERATE', 'WAITING_FOR_BACKEND', 'RUNNING', 'WAITING_FOR_CONFIRM'],
+          success: ['FINISHED'],
+          failed: ['FAILED', 'DELETED', 'REVOKED', 'SUSPENDED'],
+          default: [],
         },
-        computed: {
-            statusIcon() {
-                const keys = Object.keys(this.statusIconMap);
-                for (let i = 0; i < keys.length; i++) {
-                    const val = this.statusIconMap[keys[i]];
-                    if (val.includes(this.status)) {
-                        return keys[i];
-                    }
-                }
-                return '';
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      statusIcon() {
+        const keys = Object.keys(this.statusIconMap);
+        for (let i = 0; i < keys.length; i++) {
+          const val = this.statusIconMap[keys[i]];
+          if (val.includes(this.status)) {
+            return keys[i];
+          }
+        }
+        return '';
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

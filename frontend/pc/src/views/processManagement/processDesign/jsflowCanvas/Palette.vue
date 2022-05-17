@@ -74,12 +74,12 @@
   </ul>
 </template>
 <script>
-    export default {
-        name: 'Palette',
-        mounted() {
-            // this.$emit('registerPaletteEvent')
-        },
-    };
+  export default {
+    name: 'Palette',
+    mounted() {
+      // this.$emit('registerPaletteEvent')
+    },
+  };
 </script>
 <style lang="scss" scoped>
     ul {

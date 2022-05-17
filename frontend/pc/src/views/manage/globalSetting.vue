@@ -244,266 +244,266 @@
   </div>
 </template>
 <script>
-    import { errorHandler } from '../../utils/errorHandler';
-    import versionLog from '../systemConfig/component/versionLog.vue';
-    import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../utils/errorHandler';
+  import versionLog from '../systemConfig/component/versionLog.vue';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'attachmentStorage',
-        components: {
-            versionLog,
+  export default {
+    name: 'attachmentStorage',
+    components: {
+      versionLog,
+    },
+    mixins: [permission],
+    data() {
+      return {
+        clearStorageTime: localStorage.getItem('clearStorageTime') || this.$t('m.home["暂无"]'),
+        // placeholder: "请填写以 ''/'' 结尾的绝对目录.",
+        placeholder: this.$t('m.home["请填写路径"]'),
+        issending: false,
+        downUrl: (`${window.STATIC_URL}`) + 'help/itsm_nfs.tar.gz',
+        rowVersionList: [],
+        versionList: [],
+        formerVersion: '',
+        updatedVersion: '',
+        versionLogData: {
+          title: this.$t('m.home["升级记录"]'),
+          show: false,
+          width: 700,
         },
-        mixins: [permission],
-        data() {
-            return {
-                clearStorageTime: localStorage.getItem('clearStorageTime') || this.$t('m.home["暂无"]'),
-                // placeholder: "请填写以 ''/'' 结尾的绝对目录.",
-                placeholder: this.$t('m.home["请填写路径"]'),
-                issending: false,
-                downUrl: (`${window.STATIC_URL}`) + 'help/itsm_nfs.tar.gz',
-                rowVersionList: [],
-                versionList: [],
-                formerVersion: '',
-                updatedVersion: '',
-                versionLogData: {
-                    title: this.$t('m.home["升级记录"]'),
-                    show: false,
-                    width: 700,
-                },
-                // 开关功能对照表
-                switchKeyMap: {
-                    SYS_FILE_PATH: 'systemPath',
-                    FLOW_PREVIEW: 'preview',
-                    WIKI_SWITCH: 'wiki',
-                    CHILD_TICKET_SWITCH: 'inherit',
-                    SLA_SWITCH: 'sla',
-                    TRIGGER_SWITCH: 'trigger',
-                    TASK_SWITCH: 'task',
-                    FIRST_STATE_SWITCH: 'basic',
-                    TABLE_FIELDS_SWITCH: 'module',
-                    SMS_COMMENT_SWITCH: 'smsComment',
-                },
-                // 开关功能总体信息
-                moduleInfo: {
-                    basic: {
-                        id: '',
-                        title: this.$t('m.home["提单信息展示开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    module: {
-                        id: '',
-                        title: this.$t('m.home["基础信息展示开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    systemPath: {
-                        id: '',
-                        formerValue: '',
-                        nowValue: '',
-                        changing: false,
-                    },
-                    preview: {
-                        id: '',
-                        title: this.$t('m.home["流程预览功能开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    sla: {
-                        id: '',
-                        title: this.$t('m.home["SLA功能开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    inherit: {
-                        id: '',
-                        title: this.$t('m.home["母子单功能开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    wiki: {
-                        id: '',
-                        title: this.$t('m.home["知识库功能开关："]'),
-                        open: false,
-                        isAvailable: false,
-                    },
-                    task: {
-                        id: '',
-                        title: this.$t('m.home["任务功能开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    trigger: {
-                        id: '',
-                        title: this.$t('m.home["触发器功能开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                    smsComment: {
-                        id: '',
-                        title: this.$t('m.home["短信评论开关："]'),
-                        open: false,
-                        isAvailable: true,
-                    },
-                },
-                // 获取开关状态按钮禁用
-                isAllStatusGetting: false,
+        // 开关功能对照表
+        switchKeyMap: {
+          SYS_FILE_PATH: 'systemPath',
+          FLOW_PREVIEW: 'preview',
+          WIKI_SWITCH: 'wiki',
+          CHILD_TICKET_SWITCH: 'inherit',
+          SLA_SWITCH: 'sla',
+          TRIGGER_SWITCH: 'trigger',
+          TASK_SWITCH: 'task',
+          FIRST_STATE_SWITCH: 'basic',
+          TABLE_FIELDS_SWITCH: 'module',
+          SMS_COMMENT_SWITCH: 'smsComment',
+        },
+        // 开关功能总体信息
+        moduleInfo: {
+          basic: {
+            id: '',
+            title: this.$t('m.home["提单信息展示开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          module: {
+            id: '',
+            title: this.$t('m.home["基础信息展示开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          systemPath: {
+            id: '',
+            formerValue: '',
+            nowValue: '',
+            changing: false,
+          },
+          preview: {
+            id: '',
+            title: this.$t('m.home["流程预览功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          sla: {
+            id: '',
+            title: this.$t('m.home["SLA功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          inherit: {
+            id: '',
+            title: this.$t('m.home["母子单功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          wiki: {
+            id: '',
+            title: this.$t('m.home["知识库功能开关："]'),
+            open: false,
+            isAvailable: false,
+          },
+          task: {
+            id: '',
+            title: this.$t('m.home["任务功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          trigger: {
+            id: '',
+            title: this.$t('m.home["触发器功能开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+          smsComment: {
+            id: '',
+            title: this.$t('m.home["短信评论开关："]'),
+            open: false,
+            isAvailable: true,
+          },
+        },
+        // 获取开关状态按钮禁用
+        isAllStatusGetting: false,
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+    watch: {},
+    async created() {
+      await this.getEnableStatusAndStorage();
+    },
+    async mounted() {
+      await this.getVersionList();
+    },
+    methods: {
+      async getEnableStatusAndStorage() {
+        this.isAllStatusGetting = true;
+        await this.$store.dispatch('attachmentStorage/getEnableStatus').then((res) => {
+          const tempObj = {};
+          res.data.forEach((item) => {
+            if (item.key === 'SYS_FILE_PATH') {
+              tempObj.SYS_FILE_PATH = item.value;
+              this.moduleInfo.systemPath.nowValue = item.value;
+              this.moduleInfo.systemPath.formerValue = item.value;
+              this.moduleInfo.systemPath.id = item.id || '';
+            } else if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {
+              tempObj[item.key] = item.value === 'on';
+              this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key];
+              this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
+            }
+          });
+          this.$store.commit('changeOpenFunction', tempObj);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isAllStatusGetting = false;
+          });
+      },
+      cancelPath() {
+        this.moduleInfo.systemPath.changing = false;
+        this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
+      },
+      async allSwitchChange(openStatus, type) {
+        if (!this.hasPermission(['global_settings_manage'])) {
+          this.applyForPermission(['global_settings_manage'], [], {});
+          return;
+        }
+        if (this.isAllStatusGetting) {
+          return;
+        }
+        const { id } = this.moduleInfo[type];
+        const params = {
+          type: 'FUNCTION',
+          key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
+          value: openStatus ? 'on' : 'off',
+        };
+        if (type === 'systemPath') {
+          params.value = this.moduleInfo.systemPath.nowValue;
+          params.type = 'PATH';
+        }
+        this.isAllStatusGetting = true;
+        await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.home["更新成功"]'),
+            theme: 'success',
+          });
+          this.getEnableStatusAndStorage();
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+            this.getEnableStatusAndStorage();
+            this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
+          })
+          .finally(() => {
+            this.moduleInfo.systemPath.changing = false;
+            this.isAllStatusGetting = false;
+          });
+      },
+      // 一键清除 缓存
+      handleClear() {
+        if (!this.hasPermission(['global_settings_manage'])) {
+          this.applyForPermission(['global_settings_manage'], [], {});
+          return;
+        }
+        // https://paas-poc.o.qcloud.com/t/itsm/api/misc/clean_cache/
+        if (this.issending === true) {
+          return;
+        }
+        this.issending = true;
+        this.$store.dispatch('attachmentStorage/clearStorage', {}).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.home["清除缓存成功"]'),
+            theme: 'success',
+          });
+          this.clearStorageTime = new Date().toLocaleString('zh', { hour12: false });
+          window.localStorage.setItem('clearStorageTime', this.clearStorageTime);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.issending = false;
+            }, 10000);
+          });
+      },
+      seeLog() {
+        this.versionLogData.show = true;
+      },
+      async getVersionList() {
+        await this.$store.dispatch('version/version_logs').then((res) => {
+          this.rowVersionList = res.data.data;
+          this.updatedVersion = this.rowVersionList[0].version;
+          this.rowVersionList.forEach((item) => {
+            const ite = {
+              name: `V${item.version}`,
             };
-        },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
-            },
-        },
-        watch: {},
-        async created() {
-            await this.getEnableStatusAndStorage();
-        },
-        async mounted() {
-            await this.getVersionList();
-        },
-        methods: {
-            async getEnableStatusAndStorage() {
-                this.isAllStatusGetting = true;
-                await this.$store.dispatch('attachmentStorage/getEnableStatus').then((res) => {
-                    const tempObj = {};
-                    res.data.forEach((item) => {
-                        if (item.key === 'SYS_FILE_PATH') {
-                            tempObj.SYS_FILE_PATH = item.value;
-                            this.moduleInfo.systemPath.nowValue = item.value;
-                            this.moduleInfo.systemPath.formerValue = item.value;
-                            this.moduleInfo.systemPath.id = item.id || '';
-                        } else if (item.key !== 'SERVICE_SWITCH' && this.switchKeyMap[item.key]) {
-                            tempObj[item.key] = item.value === 'on';
-                            this.moduleInfo[this.switchKeyMap[item.key]].open = tempObj[item.key];
-                            this.moduleInfo[this.switchKeyMap[item.key]].id = item.id || '';
-                        }
-                    });
-                    this.$store.commit('changeOpenFunction', tempObj);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isAllStatusGetting = false;
-                    });
-            },
-            cancelPath() {
-                this.moduleInfo.systemPath.changing = false;
-                this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
-            },
-            async allSwitchChange(openStatus, type) {
-                if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {});
-                    return;
-                }
-                if (this.isAllStatusGetting) {
-                    return;
-                }
-                const { id } = this.moduleInfo[type];
-                const params = {
-                    type: 'FUNCTION',
-                    key: Object.keys(this.switchKeyMap)[Object.values(this.switchKeyMap).indexOf(type)],
-                    value: openStatus ? 'on' : 'off',
-                };
-                if (type === 'systemPath') {
-                    params.value = this.moduleInfo.systemPath.nowValue;
-                    params.type = 'PATH';
-                }
-                this.isAllStatusGetting = true;
-                await this.$store.dispatch('attachmentStorage/putEnableStatus', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.home["更新成功"]'),
-                        theme: 'success',
-                    });
-                    this.getEnableStatusAndStorage();
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                        this.getEnableStatusAndStorage();
-                        this.moduleInfo.systemPath.nowValue = this.moduleInfo.systemPath.formerValue;
-                    })
-                    .finally(() => {
-                        this.moduleInfo.systemPath.changing = false;
-                        this.isAllStatusGetting = false;
-                    });
-            },
-            // 一键清除 缓存
-            handleClear() {
-                if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {});
-                    return;
-                }
-                // https://paas-poc.o.qcloud.com/t/itsm/api/misc/clean_cache/
-                if (this.issending === true) {
-                    return;
-                }
-                this.issending = true;
-                this.$store.dispatch('attachmentStorage/clearStorage', {}).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.home["清除缓存成功"]'),
-                        theme: 'success',
-                    });
-                    this.clearStorageTime = new Date().toLocaleString('zh', { hour12: false });
-                    window.localStorage.setItem('clearStorageTime', this.clearStorageTime);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        setTimeout(() => {
-                            this.issending = false;
-                        }, 10000);
-                    });
-            },
-            seeLog() {
-                this.versionLogData.show = true;
-            },
-            async getVersionList() {
-                await this.$store.dispatch('version/version_logs').then((res) => {
-                    this.rowVersionList = res.data.data;
-                    this.updatedVersion = this.rowVersionList[0].version;
-                    this.rowVersionList.forEach((item) => {
-                        const ite = {
-                            name: `V${item.version}`,
-                        };
-                        this.versionList.push(ite);
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
+            this.versionList.push(ite);
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
 
-                    });
-            },
-            async onKeyUpdate() {
-                const params = {
-                    version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
-                    version_to: this.updatedVersion,
-                };
-                await this.$store.dispatch('version/oneKeymigrate', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.home["提交成功，后台执行升级中"]'),
-                        theme: 'success',
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.formerVersion = '';
-                    });
-            },
-            handleChangeSystemPath() {
-                if (!this.hasPermission(['global_settings_manage'])) {
-                    this.applyForPermission(['global_settings_manage'], [], {});
-                    return;
-                }
-                this.moduleInfo.systemPath.changing = true;
-            },
-        },
-    };
+          });
+      },
+      async onKeyUpdate() {
+        const params = {
+          version_from: this.formerVersion.substr(1, this.formerVersion.length - 1),
+          version_to: this.updatedVersion,
+        };
+        await this.$store.dispatch('version/oneKeymigrate', params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.home["提交成功，后台执行升级中"]'),
+            theme: 'success',
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.formerVersion = '';
+          });
+      },
+      handleChangeSystemPath() {
+        if (!this.hasPermission(['global_settings_manage'])) {
+          this.applyForPermission(['global_settings_manage'], [], {});
+          return;
+        }
+        this.moduleInfo.systemPath.changing = true;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

@@ -131,189 +131,189 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler';
-    import firstStep from './ticketStatus/firstStep';
-    import secondStep from './ticketStatus/secondStep';
-    import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../utils/errorHandler';
+  import firstStep from './ticketStatus/firstStep';
+  import secondStep from './ticketStatus/secondStep';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'ticketStatus',
-        components: {
-            firstStep,
-            secondStep,
+  export default {
+    name: 'ticketStatus',
+    components: {
+      firstStep,
+      secondStep,
+    },
+    mixins: [permission],
+    data() {
+      return {
+        isDataLoading: false,
+        business: false,
+        // 列表数据
+        dataList: [],
+        // 新增流程页面切换
+        processStatus: {
+          addNew: false,
         },
-        mixins: [permission],
-        data() {
-            return {
-                isDataLoading: false,
-                business: false,
-                // 列表数据
-                dataList: [],
-                // 新增流程页面切换
-                processStatus: {
-                    addNew: false,
-                },
-                versionStatus: true,
-                // 流程树
-                lineList: [
-                    {
-                        id: 1,
-                        name: this.$t('m.slaContent["单据状态"]'),
-                        type: 'primary',
-                        show: true,
-                    },
-                    {
-                        id: 2,
-                        name: this.$t('m.slaContent["流转设置"]'),
-                        type: 'normal',
-                        show: false,
-                    },
-                ],
-                // 编辑状态
-                editInfo: {
-                    itemInfo: {},
-                    newNode: false,
-                },
-                // 类型状态列表
-                treeTag: '',
-                statusType: '',
-                tagName: '',
-            };
+        versionStatus: true,
+        // 流程树
+        lineList: [
+          {
+            id: 1,
+            name: this.$t('m.slaContent["单据状态"]'),
+            type: 'primary',
+            show: true,
+          },
+          {
+            id: 2,
+            name: this.$t('m.slaContent["流转设置"]'),
+            type: 'normal',
+            show: false,
+          },
+        ],
+        // 编辑状态
+        editInfo: {
+          itemInfo: {},
+          newNode: false,
         },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
-            },
-        },
-        mounted() {
-            this.getTypeStatusList();
-        },
-        methods: {
-            getTypeStatusList() {
-                this.isDataLoading = true;
-                this.$store.dispatch('ticketStatus/getFourTypesList').then((res) => {
-                    this.dataList = res.data;
-                    const temp = this.dataList.findIndex(item => item.id === 3);
-                    this.dataList.splice(temp, 1);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            // 编辑工单状态
-            editStatus(item) {
-                if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
-                    return;
-                }
-                this.tagName = item.service_type_name;
-                this.statusType = item.service_type;
-                this.editInfo.itemInfo = item;
-                this.editInfo.newNode = item.id;
-                this.processStatus.addNew = !this.processStatus.addNew;
-                this.changeTree(0, 'first');
-            },
-            // 配置工单状态
-            configStatus(item) {
-                if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
-                    return;
-                }
-                this.tagName = item.service_type_name;
-                this.statusType = item.service_type;
-                this.editInfo.itemInfo = {};
-                this.editInfo.newNode = null;
-                this.processStatus.addNew = !this.processStatus.addNew;
-                this.changeTree(0, 'first');
-            },
-            trClick(item) {
-                if (item.configured) {
-                    this.editStatus(item);
-                } else {
-                    this.configStatus(item);
-                }
-            },
-            // 切换树状态
-            changeTree(index, type) {
-                if (this.editInfo.itemInfo.id) {
-                    if (type === 'first') {
-                        for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false;
-                            this.lineList[i].type = 'success';
-                        }
-                        this.lineList[0].show = true;
-                        this.lineList[0].type = 'primary';
-                    }
-                    if (type === 'next') {
-                        this.lineList[index].type = 'success';
-                        this.lineList[index].show = false;
-                        this.lineList[index + 1].type = 'primary';
-                        this.lineList[index + 1].show = 'true';
-                    }
-                    if (type === 'back') {
-                        this.lineList[index].type = 'success';
-                        this.lineList[index].show = false;
-                        this.lineList[index - 1].type = 'primary';
-                        this.lineList[index - 1].show = 'true';
-                    }
-                    if (type === 'change') {
-                        for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false;
-                            this.lineList[i].type = 'success';
-                        }
-                        this.lineList[index].type = 'primary';
-                        this.lineList[index].show = true;
-                    }
-                } else {
-                    if (type === 'first') {
-                        for (let i = 0; i < this.lineList.length; i++) {
-                            this.lineList[i].show = false;
-                            this.lineList[i].type = 'normal';
-                        }
-                        this.lineList[0].show = true;
-                        this.lineList[0].type = 'primary';
-                    }
-                    if (type === 'next') {
-                        this.lineList[index].type = 'success';
-                        this.lineList[index].show = false;
-                        this.lineList[index + 1].type = 'primary';
-                        this.lineList[index + 1].show = 'true';
-                    }
-                    if (type === 'back') {
-                        this.lineList[index].type = 'normal';
-                        this.lineList[index].show = false;
-                        this.lineList[index - 1].type = 'primary';
-                        this.lineList[index - 1].show = 'true';
-                    }
-                    if (type === 'change') {
-                        if (this.lineList[index].type === 'normal') {
-                            return;
-                        }
-                        const temp = this.lineList.findIndex(item => item.show);
-                        this.lineList[temp].show = false;
-                        this.lineList[temp].type = 'normal';
-                        this.lineList[index].type = 'primary';
-                        this.lineList[index].show = true;
-                    }
-                }
-            },
-            backTab() {
-                this.statusType = '';
-                this.editInfo.itemInfo = {};
-                this.editInfo.newNode = null;
-                this.processStatus.addNew = !this.processStatus.addNew;
-                this.changeTree(0, 'first');
-                this.getTypeStatusList();
-            },
-            // 关闭版本提示信息
-            closeVersion() {
-                this.versionStatus = false;
-            },
-        },
-    };
+        // 类型状态列表
+        treeTag: '',
+        statusType: '',
+        tagName: '',
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+    mounted() {
+      this.getTypeStatusList();
+    },
+    methods: {
+      getTypeStatusList() {
+        this.isDataLoading = true;
+        this.$store.dispatch('ticketStatus/getFourTypesList').then((res) => {
+          this.dataList = res.data;
+          const temp = this.dataList.findIndex(item => item.id === 3);
+          this.dataList.splice(temp, 1);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      // 编辑工单状态
+      editStatus(item) {
+        if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
+          return;
+        }
+        this.tagName = item.service_type_name;
+        this.statusType = item.service_type;
+        this.editInfo.itemInfo = item;
+        this.editInfo.newNode = item.id;
+        this.processStatus.addNew = !this.processStatus.addNew;
+        this.changeTree(0, 'first');
+      },
+      // 配置工单状态
+      configStatus(item) {
+        if (!this.hasPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyForPermission(['ticket_state_manage'], this.$store.state.project.projectAuthActions, {});
+          return;
+        }
+        this.tagName = item.service_type_name;
+        this.statusType = item.service_type;
+        this.editInfo.itemInfo = {};
+        this.editInfo.newNode = null;
+        this.processStatus.addNew = !this.processStatus.addNew;
+        this.changeTree(0, 'first');
+      },
+      trClick(item) {
+        if (item.configured) {
+          this.editStatus(item);
+        } else {
+          this.configStatus(item);
+        }
+      },
+      // 切换树状态
+      changeTree(index, type) {
+        if (this.editInfo.itemInfo.id) {
+          if (type === 'first') {
+            for (let i = 0; i < this.lineList.length; i++) {
+              this.lineList[i].show = false;
+              this.lineList[i].type = 'success';
+            }
+            this.lineList[0].show = true;
+            this.lineList[0].type = 'primary';
+          }
+          if (type === 'next') {
+            this.lineList[index].type = 'success';
+            this.lineList[index].show = false;
+            this.lineList[index + 1].type = 'primary';
+            this.lineList[index + 1].show = 'true';
+          }
+          if (type === 'back') {
+            this.lineList[index].type = 'success';
+            this.lineList[index].show = false;
+            this.lineList[index - 1].type = 'primary';
+            this.lineList[index - 1].show = 'true';
+          }
+          if (type === 'change') {
+            for (let i = 0; i < this.lineList.length; i++) {
+              this.lineList[i].show = false;
+              this.lineList[i].type = 'success';
+            }
+            this.lineList[index].type = 'primary';
+            this.lineList[index].show = true;
+          }
+        } else {
+          if (type === 'first') {
+            for (let i = 0; i < this.lineList.length; i++) {
+              this.lineList[i].show = false;
+              this.lineList[i].type = 'normal';
+            }
+            this.lineList[0].show = true;
+            this.lineList[0].type = 'primary';
+          }
+          if (type === 'next') {
+            this.lineList[index].type = 'success';
+            this.lineList[index].show = false;
+            this.lineList[index + 1].type = 'primary';
+            this.lineList[index + 1].show = 'true';
+          }
+          if (type === 'back') {
+            this.lineList[index].type = 'normal';
+            this.lineList[index].show = false;
+            this.lineList[index - 1].type = 'primary';
+            this.lineList[index - 1].show = 'true';
+          }
+          if (type === 'change') {
+            if (this.lineList[index].type === 'normal') {
+              return;
+            }
+            const temp = this.lineList.findIndex(item => item.show);
+            this.lineList[temp].show = false;
+            this.lineList[temp].type = 'normal';
+            this.lineList[index].type = 'primary';
+            this.lineList[index].show = true;
+          }
+        }
+      },
+      backTab() {
+        this.statusType = '';
+        this.editInfo.itemInfo = {};
+        this.editInfo.newNode = null;
+        this.processStatus.addNew = !this.processStatus.addNew;
+        this.changeTree(0, 'first');
+        this.getTypeStatusList();
+      },
+      // 关闭版本提示信息
+      closeVersion() {
+        this.versionStatus = false;
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

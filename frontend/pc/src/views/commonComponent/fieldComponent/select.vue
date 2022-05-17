@@ -46,76 +46,76 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
+  import mixins from '../../commonMix/field.js';
 
-    export default {
-        name: 'SELECT',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'SELECT',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                options: [],
-            };
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val'() {
-                this.conditionField(this.item, this.fields);
-            },
-            'item.choice'(newVal, oldVal) {
-                if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
-                    this.getOption();
-                }
-            },
-        },
-        async mounted() {
-            if (!this.item.val && this.item.value) {
-                this.item.val = this.item.value;
-            }
-            await this.getOption();
-            const valueStatus = this.judgeValue(this.item.val, this.item.choice);
-            this.item.val = valueStatus ? this.item.val : '';
-            this.conditionField(this.item, this.fields);
-        },
-        methods: {
-            async getOption() {
-                this.item.choice = await this.getFieldOptions(this.item);
-                this.options = this.item.choice;
-            },
-            selected() {
-                if (this.item.related_fields && this.item.related_fields.be_relied) {
-                    this.item.related_fields.be_relied.forEach((ite) => {
-                        this.fields.forEach((it) => {
-                            if (ite === it.key) {
-                                it.value = '';
-                                it.val = it.value;
-                            }
-                        });
-                    });
-                }
-            },
-        },
-    };
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        options: [],
+      };
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+      'item.choice'(newVal, oldVal) {
+        if ((this.item.source_type === 'API' || this.item.source_type === 'DATADICT' || this.item.source_type === 'RPC') && (oldVal.length !== newVal.length)) {
+          this.getOption();
+        }
+      },
+    },
+    async mounted() {
+      if (!this.item.val && this.item.value) {
+        this.item.val = this.item.value;
+      }
+      await this.getOption();
+      const valueStatus = this.judgeValue(this.item.val, this.item.choice);
+      this.item.val = valueStatus ? this.item.val : '';
+      this.conditionField(this.item, this.fields);
+    },
+    methods: {
+      async getOption() {
+        this.item.choice = await this.getFieldOptions(this.item);
+        this.options = this.item.choice;
+      },
+      selected() {
+        if (this.item.related_fields && this.item.related_fields.be_relied) {
+          this.item.related_fields.be_relied.forEach((ite) => {
+            this.fields.forEach((it) => {
+              if (ite === it.key) {
+                it.value = '';
+                it.val = it.value;
+              }
+            });
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

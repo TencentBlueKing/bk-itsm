@@ -27,14 +27,14 @@
   </div>
 </template>
 <script>
-    import NavTitle from '@/components/common/layout/NavTitle';
-    import ApprovalList from '../ticket/ApprovalList';
+  import NavTitle from '@/components/common/layout/NavTitle';
+  import ApprovalList from '../ticket/ApprovalList';
 
-    export default {
-        name: 'MyTodoTicket',
-        components: {
-            NavTitle,
-            ApprovalList,
-        },
-    };
+  export default {
+    name: 'MyTodoTicket',
+    components: {
+      NavTitle,
+      ApprovalList,
+    },
+  };
 </script>

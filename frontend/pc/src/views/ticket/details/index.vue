@@ -138,303 +138,303 @@
 </template>
 
 <script>
-    import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue';
-    import TicketHeader from './TicketHeader.vue';
-    import NoTicketContent from './components/NoTicketContent.vue';
-    import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue';
-    import commonMix from '@/views/commonMix/common.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import fieldMix from '@/views/commonMix/field.js';
-    import { mapState } from 'vuex';
-    import { errorHandler } from '@/utils/errorHandler.js';
-    import { deepClone } from '@/utils/util';
-    import leftTicketContent from './leftTicketContent.vue';
+  import SlaRecordTab from './rightTicketTabs/SlaRecordTab.vue';
+  import TicketHeader from './TicketHeader.vue';
+  import NoTicketContent from './components/NoTicketContent.vue';
+  import RightTicketTabs from './rightTicketTabs/RightTicketTabs.vue';
+  import commonMix from '@/views/commonMix/common.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import fieldMix from '@/views/commonMix/field.js';
+  import { mapState } from 'vuex';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import { deepClone } from '@/utils/util';
+  import leftTicketContent from './leftTicketContent.vue';
 
-    export default {
-        name: 'TicketDetail',
-        components: {
-            NoTicketContent,
-            leftTicketContent,
-            TicketHeader,
-            SlaRecordTab,
-            RightTicketTabs,
+  export default {
+    name: 'TicketDetail',
+    components: {
+      NoTicketContent,
+      leftTicketContent,
+      TicketHeader,
+      SlaRecordTab,
+      RightTicketTabs,
+    },
+    inject: ['reload'],
+    provide() {
+      return {
+        reloadTicket: this.reloadTicket,
+      };
+    },
+    mixins: [fieldMix, commonMix, apiFieldsWatch],
+    data() {
+      return {
+        moreLoading: false, // 底部加载loading
+        leftTicketDom: '',
+        isPageOver: false,
+        isThrottled: false,
+        isRequsetComment: false,
+        curCommentLength: 10, // 默认为10条
+        totalPages: 0, // 评论总页数
+        page: 1, // 评论当前页数
+        page_size: 10,
+        commentCount: 0,
+        isShowSla: true,
+        showRightTabs: true,
+        commentLoading: false,
+        ticketTimer: null, // 单据详情轮询器
+        containerLeftWidth: 0,
+        ticketId: '',
+        ticketErrorMessage: '',
+        // 移动布局信息
+        dragLine: {
+          base: 0,
+          move: 0,
+          startX: null,
+          maxLength: 0,
+          canMove: false,
         },
-        inject: ['reload'],
-        provide() {
-            return {
-                reloadTicket: this.reloadTicket,
-            };
+        // 单据详情信息
+        ticketInfo: {},
+        // 头部信息
+        headerInfo: {
+          statusColor: '',
         },
-        mixins: [fieldMix, commonMix, apiFieldsWatch],
-        data() {
-            return {
-                moreLoading: false, // 底部加载loading
-                leftTicketDom: '',
-                isPageOver: false,
-                isThrottled: false,
-                isRequsetComment: false,
-                curCommentLength: 10, // 默认为10条
-                totalPages: 0, // 评论总页数
-                page: 1, // 评论当前页数
-                page_size: 10,
-                commentCount: 0,
-                isShowSla: true,
-                showRightTabs: true,
-                commentLoading: false,
-                ticketTimer: null, // 单据详情轮询器
-                containerLeftWidth: 0,
-                ticketId: '',
-                ticketErrorMessage: '',
-                // 移动布局信息
-                dragLine: {
-                    base: 0,
-                    move: 0,
-                    startX: null,
-                    maxLength: 0,
-                    canMove: false,
-                },
-                // 单据详情信息
-                ticketInfo: {},
-                // 头部信息
-                headerInfo: {
-                    statusColor: '',
-                },
-                // 通知链接进入，但节点已被其他人处理提示
-                isShowNoticeDialog: false,
-                noticeInfo: {
-                    is_processed: false,
-                    processed_user: '',
-                },
-                loading: {
-                    ticketLoading: true,
-                    nodeInfoLoading: false,
-                },
-                // 节点列表
-                nodeList: [],
-                // 单据触发器列表
-                ticketTriggerList: [],
-                // 节点触发器列表
-                nodeTriggerList: [],
-                // 提单节点字段信息
-                firstStateFields: [],
-                // 所有字段列表
-                allFieldList: [],
-                commentList: [],
-                commentId: '',
-                threshold: [],
-                hasNodeOptAuth: false,
-                isShowAssgin: false,
-                basicStatus: true,
-            };
+        // 通知链接进入，但节点已被其他人处理提示
+        isShowNoticeDialog: false,
+        noticeInfo: {
+          is_processed: false,
+          processed_user: '',
         },
-        computed: {
-            ...mapState({
-                openFunction: state => state.openFunction,
-            }),
-            token() {
-                return this.$route.query.token;
-            },
+        loading: {
+          ticketLoading: true,
+          nodeInfoLoading: false,
         },
-        watch: {
-            isShowSla(val) {
-                if (val) {
-                    const slaCount = this.ticketInfo.sla.Length;
-                    const slaDom = document.querySelector('.sla-information');
-                    slaDom.style.height = `${134 * slaCount}px`;
-                }
-            },
-            commentList(val) {
-                if (val.length > 0) {
-                    this.curCommentLength = val.length;
-                }
-            },
-        },
-        async mounted() {
-            await this.initData();
-            if (this.$route.query.cache_key) {
-                // 通知链接进入
-                this.getTicketNoticeInfo();
+        // 节点列表
+        nodeList: [],
+        // 单据触发器列表
+        ticketTriggerList: [],
+        // 节点触发器列表
+        nodeTriggerList: [],
+        // 提单节点字段信息
+        firstStateFields: [],
+        // 所有字段列表
+        allFieldList: [],
+        commentList: [],
+        commentId: '',
+        threshold: [],
+        hasNodeOptAuth: false,
+        isShowAssgin: false,
+        basicStatus: true,
+      };
+    },
+    computed: {
+      ...mapState({
+        openFunction: state => state.openFunction,
+      }),
+      token() {
+        return this.$route.query.token;
+      },
+    },
+    watch: {
+      isShowSla(val) {
+        if (val) {
+          const slaCount = this.ticketInfo.sla.Length;
+          const slaDom = document.querySelector('.sla-information');
+          slaDom.style.height = `${134 * slaCount}px`;
+        }
+      },
+      commentList(val) {
+        if (val.length > 0) {
+          this.curCommentLength = val.length;
+        }
+      },
+    },
+    async mounted() {
+      await this.initData();
+      if (this.$route.query.cache_key) {
+        // 通知链接进入
+        this.getTicketNoticeInfo();
+      }
+      this.getProtocolsList();
+      this.$nextTick(function () {
+        this.leftTicketDom = document.querySelector('.comment-list');
+        this.leftTicketDom.addEventListener(
+          'scroll',
+          this.handleTicketScroll
+        );
+      });
+      if (
+        this.$refs.leftTicketContent
+        && this.$refs.leftTicketContent.currentStepList[0]
+      ) {
+        this.hasNodeOptAuth =                this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
+        this.$store.commit(
+          'ticket/setHasTicketNodeOptAuth',
+          this.hasNodeOptAuth
+        );
+      }
+      if (this.ticketInfo && this.ticketInfo.auth_actions) {
+        // 当前节点有权限不显示异常分派
+        this.isShowAssgin =                this.ticketInfo.auth_actions.includes('ticket_management')
+          && !this.hasNodeOptAuth;
+      }
+    },
+    beforeDestroy() {
+      this.clearTicketTimer();
+    },
+    methods: {
+      // 同步数据，需等待 ticketInfo 返回
+      async initData() {
+        this.ticketId = this.$route.query.id;
+        await this.getTicketDetailInfo();
+        if (this.ticketErrorMessage) {
+          this.clearTicketTimer();
+          return false;
+        }
+        this.getTriggers();
+        await this.getNodeList();
+        this.getCurrTickeStatusColor();
+        this.initCurrentStepData();
+        this.initTicketTimer();
+        this.initComments();
+      },
+      handleClickShowSla() {
+        this.isShowSla = !this.isShowSla;
+      },
+      viewSlaRule() {
+        this.$router.push({
+          name: 'slaAgreement',
+          query: {
+            project_id: this.$route.query.project_id || 0,
+          },
+        });
+      },
+      async initComments() {
+        try {
+          this.commentLoading = true;
+          // 获取root id
+          const rootRes = await this.$store.dispatch(
+            'ticket/getTicketAllComments',
+            { ticket_id: this.ticketId, show_type: '' }
+          );
+          this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id;
+          this.commentList = await this.getComments(1, 10);
+        } catch (e) {
+          console.log(e);
+        } finally {
+          this.commentLoading = false;
+        }
+      },
+      getBacicInfoStatus(val) {
+        this.basicStatus = val;
+      },
+      async getComments(page, pageSize) {
+        this.commentLoading = true;
+        const commentList = [];
+        const commmentRes = await this.$store.dispatch(
+          'ticket/getTicketAllComments',
+          {
+            ticket_id: this.ticketId,
+            show_type: this.ticketInfo.updated_by
+              .split(',')
+              .includes(window.username)
+              ? 'ALL'
+              : 'PUBLIC',
+            page,
+            page_size: pageSize,
+          }
+        );
+        commmentRes.data.items.forEach((item, index) => {
+          if (item.parent__id !== this.commentId) {
+            this.getReplyCommet(item.parent__id, index);
+          }
+        });
+        this.commentCount = commmentRes.data.count;
+        this.totalPages =                Math.ceil((commmentRes.data.count - 1) / pageSize) || 1;
+        commentList.push(...commmentRes.data.items);
+        commentList.sort((a, b) => b.id - a.id);
+        this.commentLoading = false;
+        return commentList.filter(item => item.remark_type !== 'ROOT');
+      },
+      async getReplyCommet(id, index) {
+        if (id) {
+          const res = await this.$store.dispatch(
+            'ticket/getReplyComment',
+            { ticket_id: this.ticketId, id }
+          );
+          this.$set(
+            this.commentList[index],
+            'parent_creator',
+            res.data.creator
+          );
+          this.$set(
+            this.commentList[index],
+            'parent_content',
+            res.data.content
+          );
+        }
+      },
+      async addTargetComment(curComment) {
+        if (this.commentId !== curComment.parent__id) {
+          const res = await this.$store.dispatch(
+            'ticket/getReplyComment',
+            { ticket_id: this.ticketId, id: curComment.parent__id }
+          );
+          this.commentList.push(res.data);
+          this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment);
+        }
+      },
+      handleTicketScroll() {
+        if (this.totalPages === 1) return;
+        if (
+          !this.isPageOver
+          && !this.isThrottled
+          && this.$refs.leftTicketContent.stepActiveTab === 'allComments'
+        ) {
+          this.isThrottled = true;
+          const timer = setTimeout(async () => {
+            this.isThrottled = false;
+            const el = this.leftTicketDom;
+            if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
+              this.moreLoading = true;
+              this.page += 1;
+              clearTimeout(timer);
+              const result = await this.getComments(
+                this.page,
+                this.page_size
+              );
+              this.commentList.push(...result);
+              this.isPageOver = this.page === this.totalPages;
+              this.moreLoading = false;
             }
-            this.getProtocolsList();
-            this.$nextTick(function () {
-                this.leftTicketDom = document.querySelector('.comment-list');
-                this.leftTicketDom.addEventListener(
-                    'scroll',
-                    this.handleTicketScroll
-                );
-            });
-            if (
-                this.$refs.leftTicketContent
-                && this.$refs.leftTicketContent.currentStepList[0]
-            ) {
-                this.hasNodeOptAuth =                this.$refs.leftTicketContent.currentStepList.some(item => item.can_operate);
-                this.$store.commit(
-                    'ticket/setHasTicketNodeOptAuth',
-                    this.hasNodeOptAuth
-                );
-            }
-            if (this.ticketInfo && this.ticketInfo.auth_actions) {
-                // 当前节点有权限不显示异常分派
-                this.isShowAssgin =                this.ticketInfo.auth_actions.includes('ticket_management')
-                    && !this.hasNodeOptAuth;
-            }
-        },
-        beforeDestroy() {
-            this.clearTicketTimer();
-        },
-        methods: {
-            // 同步数据，需等待 ticketInfo 返回
-            async initData() {
-                this.ticketId = this.$route.query.id;
-                await this.getTicketDetailInfo();
-                if (this.ticketErrorMessage) {
-                    this.clearTicketTimer();
-                    return false;
-                }
-                this.getTriggers();
-                await this.getNodeList();
-                this.getCurrTickeStatusColor();
-                this.initCurrentStepData();
-                this.initTicketTimer();
-                this.initComments();
-            },
-            handleClickShowSla() {
-                this.isShowSla = !this.isShowSla;
-            },
-            viewSlaRule() {
-                this.$router.push({
-                    name: 'slaAgreement',
-                    query: {
-                        project_id: this.$route.query.project_id || 0,
-                    },
-                });
-            },
-            async initComments() {
-                try {
-                    this.commentLoading = true;
-                    // 获取root id
-                    const rootRes = await this.$store.dispatch(
-                        'ticket/getTicketAllComments',
-                        { ticket_id: this.ticketId, show_type: '' }
-                    );
-                    this.commentId = rootRes.data.items.find(item => item.remark_type === 'ROOT').id;
-                    this.commentList = await this.getComments(1, 10);
-                } catch (e) {
-                    console.log(e);
-                } finally {
-                    this.commentLoading = false;
-                }
-            },
-            getBacicInfoStatus(val) {
-                this.basicStatus = val;
-            },
-            async getComments(page, pageSize) {
-                this.commentLoading = true;
-                const commentList = [];
-                const commmentRes = await this.$store.dispatch(
-                    'ticket/getTicketAllComments',
-                    {
-                        ticket_id: this.ticketId,
-                        show_type: this.ticketInfo.updated_by
-                            .split(',')
-                            .includes(window.username)
-                            ? 'ALL'
-                            : 'PUBLIC',
-                        page,
-                        page_size: pageSize,
-                    }
-                );
-                commmentRes.data.items.forEach((item, index) => {
-                    if (item.parent__id !== this.commentId) {
-                        this.getReplyCommet(item.parent__id, index);
-                    }
-                });
-                this.commentCount = commmentRes.data.count;
-                this.totalPages =                Math.ceil((commmentRes.data.count - 1) / pageSize) || 1;
-                commentList.push(...commmentRes.data.items);
-                commentList.sort((a, b) => b.id - a.id);
-                this.commentLoading = false;
-                return commentList.filter(item => item.remark_type !== 'ROOT');
-            },
-            async getReplyCommet(id, index) {
-                if (id) {
-                    const res = await this.$store.dispatch(
-                        'ticket/getReplyComment',
-                        { ticket_id: this.ticketId, id }
-                    );
-                    this.$set(
-                        this.commentList[index],
-                        'parent_creator',
-                        res.data.creator
-                    );
-                    this.$set(
-                        this.commentList[index],
-                        'parent_content',
-                        res.data.content
-                    );
-                }
-            },
-            async addTargetComment(curComment) {
-                if (this.commentId !== curComment.parent__id) {
-                    const res = await this.$store.dispatch(
-                        'ticket/getReplyComment',
-                        { ticket_id: this.ticketId, id: curComment.parent__id }
-                    );
-                    this.commentList.push(res.data);
-                    this.$refs.leftTicketContent.$refs.comment.jumpTargetComment(curComment);
-                }
-            },
-            handleTicketScroll() {
-                if (this.totalPages === 1) return;
-                if (
-                    !this.isPageOver
-                    && !this.isThrottled
-                    && this.$refs.leftTicketContent.stepActiveTab === 'allComments'
-                ) {
-                    this.isThrottled = true;
-                    const timer = setTimeout(async () => {
-                        this.isThrottled = false;
-                        const el = this.leftTicketDom;
-                        if (el.scrollHeight - el.offsetHeight - el.scrollTop < 10) {
-                            this.moreLoading = true;
-                            this.page += 1;
-                            clearTimeout(timer);
-                            const result = await this.getComments(
-                                this.page,
-                                this.page_size
-                            );
-                            this.commentList.push(...result);
-                            this.isPageOver = this.page === this.totalPages;
-                            this.moreLoading = false;
-                        }
-                    }, 500);
-                }
-            },
-            async refreshComment() {
-                this.commentList = await this.getComments(
-                    1,
-                    this.curCommentLength + 1
-                );
-                this.page = 1;
-            },
-            getProtocolsList() {
-                const params = {
-                    project_id: this.ticketInfo.project_key,
-                };
-                this.$store
-                    .dispatch('slaManagement/getProtocolsList', params)
-                    .then((res) => {
-                        const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name));
-                        const slathreshold = curSlas.map((item) => {
-                            const condition = item.action_policies.map((ite) => {
-                                const obj = {};
-                                obj[ite.type] = ite.condition.expressions[0].value;
-                                return obj;
-                            });
-                            // 1 3 2 4
-                            // type 1  2 为响应
-                            // type 3  4 为处理
-                            /* eslint-disable */
+          }, 500);
+        }
+      },
+      async refreshComment() {
+        this.commentList = await this.getComments(
+          1,
+          this.curCommentLength + 1
+        );
+        this.page = 1;
+      },
+      getProtocolsList() {
+        const params = {
+          project_id: this.ticketInfo.project_key,
+        };
+        this.$store
+          .dispatch('slaManagement/getProtocolsList', params)
+          .then((res) => {
+            const curSlas = res.data.filter(item => this.ticketInfo.sla.includes(item.name));
+            const slathreshold = curSlas.map((item) => {
+              const condition = item.action_policies.map((ite) => {
+                const obj = {};
+                obj[ite.type] = ite.condition.expressions[0].value;
+                return obj;
+              });
+              // 1 3 2 4
+              // type 1  2 为响应
+              // type 3  4 为处理
+              /* eslint-disable */
                         return {
                             sla_name: item.name,
                             rWarningThreshold: condition[0][1] / 100 || 1, // 1为100%

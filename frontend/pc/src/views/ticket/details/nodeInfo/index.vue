@@ -220,145 +220,145 @@
 </template>
 
 <script>
-    import CurrentSteps from '../currentSteps/index.vue';
-    import fieldPreview from '@/views/commonComponent/fieldPreview';
-    import autoNodeInfo from './autoNodeInfo.vue';
-    import sopsNodeInfo from './sopsNodeInfo.vue';
-    import devopsNodeInfo from './devopsNodeInfo.vue';
-    import signNodeInfo from './signNodeInfo';
-    import approvalNodeInfo from './approvalNodeInfo';
-    import { errorHandler } from '@/utils/errorHandler';
+  import CurrentSteps from '../currentSteps/index.vue';
+  import fieldPreview from '@/views/commonComponent/fieldPreview';
+  import autoNodeInfo from './autoNodeInfo.vue';
+  import sopsNodeInfo from './sopsNodeInfo.vue';
+  import devopsNodeInfo from './devopsNodeInfo.vue';
+  import signNodeInfo from './signNodeInfo';
+  import approvalNodeInfo from './approvalNodeInfo';
+  import { errorHandler } from '@/utils/errorHandler';
 
-    export default {
-        name: 'nodeContent',
-        components: {
-            CurrentSteps,
-            fieldPreview,
-            autoNodeInfo,
-            sopsNodeInfo,
-            signNodeInfo,
-            approvalNodeInfo,
-            devopsNodeInfo,
+  export default {
+    name: 'nodeContent',
+    components: {
+      CurrentSteps,
+      fieldPreview,
+      autoNodeInfo,
+      sopsNodeInfo,
+      signNodeInfo,
+      approvalNodeInfo,
+      devopsNodeInfo,
+    },
+    props: {
+      readOnly: Boolean,
+      // 单据信息
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            readOnly: Boolean,
-            // 单据信息
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 打开节点
-            openNodeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 说有节点信息
-            nodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            currentStepList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      // 打开节点
+      openNodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                basicList: [
-                    {
-                        name: this.$t('m.newCommon["节点名称"]'),
-                        value: '',
-                        key: 'name',
-                    },
-                    {
-                        name: this.$t('m.newCommon["处理人"]'),
-                        value: '',
-                        key: 'processors',
-                    },
-                    {
-                        name: this.$t('m.newCommon["处理时间"]'),
-                        value: '',
-                        key: 'update_at',
-                    },
-                ],
-                openStatus: true,
-            };
+      },
+      // 说有节点信息
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        computed: {
-            nodeListCurren() {
-                const nodeListCurren = this.nodeList.filter(item => item.state_id === this.openNodeInfo.id);
-                if (nodeListCurren[0]) {
-                    for (let i = 0; i < this.basicList.length; i++) {
-                        const property = this.basicList[i];
-                        property.value = JSON.parse(JSON.stringify(nodeListCurren[0][property.key] || ''));
-                    }
-                }
-                return nodeListCurren;
-            },
+      },
+      currentStepList: {
+        type: Array,
+        default() {
+          return [];
         },
-        mounted() {
-            setTimeout(() => {
-                if (
-                    this.nodeList[0]
-                    && this.nodeList[0].status !== 'FINISHED'
-                    && this
-                    && !this._isDestroyed
-                ) {
-                    this.getTicketNodeInfo(this.openNodeInfo);
-                }
-            }, 10000);
-        },
-        methods: {
-            initInfo() {
-                this.$emit('initInfo');
-            },
-            getTicketNodeInfo(openNodeInfo) {
-                const { id } = this.basicInfomation;
-                const params = {
-                    state_id: openNodeInfo.id,
-                };
-                this.$store
-                    .dispatch('deployOrder/getTicketNodeInfo', { params, id })
-                    .then((res) => {
-                        if (
-                            res.data.status !== 'FINISHED'
-                            && this
-                            && !this._isDestroyed
-                            && !this.basicInfomation.is_over
-                        ) {
-                            // 判断数据 和上次请求是否相同
-                            if (
-                                this.nodeList[0].toString() !== res.data.toString()
-                            ) {
-                                this.nodeInfo[0] = res.data;
-                            }
-                            // 轮询
-                            const setTimeoutFunc = setTimeout(() => {
-                                this.getTicketNodeInfo(this.openNodeInfo);
-                            }, 10000);
-                            this.$once('hook:beforeDestroy', () => {
-                                clearInterval(setTimeoutFunc);
-                            });
-                        }
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {});
-            },
-            closeSlider() {
-                this.$emit('closeSlider');
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        basicList: [
+          {
+            name: this.$t('m.newCommon["节点名称"]'),
+            value: '',
+            key: 'name',
+          },
+          {
+            name: this.$t('m.newCommon["处理人"]'),
+            value: '',
+            key: 'processors',
+          },
+          {
+            name: this.$t('m.newCommon["处理时间"]'),
+            value: '',
+            key: 'update_at',
+          },
+        ],
+        openStatus: true,
+      };
+    },
+    computed: {
+      nodeListCurren() {
+        const nodeListCurren = this.nodeList.filter(item => item.state_id === this.openNodeInfo.id);
+        if (nodeListCurren[0]) {
+          for (let i = 0; i < this.basicList.length; i++) {
+            const property = this.basicList[i];
+            property.value = JSON.parse(JSON.stringify(nodeListCurren[0][property.key] || ''));
+          }
+        }
+        return nodeListCurren;
+      },
+    },
+    mounted() {
+      setTimeout(() => {
+        if (
+          this.nodeList[0]
+          && this.nodeList[0].status !== 'FINISHED'
+          && this
+          && !this._isDestroyed
+        ) {
+          this.getTicketNodeInfo(this.openNodeInfo);
+        }
+      }, 10000);
+    },
+    methods: {
+      initInfo() {
+        this.$emit('initInfo');
+      },
+      getTicketNodeInfo(openNodeInfo) {
+        const { id } = this.basicInfomation;
+        const params = {
+          state_id: openNodeInfo.id,
+        };
+        this.$store
+          .dispatch('deployOrder/getTicketNodeInfo', { params, id })
+          .then((res) => {
+            if (
+              res.data.status !== 'FINISHED'
+              && this
+              && !this._isDestroyed
+              && !this.basicInfomation.is_over
+            ) {
+              // 判断数据 和上次请求是否相同
+              if (
+                this.nodeList[0].toString() !== res.data.toString()
+              ) {
+                this.nodeInfo[0] = res.data;
+              }
+              // 轮询
+              const setTimeoutFunc = setTimeout(() => {
+                this.getTicketNodeInfo(this.openNodeInfo);
+              }, 10000);
+              this.$once('hook:beforeDestroy', () => {
+                clearInterval(setTimeoutFunc);
+              });
+            }
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {});
+      },
+      closeSlider() {
+        this.$emit('closeSlider');
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

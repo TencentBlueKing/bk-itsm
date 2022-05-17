@@ -149,155 +149,155 @@
 </template>
 
 <script>
-    import fieldConfig from '../../processDesign/nodeConfigue/components/fieldConfig';
-    import commonTriggerList from './commonTriggerList';
-    import memberSelect from '../../../commonComponent/memberSelect';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import fieldConfig from '../../processDesign/nodeConfigue/components/fieldConfig';
+  import commonTriggerList from './commonTriggerList';
+  import memberSelect from '../../../commonComponent/memberSelect';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'commonStep',
-        components: {
-            fieldConfig,
-            commonTriggerList,
-            memberSelect,
+  export default {
+    name: 'commonStep',
+    components: {
+      fieldConfig,
+      commonTriggerList,
+      memberSelect,
+    },
+    props: {
+      templateInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            templateInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            step: {
-                type: Number,
-                default: '',
-            },
-            stepList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      step: {
+        type: Number,
+        default: '',
+      },
+      stepList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                firstStepInfo: {
-                    name: '',
-                    ownersInputValue: '',
-                    desc: '',
-                    changeName: '',
-                    changeOwners: '',
-                    changeDesc: '',
-                },
-                formRule: {
-                    name: [
-                        {
-                            required: true,
-                            message: this.$t('m.taskTemplate[\'请输入任务名称\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                },
-                buttonLoading: false,
-                // 模板信息会在编辑时保存，这里单独保存
-                changedTemplateInfo: {},
+      },
+    },
+    data() {
+      return {
+        firstStepInfo: {
+          name: '',
+          ownersInputValue: '',
+          desc: '',
+          changeName: '',
+          changeOwners: '',
+          changeDesc: '',
+        },
+        formRule: {
+          name: [
+            {
+              required: true,
+              message: this.$t('m.taskTemplate[\'请输入任务名称\']'),
+              trigger: 'blur',
+            },
+          ],
+        },
+        buttonLoading: false,
+        // 模板信息会在编辑时保存，这里单独保存
+        changedTemplateInfo: {},
+      };
+    },
+    watch: {
+      step() {
+        this.initData();
+      },
+    },
+    async mounted() {
+      await this.initData();
+    },
+    methods: {
+      async initData() {
+        this.changedTemplateInfo = JSON.parse(JSON.stringify(this.templateInfo.itemInfo));
+        this.firstStepInfo.name = this.changedTemplateInfo.name;
+        this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
+        this.firstStepInfo.desc = this.changedTemplateInfo.desc;
+      },
+      cancelStep() {
+        this.$parent.backTab();
+      },
+      // 下一步操作
+      async stepChange(type = 'next', isDraft = false, isTemplate = '') {
+        if (isTemplate === 'changeName') {
+          let valid = false;
+          await this.$refs.taskInfoForm.validate().then(() => {
+            valid = true;
+          }, () => {});
+          if (!valid) {
+            return;
+          }
+        }
+        const patch = {
+          params: {
+            name: this.firstStepInfo.name,
+            component_type: this.changedTemplateInfo.component_type,
+            is_draft: isDraft ? true : (this.step === 2 ? false : this.changedTemplateInfo.is_draft),
+            is_builtin: false,
+            owners: this.firstStepInfo.ownersInputValue.join(','),
+            desc: this.firstStepInfo.desc,
+          },
+          id: this.changedTemplateInfo.id,
+        };
+        if (!isTemplate) {
+          patch.params.task_fields = {
+            stage: this.stepList[this.step].stage,
+            task_field_ids: this.$refs.field.showTabList.map(field => field.id),
+          };
+        }
+        this.buttonLoading = true;
+        this.$store.dispatch('taskTemplate/updateTemplate', patch).then((res) => {
+          this.$bkMessage({
+            message: this.$t('m.taskTemplate[\'保存成功\']'),
+            theme: 'success',
+          });
+          this.changedTemplateInfo = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.$parent.changeTemplateInfo(this.changedTemplateInfo);
+            this.initData();
+            this.buttonLoading = false;
+            if (isTemplate) {
+              this.cancelEdit(isTemplate);
+              return;
+            }
+            if (isDraft) {
+              return;
+            }
+            if (this.step === 2) {
+              this.$parent.backTab();
+              return;
+            }
+            const stepIndex = type === 'previous' ? this.step - 1 : this.step + 1;
+            const temp = {
+              id: stepIndex + 1,
+              name: this.stepList[stepIndex].name,
+              type: 'primary',
+              is_draft: this.changedTemplateInfo.is_draft,
+              show: false,
             };
-        },
-        watch: {
-            step() {
-                this.initData();
-            },
-        },
-        async mounted() {
-            await this.initData();
-        },
-        methods: {
-            async initData() {
-                this.changedTemplateInfo = JSON.parse(JSON.stringify(this.templateInfo.itemInfo));
-                this.firstStepInfo.name = this.changedTemplateInfo.name;
-                this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
-                this.firstStepInfo.desc = this.changedTemplateInfo.desc;
-            },
-            cancelStep() {
-                this.$parent.backTab();
-            },
-            // 下一步操作
-            async stepChange(type = 'next', isDraft = false, isTemplate = '') {
-                if (isTemplate === 'changeName') {
-                    let valid = false;
-                    await this.$refs.taskInfoForm.validate().then(() => {
-                        valid = true;
-                    }, () => {});
-                    if (!valid) {
-                        return;
-                    }
-                }
-                const patch = {
-                    params: {
-                        name: this.firstStepInfo.name,
-                        component_type: this.changedTemplateInfo.component_type,
-                        is_draft: isDraft ? true : (this.step === 2 ? false : this.changedTemplateInfo.is_draft),
-                        is_builtin: false,
-                        owners: this.firstStepInfo.ownersInputValue.join(','),
-                        desc: this.firstStepInfo.desc,
-                    },
-                    id: this.changedTemplateInfo.id,
-                };
-                if (!isTemplate) {
-                    patch.params.task_fields = {
-                        stage: this.stepList[this.step].stage,
-                        task_field_ids: this.$refs.field.showTabList.map(field => field.id),
-                    };
-                }
-                this.buttonLoading = true;
-                this.$store.dispatch('taskTemplate/updateTemplate', patch).then((res) => {
-                    this.$bkMessage({
-                        message: this.$t('m.taskTemplate[\'保存成功\']'),
-                        theme: 'success',
-                    });
-                    this.changedTemplateInfo = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.$parent.changeTemplateInfo(this.changedTemplateInfo);
-                        this.initData();
-                        this.buttonLoading = false;
-                        if (isTemplate) {
-                            this.cancelEdit(isTemplate);
-                            return;
-                        }
-                        if (isDraft) {
-                            return;
-                        }
-                        if (this.step === 2) {
-                            this.$parent.backTab();
-                            return;
-                        }
-                        const stepIndex = type === 'previous' ? this.step - 1 : this.step + 1;
-                        const temp = {
-                            id: stepIndex + 1,
-                            name: this.stepList[stepIndex].name,
-                            type: 'primary',
-                            is_draft: this.changedTemplateInfo.is_draft,
-                            show: false,
-                        };
-                        this.$parent.changeTree(temp, stepIndex);
-                    });
-            },
-            cancelEdit(type) {
-                this.firstStepInfo[type] = '';
-                if (type === 'changeName') {
-                    this.firstStepInfo.name = this.changedTemplateInfo.name;
-                } else if (type === 'changeOwners') {
-                    this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
-                } else {
-                    this.firstStepInfo.desc = this.changedTemplateInfo.desc;
-                }
-            },
-        },
-    };
+            this.$parent.changeTree(temp, stepIndex);
+          });
+      },
+      cancelEdit(type) {
+        this.firstStepInfo[type] = '';
+        if (type === 'changeName') {
+          this.firstStepInfo.name = this.changedTemplateInfo.name;
+        } else if (type === 'changeOwners') {
+          this.firstStepInfo.ownersInputValue = this.changedTemplateInfo.owners ? this.changedTemplateInfo.owners.split(',') : [];
+        } else {
+          this.firstStepInfo.desc = this.changedTemplateInfo.desc;
+        }
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

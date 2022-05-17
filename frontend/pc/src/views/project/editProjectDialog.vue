@@ -69,131 +69,131 @@
   </bk-dialog>
 </template>
 <script>
-    import { deepClone } from '@/utils/util';
-    import { errorHandler } from '@/utils/errorHandler.js';
-    import i18n from '@/i18n/index.js';
+  import { deepClone } from '@/utils/util';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import i18n from '@/i18n/index.js';
 
-    export default {
-        name: 'EditProjectDialog',
-        props: {
-            isShow: {
-                type: Boolean,
-                default: false,
-            },
-            title: String,
-            project: {
-                type: Object,
-                default() {
-                    return {
-                        name: '',
-                        key: '',
-                        desc: '',
-                        color: '',
-                    };
-                },
-            },
-            editDialogFormDisable: Boolean,
+  export default {
+    name: 'EditProjectDialog',
+    props: {
+      isShow: {
+        type: Boolean,
+        default: false,
+      },
+      title: String,
+      project: {
+        type: Object,
+        default() {
+          return {
+            name: '',
+            key: '',
+            desc: '',
+            color: '',
+          };
         },
-        data() {
-            return {
-                projectForm: deepClone(this.project),
-                editProjectPending: false,
-                projectRules: {
-                    name: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                        {
-                            max: 50,
-                            message: '不能多于50个字符',
-                            trigger: 'blur',
-                        },
-                        {
-                            validator: this.validateName,
-                            message(val) {
-                                return `${val}-此项目名称已存在`;
-                            },
-                            trigger: 'blur',
-                        },
-                    ],
-                    key: [
-                        {
-                            required: true,
-                            message: '必填项',
-                            trigger: 'blur',
-                        },
-                        {
-                            max: 28,
-                            message: '不能多于28个字符',
-                            trigger: 'blur',
-                        },
-                        {
-                            regex: /^[a-z][a-z0-9-_]+$/,
-                            message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
-                            trigger: 'blur',
-                        },
-                        {
-                            validator: this.validateKey,
-                            message(val) {
-                                return `${val}-此项目代号已存在`;
-                            },
-                            trigger: 'blur',
-                        },
-                    ],
-                    desc: [
-                        {
-                            max: 100,
-                            message: '不能多于100个字符',
-                            trigger: 'blur',
-                        },
-                    ],
-                },
-            };
+      },
+      editDialogFormDisable: Boolean,
+    },
+    data() {
+      return {
+        projectForm: deepClone(this.project),
+        editProjectPending: false,
+        projectRules: {
+          name: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+            {
+              max: 50,
+              message: '不能多于50个字符',
+              trigger: 'blur',
+            },
+            {
+              validator: this.validateName,
+              message(val) {
+                return `${val}-此项目名称已存在`;
+              },
+              trigger: 'blur',
+            },
+          ],
+          key: [
+            {
+              required: true,
+              message: '必填项',
+              trigger: 'blur',
+            },
+            {
+              max: 28,
+              message: '不能多于28个字符',
+              trigger: 'blur',
+            },
+            {
+              regex: /^[a-z][a-z0-9-_]+$/,
+              message: '由小写字母，数字，下划线，横线组成，必须以英文字母开头',
+              trigger: 'blur',
+            },
+            {
+              validator: this.validateKey,
+              message(val) {
+                return `${val}-此项目代号已存在`;
+              },
+              trigger: 'blur',
+            },
+          ],
+          desc: [
+            {
+              max: 100,
+              message: '不能多于100个字符',
+              trigger: 'blur',
+            },
+          ],
         },
-        watch: {
-            isShow(val) {
-                if (val) {
-                    this.projectForm = deepClone(this.project);
-                }
-            },
-        },
-        methods: {
-            projectValidateList(list, type) {
-                const projectList = [];
-                projectList.push(list);
-                if (this.title === i18n.t('m["编辑项目"]')) {
-                    projectList.length = 0;
-                    const result = list.filter(item => item[type] !== this.project[type]);
-                    projectList.push(result);
-                }
-                return projectList[0];
-            },
-            async validateName(val) {
-                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name');
-                return !projectList.map(item => item.name).includes(val);
-            },
-            async validateKey(val) {
-                const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key');
-                return !projectList.map(item => item.key).includes(val);
-            },
-            onEditProjectConfirm() {
-                this.$refs.projectForm.validate().then(async (result) => {
-                    if (result) {
-                        this.editProjectPending = true;
-                        const url = this.project.key ? 'project/updateProject' : 'project/createProject';
-                        try {
-                            await this.$store.dispatch(url, this.projectForm);
-                            this.$emit('confirm', this.projectForm.key);
-                        } catch (e) {
-                            errorHandler(e, this);
-                        } finally {
-                            this.editProjectPending = false;
-                        }
-                    }
-                });
-            },
-        },
-    };
+      };
+    },
+    watch: {
+      isShow(val) {
+        if (val) {
+          this.projectForm = deepClone(this.project);
+        }
+      },
+    },
+    methods: {
+      projectValidateList(list, type) {
+        const projectList = [];
+        projectList.push(list);
+        if (this.title === i18n.t('m["编辑项目"]')) {
+          projectList.length = 0;
+          const result = list.filter(item => item[type] !== this.project[type]);
+          projectList.push(result);
+        }
+        return projectList[0];
+      },
+      async validateName(val) {
+        const projectList = this.projectValidateList(this.$store.state.project.projectList, 'name');
+        return !projectList.map(item => item.name).includes(val);
+      },
+      async validateKey(val) {
+        const projectList = this.projectValidateList(this.$store.state.project.projectList, 'key');
+        return !projectList.map(item => item.key).includes(val);
+      },
+      onEditProjectConfirm() {
+        this.$refs.projectForm.validate().then(async (result) => {
+          if (result) {
+            this.editProjectPending = true;
+            const url = this.project.key ? 'project/updateProject' : 'project/createProject';
+            try {
+              await this.$store.dispatch(url, this.projectForm);
+              this.$emit('confirm', this.projectForm.key);
+            } catch (e) {
+              errorHandler(e, this);
+            } finally {
+              this.editProjectPending = false;
+            }
+          }
+        });
+      },
+    },
+  };
 </script>

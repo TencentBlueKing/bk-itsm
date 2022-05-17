@@ -54,29 +54,29 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'SummaryCard',
-        props: {
-            title: {
-                type: String,
-                default: '',
-            },
-            cardData: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        computed: {
-            ratioCls() {
-                if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
-                    return 'ratio-equal';
-                } if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
-                    return 'ratio-up';
-                }
-                return 'ratio-down';
-            },
-        },
-    };
+  export default {
+    name: 'SummaryCard',
+    props: {
+      title: {
+        type: String,
+        default: '',
+      },
+      cardData: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    computed: {
+      ratioCls() {
+        if (this.cardData.week.this_week_count === this.cardData.week.last_week_count) {
+          return 'ratio-equal';
+        } if (this.cardData.week.this_week_count > this.cardData.week.last_week_count) {
+          return 'ratio-up';
+        }
+        return 'ratio-down';
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .summary-card {

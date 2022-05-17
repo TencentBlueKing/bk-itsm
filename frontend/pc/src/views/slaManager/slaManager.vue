@@ -114,202 +114,202 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler';
-    import permission from '@/mixins/permission.js';
-    import addModel from './addModel.vue';
-    import EmptyTip from '../project/components/emptyTip.vue';
+  import { errorHandler } from '../../utils/errorHandler';
+  import permission from '@/mixins/permission.js';
+  import addModel from './addModel.vue';
+  import EmptyTip from '../project/components/emptyTip.vue';
 
-    export default {
-        name: 'slaManager',
-        components: {
-            addModel,
-            EmptyTip,
+  export default {
+    name: 'slaManager',
+    components: {
+      addModel,
+      EmptyTip,
+    },
+    mixins: [permission],
+    data() {
+      return {
+        isDataLoading: false,
+        secondClick: false,
+        versionStatus: true,
+        modelList: [],
+        // 新增修改
+        changeInfo: {
+          isShow: false,
+          info: {
+            is_builtin: false,
+          },
         },
-        mixins: [permission],
-        data() {
-            return {
-                isDataLoading: false,
-                secondClick: false,
-                versionStatus: true,
-                modelList: [],
-                // 新增修改
-                changeInfo: {
-                    isShow: false,
-                    info: {
-                        is_builtin: false,
-                    },
-                },
-                // 编辑模式发送初始信息
-                isEdit: false,
-                bktooltipsInfo: {
-                    content: this.$t('m.slaContent[\'内置服务模型不可删除\']'),
-                    showOnInit: false,
-                    placements: ['top'],
-                },
-                emptyTip: {
-                    title: this.$t('m[\'当前项目下还没有 <SLA模式>\']'),
-                    subTitle: this.$t('m[\'SLA（即服务级别协议）是服务支撑团队与组织机构内最终用户之间的“服务合同”。通常，SLA 是通过定义所提供的服务必须遵守的质量标准以及交付服务的时间表来建立对服务和服务质量的清晰理解；加快服务响应时间、减少等待时长、降低运营成本，一套合理且适用的 SLA 将是您实现这些目标的最佳选择。\']'),
-                    desc: [
-                        {
-                            src: require('../../images/illustration/apply.svg'),
-                            title: this.$t('m[\'设计服务模式并制定协议\']'),
-                            content: this.$t('m[\'通常我们会先设定团队的服务时间段，然后进一步配置在规定的服务时间段内，针对不同的服务工单紧急程度约定响应和处理时长，为的是保障用户的服务体验、提升用户满意度。\']'),
-                        },
-                        {
-                            src: require('../../images/illustration/start-service.svg'),
-                            title: this.$t('m[\'为服务配置合适的 SLA\']'),
-                            content: this.$t('m[\'接下来就是为不同的服务配置合适的 SLA 了，因为很多服务的处理流程中可能会需要多个不同职能团队来处理，所以我们支持在一个服务内针对不同的流程区间设置差异化的服务协议，满足对不同服务团队的SLA要求。\']'),
-                        },
-                    ],
-                    links: [
-                        {
-                            text: this.$t('m[\'如何设计一套合理有效的 SLA ？\']'),
-                            btn: this.$t('m[\'产品白皮书\']'),
-                            href: 'https://bk.tencent.com/docs/document/6.0/145/6596',
-                        },
-                    ],
-                },
-            };
+        // 编辑模式发送初始信息
+        isEdit: false,
+        bktooltipsInfo: {
+          content: this.$t('m.slaContent[\'内置服务模型不可删除\']'),
+          showOnInit: false,
+          placements: ['top'],
         },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
+        emptyTip: {
+          title: this.$t('m[\'当前项目下还没有 <SLA模式>\']'),
+          subTitle: this.$t('m[\'SLA（即服务级别协议）是服务支撑团队与组织机构内最终用户之间的“服务合同”。通常，SLA 是通过定义所提供的服务必须遵守的质量标准以及交付服务的时间表来建立对服务和服务质量的清晰理解；加快服务响应时间、减少等待时长、降低运营成本，一套合理且适用的 SLA 将是您实现这些目标的最佳选择。\']'),
+          desc: [
+            {
+              src: require('../../images/illustration/apply.svg'),
+              title: this.$t('m[\'设计服务模式并制定协议\']'),
+              content: this.$t('m[\'通常我们会先设定团队的服务时间段，然后进一步配置在规定的服务时间段内，针对不同的服务工单紧急程度约定响应和处理时长，为的是保障用户的服务体验、提升用户满意度。\']'),
             },
+            {
+              src: require('../../images/illustration/start-service.svg'),
+              title: this.$t('m[\'为服务配置合适的 SLA\']'),
+              content: this.$t('m[\'接下来就是为不同的服务配置合适的 SLA 了，因为很多服务的处理流程中可能会需要多个不同职能团队来处理，所以我们支持在一个服务内针对不同的流程区间设置差异化的服务协议，满足对不同服务团队的SLA要求。\']'),
+            },
+          ],
+          links: [
+            {
+              text: this.$t('m[\'如何设计一套合理有效的 SLA ？\']'),
+              btn: this.$t('m[\'产品白皮书\']'),
+              href: 'https://bk.tencent.com/docs/document/6.0/145/6596',
+            },
+          ],
         },
-        watch: {},
-        mounted() {
-            this.getModelList();
-            if (this.$route.query.key === 'create') this.addModelInfo();
-        },
-        methods: {
-            async getModelList() {
-                this.isDataLoading = true;
-                await this.$store.dispatch('sla/getScheduleList', { project_key: this.$store.state.project.id }).then((res) => {
-                    this.modelList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            closeVersion() {
-                this.versionStatus = false;
-            },
-            // 新增
-            addModelInfo() {
-                if (!this.hasPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions)) {
-                    const { projectInfo } = this.$store.state.project;
-                    const resourceData = {
-                        project: [{
-                            id: projectInfo.key,
-                            name: projectInfo.name,
-                        }],
-                    };
-                    this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData);
-                } else {
-                    this.isEdit = false;
-                    this.changeInfo.isShow = true;
-                    this.changeInfo.info.is_builtin = false;
-                }
-            },
-            // 修改信息/查看详情
-            changeLineInfo(item) {
-                if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project;
-                    const resourceData = {
-                        project: [{
-                            id: projectInfo.key,
-                            name: projectInfo.name,
-                        }],
-                        sla_calendar: [{
-                            id: item.id,
-                            name: item.name,
-                        }],
-                    };
-                    this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
-                    return false;
-                }
-                this.changeInfo.info = item;
-                this.isEdit = true;
-                this.changeInfo.isShow = true;
-            },
-            // 删除
-            deleteModel(item) {
-                if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
-                    const { projectInfo } = this.$store.state.project;
-                    const resourceData = {
-                        project: [{
-                            id: projectInfo.key,
-                            name: projectInfo.name,
-                        }],
-                        sla_calendar: [{
-                            id: item.id,
-                            name: item.name,
-                        }],
-                    };
-                    this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
-                    return false;
-                }
-                if (item.is_builtin) {
-                    return;
-                }
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.slaContent["确定删除该服务模式？"]'),
-                    confirmFn: () => {
-                        const { id } = item;
-                        if (this.secondClick) {
-                            return;
-                        }
-                        this.secondClick = true;
-                        this.$store.dispatch('sla/deleteSchedule', id).then(() => {
-                            this.getModelList();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                    },
-                });
-            },
-            splitItem(item) {
-                return item.days[0].day_of_week.split(',');
-            },
-            numToDay(val) {
-                let temp = '';
-                switch (val) {
-                    case '0':
-                        temp = this.$t('m.slaContent["周一"]');
-                        break;
-                    case '1':
-                        temp = this.$t('m.slaContent["周二"]');
-                        break;
-                    case '2':
-                        temp = this.$t('m.slaContent["周三"]');
-                        break;
-                    case '3':
-                        temp = this.$t('m.slaContent["周四"]');
-                        break;
-                    case '4':
-                        temp = this.$t('m.slaContent["周五"]');
-                        break;
-                    case '5':
-                        temp = this.$t('m.slaContent["周六"]');
-                        break;
-                    case '6':
-                        temp = this.$t('m.slaContent["周日"]');
-                        break;
-                    default:
-                        temp = '';
-                }
-                return temp;
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+    watch: {},
+    mounted() {
+      this.getModelList();
+      if (this.$route.query.key === 'create') this.addModelInfo();
+    },
+    methods: {
+      async getModelList() {
+        this.isDataLoading = true;
+        await this.$store.dispatch('sla/getScheduleList', { project_key: this.$store.state.project.id }).then((res) => {
+          this.modelList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      closeVersion() {
+        this.versionStatus = false;
+      },
+      // 新增
+      addModelInfo() {
+        if (!this.hasPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions)) {
+          const { projectInfo } = this.$store.state.project;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+          };
+          this.applyForPermission(['sla_calendar_create'], this.$store.state.project.projectAuthActions, resourceData);
+        } else {
+          this.isEdit = false;
+          this.changeInfo.isShow = true;
+          this.changeInfo.info.is_builtin = false;
+        }
+      },
+      // 修改信息/查看详情
+      changeLineInfo(item) {
+        if (!this.hasPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
+          const { projectInfo } = this.$store.state.project;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+            sla_calendar: [{
+              id: item.id,
+              name: item.name,
+            }],
+          };
+          this.applyForPermission(['sla_calendar_edit'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+          return false;
+        }
+        this.changeInfo.info = item;
+        this.isEdit = true;
+        this.changeInfo.isShow = true;
+      },
+      // 删除
+      deleteModel(item) {
+        if (!this.hasPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions])) {
+          const { projectInfo } = this.$store.state.project;
+          const resourceData = {
+            project: [{
+              id: projectInfo.key,
+              name: projectInfo.name,
+            }],
+            sla_calendar: [{
+              id: item.id,
+              name: item.name,
+            }],
+          };
+          this.applyForPermission(['sla_calendar_delete'], [...this.$store.state.project.projectAuthActions, ...item.auth_actions], resourceData);
+          return false;
+        }
+        if (item.is_builtin) {
+          return;
+        }
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.slaContent["确定删除该服务模式？"]'),
+          confirmFn: () => {
+            const { id } = item;
+            if (this.secondClick) {
+              return;
+            }
+            this.secondClick = true;
+            this.$store.dispatch('sla/deleteSchedule', id).then(() => {
+              this.getModelList();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+          },
+        });
+      },
+      splitItem(item) {
+        return item.days[0].day_of_week.split(',');
+      },
+      numToDay(val) {
+        let temp = '';
+        switch (val) {
+          case '0':
+            temp = this.$t('m.slaContent["周一"]');
+            break;
+          case '1':
+            temp = this.$t('m.slaContent["周二"]');
+            break;
+          case '2':
+            temp = this.$t('m.slaContent["周三"]');
+            break;
+          case '3':
+            temp = this.$t('m.slaContent["周四"]');
+            break;
+          case '4':
+            temp = this.$t('m.slaContent["周五"]');
+            break;
+          case '5':
+            temp = this.$t('m.slaContent["周六"]');
+            break;
+          case '6':
+            temp = this.$t('m.slaContent["周日"]');
+            break;
+          default:
+            temp = '';
+        }
+        return temp;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

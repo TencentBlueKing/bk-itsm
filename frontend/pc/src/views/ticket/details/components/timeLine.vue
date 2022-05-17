@@ -47,26 +47,26 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'timeLine',
-        props: {
-            lineList: {
-                type: [Array, Object],
-                default() {
-                    return [];
-                },
-            },
-            parent: {
-                type: String,
-                default: 'normal',
-            },
+  export default {
+    name: 'timeLine',
+    props: {
+      lineList: {
+        type: [Array, Object],
+        default() {
+          return [];
         },
-        data() {
-            return {
+      },
+      parent: {
+        type: String,
+        default: 'normal',
+      },
+    },
+    data() {
+      return {
 
-            };
-        },
-    };
+      };
+    },
+  };
 </script>
 <style lang='scss' scoped>
     .bk-timeline-contain {

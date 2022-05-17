@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'ManagePage',
-    };
+  export default {
+    name: 'ManagePage',
+  };
 </script>

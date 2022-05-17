@@ -118,156 +118,156 @@
   </bk-dialog>
 </template>
 <script>
-    import debounce from 'throttle-debounce/debounce';
-    import { errorHandler } from '../../../utils/errorHandler';
+  import debounce from 'throttle-debounce/debounce';
+  import { errorHandler } from '../../../utils/errorHandler';
 
-    export default {
-        name: 'CreateTicketDialog',
-        props: {
-            isShow: Boolean,
-        },
-        data() {
-            return {
-                allList: [],
-                latestList: [],
-                searchList: [],
-                serviceClassify: [],
-                activeClassify: '',
-                searchModel: false,
-                selectedService: null,
-                latestLoading: false,
-                allLoading: false,
-                activeName: 'requset',
-            };
-        },
-        computed: {
-            loading() {
-                return this.latestLoading || this.collectedLoading || this.allLoading;
-            },
-            serviceList() {
-                const data = this.searchModel ? this.searchList : this.allList;
-                const list = this.serviceClassify.map(item => ({
-                    name: item.key,
-                    label: item.name,
-                    data: [],
-                }));
-                data.forEach((service) => {
-                    const group = list.find(item => item.name === service.key);
-                    group.data.push(service);
-                });
-                return list;
-            },
-            listNum() {
-                const serviceCount = {};
-                this.serviceList.forEach((item) => {
-                    serviceCount[item.name] = item.data.length;
-                });
-                return serviceCount;
-            },
-        },
-        watch: {
-            isShow(val) {
-                if (val) {
-                    this.getAllService();
-                    this.getServiceClassify();
-                }
-            },
-        },
-        created() {
-            this.searchHandler = debounce(500, (val) => {
-                this.onServiceSearch(val);
-            });
-        },
-        methods: {
-            // 获取所有服务
-            getAllService() {
-                this.allLoading = true;
-                this.$store.dispatch('service/getServiceList', { no_page: true }).then((resp) => {
-                    if (resp.result) {
-                        this.allList = resp.data;
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.allLoading = false;
-                    });
-            },
-            // 获取服务分类信息
-            getServiceClassify() {
-                this.serviceClassfyLoading = true;
-                return this.$store.dispatch('getCustom').then((res) => {
-                    this.serviceClassify = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.serviceClassfyLoading = false;
-                    });
-            },
-            onServiceSearch(val) {
-                if (val) {
-                    const list = [];
-                    const reg = new RegExp(val, 'i');
-                    this.allList.forEach((item) => {
-                        if (reg.test(item.name)) {
-                            const name = item.name.replace(reg, `<span style="color: #3a84ff;">${val}</span>`);
-                            list.push(Object.assign({}, item, { name }));
-                        }
-                    });
-                    this.searchModel = true;
-                    this.searchList = list;
-                } else {
-                    this.searchModel = false;
-                    this.searchList = [];
-                }
-            },
-            // 收藏/取消收藏
-            onCollectClick(service) {
-                this.$store.dispatch('service/toggleServiceFavorite', {
-                    id: service.id,
-                    favorite: !service.favorite,
-                }).then((res) => {
-                    if (res.result) {
-                        this.$set(service, 'favorite', !service.favorite);
-                    }
-                    this.$bkMessage({
-                        message: service.favorite ? this.$t('m.manageCommon[\'收藏成功\']') : this.$t('m.manageCommon[\'取消成功\']'),
-                        theme: 'success',
-                        ellipsisLine: 0,
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 点击服务
-            onSelectService(service) {
-                const { id, key } = service;
-                this.onCloseDialog();
-                this.$router.push({
-                    name: 'CreateTicket',
-                    query: {
-                        service_id: id,
-                        key,
-                        project_id: this.$route.query.project_id,
-                        from: this.$route.name,
-                    },
-                });
-            },
-            handleTabChange(name) {
-                this.activeName = name;
-            },
-            onCloseDialog() {
-                this.$emit('update:isShow', false);
-                this.selectedService = null;
-                this.searchList = [];
-                this.searchModel = false;
-            },
-        },
-    };
+  export default {
+    name: 'CreateTicketDialog',
+    props: {
+      isShow: Boolean,
+    },
+    data() {
+      return {
+        allList: [],
+        latestList: [],
+        searchList: [],
+        serviceClassify: [],
+        activeClassify: '',
+        searchModel: false,
+        selectedService: null,
+        latestLoading: false,
+        allLoading: false,
+        activeName: 'requset',
+      };
+    },
+    computed: {
+      loading() {
+        return this.latestLoading || this.collectedLoading || this.allLoading;
+      },
+      serviceList() {
+        const data = this.searchModel ? this.searchList : this.allList;
+        const list = this.serviceClassify.map(item => ({
+          name: item.key,
+          label: item.name,
+          data: [],
+        }));
+        data.forEach((service) => {
+          const group = list.find(item => item.name === service.key);
+          group.data.push(service);
+        });
+        return list;
+      },
+      listNum() {
+        const serviceCount = {};
+        this.serviceList.forEach((item) => {
+          serviceCount[item.name] = item.data.length;
+        });
+        return serviceCount;
+      },
+    },
+    watch: {
+      isShow(val) {
+        if (val) {
+          this.getAllService();
+          this.getServiceClassify();
+        }
+      },
+    },
+    created() {
+      this.searchHandler = debounce(500, (val) => {
+        this.onServiceSearch(val);
+      });
+    },
+    methods: {
+      // 获取所有服务
+      getAllService() {
+        this.allLoading = true;
+        this.$store.dispatch('service/getServiceList', { no_page: true }).then((resp) => {
+          if (resp.result) {
+            this.allList = resp.data;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.allLoading = false;
+          });
+      },
+      // 获取服务分类信息
+      getServiceClassify() {
+        this.serviceClassfyLoading = true;
+        return this.$store.dispatch('getCustom').then((res) => {
+          this.serviceClassify = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.serviceClassfyLoading = false;
+          });
+      },
+      onServiceSearch(val) {
+        if (val) {
+          const list = [];
+          const reg = new RegExp(val, 'i');
+          this.allList.forEach((item) => {
+            if (reg.test(item.name)) {
+              const name = item.name.replace(reg, `<span style="color: #3a84ff;">${val}</span>`);
+              list.push(Object.assign({}, item, { name }));
+            }
+          });
+          this.searchModel = true;
+          this.searchList = list;
+        } else {
+          this.searchModel = false;
+          this.searchList = [];
+        }
+      },
+      // 收藏/取消收藏
+      onCollectClick(service) {
+        this.$store.dispatch('service/toggleServiceFavorite', {
+          id: service.id,
+          favorite: !service.favorite,
+        }).then((res) => {
+          if (res.result) {
+            this.$set(service, 'favorite', !service.favorite);
+          }
+          this.$bkMessage({
+            message: service.favorite ? this.$t('m.manageCommon[\'收藏成功\']') : this.$t('m.manageCommon[\'取消成功\']'),
+            theme: 'success',
+            ellipsisLine: 0,
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 点击服务
+      onSelectService(service) {
+        const { id, key } = service;
+        this.onCloseDialog();
+        this.$router.push({
+          name: 'CreateTicket',
+          query: {
+            service_id: id,
+            key,
+            project_id: this.$route.query.project_id,
+            from: this.$route.name,
+          },
+        });
+      },
+      handleTabChange(name) {
+        this.activeName = name;
+      },
+      onCloseDialog() {
+        this.$emit('update:isShow', false);
+        this.selectedService = null;
+        this.searchList = [];
+        this.searchModel = false;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     @import '../../../scss/mixins/scroller.scss';

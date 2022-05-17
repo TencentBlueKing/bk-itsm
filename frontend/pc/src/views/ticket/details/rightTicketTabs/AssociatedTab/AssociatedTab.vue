@@ -150,155 +150,155 @@
 </template>
 
 <script>
-    import AssociatedDialog from './AssociatedDialog.vue';
-    import { errorHandler } from '@/utils/errorHandler.js';
-    export default {
-        name: 'AssociatedTab',
-        components: {
-            AssociatedDialog,
+  import AssociatedDialog from './AssociatedDialog.vue';
+  import { errorHandler } from '@/utils/errorHandler.js';
+  export default {
+    name: 'AssociatedTab',
+    components: {
+      AssociatedDialog,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        loading: false,
+        isShowAddAssociation: false,
+        // 关联单历史信息
+        historyInfo: {
+          isShow: false,
+          width: 700,
+          headerPosition: 'left',
+          autoClose: false,
+          precision: 0,
+          title: this.$t('m.newCommon["绑定历史"]'),
         },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        data() {
-            return {
-                loading: false,
-                isShowAddAssociation: false,
-                // 关联单历史信息
-                historyInfo: {
-                    isShow: false,
-                    width: 700,
-                    headerPosition: 'left',
-                    autoClose: false,
-                    precision: 0,
-                    title: this.$t('m.newCommon["绑定历史"]'),
-                },
-                historyList: [],
-                associatedList: [],
-            };
-        },
-        created() {},
-        mounted() {
+        historyList: [],
+        associatedList: [],
+      };
+    },
+    created() {},
+    mounted() {
+      this.getAssociates();
+      this.getAssociatesHistory();
+    },
+    methods: {
+      async getAssociates() {
+        const params = {
+          id: this.ticketInfo.id,
+        };
+        this.loading = true;
+        if (this.$route.query.token) {
+          params.token = this.$route.query.token;
+        }
+        await this.$store
+          .dispatch('deployOrder/getAssociatedTickets', params)
+          .then((res) => {
+            this.associatedList = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      closeSideslider() {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m["内容未保存，离开将取消操作！"]'),
+          confirmLoading: true,
+          confirmFn: () => {
+            // if (this.$refs.associated.typeSelected === 'associate') {
+            //     this.$refs.associated.bindTicket()
+            // } else {
+            //     this.$refs.associated.setFields()
+            // }
+            this.isShowAddAssociation = false;
+          },
+          cancelFn: () => {
+            this.isShowAddAssociation = true;
+          },
+        });
+      },
+      // 获取关联历史
+      getAssociatesHistory() {
+        const params = {
+          id: this.ticketInfo.id,
+          type: 'DERIVE',
+        };
+        this.$store
+          .dispatch('change/getBindHistory', params)
+          .then((res) => {
+            this.historyList = res.data;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      openAddAssociation() {
+        this.isShowAddAssociation = true;
+      },
+      showHistory() {
+        if (!this.historyList.length) {
+          return;
+        }
+        this.historyInfo.isShow = true;
+      },
+      closeHistory() {
+        this.historyInfo.isShow = false;
+      },
+      checkOne(rowData) {
+        const routeUrl = this.$router.resolve({
+          name: 'TicketDetail',
+          query: {
+            id: `${rowData.id}`,
+            from: this.$route.query.from,
+          },
+        });
+        window.open(routeUrl.href, '_blank');
+      },
+      // 取消关联
+      unBindDialogShow(item) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.manageCommon["确认取消关联？"]'),
+          subTitle: this.$t('m.manageCommon["取消关联后，无法查看之间的关联信息"]'),
+          confirmFn: () => {
+            this.unBind(item);
+          },
+        });
+      },
+      async unBind(item) {
+        const params = {
+          from_ticket: this.ticketInfo.id,
+          to_ticket: item.id,
+        };
+        await this.$store
+          .dispatch('change/unbindTicket', params)
+          .then(() => {
+            this.$bkMessage({
+              message: this.$t('m.manageCommon["取消关联成功"]'),
+              theme: 'success',
+            });
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
             this.getAssociates();
             this.getAssociatesHistory();
-        },
-        methods: {
-            async getAssociates() {
-                const params = {
-                    id: this.ticketInfo.id,
-                };
-                this.loading = true;
-                if (this.$route.query.token) {
-                    params.token = this.$route.query.token;
-                }
-                await this.$store
-                    .dispatch('deployOrder/getAssociatedTickets', params)
-                    .then((res) => {
-                        this.associatedList = res.data;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            closeSideslider() {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
-                    confirmLoading: true,
-                    confirmFn: () => {
-                        // if (this.$refs.associated.typeSelected === 'associate') {
-                        //     this.$refs.associated.bindTicket()
-                        // } else {
-                        //     this.$refs.associated.setFields()
-                        // }
-                        this.isShowAddAssociation = false;
-                    },
-                    cancelFn: () => {
-                        this.isShowAddAssociation = true;
-                    },
-                });
-            },
-            // 获取关联历史
-            getAssociatesHistory() {
-                const params = {
-                    id: this.ticketInfo.id,
-                    type: 'DERIVE',
-                };
-                this.$store
-                    .dispatch('change/getBindHistory', params)
-                    .then((res) => {
-                        this.historyList = res.data;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            openAddAssociation() {
-                this.isShowAddAssociation = true;
-            },
-            showHistory() {
-                if (!this.historyList.length) {
-                    return;
-                }
-                this.historyInfo.isShow = true;
-            },
-            closeHistory() {
-                this.historyInfo.isShow = false;
-            },
-            checkOne(rowData) {
-                const routeUrl = this.$router.resolve({
-                    name: 'TicketDetail',
-                    query: {
-                        id: `${rowData.id}`,
-                        from: this.$route.query.from,
-                    },
-                });
-                window.open(routeUrl.href, '_blank');
-            },
-            // 取消关联
-            unBindDialogShow(item) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.manageCommon["确认取消关联？"]'),
-                    subTitle: this.$t('m.manageCommon["取消关联后，无法查看之间的关联信息"]'),
-                    confirmFn: () => {
-                        this.unBind(item);
-                    },
-                });
-            },
-            async unBind(item) {
-                const params = {
-                    from_ticket: this.ticketInfo.id,
-                    to_ticket: item.id,
-                };
-                await this.$store
-                    .dispatch('change/unbindTicket', params)
-                    .then(() => {
-                        this.$bkMessage({
-                            message: this.$t('m.manageCommon["取消关联成功"]'),
-                            theme: 'success',
-                        });
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.getAssociates();
-                        this.getAssociatesHistory();
-                    });
-            },
-            submitSuccess() {
-                this.isShowAddAssociation = false;
-                this.getAssociates();
-                this.getAssociatesHistory();
-            },
-        },
-    };
+          });
+      },
+      submitSuccess() {
+        this.isShowAddAssociation = false;
+        this.getAssociates();
+        this.getAssociatesHistory();
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped></style>

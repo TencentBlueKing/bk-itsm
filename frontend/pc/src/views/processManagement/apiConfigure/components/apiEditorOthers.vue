@@ -34,38 +34,38 @@
 </template>
 
 <script>
-    export default {
-        name: 'apiEditorOthers',
-        props: {
-            detailInfoOri: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  export default {
+    name: 'apiEditorOthers',
+    props: {
+      detailInfoOri: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
+      },
+    },
+    data() {
+      return {
 
-            };
+      };
+    },
+    computed: {
+      // 基本设置
+      basicInfo: {
+        // getter
+        get() {
+          return this.detailInfoOri;
         },
-        computed: {
-            // 基本设置
-            basicInfo: {
-                // getter
-                get() {
-                    return this.detailInfoOri;
-                },
-                // setter
-                set(newVal) {
-                    this.$parent.DetailInfo = newVal;
-                },
-            },
+        // setter
+        set(newVal) {
+          this.$parent.DetailInfo = newVal;
         },
-        methods: {
+      },
+    },
+    methods: {
 
-        },
-    };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

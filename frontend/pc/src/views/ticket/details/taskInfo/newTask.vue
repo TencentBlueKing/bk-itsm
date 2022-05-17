@@ -128,317 +128,317 @@
 </template>
 
 <script>
-    import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
-    import commonMix from '@/views/commonMix/common.js';
-    import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
-    import { errorHandler } from '@/utils/errorHandler';
-    import { deepClone } from '@/utils/util';
+  import fieldInfo from '@/views/managePage/billCom/fieldInfo.vue';
+  import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+  import commonMix from '@/views/commonMix/common.js';
+  import apiFieldsWatch from '@/views/commonMix/api_fields_watch.js';
+  import { errorHandler } from '@/utils/errorHandler';
+  import { deepClone } from '@/utils/util';
 
-    export default {
-        name: 'newTask',
-        components: {
-            fieldInfo,
-            DealPerson,
+  export default {
+    name: 'newTask',
+    components: {
+      fieldInfo,
+      DealPerson,
+    },
+    mixins: [apiFieldsWatch, commonMix],
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [apiFieldsWatch, commonMix],
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            itemContent: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            nodeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+      itemContent: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                fieldLoading: false,
-                showField: false,
-                btnLoading: false,
-                falseStatus: false,
-                showTaskInfo: true,
-                showTemplateInfo: true,
-                dealPersonData: {
-                    value: '',
-                    type: 'PERSON',
-                },
-                excludeTypeList: [
-                    'OPEN',
-                    'STARTER',
-                    'BY_ASSIGNOR',
-                    'EMPTY',
-                    'VARIABLE',
-                    'CMDB',
-                    'ORGANIZATION',
-                    'IAM',
-                    'STARTER_LEADER',
-                    'API',
-                ],
-                formData: {
-                    template: '',
-                },
-                fieldList: [],
-                isComplexMembers: false,
-                memberContent: {},
-                // 校验
-                checkInfo: {
-                    template: false,
-                    fields: false,
-                },
-                validatePopInfo: {
-                    content: '',
-                },
-            };
+      },
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        created() {
-            if (this.itemContent.id) {
-                this.initData();
-            } else {
-                this.formData.template = this.nodeInfo.task_schemas[0].id;
-                this.getFieldList(this.formData.template);
-            }
+      },
+    },
+    data() {
+      return {
+        fieldLoading: false,
+        showField: false,
+        btnLoading: false,
+        falseStatus: false,
+        showTaskInfo: true,
+        showTemplateInfo: true,
+        dealPersonData: {
+          value: '',
+          type: 'PERSON',
         },
-        methods: {
-            initData() {
-                // 渲染任务模板信息
-                this.formData.template = this.itemContent.task_schema_id;
-                // 处理人渲染
-                this.dealPersonData.value = this.itemContent.processors;
-                this.dealPersonData.type = this.itemContent.processors_type;
-                // 通过模板渲染信息
-                this.fieldLoading = true;
-                this.showField = false;
-                const { id } = this.itemContent;
-                this.$store
-                    .dispatch('taskFlow/getTaskInfo', id)
-                    .then((res) => {
-                        this.fieldList = res.data.fields.create_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
-                        this.isComplexMembers = res.data.fields.create_fields.some(item => item.type === 'COMPLEX-MEMBERS');
-                        this.fieldList.forEach((item) => {
-                            if (item.type === 'CASCADE') {
-                                item.type = 'SELECT';
-                            }
-                            this.$set(item, 'showFeild', true);
-                            this.$set(item, 'val', item.value || '');
-                        });
-                        this.isNecessaryToWatch(
-                            { fields: this.fieldList },
-                            'submit'
-                        );
-                        this.showField = true;
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.fieldLoading = false;
-                    });
-            },
-            // 选择任务模板
-            selectTemplate(value) {
-                this.getFieldList(value);
-            },
-            // 获取字段列表
-            getFieldList(id) {
-                const params = {
-                    task_schema_id: id,
-                    stage: 'CREATE',
-                };
-                this.fieldLoading = true;
-                this.showField = false;
-                this.$store
-                    .dispatch('taskFlow/getTaskField', params)
-                    .then((res) => {
-                        this.fieldList = res.data.filter(item => item.type !== 'COMPLEX-MEMBERS');
-                        this.isComplexMembers = res.data.some(item => item.type === 'COMPLEX-MEMBERS');
-                        this.fieldList.forEach((item) => {
-                            if (item.type === 'CASCADE') {
-                                item.type = 'SELECT';
-                            }
-                            this.$set(item, 'showFeild', true);
-                            this.$set(item, 'val', item.value || '');
-                        });
-                        this.isNecessaryToWatch(
-                            { fields: this.fieldList },
-                            'submit'
-                        );
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.fieldLoading = false;
-                        this.showField = true;
-                    });
-            },
-            closeSlider() {
-                this.$emit('closeSlider');
-            },
-            submitTask() {
-                const params = {
-                    processors: '',
-                    processors_type: '',
-                    fields: {},
-                    need_start: this.nodeInfo.can_execute_task, // 执行节点创建的任务需要立即启动
-                    state_id: this.nodeInfo.state_id,
-                };
-                // 新建参数
-                if (!this.itemContent.id) {
-                    params.ticket_id = this.basicInfomation.id;
-                    params.task_schema_id = this.formData.template;
-                }
-                if (this.$refs.personSelect) {
-                    const data = this.$refs.personSelect.getValue();
-                    params.processors_type = data.type;
-                    params.processors = data.value;
-                }
-                if (this.fieldList.length) {
-                    // 将字段信息value值进行转换
-                    this.fieldFormatting(this.fieldList);
-                    this.fieldList.forEach((item) => {
-                        if (item.type === 'SOPS_TEMPLATE') {
-                            const sopsContent = deepClone(item.sopsContent);
-                            sopsContent.constants.forEach((contentItem) => {
-                                this.$set(
-                                    contentItem,
-                                    'value',
-                                    sopsContent.formData[contentItem.key]
-                                );
-                            });
-                            params.fields[item.key] = {
-                                id: sopsContent.id,
-                                template_source: sopsContent.context.project
-                                    .bk_biz_id
-                                    ? 'business'
-                                    : 'common',
-                                bk_biz_id:
-                                    this.basicInfomation.bk_biz_id !== -1
-                                        ? this.basicInfomation.bk_biz_id
-                                        : '',
-                                constants: sopsContent.constants,
-                            };
-                            if (
-                                sopsContent.createWay === 'task'
-                                || sopsContent.createWay === 'started_task'
-                            ) {
-                                params.fields[item.key].task_id =                                sopsContent.sopsTask.id;
-                                params.fields[item.key].id =                                sopsContent.sopsTask.template_id;
-                            }
-                            // 标准运维排除执行节点
-                            if (
-                                sopsContent.planId
-                                && sopsContent.planId.length > 0
-                            ) {
-                                params.exclude_task_nodes_id =                                sopsContent.exclude_task_nodes_id;
-                            } else {
-                                params.exclude_task_nodes_id = [];
-                            }
-                            // 标准运维任务参数
-                            params.source = sopsContent.createWay;
-                        } else if (item.type === 'DEVOPS_TEMPLATE') {
-                            params.fields.sub_task_params =                            item.devopsContent.variables;
-                            params.fields.sub_task_params.project_id =                            item.devopsContent.project_id;
-                            params.fields.sub_task_params.pipeline_id =                            item.devopsContent.pipeline_id;
-                        } else {
-                            params.fields[item.key] = item.value;
-                        }
-                    });
-                    if (!params.source) {
-                        params.source = 'template';
-                    }
-                }
-                // 数据校验
-                if (this.checkValue()) {
-                    return;
-                }
-                const relateValid = this.relatedRegex(
-                    this.fieldList,
-                    this.fieldList
+        excludeTypeList: [
+          'OPEN',
+          'STARTER',
+          'BY_ASSIGNOR',
+          'EMPTY',
+          'VARIABLE',
+          'CMDB',
+          'ORGANIZATION',
+          'IAM',
+          'STARTER_LEADER',
+          'API',
+        ],
+        formData: {
+          template: '',
+        },
+        fieldList: [],
+        isComplexMembers: false,
+        memberContent: {},
+        // 校验
+        checkInfo: {
+          template: false,
+          fields: false,
+        },
+        validatePopInfo: {
+          content: '',
+        },
+      };
+    },
+    created() {
+      if (this.itemContent.id) {
+        this.initData();
+      } else {
+        this.formData.template = this.nodeInfo.task_schemas[0].id;
+        this.getFieldList(this.formData.template);
+      }
+    },
+    methods: {
+      initData() {
+        // 渲染任务模板信息
+        this.formData.template = this.itemContent.task_schema_id;
+        // 处理人渲染
+        this.dealPersonData.value = this.itemContent.processors;
+        this.dealPersonData.type = this.itemContent.processors_type;
+        // 通过模板渲染信息
+        this.fieldLoading = true;
+        this.showField = false;
+        const { id } = this.itemContent;
+        this.$store
+          .dispatch('taskFlow/getTaskInfo', id)
+          .then((res) => {
+            this.fieldList = res.data.fields.create_fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
+            this.isComplexMembers = res.data.fields.create_fields.some(item => item.type === 'COMPLEX-MEMBERS');
+            this.fieldList.forEach((item) => {
+              if (item.type === 'CASCADE') {
+                item.type = 'SELECT';
+              }
+              this.$set(item, 'showFeild', true);
+              this.$set(item, 'val', item.value || '');
+            });
+            this.isNecessaryToWatch(
+              { fields: this.fieldList },
+              'submit'
+            );
+            this.showField = true;
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.fieldLoading = false;
+          });
+      },
+      // 选择任务模板
+      selectTemplate(value) {
+        this.getFieldList(value);
+      },
+      // 获取字段列表
+      getFieldList(id) {
+        const params = {
+          task_schema_id: id,
+          stage: 'CREATE',
+        };
+        this.fieldLoading = true;
+        this.showField = false;
+        this.$store
+          .dispatch('taskFlow/getTaskField', params)
+          .then((res) => {
+            this.fieldList = res.data.filter(item => item.type !== 'COMPLEX-MEMBERS');
+            this.isComplexMembers = res.data.some(item => item.type === 'COMPLEX-MEMBERS');
+            this.fieldList.forEach((item) => {
+              if (item.type === 'CASCADE') {
+                item.type = 'SELECT';
+              }
+              this.$set(item, 'showFeild', true);
+              this.$set(item, 'val', item.value || '');
+            });
+            this.isNecessaryToWatch(
+              { fields: this.fieldList },
+              'submit'
+            );
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.fieldLoading = false;
+            this.showField = true;
+          });
+      },
+      closeSlider() {
+        this.$emit('closeSlider');
+      },
+      submitTask() {
+        const params = {
+          processors: '',
+          processors_type: '',
+          fields: {},
+          need_start: this.nodeInfo.can_execute_task, // 执行节点创建的任务需要立即启动
+          state_id: this.nodeInfo.state_id,
+        };
+        // 新建参数
+        if (!this.itemContent.id) {
+          params.ticket_id = this.basicInfomation.id;
+          params.task_schema_id = this.formData.template;
+        }
+        if (this.$refs.personSelect) {
+          const data = this.$refs.personSelect.getValue();
+          params.processors_type = data.type;
+          params.processors = data.value;
+        }
+        if (this.fieldList.length) {
+          // 将字段信息value值进行转换
+          this.fieldFormatting(this.fieldList);
+          this.fieldList.forEach((item) => {
+            if (item.type === 'SOPS_TEMPLATE') {
+              const sopsContent = deepClone(item.sopsContent);
+              sopsContent.constants.forEach((contentItem) => {
+                this.$set(
+                  contentItem,
+                  'value',
+                  sopsContent.formData[contentItem.key]
                 );
-                if (!relateValid.result) {
-                    relateValid.validList.forEach((item) => {
-                        if (!item.result) {
-                            item.validList.forEach((it) => {
-                                this.validatePopInfo.content += `${it.tips}、`;
-                            });
-                            this.validatePopInfo.content = `${this.validatePopInfo.content.substr(
-                                0,
-                                this.validatePopInfo.content.length - 1
-                            )}！`;
-                        }
-                    });
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: '',
-                        subTitle: this.validatePopInfo.content,
-                    });
-                    this.validatePopInfo.content = '';
-                    return;
-                }
-                this.btnLoading = true;
-                if (this.itemContent.id) {
-                    const { id } = this.itemContent;
-                    this.$store
-                        .dispatch('taskFlow/editorTask', { params, id })
-                        .then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.task[\'编辑任务成功\']'),
-                                theme: 'success',
-                            });
-                            this.closeSlider();
-                            // 刷新数据
-                            this.$emit('getTaskList');
-                        })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        })
-                        .finally(() => {
-                            this.btnLoading = false;
-                        });
-                } else {
-                    this.$store
-                        .dispatch('taskFlow/createTask', { params })
-                        .then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.task[\'新建任务成功\']'),
-                                theme: 'success',
-                            });
-                            this.closeSlider();
-                            // 刷新数据
-                            this.$emit('getTaskList');
-                        })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        })
-                        .finally(() => {
-                            this.btnLoading = false;
-                        });
-                }
-            },
-            checkValue() {
-                this.checkInfo.template = !this.formData.template;
-                // 处理人
-                const personStatus = this.isComplexMembers
-                    ? !this.$refs.personSelect.verifyValue()
-                    : false;
-                // 字段
-                const fieldStatus = !this.$refs.fieldInfo.checkValue();
-                return personStatus || this.checkInfo.template || fieldStatus;
-            },
-        },
-    };
+              });
+              params.fields[item.key] = {
+                id: sopsContent.id,
+                template_source: sopsContent.context.project
+                  .bk_biz_id
+                  ? 'business'
+                  : 'common',
+                bk_biz_id:
+                  this.basicInfomation.bk_biz_id !== -1
+                    ? this.basicInfomation.bk_biz_id
+                    : '',
+                constants: sopsContent.constants,
+              };
+              if (
+                sopsContent.createWay === 'task'
+                || sopsContent.createWay === 'started_task'
+              ) {
+                params.fields[item.key].task_id =                                sopsContent.sopsTask.id;
+                params.fields[item.key].id =                                sopsContent.sopsTask.template_id;
+              }
+              // 标准运维排除执行节点
+              if (
+                sopsContent.planId
+                && sopsContent.planId.length > 0
+              ) {
+                params.exclude_task_nodes_id =                                sopsContent.exclude_task_nodes_id;
+              } else {
+                params.exclude_task_nodes_id = [];
+              }
+              // 标准运维任务参数
+              params.source = sopsContent.createWay;
+            } else if (item.type === 'DEVOPS_TEMPLATE') {
+              params.fields.sub_task_params =                            item.devopsContent.variables;
+              params.fields.sub_task_params.project_id =                            item.devopsContent.project_id;
+              params.fields.sub_task_params.pipeline_id =                            item.devopsContent.pipeline_id;
+            } else {
+              params.fields[item.key] = item.value;
+            }
+          });
+          if (!params.source) {
+            params.source = 'template';
+          }
+        }
+        // 数据校验
+        if (this.checkValue()) {
+          return;
+        }
+        const relateValid = this.relatedRegex(
+          this.fieldList,
+          this.fieldList
+        );
+        if (!relateValid.result) {
+          relateValid.validList.forEach((item) => {
+            if (!item.result) {
+              item.validList.forEach((it) => {
+                this.validatePopInfo.content += `${it.tips}、`;
+              });
+              this.validatePopInfo.content = `${this.validatePopInfo.content.substr(
+                0,
+                this.validatePopInfo.content.length - 1
+              )}！`;
+            }
+          });
+          this.$bkInfo({
+            type: 'warning',
+            title: '',
+            subTitle: this.validatePopInfo.content,
+          });
+          this.validatePopInfo.content = '';
+          return;
+        }
+        this.btnLoading = true;
+        if (this.itemContent.id) {
+          const { id } = this.itemContent;
+          this.$store
+            .dispatch('taskFlow/editorTask', { params, id })
+            .then(() => {
+              this.$bkMessage({
+                message: this.$t('m.task[\'编辑任务成功\']'),
+                theme: 'success',
+              });
+              this.closeSlider();
+              // 刷新数据
+              this.$emit('getTaskList');
+            })
+            .catch((res) => {
+              errorHandler(res, this);
+            })
+            .finally(() => {
+              this.btnLoading = false;
+            });
+        } else {
+          this.$store
+            .dispatch('taskFlow/createTask', { params })
+            .then(() => {
+              this.$bkMessage({
+                message: this.$t('m.task[\'新建任务成功\']'),
+                theme: 'success',
+              });
+              this.closeSlider();
+              // 刷新数据
+              this.$emit('getTaskList');
+            })
+            .catch((res) => {
+              errorHandler(res, this);
+            })
+            .finally(() => {
+              this.btnLoading = false;
+            });
+        }
+      },
+      checkValue() {
+        this.checkInfo.template = !this.formData.template;
+        // 处理人
+        const personStatus = this.isComplexMembers
+          ? !this.$refs.personSelect.verifyValue()
+          : false;
+        // 字段
+        const fieldStatus = !this.$refs.fieldInfo.checkValue();
+        return personStatus || this.checkInfo.template || fieldStatus;
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

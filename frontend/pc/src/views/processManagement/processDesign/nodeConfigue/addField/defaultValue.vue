@@ -137,160 +137,160 @@
   </div>
 </template>
 <script>
-    import memberSelect from '../../../../commonComponent/memberSelect';
-    import RichTextEditor from '../../../../../components/form/richTextEditor/richTextEditor.vue';
-    import CodeEditor from '../../../../../components/CodeEditor';
-    import { CUSTOM_FORM_TEMPLATE } from '../../../../../constants/customFormTemplate';
-    import { errorHandler } from '../../../../../utils/errorHandler';
+  import memberSelect from '../../../../commonComponent/memberSelect';
+  import RichTextEditor from '../../../../../components/form/richTextEditor/richTextEditor.vue';
+  import CodeEditor from '../../../../../components/CodeEditor';
+  import { CUSTOM_FORM_TEMPLATE } from '../../../../../constants/customFormTemplate';
+  import { errorHandler } from '../../../../../utils/errorHandler';
 
-    export default {
-        name: 'defaultValue',
-        components: {
-            memberSelect,
-            RichTextEditor,
-            CodeEditor,
+  export default {
+    name: 'defaultValue',
+    components: {
+      memberSelect,
+      RichTextEditor,
+      CodeEditor,
+    },
+    props: {
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            formInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            fieldInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            dictionaryData: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            label: {
-                type: String,
-                default: '',
-            },
-            checkStatus: {
-                type: Object,
-                default() {
-                    return {
-                    };
-                },
-            },
+      },
+      fieldInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                selectList: [],
-                // 记录是否更新过数据
-                updateStatus: false,
-                typeList: ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER'],
-                precision: 0,
-            };
+      },
+      dictionaryData: {
+        type: Object,
+        default() {
+          return {};
         },
-        watch: {
-            // 当字段类型，数据源发生变化时，清空数据
-            'formInfo.source_type'() {
-                if (this.updateStatus) {
-                    this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
-                }
-                if (this.formInfo.source_type !== this.changeInfo.source_type) {
-                    this.updateStatus = true;
-                    this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
-                }
-                if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
-                    this.formInfo.default_value = '';
-                }
-            },
-            'formInfo.type'() {
-                if (this.updateStatus) {
-                    this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
-                }
-                if (this.formInfo.type !== this.changeInfo.type) {
-                    this.updateStatus = true;
-                    this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
-                }
-                if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
-                    this.formInfo.default_value = '';
-                }
-            },
-            'formInfo.default_value'() {
-                if (this.formInfo.type === 'CUSTOM-FORM') {
-                    this.checkStatus.customFormStatus = false;
-                }
-            },
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted() {
-            if (this.changeInfo.id) {
-                if (this.changeInfo.source_type === 'DATADICT') {
-                    this.getDictionList(this.changeInfo.source_uri);
-                }
+      },
+      label: {
+        type: String,
+        default: '',
+      },
+      checkStatus: {
+        type: Object,
+        default() {
+          return {
+          };
+        },
+      },
+    },
+    data() {
+      return {
+        selectList: [],
+        // 记录是否更新过数据
+        updateStatus: false,
+        typeList: ['MULTISELECT', 'CHECKBOX', 'MEMBERS', 'MEMBER'],
+        precision: 0,
+      };
+    },
+    watch: {
+      // 当字段类型，数据源发生变化时，清空数据
+      'formInfo.source_type'() {
+        if (this.updateStatus) {
+          this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
+        }
+        if (this.formInfo.source_type !== this.changeInfo.source_type) {
+          this.updateStatus = true;
+          this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
+        }
+        if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
+          this.formInfo.default_value = '';
+        }
+      },
+      'formInfo.type'() {
+        if (this.updateStatus) {
+          this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
+        }
+        if (this.formInfo.type !== this.changeInfo.type) {
+          this.updateStatus = true;
+          this.formInfo.default_value = (this.typeList.some(typeItem => typeItem === this.formInfo.type)) ? [] : '';
+        }
+        if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
+          this.formInfo.default_value = '';
+        }
+      },
+      'formInfo.default_value'() {
+        if (this.formInfo.type === 'CUSTOM-FORM') {
+          this.checkStatus.customFormStatus = false;
+        }
+      },
+    },
+    mounted() {
+      if (this.changeInfo.id) {
+        if (this.changeInfo.source_type === 'DATADICT') {
+          this.getDictionList(this.changeInfo.source_uri);
+        }
+      }
+      if (this.formInfo.default_value !== '') {
+        this.getSelectList(this.formInfo.default_value);
+      }
+    },
+    methods: {
+      getSelectList(val) {
+        this.selectList = [];
+        if (val) {
+          if (this.formInfo.source_type === 'CUSTOM') {
+            // 自定义数据(去掉当前key和name不存在数据)
+            this.selectList = this.fieldInfo.list.filter(item => (item.key && item.name));
+          } else if (this.formInfo.source_type === 'DATADICT') {
+            // 数据字典数据
+            if (this.dictionaryData.check) {
+              this.getDictionList(this.dictionaryData.check);
             }
-            if (this.formInfo.default_value !== '') {
-                this.getSelectList(this.formInfo.default_value);
-            }
-        },
-        methods: {
-            getSelectList(val) {
-                this.selectList = [];
-                if (val) {
-                    if (this.formInfo.source_type === 'CUSTOM') {
-                        // 自定义数据(去掉当前key和name不存在数据)
-                        this.selectList = this.fieldInfo.list.filter(item => (item.key && item.name));
-                    } else if (this.formInfo.source_type === 'DATADICT') {
-                        // 数据字典数据
-                        if (this.dictionaryData.check) {
-                            this.getDictionList(this.dictionaryData.check);
-                        }
-                    } else if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
-                        // 接口数据, RPC数据
-                        this.getApiList();
-                    }
-                }
-            },
-            getDictionList(key) {
-                const params = {
-                    key,
-                };
-                this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
-                    this.selectList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            downCustomFormTempalte() {
-                const link = document.createElement('a');
-                const time = +new Date();
-                link.download = `bk_itsm_custom_form_template_${time}.json`;
-                link.href = `data:text/plain,${JSON.stringify(CUSTOM_FORM_TEMPLATE, null, 4)}`;
-                link.click();
-            },
-            getApiList() {
-                // ...
-                // const params = {
-                //     api_instance_id: '',
-                //     kv_relation: {}
-                // }
-                // this.$store.dispatch('apiRemote/get_data_workflow', params).then((res) => {
-                //     this.selectList = res.data
-                // }).catch(res => {
-                //     this.$bkMessage({
-                //         message: res.data.msg,
-                //         theme: 'error'
-                //     })
-                // })
-            },
-        },
-    };
+          } else if (this.formInfo.source_type === 'API' || this.formInfo.source_type === 'RPC') {
+            // 接口数据, RPC数据
+            this.getApiList();
+          }
+        }
+      },
+      getDictionList(key) {
+        const params = {
+          key,
+        };
+        this.$store.dispatch('datadict/get_data_by_key', params).then((res) => {
+          this.selectList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      downCustomFormTempalte() {
+        const link = document.createElement('a');
+        const time = +new Date();
+        link.download = `bk_itsm_custom_form_template_${time}.json`;
+        link.href = `data:text/plain,${JSON.stringify(CUSTOM_FORM_TEMPLATE, null, 4)}`;
+        link.click();
+      },
+      getApiList() {
+        // ...
+        // const params = {
+        //     api_instance_id: '',
+        //     kv_relation: {}
+        // }
+        // this.$store.dispatch('apiRemote/get_data_workflow', params).then((res) => {
+        //     this.selectList = res.data
+        // }).catch(res => {
+        //     this.$bkMessage({
+        //         message: res.data.msg,
+        //         theme: 'error'
+        //     })
+        // })
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

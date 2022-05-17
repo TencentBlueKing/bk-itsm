@@ -178,275 +178,275 @@
 </template>
 
 <script>
-    import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
-    import collapseTransition from '@/views/commonMix/collapse-transition.js';
-    import BasicCard from '@/components/common/layout/BasicCard.vue';
-    import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList.vue';
-    import TaskConfigPanel from './TaskConfigPanel.vue';
-    import { errorHandler } from '../../../utils/errorHandler';
-    const frequencyList = [
-        { id: 0, name: '00:00' },
-        { id: 1, name: '01:00' },
-        { id: 2, name: '02:00' },
-        { id: 3, name: '03:00' },
-        { id: 4, name: '04:00' },
-        { id: 5, name: '05:00' },
-        { id: 6, name: '06:00' },
-        { id: 7, name: '07:00' },
-        { id: 8, name: '08:00' },
-        { id: 9, name: '09:00' },
-        { id: 10, name: '10:00' },
-        { id: 11, name: '11:00' },
-        { id: 12, name: '12:00' },
-        { id: 13, name: '13:00' },
-        { id: 14, name: '14:00' },
-        { id: 15, name: '15:00' },
-        { id: 16, name: '16:00' },
-        { id: 17, name: '17:00' },
-        { id: 18, name: '18:00' },
-        { id: 19, name: '19:00' },
-        { id: 20, name: '20:00' },
-        { id: 21, name: '21:00' },
-        { id: 22, name: '22:00' },
-        { id: 23, name: '23:00' },
-    ];
-    export default {
-        name: 'ServiceSettingStep',
-        components: {
-            DealPerson,
-            BasicCard,
-            collapseTransition,
-            commonTriggerList,
-            TaskConfigPanel,
+  import DealPerson from '@/views/processManagement/processDesign/nodeConfigue/components/dealPerson';
+  import collapseTransition from '@/views/commonMix/collapse-transition.js';
+  import BasicCard from '@/components/common/layout/BasicCard.vue';
+  import commonTriggerList from '@/views/processManagement/taskTemplate/components/commonTriggerList.vue';
+  import TaskConfigPanel from './TaskConfigPanel.vue';
+  import { errorHandler } from '../../../utils/errorHandler';
+  const frequencyList = [
+    { id: 0, name: '00:00' },
+    { id: 1, name: '01:00' },
+    { id: 2, name: '02:00' },
+    { id: 3, name: '03:00' },
+    { id: 4, name: '04:00' },
+    { id: 5, name: '05:00' },
+    { id: 6, name: '06:00' },
+    { id: 7, name: '07:00' },
+    { id: 8, name: '08:00' },
+    { id: 9, name: '09:00' },
+    { id: 10, name: '10:00' },
+    { id: 11, name: '11:00' },
+    { id: 12, name: '12:00' },
+    { id: 13, name: '13:00' },
+    { id: 14, name: '14:00' },
+    { id: 15, name: '15:00' },
+    { id: 16, name: '16:00' },
+    { id: 17, name: '17:00' },
+    { id: 18, name: '18:00' },
+    { id: 19, name: '19:00' },
+    { id: 20, name: '20:00' },
+    { id: 21, name: '21:00' },
+    { id: 22, name: '22:00' },
+    { id: 23, name: '23:00' },
+  ];
+  export default {
+    name: 'ServiceSettingStep',
+    components: {
+      DealPerson,
+      BasicCard,
+      collapseTransition,
+      commonTriggerList,
+      TaskConfigPanel,
+    },
+    props: {
+      serviceInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      flowInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        frequencyList,
+        showMoreConfig: false,
+        revokeWayList: [
+          { name: '不支持撤回', id: 'not_support', key: 0 },
+          { name: this.$t('m.treeinfo[\'提单后，单据未被处理流转前，提单人可以撤回\']'), id: 'before_flow', key: 2 },
+          { name: this.$t('m.treeinfo[\'任何节点，提单人都可撤回单据\']'), id: 'all_node', key: 1 },
+          { name: this.$t('m.treeinfo[\'指定节点前可以撤回\']'), id: 'specify_node', key: 3 },
+        ],
+        displayRangeTypes: ['OPEN', 'ORGANIZATION', 'GENERAL', 'API'],
+        notifyList: [
+          { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
+          { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
+          { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
+        ],
+        nodeListLoading: false,
+        nodeList: [],
+        formData: {
+          visibleRange: {
+            type: 'OPEN',
+            value: '',
+          },
+          revokeWay: 'before_flow',
+          revokeState: 0,
+          otherSettings: [],
+          notify_rule: 'ONCE',
+          notify_freq: '',
+          notify: ['WEIXIN', 'EMAIL'],
+          is_auto_approve: false,
         },
-        props: {
-            serviceInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            flowInfo: {
-                type: Object,
-                default: () => ({}),
-            },
+        superviseTypes: ['PERSON', 'GENERAL', 'STARTER'],
+        supervisePerson: {
+          type: 'STARTER',
+          value: '',
         },
-        data() {
-            return {
-                frequencyList,
-                showMoreConfig: false,
-                revokeWayList: [
-                    { name: '不支持撤回', id: 'not_support', key: 0 },
-                    { name: this.$t('m.treeinfo[\'提单后，单据未被处理流转前，提单人可以撤回\']'), id: 'before_flow', key: 2 },
-                    { name: this.$t('m.treeinfo[\'任何节点，提单人都可撤回单据\']'), id: 'all_node', key: 1 },
-                    { name: this.$t('m.treeinfo[\'指定节点前可以撤回\']'), id: 'specify_node', key: 3 },
-                ],
-                displayRangeTypes: ['OPEN', 'ORGANIZATION', 'GENERAL', 'API'],
-                notifyList: [
-                    { name: this.$t('m.treeinfo["企业微信"]'), type: 'WEIXIN' },
-                    { name: this.$t('m.treeinfo["邮件"]'), type: 'EMAIL' },
-                    { name: this.$t('m.treeinfo["SMS短信"]'), type: 'SMS' },
-                ],
-                nodeListLoading: false,
-                nodeList: [],
-                formData: {
-                    visibleRange: {
-                        type: 'OPEN',
-                        value: '',
-                    },
-                    revokeWay: 'before_flow',
-                    revokeState: 0,
-                    otherSettings: [],
-                    notify_rule: 'ONCE',
-                    notify_freq: '',
-                    notify: ['WEIXIN', 'EMAIL'],
-                    is_auto_approve: false,
-                },
-                superviseTypes: ['PERSON', 'GENERAL', 'STARTER'],
-                supervisePerson: {
-                    type: 'STARTER',
-                    value: '',
-                },
-                slaValidateMsg: [],
-                slaValidateDialogShow: false,
-            };
-        },
-        computed: {
-            openFunction() {
-                return this.$store.state.openFunction;
+        slaValidateMsg: [],
+        slaValidateDialogShow: false,
+      };
+    },
+    computed: {
+      openFunction() {
+        return this.$store.state.openFunction;
+      },
+      processId() {
+        return this.serviceInfo.workflow_id;
+      },
+    },
+    watch: {
+      'formData.revokeWay'(val) {
+        if (val === 'specify_node' && !this.nodeList.length) {
+          this.getNodeList();
+        }
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      initData() {
+        const {
+          notify,
+          display_type,
+          display_role,
+          supervisor,
+          revoke_config: revokeConfig,
+          can_ticket_agency: canTicketAgency,
+          is_supervise_needed: isSuperviseNeeded,
+          notify_rule: notifyRule,
+          notify_freq: notifyFreq,
+          supervise_type: superviseType,
+        } = this.serviceInfo;
+        try {
+          const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type);
+          this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'not_support';
+          this.formData.revokeState = revokeConfig.state;
+        } catch (error) {
+          console.log(error);
+        }
+        this.formData.is_auto_approve = this.flowInfo.is_auto_approve;
+        this.formData.visibleRange = {
+          type: display_type,
+          value: display_role,
+        };
+        this.formData.otherSettings = [];
+        if (canTicketAgency) {
+          this.formData.otherSettings.push('can_ticket_agency');
+        }
+        if (isSuperviseNeeded) {
+          this.formData.otherSettings.push('is_supervise_needed');
+        }
+        this.formData.notify = (notify || []).map(m => m.type);
+        if (this.formData.notify.length) {
+          this.formData.notify_rule = notifyRule;
+          this.formData.notify_freq = Number(notifyFreq) / 3600;
+        }
+        this.supervisePerson = {
+          type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
+          value: supervisor,
+        };
+      },
+      // 获取流程节点
+      getNodeList() {
+        this.nodeListLoading = true;
+        this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then((res) => {
+          this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.nodeListLoading = false;
+          });
+      },
+      saveAndActionService(params) {
+        return this.$store.dispatch('service/saveAndActionService', {
+          id: this.serviceInfo.id,
+          params,
+        }).catch((res) => {
+          errorHandler(res, this);
+        })
+          .finally(() => {
+            this.nodeListLoading = false;
+          });
+      },
+      goToServiceList() {
+        this.$router.push({
+          name: 'projectServiceList',
+          query: {
+            project_id: this.$store.state.project.id,
+          },
+        });
+      },
+      async validate() {
+        const params = {
+          workflow_config: {
+            supervise_type: 'EMPTY',
+            supervisor: '',
+            revoke_config: {
+              type: 0, // 默认值
+              state: 0,
             },
-            processId() {
-                return this.serviceInfo.workflow_id;
-            },
-        },
-        watch: {
-            'formData.revokeWay'(val) {
-                if (val === 'specify_node' && !this.nodeList.length) {
-                    this.getNodeList();
-                }
-            },
-        },
-        mounted() {
-            this.initData();
-        },
-        methods: {
-            initData() {
-                const {
-                    notify,
-                    display_type,
-                    display_role,
-                    supervisor,
-                    revoke_config: revokeConfig,
-                    can_ticket_agency: canTicketAgency,
-                    is_supervise_needed: isSuperviseNeeded,
-                    notify_rule: notifyRule,
-                    notify_freq: notifyFreq,
-                    supervise_type: superviseType,
-                } = this.serviceInfo;
-                try {
-                    const revokeWayItem = this.revokeWayList.find(m => m.key === revokeConfig.type);
-                    this.formData.revokeWay = revokeWayItem ? revokeWayItem.id : 'not_support';
-                    this.formData.revokeState = revokeConfig.state;
-                } catch (error) {
-                    console.log(error);
-                }
-                this.formData.is_auto_approve = this.flowInfo.is_auto_approve;
-                this.formData.visibleRange = {
-                    type: display_type,
-                    value: display_role,
-                };
-                this.formData.otherSettings = [];
-                if (canTicketAgency) {
-                    this.formData.otherSettings.push('can_ticket_agency');
-                }
-                if (isSuperviseNeeded) {
-                    this.formData.otherSettings.push('is_supervise_needed');
-                }
-                this.formData.notify = (notify || []).map(m => m.type);
-                if (this.formData.notify.length) {
-                    this.formData.notify_rule = notifyRule;
-                    this.formData.notify_freq = Number(notifyFreq) / 3600;
-                }
-                this.supervisePerson = {
-                    type: superviseType === 'EMPTY' ? 'STARTER' : superviseType,
-                    value: supervisor,
-                };
-            },
-            // 获取流程节点
-            getNodeList() {
-                this.nodeListLoading = true;
-                this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then((res) => {
-                    this.nodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.nodeListLoading = false;
-                    });
-            },
-            saveAndActionService(params) {
-                return this.$store.dispatch('service/saveAndActionService', {
-                    id: this.serviceInfo.id,
-                    params,
-                }).catch((res) => {
-                    errorHandler(res, this);
-                })
-                    .finally(() => {
-                        this.nodeListLoading = false;
-                    });
-            },
-            goToServiceList() {
-                this.$router.push({
-                    name: 'projectServiceList',
-                    query: {
-                        project_id: this.$store.state.project.id,
-                    },
-                });
-            },
-            async validate() {
-                const params = {
-                    workflow_config: {
-                        supervise_type: 'EMPTY',
-                        supervisor: '',
-                        revoke_config: {
-                            type: 0, // 默认值
-                            state: 0,
-                        },
-                        is_auto_approve: this.formData.is_auto_approve,
-                    },
-                };
-                const workflow = params.workflow_config; // 之前存在流程上的参数
-                // 可见范围
-                if (this.$refs.displayRange && !this.$refs.displayRange.verifyValue()) {
-                    return false;
-                }
-                if (this.$refs.taskConfigPanel) {
-                    await this.$refs.taskConfigPanel.validate();
-                }
-                if (this.$refs.displayRange) {
-                    const data = this.$refs.displayRange.getValue();
-                    params.display_type = data.type;
-                    params.display_role = data.value || undefined;
-                }
-                workflow.is_auto_approve = this.formData.is_auto_approve;
-                // 撤单方式
-                const {
-                    revokeWay,
-                    revokeState,
-                    otherSettings,
-                    notify,
-                } = this.formData;
-                if (revokeWay === 'not_support') {
-                    workflow.is_revocable = false;
-                    // 这是字段
-                } else {
-                    workflow.is_revocable = true;
-                    const type = this.revokeWayList.find(item => item.id === revokeWay).key;
-                    workflow.revoke_config = {
-                        type,
-                        state: revokeWay === 'specify_node' ? revokeState : 0,
-                    };
-                }
-                // 其他设置
-                params.can_ticket_agency = otherSettings.some(key => key === 'can_ticket_agency');
-                workflow.is_supervise_needed = otherSettings.some(key => key === 'is_supervise_needed');
-                // 督办
-                if (this.$refs.supervisePerson && workflow.is_supervise_needed) {
-                    const { type, value } = this.$refs.supervisePerson.getValue();
-                    if (type !== 'STARTER') {
-                        workflow.supervise_type = type;
-                        workflow.supervisor = value;
-                    }
-                }
-                // 通知方式
-                workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item));
-                workflow.notify_freq = 0;
-                workflow.notify_rule = 'ONCE';
+            is_auto_approve: this.formData.is_auto_approve,
+          },
+        };
+        const workflow = params.workflow_config; // 之前存在流程上的参数
+        // 可见范围
+        if (this.$refs.displayRange && !this.$refs.displayRange.verifyValue()) {
+          return false;
+        }
+        if (this.$refs.taskConfigPanel) {
+          await this.$refs.taskConfigPanel.validate();
+        }
+        if (this.$refs.displayRange) {
+          const data = this.$refs.displayRange.getValue();
+          params.display_type = data.type;
+          params.display_role = data.value || undefined;
+        }
+        workflow.is_auto_approve = this.formData.is_auto_approve;
+        // 撤单方式
+        const {
+          revokeWay,
+          revokeState,
+          otherSettings,
+          notify,
+        } = this.formData;
+        if (revokeWay === 'not_support') {
+          workflow.is_revocable = false;
+          // 这是字段
+        } else {
+          workflow.is_revocable = true;
+          const type = this.revokeWayList.find(item => item.id === revokeWay).key;
+          workflow.revoke_config = {
+            type,
+            state: revokeWay === 'specify_node' ? revokeState : 0,
+          };
+        }
+        // 其他设置
+        params.can_ticket_agency = otherSettings.some(key => key === 'can_ticket_agency');
+        workflow.is_supervise_needed = otherSettings.some(key => key === 'is_supervise_needed');
+        // 督办
+        if (this.$refs.supervisePerson && workflow.is_supervise_needed) {
+          const { type, value } = this.$refs.supervisePerson.getValue();
+          if (type !== 'STARTER') {
+            workflow.supervise_type = type;
+            workflow.supervisor = value;
+          }
+        }
+        // 通知方式
+        workflow.notify = this.notifyList.filter(notifyItem => notify.some(item => notifyItem.type === item));
+        workflow.notify_freq = 0;
+        workflow.notify_rule = 'ONCE';
 
-                // const canNotice = !!notify.length
-                // if (canNotice) {
-                //     workflow.notify_rule = notifyRule
-                //     workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
-                // } else {
-                //     workflow.notify_rule = 'NONE'
-                //     workflow.notify_freq = 0
-                // }
+        // const canNotice = !!notify.length
+        // if (canNotice) {
+        //     workflow.notify_rule = notifyRule
+        //     workflow.notify_freq = notifyRule === 'ONCE' ? 0 : notifyFreq * 3600
+        // } else {
+        //     workflow.notify_rule = 'NONE'
+        //     workflow.notify_freq = 0
+        // }
 
-                // 任务配置
-                if (this.$refs.taskConfigPanel) {
-                    workflow.extras = {};
-                    workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams();
-                }
-                const checkResult = await this.saveAndActionService(params);
-                await this.$store.dispatch('service/slaValidate', this.serviceInfo.id);
-                if (!checkResult.result) {
-                    this.slaValidateMsg = checkResult.data.messages;
-                    this.slaValidateDialogShow = true;
-                    return { data: { result: false } };
-                }
-                return true;
-            },
-        },
-    };
+        // 任务配置
+        if (this.$refs.taskConfigPanel) {
+          workflow.extras = {};
+          workflow.extras.task_settings = this.$refs.taskConfigPanel.getPostParams();
+        }
+        const checkResult = await this.saveAndActionService(params);
+        await this.$store.dispatch('service/slaValidate', this.serviceInfo.id);
+        if (!checkResult.result) {
+          this.slaValidateMsg = checkResult.data.messages;
+          this.slaValidateDialogShow = true;
+          return { data: { result: false } };
+        }
+        return true;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/scroller.scss';

@@ -52,76 +52,76 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../utils/errorHandler';
+  import { errorHandler } from '../../utils/errorHandler';
 
-    export default {
-        name: 'ApprovalDialog',
-        props: {
-            isShow: {
-                type: Boolean,
-                default: false,
-            },
-            approvalInfo: {
-                type: Object,
-                default: () => ({
-                    result: true,
-                    showAllOption: false,
-                    approvalList: [],
-                }),
-            },
+  export default {
+    name: 'ApprovalDialog',
+    props: {
+      isShow: {
+        type: Boolean,
+        default: false,
+      },
+      approvalInfo: {
+        type: Object,
+        default: () => ({
+          result: true,
+          showAllOption: false,
+          approvalList: [],
+        }),
+      },
+    },
+    data() {
+      return {
+        approvalConfirmBtnLoading: false,
+        formData: { approvalNotice: '' },
+        formRules: {
+          approvalNotice: [{
+            validator: this.checkApprovalNotice,
+            message: this.$t('m.systemConfig[\'备注\']') + this.$t('m.common["为必填项，请补充完善"]'),
+            trigger: 'blur',
+
+          }],
         },
-        data() {
-            return {
-                approvalConfirmBtnLoading: false,
-                formData: { approvalNotice: '' },
-                formRules: {
-                    approvalNotice: [{
-                        validator: this.checkApprovalNotice,
-                        message: this.$t('m.systemConfig[\'备注\']') + this.$t('m.common["为必填项，请补充完善"]'),
-                        trigger: 'blur',
-
-                    }],
-                },
+      };
+    },
+    methods: {
+      onApprovalConfirm() {
+        this.approvalConfirmBtnLoading = true;
+        this.$refs.approvalForm.validate().then(async (val) => {
+          if (val) {
+            const data = {
+              result: this.approvalInfo.result.toString(),
+              opinion: this.formData.approvalNotice,
+              approval_list: this.approvalInfo.approvalList,
             };
-        },
-        methods: {
-            onApprovalConfirm() {
-                this.approvalConfirmBtnLoading = true;
-                this.$refs.approvalForm.validate().then(async (val) => {
-                    if (val) {
-                        const data = {
-                            result: this.approvalInfo.result.toString(),
-                            opinion: this.formData.approvalNotice,
-                            approval_list: this.approvalInfo.approvalList,
-                        };
-                        await this.$store.dispatch('workbench/batchApproval', data).then(() => {
-                            this.$emit('cancel', true);
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.formData.approvalNotice = '';
-                            });
-                    }
-                })
-                    .finally(() => {
-                        this.approvalConfirmBtnLoading = false;
-                    });
-            },
-            onApprovalCancel() {
+            await this.$store.dispatch('workbench/batchApproval', data).then(() => {
+              this.$emit('cancel', true);
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
                 this.formData.approvalNotice = '';
-                this.approvalConfirmBtnLoading = false;
-                this.$emit('cancel');
-            },
-            checkApprovalNotice(val) {
-                if (!this.approvalInfo.result) {
-                    return val !== '';
-                }
-                return true;
-            },
-        },
-    };
+              });
+          }
+        })
+          .finally(() => {
+            this.approvalConfirmBtnLoading = false;
+          });
+      },
+      onApprovalCancel() {
+        this.formData.approvalNotice = '';
+        this.approvalConfirmBtnLoading = false;
+        this.$emit('cancel');
+      },
+      checkApprovalNotice(val) {
+        if (!this.approvalInfo.result) {
+          return val !== '';
+        }
+        return true;
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .result-tag {

@@ -126,249 +126,249 @@
   </div>
 </template>
 <script>
-    import dealPerson from './components/dealPerson.vue';
-    import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
-    import BasicCard from '@/components/common/layout/BasicCard.vue';
-    import DevopsPreview from '@/components/task/DevopsPreview.vue';
-    import NoData from '@/components/common/NoData.vue';
-    import { errorHandler } from '../../../../utils/errorHandler';
-    import i18n from '@/i18n/index.js';
-    function newRequiredRule() {
-        return {
-            required: true,
-            message: i18n.t('m.treeinfo["字段必填"]'),
-            trigger: 'blur',
-        };
-    }
-    export default {
-        name: 'devops',
-        components: {
-            BasicCard,
-            commonTriggerList,
-            DevopsPreview,
-            NoData,
-            dealPerson,
-        },
-        props: {
-            // 流程信息
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 节点信息
-            configur: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            state: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
-        },
-        data() {
-            return {
-                isLoading: false,
-                basicInfo: {
-                    nodeName: '',
-                    businessId: '',
-                    pipelineId: '',
-                    processors: [],
-                },
-                businessList: [],
-                pipelineList: [],
-                pipelineDisabled: true,
-                pipelineLoading: false,
-                constants: [],
-                pipelineFormList: [],
-                pipelineData: {}, // 流水线参数
-                pipeFormLoading: false,
-                pipelineStages: [],
-                showPipelineStages: true, // 展示预览
-                basicInfoRules: {
-                    nodeName: [newRequiredRule()],
-                    businessId: [newRequiredRule()],
-                    pipelineId: [newRequiredRule()],
-
-                },
-                pipelineRules: {},
-                checkStatus: {
-                    delivers: false,
-                    processors: false,
-                },
-                excludeProcessor: [],
-                processorsInfo: {
-                    type: '',
-                    value: '',
-                },
-            };
-        },
-        watch: {
-            'basicInfo.businessId'(val) {
-                this.pipelineDisabled = !val;
-                if (!val) {
-                    this.pipelineList = [];
-                    this.pipelineFormList = [];
-                    this.basicInfo.pipelineId = '';
-                }
-            },
-            'basicInfo.pipelineId'(val) {
-                if (!val) {
-                    this.pipelineFormList = [];
-                }
-            },
-        },
-        mounted() {
-            this.initData();
-        },
-        methods: {
-            async initData() {
-                this.$store.dispatch('ticket/getDevopsUserProjectList').then((res) => {
-                    this.businessList = res.data;
-                    if (this.configur && !this.configur.is_draft) {
-                        this.basicInfo.nodeName = this.configur.name;
-                        this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName;
-                        this.onSelectBusiness();
-                        this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value;
-                        this.getPipelineInfo(1);
-                        this.processorsInfo = {
-                            type: this.configur.processors_type,
-                            value: this.configur.processors,
-                        };
-                        this.getExcludeRoleTypeList();
-                    }
-                });
-            },
-            // 计算处理人类型需要排除的类型
-            getExcludeRoleTypeList() {
-                // 不显示的人员类型
-                let excludeProcessor = [];
-                // 内置节点
-                if (this.configur.is_builtin) {
-                    excludeProcessor = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
-                } else {
-                    excludeProcessor = ['OPEN'];
-                }
-                // 是否使用权限中心角色
-                // if (!this.flowInfo.is_iam_used) {
-                //     excludeProcessor.push('IAM')
-                // }
-                // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
-                if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
-                    excludeProcessor.push('BY_ASSIGNOR');
-                }
-                if (!this.flowInfo.is_biz_needed) {
-                    excludeProcessor.push('CMDB');
-                }
-                this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
-            },
-            // 选择项目获取流水线
-            onSelectBusiness() {
-                this.pipelineLoading = true;
-                this.basicInfo.pipelineId = '';
-                try {
-                    this.$store.dispatch('ticket/getDevopsPipelineList', { project_id: this.basicInfo.businessId }).then((res) => {
-                        this.pipelineList = res.data;
-                    });
-                } catch (e) {
-                    console.log(e);
-                } finally {
-                    this.pipelineLoading = false;
-                }
-            },
-            // 获取流水线信息
-            getPipelineInfo(init) {
-                this.pipeFormLoading = true;
-                Promise.all([
-                    this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
-                    this.$store.dispatch('ticket/getDevopsPipelineDetail', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
-                ]).then((res) => {
-                    this.pipelineData = {};
-                    this.pipelineFormList = res[0].data.properties;
-                    res[0].data.properties.forEach((item) => {
-                        if (init) item.defaultValue = this.configur.extras.devops_info.constants.filter(ite => ite.name === item.id)[0].value;
-                        this.$set(this.pipelineData, item.id, item.defaultValue);
-                        this.pipelineRules[item.id] = [{
-                            required: item.required,
-                            message: i18n.t('m.treeinfo["字段必填"]'),
-                            trigger: 'blur',
-                        }];
-                    });
-                    this.pipelineStages = res[1].data.stages;
-                })
-                    .catch((e) => {
-                        console.log(e);
-                    })
-                    .finally(() => {
-                        this.pipeFormLoading = false;
-                    });
-            },
-            closeNode() {
-                this.$parent.closeConfigur();
-            },
-            submit() {
-                if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
-                    this.checkStatus.processors = true;
-                    return;
-                }
-                Promise.all([
-                    this.$refs.basicInfo.validate(),
-                    this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null,
-                ]).then(() => {
-                    const basicData = this.businessList.filter(item => item.project_code === this.basicInfo.businessId)[0];
-                    const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0];
-                    const constants = Object.keys(this.pipelineData).map(item => ({
-                        value: this.pipelineData[item],
-                        name: item,
-                        key: item,
-                    }));
-                    const { value: processors, type: processorsType } = this.$refs.processors.getValue();
-                    const params = {
-                        extras: {
-                            devops_info: {
-                                username: window.username,
-                                project_id: {
-                                    value: basicData.projectCode,
-                                    name: basicData.projectName,
-                                    key: basicData.project_id,
-                                },
-                                pipeline_id: {
-                                    value: pipelineData.pipelineId,
-                                    name: pipelineData.pipelineName,
-                                    key: pipelineData.pipeline_id,
-                                },
-                                constants,
-                            },
-                        },
-                        processors: processors || '',
-                        processors_type: processorsType,
-                        is_draft: false,
-                        is_terminable: false,
-                        name: this.basicInfo.nodeName,
-                        type: 'TASK-DEVOPS',
-                        workflow: this.configur.workflow,
-                    };
-                    const stateId = this.configur.id;
-                    this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then(() => {
-                        this.$bkMessage({
-                            message: this.$t('m.treeinfo["保存成功"]'),
-                            theme: 'success',
-                        });
-                        this.$parent.closeConfigur();
-                    }, (res) => {
-                        errorHandler(res, this);
-                    })
-                        .finally(() => {
-                        });
-                });
-            },
-        },
+  import dealPerson from './components/dealPerson.vue';
+  import commonTriggerList from '../../taskTemplate/components/commonTriggerList';
+  import BasicCard from '@/components/common/layout/BasicCard.vue';
+  import DevopsPreview from '@/components/task/DevopsPreview.vue';
+  import NoData from '@/components/common/NoData.vue';
+  import { errorHandler } from '../../../../utils/errorHandler';
+  import i18n from '@/i18n/index.js';
+  function newRequiredRule() {
+    return {
+      required: true,
+      message: i18n.t('m.treeinfo["字段必填"]'),
+      trigger: 'blur',
     };
+  }
+  export default {
+    name: 'devops',
+    components: {
+      BasicCard,
+      commonTriggerList,
+      DevopsPreview,
+      NoData,
+      dealPerson,
+    },
+    props: {
+      // 流程信息
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      // 节点信息
+      configur: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
+        },
+      },
+    },
+    data() {
+      return {
+        isLoading: false,
+        basicInfo: {
+          nodeName: '',
+          businessId: '',
+          pipelineId: '',
+          processors: [],
+        },
+        businessList: [],
+        pipelineList: [],
+        pipelineDisabled: true,
+        pipelineLoading: false,
+        constants: [],
+        pipelineFormList: [],
+        pipelineData: {}, // 流水线参数
+        pipeFormLoading: false,
+        pipelineStages: [],
+        showPipelineStages: true, // 展示预览
+        basicInfoRules: {
+          nodeName: [newRequiredRule()],
+          businessId: [newRequiredRule()],
+          pipelineId: [newRequiredRule()],
+
+        },
+        pipelineRules: {},
+        checkStatus: {
+          delivers: false,
+          processors: false,
+        },
+        excludeProcessor: [],
+        processorsInfo: {
+          type: '',
+          value: '',
+        },
+      };
+    },
+    watch: {
+      'basicInfo.businessId'(val) {
+        this.pipelineDisabled = !val;
+        if (!val) {
+          this.pipelineList = [];
+          this.pipelineFormList = [];
+          this.basicInfo.pipelineId = '';
+        }
+      },
+      'basicInfo.pipelineId'(val) {
+        if (!val) {
+          this.pipelineFormList = [];
+        }
+      },
+    },
+    mounted() {
+      this.initData();
+    },
+    methods: {
+      async initData() {
+        this.$store.dispatch('ticket/getDevopsUserProjectList').then((res) => {
+          this.businessList = res.data;
+          if (this.configur && !this.configur.is_draft) {
+            this.basicInfo.nodeName = this.configur.name;
+            this.basicInfo.businessId = res.data.filter(item => item.project_name === this.configur.extras.devops_info.project_id.name)[0].englishName;
+            this.onSelectBusiness();
+            this.basicInfo.pipelineId = this.configur.extras.devops_info.pipeline_id.value;
+            this.getPipelineInfo(1);
+            this.processorsInfo = {
+              type: this.configur.processors_type,
+              value: this.configur.processors,
+            };
+            this.getExcludeRoleTypeList();
+          }
+        });
+      },
+      // 计算处理人类型需要排除的类型
+      getExcludeRoleTypeList() {
+        // 不显示的人员类型
+        let excludeProcessor = [];
+        // 内置节点
+        if (this.configur.is_builtin) {
+          excludeProcessor = ['BY_ASSIGNOR', 'STARTER', 'VARIABLE'];
+        } else {
+          excludeProcessor = ['OPEN'];
+        }
+        // 是否使用权限中心角色
+        // if (!this.flowInfo.is_iam_used) {
+        //     excludeProcessor.push('IAM')
+        // }
+        // 处理场景如果不是'DISTRIBUTE_THEN_PROCESS' || 'DISTRIBUTE_THEN_CLAIM'，则去掉派单人指定
+        if (this.configur.distribute_type !== 'DISTRIBUTE_THEN_PROCESS' && this.configur.distribute_type !== 'DISTRIBUTE_THEN_CLAIM') {
+          excludeProcessor.push('BY_ASSIGNOR');
+        }
+        if (!this.flowInfo.is_biz_needed) {
+          excludeProcessor.push('CMDB');
+        }
+        this.excludeProcessor = [...['EMPTY', 'API'], ...excludeProcessor];
+      },
+      // 选择项目获取流水线
+      onSelectBusiness() {
+        this.pipelineLoading = true;
+        this.basicInfo.pipelineId = '';
+        try {
+          this.$store.dispatch('ticket/getDevopsPipelineList', { project_id: this.basicInfo.businessId }).then((res) => {
+            this.pipelineList = res.data;
+          });
+        } catch (e) {
+          console.log(e);
+        } finally {
+          this.pipelineLoading = false;
+        }
+      },
+      // 获取流水线信息
+      getPipelineInfo(init) {
+        this.pipeFormLoading = true;
+        Promise.all([
+          this.$store.dispatch('ticket/getDevopsPipelineStartInfo', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
+          this.$store.dispatch('ticket/getDevopsPipelineDetail', { project_id: this.basicInfo.businessId, pipeline_id: this.basicInfo.pipelineId }),
+        ]).then((res) => {
+          this.pipelineData = {};
+          this.pipelineFormList = res[0].data.properties;
+          res[0].data.properties.forEach((item) => {
+            if (init) item.defaultValue = this.configur.extras.devops_info.constants.filter(ite => ite.name === item.id)[0].value;
+            this.$set(this.pipelineData, item.id, item.defaultValue);
+            this.pipelineRules[item.id] = [{
+              required: item.required,
+              message: i18n.t('m.treeinfo["字段必填"]'),
+              trigger: 'blur',
+            }];
+          });
+          this.pipelineStages = res[1].data.stages;
+        })
+          .catch((e) => {
+            console.log(e);
+          })
+          .finally(() => {
+            this.pipeFormLoading = false;
+          });
+      },
+      closeNode() {
+        this.$parent.closeConfigur();
+      },
+      submit() {
+        if (this.$refs.processors && !this.$refs.processors.verifyValue()) {
+          this.checkStatus.processors = true;
+          return;
+        }
+        Promise.all([
+          this.$refs.basicInfo.validate(),
+          this.$refs.devopsVariable ? this.$refs.devopsVariable.validate() : null,
+        ]).then(() => {
+          const basicData = this.businessList.filter(item => item.project_code === this.basicInfo.businessId)[0];
+          const pipelineData = this.pipelineList.filter(item => item.pipelineId === this.basicInfo.pipelineId)[0];
+          const constants = Object.keys(this.pipelineData).map(item => ({
+            value: this.pipelineData[item],
+            name: item,
+            key: item,
+          }));
+          const { value: processors, type: processorsType } = this.$refs.processors.getValue();
+          const params = {
+            extras: {
+              devops_info: {
+                username: window.username,
+                project_id: {
+                  value: basicData.projectCode,
+                  name: basicData.projectName,
+                  key: basicData.project_id,
+                },
+                pipeline_id: {
+                  value: pipelineData.pipelineId,
+                  name: pipelineData.pipelineName,
+                  key: pipelineData.pipeline_id,
+                },
+                constants,
+              },
+            },
+            processors: processors || '',
+            processors_type: processorsType,
+            is_draft: false,
+            is_terminable: false,
+            name: this.basicInfo.nodeName,
+            type: 'TASK-DEVOPS',
+            workflow: this.configur.workflow,
+          };
+          const stateId = this.configur.id;
+          this.$store.dispatch('cdeploy/putDevopsInfo', { params, stateId }).then(() => {
+            this.$bkMessage({
+              message: this.$t('m.treeinfo["保存成功"]'),
+              theme: 'success',
+            });
+            this.$parent.closeConfigur();
+          }, (res) => {
+            errorHandler(res, this);
+          })
+            .finally(() => {
+            });
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

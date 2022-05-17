@@ -77,145 +77,145 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import { errorHandler } from '../../../utils/errorHandler';
-    import secondFlow from './flowCanvas/secondFlow.vue';
-    import basicNode from '@/views/processManagement/processDesign/nodeConfigue/basicNode.vue';
-    import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue';
-    import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue';
-    import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue';
-    import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue';
-    import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue';
+  import axios from 'axios';
+  import { errorHandler } from '../../../utils/errorHandler';
+  import secondFlow from './flowCanvas/secondFlow.vue';
+  import basicNode from '@/views/processManagement/processDesign/nodeConfigue/basicNode.vue';
+  import autoNode from '@/views/processManagement/processDesign/nodeConfigue/autoNode.vue';
+  import sopsNode from '@/views/processManagement/processDesign/nodeConfigue/sopsNode.vue';
+  import signNode from '@/views/processManagement/processDesign/nodeConfigue/signNode.vue';
+  import devopsNode from '@/views/processManagement/processDesign/nodeConfigue/devopsNode.vue';
+  import ApprovalNode from '@/views/processManagement/processDesign/nodeConfigue/ApprovalNode.vue';
 
-    export default {
-        name: 'ServiceProcessStep',
-        components: {
-            secondFlow,
-            basicNode,
-            autoNode,
-            sopsNode,
-            signNode,
-            ApprovalNode,
-            devopsNode,
-        },
-        props: {
-            serviceInfo: {
-                type: Object,
-                default: () => ({}),
+  export default {
+    name: 'ServiceProcessStep',
+    components: {
+      secondFlow,
+      basicNode,
+      autoNode,
+      sopsNode,
+      signNode,
+      ApprovalNode,
+      devopsNode,
+    },
+    props: {
+      serviceInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      flowInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        flowDataLoading: false,
+        isShowNodeConfig: false,
+        nodeList: [],
+        lineList: [],
+        configur: {},
+      };
+    },
+    computed: {
+      processId() {
+        return this.serviceInfo.workflow_id;
+      },
+      nodeType() {
+        const nodoTypeList = {
+          'TASK-DEVOPS': this.$t('m["蓝盾节点"]'),
+          'TASK-SOPS': this.$t('m["标准运维节点"]'),
+          NORMAL: this.$t('m["手动节点"]'),
+          TASK: this.$t('m["任务节点"]'),
+          APPROVAL: this.$t('m["审批节点"]'),
+          SIGN: this.$t('m["会签节点"]'),
+        };
+        return nodoTypeList[this.configur.type];
+      },
+    },
+    watch: {
+      isShowNodeConfig(val) {
+        this.$emit('setConfigStatus', val);
+      },
+    },
+    created() {
+      this.$emit('setConfigStatus', this.isShowNodeConfig);
+    },
+    mounted() {
+      if (this.processId) {
+        this.getFlowChart();
+      }
+    },
+    methods: {
+      // 获取流程图
+      getFlowChart() {
+        this.flowDataLoading = true;
+        axios.all([
+          this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
+          this.$store.dispatch('deployCommon/getChartLink', {
+            workflow: this.processId,
+            page_size: 1000,
+          }),
+        ]).then(axios.spread((userResp, reposResp) => {
+          this.nodeList = userResp.data;
+          this.lineList = reposResp.data.items;
+        }))
+          .finally(() => {
+            this.flowDataLoading = false;
+          });
+      },
+      handleNodeClick(data) {
+        this.isShowNodeConfig = true;
+        this.configur = data;
+      },
+      closeConfigur() {
+        this.isShowNodeConfig = false;
+        this.configur = {};
+        this.$emit('updateFlowInfo');
+      },
+      // 保存节点位置
+      submitFlow() {
+        const lineInfoList = this.$refs.flowInfo.canvasData;
+        const params = {
+          workflow_id: this.processId,
+          transitions: [],
+        };
+        lineInfoList.lines.forEach((item) => {
+          params.transitions.push({
+            id: item.lineInfo.id,
+            axis: {
+              start: item.source.arrow,
+              end: item.target.arrow,
             },
-            flowInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        data() {
-            return {
-                flowDataLoading: false,
-                isShowNodeConfig: false,
-                nodeList: [],
-                lineList: [],
-                configur: {},
-            };
-        },
-        computed: {
-            processId() {
-                return this.serviceInfo.workflow_id;
-            },
-            nodeType() {
-                const nodoTypeList = {
-                    'TASK-DEVOPS': this.$t('m["蓝盾节点"]'),
-                    'TASK-SOPS': this.$t('m["标准运维节点"]'),
-                    NORMAL: this.$t('m["手动节点"]'),
-                    TASK: this.$t('m["任务节点"]'),
-                    APPROVAL: this.$t('m["审批节点"]'),
-                    SIGN: this.$t('m["会签节点"]'),
-                };
-                return nodoTypeList[this.configur.type];
-            },
-        },
-        watch: {
-            isShowNodeConfig(val) {
-                this.$emit('setConfigStatus', val);
-            },
-        },
-        created() {
-            this.$emit('setConfigStatus', this.isShowNodeConfig);
-        },
-        mounted() {
-            if (this.processId) {
-                this.getFlowChart();
-            }
-        },
-        methods: {
-            // 获取流程图
-            getFlowChart() {
-                this.flowDataLoading = true;
-                axios.all([
-                    this.$store.dispatch('deployCommon/getStates', { workflow: this.processId }),
-                    this.$store.dispatch('deployCommon/getChartLink', {
-                        workflow: this.processId,
-                        page_size: 1000,
-                    }),
-                ]).then(axios.spread((userResp, reposResp) => {
-                    this.nodeList = userResp.data;
-                    this.lineList = reposResp.data.items;
-                }))
-                    .finally(() => {
-                        this.flowDataLoading = false;
-                    });
-            },
-            handleNodeClick(data) {
-                this.isShowNodeConfig = true;
-                this.configur = data;
-            },
-            closeConfigur() {
-                this.isShowNodeConfig = false;
-                this.configur = {};
-                this.$emit('updateFlowInfo');
-            },
-            // 保存节点位置
-            submitFlow() {
-                const lineInfoList = this.$refs.flowInfo.canvasData;
-                const params = {
-                    workflow_id: this.processId,
-                    transitions: [],
-                };
-                lineInfoList.lines.forEach((item) => {
-                    params.transitions.push({
-                        id: item.lineInfo.id,
-                        axis: {
-                            start: item.source.arrow,
-                            end: item.target.arrow,
-                        },
-                    });
-                });
-                this.$store.dispatch('deployCommon/updateFlowLine', { params }).catch((res) => {
-                    errorHandler(res, this);
-                });
-            },
-            saveProcess() {
-                const id = this.processId;
-                const params = [];
-                return this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.treeinfo["保存成功"]'),
-                        theme: 'success',
-                    });
-                }, (res) => {
-                    if (res.data && res.data.data) {
-                        this.errorList = res.data.data.invalid_state_ids;
-                        this.$refs.flowInfo.errorNodes(this.errorList);
-                    }
-                    errorHandler(res, this);
-                    return { data: { result: false } };
-                });
-            },
-            validate() {
-                this.submitFlow();
-                return this.saveProcess();
-            },
-        },
-    };
+          });
+        });
+        this.$store.dispatch('deployCommon/updateFlowLine', { params }).catch((res) => {
+          errorHandler(res, this);
+        });
+      },
+      saveProcess() {
+        const id = this.processId;
+        const params = [];
+        return this.$store.dispatch('cdeploy/submitChart', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.treeinfo["保存成功"]'),
+            theme: 'success',
+          });
+        }, (res) => {
+          if (res.data && res.data.data) {
+            this.errorList = res.data.data.invalid_state_ids;
+            this.$refs.flowInfo.errorNodes(this.errorList);
+          }
+          errorHandler(res, this);
+          return { data: { result: false } };
+        });
+      },
+      validate() {
+        this.submitFlow();
+        return this.saveProcess();
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .process-step {

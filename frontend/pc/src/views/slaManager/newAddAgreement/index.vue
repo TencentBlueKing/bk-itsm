@@ -116,297 +116,297 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js';
-    import priorityConfigur from './priorityConfigur.vue';
-    import eventRemind from './eventRemind.vue';
-    export default {
-        name: 'addAgreement',
-        components: {
-            priorityConfigur,
-            eventRemind,
+  import commonMix from '../../commonMix/common.js';
+  import priorityConfigur from './priorityConfigur.vue';
+  import eventRemind from './eventRemind.vue';
+  export default {
+    name: 'addAgreement',
+    components: {
+      priorityConfigur,
+      eventRemind,
+    },
+    mixins: [commonMix],
+    props: {
+      modelList: {
+        type: Array,
+        default() {
+          return [];
         },
-        mixins: [commonMix],
-        props: {
-            modelList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            emailNotifyEventList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            weixinNotifyEventList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            modelPriority: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+      emailNotifyEventList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                testPriority1: [
-                    {
-                        type: 1,
-                        eventName: this.$t('m[\'响应提醒\']'),
-                        hasCheckBox: true,
-                        isCheck: false,
-                        remindRuleText: this.$t('m[\'响应时长达到协议标准的\']'),
-                        remindRuleValue: 20,
-                        remindRuleUnit: '%',
-                        receivers: '',
-                        notify_type_list: ['email', 'weixin'],
-                        email_notify: '',
-                        weixin_notify: '',
-                        notify_rule: 'once',
-                        notify_freq: 10,
-                        freq_unit: '%',
-                    },
-                    {
-                        type: 3,
-                        eventName: this.$t('m[\'处理提醒\']'),
-                        hasCheckBox: false,
-                        isCheck: false,
-                        remindRuleText: this.$t('m[\'处理时长达到协议标准的\']'),
-                        remindRuleValue: 20,
-                        remindRuleUnit: '%',
-                        receivers: '',
-                        notify_type_list: ['email', 'weixin'],
-                        email_notify: '',
-                        weixin_notify: '',
-                        notify_rule: 'once',
-                        notify_freq: 10,
-                        freq_unit: '%',
-                    },
-                ],
-                testPriority3: [
-                    {
-                        type: 2,
-                        eventName: this.$t('m[\'超时响应提醒\']'),
-                        hasCheckBox: true,
-                        isCheck: false,
-                        remindRuleText: this.$t('m[\'响应时长超出协议标准还未响应时\']'),
-                        receivers: '',
-                        notify_type_list: ['email', 'weixin'],
-                        email_notify: '',
-                        weixin_notify: '',
-                        notify_rule: 'once',
-                        notify_freq: 10,
-                        freq_unit: '%',
-                    },
-                    {
-                        type: 4,
-                        eventName: this.$t('m[\'超时处理提醒\']'),
-                        hasCheckBox: false,
-                        isCheck: false,
-                        remindRuleText: this.$t('m[\'处理时长超出协议标准还未解决时\']'),
-                        receivers: '',
-                        notify_type_list: ['email', 'weixin'],
-                        email_notify: '',
-                        weixin_notify: '',
-                        notify_rule: 'once',
-                        notify_freq: 10,
-                        freq_unit: '%',
-                    },
-                ],
-                secondClick: false,
-                formInfo: {
-                    name: '',
-                    agreementStatus: true,
-                    id: '',
-                },
-                // 校验规则
-                nameRules: {},
-            };
+      },
+      weixinNotifyEventList: {
+        type: Array,
+        default() {
+          return [];
         },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
-            },
+      },
+      modelPriority: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            // emailNotifyEventList: {
-            //     handler: function (list) {
-            //         this.wacthEventList('testPriority1', 'email', list)
-            //         this.wacthEventList('testPriority3', 'email', list)
-            //     },
-            //     immediate: true
-            // },
-            // weixinNotifyEventList: {
-            //     handler: function (list) {
-            //         this.wacthEventList('testPriority1', 'weixin', list)
-            //         this.wacthEventList('testPriority3', 'weixin', list)
-            //     },
-            //     immediate: true
-            // }
-            'changeInfo.is_reply_need'(val) {
-                if (!val) {
-                    this.$refs.priorityConfigur.clearFromError();
-                }
-            },
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted() {
-            this.initData();
-            this.nameRules = this.checkCommonRules('name');
+      },
+    },
+    data() {
+      return {
+        testPriority1: [
+          {
+            type: 1,
+            eventName: this.$t('m[\'响应提醒\']'),
+            hasCheckBox: true,
+            isCheck: false,
+            remindRuleText: this.$t('m[\'响应时长达到协议标准的\']'),
+            remindRuleValue: 20,
+            remindRuleUnit: '%',
+            receivers: '',
+            notify_type_list: ['email', 'weixin'],
+            email_notify: '',
+            weixin_notify: '',
+            notify_rule: 'once',
+            notify_freq: 10,
+            freq_unit: '%',
+          },
+          {
+            type: 3,
+            eventName: this.$t('m[\'处理提醒\']'),
+            hasCheckBox: false,
+            isCheck: false,
+            remindRuleText: this.$t('m[\'处理时长达到协议标准的\']'),
+            remindRuleValue: 20,
+            remindRuleUnit: '%',
+            receivers: '',
+            notify_type_list: ['email', 'weixin'],
+            email_notify: '',
+            weixin_notify: '',
+            notify_rule: 'once',
+            notify_freq: 10,
+            freq_unit: '%',
+          },
+        ],
+        testPriority3: [
+          {
+            type: 2,
+            eventName: this.$t('m[\'超时响应提醒\']'),
+            hasCheckBox: true,
+            isCheck: false,
+            remindRuleText: this.$t('m[\'响应时长超出协议标准还未响应时\']'),
+            receivers: '',
+            notify_type_list: ['email', 'weixin'],
+            email_notify: '',
+            weixin_notify: '',
+            notify_rule: 'once',
+            notify_freq: 10,
+            freq_unit: '%',
+          },
+          {
+            type: 4,
+            eventName: this.$t('m[\'超时处理提醒\']'),
+            hasCheckBox: false,
+            isCheck: false,
+            remindRuleText: this.$t('m[\'处理时长超出协议标准还未解决时\']'),
+            receivers: '',
+            notify_type_list: ['email', 'weixin'],
+            email_notify: '',
+            weixin_notify: '',
+            notify_rule: 'once',
+            notify_freq: 10,
+            freq_unit: '%',
+          },
+        ],
+        secondClick: false,
+        formInfo: {
+          name: '',
+          agreementStatus: true,
+          id: '',
         },
-        methods: {
-            // 初始化数据
-            initData() {
-                const parentInfo = this.changeInfo.info;
-                this.formInfo = {
-                    name: parentInfo.name || '',
-                    agreementStatus: parentInfo.is_enabled || true,
-                    id: parentInfo.id,
-                };
-            },
-            wacthEventList(listKey, watchType, eventList) {
-                this[listKey] = this[listKey].map((item) => {
-                    if (!this.changeInfo.info.id || !item[`${watchType}_notify`]) {
-                        item[`${watchType}_notify`] = eventList[0].id;
-                    }
-                    return item;
-                });
-            },
+        // 校验规则
+        nameRules: {},
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+    watch: {
+      // emailNotifyEventList: {
+      //     handler: function (list) {
+      //         this.wacthEventList('testPriority1', 'email', list)
+      //         this.wacthEventList('testPriority3', 'email', list)
+      //     },
+      //     immediate: true
+      // },
+      // weixinNotifyEventList: {
+      //     handler: function (list) {
+      //         this.wacthEventList('testPriority1', 'weixin', list)
+      //         this.wacthEventList('testPriority3', 'weixin', list)
+      //     },
+      //     immediate: true
+      // }
+      'changeInfo.is_reply_need'(val) {
+        if (!val) {
+          this.$refs.priorityConfigur.clearFromError();
+        }
+      },
+    },
+    mounted() {
+      this.initData();
+      this.nameRules = this.checkCommonRules('name');
+    },
+    methods: {
+      // 初始化数据
+      initData() {
+        const parentInfo = this.changeInfo.info;
+        this.formInfo = {
+          name: parentInfo.name || '',
+          agreementStatus: parentInfo.is_enabled || true,
+          id: parentInfo.id,
+        };
+      },
+      wacthEventList(listKey, watchType, eventList) {
+        this[listKey] = this[listKey].map((item) => {
+          if (!this.changeInfo.info.id || !item[`${watchType}_notify`]) {
+            item[`${watchType}_notify`] = eventList[0].id;
+          }
+          return item;
+        });
+      },
 
-            getReminderInfo(id) {
-                const priorList = [];
-                let priorObj = {};
-                this.$refs[`eventRemind${id}`].priorityList.map((prior) => {
-                    priorObj = {
-                        type: prior.type,
-                        condition: {
-                            type: 'all',
-                            expressions: [
-                                {
-                                    name: 'handle_time_percent',
-                                    value: prior.remindRuleValue || 100,
-                                    type: 'INT',
-                                    operator: 'greater_than',
-                                },
-                            ],
-                        },
-                        actions: [
-                            {
-                                action_type: 'alert',
-                                config: {
-                                    receivers: prior.receivers || '',
-                                    notify_rule: prior.notify_rule || '',
-                                    notify_freq: prior.notify_freq || 0,
-                                    freq_unit: prior.freq_unit || '',
-                                    notify: prior.notify_type_list.map(notifyType => ({
-                                        notify_type: notifyType,
-                                        notify_template: prior[`${notifyType}_notify`],
-                                    })),
-                                },
-                            },
-                        ],
-                    };
-                    if (!prior.hasCheckBox || (this.changeInfo.is_reply_need && prior.isCheck)) {
-                        priorList.push(priorObj);
-                    }
-                });
-                return priorList;
+      getReminderInfo(id) {
+        const priorList = [];
+        let priorObj = {};
+        this.$refs[`eventRemind${id}`].priorityList.map((prior) => {
+          priorObj = {
+            type: prior.type,
+            condition: {
+              type: 'all',
+              expressions: [
+                {
+                  name: 'handle_time_percent',
+                  value: prior.remindRuleValue || 100,
+                  type: 'INT',
+                  operator: 'greater_than',
+                },
+              ],
             },
-            // 提交 取消
-            submitFn() {
-                const policies = this.$refs.priorityConfigur.priorityList;
-                const params = {
-                    name: this.formInfo.name,
-                    is_enabled: this.formInfo.agreementStatus,
-                    is_reply_need: this.changeInfo.is_reply_need || false,
-                    action_policies: [...this.getReminderInfo(1), ...this.getReminderInfo(3)],
-                    project_key: this.$store.state.project.id,
-                    policies,
-                };
-                // 修改和新建
-                const urlValue = this.changeInfo.info.id ? 'putProtocol' : 'addProtocol';
-                const paramsValue = {
-                    params,
-                };
-                if (this.changeInfo.info.id) {
-                    paramsValue.id = this.changeInfo.info.id;
-                }
-                // 请求方法
-                if (this.secondClick) {
-                    return;
-                }
-                this.secondClick = true;
-                this.$store.dispatch(`slaManagement/${urlValue}`, paramsValue).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.deployPage["保存成功"]'),
-                        theme: 'success',
-                    });
-                    this.closeAgreement(true);
-                })
-                    .catch((res) => {
-                        this.$bkMessage({
-                            message: res.data.msg,
-                            theme: 'error',
-                        });
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
+            actions: [
+              {
+                action_type: 'alert',
+                config: {
+                  receivers: prior.receivers || '',
+                  notify_rule: prior.notify_rule || '',
+                  notify_freq: prior.notify_freq || 0,
+                  freq_unit: prior.freq_unit || '',
+                  notify: prior.notify_type_list.map(notifyType => ({
+                    notify_type: notifyType,
+                    notify_template: prior[`${notifyType}_notify`],
+                  })),
+                },
+              },
+            ],
+          };
+          if (!prior.hasCheckBox || (this.changeInfo.is_reply_need && prior.isCheck)) {
+            priorList.push(priorObj);
+          }
+        });
+        return priorList;
+      },
+      // 提交 取消
+      submitFn() {
+        const policies = this.$refs.priorityConfigur.priorityList;
+        const params = {
+          name: this.formInfo.name,
+          is_enabled: this.formInfo.agreementStatus,
+          is_reply_need: this.changeInfo.is_reply_need || false,
+          action_policies: [...this.getReminderInfo(1), ...this.getReminderInfo(3)],
+          project_key: this.$store.state.project.id,
+          policies,
+        };
+        // 修改和新建
+        const urlValue = this.changeInfo.info.id ? 'putProtocol' : 'addProtocol';
+        const paramsValue = {
+          params,
+        };
+        if (this.changeInfo.info.id) {
+          paramsValue.id = this.changeInfo.info.id;
+        }
+        // 请求方法
+        if (this.secondClick) {
+          return;
+        }
+        this.secondClick = true;
+        this.$store.dispatch(`slaManagement/${urlValue}`, paramsValue).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.deployPage["保存成功"]'),
+            theme: 'success',
+          });
+          this.closeAgreement(true);
+        })
+          .catch((res) => {
+            this.$bkMessage({
+              message: res.data.msg,
+              theme: 'error',
+            });
+          })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+      closeAgreement(type) {
+        if (!type && this.checkDataChange()) {
+          this.$bkInfo({
+            type: 'warning',
+            title: this.$t('m.slaContent["确认返回？"]'),
+            // subTitle: this.$t(`m.slaContent["数据发生更改，确认后将不保存修改的数据！"]`),
+            confirmFn: () => {
+              this.$parent.getList(1);
+              this.$parent.closeAgreement();
             },
-            closeAgreement(type) {
-                if (!type && this.checkDataChange()) {
-                    this.$bkInfo({
-                        type: 'warning',
-                        title: this.$t('m.slaContent["确认返回？"]'),
-                        // subTitle: this.$t(`m.slaContent["数据发生更改，确认后将不保存修改的数据！"]`),
-                        confirmFn: () => {
-                            this.$parent.getList(1);
-                            this.$parent.closeAgreement();
-                        },
-                    });
-                } else {
-                    this.$parent.getList(1);
-                    this.$parent.closeAgreement();
-                }
-            },
-            // 数据对比
-            checkDataChange() {
-                return true;
-            },
-            // 校验
-            async submitInfo() {
-                const priorityConfigurCheck = await this.$refs.priorityConfigur.checkData();
-                const warningEventRemindCheck = await this.$refs.eventRemind1.checkData();
-                const timeOutEventRemindCheck = await this.$refs.eventRemind3.checkData();
-                this.$refs.dynamicForm.validate().then(() => {
-                    if (!priorityConfigurCheck && !warningEventRemindCheck && !timeOutEventRemindCheck) {
-                        if (this.changeInfo.info.id) {
-                            this.$bkInfo({
-                                type: 'warning',
-                                title: this.$t('m.slaContent["确认更新服务协议？"]'),
-                                // subTitle: this.$t(`m.slaContent["更新的内容将会实时应用在关联的服务中，请谨慎修改！"]`),
-                                confirmFn: () => {
-                                    this.submitFn();
-                                },
-                            });
-                        } else {
-                            this.submitFn();
-                        }
-                    }
-                });
-            },
-        },
-    };
+          });
+        } else {
+          this.$parent.getList(1);
+          this.$parent.closeAgreement();
+        }
+      },
+      // 数据对比
+      checkDataChange() {
+        return true;
+      },
+      // 校验
+      async submitInfo() {
+        const priorityConfigurCheck = await this.$refs.priorityConfigur.checkData();
+        const warningEventRemindCheck = await this.$refs.eventRemind1.checkData();
+        const timeOutEventRemindCheck = await this.$refs.eventRemind3.checkData();
+        this.$refs.dynamicForm.validate().then(() => {
+          if (!priorityConfigurCheck && !warningEventRemindCheck && !timeOutEventRemindCheck) {
+            if (this.changeInfo.info.id) {
+              this.$bkInfo({
+                type: 'warning',
+                title: this.$t('m.slaContent["确认更新服务协议？"]'),
+                // subTitle: this.$t(`m.slaContent["更新的内容将会实时应用在关联的服务中，请谨慎修改！"]`),
+                confirmFn: () => {
+                  this.submitFn();
+                },
+              });
+            } else {
+              this.submitFn();
+            }
+          }
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

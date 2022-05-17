@@ -36,58 +36,58 @@
   </div>
 </template>
 <script>
-    import ViewItem from './ViewItem';
+  import ViewItem from './ViewItem';
 
-    export default {
-        name: 'RenderView',
-        components: {
-            ViewItem,
-        },
-        props: {
-            formData: {
-                type: Array,
-                default: () => ([]),
-            },
-            context: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        provide() {
-            return {
-                getContext: () => this.context,
-            };
-        },
-        data() {
-            return {
-                isRootRenderView: null,
-                value: {},
-            };
-        },
-        created() {
-            this.initRenderView();
-        },
-        methods: {
-            getScheme(form) {
-                if (this.context.schemes[form.scheme]) {
-                    return this.context.schemes[form.scheme];
-                }
-                return {};
-            },
-            initRenderView() {
-                let vueTag = this;
-                let findParent = false;
-                while (!findParent && vueTag.$parent) {
-                    if (vueTag.$parent.$options._componentTag === 'render-view') {
-                        findParent = true;
-                    } else {
-                        vueTag = vueTag.$parent;
-                    }
-                }
-                this.isRootRenderView = !findParent;
-            },
-        },
-    };
+  export default {
+    name: 'RenderView',
+    components: {
+      ViewItem,
+    },
+    props: {
+      formData: {
+        type: Array,
+        default: () => ([]),
+      },
+      context: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    provide() {
+      return {
+        getContext: () => this.context,
+      };
+    },
+    data() {
+      return {
+        isRootRenderView: null,
+        value: {},
+      };
+    },
+    created() {
+      this.initRenderView();
+    },
+    methods: {
+      getScheme(form) {
+        if (this.context.schemes[form.scheme]) {
+          return this.context.schemes[form.scheme];
+        }
+        return {};
+      },
+      initRenderView() {
+        let vueTag = this;
+        let findParent = false;
+        while (!findParent && vueTag.$parent) {
+          if (vueTag.$parent.$options._componentTag === 'render-view') {
+            findParent = true;
+          } else {
+            vueTag = vueTag.$parent;
+          }
+        }
+        this.isRootRenderView = !findParent;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

@@ -184,130 +184,130 @@
 </template>
 
 <script>
-    import { convertTimeArrToMS, convertTimeArrToString } from '@/utils/util.js';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import { convertTimeArrToMS, convertTimeArrToString } from '@/utils/util.js';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'slaRecord',
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            threshold: Array,
+  export default {
+    name: 'slaRecord',
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                convertTimeArrToString,
-                loading: false,
-                slaList: [],
-                runningTime: [],
-                curTime: new Date(),
-                taskStatusColor: [
-                    {},
-                    {
-                        textColor: '#3A84FF',
-                        backgroundColor: '#E1ECFF',
-                    },
-                    {
-                        textColor: '#2DCB56',
-                        backgroundColor: '#DCFFE2',
-                    },
-                    {
-                        textColor: '#63656E',
-                        backgroundColor: '#DCDEE5',
-                    },
-                    {
-                        textColor: '#63656E',
-                        backgroundColor: '#DCDEE5',
-                    },
-                    {
-                        textColor: '#EA3536',
-                        backgroundColor: '#FEDDDC',
-                    },
-                ],
-                taskStatusList: [
-                    '',
-                    this.$t('m.newCommon["未开启"]'),
-                    this.$t('m.newCommon["计时中"]'),
-                    this.$t('m.newCommon["暂停中"]'),
-                    this.$t('m.newCommon["已结束"]'),
-                    this.$t('m.newCommon["已超时"]'),
-                ],
-                responseCost: '',
-                processCost: '',
-            };
-        },
-        watch: {},
-        mounted() {
-            this.getReceiptsSlaTask();
-        },
-        methods: {
-            getReceiptsSlaTask() {
-                if (
-                    Object.prototype.hasOwnProperty.call(this.basicInfomation, 'id')
-                ) {
-                    this.loading = true;
-                    const params = {
-                        id: this.basicInfomation.id,
-                    };
-                    this.$store
-                        .dispatch('change/getReceiptsSlaTask', params)
-                        .then((res) => {
-                            this.slaList = res.data;
-                            this.slaList.forEach((item) => {
-                                this.$set(
-                                    item,
-                                    'sla_responseTime',
-                                    [0, 0, 0, 0, 0, 0]
-                                );
-                                this.$set(
-                                    item,
-                                    'sla_processTime',
-                                    [0, 0, 0, 0, 0, 0]
-                                );
-                            });
-                        })
-                        .catch((res) => {
-                            errorHandler(res, this);
-                        })
-                        .finally(() => {
-                            this.loading = false;
-                            this.changeTimeoutStatus();
-                        });
-                }
-            },
-            changeTimeoutStatus() {
-                this.slaList.forEach((item, index) => {
-                    if (item.task_status === 2) {
-                        // 当前时间
-                        const curTime = convertTimeArrToMS(new Date()
-                            .toLocaleDateString()
-                            .split('/')
-                            .concat(new Date()
-                                .toTimeString()
-                                .split(' ')[0]
-                                .split(':')));
-                        // 响应倒计时
-                        const Rtime = convertTimeArrToMS(item.reply_deadline
-                            .split(' ')[0]
-                            .split('-')
-                            .concat(item.reply_deadline.split(' ')[1].split(':')));
-                        // 处理倒计时
-                        const Ptime = convertTimeArrToMS(item.deadline
-                            .split(' ')[0]
-                            .split('-')
-                            .concat(item.deadline.split(' ')[1].split(':')));
-                        const responseCost = Rtime - curTime;
-                        const processCost = Ptime - curTime;
-                        this.runTime(responseCost, processCost, index, item.name);
-                    }
-                    item.reply_cost = convertTimeArrToString(item.reply_cost);
-                });
-            },
-            /* eslint-disable */
+      },
+      threshold: Array,
+    },
+    data() {
+      return {
+        convertTimeArrToString,
+        loading: false,
+        slaList: [],
+        runningTime: [],
+        curTime: new Date(),
+        taskStatusColor: [
+          {},
+          {
+            textColor: '#3A84FF',
+            backgroundColor: '#E1ECFF',
+          },
+          {
+            textColor: '#2DCB56',
+            backgroundColor: '#DCFFE2',
+          },
+          {
+            textColor: '#63656E',
+            backgroundColor: '#DCDEE5',
+          },
+          {
+            textColor: '#63656E',
+            backgroundColor: '#DCDEE5',
+          },
+          {
+            textColor: '#EA3536',
+            backgroundColor: '#FEDDDC',
+          },
+        ],
+        taskStatusList: [
+          '',
+          this.$t('m.newCommon["未开启"]'),
+          this.$t('m.newCommon["计时中"]'),
+          this.$t('m.newCommon["暂停中"]'),
+          this.$t('m.newCommon["已结束"]'),
+          this.$t('m.newCommon["已超时"]'),
+        ],
+        responseCost: '',
+        processCost: '',
+      };
+    },
+    watch: {},
+    mounted() {
+      this.getReceiptsSlaTask();
+    },
+    methods: {
+      getReceiptsSlaTask() {
+        if (
+          Object.prototype.hasOwnProperty.call(this.basicInfomation, 'id')
+        ) {
+          this.loading = true;
+          const params = {
+            id: this.basicInfomation.id,
+          };
+          this.$store
+            .dispatch('change/getReceiptsSlaTask', params)
+            .then((res) => {
+              this.slaList = res.data;
+              this.slaList.forEach((item) => {
+                this.$set(
+                  item,
+                  'sla_responseTime',
+                  [0, 0, 0, 0, 0, 0]
+                );
+                this.$set(
+                  item,
+                  'sla_processTime',
+                  [0, 0, 0, 0, 0, 0]
+                );
+              });
+            })
+            .catch((res) => {
+              errorHandler(res, this);
+            })
+            .finally(() => {
+              this.loading = false;
+              this.changeTimeoutStatus();
+            });
+        }
+      },
+      changeTimeoutStatus() {
+        this.slaList.forEach((item, index) => {
+          if (item.task_status === 2) {
+            // 当前时间
+            const curTime = convertTimeArrToMS(new Date()
+              .toLocaleDateString()
+              .split('/')
+              .concat(new Date()
+                .toTimeString()
+                .split(' ')[0]
+                .split(':')));
+            // 响应倒计时
+            const Rtime = convertTimeArrToMS(item.reply_deadline
+              .split(' ')[0]
+              .split('-')
+              .concat(item.reply_deadline.split(' ')[1].split(':')));
+            // 处理倒计时
+            const Ptime = convertTimeArrToMS(item.deadline
+              .split(' ')[0]
+              .split('-')
+              .concat(item.deadline.split(' ')[1].split(':')));
+            const responseCost = Rtime - curTime;
+            const processCost = Ptime - curTime;
+            this.runTime(responseCost, processCost, index, item.name);
+          }
+          item.reply_cost = convertTimeArrToString(item.reply_cost);
+        });
+      },
+      /* eslint-disable */
         changeTime(currentSec) {
             const absCurrentSec = Math.abs(currentSec);
             const day = absCurrentSec / (24 * 60 * 60);

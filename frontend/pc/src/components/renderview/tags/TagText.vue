@@ -43,55 +43,55 @@
 </template>
 
 <script>
-    import { getFormMixins } from '../formMixins';
-    import Sideslider from '../sideslider/sideslider.js';
+  import { getFormMixins } from '../formMixins';
+  import Sideslider from '../sideslider/sideslider.js';
 
-    const textAttrs = {
-        styles: {
-            type: Object,
-            default: () => ({}),
-        },
-        value: {
-            type: [String, Array],
-            default: '',
-        },
-    };
-    export default {
-        name: 'TagText',
-        mixins: [getFormMixins(textAttrs)],
-        data() {
-            return {};
-        },
-        computed: {
-            hasChildren() {
-                return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length;
-            },
-        },
-        methods: {
-            onClick() {
-                if (!this.hasChildren) {
-                    return;
-                }
-                let title = '';
-                if (Array.isArray(this.value)) {
-                    title = this.value.map(item => (item.label || '') + item.value).join(',');
-                } else {
-                    title = (this.label || '') + this.value;
-                }
-                const context = this.getContext();
-                if (context.config && context.config.mode === 'combine') {
-                    const topViewItem = this.getTopViewItem();
-                    topViewItem.appendCrumbsItem(title, this.form.children);
-                } else {
-                    Sideslider({
-                        title,
-                        formData: this.form.children,
-                        context,
-                    });
-                }
-            },
-        },
-    };
+  const textAttrs = {
+    styles: {
+      type: Object,
+      default: () => ({}),
+    },
+    value: {
+      type: [String, Array],
+      default: '',
+    },
+  };
+  export default {
+    name: 'TagText',
+    mixins: [getFormMixins(textAttrs)],
+    data() {
+      return {};
+    },
+    computed: {
+      hasChildren() {
+        return this.form.children && Array.isArray(this.form.children) && !!this.form.children.length;
+      },
+    },
+    methods: {
+      onClick() {
+        if (!this.hasChildren) {
+          return;
+        }
+        let title = '';
+        if (Array.isArray(this.value)) {
+          title = this.value.map(item => (item.label || '') + item.value).join(',');
+        } else {
+          title = (this.label || '') + this.value;
+        }
+        const context = this.getContext();
+        if (context.config && context.config.mode === 'combine') {
+          const topViewItem = this.getTopViewItem();
+          topViewItem.appendCrumbsItem(title, this.form.children);
+        } else {
+          Sideslider({
+            title,
+            formData: this.form.children,
+            context,
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

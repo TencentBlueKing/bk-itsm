@@ -151,166 +151,166 @@
 </template>
 
 <script>
-    import commonMix from '../../commonMix/common.js';
-    export default {
-        name: 'priorityConfigur',
-        mixins: [commonMix],
-        props: {
-            modelList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            modelPriority: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  import commonMix from '../../commonMix/common.js';
+  export default {
+    name: 'priorityConfigur',
+    mixins: [commonMix],
+    props: {
+      modelList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                // 程度颜色
-                typeColorList: ['', '#99C5FF', '#FE9C00', '#EA3536'],
-                timeList: [
-                    { id: 'm', name: this.$t('m.slaContent["分钟"]') },
-                    { id: 'h', name: this.$t('m.slaContent["小时"]') },
-                    { id: 'd', name: this.$t('m.slaContent["天"]') },
-                ],
-                priorityList: [],
-                historyPriority: [],
-                // 校验规则
-                scheduleRules: {},
-                handleTimeRules: {},
-                replyTimeRules: {
-                    reply_time: [
-                        {
-                            message: '字段必填',
-                            required: true,
-                            trigger: 'blur',
-                            type: 'string',
-                            validator: v => !!v,
-                        },
-                    ],
-                },
-                iconOffset: 75,
-            };
+      },
+      modelPriority: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            modelPriority() {
-                this.initData();
-            },
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted() {
-            this.initData();
-            // 初始化校验规则
-            this.scheduleRules = this.checkCommonRules('schedule');
-            this.handleTimeRules = this.checkCommonRules('handle_time');
+      },
+    },
+    data() {
+      return {
+        // 程度颜色
+        typeColorList: ['', '#99C5FF', '#FE9C00', '#EA3536'],
+        timeList: [
+          { id: 'm', name: this.$t('m.slaContent["分钟"]') },
+          { id: 'h', name: this.$t('m.slaContent["小时"]') },
+          { id: 'd', name: this.$t('m.slaContent["天"]') },
+        ],
+        priorityList: [],
+        historyPriority: [],
+        // 校验规则
+        scheduleRules: {},
+        handleTimeRules: {},
+        replyTimeRules: {
+          reply_time: [
+            {
+              message: '字段必填',
+              required: true,
+              trigger: 'blur',
+              type: 'string',
+              validator: v => !!v,
+            },
+          ],
         },
-        methods: {
-            initData() {
-                const parentInfo = this.changeInfo.info;
-                // 区分初始化和编辑状态priorityList的值不同
-                if (!parentInfo.policies.length) {
-                    this.modelPriority.forEach((item) => {
-                        this.priorityList.push({
-                            priority: item.key,
-                            schedule: '',
-                            handle_time: '',
-                            handle_unit: 'h',
-                            reply_time: '',
-                            reply_unit: 'h',
-                            scheduleCheck: false,
-                            timeCheck: false,
-                            isRespDropdownShow: false,
-                            isDealDropdownShow: false,
-                        });
-                    });
-                } else {
-                    this.priorityList = [];
-                    parentInfo.policies.forEach((item) => {
-                        this.priorityList.push({
-                            priority: item.priority,
-                            schedule: item.schedule,
-                            handle_time: item.handle_time,
-                            handle_unit: item.handle_unit,
-                            reply_time: item.reply_time,
-                            reply_unit: item.reply_unit,
-                            id: item.id,
-                            scheduleCheck: false,
-                            timeCheck: false,
-                            isRespDropdownShow: false,
-                            isDealDropdownShow: false,
-                        });
-                    });
-                }
-                // 深拷贝数据
-                this.historyPriority = JSON.parse(JSON.stringify(this.priorityList));
-            },
-            dropdownShow(item, key) {
-                if (key === 'resp') {
-                    item.isRespDropdownShow = true;
-                } else if (key === 'deal') {
-                    item.isDealDropdownShow = true;
-                }
-            },
-            dropdownHide(item, key) {
-                if (key === 'resp') {
-                    item.isRespDropdownShow = false;
-                } else if (key === 'deal') {
-                    item.isDealDropdownShow = false;
-                }
-            },
-            timeHandler(key, time, item, index, order) {
-                this.$refs[`dropdown${index}`][order].hide();
-                item[key] = time.id;
-            },
-            // 跳转到新建服务模式
-            handleCreate() {
-                const routeData = this.$router.resolve({ path: '/project/sla_manage', query: { project_id: this.$store.state.project.id, key: 'create' } });
-                window.open(routeData.href, '_blank');
-            },
-            // 校验
-            async checkData() {
-                const validates = [];
-                let valid = true;
-                this.$refs.schedule.forEach((item) => {
-                    validates.push(item.validate());
-                });
-                if (this.changeInfo.is_reply_need) {
-                    this.$refs.replyTime.forEach((item) => {
-                        validates.push(item.validate());
-                    });
-                }
-                this.$refs.handleTime.forEach((item) => {
-                    validates.push(item.validate());
-                });
-                await Promise.all(validates).then(() => {
-                    valid = false;
-                })
-                    .catch(() => {
-                        // 防止出现Uncaught
-                        valid = true;
-                    });
-                return valid;
-            },
-            clearFromError() {
-                const refs = ['schedule', 'replyTime', 'handleTime'];
-                refs.forEach((item) => {
-                    this.$refs[item].forEach((ite) => {
-                        ite.clearError();
-                    });
-                });
-            },
-        },
-    };
+        iconOffset: 75,
+      };
+    },
+    watch: {
+      modelPriority() {
+        this.initData();
+      },
+    },
+    mounted() {
+      this.initData();
+      // 初始化校验规则
+      this.scheduleRules = this.checkCommonRules('schedule');
+      this.handleTimeRules = this.checkCommonRules('handle_time');
+    },
+    methods: {
+      initData() {
+        const parentInfo = this.changeInfo.info;
+        // 区分初始化和编辑状态priorityList的值不同
+        if (!parentInfo.policies.length) {
+          this.modelPriority.forEach((item) => {
+            this.priorityList.push({
+              priority: item.key,
+              schedule: '',
+              handle_time: '',
+              handle_unit: 'h',
+              reply_time: '',
+              reply_unit: 'h',
+              scheduleCheck: false,
+              timeCheck: false,
+              isRespDropdownShow: false,
+              isDealDropdownShow: false,
+            });
+          });
+        } else {
+          this.priorityList = [];
+          parentInfo.policies.forEach((item) => {
+            this.priorityList.push({
+              priority: item.priority,
+              schedule: item.schedule,
+              handle_time: item.handle_time,
+              handle_unit: item.handle_unit,
+              reply_time: item.reply_time,
+              reply_unit: item.reply_unit,
+              id: item.id,
+              scheduleCheck: false,
+              timeCheck: false,
+              isRespDropdownShow: false,
+              isDealDropdownShow: false,
+            });
+          });
+        }
+        // 深拷贝数据
+        this.historyPriority = JSON.parse(JSON.stringify(this.priorityList));
+      },
+      dropdownShow(item, key) {
+        if (key === 'resp') {
+          item.isRespDropdownShow = true;
+        } else if (key === 'deal') {
+          item.isDealDropdownShow = true;
+        }
+      },
+      dropdownHide(item, key) {
+        if (key === 'resp') {
+          item.isRespDropdownShow = false;
+        } else if (key === 'deal') {
+          item.isDealDropdownShow = false;
+        }
+      },
+      timeHandler(key, time, item, index, order) {
+        this.$refs[`dropdown${index}`][order].hide();
+        item[key] = time.id;
+      },
+      // 跳转到新建服务模式
+      handleCreate() {
+        const routeData = this.$router.resolve({ path: '/project/sla_manage', query: { project_id: this.$store.state.project.id, key: 'create' } });
+        window.open(routeData.href, '_blank');
+      },
+      // 校验
+      async checkData() {
+        const validates = [];
+        let valid = true;
+        this.$refs.schedule.forEach((item) => {
+          validates.push(item.validate());
+        });
+        if (this.changeInfo.is_reply_need) {
+          this.$refs.replyTime.forEach((item) => {
+            validates.push(item.validate());
+          });
+        }
+        this.$refs.handleTime.forEach((item) => {
+          validates.push(item.validate());
+        });
+        await Promise.all(validates).then(() => {
+          valid = false;
+        })
+          .catch(() => {
+            // 防止出现Uncaught
+            valid = true;
+          });
+        return valid;
+      },
+      clearFromError() {
+        const refs = ['schedule', 'replyTime', 'handleTime'];
+        refs.forEach((item) => {
+          this.$refs[item].forEach((ite) => {
+            ite.clearError();
+          });
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

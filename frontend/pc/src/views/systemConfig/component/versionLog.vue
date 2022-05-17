@@ -45,49 +45,49 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler';
-    export default {
-        name: 'versionLog',
-        props: {
-            versionLogData: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  import { errorHandler } from '../../../utils/errorHandler';
+  export default {
+    name: 'versionLog',
+    props: {
+      versionLogData: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                versionData: [],
-                isDataLoading: false,
-            };
-        },
-        mounted() {
-            this.getHistory();
-        },
-        methods: {
-            getHistory() {
-                this.isDataLoading = true;
-                this.$store.dispatch('version/updateHistory').then((res) => {
-                    this.versionData = res.data.data;
-                    this.versionData.forEach((item) => {
-                        if (item.version_from) {
-                            item.version_from = `V${item.version_from}`;
-                        }
-                        if (item.version_to) {
-                            item.version_to = `V${item.version_to}`;
-                        }
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        versionData: [],
+        isDataLoading: false,
+      };
+    },
+    mounted() {
+      this.getHistory();
+    },
+    methods: {
+      getHistory() {
+        this.isDataLoading = true;
+        this.$store.dispatch('version/updateHistory').then((res) => {
+          this.versionData = res.data.data;
+          this.versionData.forEach((item) => {
+            if (item.version_from) {
+              item.version_from = `V${item.version_from}`;
+            }
+            if (item.version_to) {
+              item.version_to = `V${item.version_to}`;
+            }
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

@@ -42,58 +42,58 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
+  import mixins from '../../commonMix/field.js';
 
-    export default {
-        name: 'STRING',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default: () => {
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'STRING',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default: () => {
         },
-        data() {
-            return {};
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        computed: {
-            maxLength() {
-                if (this.item.key === 'title') {
-                    return 120;
-                }
-                if (this.item.key === 'task_name') { // 标准运维任务名限制 50
-                    return 50;
-                }
-                return null;
-            },
-        },
-        watch: {
-            'item.val'() {
-                this.conditionField(this.item, this.fields);
-            },
-        },
-        mounted() {
-            this.conditionField(this.item, this.fields);
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-        },
-    };
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    computed: {
+      maxLength() {
+        if (this.item.key === 'title') {
+          return 120;
+        }
+        if (this.item.key === 'task_name') { // 标准运维任务名限制 50
+          return 50;
+        }
+        return null;
+      },
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      this.conditionField(this.item, this.fields);
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

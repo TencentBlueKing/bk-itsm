@@ -98,117 +98,117 @@
 </template>
 
 <script>
-    import apiRunConfig from './apiRunConfig.vue';
-    import ace from '../../../commonComponent/aceEditor/index.js';
-    import mixins from '../../../commonMix/mixins_api.js';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import apiRunConfig from './apiRunConfig.vue';
+  import ace from '../../../commonComponent/aceEditor/index.js';
+  import mixins from '../../../commonMix/mixins_api.js';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        components: {
-            apiRunConfig,
-            ace,
+  export default {
+    components: {
+      apiRunConfig,
+      ace,
+    },
+    mixins: [mixins],
+    props: {
+      apiDetailInfoCommon: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            apiDetailInfoCommon: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        alarmDetailConfig: {
+          value: '',
+          width: '100%',
+          height: 300,
+          readOnly: true,
+          fullScreen: true,
+          lang: 'json',
         },
-        data() {
-            return {
-                alarmDetailConfig: {
-                    value: '',
-                    width: '100%',
-                    height: 300,
-                    readOnly: true,
-                    fullScreen: true,
-                    lang: 'json',
-                },
-                reqDataProcess: {
-                    value: '',
-                    width: '100%',
-                    height: 300,
-                    fullScreen: true,
-                    lang: 'python',
-                },
-                dataProcess: {
-                    value: '',
-                    width: '100%',
-                    height: 300,
-                    fullScreen: true,
-                    lang: 'python',
-                },
-                // 是否执行成功
-                isSuccess: true,
-            };
+        reqDataProcess: {
+          value: '',
+          width: '100%',
+          height: 300,
+          fullScreen: true,
+          lang: 'python',
         },
-        computed: {},
-        watch: {},
-        mounted() {
-            // this.initDate()
+        dataProcess: {
+          value: '',
+          width: '100%',
+          height: 300,
+          fullScreen: true,
+          lang: 'python',
         },
-        methods: {
-            getRemoteApiDetail(id) {
-                this.$parent.$parent.getRemoteApiDetail(id);
-            },
-            changBlur(val) {
-                this.dataProcess.value = val;
-            },
-            reqChangBlur(val) {
-                this.reqDataProcess.value = val;
-            },
-            editorInitAfter() {
-            },
-            async updateApi() {
-                if (this.secondClick || !this.apiDetailInfoCommon.treeDataList || !this.apiDetailInfoCommon.responseTreeDataList) {
-                    return;
-                }
-                try {
-                    // 2.重置数据 参数和返回数据统一
-                    const resData = JSON.parse(this.alarmDetailConfig.value);
-                    this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value));
-                    this.apiDetailInfoCommon.resJsonschemaData = this.jsonToJsonschema(resData || {});
-                } catch (err) {
-                    this.$bkMessage({
-                        message: err.message ? err.message : err,
-                        theme: 'error',
-                    });
-                    return;
-                }
-                // body Jsonschema数据结构
-                this.apiDetailInfoCommon.req_body = this.apiDetailInfoCommon.bodyJsonschemaData.root; // root初始 Jsonschema数据结构
-                // response Jsonschema数据结构
-                this.apiDetailInfoCommon.rsp_data = this.apiDetailInfoCommon.resJsonschemaData.root; // root初始 Jsonschema数据结构
-                // 删除多重数据
-                await delete this.apiDetailInfoCommon.treeDataList;
-                await delete this.apiDetailInfoCommon.responseTreeDataList;
+        // 是否执行成功
+        isSuccess: true,
+      };
+    },
+    computed: {},
+    watch: {},
+    mounted() {
+      // this.initDate()
+    },
+    methods: {
+      getRemoteApiDetail(id) {
+        this.$parent.$parent.getRemoteApiDetail(id);
+      },
+      changBlur(val) {
+        this.dataProcess.value = val;
+      },
+      reqChangBlur(val) {
+        this.reqDataProcess.value = val;
+      },
+      editorInitAfter() {
+      },
+      async updateApi() {
+        if (this.secondClick || !this.apiDetailInfoCommon.treeDataList || !this.apiDetailInfoCommon.responseTreeDataList) {
+          return;
+        }
+        try {
+          // 2.重置数据 参数和返回数据统一
+          const resData = JSON.parse(this.alarmDetailConfig.value);
+          this.apiDetailInfoCommon.bodyJsonschemaData = this.jsonToJsonschema(JSON.parse(this.$refs.apiRunConfig.bodyDetailConfig.value));
+          this.apiDetailInfoCommon.resJsonschemaData = this.jsonToJsonschema(resData || {});
+        } catch (err) {
+          this.$bkMessage({
+            message: err.message ? err.message : err,
+            theme: 'error',
+          });
+          return;
+        }
+        // body Jsonschema数据结构
+        this.apiDetailInfoCommon.req_body = this.apiDetailInfoCommon.bodyJsonschemaData.root; // root初始 Jsonschema数据结构
+        // response Jsonschema数据结构
+        this.apiDetailInfoCommon.rsp_data = this.apiDetailInfoCommon.resJsonschemaData.root; // root初始 Jsonschema数据结构
+        // 删除多重数据
+        await delete this.apiDetailInfoCommon.treeDataList;
+        await delete this.apiDetailInfoCommon.responseTreeDataList;
 
-                const params = this.apiDetailInfoCommon;
-                if (params.req_body.required.length === 0) {
-                    delete params.req_body.required;
-                }
-                params.map_code = this.dataProcess.value;
-                params.before_req = this.reqDataProcess.value;
-                this.secondClick = true;
-                await this.$store.dispatch('apiRemote/put_remote_api', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.systemConfig["更新成功"]'),
-                        theme: 'success',
-                    });
-                    this.getRemoteApiDetail(this.apiDetailInfoCommon.id);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.secondClick = false;
-                    });
-            },
-        },
-    };
+        const params = this.apiDetailInfoCommon;
+        if (params.req_body.required.length === 0) {
+          delete params.req_body.required;
+        }
+        params.map_code = this.dataProcess.value;
+        params.before_req = this.reqDataProcess.value;
+        this.secondClick = true;
+        await this.$store.dispatch('apiRemote/put_remote_api', params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.systemConfig["更新成功"]'),
+            theme: 'success',
+          });
+          this.getRemoteApiDetail(this.apiDetailInfoCommon.id);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.secondClick = false;
+          });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

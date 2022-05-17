@@ -83,64 +83,64 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'NodeTemplate',
-        props: {
-            node: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            previewInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            normalColor: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'NodeTemplate',
+    props: {
+      node: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                moveFlag: false,
-                typeList: [
-                    { type: 'NORMAL', iconStyle: 'icon-icon-person' },
-                    { type: 'ROUTER', iconStyle: 'icon-icon-person' },
-                    { type: 'TASK', iconStyle: 'icon-api-icon' },
-                    { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
-                    { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
-                ],
-            };
+      },
+      previewInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted() {
+      },
+      normalColor: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        moveFlag: false,
+        typeList: [
+          { type: 'NORMAL', iconStyle: 'icon-icon-person' },
+          { type: 'ROUTER', iconStyle: 'icon-icon-person' },
+          { type: 'TASK', iconStyle: 'icon-api-icon' },
+          { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+          { type: 'TASK-DEVOPS', iconStyle: 'icon-devops-task-icon' },
+          { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
+          { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+        ],
+      };
+    },
+    mounted() {
 
-        },
-        methods: {
-            movdeDoneFn() {
-                this.moveFlag = false;
-            },
-            moveFn() {
-                this.moveFlag = true;
-            },
-            onNodeClick(node) {
-                if (!this.moveFlag) {
-                    // 对于开始，结束，网关，汇聚不弹出信息
-                    if (node.type === 'START' || node.type === 'END' || node.type === 'ROUTER-P' || node.type === 'COVERAGE') {
-                        return;
-                    }
-                    this.$emit('clickNodeInfo', node);
-                } else {
-                    this.$emit('submitNodeValue', node);
-                }
-                this.moveFlag = false;
-            },
-        },
-    };
+    },
+    methods: {
+      movdeDoneFn() {
+        this.moveFlag = false;
+      },
+      moveFn() {
+        this.moveFlag = true;
+      },
+      onNodeClick(node) {
+        if (!this.moveFlag) {
+          // 对于开始，结束，网关，汇聚不弹出信息
+          if (node.type === 'START' || node.type === 'END' || node.type === 'ROUTER-P' || node.type === 'COVERAGE') {
+            return;
+          }
+          this.$emit('clickNodeInfo', node);
+        } else {
+          this.$emit('submitNodeValue', node);
+        }
+        this.moveFlag = false;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     @import './nodeTemplate.scss';

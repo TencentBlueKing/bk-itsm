@@ -98,139 +98,139 @@
   </div>
 </template>
 <script>
-    import commonMix from '../../../commonMix/common.js';
-    import memberSelect from '../../../commonComponent/memberSelect';
-    import { errorHandler } from '../../../../utils/errorHandler.js';
-    import SectionCard from '@/components/common/layout/SectionCard';
+  import commonMix from '../../../commonMix/common.js';
+  import memberSelect from '../../../commonComponent/memberSelect';
+  import { errorHandler } from '../../../../utils/errorHandler.js';
+  import SectionCard from '@/components/common/layout/SectionCard';
 
-    export default {
-        name: 'CreateProcess',
-        components: { memberSelect, SectionCard },
-        mixins: [commonMix],
-        props: {
-            flowInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            isNewFlow: {
-                type: Boolean,
-                default: false,
-            },
-            isSaveing: {
-                type: Boolean,
-                default: false,
-            },
-            processId: {
-                type: [String, Number],
-                required: true,
-            },
+  export default {
+    name: 'CreateProcess',
+    components: { memberSelect, SectionCard },
+    mixins: [commonMix],
+    props: {
+      flowInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                // 基础模型类型
-                flowModuleTypes: [],
-                // 新增or修改
-                addStatus: false,
-                // 表单数据
-                formInfo: {
-                    // 流程名称
-                    name: '',
-                    // 流程说明
-                    desc: '',
-                    // 流程类型
-                    flowType: '',
-                    // 基础模型类型
-                    flowModuleType: '',
-                    // 关联业务
-                    business: false,
-                    // 流程配置中使用权限中心角色
-                    useIam: false,
-                    flowModuleTypeDisabled: false,
-                    owners: [],
-                },
-                // 校验
-                rules: {},
-                // 向父组件传值
-                parentInfo: {
-                    status: 'success',
-                    index: 0,
-                    firstStep: {},
-                },
-            };
+      },
+      isNewFlow: {
+        type: Boolean,
+        default: false,
+      },
+      isSaveing: {
+        type: Boolean,
+        default: false,
+      },
+      processId: {
+        type: [String, Number],
+        required: true,
+      },
+    },
+    data() {
+      return {
+        // 基础模型类型
+        flowModuleTypes: [],
+        // 新增or修改
+        addStatus: false,
+        // 表单数据
+        formInfo: {
+          // 流程名称
+          name: '',
+          // 流程说明
+          desc: '',
+          // 流程类型
+          flowType: '',
+          // 基础模型类型
+          flowModuleType: '',
+          // 关联业务
+          business: false,
+          // 流程配置中使用权限中心角色
+          useIam: false,
+          flowModuleTypeDisabled: false,
+          owners: [],
         },
-        watch: {
-            flowInfo() {
-                this.initInfo();
-            },
+        // 校验
+        rules: {},
+        // 向父组件传值
+        parentInfo: {
+          status: 'success',
+          index: 0,
+          firstStep: {},
         },
-        mounted() {
-            this.getFlowModuleTypes();
-            // 判断是编辑数据还是新增数据
-            if (!this.isNewFlow) {
-                this.initInfo();
-            }
-            // 校验
-            this.rules.name = this.checkCommonRules('name').name;
-            this.rules.flowModuleType = this.checkCommonRules('select').select;
-        },
-        methods: {
-            // 基础模型类型
-            getFlowModuleTypes() {
-                const params = {
-                    all: true,
-                };
-                this.$store.dispatch('basicModule/get_tables', params).then((res) => {
-                    this.flowModuleTypes = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 通过ID获取数据
-            initInfo() {
-                this.formInfo.name = this.flowInfo.name;
-                this.formInfo.owners = this.flowInfo.owners ? this.flowInfo.owners.split(',') : [];
-                this.formInfo.desc = this.flowInfo.desc;
-                this.formInfo.flowType = this.flowInfo.flow_type;
-                this.formInfo.flowModuleType = this.flowInfo.table || '';
-                this.formInfo.flowModuleTypeDisabled = !!this.flowInfo.table;
-                this.formInfo.business = this.flowInfo.is_biz_needed;
-                this.formInfo.useIam = this.flowInfo.is_iam_used;
-            },
-            // 数据校验
-            changeText() {
-                this.$refs.stepOneForm.validate().then(() => {
-                    this.stepNext();
-                });
-            },
-            // 下一步操作
-            stepNext() {
-                if (this.isSaveing) {
-                    return;
-                }
-                // 基础参数
-                const params = {
-                    name: this.formInfo.name,
-                    owners: this.formInfo.owners.join(','),
-                    flow_type: this.formInfo.flowType || 'other',
-                    table: this.formInfo.flowModuleType,
-                    desc: this.formInfo.desc,
-                    is_biz_needed: this.formInfo.business,
-                    is_iam_used: this.formInfo.useIam,
-                };
-                // 保存
-                this.$emit('saveFlowInfo', params, this.isNewFlow);
-                this.$emit('onBusinessChange', this.formInfo.business);
-            },
-            previousStep() {
-                this.$router.push({
-                    name: 'ProcessHome',
-                });
-            },
-        },
-    };
+      };
+    },
+    watch: {
+      flowInfo() {
+        this.initInfo();
+      },
+    },
+    mounted() {
+      this.getFlowModuleTypes();
+      // 判断是编辑数据还是新增数据
+      if (!this.isNewFlow) {
+        this.initInfo();
+      }
+      // 校验
+      this.rules.name = this.checkCommonRules('name').name;
+      this.rules.flowModuleType = this.checkCommonRules('select').select;
+    },
+    methods: {
+      // 基础模型类型
+      getFlowModuleTypes() {
+        const params = {
+          all: true,
+        };
+        this.$store.dispatch('basicModule/get_tables', params).then((res) => {
+          this.flowModuleTypes = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 通过ID获取数据
+      initInfo() {
+        this.formInfo.name = this.flowInfo.name;
+        this.formInfo.owners = this.flowInfo.owners ? this.flowInfo.owners.split(',') : [];
+        this.formInfo.desc = this.flowInfo.desc;
+        this.formInfo.flowType = this.flowInfo.flow_type;
+        this.formInfo.flowModuleType = this.flowInfo.table || '';
+        this.formInfo.flowModuleTypeDisabled = !!this.flowInfo.table;
+        this.formInfo.business = this.flowInfo.is_biz_needed;
+        this.formInfo.useIam = this.flowInfo.is_iam_used;
+      },
+      // 数据校验
+      changeText() {
+        this.$refs.stepOneForm.validate().then(() => {
+          this.stepNext();
+        });
+      },
+      // 下一步操作
+      stepNext() {
+        if (this.isSaveing) {
+          return;
+        }
+        // 基础参数
+        const params = {
+          name: this.formInfo.name,
+          owners: this.formInfo.owners.join(','),
+          flow_type: this.formInfo.flowType || 'other',
+          table: this.formInfo.flowModuleType,
+          desc: this.formInfo.desc,
+          is_biz_needed: this.formInfo.business,
+          is_iam_used: this.formInfo.useIam,
+        };
+        // 保存
+        this.$emit('saveFlowInfo', params, this.isNewFlow);
+        this.$emit('onBusinessChange', this.formInfo.business);
+      },
+      previousStep() {
+        this.$router.push({
+          name: 'ProcessHome',
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

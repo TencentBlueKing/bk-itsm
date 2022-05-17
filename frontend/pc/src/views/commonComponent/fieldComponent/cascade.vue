@@ -85,114 +85,114 @@
 </template>
 
 <script>
-    export default {
-        name: 'CASCADE',
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {},
-            },
-            fields: {
-                type: Array,
-                required: true,
-                default: () => [],
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        data() {
-            return {
-                // selectList: []
-                firstShow: false,
-                firstInfo: this.item.val,
-                firstList: [],
-                secondInfo: '',
-                firstPlace: this.$t('m.newCommon["请选择所属的厅委办"]'),
-                secondPlace: this.$t('m.newCommon["请选择所属业务"]'),
-                clickChange: false,
-            };
-        },
-        computed: {
-            changeFields() {
-                return this.fields;
-            },
-        },
-        watch: {
-            'item.val'() {
-                this.changeInfo();
-            },
-        },
-        mounted() {
-            this.changeInfo();
-        },
-        methods: {
-            itemSelect(val) {
-                const itemInfo = this.item.choice.filter(item => item.key === val)[0];
-                this.clickInfo = true;
-                this.firstShow = !!itemInfo.items;
-                this.firstInfo = val;
-                this.item.val = this.firstShow ? '' : val;
-                this.firstList = itemInfo.items;
-                this.secondInfo = '';
-                this.clickChange = true;
-            },
-            changeFrist(val) {
-                this.secondInfo = val;
-                this.item.val = this.secondInfo;
-            },
-            changeInfo() {
-                if (this.clickChange) {
-                    this.clickChange = false;
-                    return;
+  export default {
+    name: 'CASCADE',
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {},
+      },
+      fields: {
+        type: Array,
+        required: true,
+        default: () => [],
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        // selectList: []
+        firstShow: false,
+        firstInfo: this.item.val,
+        firstList: [],
+        secondInfo: '',
+        firstPlace: this.$t('m.newCommon["请选择所属的厅委办"]'),
+        secondPlace: this.$t('m.newCommon["请选择所属业务"]'),
+        clickChange: false,
+      };
+    },
+    computed: {
+      changeFields() {
+        return this.fields;
+      },
+    },
+    watch: {
+      'item.val'() {
+        this.changeInfo();
+      },
+    },
+    mounted() {
+      this.changeInfo();
+    },
+    methods: {
+      itemSelect(val) {
+        const itemInfo = this.item.choice.filter(item => item.key === val)[0];
+        this.clickInfo = true;
+        this.firstShow = !!itemInfo.items;
+        this.firstInfo = val;
+        this.item.val = this.firstShow ? '' : val;
+        this.firstList = itemInfo.items;
+        this.secondInfo = '';
+        this.clickChange = true;
+      },
+      changeFrist(val) {
+        this.secondInfo = val;
+        this.item.val = this.secondInfo;
+      },
+      changeInfo() {
+        if (this.clickChange) {
+          this.clickChange = false;
+          return;
+        }
+
+        if (!this.item.val) {
+          this.firstShow = false;
+          this.firstList = [];
+          this.firstInfo = '';
+        } else {
+          this.firstShow = false;
+          this.firstList = [];
+          let valStatus = true;
+          for (let i = 0; i < this.item.choice.length; i++) {
+            if (String(this.item.choice[i].key) === String(this.item.val)) {
+              this.firstInfo = this.item.val;
+              valStatus = false;
+              this.firstShow = !!this.item.choice[i].items;
+              break;
+            }
+          }
+          if (valStatus) {
+            for (let i = 0; i < this.item.choice.length; i++) {
+              if (this.item.choice[i].items) {
+                const valInfo = this.item.choice[i].items;
+                this.firstShow = true;
+                if (this.firstInfo === this.item.choice[i].key) {
+                  this.firstList = valInfo;
                 }
 
-                if (!this.item.val) {
-                    this.firstShow = false;
-                    this.firstList = [];
-                    this.firstInfo = '';
-                } else {
-                    this.firstShow = false;
-                    this.firstList = [];
-                    let valStatus = true;
-                    for (let i = 0; i < this.item.choice.length; i++) {
-                        if (String(this.item.choice[i].key) === String(this.item.val)) {
-                            this.firstInfo = this.item.val;
-                            valStatus = false;
-                            this.firstShow = !!this.item.choice[i].items;
-                            break;
-                        }
-                    }
-                    if (valStatus) {
-                        for (let i = 0; i < this.item.choice.length; i++) {
-                            if (this.item.choice[i].items) {
-                                const valInfo = this.item.choice[i].items;
-                                this.firstShow = true;
-                                if (this.firstInfo === this.item.choice[i].key) {
-                                    this.firstList = valInfo;
-                                }
-
-                                for (let j = 0; j < valInfo.length; j++) {
-                                    if (String(valInfo[j].key) === String(this.item.val)) {
-                                        this.firstList = valInfo;
-                                        this.secondInfo = this.item.val;
-                                        this.firstInfo = this.item.choice[i].key;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                for (let j = 0; j < valInfo.length; j++) {
+                  if (String(valInfo[j].key) === String(this.item.val)) {
+                    this.firstList = valInfo;
+                    this.secondInfo = this.item.val;
+                    this.firstInfo = this.item.choice[i].key;
+                    break;
+                  }
                 }
-            },
-        },
-    };
+              }
+            }
+          }
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

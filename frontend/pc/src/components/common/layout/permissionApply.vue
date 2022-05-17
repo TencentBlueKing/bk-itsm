@@ -38,84 +38,84 @@
   </div>
 </template>
 <script>
-    import PermissionContent from './PermissionContent.vue';
-    import permission from '@/mixins/permission.js';
-    import _ from 'lodash';
-    import { errorHandler } from '@/utils/errorHandler.js';
+  import PermissionContent from './PermissionContent.vue';
+  import permission from '@/mixins/permission.js';
+  import _ from 'lodash';
+  import { errorHandler } from '@/utils/errorHandler.js';
 
-    export default {
-        name: 'PermissionApply',
-        components: {
-            PermissionContent,
+  export default {
+    name: 'PermissionApply',
+    components: {
+      PermissionContent,
+    },
+    mixins: [permission],
+    props: {
+      permissionData: {
+        type: Object,
+        default() {
+          return {
+            type: 'project', // 无权限类型: project、other
+            permission: null,
+          };
         },
-        mixins: [permission],
-        props: {
-            permissionData: {
-                type: Object,
-                default() {
-                    return {
-                        type: 'project', // 无权限类型: project、other
-                        permission: null,
-                    };
-                },
-            },
+      },
+    },
+    data() {
+      return {
+        url: '',
+        loading: false,
+        hasClicked: false,
+        authActions: [],
+      };
+    },
+    watch: {
+      permissionData: {
+        deep: true,
+        immediate: true,
+        handler(val, oldVal) {
+          if (!_.isEqual(val, oldVal)) {
+            this.loadPermissionUrl();
+          }
         },
-        data() {
-            return {
-                url: '',
-                loading: false,
-                hasClicked: false,
-                authActions: [],
-            };
-        },
-        watch: {
-            permissionData: {
-                deep: true,
-                immediate: true,
-                handler(val, oldVal) {
-                    if (!_.isEqual(val, oldVal)) {
-                        this.loadPermissionUrl();
-                    }
-                },
-            },
-        },
-        created() {
-            if (this.permissionData.permission) {
-                this.loadPermissionUrl();
-            }
-        },
-        methods: {
-            applyBtnClick() {
-                this.goToAuthCenter();
-            },
-            goToAuthCenter() {
-                if (this.loading || !this.url) {
-                    return;
-                }
-                if (this.hasClicked) {
-                    window.location.reload();
-                } else {
-                    this.hasClicked = true;
-                    window.open(this.url, '__blank');
-                }
-            },
-            async loadPermissionUrl() {
-                try {
-                    this.loading = true;
-                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData.permission);
-                    if (res.result) {
-                        this.url = res.data.url;
-                    } else {
-                        errorHandler(res, this);
-                    }
-                } catch (err) {
-                    errorHandler(err, this);
-                } finally {
-                    this.loading = false;
-                }
-            },
-        },
-    };
+      },
+    },
+    created() {
+      if (this.permissionData.permission) {
+        this.loadPermissionUrl();
+      }
+    },
+    methods: {
+      applyBtnClick() {
+        this.goToAuthCenter();
+      },
+      goToAuthCenter() {
+        if (this.loading || !this.url) {
+          return;
+        }
+        if (this.hasClicked) {
+          window.location.reload();
+        } else {
+          this.hasClicked = true;
+          window.open(this.url, '__blank');
+        }
+      },
+      async loadPermissionUrl() {
+        try {
+          this.loading = true;
+          const res = await this.$store.dispatch('common/getIamUrl', this.permissionData.permission);
+          if (res.result) {
+            this.url = res.data.url;
+          } else {
+            errorHandler(res, this);
+          }
+        } catch (err) {
+          errorHandler(err, this);
+        } finally {
+          this.loading = false;
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .permisson-apply {

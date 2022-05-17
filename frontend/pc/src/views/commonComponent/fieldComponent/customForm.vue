@@ -37,69 +37,69 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
-    import RenderView from '../../../components/renderview/RenderView';
+  import mixins from '../../commonMix/field.js';
+  import RenderView from '../../../components/renderview/RenderView';
 
-    export default {
-        name: 'CUSTOM-FORM',
-        components: {
-            RenderView,
+  export default {
+    name: 'CUSTOM-FORM',
+    components: {
+      RenderView,
+    },
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        default: () => {
         },
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                default: () => {
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                formData: [],
-                context: {},
-                errMessage: '',
-            };
+      },
+    },
+    data() {
+      return {
+        formData: [],
+        context: {},
+        errMessage: '',
+      };
+    },
+    watch: {
+      'item.val': {
+        handler() {
+          this.conditionField(this.item, this.fields);
+          this.initRenderView();
         },
-        watch: {
-            'item.val': {
-                handler() {
-                    this.conditionField(this.item, this.fields);
-                    this.initRenderView();
-                },
-                immediate: true,
+        immediate: true,
 
-            },
-        },
-        mounted() {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-        },
-        methods: {
-            initRenderView() {
-                this.errMessage = '';
-                try {
-                    const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val;
-                    const { form_data: formData, schemes, config } = data;
-                    // 渲染表单
-                    this.formData = formData;
-                    this.context = {
-                        schemes,
-                        config,
-                    };
-                } catch (err) {
-                    this.errMessage = err;
-                    this.formData = [];
-                }
-            },
-        },
-    };
+      },
+    },
+    mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+    methods: {
+      initRenderView() {
+        this.errMessage = '';
+        try {
+          const data = typeof this.item.val === 'string' ? JSON.parse(this.item.val) : this.item.val;
+          const { form_data: formData, schemes, config } = data;
+          // 渲染表单
+          this.formData = formData;
+          this.context = {
+            schemes,
+            config,
+          };
+        } catch (err) {
+          this.errMessage = err;
+          this.formData = [];
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

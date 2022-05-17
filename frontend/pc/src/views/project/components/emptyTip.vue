@@ -52,37 +52,37 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'EmptyPageTip',
-        props: {
-            title: {
-                type: String,
-                value: '',
-            },
-            subTitle: {
-                type: String,
-                value: '',
-            },
-            desc: {
-                type: Array,
-                default: () => ([]),
-                // eg: [{
-                //     img: '',
-                //     title: '',
-                //     content: ''
-                // }]
-            },
-            links: {
-                type: Array,
-                default: () => ([]),
-                // eg: [{
-                //     text: '',
-                //     href: '',
-                //     btn: ''
-                // }]
-            },
-        },
-    };
+  export default {
+    name: 'EmptyPageTip',
+    props: {
+      title: {
+        type: String,
+        value: '',
+      },
+      subTitle: {
+        type: String,
+        value: '',
+      },
+      desc: {
+        type: Array,
+        default: () => ([]),
+        // eg: [{
+        //     img: '',
+        //     title: '',
+        //     content: ''
+        // }]
+      },
+      links: {
+        type: Array,
+        default: () => ([]),
+        // eg: [{
+        //     text: '',
+        //     href: '',
+        //     btn: ''
+        // }]
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .empty-page-tip {

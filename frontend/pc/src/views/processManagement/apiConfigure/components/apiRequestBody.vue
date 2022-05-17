@@ -188,89 +188,89 @@
 </template>
 
 <script>
-    import collapseTransition from '../../../../utils/collapse-transition';
+  import collapseTransition from '../../../../utils/collapse-transition';
 
-    export default {
-        name: 'exportTree',
-        components: {
-            collapseTransition,
+  export default {
+    name: 'exportTree',
+    components: {
+      collapseTransition,
+    },
+    props: {
+      isBuiltin: {
+        type: Boolean,
+        default() {
+          return false;
         },
-        props: {
-            isBuiltin: {
-                type: Boolean,
-                default() {
-                    return false;
-                },
-            },
-            isBody: {
-                type: Boolean,
-                default() {
-                    return false;
-                },
-            },
-            treeDataList: {
-                type: Array,
-                default: () => [],
-            },
-            treeIndex: {
-                type: Number,
-                default: () => 0,
-            },
+      },
+      isBody: {
+        type: Boolean,
+        default() {
+          return false;
         },
-        data() {
-            return {
-                pLeft: `padding-left:${15 * (this.treeIndex)}px; padding-right: 5px;`,
-                treeTypeList: [
-                    { id: 'string', name: 'string' },
-                    { id: 'object', name: 'object' },
-                    { id: 'number', name: 'number' },
-                    { id: 'boolean', name: 'boolean' },
-                    { id: 'array', name: 'array' },
-                ],
-                trueStatus: true,
-                falseStatus: false,
-            };
-        },
-        watch: {
-            // treeDataList: {
-            //     handler: function (newVal, oldVal) {
-            //         console.info('value changed ', newVal)
-            //     },
-            //     deep: true
-            // }
-        },
-        mounted() {
-        },
-        methods: {
-            // 展开子级
-            toggleChildren(item) {
-                this.$emit('toggleChildren', item);
-            },
-            toggle(item) {
-                this.$emit('toggle', item);
-            },
-            // 组件内调用组件，需要抛出数据两次
-            selectItem(item) {
-                this.$emit('selectItem', item);
-            },
-            // 新增数据
-            addBrotherLine(item) {
-                this.$emit('addBrotherLine', item);
-            },
-            addChildLine(item) {
-                this.$emit('addChildLine', item);
-            },
-            deleteLine(item) {
-                this.$emit('deleteLine', item);
-            },
-            changeType(item) {
-                this.$set(item, 'children', []);
-                if (item.type === 'array') {
-                    this.addChildLine(item);
-                }
-            },
-        },
-    };
+      },
+      treeDataList: {
+        type: Array,
+        default: () => [],
+      },
+      treeIndex: {
+        type: Number,
+        default: () => 0,
+      },
+    },
+    data() {
+      return {
+        pLeft: `padding-left:${15 * (this.treeIndex)}px; padding-right: 5px;`,
+        treeTypeList: [
+          { id: 'string', name: 'string' },
+          { id: 'object', name: 'object' },
+          { id: 'number', name: 'number' },
+          { id: 'boolean', name: 'boolean' },
+          { id: 'array', name: 'array' },
+        ],
+        trueStatus: true,
+        falseStatus: false,
+      };
+    },
+    watch: {
+      // treeDataList: {
+      //     handler: function (newVal, oldVal) {
+      //         console.info('value changed ', newVal)
+      //     },
+      //     deep: true
+      // }
+    },
+    mounted() {
+    },
+    methods: {
+      // 展开子级
+      toggleChildren(item) {
+        this.$emit('toggleChildren', item);
+      },
+      toggle(item) {
+        this.$emit('toggle', item);
+      },
+      // 组件内调用组件，需要抛出数据两次
+      selectItem(item) {
+        this.$emit('selectItem', item);
+      },
+      // 新增数据
+      addBrotherLine(item) {
+        this.$emit('addBrotherLine', item);
+      },
+      addChildLine(item) {
+        this.$emit('addChildLine', item);
+      },
+      deleteLine(item) {
+        this.$emit('deleteLine', item);
+      },
+      changeType(item) {
+        this.$set(item, 'children', []);
+        if (item.type === 'array') {
+          this.addChildLine(item);
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

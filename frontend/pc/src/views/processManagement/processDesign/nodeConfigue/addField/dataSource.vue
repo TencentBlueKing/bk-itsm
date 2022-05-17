@@ -91,164 +91,164 @@
   </div>
 </template>
 <script>
-    import { errorHandler } from '../../../../../utils/errorHandler';
-    export default {
-        name: 'dataSource',
-        components: {},
-        mixins: [],
-        props: {
-            formInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            prcData: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            dictionaryData: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            apiInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  import { errorHandler } from '../../../../../utils/errorHandler';
+  export default {
+    name: 'dataSource',
+    components: {},
+    mixins: [],
+    props: {
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                typeClass: '',
-                isApiLoading: false,
-                isSystemLoading: false,
-                sourceList: [],
-                apiSysList: [],
-                apiPortList: [],
-            };
+      },
+      prcData: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
+      },
+      dictionaryData: {
+        type: Object,
+        default() {
+          return {};
         },
-        watch: {
-            'formInfo.type'() {
-                this.initData();
-                this.getSourceList();
-            },
+      },
+      apiInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mounted() {
-            this.initData();
-            this.getSourceList();
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        methods: {
-            initData() {
-                this.typeClass = this.formInfo.source_type === 'API' ? 'bk-threeline-item bk-halfline-margin' : 'bk-halfline-item bk-halfline-margin';
-                this.getApiSystemList();
-                if (this.formInfo.source_type === 'API' && this.apiInfo.remote_system_id) {
-                    this.getApiPortList(this.apiInfo.remote_system_id);
-                }
-            },
-            getSourceList() {
-                // 根据不同类型来显示数据源类型列表
-                const typeList = this.globalChoise.source_type;
-                if (this.formInfo.type === 'TABLE') {
-                    this.sourceList = typeList.filter(item => item.typeName === 'CUSTOM');
-                } else if (this.formInfo.type === 'TREESELECT') {
-                    this.sourceList = typeList.filter(item => item.typeName === 'DATADICT' || item.typeName === 'RPC');
-                } else {
-                    this.sourceList = this.globalChoise.source_type;
-                }
-            },
-            // 获取Api系统列表
-            getApiSystemList() {
-                const params = {
-                    project_key: this.$store.state.project.id || 'public',
-                };
-                this.isSystemLoading = true;
-                this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
-                    this.apiSysList = res.data.filter(item => item.is_activated);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isSystemLoading = false;
-                    });
-            },
-            getApiPortList(val) {
-                const params = {
-                    remote_system: val || '',
-                };
-                this.isApiLoading = true;
-                this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
-                    this.apiPortList = res.data.filter(item => item.is_activated);
-                    const optionObject = this.apiPortList.filter(item => String(item.id) === String(this.apiInfo.remote_api_id))[0];
-                    const valueObject = Object.assign({}, optionObject);
-                    this.$emit('changeApiInfo', valueObject);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isApiLoading = false;
-                    });
-            },
-            changeApiPort(val) {
-                this.apiInfo.rsp_data = '';
-                this.apiInfo.req_params = {};
-                this.apiInfo.req_body = {};
-                const optionObject = this.apiPortList.filter(item => String(item.id) === String(val))[0];
-                const valueObject = Object.assign({}, optionObject);
-                this.$emit('changeApiInfo', valueObject);
-            },
-            changeSource() {
-                this.typeClass = this.formInfo.source_type === 'API' ? 'bk-threeline-item bk-halfline-margin' : 'bk-halfline-item bk-halfline-margin';
-            },
-            changeApiSystem(val) {
-                this.apiInfo.remote_api_id = '';
-                this.apiInfo.rsp_data = '';
-                this.apiInfo.req_params = {};
-                this.apiInfo.req_body = {};
-                this.getApiPortList(val);
-            },
-            // rpc数据
-            changeRpc(val) {
-                const rpcObject = this.prcData.list.filter(item => item.key === val)[0].req_params;
-                this.$emit('getRpcData', rpcObject);
-            },
-            // 校验
-            checkSouce() {
-                let checkStatus = false;
-                if (this.formInfo.source_type === 'DATADICT') {
-                    checkStatus = !this.dictionaryData.check;
-                } else if (this.formInfo.source_type === 'API') {
-                    checkStatus = !this.apiInfo.remote_system_id || !this.apiInfo.remote_api_id;
-                } else if (this.formInfo.source_type === 'RPC') {
-                    checkStatus = !this.prcData.check;
-                }
-                if (checkStatus) {
-                    this.$bkMessage({
-                        theme: 'warning',
-                        message: this.$t('m.treeinfo["请选择正确的数据源"]'),
-                    });
-                }
-                return checkStatus;
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        typeClass: '',
+        isApiLoading: false,
+        isSystemLoading: false,
+        sourceList: [],
+        apiSysList: [],
+        apiPortList: [],
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    watch: {
+      'formInfo.type'() {
+        this.initData();
+        this.getSourceList();
+      },
+    },
+    mounted() {
+      this.initData();
+      this.getSourceList();
+    },
+    methods: {
+      initData() {
+        this.typeClass = this.formInfo.source_type === 'API' ? 'bk-threeline-item bk-halfline-margin' : 'bk-halfline-item bk-halfline-margin';
+        this.getApiSystemList();
+        if (this.formInfo.source_type === 'API' && this.apiInfo.remote_system_id) {
+          this.getApiPortList(this.apiInfo.remote_system_id);
+        }
+      },
+      getSourceList() {
+        // 根据不同类型来显示数据源类型列表
+        const typeList = this.globalChoise.source_type;
+        if (this.formInfo.type === 'TABLE') {
+          this.sourceList = typeList.filter(item => item.typeName === 'CUSTOM');
+        } else if (this.formInfo.type === 'TREESELECT') {
+          this.sourceList = typeList.filter(item => item.typeName === 'DATADICT' || item.typeName === 'RPC');
+        } else {
+          this.sourceList = this.globalChoise.source_type;
+        }
+      },
+      // 获取Api系统列表
+      getApiSystemList() {
+        const params = {
+          project_key: this.$store.state.project.id || 'public',
+        };
+        this.isSystemLoading = true;
+        this.$store.dispatch('apiRemote/get_all_remote_system', params).then((res) => {
+          this.apiSysList = res.data.filter(item => item.is_activated);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isSystemLoading = false;
+          });
+      },
+      getApiPortList(val) {
+        const params = {
+          remote_system: val || '',
+        };
+        this.isApiLoading = true;
+        this.$store.dispatch('apiRemote/get_remote_api', params).then((res) => {
+          this.apiPortList = res.data.filter(item => item.is_activated);
+          const optionObject = this.apiPortList.filter(item => String(item.id) === String(this.apiInfo.remote_api_id))[0];
+          const valueObject = Object.assign({}, optionObject);
+          this.$emit('changeApiInfo', valueObject);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isApiLoading = false;
+          });
+      },
+      changeApiPort(val) {
+        this.apiInfo.rsp_data = '';
+        this.apiInfo.req_params = {};
+        this.apiInfo.req_body = {};
+        const optionObject = this.apiPortList.filter(item => String(item.id) === String(val))[0];
+        const valueObject = Object.assign({}, optionObject);
+        this.$emit('changeApiInfo', valueObject);
+      },
+      changeSource() {
+        this.typeClass = this.formInfo.source_type === 'API' ? 'bk-threeline-item bk-halfline-margin' : 'bk-halfline-item bk-halfline-margin';
+      },
+      changeApiSystem(val) {
+        this.apiInfo.remote_api_id = '';
+        this.apiInfo.rsp_data = '';
+        this.apiInfo.req_params = {};
+        this.apiInfo.req_body = {};
+        this.getApiPortList(val);
+      },
+      // rpc数据
+      changeRpc(val) {
+        const rpcObject = this.prcData.list.filter(item => item.key === val)[0].req_params;
+        this.$emit('getRpcData', rpcObject);
+      },
+      // 校验
+      checkSouce() {
+        let checkStatus = false;
+        if (this.formInfo.source_type === 'DATADICT') {
+          checkStatus = !this.dictionaryData.check;
+        } else if (this.formInfo.source_type === 'API') {
+          checkStatus = !this.apiInfo.remote_system_id || !this.apiInfo.remote_api_id;
+        } else if (this.formInfo.source_type === 'RPC') {
+          checkStatus = !this.prcData.check;
+        }
+        if (checkStatus) {
+          this.$bkMessage({
+            theme: 'warning',
+            message: this.$t('m.treeinfo["请选择正确的数据源"]'),
+          });
+        }
+        return checkStatus;
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

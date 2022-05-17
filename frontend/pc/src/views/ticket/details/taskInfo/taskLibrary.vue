@@ -176,250 +176,250 @@
 </template>
 
 <script>
-    import fieldInfo from '../../managePage/billCom/fieldInfo.vue';
-    import DealPerson from '../../processManagement/processDesign/nodeConfigue/components/dealPerson';
-    import commonMix from '../../commonMix/common.js';
-    import apiFieldsWatch from '../../commonMix/api_fields_watch.js';
-    import { errorHandler } from '@/utils/errorHandler';
+  import fieldInfo from '../../managePage/billCom/fieldInfo.vue';
+  import DealPerson from '../../processManagement/processDesign/nodeConfigue/components/dealPerson';
+  import commonMix from '../../commonMix/common.js';
+  import apiFieldsWatch from '../../commonMix/api_fields_watch.js';
+  import { errorHandler } from '@/utils/errorHandler';
 
-    export default {
-        name: 'taskLibrary',
-        components: {
-            fieldInfo,
-            DealPerson,
+  export default {
+    name: 'taskLibrary',
+    components: {
+      fieldInfo,
+      DealPerson,
+    },
+    mixins: [apiFieldsWatch, commonMix],
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [apiFieldsWatch, commonMix],
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            ticketId: {
-                type: Number,
-                default() {
-                    return '';
-                },
-            },
+      },
+      ticketId: {
+        type: Number,
+        default() {
+          return '';
         },
-        data() {
-            return {
-                btnLoading: false,
-                excludeTypeList: [
-                    'OPEN',
-                    'STARTER',
-                    'BY_ASSIGNOR',
-                    'EMPTY',
-                    'VARIABLE',
-                    'CMDB',
-                    'ORGANIZATION',
-                    'IAM',
-                    'STARTER_LEADER',
-                    'API'],
-                formData: {
-                    key: '',
-                },
-                libraryList: [],
-                // table数据
-                tableList: [],
-                tabLoading: false,
-                tableContent: {
-                    show: false,
-                    title: this.$t('m.task[\'修改任务信息\']'),
-                    width: 660,
-                    content: {},
-                    formInfo: {
-                        value: '',
-                        type: '',
-                    },
-                },
-                // 输入框
-                precision: 0,
-                minWidth: 60,
-            };
+      },
+    },
+    data() {
+      return {
+        btnLoading: false,
+        excludeTypeList: [
+          'OPEN',
+          'STARTER',
+          'BY_ASSIGNOR',
+          'EMPTY',
+          'VARIABLE',
+          'CMDB',
+          'ORGANIZATION',
+          'IAM',
+          'STARTER_LEADER',
+          'API'],
+        formData: {
+          key: '',
         },
-        created() {
-            this.getLibraryList();
+        libraryList: [],
+        // table数据
+        tableList: [],
+        tabLoading: false,
+        tableContent: {
+          show: false,
+          title: this.$t('m.task[\'修改任务信息\']'),
+          width: 660,
+          content: {},
+          formInfo: {
+            value: '',
+            type: '',
+          },
         },
-        methods: {
-            getLibraryList() {
-                this.$store.dispatch('taskFlow/getLibraryList').then((res) => {
-                    this.libraryList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
+        // 输入框
+        precision: 0,
+        minWidth: 60,
+      };
+    },
+    created() {
+      this.getLibraryList();
+    },
+    methods: {
+      getLibraryList() {
+        this.$store.dispatch('taskFlow/getLibraryList').then((res) => {
+          this.libraryList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
 
-                    });
-            },
-            // 删除某个任务库
-            handleDeleteOption(option) {
-                const { id } = option;
-                this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
-                    this.libraryList = this.libraryList.filter(item => item.id !== option.id);
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
+          });
+      },
+      // 删除某个任务库
+      handleDeleteOption(option) {
+        const { id } = option;
+        this.$store.dispatch('taskFlow/deleteLibrary', id).then(() => {
+          this.libraryList = this.libraryList.filter(item => item.id !== option.id);
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
 
-                    });
-            },
-            selectLibrary() {
-                // 根据任务库获取列表数据
-                this.tabLoading = true;
-                const id = this.formData.key;
-                const params = {
-                    ticket_id: this.ticketId,
-                };
-                this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
-                    this.tableList = res.data;
-                    this.tableList.forEach((item) => {
-                        this.$set(item, 'orderStatus', true);
-                        this.$set(item, 'orderInfo', item.order);
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.tabLoading = false;
-                    });
-            },
-            // 改变处理顺序
-            changeOrderStatus(value) {
-                this.tableList.forEach((item) => {
-                    item.orderStatus = true;
-                });
-                value.orderStatus = false;
-                this.minWidth = 160;
-            },
-            submitOrder(value) {
-                value.order = Number(value.orderInfo);
-                value.orderStatus = true;
-                this.minWidth = 60;
-            },
-            closeOrder(value) {
-                const orderValue = this.tableList.filter(item => item.id === value.id)[0].order;
-                value.orderInfo = Number(orderValue);
-                value.orderStatus = true;
-                this.minWidth = 60;
-            },
-            // 删除数据
-            deleteLibrary(item) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.task[\'确认删除数据？\']'),
-                    subTitle: this.$t('m.task[\'数据如果被删除，此数据在当前任务库中不可用。\']'),
-                    confirmFn: () => {
-                        this.tableList = this.tableList.filter(node => node.id !== item.id);
-                    },
-                });
-            },
-            closeTaskLibrary() {
-                this.$emit('closeTaskLibrary');
-            },
-            // 编辑任务弹窗
-            editorLibrary(item) {
-                this.tableContent.show = true;
-                this.tableContent.content = JSON.parse(JSON.stringify(item));
-                // fields数据
-                this.tableContent.content.fields = this.tableContent.content.fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
-                this.tableContent.content.fields.forEach((item) => {
-                    if (item.type === 'CASCADE') {
-                        item.type = 'SELECT';
-                    }
-                    this.$set(item, 'showFeild', true);
-                    this.$set(item, 'val', item.value || '');
-                });
-                this.isNecessaryToWatch({ fields: this.tableContent.content.fields }, 'submit');
-                // 处理人数据
-                this.tableContent.formInfo.value = item.processors;
-                this.tableContent.formInfo.type = item.processors_type;
-            },
-            submitTableContent() {
-                // 处理人信息
-                if (this.$refs.personSelect) {
-                    const data = this.$refs.personSelect.getValue();
-                    this.tableContent.formInfo.type = data.type;
-                    this.tableContent.formInfo.value = data.value;
-                }
+          });
+      },
+      selectLibrary() {
+        // 根据任务库获取列表数据
+        this.tabLoading = true;
+        const id = this.formData.key;
+        const params = {
+          ticket_id: this.ticketId,
+        };
+        this.$store.dispatch('taskFlow/getLibraryInfo', { params, id }).then((res) => {
+          this.tableList = res.data;
+          this.tableList.forEach((item) => {
+            this.$set(item, 'orderStatus', true);
+            this.$set(item, 'orderInfo', item.order);
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.tabLoading = false;
+          });
+      },
+      // 改变处理顺序
+      changeOrderStatus(value) {
+        this.tableList.forEach((item) => {
+          item.orderStatus = true;
+        });
+        value.orderStatus = false;
+        this.minWidth = 160;
+      },
+      submitOrder(value) {
+        value.order = Number(value.orderInfo);
+        value.orderStatus = true;
+        this.minWidth = 60;
+      },
+      closeOrder(value) {
+        const orderValue = this.tableList.filter(item => item.id === value.id)[0].order;
+        value.orderInfo = Number(orderValue);
+        value.orderStatus = true;
+        this.minWidth = 60;
+      },
+      // 删除数据
+      deleteLibrary(item) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.task[\'确认删除数据？\']'),
+          subTitle: this.$t('m.task[\'数据如果被删除，此数据在当前任务库中不可用。\']'),
+          confirmFn: () => {
+            this.tableList = this.tableList.filter(node => node.id !== item.id);
+          },
+        });
+      },
+      closeTaskLibrary() {
+        this.$emit('closeTaskLibrary');
+      },
+      // 编辑任务弹窗
+      editorLibrary(item) {
+        this.tableContent.show = true;
+        this.tableContent.content = JSON.parse(JSON.stringify(item));
+        // fields数据
+        this.tableContent.content.fields = this.tableContent.content.fields.filter(item => item.type !== 'COMPLEX-MEMBERS');
+        this.tableContent.content.fields.forEach((item) => {
+          if (item.type === 'CASCADE') {
+            item.type = 'SELECT';
+          }
+          this.$set(item, 'showFeild', true);
+          this.$set(item, 'val', item.value || '');
+        });
+        this.isNecessaryToWatch({ fields: this.tableContent.content.fields }, 'submit');
+        // 处理人数据
+        this.tableContent.formInfo.value = item.processors;
+        this.tableContent.formInfo.type = item.processors_type;
+      },
+      submitTableContent() {
+        // 处理人信息
+        if (this.$refs.personSelect) {
+          const data = this.$refs.personSelect.getValue();
+          this.tableContent.formInfo.type = data.type;
+          this.tableContent.formInfo.value = data.value;
+        }
 
-                // 字段信息(将字段信息value值进行转换)
-                this.fieldFormatting(this.tableContent.content.fields);
-                // 将修改好的信息存入列表数据
-                this.tableList.forEach((item) => {
-                    if (item.id === this.tableContent.content.id) {
-                        item.fields = this.tableContent.content.fields;
-                        item.processors = this.tableContent.formInfo.value;
-                        item.processors_type = this.tableContent.formInfo.type;
-                        item.name = this.tableContent.content.fields.filter(node => node.key === 'task_name')[0].value;
-                    }
-                });
-                this.tableContent.show = false;
-            },
-            // 更新任务库
-            updataLibrary() {
-                this.btnLoading = true;
-                const id = this.formData.key;
-                const params = {
-                    name: this.libraryList.filter(item => item.id === this.formData.key)[0].name,
-                    tasks: this.tableList,
-                };
-                this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.task[\'更新成功\']'),
-                        theme: 'success',
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.btnLoading = false;
-                    });
-            },
-            // 创建任务库
-            submitLibrary() {
-                const params = {
-                    batch_create: 1,
-                    ticket_id: this.ticketId,
-                    tasks: [],
-                };
-                this.tableList.forEach((node) => {
-                    const valueInfo = {
-                        processors: node.processors,
-                        processors_type: node.processors_type,
-                        task_schema_id: node.task_schema_id,
-                        order: node.order,
-                        fields: {},
-                    };
-                    node.fields.forEach((item) => {
-                        valueInfo.fields[item.key] = item.value;
-                    });
-                    params.tasks.push(valueInfo);
-                });
-                this.btnLoading = true;
-                this.$store.dispatch('taskFlow/createTask', params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.task[\'创建任务成功\']'),
-                        theme: 'success',
-                    });
-                    this.$emit('closeTaskLibrary');
-                    // 刷新数据
-                    this.$emit('getTaskList');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.btnLoading = false;
-                    });
-            },
-        },
-    };
+        // 字段信息(将字段信息value值进行转换)
+        this.fieldFormatting(this.tableContent.content.fields);
+        // 将修改好的信息存入列表数据
+        this.tableList.forEach((item) => {
+          if (item.id === this.tableContent.content.id) {
+            item.fields = this.tableContent.content.fields;
+            item.processors = this.tableContent.formInfo.value;
+            item.processors_type = this.tableContent.formInfo.type;
+            item.name = this.tableContent.content.fields.filter(node => node.key === 'task_name')[0].value;
+          }
+        });
+        this.tableContent.show = false;
+      },
+      // 更新任务库
+      updataLibrary() {
+        this.btnLoading = true;
+        const id = this.formData.key;
+        const params = {
+          name: this.libraryList.filter(item => item.id === this.formData.key)[0].name,
+          tasks: this.tableList,
+        };
+        this.$store.dispatch('taskFlow/updataLibrary', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.task[\'更新成功\']'),
+            theme: 'success',
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.btnLoading = false;
+          });
+      },
+      // 创建任务库
+      submitLibrary() {
+        const params = {
+          batch_create: 1,
+          ticket_id: this.ticketId,
+          tasks: [],
+        };
+        this.tableList.forEach((node) => {
+          const valueInfo = {
+            processors: node.processors,
+            processors_type: node.processors_type,
+            task_schema_id: node.task_schema_id,
+            order: node.order,
+            fields: {},
+          };
+          node.fields.forEach((item) => {
+            valueInfo.fields[item.key] = item.value;
+          });
+          params.tasks.push(valueInfo);
+        });
+        this.btnLoading = true;
+        this.$store.dispatch('taskFlow/createTask', params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.task[\'创建任务成功\']'),
+            theme: 'success',
+          });
+          this.$emit('closeTaskLibrary');
+          // 刷新数据
+          this.$emit('getTaskList');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.btnLoading = false;
+          });
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

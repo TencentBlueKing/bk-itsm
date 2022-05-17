@@ -111,184 +111,184 @@
   </div>
 </template>
 <script>
-    import triggerField from '../common/triggerField.vue';
-    import { mapState } from 'vuex';
-    import { errorHandler } from '../../../../utils/errorHandler';
+  import triggerField from '../common/triggerField.vue';
+  import { mapState } from 'vuex';
+  import { errorHandler } from '../../../../utils/errorHandler';
 
-    export default {
-        name: 'triggerCondition',
-        components: {
-            triggerField,
+  export default {
+    name: 'triggerCondition',
+    components: {
+      triggerField,
+    },
+    props: {
+      triggerRules: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            triggerRules: {
-                type: Object,
-                default() {
-                    return {};
-                },
+      },
+    },
+    data() {
+      return {
+        // 下拉选框
+        keyList: [],
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+      ...mapState('trigger', {
+        triggerVariables: state => state.triggerVariables,
+      }),
+    },
+    mounted() {
+      this.keyList = this.triggerVariables;
+      // 初始化内置触发条件检查参数
+      this.$set(this.triggerRules, 'checkStatus', false);
+    },
+    methods: {
+      // 新增和删除行
+      addLine(item, node, nodeIndex) {
+        item.itemList.splice(nodeIndex + 1, 0, {
+          condition: '',
+          key: '',
+          value: '',
+          conditionList: [],
+          type: 'STRING',
+        });
+      },
+      deleteLine(item, node, nodeIndex) {
+        if (item.itemList.length === 1) {
+          return;
+        }
+        item.itemList.splice(nodeIndex, 1);
+      },
+      // 切换关系
+      changeBetween(item) {
+        item.type = item.type === 'all' ? 'any' : 'all';
+      },
+      handleBetween() {
+        this.triggerRules.type = this.triggerRules.type === 'all' ? 'any' : 'all';
+      },
+      // 添加和删除触发条件组
+      addGroup() {
+        this.triggerRules.list.push({
+          type: 'all',
+          itemList: [
+            {
+              key: '',
+              condition: '',
+              value: '',
+              conditionList: [],
+              type: 'STRING',
             },
-        },
-        data() {
-            return {
-                // 下拉选框
-                keyList: [],
-            };
-        },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
-            ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables,
-            }),
-        },
-        mounted() {
-            this.keyList = this.triggerVariables;
-            // 初始化内置触发条件检查参数
-            this.$set(this.triggerRules, 'checkStatus', false);
-        },
-        methods: {
-            // 新增和删除行
-            addLine(item, node, nodeIndex) {
-                item.itemList.splice(nodeIndex + 1, 0, {
-                    condition: '',
-                    key: '',
-                    value: '',
-                    conditionList: [],
-                    type: 'STRING',
-                });
-            },
-            deleteLine(item, node, nodeIndex) {
-                if (item.itemList.length === 1) {
-                    return;
-                }
-                item.itemList.splice(nodeIndex, 1);
-            },
-            // 切换关系
-            changeBetween(item) {
-                item.type = item.type === 'all' ? 'any' : 'all';
-            },
-            handleBetween() {
-                this.triggerRules.type = this.triggerRules.type === 'all' ? 'any' : 'all';
-            },
-            // 添加和删除触发条件组
-            addGroup() {
-                this.triggerRules.list.push({
-                    type: 'all',
-                    itemList: [
-                        {
-                            key: '',
-                            condition: '',
-                            value: '',
-                            conditionList: [],
-                            type: 'STRING',
-                        },
-                    ],
-                });
-            },
-            deleteGroup(item, index) {
-                if (this.triggerRules.list.length === 1) {
-                    return;
-                }
-                this.triggerRules.list.splice(index, 1);
-            },
-            // 切换选项内容，匹配不同的表达式
-            changeContent(node) {
-                // 获取选中的项
-                const checkItem = this.keyList.filter(item => item.key === node.key)[0];
-                // 字母小写
-                const lowerType = checkItem.type.toLowerCase();
-                node.conditionList = this.globalChoise.trigger_methods[lowerType];
-                this.getConditionList(checkItem, node);
-                node.condition = '';
-                this.$set(node, 'conditionType', '');
-                node.type = checkItem.type;
-                const multiType = ['MEMBERS', 'MEMBER', 'MULTI_MEMBERS', 'MULTISELECT', 'CHECKBOX'];
-                node.value = multiType.some(item => item === node.type) ? [] : '';
-            },
-            changeCondition(node) {
-                // 获取选中的项
-                const checkItem = node.conditionList.filter(item => item.name === node.condition)[0];
-                this.$set(node, 'conditionType', checkItem.input_type);
-            },
-            // 根据条件的不同，填充不同的conditionList数据
-            getConditionList(checkItem, node) {
-                const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX'];
-                if (typeList.some(item => item === checkItem.type)) {
-                    // 数据字典
-                    this.$set(node, 'loading', true);
-                    this.$set(node, 'options', []);
-                    if (checkItem.source_type === 'DATADICT') {
-                        this.$store.dispatch('datadict/get_data_by_key', {
-                            key: checkItem.source_uri,
-                            field_key: checkItem.key,
-                        }).then((res) => {
-                            node.options = res.data.map((ite) => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name,
-                                };
-                                return temp;
-                            });
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                node.loading = false;
-                            });
-                    } else if (checkItem.source_type === 'API') {
-                        this.$store.dispatch('apiRemote/get_data_workflow', {
-                            kv_relation: checkItem.kv_relation,
-                            api_instance_id: checkItem.api_instance_id,
-                        }).then((res) => {
-                            node.options = res.data.map((ite) => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name,
-                                };
-                                return temp;
-                            });
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                node.loading = false;
-                            });
-                    } else if (checkItem.source_type === 'RPC') {
-                        this.$store.dispatch('apiRemote/getRpcData', {
-                            meta: checkItem.meta,
-                            source_uri: checkItem.source_uri,
-                        }).then((res) => {
-                            node.options = res.data.map((ite) => {
-                                const temp = {
-                                    key: ite.key,
-                                    name: ite.name,
-                                };
-                                return temp;
-                            });
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                node.loading = false;
-                            });
-                    } else {
-                        node.options = checkItem.choice.map((ite) => {
-                            const temp = {
-                                key: ite.key,
-                                name: ite.name,
-                            };
-                            return temp;
-                        });
-                        node.loading = false;
-                    }
-                }
-            },
-        },
-    };
+          ],
+        });
+      },
+      deleteGroup(item, index) {
+        if (this.triggerRules.list.length === 1) {
+          return;
+        }
+        this.triggerRules.list.splice(index, 1);
+      },
+      // 切换选项内容，匹配不同的表达式
+      changeContent(node) {
+        // 获取选中的项
+        const checkItem = this.keyList.filter(item => item.key === node.key)[0];
+        // 字母小写
+        const lowerType = checkItem.type.toLowerCase();
+        node.conditionList = this.globalChoise.trigger_methods[lowerType];
+        this.getConditionList(checkItem, node);
+        node.condition = '';
+        this.$set(node, 'conditionType', '');
+        node.type = checkItem.type;
+        const multiType = ['MEMBERS', 'MEMBER', 'MULTI_MEMBERS', 'MULTISELECT', 'CHECKBOX'];
+        node.value = multiType.some(item => item === node.type) ? [] : '';
+      },
+      changeCondition(node) {
+        // 获取选中的项
+        const checkItem = node.conditionList.filter(item => item.name === node.condition)[0];
+        this.$set(node, 'conditionType', checkItem.input_type);
+      },
+      // 根据条件的不同，填充不同的conditionList数据
+      getConditionList(checkItem, node) {
+        const typeList = ['SELECT', 'RADIO', 'MULTISELECT', 'CHECKBOX'];
+        if (typeList.some(item => item === checkItem.type)) {
+          // 数据字典
+          this.$set(node, 'loading', true);
+          this.$set(node, 'options', []);
+          if (checkItem.source_type === 'DATADICT') {
+            this.$store.dispatch('datadict/get_data_by_key', {
+              key: checkItem.source_uri,
+              field_key: checkItem.key,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else if (checkItem.source_type === 'API') {
+            this.$store.dispatch('apiRemote/get_data_workflow', {
+              kv_relation: checkItem.kv_relation,
+              api_instance_id: checkItem.api_instance_id,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else if (checkItem.source_type === 'RPC') {
+            this.$store.dispatch('apiRemote/getRpcData', {
+              meta: checkItem.meta,
+              source_uri: checkItem.source_uri,
+            }).then((res) => {
+              node.options = res.data.map((ite) => {
+                const temp = {
+                  key: ite.key,
+                  name: ite.name,
+                };
+                return temp;
+              });
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                node.loading = false;
+              });
+          } else {
+            node.options = checkItem.choice.map((ite) => {
+              const temp = {
+                key: ite.key,
+                name: ite.name,
+              };
+              return temp;
+            });
+            node.loading = false;
+          }
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

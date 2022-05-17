@@ -85,88 +85,88 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler';
-    import editorNotice from './editorNotice.vue';
-    import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../../utils/errorHandler';
+  import editorNotice from './editorNotice.vue';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'noticeConfigure',
-        components: {
-            editorNotice,
+  export default {
+    name: 'noticeConfigure',
+    components: {
+      editorNotice,
+    },
+    mixins: [permission],
+    data() {
+      return {
+        isDataLoading: true,
+        remindWayList: [
+          { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
+          { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
+          { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') },
+        ],
+        checkId: 'WEIXIN',
+        noticeList: [],
+        noticeInfo: {
+          show: false,
+          title: this.$t('m.deployPage["编辑"]'),
+          width: 700,
+          formInfo: {},
         },
-        mixins: [permission],
-        data() {
-            return {
-                isDataLoading: true,
-                remindWayList: [
-                    { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
-                    { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
-                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') },
-                ],
-                checkId: 'WEIXIN',
-                noticeList: [],
-                noticeInfo: {
-                    show: false,
-                    title: this.$t('m.deployPage["编辑"]'),
-                    width: 700,
-                    formInfo: {},
-                },
-            };
-        },
-        computed: {
-            sliderStatus() {
-                return this.$store.state.common.slideStatus;
-            },
-        },
-        mounted() {
-            this.getNoticeList();
-        },
-        methods: {
-            // 获取数据
-            getNoticeList() {
-                this.isDataLoading = true;
-                const params = {
-                    notify_type: this.checkId,
-                };
-                this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
-                    this.noticeList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isDataLoading = false;
-                    });
-            },
-            changeNotice(item) {
-                this.checkId = item.id;
-                this.getNoticeList();
-            },
-            editorInfo(item) {
-                if (!this.hasPermission(['notification_manage'], this.$store.state.project.projectAuthActions)) {
-                    this.applyForPermission(['notification_manage'], this.$store.state.project.projectAuthActions, {});
-                    return;
-                }
-                this.noticeInfo.formInfo = item;
-                this.noticeInfo.show = true;
-            },
-            closeEditor() {
-                this.noticeInfo.show = false;
-            },
-            closeSideslider() {
-                this.$bkInfo({
-                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
-                    confirmLoading: true,
-                    confirmFn: () => {
-                        this.noticeInfo.show = false;
-                    },
-                    cancelFn: () => {
-                        this.noticeInfo.show = true;
-                    },
-                });
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      sliderStatus() {
+        return this.$store.state.common.slideStatus;
+      },
+    },
+    mounted() {
+      this.getNoticeList();
+    },
+    methods: {
+      // 获取数据
+      getNoticeList() {
+        this.isDataLoading = true;
+        const params = {
+          notify_type: this.checkId,
+        };
+        this.$store.dispatch('noticeConfigure/getNoticeList', { params }).then((res) => {
+          this.noticeList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isDataLoading = false;
+          });
+      },
+      changeNotice(item) {
+        this.checkId = item.id;
+        this.getNoticeList();
+      },
+      editorInfo(item) {
+        if (!this.hasPermission(['notification_manage'], this.$store.state.project.projectAuthActions)) {
+          this.applyForPermission(['notification_manage'], this.$store.state.project.projectAuthActions, {});
+          return;
+        }
+        this.noticeInfo.formInfo = item;
+        this.noticeInfo.show = true;
+      },
+      closeEditor() {
+        this.noticeInfo.show = false;
+      },
+      closeSideslider() {
+        this.$bkInfo({
+          title: this.$t('m["内容未保存，离开将取消操作！"]'),
+          confirmLoading: true,
+          confirmFn: () => {
+            this.noticeInfo.show = false;
+          },
+          cancelFn: () => {
+            this.noticeInfo.show = true;
+          },
+        });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

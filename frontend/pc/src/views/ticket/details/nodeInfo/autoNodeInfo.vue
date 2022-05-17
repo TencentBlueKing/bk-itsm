@@ -219,74 +219,74 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/addField/getParam.vue';
-    import postParam from '@/views/processManagement/processDesign/nodeConfigue/addField/postParam.vue';
-    import ace from '@/views/commonComponent/aceEditor';
+  import getParam from '@/views/processManagement/processDesign/nodeConfigue/addField/getParam.vue';
+  import postParam from '@/views/processManagement/processDesign/nodeConfigue/addField/postParam.vue';
+  import ace from '@/views/commonComponent/aceEditor';
 
-    export default {
-        name: 'autoNodeInfo',
-        components: {
-            getParam,
-            postParam,
-            ace,
+  export default {
+    name: 'autoNodeInfo',
+    components: {
+      getParam,
+      postParam,
+      ace,
+    },
+    props: {
+      nodeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            nodeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            // 自动节点信息
-            apiInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+      // 自动节点信息
+      apiInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                // 返回数据 -- ace编辑器展示
-                bodyDetailConfig: {
-                    value: '',
-                    width: '100%',
-                    height: 200,
-                    readOnly: true,
-                    fullScreen: true,
-                    lang: 'json',
-                },
-                isShowAce: false,
-                isFull: false,
-            };
+      },
+    },
+    data() {
+      return {
+        // 返回数据 -- ace编辑器展示
+        bodyDetailConfig: {
+          value: '',
+          width: '100%',
+          height: 200,
+          readOnly: true,
+          fullScreen: true,
+          lang: 'json',
         },
-        computed: {
-            // 拼接/接口名
-            apiName() {
-                const remoteSystem =                this.nodeInfo.api_info.remote_api_info.remote_system_name || '';
-                const remoteApi = this.nodeInfo.api_info.remote_api_info.name || '';
-                return `${remoteSystem}/${remoteApi}`;
-            },
-        },
-        async mounted() {
-            await this.nodeInfo;
-            if (this.nodeInfo && Object.keys(this.bodyDetailConfig.value).length) {
-                this.bodyDetailConfig.value = JSON.stringify(
-                    this.nodeInfo.api_info.response,
-                    null,
-                    4
-                );
-            }
-        },
-        methods: {
-            editorInitAfter() {
-            // ...
-            },
-            blur(content) {
-                this.bodyDetailConfig.value = content;
-            },
-        },
-    };
+        isShowAce: false,
+        isFull: false,
+      };
+    },
+    computed: {
+      // 拼接/接口名
+      apiName() {
+        const remoteSystem =                this.nodeInfo.api_info.remote_api_info.remote_system_name || '';
+        const remoteApi = this.nodeInfo.api_info.remote_api_info.name || '';
+        return `${remoteSystem}/${remoteApi}`;
+      },
+    },
+    async mounted() {
+      await this.nodeInfo;
+      if (this.nodeInfo && Object.keys(this.bodyDetailConfig.value).length) {
+        this.bodyDetailConfig.value = JSON.stringify(
+          this.nodeInfo.api_info.response,
+          null,
+          4
+        );
+      }
+    },
+    methods: {
+      editorInitAfter() {
+        // ...
+      },
+      blur(content) {
+        this.bodyDetailConfig.value = content;
+      },
+    },
+  };
 </script>
 
 <style scoped lang="scss">

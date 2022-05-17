@@ -80,97 +80,97 @@
 </template>
 
 <script>
-    import historyDetail from './taskHistoryDetail.vue';
-    import { errorHandler } from '@/utils/errorHandler';
+  import historyDetail from './taskHistoryDetail.vue';
+  import { errorHandler } from '@/utils/errorHandler';
 
-    export default {
-        name: 'taskHistory',
-        components: {
-            historyDetail,
+  export default {
+    name: 'taskHistory',
+    components: {
+      historyDetail,
+    },
+    props: {
+      basicInfomation: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            basicInfomation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            nodeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      nodeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                loading: false,
-                historyList: [],
-                historyDetail: {
-                    isShow: false,
-                    title: this.$t('m.task[\'记录详情\']'),
-                    loading: false,
-                    width: 660,
-                    id: '',
-                },
-            };
+      },
+    },
+    data() {
+      return {
+        loading: false,
+        historyList: [],
+        historyDetail: {
+          isShow: false,
+          title: this.$t('m.task[\'记录详情\']'),
+          loading: false,
+          width: 660,
+          id: '',
         },
-        computed: {
-            taskHistoryRefresh() {
-                return this.$store.state.taskHistoryRefresh;
-            },
-        },
-        watch: {
-            taskHistoryRefresh() {
-                this.getHistoryList();
-            },
-        },
-        mounted() {
-            this.getHistoryList();
-        },
-        methods: {
-            getHistoryList() {
-                // 获取单据手动触发器
-                const params = {
-                    operate_type: 'all',
-                };
-                this.loading = true;
-                const { id } = this.basicInfomation;
-                this.$store.dispatch('trigger/getTicketHandleTriggers', { id, params }).then((res) => {
-                    this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            openDetail(task) {
-                this.historyDetail.isShow = true;
-                this.historyDetail.id = task.id;
-            },
-            orderingClick(value) {
-                this.historyList.sort(this.sortCompare('status', value.order));
-            },
-            sortCompare(prop, type) {
-                return (obj1, obj2) => {
-                    let val1 = obj1[prop];
-                    let val2 = obj2[prop];
-                    if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
-                        val1 = Number(val1);
-                        val2 = Number(val2);
-                    }
-                    if (val1 < val2) {
-                        return (type === 'ascending' ? -1 : 1);
-                    } if (val1 > val2) {
-                        return (type === 'ascending' ? 1 : -1);
-                    }
-                    return 0;
-                };
-            },
-        },
-    };
+      };
+    },
+    computed: {
+      taskHistoryRefresh() {
+        return this.$store.state.taskHistoryRefresh;
+      },
+    },
+    watch: {
+      taskHistoryRefresh() {
+        this.getHistoryList();
+      },
+    },
+    mounted() {
+      this.getHistoryList();
+    },
+    methods: {
+      getHistoryList() {
+        // 获取单据手动触发器
+        const params = {
+          operate_type: 'all',
+        };
+        this.loading = true;
+        const { id } = this.basicInfomation;
+        this.$store.dispatch('trigger/getTicketHandleTriggers', { id, params }).then((res) => {
+          this.historyList = res.data.filter(item => item.status === 'FAILED' || item.status === 'SUCCEED');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      openDetail(task) {
+        this.historyDetail.isShow = true;
+        this.historyDetail.id = task.id;
+      },
+      orderingClick(value) {
+        this.historyList.sort(this.sortCompare('status', value.order));
+      },
+      sortCompare(prop, type) {
+        return (obj1, obj2) => {
+          let val1 = obj1[prop];
+          let val2 = obj2[prop];
+          if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+            val1 = Number(val1);
+            val2 = Number(val2);
+          }
+          if (val1 < val2) {
+            return (type === 'ascending' ? -1 : 1);
+          } if (val1 > val2) {
+            return (type === 'ascending' ? 1 : -1);
+          }
+          return 0;
+        };
+      },
+    },
+  };
 </script>
 
 <style scoped lang='scss'>

@@ -121,168 +121,168 @@
   </div>
 </template>
 <script>
-    import pinyin from 'pinyin';
-    import getParam from './getParam.vue';
-    import postParam from './postParam.vue';
-    import responseData from './responseData.vue';
-    import getRpcParam from './getRpcParam.vue';
-    import mixins from '../../../../commonMix/mixins_api.js';
-    import { errorHandler } from '../../../../../utils/errorHandler';
+  import pinyin from 'pinyin';
+  import getParam from './getParam.vue';
+  import postParam from './postParam.vue';
+  import responseData from './responseData.vue';
+  import getRpcParam from './getRpcParam.vue';
+  import mixins from '../../../../commonMix/mixins_api.js';
+  import { errorHandler } from '../../../../../utils/errorHandler';
 
-    export default {
-        name: 'dataContent',
-        components: {
-            getParam,
-            postParam,
-            responseData,
-            getRpcParam,
+  export default {
+    name: 'dataContent',
+    components: {
+      getParam,
+      postParam,
+      responseData,
+      getRpcParam,
+    },
+    mixins: [mixins],
+    props: {
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [mixins],
-        props: {
-            formInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            apiDetail: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            workflow: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
-            state: {
-                type: [String, Number],
-                default() {
-                    return '';
-                },
-            },
-            apiInfo: {
-                type: Object,
-                default() {
-                    return {
-                        remote_system_id: '',
-                        remote_api_id: '',
-                        req_params: {},
-                        req_body: {},
-                        rsp_data: '',
-                    };
-                },
-            },
-            fieldInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            kvRelation: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            prcTable: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                stateList: [],
-                trueStatus: true,
-                falseStatus: false,
-            };
+      },
+      apiDetail: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
+      },
+      workflow: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        mounted() {
-            this.getRelatedFields();
+      },
+      state: {
+        type: [String, Number],
+        default() {
+          return '';
         },
-        methods: {
-            // 自定义类型
-            addDataLine(item, index) {
-                if (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT') {
-                    return;
-                }
-                const valueInfo = {
-                    name: '',
-                    key: '',
-                    required: false,
-                    nameCheck: false,
-                    keyCheck: false,
-                };
-                this.fieldInfo.list.splice(index + 1, 0, valueInfo);
-            },
-            deleteDataLine(item, index) {
-                if (this.fieldInfo.list.length === 1 || (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT')) {
-                    return;
-                }
-                this.fieldInfo.list.splice(index, 1);
-            },
-            closeError() {
-                this.fieldInfo.list.forEach((item) => {
-                    item.nameCheck = false;
-                    item.keyCheck = false;
-                });
-            },
-            // API
-            // 获取节点以前的字段--引用字段/变量
-            getRelatedFields() {
-                if (!this.state) {
-                    return;
-                }
-                const params = {
-                    workflow: this.workflow,
-                    state: this.state,
-                    field: '',
-                };
-                this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
-                    this.stateList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                    });
-            },
-            // 计算祖先元素type是列表array的有几个
-            countArrayAncestors(data) {
-                const ids = [];
-                const countArrayAncestorsStep = function (item) {
-                    if (item.parentInfo.type === 'array') {
-                        ids.push(item);
-                        countArrayAncestorsStep(item.parentInfo);
-                    }
-                    if (item.parentInfo.type === 'object') {
-                        countArrayAncestorsStep(item.parentInfo);
-                    }
-                };
-                countArrayAncestorsStep(data);
-                return ids;
-            },
-            // 多级列表数据转换为JSON数据
-            listTojson(listdata) {
-                const jsondata = {};
-                if (listdata.length) {
-                    listdata.forEach((item) => {
-                        /* eslint-disable */
+      },
+      apiInfo: {
+        type: Object,
+        default() {
+          return {
+            remote_system_id: '',
+            remote_api_id: '',
+            req_params: {},
+            req_body: {},
+            rsp_data: '',
+          };
+        },
+      },
+      fieldInfo: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      kvRelation: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      prcTable: {
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+    },
+    data() {
+      return {
+        stateList: [],
+        trueStatus: true,
+        falseStatus: false,
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    mounted() {
+      this.getRelatedFields();
+    },
+    methods: {
+      // 自定义类型
+      addDataLine(item, index) {
+        if (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT') {
+          return;
+        }
+        const valueInfo = {
+          name: '',
+          key: '',
+          required: false,
+          nameCheck: false,
+          keyCheck: false,
+        };
+        this.fieldInfo.list.splice(index + 1, 0, valueInfo);
+      },
+      deleteDataLine(item, index) {
+        if (this.fieldInfo.list.length === 1 || (this.changeInfo.meta && this.changeInfo.meta.code === 'APPROVE_RESULT')) {
+          return;
+        }
+        this.fieldInfo.list.splice(index, 1);
+      },
+      closeError() {
+        this.fieldInfo.list.forEach((item) => {
+          item.nameCheck = false;
+          item.keyCheck = false;
+        });
+      },
+      // API
+      // 获取节点以前的字段--引用字段/变量
+      getRelatedFields() {
+        if (!this.state) {
+          return;
+        }
+        const params = {
+          workflow: this.workflow,
+          state: this.state,
+          field: '',
+        };
+        this.$store.dispatch('apiRemote/get_related_fields', params).then((res) => {
+          this.stateList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+          });
+      },
+      // 计算祖先元素type是列表array的有几个
+      countArrayAncestors(data) {
+        const ids = [];
+        const countArrayAncestorsStep = function (item) {
+          if (item.parentInfo.type === 'array') {
+            ids.push(item);
+            countArrayAncestorsStep(item.parentInfo);
+          }
+          if (item.parentInfo.type === 'object') {
+            countArrayAncestorsStep(item.parentInfo);
+          }
+        };
+        countArrayAncestorsStep(data);
+        return ids;
+      },
+      // 多级列表数据转换为JSON数据
+      listTojson(listdata) {
+        const jsondata = {};
+        if (listdata.length) {
+          listdata.forEach((item) => {
+            /* eslint-disable */
                         jsondata[item.name] = item.source_type === 'CUSTOM' ? item.value
                             : `\$\{params\_${item.value_key}\}`;
                         /* eslint-disable */

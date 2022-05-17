@@ -133,226 +133,226 @@
 </template>
 
 <script>
-    import businessCard from '@/components/common/BusinessCard.vue';
-    import memberSelect from '@/views/commonComponent/memberSelect/index.vue';
-    import { SCORE_LIST } from '@/constants/ticket';
-    import { errorHandler } from '../../../utils/errorHandler';
+  import businessCard from '@/components/common/BusinessCard.vue';
+  import memberSelect from '@/views/commonComponent/memberSelect/index.vue';
+  import { SCORE_LIST } from '@/constants/ticket';
+  import { errorHandler } from '../../../utils/errorHandler';
 
-    export default {
-        name: 'EvaluationTicketContent',
-        components: {
-            memberSelect,
-            businessCard,
+  export default {
+    name: 'EvaluationTicketContent',
+    components: {
+      memberSelect,
+      businessCard,
+    },
+    props: {
+      satisfactInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      isShowSubmitBtn: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    data() {
+      return {
+        picked: 'One',
+        // 评价
+        scoreInfo: {
+          // TODO: 临时解决方案
+          scoreList: SCORE_LIST,
+          comments: '',
+          startInfo: 0,
+          clickSecond: false,
+          telephone: '',
+          email: '',
+          // 用于member组件临时使用
+          emailTempInfo: {
+            val: [],
+            showFeild: true,
+            desc: this.$t('m.newCommon["请输入蓝鲸用户"]'),
+            evaluDisable: false,
+          },
+          teleCheck: false,
+          title: '',
+          content: '',
+          inviteType: '',
         },
-        props: {
-            satisfactInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            isShowSubmitBtn: {
-                type: Boolean,
-                default: true,
-            },
-        },
-        data() {
-            return {
-                picked: 'One',
-                // 评价
-                scoreInfo: {
-                    // TODO: 临时解决方案
-                    scoreList: SCORE_LIST,
-                    comments: '',
-                    startInfo: 0,
-                    clickSecond: false,
-                    telephone: '',
-                    email: '',
-                    // 用于member组件临时使用
-                    emailTempInfo: {
-                        val: [],
-                        showFeild: true,
-                        desc: this.$t('m.newCommon["请输入蓝鲸用户"]'),
-                        evaluDisable: false,
-                    },
-                    teleCheck: false,
-                    title: '',
-                    content: '',
-                    inviteType: '',
-                },
-            };
-        },
-        computed: {
-            submitBtnInfo() {
-                if (this.picked === 'One') {
-                    return {
-                        name: this.$t('m.newCommon["提交"]'),
-                        disabled: this.scoreInfo.clickSecond,
-                    };
-                }
-                return {
-                    name: this.$t('m.newCommon["发送"]'),
-                    disabled: this.scoreInfo.clickSecond || !!this.satisfactInfo.has_invited,
-                };
-            },
-            // 是否展示短信评论
-            isShowSMSComment() {
-                return this.$store.state.openFunction.SMS_COMMENT_SWITCH && window.run_site !== 'bmw';
-            },
-        },
-        methods: {
-            // 提交
-            onSubmit() {
-                if (this.picked === 'One') {
-                    this.postEvaluation();
-                } else if (this.picked === 'Two') {
-                    this.openSendPhone();
-                } else {
-                    this.openSendEmail();
-                }
-            },
-            // 选择评价分数
-            chooseRate(val) {
-                this.scoreInfo.startInfo = val;
-            },
-            // 提交满意度评价
-            postEvaluation() {
-                if (this.scoreInfo.clickSecond) {
-                    return;
-                }
-                this.scoreInfo.clickSecond = true;
-                const params = {
-                    ticket: this.ticketInfo.id,
-                    stars: this.scoreInfo.startInfo,
-                    comments: this.scoreInfo.comments,
-                    source: 'WEB',
-                    creator: window.username,
-                };
+      };
+    },
+    computed: {
+      submitBtnInfo() {
+        if (this.picked === 'One') {
+          return {
+            name: this.$t('m.newCommon["提交"]'),
+            disabled: this.scoreInfo.clickSecond,
+          };
+        }
+        return {
+          name: this.$t('m.newCommon["发送"]'),
+          disabled: this.scoreInfo.clickSecond || !!this.satisfactInfo.has_invited,
+        };
+      },
+      // 是否展示短信评论
+      isShowSMSComment() {
+        return this.$store.state.openFunction.SMS_COMMENT_SWITCH && window.run_site !== 'bmw';
+      },
+    },
+    methods: {
+      // 提交
+      onSubmit() {
+        if (this.picked === 'One') {
+          this.postEvaluation();
+        } else if (this.picked === 'Two') {
+          this.openSendPhone();
+        } else {
+          this.openSendEmail();
+        }
+      },
+      // 选择评价分数
+      chooseRate(val) {
+        this.scoreInfo.startInfo = val;
+      },
+      // 提交满意度评价
+      postEvaluation() {
+        if (this.scoreInfo.clickSecond) {
+          return;
+        }
+        this.scoreInfo.clickSecond = true;
+        const params = {
+          ticket: this.ticketInfo.id,
+          stars: this.scoreInfo.startInfo,
+          comments: this.scoreInfo.comments,
+          source: 'WEB',
+          creator: window.username,
+        };
 
-                if (!this.scoreInfo.startInfo) {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["请进行评分"]'),
-                        theme: 'error',
-                    });
-                    this.scoreInfo.clickSecond = false;
-                    return;
-                }
-                const id = this.ticketInfo.comment_id;
+        if (!this.scoreInfo.startInfo) {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["请进行评分"]'),
+            theme: 'error',
+          });
+          this.scoreInfo.clickSecond = false;
+          return;
+        }
+        const id = this.ticketInfo.comment_id;
 
-                this.$emit('beforeSubmit');
-                this.$store.dispatch('evaluation/postEvaluation', { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["评价成功"]'),
-                        theme: 'success',
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.$emit('submitSuccess');
-                        this.scoreInfo.clickSecond = false;
-                    });
-            },
-            openSendPhone() {
-                if (this.scoreInfo.teleCheck || !this.scoreInfo.telephone) {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["请输入正确的手机号"]'),
-                        theme: 'error',
-                    });
-                    return;
-                }
-                this.scoreInfo.title = this.$t('m.newCommon["确认发送此短信？"]');
-                this.scoreInfo.content = this.$t('m.newCommon["发送一次以后不能再进行发送操作，请谨慎操作"]');
-                this.scoreInfo.inviteType = 'mobile';
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.scoreInfo.title,
-                    subTitle: this.scoreInfo.content,
-                    confirmFn: () => {
-                        this.sendTelephone();
-                    },
-                });
-            },
-            openSendEmail() {
-                if (this.checkEmail()) {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["未找到当前用户邮箱信息或发送失败"]'),
-                        theme: 'error',
-                    });
-                    return;
-                }
-                this.scoreInfo.title = this.$t('m.newCommon["确认发送此邮件？"]');
-                this.scoreInfo.content = this.$t('m.newCommon["发送一次以后不能再进行发送操作，请谨慎操作"]');
-                this.scoreInfo.inviteType = 'email';
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.scoreInfo.title,
-                    subTitle: this.scoreInfo.content,
-                    confirmFn: () => {
-                        this.sendTelephone();
-                    },
-                });
-            },
-            checkEmail() {
-                if (!this.scoreInfo.emailTempInfo.val.length) {
-                    return true;
-                }
-                const params = {
-                    users: this.scoreInfo.emailTempInfo.val.join(','),
-                    properties: 'all',
-                };
-                this.$store.dispatch('getPersonInfo', params).then(res => !res.data[0].email)
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 邀请评价
-            // 校验电话规则
-            checkTelephone() {
-                const res = /^1[34578]\d{9}$/;
-                const val = this.scoreInfo.telephone.trim().split(',');
-                const result = val.some(item => !res.test(item));
-                this.scoreInfo.teleCheck = result;
-            },
-            sendTelephone() {
-                if (this.scoreInfo.clickSecond) {
-                    return;
-                }
-                this.scoreInfo.clickSecond = true;
-                let url = '';
-                const params = {};
-                let id = '';
-                if (this.scoreInfo.inviteType === 'mobile') {
-                    url = 'evaluation/sendTelephone';
-                    params.receiver = this.scoreInfo.telephone;
-                    params.comment_id = this.ticketInfo.comment_id;
-                    id = this.ticketInfo.id;
-                } else {
-                    url = 'evaluation/sendEmail';
-                    params.receiver = this.scoreInfo.emailTempInfo.val.join(',');
-                    id = this.ticketInfo.id;
-                }
+        this.$emit('beforeSubmit');
+        this.$store.dispatch('evaluation/postEvaluation', { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["评价成功"]'),
+            theme: 'success',
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.$emit('submitSuccess');
+            this.scoreInfo.clickSecond = false;
+          });
+      },
+      openSendPhone() {
+        if (this.scoreInfo.teleCheck || !this.scoreInfo.telephone) {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["请输入正确的手机号"]'),
+            theme: 'error',
+          });
+          return;
+        }
+        this.scoreInfo.title = this.$t('m.newCommon["确认发送此短信？"]');
+        this.scoreInfo.content = this.$t('m.newCommon["发送一次以后不能再进行发送操作，请谨慎操作"]');
+        this.scoreInfo.inviteType = 'mobile';
+        this.$bkInfo({
+          type: 'warning',
+          title: this.scoreInfo.title,
+          subTitle: this.scoreInfo.content,
+          confirmFn: () => {
+            this.sendTelephone();
+          },
+        });
+      },
+      openSendEmail() {
+        if (this.checkEmail()) {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["未找到当前用户邮箱信息或发送失败"]'),
+            theme: 'error',
+          });
+          return;
+        }
+        this.scoreInfo.title = this.$t('m.newCommon["确认发送此邮件？"]');
+        this.scoreInfo.content = this.$t('m.newCommon["发送一次以后不能再进行发送操作，请谨慎操作"]');
+        this.scoreInfo.inviteType = 'email';
+        this.$bkInfo({
+          type: 'warning',
+          title: this.scoreInfo.title,
+          subTitle: this.scoreInfo.content,
+          confirmFn: () => {
+            this.sendTelephone();
+          },
+        });
+      },
+      checkEmail() {
+        if (!this.scoreInfo.emailTempInfo.val.length) {
+          return true;
+        }
+        const params = {
+          users: this.scoreInfo.emailTempInfo.val.join(','),
+          properties: 'all',
+        };
+        this.$store.dispatch('getPersonInfo', params).then(res => !res.data[0].email)
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 邀请评价
+      // 校验电话规则
+      checkTelephone() {
+        const res = /^1[34578]\d{9}$/;
+        const val = this.scoreInfo.telephone.trim().split(',');
+        const result = val.some(item => !res.test(item));
+        this.scoreInfo.teleCheck = result;
+      },
+      sendTelephone() {
+        if (this.scoreInfo.clickSecond) {
+          return;
+        }
+        this.scoreInfo.clickSecond = true;
+        let url = '';
+        const params = {};
+        let id = '';
+        if (this.scoreInfo.inviteType === 'mobile') {
+          url = 'evaluation/sendTelephone';
+          params.receiver = this.scoreInfo.telephone;
+          params.comment_id = this.ticketInfo.comment_id;
+          id = this.ticketInfo.id;
+        } else {
+          url = 'evaluation/sendEmail';
+          params.receiver = this.scoreInfo.emailTempInfo.val.join(',');
+          id = this.ticketInfo.id;
+        }
 
-                this.$emit('beforeSubmit');
-                this.$store.dispatch(url, { params, id }).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.newCommon["发送成功"]'),
-                        theme: 'success',
-                    });
-                    this.$emit('submitSuccess');
-                })
-                    .catch(() => {
-                        errorHandler(this);
-                    })
-                    .finally(() => {
-                        this.scoreInfo.clickSecond = false;
-                    });
-            },
-        },
-    };
+        this.$emit('beforeSubmit');
+        this.$store.dispatch(url, { params, id }).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.newCommon["发送成功"]'),
+            theme: 'success',
+          });
+          this.$emit('submitSuccess');
+        })
+          .catch(() => {
+            errorHandler(this);
+          })
+          .finally(() => {
+            this.scoreInfo.clickSecond = false;
+          });
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 .evaluation-content {

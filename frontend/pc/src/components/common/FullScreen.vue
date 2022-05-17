@@ -36,40 +36,40 @@
 </template>
 
 <script>
-    export default {
-        name: 'FullScreen',
-        props: {
-            isFull: {
-                type: Boolean,
-                default: false,
-            },
-            title: {
-                type: String,
-                default: '',
-            },
-        },
-        watch: {
-            isFull(val) {
-                if (val) {
-                    this.$bkMessage({
-                        message: this.$t('m.common["按 ESC 键退出全屏"]'),
-                    });
-                    document.addEventListener('keydown', this.handlerKeyDown);
-                }
-            },
-        },
-        methods: {
-            onClose() {
-                this.$emit('onClose');
-            },
-            handlerKeyDown(event) {
-                if (event.keyCode === 27) {
-                    this.onClose();
-                    document.removeEventListener('keydown', this.handlerKeyDown);
-                }
-            },
-        },
-    };
+  export default {
+    name: 'FullScreen',
+    props: {
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+      title: {
+        type: String,
+        default: '',
+      },
+    },
+    watch: {
+      isFull(val) {
+        if (val) {
+          this.$bkMessage({
+            message: this.$t('m.common["按 ESC 键退出全屏"]'),
+          });
+          document.addEventListener('keydown', this.handlerKeyDown);
+        }
+      },
+    },
+    methods: {
+      onClose() {
+        this.$emit('onClose');
+      },
+      handlerKeyDown(event) {
+        if (event.keyCode === 27) {
+          this.onClose();
+          document.removeEventListener('keydown', this.handlerKeyDown);
+        }
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

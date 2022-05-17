@@ -24,16 +24,16 @@
   <footer id="page-footer-wrapper" v-html="footer"></footer>
 </template>
 <script>
-    import { mapState } from 'vuex';
+  import { mapState } from 'vuex';
 
-    export default {
-        name: 'CopyrightFooter',
-        computed: {
-            ...mapState({
-                footer: state => state.common.footer,
-            }),
-        },
-    };
+  export default {
+    name: 'CopyrightFooter',
+    computed: {
+      ...mapState({
+        footer: state => state.common.footer,
+      }),
+    },
+  };
 </script>
 <style lang="scss">
 #page-footer-wrapper {

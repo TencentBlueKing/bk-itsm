@@ -424,7 +424,7 @@ module.exports = {
         'vue/return-in-computed-property': 'error',
 
         // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/script-indent.md
-        'vue/script-indent': ['error', 4, {
+        'vue/script-indent': ['error', 2, {
             'baseIndent': 1,
             'switchCase': 1
         }],

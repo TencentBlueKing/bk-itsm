@@ -124,147 +124,147 @@
 </template>
 
 <script>
-    import draggable from 'vuedraggable';
-    import { errorHandler } from '../../../utils/errorHandler.js';
-    import commonMix from '../../commonMix/common.js';
+  import draggable from 'vuedraggable';
+  import { errorHandler } from '../../../utils/errorHandler.js';
+  import commonMix from '../../commonMix/common.js';
 
-    export default {
-        name: 'addBasicModule',
-        components: {
-            draggable,
+  export default {
+    name: 'addBasicModule',
+    components: {
+      draggable,
+    },
+    mixins: [commonMix],
+    props: {
+      slideData: {
+        type: Object,
+        default() {
+          return {};
         },
-        mixins: [commonMix],
-        props: {
-            slideData: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            publicList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
+      },
+      publicList: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                isDataLoading: false,
-                addTableInfo: {
-                    openShow: false,
-                    formInfo: {
-                        id: '',
-                        name: '',
-                        desc: '',
-                        fields: [],
-                    },
-                },
-                dataList: [],
-                fieldsList: [],
-                rules: {},
-            };
+      },
+    },
+    data() {
+      return {
+        isDataLoading: false,
+        addTableInfo: {
+          openShow: false,
+          formInfo: {
+            id: '',
+            name: '',
+            desc: '',
+            fields: [],
+          },
         },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
-        },
-        mounted() {
-            this.initData();
-            this.rules = this.checkCommonRules('name');
-        },
-        methods: {
-            initData() {
-                this.publicList.forEach((item) => {
-                    this.globalChoise.field_type.forEach((node) => {
-                        if (item.type === node.typeName) {
-                            this.$set(item, 'typeName', node.name);
-                        }
-                    });
-                });
-                this.fieldsList = this.publicList.filter(item => (item.key !== 'title' && item.key !== 'current_status'));
-                if (this.slideData.id) {
-                    this.addTableInfo.formInfo.id = this.slideData.id;
-                    this.addTableInfo.formInfo.name = this.slideData.name;
-                    this.addTableInfo.formInfo.desc = this.slideData.desc;
-                    this.addTableInfo.formInfo.fields = this.slideData.fields_order;
-                    // 初始化列表数据
-                    this.dataList = JSON.parse(JSON.stringify(this.slideData.fields));
-                    this.dataList.forEach((item) => {
-                        this.globalChoise.field_type.forEach((node) => {
-                            if (item.type === node.typeName) {
-                                this.$set(item, 'typeName', node.name);
-                            }
-                        });
-                    });
-                } else {
-                    this.dataList = this.publicList.filter(item => (item.key === 'title' || item.key === 'current_status'));
-                    this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
-                }
-            },
-            // 创建/更新数据字典
-            save() {
-                this.$refs.addForm.validate().then(() => {
-                    const params = {
-                        desc: this.addTableInfo.formInfo.desc,
-                        fields: this.addTableInfo.formInfo.fields,
-                        fields_order: this.addTableInfo.formInfo.fields,
-                        id: this.addTableInfo.formInfo.id,
-                        name: this.addTableInfo.formInfo.name,
-                    };
-                    // create or update
-                    if (!this.addTableInfo.formInfo.id) {
-                        this.$store.dispatch('basicModule/add_tables', { params }).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["添加成功"]'),
-                                theme: 'success',
-                            });
-                            this.cancel();
-                            this.$parent.$parent.getList();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            });
-                    } else {
-                        this.$store.dispatch('basicModule/update_tables', {
-                            params,
-                            id: this.addTableInfo.formInfo.id,
-                        }).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["更新成功"]'),
-                                theme: 'success',
-                            });
-                            this.cancel();
-                            this.$parent.$parent.getList();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            });
-                    }
-                }, () => {});
-            },
-            // 取消
-            cancel() {
-                this.$parent.$parent.closeShade();
-            },
-            typeSelected(...value) {
-                this.addTableInfo.formInfo.fields = value[0];
-                this.dataList = [];
-                value[0].forEach((node) => {
-                    this.publicList.forEach((item) => {
-                        if (item.id === node) {
-                            this.dataList.push(item);
-                        }
-                    });
-                });
-            },
-            // 拖动结束后的数据
-            updateInfo() {
-                this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
-            },
-        },
-    };
+        dataList: [],
+        fieldsList: [],
+        rules: {},
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+    },
+    mounted() {
+      this.initData();
+      this.rules = this.checkCommonRules('name');
+    },
+    methods: {
+      initData() {
+        this.publicList.forEach((item) => {
+          this.globalChoise.field_type.forEach((node) => {
+            if (item.type === node.typeName) {
+              this.$set(item, 'typeName', node.name);
+            }
+          });
+        });
+        this.fieldsList = this.publicList.filter(item => (item.key !== 'title' && item.key !== 'current_status'));
+        if (this.slideData.id) {
+          this.addTableInfo.formInfo.id = this.slideData.id;
+          this.addTableInfo.formInfo.name = this.slideData.name;
+          this.addTableInfo.formInfo.desc = this.slideData.desc;
+          this.addTableInfo.formInfo.fields = this.slideData.fields_order;
+          // 初始化列表数据
+          this.dataList = JSON.parse(JSON.stringify(this.slideData.fields));
+          this.dataList.forEach((item) => {
+            this.globalChoise.field_type.forEach((node) => {
+              if (item.type === node.typeName) {
+                this.$set(item, 'typeName', node.name);
+              }
+            });
+          });
+        } else {
+          this.dataList = this.publicList.filter(item => (item.key === 'title' || item.key === 'current_status'));
+          this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
+        }
+      },
+      // 创建/更新数据字典
+      save() {
+        this.$refs.addForm.validate().then(() => {
+          const params = {
+            desc: this.addTableInfo.formInfo.desc,
+            fields: this.addTableInfo.formInfo.fields,
+            fields_order: this.addTableInfo.formInfo.fields,
+            id: this.addTableInfo.formInfo.id,
+            name: this.addTableInfo.formInfo.name,
+          };
+          // create or update
+          if (!this.addTableInfo.formInfo.id) {
+            this.$store.dispatch('basicModule/add_tables', { params }).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["添加成功"]'),
+                theme: 'success',
+              });
+              this.cancel();
+              this.$parent.$parent.getList();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              });
+          } else {
+            this.$store.dispatch('basicModule/update_tables', {
+              params,
+              id: this.addTableInfo.formInfo.id,
+            }).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["更新成功"]'),
+                theme: 'success',
+              });
+              this.cancel();
+              this.$parent.$parent.getList();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              });
+          }
+        }, () => {});
+      },
+      // 取消
+      cancel() {
+        this.$parent.$parent.closeShade();
+      },
+      typeSelected(...value) {
+        this.addTableInfo.formInfo.fields = value[0];
+        this.dataList = [];
+        value[0].forEach((node) => {
+          this.publicList.forEach((item) => {
+            if (item.id === node) {
+              this.dataList.push(item);
+            }
+          });
+        });
+      },
+      // 拖动结束后的数据
+      updateInfo() {
+        this.addTableInfo.formInfo.fields = this.dataList.map(item => item.id);
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

@@ -96,47 +96,47 @@
 </template>
 
 <script>
-    import collapseTransition from '../../../utils/collapse-transition';
-    import commonCascade from '../commonCascade';
-    import memberSelect from '../memberSelect';
+  import collapseTransition from '../../../utils/collapse-transition';
+  import commonCascade from '../commonCascade';
+  import memberSelect from '../memberSelect';
 
-    export default {
-        name: 'searchInfo',
-        components: {
-            collapseTransition,
-            commonCascade,
-            memberSelect,
+  export default {
+    name: 'searchInfo',
+    components: {
+      collapseTransition,
+      commonCascade,
+      memberSelect,
+    },
+    props: {
+      moreSearch: {
+        type: Array,
+        default() {
+          return [];
         },
-        props: {
-            moreSearch: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-        },
-        data() {
-            return {
-                searchWord: '',
-                showMore: false,
-            };
-        },
-        methods: {
-            searchMore() {
-                this.showMore = !this.showMore;
-            },
-            closeSearch() {
-                this.showMore = false;
-            },
-            searchContent() {
-                this.$parent.getList(1, true);
-            },
-            clearSearch() {
-                this.$parent.clearSearch();
-                this.$parent.getList(1, true);
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        searchWord: '',
+        showMore: false,
+      };
+    },
+    methods: {
+      searchMore() {
+        this.showMore = !this.showMore;
+      },
+      closeSearch() {
+        this.showMore = false;
+      },
+      searchContent() {
+        this.$parent.getList(1, true);
+      },
+      clearSearch() {
+        this.$parent.clearSearch();
+        this.$parent.getList(1, true);
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

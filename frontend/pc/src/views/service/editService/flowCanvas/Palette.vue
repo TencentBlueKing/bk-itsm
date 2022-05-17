@@ -80,14 +80,14 @@
   </ul>
 </template>
 <script>
-    export default {
-        name: 'Palette',
-        data() {
-            return {
-                devsopDisable: window.RUN_VER,
-            };
-        },
-    };
+  export default {
+    name: 'Palette',
+    data() {
+      return {
+        devsopDisable: window.RUN_VER,
+      };
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .disable {

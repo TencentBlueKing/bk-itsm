@@ -122,70 +122,70 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex';
-    import LogTab from './LogTab.vue';
-    import AssociatedTab from './AssociatedTab/AssociatedTab.vue';
-    import InheritTicket from './InheritTicketTab.vue';
-    import EmailNoticeTab from './EmailNoticeTab.vue';
-    import CommentTab from './CommentTab.vue';
-    import AllTaskTab from './AllTaskTab.vue';
-    import taskHistory from '../taskInfo/taskHistory.vue';
+  import { mapState } from 'vuex';
+  import LogTab from './LogTab.vue';
+  import AssociatedTab from './AssociatedTab/AssociatedTab.vue';
+  import InheritTicket from './InheritTicketTab.vue';
+  import EmailNoticeTab from './EmailNoticeTab.vue';
+  import CommentTab from './CommentTab.vue';
+  import AllTaskTab from './AllTaskTab.vue';
+  import taskHistory from '../taskInfo/taskHistory.vue';
 
-    export default {
-        name: 'RightTiketTabs',
-        components: {
-            LogTab,
-            AssociatedTab,
-            InheritTicket,
-            EmailNoticeTab,
-            CommentTab,
-            AllTaskTab,
-            taskHistory,
-        },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            nodeList: {
-                type: Array,
-                default: () => [],
-            },
-            hasNodeOptAuth: Boolean,
-        },
-        data() {
-            return {
-                activeTab: 'log',
-                isUseSla: true,
-                isShowSla: true,
-                isResponseTimeout: true,
-                isDisposeTimeout: false,
-                isNormal: false, // sla正常时间内
-            };
-        },
-        computed: {
-            ...mapState({
-                openFunction: state => state.openFunction,
-            }),
-        },
-        methods: {
-            handleClickShowSla() {
-                this.isShowSla = !this.isShowSla;
-            },
-            // 跳转对应项目下sla
-            viewSlaRule() {
-                this.$router.push({
-                    name: 'slaAgreement',
-                    query: {
-                        project_id: this.$route.query.project_id || 0,
-                    },
-                });
-            },
-            viewProcess(val) {
-                this.$emit('viewProcess', val);
-            },
-        },
-    };
+  export default {
+    name: 'RightTiketTabs',
+    components: {
+      LogTab,
+      AssociatedTab,
+      InheritTicket,
+      EmailNoticeTab,
+      CommentTab,
+      AllTaskTab,
+      taskHistory,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      nodeList: {
+        type: Array,
+        default: () => [],
+      },
+      hasNodeOptAuth: Boolean,
+    },
+    data() {
+      return {
+        activeTab: 'log',
+        isUseSla: true,
+        isShowSla: true,
+        isResponseTimeout: true,
+        isDisposeTimeout: false,
+        isNormal: false, // sla正常时间内
+      };
+    },
+    computed: {
+      ...mapState({
+        openFunction: state => state.openFunction,
+      }),
+    },
+    methods: {
+      handleClickShowSla() {
+        this.isShowSla = !this.isShowSla;
+      },
+      // 跳转对应项目下sla
+      viewSlaRule() {
+        this.$router.push({
+          name: 'slaAgreement',
+          query: {
+            project_id: this.$route.query.project_id || 0,
+          },
+        });
+      },
+      viewProcess(val) {
+        this.$emit('viewProcess', val);
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

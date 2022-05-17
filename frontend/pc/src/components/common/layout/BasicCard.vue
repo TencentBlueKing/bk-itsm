@@ -44,48 +44,48 @@
 </template>
 
 <script>
-    import collapseTransition from '@/utils/collapse-transition.js';
-    export default {
-        name: 'BasicCard',
-        components: {
-            collapseTransition,
+  import collapseTransition from '@/utils/collapse-transition.js';
+  export default {
+    name: 'BasicCard',
+    components: {
+      collapseTransition,
+    },
+    props: {
+      showFoldTitle: {
+        type: Boolean,
+        default: false,
+      },
+      foldTitle: {
+        type: String,
+        default: '',
+      },
+      firstUnfold: {
+        type: Boolean,
+        default: true,
+      },
+      cardLabel: {
+        type: String,
+        default: '',
+      },
+      cardDesc: {
+        type: String,
+        default: '',
+      },
+    },
+    data() {
+      return {
+        showMore: true,
+      };
+    },
+    watch: {
+      isFold: {
+        handler() {
+          this.showMore = this.firstUnfold;
         },
-        props: {
-            showFoldTitle: {
-                type: Boolean,
-                default: false,
-            },
-            foldTitle: {
-                type: String,
-                default: '',
-            },
-            firstUnfold: {
-                type: Boolean,
-                default: true,
-            },
-            cardLabel: {
-                type: String,
-                default: '',
-            },
-            cardDesc: {
-                type: String,
-                default: '',
-            },
-        },
-        data() {
-            return {
-                showMore: true,
-            };
-        },
-        watch: {
-            isFold: {
-                handler() {
-                    this.showMore = this.firstUnfold;
-                },
-                immediate: true,
-            },
-        },
-    };
+        immediate: true,
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/common-section-card.scss';

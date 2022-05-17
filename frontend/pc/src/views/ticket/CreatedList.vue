@@ -153,111 +153,111 @@
   </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
-    import i18n from '@/i18n/index.js';
-    import ticketListMixins from './ticketListMixins.js';
+  import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+  import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+  import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+  import i18n from '@/i18n/index.js';
+  import ticketListMixins from './ticketListMixins.js';
 
-    const COLUMN_LIST = [
-        {
-            id: 'id',
-            label: i18n.t('m.manageCommon[\'单号\']'),
-            width: '200',
-            disabled: true,
-        },
-        {
-            id: 'title',
-            label: i18n.t('m.manageCommon[\'标题\']'),
-            minWidth: '180' },
-        {
-            id: 'service_name',
-            label: i18n.t('m.home[\'服务\']'),
-            minWidth: '140',
-            prop: 'service_name' },
-        {
-            id: 'service_type_name',
-            label: i18n.t('m.manageCommon[\'类型\']'),
-            minWidth: '80' },
-        {
-            id: 'priority',
-            label: i18n.t('m.slaContent[\'优先级\']'),
-            minWidth: '120',
-            sortable: 'custom',
-            prop: 'priority_name' },
-        {
-            id: 'current_steps',
-            label: i18n.t('m.newCommon[\'当前步骤\']'),
-            minWidth: '80',
-            prop: 'current_steps' },
-        {
-            id: 'current_processors',
-            label: i18n.t('m.manageCommon[\'当前处理人\']'),
-            width: '130',
-            prop: 'current_processors' },
-        {
-            id: 'status',
-            label: i18n.t('m.manageCommon[\'状态\']'),
-            minWidth: '120',
-            sortable: 'custom',
-            prop: 'status' },
-        {
-            id: 'create_at',
-            label: i18n.t('m.manageCommon[\'提单时间\']'),
-            minWidth: '140',
-            sortable: 'custom',
-            prop: 'create_at' },
-        {
-            id: 'operate',
-            label: i18n.t('m.manageCommon[\'操作\']'),
-            minWidth: '80' },
-    ];
+  const COLUMN_LIST = [
+    {
+      id: 'id',
+      label: i18n.t('m.manageCommon[\'单号\']'),
+      width: '200',
+      disabled: true,
+    },
+    {
+      id: 'title',
+      label: i18n.t('m.manageCommon[\'标题\']'),
+      minWidth: '180' },
+    {
+      id: 'service_name',
+      label: i18n.t('m.home[\'服务\']'),
+      minWidth: '140',
+      prop: 'service_name' },
+    {
+      id: 'service_type_name',
+      label: i18n.t('m.manageCommon[\'类型\']'),
+      minWidth: '80' },
+    {
+      id: 'priority',
+      label: i18n.t('m.slaContent[\'优先级\']'),
+      minWidth: '120',
+      sortable: 'custom',
+      prop: 'priority_name' },
+    {
+      id: 'current_steps',
+      label: i18n.t('m.newCommon[\'当前步骤\']'),
+      minWidth: '80',
+      prop: 'current_steps' },
+    {
+      id: 'current_processors',
+      label: i18n.t('m.manageCommon[\'当前处理人\']'),
+      width: '130',
+      prop: 'current_processors' },
+    {
+      id: 'status',
+      label: i18n.t('m.manageCommon[\'状态\']'),
+      minWidth: '120',
+      sortable: 'custom',
+      prop: 'status' },
+    {
+      id: 'create_at',
+      label: i18n.t('m.manageCommon[\'提单时间\']'),
+      minWidth: '140',
+      sortable: 'custom',
+      prop: 'create_at' },
+    {
+      id: 'operate',
+      label: i18n.t('m.manageCommon[\'操作\']'),
+      minWidth: '80' },
+  ];
 
-    export default {
-        name: 'CreatedList',
-        components: {
-            AdvancedSearch,
-            ExportTicketDialog,
-            EvaluationTicketModal,
-        },
-        mixins: [ticketListMixins],
-        props: {
-            from: String,
-        },
-        data() {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
-            return {
-                columnList,
-                type: 'created',
-                isExportDialogShow: false,
-                // 评价
-                evaluationTicketInfo: {},
-            };
-        },
-        computed: {
-            fromRouter() {
-                return `${this.$route.name}`;
-            },
-        },
-        methods: {
-            // 打开满意度评价
-            onOpenEvaluationTicketModal(row) {
-                this.$refs.evaluationModal.show();
-                this.evaluationTicketInfo = row;
-            },
-            reCreateTicket(row) {
-                const { href } = this.$router.resolve({
-                    name: 'CreateTicket',
-                    query: {
-                        from: this.fromRouter,
-                        service_id: row.service_id,
-                        rc_ticket_id: row.id,
-                    },
-                });
-                window.open(href, '_blank');
-            },
-        },
-    };
+  export default {
+    name: 'CreatedList',
+    components: {
+      AdvancedSearch,
+      ExportTicketDialog,
+      EvaluationTicketModal,
+    },
+    mixins: [ticketListMixins],
+    props: {
+      from: String,
+    },
+    data() {
+      const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
+      return {
+        columnList,
+        type: 'created',
+        isExportDialogShow: false,
+        // 评价
+        evaluationTicketInfo: {},
+      };
+    },
+    computed: {
+      fromRouter() {
+        return `${this.$route.name}`;
+      },
+    },
+    methods: {
+      // 打开满意度评价
+      onOpenEvaluationTicketModal(row) {
+        this.$refs.evaluationModal.show();
+        this.evaluationTicketInfo = row;
+      },
+      reCreateTicket(row) {
+        const { href } = this.$router.resolve({
+          name: 'CreateTicket',
+          query: {
+            from: this.fromRouter,
+            service_id: row.service_id,
+            rc_ticket_id: row.id,
+          },
+        });
+        window.open(href, '_blank');
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

@@ -99,132 +99,132 @@
 </template>
 
 <script>
-    import memberSelect from '../memberSelect';
-    import SelectTree from '../../../components/form/selectTree/index.vue';
-    import { errorHandler } from '../../../utils/errorHandler.js';
-    export default {
-        name: 'COMPLEX-MEMBERS',
-        components: {
-            SelectTree,
-            memberSelect,
+  import memberSelect from '../memberSelect';
+  import SelectTree from '../../../components/form/selectTree/index.vue';
+  import { errorHandler } from '../../../utils/errorHandler.js';
+  export default {
+    name: 'COMPLEX-MEMBERS',
+    components: {
+      SelectTree,
+      memberSelect,
+    },
+    props: {
+      item: {
+        type: Object,
+        default() {
+          return {};
         },
-        props: {
-            item: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            checkValue: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                isLoading: false,
-                formData: {
-                    levelOne: '',
-                    levelSecond: [],
-                },
-                secondLevelList: [],
-                organizationList: [],
-            };
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      checkValue: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {
-            firstLevelList() {
-                const valueList = this.$store.state.common.configurInfo.processor_type;
-                const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION'];
-                const backList = valueList.filter(item => !filterList.some(filterName => filterName === item.typeName));
-                return backList;
-            },
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        isLoading: false,
+        formData: {
+          levelOne: '',
+          levelSecond: [],
         },
-        mounted() {
-            this.formData.levelOne = 'PERSON';
-            this.getSecondLevelList(this.formData.levelOne);
-        },
-        methods: {
-            getSecondLevelList(value) {
-                // 清空二级数据
-                this.formData.levelSecond = [];
-                this.secondLevelList = [];
-                if (value === 'ORGANIZATION') {
-                    this.formData.levelSecond = '';
-                    this.getOrganization();
-                } else if (value === 'PERSON') {
-                    this.secondLevelList = [];
-                } else if (value === 'GENERAL') {
-                    this.formData.levelSecond = '';
-                    this.secondListFn(value);
-                } else {
-                    this.secondListFn(value);
-                }
-            },
-            // 获取数据
-            secondListFn(value) {
-                if (!value) {
-                    return;
-                }
-                this.isLoading = true;
-                this.$store.dispatch('deployCommon/getSecondUser', {
-                    role_type: value,
-                    project_key: this.$store.state.project.id,
-                }).then((res) => {
-                    const valueList = res.data;
-                    const userList = [];
-                    if (value === 'GENERAL') {
-                        valueList.forEach((item) => {
-                            userList.push({
-                                id: String(item.id),
-                                name: `${item.name}(${item.count})`,
-                                disabled: (item.count === 0),
-                            });
-                        });
-                    } else {
-                        valueList.forEach((item) => {
-                            userList.push({
-                                id: String(item.id),
-                                name: item.name,
-                            });
-                        });
-                    }
-                    this.secondLevelList = userList;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isLoading = false;
-                    });
-            },
-            // 组织架构
-            getOrganization() {
-                this.$store.dispatch('cdeploy/getTreeInfo').then((res) => {
-                    // 操作角色组织架构
-                    this.organizationList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-        },
-    };
+        secondLevelList: [],
+        organizationList: [],
+      };
+    },
+    computed: {
+      firstLevelList() {
+        const valueList = this.$store.state.common.configurInfo.processor_type;
+        const filterList = ['OPEN', 'STARTER', 'BY_ASSIGNOR', 'EMPTY', 'VARIABLE', 'CMDB', 'ORGANIZATION'];
+        const backList = valueList.filter(item => !filterList.some(filterName => filterName === item.typeName));
+        return backList;
+      },
+    },
+    mounted() {
+      this.formData.levelOne = 'PERSON';
+      this.getSecondLevelList(this.formData.levelOne);
+    },
+    methods: {
+      getSecondLevelList(value) {
+        // 清空二级数据
+        this.formData.levelSecond = [];
+        this.secondLevelList = [];
+        if (value === 'ORGANIZATION') {
+          this.formData.levelSecond = '';
+          this.getOrganization();
+        } else if (value === 'PERSON') {
+          this.secondLevelList = [];
+        } else if (value === 'GENERAL') {
+          this.formData.levelSecond = '';
+          this.secondListFn(value);
+        } else {
+          this.secondListFn(value);
+        }
+      },
+      // 获取数据
+      secondListFn(value) {
+        if (!value) {
+          return;
+        }
+        this.isLoading = true;
+        this.$store.dispatch('deployCommon/getSecondUser', {
+          role_type: value,
+          project_key: this.$store.state.project.id,
+        }).then((res) => {
+          const valueList = res.data;
+          const userList = [];
+          if (value === 'GENERAL') {
+            valueList.forEach((item) => {
+              userList.push({
+                id: String(item.id),
+                name: `${item.name}(${item.count})`,
+                disabled: (item.count === 0),
+              });
+            });
+          } else {
+            valueList.forEach((item) => {
+              userList.push({
+                id: String(item.id),
+                name: item.name,
+              });
+            });
+          }
+          this.secondLevelList = userList;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      },
+      // 组织架构
+      getOrganization() {
+        this.$store.dispatch('cdeploy/getTreeInfo').then((res) => {
+          // 操作角色组织架构
+          this.organizationList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

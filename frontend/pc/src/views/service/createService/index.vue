@@ -26,24 +26,24 @@
 
 <script>
 
-    export default {
-        name: 'CreateService',
-        components: {},
-        data() {
-            return {
+  export default {
+    name: 'CreateService',
+    components: {},
+    data() {
+      return {
 
-            };
-        },
-        created() {
+      };
+    },
+    created() {
 
-        },
-        mounted() {
+    },
+    mounted() {
 
-        },
-        methods: {
+    },
+    methods: {
 
-        },
-    };
+    },
+  };
 </script>
 <style lang='scss' scoped>
 

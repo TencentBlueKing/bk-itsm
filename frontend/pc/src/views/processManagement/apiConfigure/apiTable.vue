@@ -207,308 +207,308 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler';
-    import addApiInfo from './addApiInfo.vue';
-    import permission from '@/mixins/permission.js';
+  import { errorHandler } from '../../../utils/errorHandler';
+  import addApiInfo from './addApiInfo.vue';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        components: {
-            addApiInfo,
+  export default {
+    components: {
+      addApiInfo,
+    },
+    mixins: [permission],
+    props: {
+      treeList: {
+        type: Array,
+        default() {
+          return [];
         },
-        mixins: [permission],
-        props: {
-            treeList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            listInfoOri: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            pathList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            projectId: String,
-            firstLevelInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            customPaging: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+      },
+      listInfoOri: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                secondClick: false,
-                isDropdownShow: false,
-                // tag
-                titleList: [
-                    { name: this.$t('m.systemConfig["API列表"]') },
-                    // { name: '编辑分类' }
-                ],
-                checkIndex: 0,
-                isTableLoading: false,
-                nameInfo: '',
-                // 选中
-                checkList: [],
-                allCheck: false,
-                // 查询
-                searchInfo: {
-                    key: '',
-                },
-                // 分页
-                pagination: {
-                    current: 1,
-                    count: 10,
-                    limit: 10,
-                },
-                // 新增服务
-                entryInfo: {
-                    show: false,
-                    title: '',
-                    width: 700,
-                },
-                fileVal: '',
-                typeInfo: '',
+      },
+      pathList: {
+        type: Array,
+        default() {
+          return [];
+        },
+      },
+      projectId: String,
+      firstLevelInfo: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+      customPaging: {
+        type: Object,
+        default() {
+          return {};
+        },
+      },
+    },
+    data() {
+      return {
+        secondClick: false,
+        isDropdownShow: false,
+        // tag
+        titleList: [
+          { name: this.$t('m.systemConfig["API列表"]') },
+          // { name: '编辑分类' }
+        ],
+        checkIndex: 0,
+        isTableLoading: false,
+        nameInfo: '',
+        // 选中
+        checkList: [],
+        allCheck: false,
+        // 查询
+        searchInfo: {
+          key: '',
+        },
+        // 分页
+        pagination: {
+          current: 1,
+          count: 10,
+          limit: 10,
+        },
+        // 新增服务
+        entryInfo: {
+          show: false,
+          title: '',
+          width: 700,
+        },
+        fileVal: '',
+        typeInfo: '',
+      };
+    },
+    computed: {
+      listInfo: {
+        // getter
+        get() {
+          return this.listInfoOri;
+        },
+        // setter
+        set(newVal) {
+          this.$parent.listInfo = newVal;
+        },
+      },
+    },
+    watch: {},
+    mounted() {
+
+    },
+    methods: {
+      async entryOne(item) {
+        // 公共api
+        if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
+          const resourceData = {
+            public_api: [{
+              id: item.id,
+              name: item.name,
+            }],
+          };
+          this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
+          return;
+        }
+        this.$parent.displayInfo.level_1 = item;
+        // 展示 单个api
+        await this.$parent.getRemoteApiDetail(item.id);
+      },
+      getRemoteSystemData() {
+        this.$parent.getRemoteSystemData();
+        const customPaging = {
+          page: this.pagination.current,
+          page_size: this.pagination.limit,
+        };
+        this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
+      },
+      systemName(id) {
+        const system = this.treeList.filter(item => item.id === id);
+        if (system.length) {
+          return system[0].name;
+        }
+        return '--';
+      },
+      changTitle(item, index) {
+        this.checkIndex = index;
+      },
+      // 新增
+      openShade(type) {
+        if (!this.projectId) {
+          if (!this.hasPermission(['public_api_create'])) {
+            this.applyForPermission(['public_api_create'], [], {});
+            return;
+          }
+        }
+        this.typeInfo = type;
+        this.entryInfo.title = type === 'ADD'
+          ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
+        this.$refs.apiDropdown.hide();
+        this.entryInfo.show = !this.entryInfo.show;
+      },
+      dropdownShow() {
+        this.isDropdownShow = true;
+      },
+      dropdownHide() {
+        this.isDropdownShow = false;
+      },
+      // 查询
+      serchEntry() {
+        const customPaging = {
+          page: this.pagination.current,
+          page_size: this.pagination.limit,
+        };
+        this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
+      },
+      clearInfo() {
+        this.searchInfo.key = '';
+        this.serchEntry();
+      },
+      // 分页过滤数据
+      handlePageLimitChange() {
+        this.pagination.limit = arguments[0];
+        const customPaging = {
+          page: this.pagination.current,
+          page_size: this.pagination.limit,
+        };
+        this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
+      },
+      handlePageChange(page) {
+        this.pagination.current = page;
+        const customPaging = {
+          page: this.pagination.current,
+          page_size: this.pagination.limit,
+        };
+        this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
+      },
+      // 全选 半选
+      handleSelectAll(selection) {
+        this.checkList = selection;
+      },
+      handleSelect(selection) {
+        this.checkList = selection;
+      },
+      disabledFn(item) {
+        if (!this.projectId) {
+          return this.hasPermission(['public_api_manage'], item.auth_actions) && !item.is_builtin;
+        }
+        return !item.is_builtin;
+      },
+      // 二次弹窗确认
+      openDelete(item) {
+        if (!this.projectId) {
+          if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
+            const resourceData = {
+              public_api: [{
+                id: item.id,
+                name: item.name,
+              }],
             };
-        },
-        computed: {
-            listInfo: {
-                // getter
-                get() {
-                    return this.listInfoOri;
-                },
-                // setter
-                set(newVal) {
-                    this.$parent.listInfo = newVal;
-                },
-            },
-        },
-        watch: {},
-        mounted() {
-
-        },
-        methods: {
-            async entryOne(item) {
-                // 公共api
-                if (!this.projectId && !this.hasPermission(['public_api_manage'], item.auth_actions)) {
-                    const resourceData = {
-                        public_api: [{
-                            id: item.id,
-                            name: item.name,
-                        }],
-                    };
-                    this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
-                    return;
-                }
-                this.$parent.displayInfo.level_1 = item;
-                // 展示 单个api
-                await this.$parent.getRemoteApiDetail(item.id);
-            },
-            getRemoteSystemData() {
-                this.$parent.getRemoteSystemData();
-                const customPaging = {
-                    page: this.pagination.current,
-                    page_size: this.pagination.limit,
-                };
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
-            },
-            systemName(id) {
-                const system = this.treeList.filter(item => item.id === id);
-                if (system.length) {
-                    return system[0].name;
-                }
-                return '--';
-            },
-            changTitle(item, index) {
-                this.checkIndex = index;
-            },
-            // 新增
-            openShade(type) {
-                if (!this.projectId) {
-                    if (!this.hasPermission(['public_api_create'])) {
-                        this.applyForPermission(['public_api_create'], [], {});
-                        return;
-                    }
-                }
-                this.typeInfo = type;
-                this.entryInfo.title = type === 'ADD'
-                    ? this.$t('m.systemConfig["新增接口"]') : this.$t('m.systemConfig["接入接口"]');
-                this.$refs.apiDropdown.hide();
-                this.entryInfo.show = !this.entryInfo.show;
-            },
-            dropdownShow() {
-                this.isDropdownShow = true;
-            },
-            dropdownHide() {
-                this.isDropdownShow = false;
-            },
-            // 查询
-            serchEntry() {
-                const customPaging = {
-                    page: this.pagination.current,
-                    page_size: this.pagination.limit,
-                };
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
-            },
-            clearInfo() {
-                this.searchInfo.key = '';
-                this.serchEntry();
-            },
-            // 分页过滤数据
-            handlePageLimitChange() {
-                this.pagination.limit = arguments[0];
-                const customPaging = {
-                    page: this.pagination.current,
-                    page_size: this.pagination.limit,
-                };
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
-            },
-            handlePageChange(page) {
-                this.pagination.current = page;
-                const customPaging = {
-                    page: this.pagination.current,
-                    page_size: this.pagination.limit,
-                };
-                this.$parent.getTableList(this.$parent.displayInfo.level_0.id || '', customPaging, this.searchInfo);
-            },
-            // 全选 半选
-            handleSelectAll(selection) {
-                this.checkList = selection;
-            },
-            handleSelect(selection) {
-                this.checkList = selection;
-            },
-            disabledFn(item) {
-                if (!this.projectId) {
-                    return this.hasPermission(['public_api_manage'], item.auth_actions) && !item.is_builtin;
-                }
-                return !item.is_builtin;
-            },
-            // 二次弹窗确认
-            openDelete(item) {
-                if (!this.projectId) {
-                    if (!this.hasPermission(['public_api_manage'], item.auth_actions)) {
-                        const resourceData = {
-                            public_api: [{
-                                id: item.id,
-                                name: item.name,
-                            }],
-                        };
-                        this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
-                        return;
-                    }
-                }
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.systemConfig["确认移除服务？"]'),
-                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
-                    confirmFn: () => {
-                        const { id } = item;
-                        if (this.secondClick) {
-                            return;
-                        }
-                        this.secondClick = true;
-                        this.$store.dispatch('apiRemote/delete_api', id).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["删除成功"]'),
-                                theme: 'success',
-                            });
-                            this.getRemoteSystemData();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                    },
-                });
-            },
-            deleteCheck() {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.systemConfig["确认移除服务？"]'),
-                    subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
-                    confirmFn: () => {
-                        const id = this.checkList.map(item => item.id).join(',');
-                        if (this.secondClick) {
-                            return;
-                        }
-                        this.secondClick = true;
-                        this.$store.dispatch('apiRemote/batch_delete_apis', { id }).then(() => {
-                            this.$bkMessage({
-                                message: this.$t('m.systemConfig["批量删除成功"]'),
-                                theme: 'success',
-                            });
-                            this.getRemoteSystemData();
-                        })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            })
-                            .finally(() => {
-                                this.secondClick = false;
-                            });
-                    },
-                });
-            },
-            //
-            hasImportPermission() {
-                if (!this.projectId) {
-                    if (!this.hasPermission(['public_api_create'])) {
-                        this.applyForPermission(['public_api_create'], [], {});
-                    }
-                }
-            },
-            // 上传文件模板
-            handleFile(e) {
-                const fileInfo = e.target.files[0];
-                if (fileInfo.size <= 10 * 1024 * 1024) {
-                    const data = new FormData();
-                    data.append('file', fileInfo);
-                    const fileType = 'json';
-                    this.$store.dispatch('apiRemote/get_api_import', { fileType, data }).then((res) => {
-                        this.$bkMessage({
-                            message: `${this.$t('m.systemConfig["成功导入"]')}
+            this.applyForPermission(['public_api_manage'], item.auth_actions, resourceData);
+            return;
+          }
+        }
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.systemConfig["确认移除服务？"]'),
+          subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
+          confirmFn: () => {
+            const { id } = item;
+            if (this.secondClick) {
+              return;
+            }
+            this.secondClick = true;
+            this.$store.dispatch('apiRemote/delete_api', id).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["删除成功"]'),
+                theme: 'success',
+              });
+              this.getRemoteSystemData();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+          },
+        });
+      },
+      deleteCheck() {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.systemConfig["确认移除服务？"]'),
+          subTitle: this.$t('m.systemConfig["移除后，将无法使用该接口，请谨慎操作"]'),
+          confirmFn: () => {
+            const id = this.checkList.map(item => item.id).join(',');
+            if (this.secondClick) {
+              return;
+            }
+            this.secondClick = true;
+            this.$store.dispatch('apiRemote/batch_delete_apis', { id }).then(() => {
+              this.$bkMessage({
+                message: this.$t('m.systemConfig["批量删除成功"]'),
+                theme: 'success',
+              });
+              this.getRemoteSystemData();
+            })
+              .catch((res) => {
+                errorHandler(res, this);
+              })
+              .finally(() => {
+                this.secondClick = false;
+              });
+          },
+        });
+      },
+      //
+      hasImportPermission() {
+        if (!this.projectId) {
+          if (!this.hasPermission(['public_api_create'])) {
+            this.applyForPermission(['public_api_create'], [], {});
+          }
+        }
+      },
+      // 上传文件模板
+      handleFile(e) {
+        const fileInfo = e.target.files[0];
+        if (fileInfo.size <= 10 * 1024 * 1024) {
+          const data = new FormData();
+          data.append('file', fileInfo);
+          const fileType = 'json';
+          this.$store.dispatch('apiRemote/get_api_import', { fileType, data }).then((res) => {
+            this.$bkMessage({
+              message: `${this.$t('m.systemConfig["成功导入"]')}
                                 ${res.data.success}
                                 ${this.$t('m.systemConfig["个API接口，"]')}
                                 ${this.$t('m.systemConfig["失败"]')}
                                 ${res.data.failed}
                                 ${this.$t('m.systemConfig["个"]')}`,
-                            theme: 'success',
-                        });
-                        this.getRemoteSystemData();
-                    }, (res) => {
-                        errorHandler(res, this);
-                    })
-                        .finally(() => {
-                            this.fileVal = '';
-                        });
-                } else {
-                    this.fileVal = '';
-                    this.$bkMessage({
-                        message: this.$t('m.systemConfig["文件大小不能超过10MB！"]'),
-                        theme: 'error',
-                    });
-                }
-            },
-            exportFlow(item) {
-                window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`);
-            },
-        },
-    };
+              theme: 'success',
+            });
+            this.getRemoteSystemData();
+          }, (res) => {
+            errorHandler(res, this);
+          })
+            .finally(() => {
+              this.fileVal = '';
+            });
+        } else {
+          this.fileVal = '';
+          this.$bkMessage({
+            message: this.$t('m.systemConfig["文件大小不能超过10MB！"]'),
+            theme: 'error',
+          });
+        }
+      },
+      exportFlow(item) {
+        window.open(`${window.SITE_URL}api/postman/remote_api/${item.id}/exports/`);
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

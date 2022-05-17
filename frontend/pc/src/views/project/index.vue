@@ -26,72 +26,72 @@
   </div>
 </template>
 <script>
-    import { mapState } from 'vuex';
-    import { errorHandler } from '@/utils/errorHandler';
-    import permission from '@/mixins/permission.js';
+  import { mapState } from 'vuex';
+  import { errorHandler } from '@/utils/errorHandler';
+  import permission from '@/mixins/permission.js';
 
-    export default {
-        name: 'ProjectHome',
-        mixins: [permission],
-        data() {
-            return {
-                projectDetailLoading: false,
-            };
-        },
-        computed: {
-            ...mapState({
-                projectListLoading: state => state.project.projectListLoading,
-            }),
-        },
-        watch: {
-            '$store.state.project.id'(val) {
-                if (val) {
-                    this.getProjectDetail();
-                }
-            },
-        },
-        created() {
-            if (this.$store.state.project.id !== this.$route.query.project_id && this.$route.query.project_id !== '') {
-                this.$store.commit('project/setProjectId', this.$route.query.project_id);
-            }
-            this.getProjectList();
-            if (this.$store.state.project.id) {
-                this.getProjectDetail();
-            }
-        },
-        methods: {
-            async getProjectDetail() {
-                try {
-                    this.projectDetailLoading = true;
-                    await this.$store.dispatch('project/getProjectDetail', this.$store.state.project.id);
-                } catch (e) {
-                    errorHandler(e, this);
-                } finally {
-                    this.projectDetailLoading = false;
-                }
-            },
-            async getProjectList() {
-                try {
-                    this.$store.commit('project/setProjectListLoading', true);
-                    const res = await this.$store.dispatch('project/getProjectAllList');
-                    this.$store.commit('project/setProjectList', res.data);
-                    const projectsWithViewPerm = this.$store.state.project.projectList.filter(item => item.auth_actions.includes('project_view'));
-                    if (projectsWithViewPerm.length === 0) {
-                        this.$router.replace({ name: 'ProjectGuide' });
-                    }
-                    if (!this.$store.state.project.id && projectsWithViewPerm.length !== 0) {
-                        this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key);
-                        this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key);
-                        this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } });
-                    }
-                } catch (e) {
-                    errorHandler(e, this);
-                } finally {
-                    this.$store.commit('project/setProjectListLoading', false);
-                }
-            },
-        },
-    };
+  export default {
+    name: 'ProjectHome',
+    mixins: [permission],
+    data() {
+      return {
+        projectDetailLoading: false,
+      };
+    },
+    computed: {
+      ...mapState({
+        projectListLoading: state => state.project.projectListLoading,
+      }),
+    },
+    watch: {
+      '$store.state.project.id'(val) {
+        if (val) {
+          this.getProjectDetail();
+        }
+      },
+    },
+    created() {
+      if (this.$store.state.project.id !== this.$route.query.project_id && this.$route.query.project_id !== '') {
+        this.$store.commit('project/setProjectId', this.$route.query.project_id);
+      }
+      this.getProjectList();
+      if (this.$store.state.project.id) {
+        this.getProjectDetail();
+      }
+    },
+    methods: {
+      async getProjectDetail() {
+        try {
+          this.projectDetailLoading = true;
+          await this.$store.dispatch('project/getProjectDetail', this.$store.state.project.id);
+        } catch (e) {
+          errorHandler(e, this);
+        } finally {
+          this.projectDetailLoading = false;
+        }
+      },
+      async getProjectList() {
+        try {
+          this.$store.commit('project/setProjectListLoading', true);
+          const res = await this.$store.dispatch('project/getProjectAllList');
+          this.$store.commit('project/setProjectList', res.data);
+          const projectsWithViewPerm = this.$store.state.project.projectList.filter(item => item.auth_actions.includes('project_view'));
+          if (projectsWithViewPerm.length === 0) {
+            this.$router.replace({ name: 'ProjectGuide' });
+          }
+          if (!this.$store.state.project.id && projectsWithViewPerm.length !== 0) {
+            this.$store.commit('project/setProjectId', projectsWithViewPerm[0].key);
+            this.$store.dispatch('project/changeDefaultProject', projectsWithViewPerm[0].key);
+            this.$router.replace({ name: 'projectTicket', query: { project_id: projectsWithViewPerm[0].key } });
+          }
+        } catch (e) {
+          errorHandler(e, this);
+        } finally {
+          this.$store.commit('project/setProjectListLoading', false);
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .project-page {

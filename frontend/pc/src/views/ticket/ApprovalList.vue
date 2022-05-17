@@ -151,148 +151,148 @@
   </div>
 </template>
 <script>
-    import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
-    import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
-    import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
-    import i18n from '@/i18n/index.js';
-    import ticketListMixins from './ticketListMixins.js';
+  import AdvancedSearch from '@/components/form/advancedSearch/NewAdvancedSearch';
+  import ExportTicketDialog from '@/components/ticket/ExportTicketDialog.vue';
+  import ApprovalDialog from '@/components/ticket/ApprovalDialog.vue';
+  import i18n from '@/i18n/index.js';
+  import ticketListMixins from './ticketListMixins.js';
 
-    const COLUMN_LIST = [
-        {
-            id: 'id',
-            label: i18n.t('m.manageCommon[\'单号\']'),
-            width: '200',
-            disabled: true,
-        },
-        {
-            id: 'title',
-            label: i18n.t('m.manageCommon[\'标题\']'),
-            minWidth: '180' },
-        {
-            id: 'service_name',
-            label: i18n.t('m.home[\'服务\']'),
-            minWidth: '140',
-            prop: 'service_name' },
-        {
-            id: 'service_type_name',
-            label: i18n.t('m.manageCommon[\'类型\']'),
-            minWidth: '80' },
-        {
-            id: 'priority',
-            label: i18n.t('m.slaContent[\'优先级\']'),
-            minWidth: '120',
-            sortable: 'custom',
-            prop: 'priority_name' },
-        {
-            id: 'current_steps',
-            label: i18n.t('m.newCommon[\'当前步骤\']'),
-            minWidth: '80',
-            prop: 'current_steps' },
-        {
-            id: 'current_processors',
-            label: i18n.t('m.manageCommon[\'当前处理人\']'),
-            width: '130',
-            prop: 'current_processors' },
-        {
-            id: 'status',
-            label: i18n.t('m.manageCommon[\'状态\']'),
-            minWidth: '120',
-            sortable: 'custom',
-            prop: 'status' },
-        {
-            id: 'create_at',
-            label: i18n.t('m.manageCommon[\'提单时间\']'),
-            minWidth: '140',
-            sortable: 'custom',
-            prop: 'create_at' },
-        {
-            id: 'creator',
-            label: i18n.t('m.manageCommon[\'提单人\']'),
-            minWidth: '140',
-            prop: 'creator' },
-        {
-            id: 'operate',
-            label: i18n.t('m.manageCommon[\'操作\']'),
-            minWidth: '80' },
-    ];
+  const COLUMN_LIST = [
+    {
+      id: 'id',
+      label: i18n.t('m.manageCommon[\'单号\']'),
+      width: '200',
+      disabled: true,
+    },
+    {
+      id: 'title',
+      label: i18n.t('m.manageCommon[\'标题\']'),
+      minWidth: '180' },
+    {
+      id: 'service_name',
+      label: i18n.t('m.home[\'服务\']'),
+      minWidth: '140',
+      prop: 'service_name' },
+    {
+      id: 'service_type_name',
+      label: i18n.t('m.manageCommon[\'类型\']'),
+      minWidth: '80' },
+    {
+      id: 'priority',
+      label: i18n.t('m.slaContent[\'优先级\']'),
+      minWidth: '120',
+      sortable: 'custom',
+      prop: 'priority_name' },
+    {
+      id: 'current_steps',
+      label: i18n.t('m.newCommon[\'当前步骤\']'),
+      minWidth: '80',
+      prop: 'current_steps' },
+    {
+      id: 'current_processors',
+      label: i18n.t('m.manageCommon[\'当前处理人\']'),
+      width: '130',
+      prop: 'current_processors' },
+    {
+      id: 'status',
+      label: i18n.t('m.manageCommon[\'状态\']'),
+      minWidth: '120',
+      sortable: 'custom',
+      prop: 'status' },
+    {
+      id: 'create_at',
+      label: i18n.t('m.manageCommon[\'提单时间\']'),
+      minWidth: '140',
+      sortable: 'custom',
+      prop: 'create_at' },
+    {
+      id: 'creator',
+      label: i18n.t('m.manageCommon[\'提单人\']'),
+      minWidth: '140',
+      prop: 'creator' },
+    {
+      id: 'operate',
+      label: i18n.t('m.manageCommon[\'操作\']'),
+      minWidth: '80' },
+  ];
 
-    export default {
-        name: 'ApprovalList',
-        components: {
-            AdvancedSearch,
-            ExportTicketDialog,
-            ApprovalDialog,
+  export default {
+    name: 'ApprovalList',
+    components: {
+      AdvancedSearch,
+      ExportTicketDialog,
+      ApprovalDialog,
+    },
+    mixins: [ticketListMixins],
+    data() {
+      const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
+      return {
+        columnList,
+        type: 'approval',
+        approvalInfo: {
+          showAllOption: false,
+          result: true,
+          approvalList: [],
         },
-        mixins: [ticketListMixins],
-        data() {
-            const columnList = COLUMN_LIST.filter(column => this.$store.state.openFunction.SLA_SWITCH || column.id !== 'priority');
-            return {
-                columnList,
-                type: 'approval',
-                approvalInfo: {
-                    showAllOption: false,
-                    result: true,
-                    approvalList: [],
-                },
-                isExportDialogShow: false,
-                isApprovalDialogShow: false,
-                // 批量审批选中单
-                selectedList: [],
-            };
-        },
-        methods: {
-            // 批量审批
-            onBatchApprovalClick() {
-                this.isApprovalDialogShow = true;
-                this.approvalInfo = {
-                    result: true,
-                    showAllOption: true,
-                    approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
-                };
-            },
-            // 可以选中
-            canSelected(row) {
-                return row.waiting_approve;
-            },
-            // 全选 半选
-            handleSelectAll(selection) {
-                this.ticketList.forEach((item) => {
-                    item.checkStatus = !!selection.length;
-                });
-                this.selectedList = selection;
-            },
-            // 批量审批-单个选中
-            // 改变中选态，与表头选择相呼应
-            changeSelection(value) {
-                this.$refs.ticketList.toggleRowSelection(value, value.checkStatus);
-                if (value.checkStatus) {
-                    if (!this.selectedList.some(item => item.id === value.id)) {
-                        this.selectedList.push(value);
-                    }
-                } else {
-                    this.selectedList = this.selectedList.filter(item => item.id !== value.id);
-                }
-            },
-            onOpenApprovalDialog(id, result) {
-                this.isApprovalDialogShow = true;
-                this.approvalInfo = {
-                    result,
-                    approvalList: [{ ticket_id: id }],
-                };
-            },
-            onApprovalDialogHidden(result) {
-                this.isApprovalDialogShow = false;
-                this.approvalInfo = {
-                    result: true,
-                    showAllOption: false,
-                    approvalList: [],
-                };
-                if (result) {
-                    this.initData();
-                }
-            },
-        },
-    };
+        isExportDialogShow: false,
+        isApprovalDialogShow: false,
+        // 批量审批选中单
+        selectedList: [],
+      };
+    },
+    methods: {
+      // 批量审批
+      onBatchApprovalClick() {
+        this.isApprovalDialogShow = true;
+        this.approvalInfo = {
+          result: true,
+          showAllOption: true,
+          approvalList: this.selectedList.map(item => ({ ticket_id: item.id })),
+        };
+      },
+      // 可以选中
+      canSelected(row) {
+        return row.waiting_approve;
+      },
+      // 全选 半选
+      handleSelectAll(selection) {
+        this.ticketList.forEach((item) => {
+          item.checkStatus = !!selection.length;
+        });
+        this.selectedList = selection;
+      },
+      // 批量审批-单个选中
+      // 改变中选态，与表头选择相呼应
+      changeSelection(value) {
+        this.$refs.ticketList.toggleRowSelection(value, value.checkStatus);
+        if (value.checkStatus) {
+          if (!this.selectedList.some(item => item.id === value.id)) {
+            this.selectedList.push(value);
+          }
+        } else {
+          this.selectedList = this.selectedList.filter(item => item.id !== value.id);
+        }
+      },
+      onOpenApprovalDialog(id, result) {
+        this.isApprovalDialogShow = true;
+        this.approvalInfo = {
+          result,
+          approvalList: [{ ticket_id: id }],
+        };
+      },
+      onApprovalDialogHidden(result) {
+        this.isApprovalDialogShow = false;
+        this.approvalInfo = {
+          result: true,
+          showAllOption: false,
+          approvalList: [],
+        };
+        if (result) {
+          this.initData();
+        }
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     @import './ticketList.scss';

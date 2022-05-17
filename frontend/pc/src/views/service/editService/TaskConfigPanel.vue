@@ -113,207 +113,207 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler';
-    function newTaskCondition() {
-        return {
-            taskId: '',
-            createNodeId: '',
-            dealNodeId: '',
-            others: [1, 2],
-        };
-    }
-    export default {
-        name: 'TaskConfigPanel',
-        components: {},
-        props: {
-            serviceInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-        },
-        data() {
-            return {
-                taskConfigRule: {
-                    taskId: [
-                        {
-                            required: true,
-                            message: this.$t('m.taskTemplate[\'请选择任务模板\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                    createNodeId: [
-                        {
-                            required: true,
-                            message: this.$t('m[\'请选择可创建任务节点\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                    dealNodeId: [
-                        {
-                            required: true,
-                            message: this.$t('m[\'请选择可处理任务的节点\']'),
-                            trigger: 'blur',
-                        },
-                    ],
-                },
-                taskTemplateList: [],
-                normalNodeList: [],
-                taskConditionList: [],
-                selectedDealNodeIds: [],
-                useTask: false,
-                nodeListLoading: false,
-            };
-        },
-        computed: {
-            taskSettings() {
-                if (this.serviceInfo.extras && this.serviceInfo.extras.task_settings) {
-                    const taskSettings = this.serviceInfo.extras.task_settings;
-                    if (Array.isArray(taskSettings)) {
-                        return this.serviceInfo.extras.task_settings;
-                    }
-                }
-                return [];
-            },
-        },
-        async created() {
-            this.initTaskCondition();
-            this.getTaskTemplateList();
-            await this.getNodeList();
-            this.handleDealNodeChange();
-        },
-        methods: {
-            initTaskCondition() {
-                if (this.serviceInfo.extras && this.serviceInfo.extras.task_settings) {
-                    const taskSettings = this.serviceInfo.extras.task_settings;
-                    if (Array.isArray(taskSettings)) {
-                        this.taskConditionList = taskSettings.map((setting) => {
-                            const con = {
-                                taskId: setting.task_schema_id,
-                                createNodeId: setting.create_task_state,
-                                dealNodeId: setting.execute_task_state,
-                                others: [],
-                                dealLoading: false,
-                                dealList: [],
-                            };
-                            if (setting.execute_can_create) {
-                                con.others.push(1);
-                            }
-                            if (setting.need_task_finished) {
-                                con.others.push(2);
-                            }
-                            return con;
-                        });
-                        this.taskConditionList.forEach((condition) => {
-                            this.getCanDealNodeList(condition.createNodeId, condition);
-                        });
-                        this.useTask = !!taskSettings.length;
-                    } else {
-                        errorHandler('taskSettings not Array', this);
-                    }
-                }
-            },
-            getTaskTemplateList() {
-                const params = {
-                    // name__icontains: '',
-                    is_draft: false,
-                };
-                return this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
-                    this.taskTemplateList = res.data.filter((task) => {
-                        // 流程未关联业务，则不显示标准运维模板
-                        if (!this.serviceInfo.is_biz_needed && task.component_type === 'SOPS') {
-                            return false;
-                        }
-                        return true;
-                    });
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 获取流程节点
-            async getNodeList() {
-                this.nodeListLoading = true;
-                return this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then((res) => {
-                    this.normalNodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.nodeListLoading = false;
-                    });
-            },
-            // 选择创建节点的回调
-            getCanDealNodeList(createNodeId, item) {
-                if (!createNodeId) {
-                    return;
-                }
-                this.$set(item, 'dealLoading', true);
-                const params = {
-                    id: createNodeId,
-                    include_self: true,
-                };
-                return this.$store.dispatch('deployCommon/getOrderedStates', params).then((res) => {
-                    item.dealList = res.data;
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.$set(item, 'dealLoading', false);
-                    });
-            },
-            getAllDealNodeIds() {
-                this.selectedDealNodeIds = this.taskConditionList.map(condition => condition.dealNodeId).filter(id => !!id);
-            },
-            handleDealNodeChange() {
-                this.getAllDealNodeIds();
-                this.normalNodeList.forEach((node) => {
-                    node.disabled = false;
-                    if (this.selectedDealNodeIds.includes(node.id)) {
-                        node.disabled = true;
-                    }
-                });
-            },
-            onAddCondition() {
-                this.taskConditionList.push(newTaskCondition());
-            },
-            onDelCondition(index) {
-                this.taskConditionList.splice(index, 1);
-                if (this.taskConditionList.length === 0) {
-                    this.useTask = false;
-                }
-            },
-            async validate() {
-                if (!this.useTask) {
-                    return true;
-                }
-                const checks = this.$refs.taskForms.map((form) => {
-                    const check = form.validate();
-                    return check;
-                });
-                return Promise.all(checks);
-                // return checks.every(check => !!check)
-            },
-            getPostParams() {
-                if (!this.useTask) {
-                    return [];
-                }
-                return this.taskConditionList.map(condition => ({
-                    create_task_state: condition.createNodeId,
-                    task_schema_id: condition.taskId,
-                    execute_task_state: condition.dealNodeId,
-                    need_task_finished: condition.others.indexOf(2) !== -1,
-                    execute_can_create: condition.others.indexOf(1) !== -1,
-                }));
-            },
-            handleUseTaskChange(val) {
-                if (val && !this.taskConditionList.length) {
-                    this.onAddCondition();
-                }
-            },
-        },
+  import { errorHandler } from '@/utils/errorHandler';
+  function newTaskCondition() {
+    return {
+      taskId: '',
+      createNodeId: '',
+      dealNodeId: '',
+      others: [1, 2],
     };
+  }
+  export default {
+    name: 'TaskConfigPanel',
+    components: {},
+    props: {
+      serviceInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        taskConfigRule: {
+          taskId: [
+            {
+              required: true,
+              message: this.$t('m.taskTemplate[\'请选择任务模板\']'),
+              trigger: 'blur',
+            },
+          ],
+          createNodeId: [
+            {
+              required: true,
+              message: this.$t('m[\'请选择可创建任务节点\']'),
+              trigger: 'blur',
+            },
+          ],
+          dealNodeId: [
+            {
+              required: true,
+              message: this.$t('m[\'请选择可处理任务的节点\']'),
+              trigger: 'blur',
+            },
+          ],
+        },
+        taskTemplateList: [],
+        normalNodeList: [],
+        taskConditionList: [],
+        selectedDealNodeIds: [],
+        useTask: false,
+        nodeListLoading: false,
+      };
+    },
+    computed: {
+      taskSettings() {
+        if (this.serviceInfo.extras && this.serviceInfo.extras.task_settings) {
+          const taskSettings = this.serviceInfo.extras.task_settings;
+          if (Array.isArray(taskSettings)) {
+            return this.serviceInfo.extras.task_settings;
+          }
+        }
+        return [];
+      },
+    },
+    async created() {
+      this.initTaskCondition();
+      this.getTaskTemplateList();
+      await this.getNodeList();
+      this.handleDealNodeChange();
+    },
+    methods: {
+      initTaskCondition() {
+        if (this.serviceInfo.extras && this.serviceInfo.extras.task_settings) {
+          const taskSettings = this.serviceInfo.extras.task_settings;
+          if (Array.isArray(taskSettings)) {
+            this.taskConditionList = taskSettings.map((setting) => {
+              const con = {
+                taskId: setting.task_schema_id,
+                createNodeId: setting.create_task_state,
+                dealNodeId: setting.execute_task_state,
+                others: [],
+                dealLoading: false,
+                dealList: [],
+              };
+              if (setting.execute_can_create) {
+                con.others.push(1);
+              }
+              if (setting.need_task_finished) {
+                con.others.push(2);
+              }
+              return con;
+            });
+            this.taskConditionList.forEach((condition) => {
+              this.getCanDealNodeList(condition.createNodeId, condition);
+            });
+            this.useTask = !!taskSettings.length;
+          } else {
+            errorHandler('taskSettings not Array', this);
+          }
+        }
+      },
+      getTaskTemplateList() {
+        const params = {
+          // name__icontains: '',
+          is_draft: false,
+        };
+        return this.$store.dispatch('taskTemplate/getTemplateList', params).then((res) => {
+          this.taskTemplateList = res.data.filter((task) => {
+            // 流程未关联业务，则不显示标准运维模板
+            if (!this.serviceInfo.is_biz_needed && task.component_type === 'SOPS') {
+              return false;
+            }
+            return true;
+          });
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 获取流程节点
+      async getNodeList() {
+        this.nodeListLoading = true;
+        return this.$store.dispatch('deployCommon/getStates', { workflow: this.serviceInfo.workflow_id }).then((res) => {
+          this.normalNodeList = res.data.filter(node => !node.is_builtin && node.type !== 'ROUTER-P' && node.type !== 'COVERAGE');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.nodeListLoading = false;
+          });
+      },
+      // 选择创建节点的回调
+      getCanDealNodeList(createNodeId, item) {
+        if (!createNodeId) {
+          return;
+        }
+        this.$set(item, 'dealLoading', true);
+        const params = {
+          id: createNodeId,
+          include_self: true,
+        };
+        return this.$store.dispatch('deployCommon/getOrderedStates', params).then((res) => {
+          item.dealList = res.data;
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.$set(item, 'dealLoading', false);
+          });
+      },
+      getAllDealNodeIds() {
+        this.selectedDealNodeIds = this.taskConditionList.map(condition => condition.dealNodeId).filter(id => !!id);
+      },
+      handleDealNodeChange() {
+        this.getAllDealNodeIds();
+        this.normalNodeList.forEach((node) => {
+          node.disabled = false;
+          if (this.selectedDealNodeIds.includes(node.id)) {
+            node.disabled = true;
+          }
+        });
+      },
+      onAddCondition() {
+        this.taskConditionList.push(newTaskCondition());
+      },
+      onDelCondition(index) {
+        this.taskConditionList.splice(index, 1);
+        if (this.taskConditionList.length === 0) {
+          this.useTask = false;
+        }
+      },
+      async validate() {
+        if (!this.useTask) {
+          return true;
+        }
+        const checks = this.$refs.taskForms.map((form) => {
+          const check = form.validate();
+          return check;
+        });
+        return Promise.all(checks);
+        // return checks.every(check => !!check)
+      },
+      getPostParams() {
+        if (!this.useTask) {
+          return [];
+        }
+        return this.taskConditionList.map(condition => ({
+          create_task_state: condition.createNodeId,
+          task_schema_id: condition.taskId,
+          execute_task_state: condition.dealNodeId,
+          need_task_finished: condition.others.indexOf(2) !== -1,
+          execute_can_create: condition.others.indexOf(1) !== -1,
+        }));
+      },
+      handleUseTaskChange(val) {
+        if (val && !this.taskConditionList.length) {
+          this.onAddCondition();
+        }
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/form.scss';

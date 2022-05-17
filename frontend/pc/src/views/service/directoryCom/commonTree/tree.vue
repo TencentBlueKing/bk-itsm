@@ -102,160 +102,160 @@
 
 <script>
     // import Render from './render'
-    import CollapseTransition from './collapse-transition';
+  import CollapseTransition from './collapse-transition';
 
-    export default {
-        name: 'bk-tree',
-        components: {
-            CollapseTransition,
+  export default {
+    name: 'bk-tree',
+    components: {
+      CollapseTransition,
+    },
+    props: {
+      data: {
+        type: Array,
+        default: () => [],
+      },
+      parent: {
+        type: Object,
+        default: () => null,
+      },
+      multiple: {
+        type: Boolean,
+        default: false,
+      },
+      nodeKey: {
+        type: String,
+        default: 'id',
+      },
+      draggable: {
+        type: Boolean,
+        default: true,
+      },
+      dragSort: {
+        type: Boolean,
+        default: true,
+      },
+      hasBorder: {
+        type: Boolean,
+        default: false,
+      },
+      dragAfterExpanded: {
+        type: Boolean,
+        default: true,
+      },
+      isDeleteRoot: {
+        type: Boolean,
+        default: false,
+      },
+      emptyText: {
+        type: String,
+        default() {
+          return this.$t('m.serviceConfig["暂无数据"]');
         },
-        props: {
-            data: {
-                type: Array,
-                default: () => [],
-            },
-            parent: {
-                type: Object,
-                default: () => null,
-            },
-            multiple: {
-                type: Boolean,
-                default: false,
-            },
-            nodeKey: {
-                type: String,
-                default: 'id',
-            },
-            draggable: {
-                type: Boolean,
-                default: true,
-            },
-            dragSort: {
-                type: Boolean,
-                default: true,
-            },
-            hasBorder: {
-                type: Boolean,
-                default: false,
-            },
-            dragAfterExpanded: {
-                type: Boolean,
-                default: true,
-            },
-            isDeleteRoot: {
-                type: Boolean,
-                default: false,
-            },
-            emptyText: {
-                type: String,
-                default() {
-                    return this.$t('m.serviceConfig["暂无数据"]');
-                },
-            },
-            tpl: Function,
-        },
-        data() {
-            return {
-                halfcheck: true,
-                isBorder: this.hasBorder,
-                bkTreeDrag: {},
-                visibleStatus: [],
-                isEmpty: false,
-                searchFlag: false,
-                isDragSort: this.dragSort,
-            };
-        },
-        watch: {
-            data() {
-                this.initTreeData();
-            },
-            dragSort(value) {
-                this.isDragSort = !!value;
-            },
-            hasBorder(value) {
-                this.isBorder = !!value;
-            },
-        },
-        mounted() {
-            /**
-             * @event monitor 子节点 selected event
-             */
-            this.$on('childChecked', (node, checked) => {
-                if (node.children && node.children.length) {
-                    for (const child of node.children) {
-                        if (!child.disabled) {
-                            this.$set(child, 'checked', checked);
-                        }
-                        this.$emit('on-check', child, checked);
-                    }
-                }
-            });
+      },
+      tpl: Function,
+    },
+    data() {
+      return {
+        halfcheck: true,
+        isBorder: this.hasBorder,
+        bkTreeDrag: {},
+        visibleStatus: [],
+        isEmpty: false,
+        searchFlag: false,
+        isDragSort: this.dragSort,
+      };
+    },
+    watch: {
+      data() {
+        this.initTreeData();
+      },
+      dragSort(value) {
+        this.isDragSort = !!value;
+      },
+      hasBorder(value) {
+        this.isBorder = !!value;
+      },
+    },
+    mounted() {
+      /**
+       * @event monitor 子节点 selected event
+       */
+      this.$on('childChecked', (node, checked) => {
+        if (node.children && node.children.length) {
+          for (const child of node.children) {
+            if (!child.disabled) {
+              this.$set(child, 'checked', checked);
+            }
+            this.$emit('on-check', child, checked);
+          }
+        }
+      });
 
-            /**
-             * @event monitor 父节点 selected event
-             */
-            this.$on('parentChecked', (node, checked) => {
-                if (!node.disabled) {
-                    this.$set(node, 'checked', checked);
-                }
-                if (!node.parent) return false;
-                const someBortherNodeChecked = node.parent.children.some(node => node.checked);
-                const allBortherNodeChecked = node.parent.children.every(node => node.checked);
-                if (this.halfcheck) {
-                    allBortherNodeChecked ? this.$set(node.parent, 'halfcheck', false) : someBortherNodeChecked ? this.$set(node.parent, 'halfcheck', true) : this.$set(node.parent, 'halfcheck', false);
-                    if (!checked && someBortherNodeChecked) {
-                        this.$set(node.parent, 'halfcheck', true);
-                        return false;
-                    }
-                    this.$emit('parentChecked', node.parent, checked);
-                } else {
-                    if (checked && allBortherNodeChecked) this.$emit('parentChecked', node.parent, checked);
-                    if (!checked) this.$emit('parentChecked', node.parent, checked);
-                }
-            });
+      /**
+       * @event monitor 父节点 selected event
+       */
+      this.$on('parentChecked', (node, checked) => {
+        if (!node.disabled) {
+          this.$set(node, 'checked', checked);
+        }
+        if (!node.parent) return false;
+        const someBortherNodeChecked = node.parent.children.some(node => node.checked);
+        const allBortherNodeChecked = node.parent.children.every(node => node.checked);
+        if (this.halfcheck) {
+          allBortherNodeChecked ? this.$set(node.parent, 'halfcheck', false) : someBortherNodeChecked ? this.$set(node.parent, 'halfcheck', true) : this.$set(node.parent, 'halfcheck', false);
+          if (!checked && someBortherNodeChecked) {
+            this.$set(node.parent, 'halfcheck', true);
+            return false;
+          }
+          this.$emit('parentChecked', node.parent, checked);
+        } else {
+          if (checked && allBortherNodeChecked) this.$emit('parentChecked', node.parent, checked);
+          if (!checked) this.$emit('parentChecked', node.parent, checked);
+        }
+      });
 
-            /**
-             * @event monitor 节点 selected event
-             */
-            this.$on('on-check', (node, checked) => {
-                this.$emit('parentChecked', node, checked);
-                this.$emit('childChecked', node, checked);
-                this.$emit('dropTreeChecked', node, checked);
-            });
+      /**
+       * @event monitor 节点 selected event
+       */
+      this.$on('on-check', (node, checked) => {
+        this.$emit('parentChecked', node, checked);
+        this.$emit('childChecked', node, checked);
+        this.$emit('dropTreeChecked', node, checked);
+      });
 
-            /**
-             * @event monitor 节点过滤时 可见/不可见 visible event
-             */
-            this.$on('toggleshow', (node, isShow) => {
-                this.$set(node, 'visible', isShow);
-                this.visibleStatus.push(node.visible);
-                if (this.visibleStatus.every(item => !item)) {
-                    this.isEmpty = true;
-                    return;
-                }
-                if (isShow && node.parent) {
-                    this.searchFlag = false;
-                    this.$emit('toggleshow', node.parent, isShow);
-                }
-            });
-            this.$on('cancelSelected', (root) => {
-                for (const child of root.$children) {
-                    for (const node of child.data) {
-                        child.$set(node, 'selected', false);
-                    }
-                    if (child.$children) child.$emit('cancelSelected', child);
-                }
-            });
-            this.initTreeData();
-        },
-        destroyed() {
-            this.$delete(window, 'bkTreeDrag');
-        },
-        methods: {
-            /**
-             * 拖拽时生成随机guid将节点暂存window['bkTreeDrag'][guid]上
-             */
-            /* eslint-disable */
+      /**
+       * @event monitor 节点过滤时 可见/不可见 visible event
+       */
+      this.$on('toggleshow', (node, isShow) => {
+        this.$set(node, 'visible', isShow);
+        this.visibleStatus.push(node.visible);
+        if (this.visibleStatus.every(item => !item)) {
+          this.isEmpty = true;
+          return;
+        }
+        if (isShow && node.parent) {
+          this.searchFlag = false;
+          this.$emit('toggleshow', node.parent, isShow);
+        }
+      });
+      this.$on('cancelSelected', (root) => {
+        for (const child of root.$children) {
+          for (const node of child.data) {
+            child.$set(node, 'selected', false);
+          }
+          if (child.$children) child.$emit('cancelSelected', child);
+        }
+      });
+      this.initTreeData();
+    },
+    destroyed() {
+      this.$delete(window, 'bkTreeDrag');
+    },
+    methods: {
+      /**
+       * 拖拽时生成随机guid将节点暂存window['bkTreeDrag'][guid]上
+       */
+      /* eslint-disable */
             gid() {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
                     const r = Math.random() * 16 | 0;

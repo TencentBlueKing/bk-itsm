@@ -36,20 +36,20 @@
 </template>
 
 <script>
-    import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
+  import getParam from '@/views/processManagement/processDesign/nodeConfigue/components/sopsGetParam.vue';
 
-    export default {
-        name: 'sopsNodeLog',
-        components: {
-            getParam,
-        },
-        props: {
-            sopsInfo: {
-                type: Array,
-                default: () => ({}),
-            },
-        },
-    };
+  export default {
+    name: 'sopsNodeLog',
+    components: {
+      getParam,
+    },
+    props: {
+      sopsInfo: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

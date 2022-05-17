@@ -378,289 +378,289 @@
 </template>
 
 <script>
-    import { errorHandler } from '@/utils/errorHandler';
-    import newTask from '../../taskInfo/newTask.vue';
-    import dealTask from '../../taskInfo/dealTask.vue';
-    import TaskStatus from './TaskStatus.vue';
-    import taskHandleTrigger from '../../taskInfo/taskHandleTrigger.vue';
-    import DevopsExecutInfo from './DevopsExecutInfo.vue';
-    import TaskLibrary from './TaskLibrary.vue';
-    import TaskLibraryOptPanel from './TaskLibraryOptPanel.vue';
-    import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
+  import { errorHandler } from '@/utils/errorHandler';
+  import newTask from '../../taskInfo/newTask.vue';
+  import dealTask from '../../taskInfo/dealTask.vue';
+  import TaskStatus from './TaskStatus.vue';
+  import taskHandleTrigger from '../../taskInfo/taskHandleTrigger.vue';
+  import DevopsExecutInfo from './DevopsExecutInfo.vue';
+  import TaskLibrary from './TaskLibrary.vue';
+  import TaskLibraryOptPanel from './TaskLibraryOptPanel.vue';
+  import { TASK_TEMPLATE_TYPES } from '@/constants/task.js';
 
-    export default {
-        name: 'NodeTaskList',
-        inject: ['reload'],
-        components: {
-            TaskStatus,
-            newTask,
-            dealTask,
-            TaskLibrary,
-            taskHandleTrigger,
-            DevopsExecutInfo,
-            TaskLibraryOptPanel,
+  export default {
+    name: 'NodeTaskList',
+    inject: ['reload'],
+    components: {
+      TaskStatus,
+      newTask,
+      dealTask,
+      TaskLibrary,
+      taskHandleTrigger,
+      DevopsExecutInfo,
+      TaskLibraryOptPanel,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      nodeInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        refreshing: false,
+        edittingOrderId: '',
+        taskLibrary: {
+          show: false,
         },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            nodeInfo: {
-                type: Object,
-                default: () => ({}),
-            },
+        // 创建/编辑任务
+        createInfo: {
+          isShow: false,
+          isAdd: true,
+          taskInfo: {},
+          bk_biz_id: '',
         },
-        data() {
-            return {
-                refreshing: false,
-                edittingOrderId: '',
-                taskLibrary: {
-                    show: false,
-                },
-                // 创建/编辑任务
-                createInfo: {
-                    isShow: false,
-                    isAdd: true,
-                    taskInfo: {},
-                    bk_biz_id: '',
-                },
-                // 处理任务
-                dealTaskInfo: {
-                    show: false,
-                    title: this.$t('m.task[\'处理任务\']'),
-                    loading: false,
-                    itemContent: {},
-                    type: '',
-                },
-                // 查看/处理任务
-                viewTask: {
-                    isShow: false,
-                    isView: true,
-                    taskInfo: {},
-                },
-                isListLoading: false,
-                // 状态对应操作列表
-                operatingMap: {
-                    NEW: ['edit', 'delete', 'view'],
-                    QUEUE: ['deal', 'view'],
-                    WAITING_FOR_OPERATE: ['deal', 'view'],
-                    WAITING_FOR_BACKEND: ['view'],
-                    RUNNING: ['view'],
-                    WAITING_FOR_CONFIRM: ['confiam', 'view'],
-                    FINISHED: ['view'],
-                    FAILED: ['to_deal_sops', 'view'],
-                    DELETED: [],
-                    REVOKED: ['view'],
-                    SUSPENDED: ['view'],
-                },
-                taskList: [],
-                taskTemplateTypes: TASK_TEMPLATE_TYPES,
-            };
+        // 处理任务
+        dealTaskInfo: {
+          show: false,
+          title: this.$t('m.task[\'处理任务\']'),
+          loading: false,
+          itemContent: {},
+          type: '',
         },
-        mounted() {
-            this.refreshTaskList();
+        // 查看/处理任务
+        viewTask: {
+          isShow: false,
+          isView: true,
+          taskInfo: {},
         },
-        methods: {
-            closeSideslider(type) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m["内容未保存，离开将取消操作！"]'),
-                    confirmLoading: true,
-                    confirmFn: () => {
-                        this.createInfo.isShow = false;
-                        this.taskLibrary.show = false;
-                    },
-                    cancelFn: () => {
-                        if (type === 'newTask') {
-                            this.createInfo.isShow = true;
-                        } else {
-                            this.taskLibrary.show = true;
-                        }
-                    },
+        isListLoading: false,
+        // 状态对应操作列表
+        operatingMap: {
+          NEW: ['edit', 'delete', 'view'],
+          QUEUE: ['deal', 'view'],
+          WAITING_FOR_OPERATE: ['deal', 'view'],
+          WAITING_FOR_BACKEND: ['view'],
+          RUNNING: ['view'],
+          WAITING_FOR_CONFIRM: ['confiam', 'view'],
+          FINISHED: ['view'],
+          FAILED: ['to_deal_sops', 'view'],
+          DELETED: [],
+          REVOKED: ['view'],
+          SUSPENDED: ['view'],
+        },
+        taskList: [],
+        taskTemplateTypes: TASK_TEMPLATE_TYPES,
+      };
+    },
+    mounted() {
+      this.refreshTaskList();
+    },
+    methods: {
+      closeSideslider(type) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m["内容未保存，离开将取消操作！"]'),
+          confirmLoading: true,
+          confirmFn: () => {
+            this.createInfo.isShow = false;
+            this.taskLibrary.show = false;
+          },
+          cancelFn: () => {
+            if (type === 'newTask') {
+              this.createInfo.isShow = true;
+            } else {
+              this.taskLibrary.show = true;
+            }
+          },
+        });
+      },
+      // 获取任务列表
+      getTaskList(source) {
+        const params = {
+          ticket_id: this.ticketInfo.id,
+        };
+        return this.$store
+          .dispatch('taskFlow/getTaskList', params)
+          .then((res) => {
+            this.taskList = res.data;
+            this.taskList.forEach((item) => {
+              this.$set(item, 'editOrder', item.order);
+            });
+            // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询,否则为处理完成状态,需刷新单据
+            const loopStatusList = [
+              'QUEUE',
+              'RUNNING',
+              'WAITING_FOR_OPERATE',
+              'WAITING_FOR_BACKEND',
+              'WAITING_FOR_CONFIRM',
+            ];
+            if (
+              !res.data.some(task => loopStatusList.includes(task.status))
+              && source === 'refreshBtn'
+            ) {
+              this.reload();
+            }
+            // 轮询
+            if (
+              res.data.some(task => loopStatusList.includes(task.status))
+            ) {
+              const setTimeoutFunc = setTimeout(() => {
+                this.getTaskList(source);
+              }, 10000);
+              this.$once('hook:beforeDestroy', () => {
+                clearInterval(setTimeoutFunc);
+              });
+            }
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          });
+      },
+      // 同步标准运维状态
+      syncSopsTaskStatus() {
+        return this.$store.dispatch('taskFlow/syncSopsTaskStatus', {
+          ticket_id: this.ticketInfo.id,
+        });
+      },
+      // 刷新任务列表
+      async refreshTaskList(source = 'init') {
+        if (this.isListLoading) {
+          return;
+        }
+        this.isListLoading = true;
+        await this.syncSopsTaskStatus();
+        await this.getTaskList(source);
+        this.isListLoading = false;
+      },
+      // 创建任务
+      onCreateTaskClick() {
+        this.createInfo = {
+          isShow: true,
+          isAdd: true,
+          taskInfo: {},
+          bk_biz_id: this.ticketInfo.bk_biz_id,
+        };
+      },
+      // 编辑任务
+      onTaskEditClick(row) {
+        this.createInfo = {
+          isShow: true,
+          isAdd: false,
+          taskInfo: row,
+          bk_biz_id: this.ticketInfo.bk_biz_id,
+        };
+      },
+      // 删除任务
+      onTaskDeleteClick(row) {
+        this.$bkInfo({
+          type: 'warning',
+          title: this.$t('m.task[\'确认删除任务？\']'),
+          subTitle: this.$t('m.task[\'任务如果被删除，与任务相关的触发动作将会一并删除。\']'),
+          confirmFn: () => {
+            const { id } = row;
+            this.$store
+              .dispatch('taskFlow/deleteTask', id)
+              .then(() => {
+                this.$bkMessage({
+                  message: this.$t('m.task[\'删除成功\']'),
+                  theme: 'success',
                 });
-            },
-            // 获取任务列表
-            getTaskList(source) {
-                const params = {
-                    ticket_id: this.ticketInfo.id,
-                };
-                return this.$store
-                    .dispatch('taskFlow/getTaskList', params)
-                    .then((res) => {
-                        this.taskList = res.data;
-                        this.taskList.forEach((item) => {
-                            this.$set(item, 'editOrder', item.order);
-                        });
-                        // 如果当前的状态为QUEUE、RUNNING、WAITING_FOR_XXX则轮询,否则为处理完成状态,需刷新单据
-                        const loopStatusList = [
-                            'QUEUE',
-                            'RUNNING',
-                            'WAITING_FOR_OPERATE',
-                            'WAITING_FOR_BACKEND',
-                            'WAITING_FOR_CONFIRM',
-                        ];
-                        if (
-                            !res.data.some(task => loopStatusList.includes(task.status))
-                            && source === 'refreshBtn'
-                        ) {
-                            this.reload();
-                        }
-                        // 轮询
-                        if (
-                            res.data.some(task => loopStatusList.includes(task.status))
-                        ) {
-                            const setTimeoutFunc = setTimeout(() => {
-                                this.getTaskList(source);
-                            }, 10000);
-                            this.$once('hook:beforeDestroy', () => {
-                                clearInterval(setTimeoutFunc);
-                            });
-                        }
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    });
-            },
-            // 同步标准运维状态
-            syncSopsTaskStatus() {
-                return this.$store.dispatch('taskFlow/syncSopsTaskStatus', {
-                    ticket_id: this.ticketInfo.id,
-                });
-            },
-            // 刷新任务列表
-            async refreshTaskList(source = 'init') {
-                if (this.isListLoading) {
-                    return;
-                }
-                this.isListLoading = true;
-                await this.syncSopsTaskStatus();
-                await this.getTaskList(source);
-                this.isListLoading = false;
-            },
-            // 创建任务
-            onCreateTaskClick() {
-                this.createInfo = {
-                    isShow: true,
-                    isAdd: true,
-                    taskInfo: {},
-                    bk_biz_id: this.ticketInfo.bk_biz_id,
-                };
-            },
-            // 编辑任务
-            onTaskEditClick(row) {
-                this.createInfo = {
-                    isShow: true,
-                    isAdd: false,
-                    taskInfo: row,
-                    bk_biz_id: this.ticketInfo.bk_biz_id,
-                };
-            },
-            // 删除任务
-            onTaskDeleteClick(row) {
-                this.$bkInfo({
-                    type: 'warning',
-                    title: this.$t('m.task[\'确认删除任务？\']'),
-                    subTitle: this.$t('m.task[\'任务如果被删除，与任务相关的触发动作将会一并删除。\']'),
-                    confirmFn: () => {
-                        const { id } = row;
-                        this.$store
-                            .dispatch('taskFlow/deleteTask', id)
-                            .then(() => {
-                                this.$bkMessage({
-                                    message: this.$t('m.task[\'删除成功\']'),
-                                    theme: 'success',
-                                });
-                                this.getTaskList();
-                            })
-                            .catch((res) => {
-                                errorHandler(res, this);
-                            });
-                    },
-                });
-            },
-            // 处理任务
-            dealTaskSlider(item, type) {
-                this.dealTaskInfo.itemContent = item;
-                this.dealTaskInfo.type = type;
-                const typeObject = {
-                    SEE: this.$t('m.task[\'查看任务\']'),
-                    OPERATE: this.$t('m.task[\'处理任务\']'),
-                    CONFIRM: this.$t('m.task[\'总结任务\']'),
-                    RETRY: this.$t('m.task[\'重试任务\']'),
-                };
-                this.dealTaskInfo.title = typeObject[type];
-                this.dealTaskInfo.show = true;
-            },
-            // 处理任务成功回调
-            dealSuccess() {
-                this.dealTaskInfo.show = false;
                 this.getTaskList();
-                this.$emit('updateCurrentStep');
-            },
-            // 跳转到标准运维
-            onJumpToSopsClick(row) {
-                window.open(row.task_url);
-            },
-            // 编辑顺序
-            onEditOrderBlur(row) {
-                const params = {
-                    order: Number(row.editOrder),
-                };
-                this.$store
-                    .dispatch('taskFlow/editorTask', { params, id: row.id })
-                    .then(() => {
-                        row.order = Number(row.editOrder);
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.edittingOrderId = '';
-                    });
-            },
-            // 查看任务
-            onViewTaskClick(row, type) {
-                this.viewTask = {
-                    isShow: true,
-                    isView: type !== 'deal',
-                    taskInfo: row,
-                    bk_biz_id: this.ticketInfo.bk_biz_id,
-                };
-            },
-            onTaskOrderClick(row) {
-                if (row.status !== 'NEW') {
-                    return false;
-                }
-                this.edittingOrderId = row.id;
-            },
-            handleSubmitSuccess() {
-                this.createInfo.isShow = false;
-                this.getTaskList();
-            },
-            getTaskTypeName(type) {
-                const target = this.taskTemplateTypes.find(m => m.type === type);
-                return target ? target.name : type;
-            },
-            isShowJumpIcon(taskInfo) {
-                return (
-                    !['NEW', 'WAITING_FOR_CONFIRM', 'FINISHED', 'DELETED'].includes(taskInfo.status)
-                    && ['SOPS', 'DEVOPS'].includes(taskInfo.component_type)
-                    && taskInfo.component_type === 'DEVOPS'
-                    && taskInfo.status !== 'WAITING_FOR_OPERATE'
-                );
-            },
-            onCreateByTaskLibrary() {
-                this.taskLibrary.show = true;
-            },
-            // 关闭任务库弹窗
-            handleTaskLibraryClose(refech) {
-                this.taskLibrary.show = false;
-                if (refech) {
-                    this.refreshTaskList();
-                }
-            },
-        },
-    };
+              })
+              .catch((res) => {
+                errorHandler(res, this);
+              });
+          },
+        });
+      },
+      // 处理任务
+      dealTaskSlider(item, type) {
+        this.dealTaskInfo.itemContent = item;
+        this.dealTaskInfo.type = type;
+        const typeObject = {
+          SEE: this.$t('m.task[\'查看任务\']'),
+          OPERATE: this.$t('m.task[\'处理任务\']'),
+          CONFIRM: this.$t('m.task[\'总结任务\']'),
+          RETRY: this.$t('m.task[\'重试任务\']'),
+        };
+        this.dealTaskInfo.title = typeObject[type];
+        this.dealTaskInfo.show = true;
+      },
+      // 处理任务成功回调
+      dealSuccess() {
+        this.dealTaskInfo.show = false;
+        this.getTaskList();
+        this.$emit('updateCurrentStep');
+      },
+      // 跳转到标准运维
+      onJumpToSopsClick(row) {
+        window.open(row.task_url);
+      },
+      // 编辑顺序
+      onEditOrderBlur(row) {
+        const params = {
+          order: Number(row.editOrder),
+        };
+        this.$store
+          .dispatch('taskFlow/editorTask', { params, id: row.id })
+          .then(() => {
+            row.order = Number(row.editOrder);
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.edittingOrderId = '';
+          });
+      },
+      // 查看任务
+      onViewTaskClick(row, type) {
+        this.viewTask = {
+          isShow: true,
+          isView: type !== 'deal',
+          taskInfo: row,
+          bk_biz_id: this.ticketInfo.bk_biz_id,
+        };
+      },
+      onTaskOrderClick(row) {
+        if (row.status !== 'NEW') {
+          return false;
+        }
+        this.edittingOrderId = row.id;
+      },
+      handleSubmitSuccess() {
+        this.createInfo.isShow = false;
+        this.getTaskList();
+      },
+      getTaskTypeName(type) {
+        const target = this.taskTemplateTypes.find(m => m.type === type);
+        return target ? target.name : type;
+      },
+      isShowJumpIcon(taskInfo) {
+        return (
+          !['NEW', 'WAITING_FOR_CONFIRM', 'FINISHED', 'DELETED'].includes(taskInfo.status)
+          && ['SOPS', 'DEVOPS'].includes(taskInfo.component_type)
+          && taskInfo.component_type === 'DEVOPS'
+          && taskInfo.status !== 'WAITING_FOR_OPERATE'
+        );
+      },
+      onCreateByTaskLibrary() {
+        this.taskLibrary.show = true;
+      },
+      // 关闭任务库弹窗
+      handleTaskLibraryClose(refech) {
+        this.taskLibrary.show = false;
+        if (refech) {
+          this.refreshTaskList();
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

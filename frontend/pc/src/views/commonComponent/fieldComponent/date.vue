@@ -38,54 +38,54 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
-    export default {
-        name: 'DATE',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {},
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  import mixins from '../../commonMix/field.js';
+  export default {
+    name: 'DATE',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {},
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {};
-        },
-        watch: {
-            'item.val'() {
-                this.conditionField(this.item, this.fields);
-            },
-        },
-        mounted() {
-            this.conditionField(this.item, this.fields);
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-            if (!this.item.val) {
-                const currTime = new Date();
-                this.item.val = currTime;
-                this.item.value = currTime;
-            }
-        },
-        methods: {
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {};
+    },
+    watch: {
+      'item.val'() {
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      this.conditionField(this.item, this.fields);
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+      if (!this.item.val) {
+        const currTime = new Date();
+        this.item.val = currTime;
+        this.item.value = currTime;
+      }
+    },
+    methods: {
 
-        },
-    };
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

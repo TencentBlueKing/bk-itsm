@@ -34,31 +34,31 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'toolPanel',
-        props: {
-            fullStatus: {
-                type: Boolean,
-                default() {
-                    return false;
-                },
-            },
+  export default {
+    name: 'toolPanel',
+    props: {
+      fullStatus: {
+        type: Boolean,
+        default() {
+          return false;
         },
-        data() {
-            return {};
-        },
-        methods: {
-            onZoomIn() {
-                this.$emit('onZoomIn');
-            },
-            onZoomOut() {
-                this.$emit('onZoomOut');
-            },
-            onResetPosition() {
-                this.$emit('onResetPosition');
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {};
+    },
+    methods: {
+      onZoomIn() {
+        this.$emit('onZoomIn');
+      },
+      onZoomOut() {
+        this.$emit('onZoomOut');
+      },
+      onResetPosition() {
+        this.$emit('onResetPosition');
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .tools-wrapper {

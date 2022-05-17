@@ -67,126 +67,126 @@
 </template>
 
 <script>
-    import { errorHandler } from '../../../utils/errorHandler';
+  import { errorHandler } from '../../../utils/errorHandler';
 
-    export default {
-        name: 'ChooseServiceTemplateDialog',
-        components: {},
-        props: {
-            isShow: Boolean,
-            createInfo: Object,
-            serviceId: [String, Number],
-        },
-        data() {
-            return {
-                loading: false,
-                searchModel: false,
-                searchResultList: [],
-                recomTemplateList: [],
-                createdTemplateList: [],
-            };
-        },
-        computed: {
-            createWay() {
-                return this.createInfo.key;
-            },
-            templateList() {
-                if (this.searchModel) {
-                    return this.searchResultList;
-                }
-                return this.createWay === 'recom' ? this.recomTemplateList : this.createdTemplateList;
-            },
-        },
-        watch: {
-            isShow(val) {
-                if (!val) {
-                    return false;
-                }
-                if (this.createWay === 'recom') {
-                    this.getRecomService();
-                } else {
-                    this.getAllService();
-                }
-            },
-        },
-        methods: {
-            // 获取所有服务
-            getAllService() {
-                this.loading = true;
-                this.$store.dispatch('service/getServiceList', { no_page: true }).then((resp) => {
-                    if (resp.result) {
-                        this.createdTemplateList = resp.data;
-                    }
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            // 获取推荐服务（原基础模型）列表
-            getRecomService() {
-                this.loading = true;
-                this.$store.dispatch('basicModule/get_tables', { no_page: true }).then((res) => {
-                    this.recomTemplateList = res.data;
-                }, (res) => {
-                    errorHandler(res, this);
-                })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            searchHandler(val) {
-                this.searchModel = val !== '';
-                const reg = new RegExp(`(${val})`, 'ig');
-                this.searchResultList = this.createdTemplateList
-                    .filter(item => reg.test(item.name))
-                    .map(item => ({
-                        ...item,
-                        name: item.name.replace(reg, '<span style="color: #3a84ff;">$1</span>'),
-                    }));
-            },
-            onTemplateClick(item) {
-                let params;
-                let actionName;
-                if (this.createWay === 'recom') {
-                    params = {
-                        id: this.serviceId,
-                        table_id: item.id,
-                    };
-                    actionName = 'importFromTemplate';
-                } else {
-                    params = {
-                        id: this.serviceId,
-                        service_id: item.id,
-                    };
-                    actionName = 'importFromService';
-                }
-                this.updateCurrServiceForm(params, actionName);
-            },
-            updateCurrServiceForm(params, actionName) {
-                this.loading = true;
-                this.$store.dispatch(`service/${actionName}`, params).then(() => {
-                    this.$bkMessage({
-                        message: this.$t('m.systemConfig["更新成功"]'),
-                        theme: 'success',
-                    });
-                    this.$emit('update:isShow', false);
-                    this.$emit('updateServiceSource', actionName === 'importFromTemplate' ? 'template' : 'service');
-                })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            onDialogClose(val) {
-                this.$emit('update:isShow', val);
-            },
-        },
-    };
+  export default {
+    name: 'ChooseServiceTemplateDialog',
+    components: {},
+    props: {
+      isShow: Boolean,
+      createInfo: Object,
+      serviceId: [String, Number],
+    },
+    data() {
+      return {
+        loading: false,
+        searchModel: false,
+        searchResultList: [],
+        recomTemplateList: [],
+        createdTemplateList: [],
+      };
+    },
+    computed: {
+      createWay() {
+        return this.createInfo.key;
+      },
+      templateList() {
+        if (this.searchModel) {
+          return this.searchResultList;
+        }
+        return this.createWay === 'recom' ? this.recomTemplateList : this.createdTemplateList;
+      },
+    },
+    watch: {
+      isShow(val) {
+        if (!val) {
+          return false;
+        }
+        if (this.createWay === 'recom') {
+          this.getRecomService();
+        } else {
+          this.getAllService();
+        }
+      },
+    },
+    methods: {
+      // 获取所有服务
+      getAllService() {
+        this.loading = true;
+        this.$store.dispatch('service/getServiceList', { no_page: true }).then((resp) => {
+          if (resp.result) {
+            this.createdTemplateList = resp.data;
+          }
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      // 获取推荐服务（原基础模型）列表
+      getRecomService() {
+        this.loading = true;
+        this.$store.dispatch('basicModule/get_tables', { no_page: true }).then((res) => {
+          this.recomTemplateList = res.data;
+        }, (res) => {
+          errorHandler(res, this);
+        })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      searchHandler(val) {
+        this.searchModel = val !== '';
+        const reg = new RegExp(`(${val})`, 'ig');
+        this.searchResultList = this.createdTemplateList
+          .filter(item => reg.test(item.name))
+          .map(item => ({
+            ...item,
+            name: item.name.replace(reg, '<span style="color: #3a84ff;">$1</span>'),
+          }));
+      },
+      onTemplateClick(item) {
+        let params;
+        let actionName;
+        if (this.createWay === 'recom') {
+          params = {
+            id: this.serviceId,
+            table_id: item.id,
+          };
+          actionName = 'importFromTemplate';
+        } else {
+          params = {
+            id: this.serviceId,
+            service_id: item.id,
+          };
+          actionName = 'importFromService';
+        }
+        this.updateCurrServiceForm(params, actionName);
+      },
+      updateCurrServiceForm(params, actionName) {
+        this.loading = true;
+        this.$store.dispatch(`service/${actionName}`, params).then(() => {
+          this.$bkMessage({
+            message: this.$t('m.systemConfig["更新成功"]'),
+            theme: 'success',
+          });
+          this.$emit('update:isShow', false);
+          this.$emit('updateServiceSource', actionName === 'importFromTemplate' ? 'template' : 'service');
+        })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      onDialogClose(val) {
+        this.$emit('update:isShow', val);
+      },
+    },
+  };
 </script>
 <style lang='scss' scoped>
 @import '~@/scss/mixins/ellipsis.scss';

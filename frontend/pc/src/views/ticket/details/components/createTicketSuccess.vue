@@ -34,45 +34,45 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'CreateTickerSuccer',
-        props: {
-            routerInfo: Object,
-        },
-        data() {
-            return {
-                time: 30,
-                timer: '',
-                isStart: true,
-            };
-        },
-        mounted() {
-            this.countDown();
-        },
-        methods: {
-            countDown() {
-                if (this.isStart) {
-                    this.timer = setInterval(() => {
-                        this.time -= 1;
-                        if (this.time === 0) {
-                            clearInterval(this.timer);
-                            this.jumpPage();
-                        }
-                    }, 1000);
-                }
-            },
-            jumpPage() {
-                clearInterval(this.timer);
-                this.isStart = false;
-                this.$router.push(this.routerInfo);
-            },
-            onBackClick() {
-                clearInterval(this.timer);
-                this.isStart = false;
-                this.$emit('onBackIconClick');
-            },
-        },
-    };
+  export default {
+    name: 'CreateTickerSuccer',
+    props: {
+      routerInfo: Object,
+    },
+    data() {
+      return {
+        time: 30,
+        timer: '',
+        isStart: true,
+      };
+    },
+    mounted() {
+      this.countDown();
+    },
+    methods: {
+      countDown() {
+        if (this.isStart) {
+          this.timer = setInterval(() => {
+            this.time -= 1;
+            if (this.time === 0) {
+              clearInterval(this.timer);
+              this.jumpPage();
+            }
+          }, 1000);
+        }
+      },
+      jumpPage() {
+        clearInterval(this.timer);
+        this.isStart = false;
+        this.$router.push(this.routerInfo);
+      },
+      onBackClick() {
+        clearInterval(this.timer);
+        this.isStart = false;
+        this.$emit('onBackIconClick');
+      },
+    },
+  };
 </script>
 <style scoped lang="scss">
     .tip-box {

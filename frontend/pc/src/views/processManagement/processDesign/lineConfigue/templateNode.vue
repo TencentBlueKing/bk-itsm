@@ -51,32 +51,32 @@
   </div>
 </template>
 <script>
-    export default {
-        name: 'templateNode',
-        props: {
-            node: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  export default {
+    name: 'templateNode',
+    props: {
+      node: {
+        type: Object,
+        default() {
+          return {};
         },
-        data() {
-            return {
-                typeList: [
-                    { type: 'NORMAL', iconStyle: 'icon-icon-person' },
-                    { type: 'ROUTER', iconStyle: 'icon-icon-person' },
-                    { type: 'TASK', iconStyle: 'icon-api-icon' },
-                    { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
-                    { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
-                    { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
-                ],
-            };
-        },
-        methods: {
+      },
+    },
+    data() {
+      return {
+        typeList: [
+          { type: 'NORMAL', iconStyle: 'icon-icon-person' },
+          { type: 'ROUTER', iconStyle: 'icon-icon-person' },
+          { type: 'TASK', iconStyle: 'icon-api-icon' },
+          { type: 'TASK-SOPS', iconStyle: 'icon-task-node' },
+          { type: 'SIGN', iconStyle: 'icon-sign-node-white' },
+          { type: 'APPROVAL', iconStyle: 'icon-approval-node' },
+        ],
+      };
+    },
+    methods: {
 
-        },
-    };
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

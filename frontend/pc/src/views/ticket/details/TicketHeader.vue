@@ -291,216 +291,216 @@
 </template>
 
 <script>
-    import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
-    import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
-    import StepSubmitDialog from './StepSubmitDialog.vue';
-    import { errorHandler } from '@/utils/errorHandler';
-    import cookie from 'cookie';
+  import TicketTriggerDialog from '@/components/ticket/TicketTriggerDialog.vue';
+  import EvaluationTicketModal from '@/components/ticket/evaluation/EvaluationTicketModal.vue';
+  import StepSubmitDialog from './StepSubmitDialog.vue';
+  import { errorHandler } from '@/utils/errorHandler';
+  import cookie from 'cookie';
 
-    export default {
-        name: 'TicketHeader',
-        components: {
-            StepSubmitDialog,
-            TicketTriggerDialog,
-            EvaluationTicketModal,
-        },
-        props: {
-            ticketInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            headerInfo: {
-                type: Object,
-                default: () => ({}),
-            },
-            ticketTriggerList: {
-                type: Array,
-                default: () => ({}),
-            },
-        },
-        data() {
-            return {
-                isSubmitting: false,
-                hasAttention: false,
-                rotate: false,
-                isDropdownShow: false,
-                disabledText: this.$t('m.newCommon["暂无权限或单据已结束"]'),
-                ticketOperateType: '',
-                localeCookie: false,
-            };
-        },
-        mounted() {
-            this.initData();
-            this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
-        },
-        methods: {
-            initData() {
-                this.hasAttention = this.ticketInfo.followers
-                    ? this.ticketInfo.followers.some(name => name === window.username)
-                    : false;
-            },
-            // 关注
-            onAttention() {
-                const { id } = this.ticketInfo;
-                const params = {
-                    attention: !this.hasAttention,
-                };
-                const bkMessage = this.hasAttention
-                    ? this.$t('m.manageCommon[\'取消关注成功~\']')
-                    : this.$t('m.manageCommon[\'添加关注成功~\']');
-                this.$store
-                    .dispatch('deployOrder/setAttention', { params, id })
-                    .then(() => {
-                        this.$bkMessage({
-                            message: bkMessage,
-                            theme: 'success',
-                            ellipsisLine: 0,
-                        });
-                        this.hasAttention = !this.hasAttention;
-                    })
-                    .catch((res) => {
-                        this.$bkMessage({
-                            message: res.data.msg,
-                            theme: 'error',
-                            ellipsisLine: 0,
-                        });
-                    });
-            },
-            // 单据操作按钮点击
-            onTicketBtnClick(type, item) {
-                this.$refs.dropdown.hide();
+  export default {
+    name: 'TicketHeader',
+    components: {
+      StepSubmitDialog,
+      TicketTriggerDialog,
+      EvaluationTicketModal,
+    },
+    props: {
+      ticketInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      headerInfo: {
+        type: Object,
+        default: () => ({}),
+      },
+      ticketTriggerList: {
+        type: Array,
+        default: () => ({}),
+      },
+    },
+    data() {
+      return {
+        isSubmitting: false,
+        hasAttention: false,
+        rotate: false,
+        isDropdownShow: false,
+        disabledText: this.$t('m.newCommon["暂无权限或单据已结束"]'),
+        ticketOperateType: '',
+        localeCookie: false,
+      };
+    },
+    mounted() {
+      this.initData();
+      this.localeCookie =            cookie.parse(document.cookie).blueking_language !== 'zh-cn';
+    },
+    methods: {
+      initData() {
+        this.hasAttention = this.ticketInfo.followers
+          ? this.ticketInfo.followers.some(name => name === window.username)
+          : false;
+      },
+      // 关注
+      onAttention() {
+        const { id } = this.ticketInfo;
+        const params = {
+          attention: !this.hasAttention,
+        };
+        const bkMessage = this.hasAttention
+          ? this.$t('m.manageCommon[\'取消关注成功~\']')
+          : this.$t('m.manageCommon[\'添加关注成功~\']');
+        this.$store
+          .dispatch('deployOrder/setAttention', { params, id })
+          .then(() => {
+            this.$bkMessage({
+              message: bkMessage,
+              theme: 'success',
+              ellipsisLine: 0,
+            });
+            this.hasAttention = !this.hasAttention;
+          })
+          .catch((res) => {
+            this.$bkMessage({
+              message: res.data.msg,
+              theme: 'error',
+              ellipsisLine: 0,
+            });
+          });
+      },
+      // 单据操作按钮点击
+      onTicketBtnClick(type, item) {
+        this.$refs.dropdown.hide();
 
-                switch (type) {
-                    case 'print': {
-                        const { href } = this.$router.resolve({
-                            path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
-                        });
-                        window.open(href, '_blank');
-                        break;
-                    }
-                    case 'trigger':
-                        {
-                            this.openTriggerDialog(item);
-                        }
-                        break;
-                    case 'comment':
-                        {
-                            this.$refs.evaluationModal.show();
-                        }
-                        break;
-                    default: {
-                        this.ticketOperatingHandler(type);
-                    }
-                }
+        switch (type) {
+          case 'print': {
+            const { href } = this.$router.resolve({
+              path: `/printOrder?ticket_id=${this.ticketInfo.id}`,
+            });
+            window.open(href, '_blank');
+            break;
+          }
+          case 'trigger':
+            {
+              this.openTriggerDialog(item);
+            }
+            break;
+          case 'comment':
+            {
+              this.$refs.evaluationModal.show();
+            }
+            break;
+          default: {
+            this.ticketOperatingHandler(type);
+          }
+        }
+      },
+      // 单据操作
+      ticketOperatingHandler(type) {
+        // 督办,撤单
+        if (type === 'widthdraw' || type === 'supervise') {
+          this.confirmOperating(type);
+        }
+        if (type === 'suspend' || type === 'close' || type === 'restore') {
+          this.ticketOperateType = type;
+          this.$nextTick(() => {
+            this.$refs.ticketOperate.openCel();
+          });
+        }
+      },
+      // 二次确认操作
+      confirmOperating(type) {
+        const infoMap = {
+          widthdraw: {
+            title: this.$t('m.newCommon["确认撤销此单据？"]'),
+            instructions: this.$t('m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]'),
+            dispatchAcationPath: 'deployOrder/widthdrawOrder',
+            successText: this.$t('m.newCommon["撤单成功"]'),
+            params: {
+              state_id: this.ticketInfo.id,
             },
-            // 单据操作
-            ticketOperatingHandler(type) {
-                // 督办,撤单
-                if (type === 'widthdraw' || type === 'supervise') {
-                    this.confirmOperating(type);
-                }
-                if (type === 'suspend' || type === 'close' || type === 'restore') {
-                    this.ticketOperateType = type;
-                    this.$nextTick(() => {
-                        this.$refs.ticketOperate.openCel();
-                    });
-                }
+          },
+          supervise: {
+            title: this.$t('m.newCommon["确认督办该节点？"]'),
+            instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
+            dispatchAcationPath: 'change/submitSupervise',
+            successText: this.$t('m.newCommon["督办成功"]'),
+            params: {},
+          },
+        };
+        this.$bkInfo({
+          type: 'warning',
+          title: infoMap[type].title,
+          subTitle: infoMap[type].instructions,
+          confirmFn: () => {
+            this.submitOperating(type, infoMap);
+          },
+        });
+      },
+      // 提交操作
+      submitOperating(type, infoMap) {
+        this.isSubmitting = true;
+        const { id } = this.ticketInfo;
+        const { dispatchAcationPath, params, successText } = infoMap[type];
+        this.$store
+          .dispatch(dispatchAcationPath, { params, id })
+          .then(() => {
+            this.$bkMessage({
+              message: successText,
+              theme: 'success',
+            });
+            this.reloadTicket();
+          })
+          .catch((res) => {
+            errorHandler(res, this);
+          })
+          .finally(() => {
+            this.isSubmitting = false;
+          });
+      },
+      // 单据手动触发器
+      openTriggerDialog(trigger) {
+        this.$refs.ticketTriggerDialog.openDialog(trigger);
+      },
+      reloadTicket() {
+        this.$emit('reloadTicket');
+      },
+      triggerSuccessCallback() {
+        this.reloadTicket();
+      },
+      onRefreshBtnClick() {
+        this.rotate = !this.rotate;
+        setTimeout(() => {
+          this.reloadTicket();
+        }, 500);
+      },
+      evaluationSubmitSuccess() {
+        this.reloadTicket();
+      },
+      getDisabledContentText(isCommented) {
+        return isCommented
+          ? this.$t('m.newCommon["已评价"]')
+          : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
+      },
+      onBackClick() {
+        const from = this.$route.query.from || '';
+        if (from === 'projectTicket' || from === '') {
+          this.$router.push({
+            name: 'projectTicket',
+            query: {
+              project_id: this.$route.query.project_id,
             },
-            // 二次确认操作
-            confirmOperating(type) {
-                const infoMap = {
-                    widthdraw: {
-                        title: this.$t('m.newCommon["确认撤销此单据？"]'),
-                        instructions: this.$t('m.newCommon["撤销后，您仍然可以在“我的申请单”中查看单据信息。"]'),
-                        dispatchAcationPath: 'deployOrder/widthdrawOrder',
-                        successText: this.$t('m.newCommon["撤单成功"]'),
-                        params: {
-                            state_id: this.ticketInfo.id,
-                        },
-                    },
-                    supervise: {
-                        title: this.$t('m.newCommon["确认督办该节点？"]'),
-                        instructions: this.$t('m.newCommon["执行督办操作后，将发送信息至处理人。"]'),
-                        dispatchAcationPath: 'change/submitSupervise',
-                        successText: this.$t('m.newCommon["督办成功"]'),
-                        params: {},
-                    },
-                };
-                this.$bkInfo({
-                    type: 'warning',
-                    title: infoMap[type].title,
-                    subTitle: infoMap[type].instructions,
-                    confirmFn: () => {
-                        this.submitOperating(type, infoMap);
-                    },
-                });
-            },
-            // 提交操作
-            submitOperating(type, infoMap) {
-                this.isSubmitting = true;
-                const { id } = this.ticketInfo;
-                const { dispatchAcationPath, params, successText } = infoMap[type];
-                this.$store
-                    .dispatch(dispatchAcationPath, { params, id })
-                    .then(() => {
-                        this.$bkMessage({
-                            message: successText,
-                            theme: 'success',
-                        });
-                        this.reloadTicket();
-                    })
-                    .catch((res) => {
-                        errorHandler(res, this);
-                    })
-                    .finally(() => {
-                        this.isSubmitting = false;
-                    });
-            },
-            // 单据手动触发器
-            openTriggerDialog(trigger) {
-                this.$refs.ticketTriggerDialog.openDialog(trigger);
-            },
-            reloadTicket() {
-                this.$emit('reloadTicket');
-            },
-            triggerSuccessCallback() {
-                this.reloadTicket();
-            },
-            onRefreshBtnClick() {
-                this.rotate = !this.rotate;
-                setTimeout(() => {
-                    this.reloadTicket();
-                }, 500);
-            },
-            evaluationSubmitSuccess() {
-                this.reloadTicket();
-            },
-            getDisabledContentText(isCommented) {
-                return isCommented
-                    ? this.$t('m.newCommon["已评价"]')
-                    : this.$t('m.newCommon["单据处理未完成或没有评价权限，不能评价！"]');
-            },
-            onBackClick() {
-                const from = this.$route.query.from || '';
-                if (from === 'projectTicket' || from === '') {
-                    this.$router.push({
-                        name: 'projectTicket',
-                        query: {
-                            project_id: this.$route.query.project_id,
-                        },
-                    });
-                } else if (from === 'created') {
-                    this.$router.push({
-                        name: 'myCreatedTicket',
-                    });
-                } else {
-                    this.$router.push({
-                        name: from,
-                    });
-                }
-            },
-        },
-    };
+          });
+        } else if (from === 'created') {
+          this.$router.push({
+            name: 'myCreatedTicket',
+          });
+        } else {
+          this.$router.push({
+            name: from,
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>

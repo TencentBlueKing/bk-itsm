@@ -80,91 +80,91 @@
   </div>
 </template>
 <script>
-    import fieldInfo from '../../../managePage/billCom/fieldInfo';
-    import { mapState } from 'vuex';
+  import fieldInfo from '../../../managePage/billCom/fieldInfo';
+  import { mapState } from 'vuex';
 
-    export default {
-        name: 'modifyFields',
-        components: {
-            fieldInfo,
+  export default {
+    name: 'modifyFields',
+    components: {
+      fieldInfo,
+    },
+    props: {
+      fieldSchema: {
+        type: Array,
+        default() {
+          return [];
         },
-        props: {
-            fieldSchema: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-        },
-        data() {
-            return {
-                fieldKeyItem: '',
-                fieldValueItem: '',
-                fieldValue: '',
-                show: true,
-                sourceTypeList: [
-                    {
-                        id: 1,
-                        key: 'custom',
-                        name: this.$t('m.treeinfo["自定义"]'),
-                    },
-                    {
-                        id: 2,
-                        key: 'reference',
-                        name: this.$t('m.treeinfo["引用变量"]'),
-                    },
-                ],
-                variableList: [],
-            };
-        },
-        computed: {
-            globalChoise() {
-                return this.$store.state.common.configurInfo;
-            },
-            ...mapState('trigger', {
-                triggerVariables: state => state.triggerVariables,
-            }),
-        },
-        watch: {
-            triggerVariables(newVal) {
-                this.variableList = newVal;
-            },
-        },
-        mounted() {
-            this.variableList = this.triggerVariables;
-            this.initData();
-        },
-        methods: {
-            initData() {
-                this.fieldSchema.forEach((item) => {
-                    this.$set(item, 'referenceType', (item.ref_type || 'custom'));
-                });
-                this.fieldKeyItem = this.fieldSchema[0];
-                this.fieldValueItem = this.fieldSchema[1];
-                this.$set(this.fieldValueItem, 'itemInfo', []);
-                if (this.fieldKeyItem.value) {
-                    const tempItemInfo = this.fieldKeyItem.choice.filter(item => item.key === this.fieldKeyItem.value);
-                    tempItemInfo[0].val = this.fieldValueItem.value;
-                    tempItemInfo[0].value = tempItemInfo[0].val;
-                    this.fieldValueItem.itemInfo = tempItemInfo;
-                    this.show = true;
-                }
-            },
-            selectedFieldKey(key) {
-                this.fieldValueItem.itemInfo.splice(0, this.fieldValueItem.itemInfo.length);
-                this.show = false;
-                this.$nextTick(() => {
-                    const temp = this.fieldKeyItem.choice.find(item => item.key === key);
-                    temp.showFeild = true;
-                    this.fieldValueItem.itemInfo.push(temp);
-                    this.show = true;
-                });
-            },
-            selectedReference() {
-                this.fieldValueItem.itemInfo[0].value = '';
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        fieldKeyItem: '',
+        fieldValueItem: '',
+        fieldValue: '',
+        show: true,
+        sourceTypeList: [
+          {
+            id: 1,
+            key: 'custom',
+            name: this.$t('m.treeinfo["自定义"]'),
+          },
+          {
+            id: 2,
+            key: 'reference',
+            name: this.$t('m.treeinfo["引用变量"]'),
+          },
+        ],
+        variableList: [],
+      };
+    },
+    computed: {
+      globalChoise() {
+        return this.$store.state.common.configurInfo;
+      },
+      ...mapState('trigger', {
+        triggerVariables: state => state.triggerVariables,
+      }),
+    },
+    watch: {
+      triggerVariables(newVal) {
+        this.variableList = newVal;
+      },
+    },
+    mounted() {
+      this.variableList = this.triggerVariables;
+      this.initData();
+    },
+    methods: {
+      initData() {
+        this.fieldSchema.forEach((item) => {
+          this.$set(item, 'referenceType', (item.ref_type || 'custom'));
+        });
+        this.fieldKeyItem = this.fieldSchema[0];
+        this.fieldValueItem = this.fieldSchema[1];
+        this.$set(this.fieldValueItem, 'itemInfo', []);
+        if (this.fieldKeyItem.value) {
+          const tempItemInfo = this.fieldKeyItem.choice.filter(item => item.key === this.fieldKeyItem.value);
+          tempItemInfo[0].val = this.fieldValueItem.value;
+          tempItemInfo[0].value = tempItemInfo[0].val;
+          this.fieldValueItem.itemInfo = tempItemInfo;
+          this.show = true;
+        }
+      },
+      selectedFieldKey(key) {
+        this.fieldValueItem.itemInfo.splice(0, this.fieldValueItem.itemInfo.length);
+        this.show = false;
+        this.$nextTick(() => {
+          const temp = this.fieldKeyItem.choice.find(item => item.key === key);
+          temp.showFeild = true;
+          this.fieldValueItem.itemInfo.push(temp);
+          this.show = true;
+        });
+      },
+      selectedReference() {
+        this.fieldValueItem.itemInfo[0].value = '';
+      },
+    },
+  };
 </script>
 
 <style lang='scss' scoped>

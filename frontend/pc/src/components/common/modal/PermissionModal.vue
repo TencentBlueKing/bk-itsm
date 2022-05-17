@@ -41,65 +41,65 @@
   </bk-dialog>
 </template>
 <script>
-    import { errorHandler } from '@/utils/errorHandler.js';
-    import PermissionContent from '../layout/PermissionContent.vue';
-    export default {
-        name: 'permissionModal',
-        components: {
-            PermissionContent,
-        },
-        data() {
-            return {
-                isModalShow: false,
-                hasClicked: false,
-                permissionData: {},
-                loading: false,
-                lock: require('../../../images/lock-radius.svg'),
-            };
-        },
-        watch: {
-            isModalShow(val) {
-                if (val) {
-                    this.loadPermissionUrl();
-                }
-            },
-        },
-        methods: {
-            async loadPermissionUrl() {
-                try {
-                    this.loading = true;
-                    const res = await this.$store.dispatch('common/getIamUrl', this.permissionData);
-                    if (res.result) {
-                        this.url = res.data.url;
-                    } else {
-                        errorHandler(res, this);
-                    }
-                } catch (err) {
-                    errorHandler(err, this);
-                } finally {
-                    this.loading = false;
-                }
-            },
-            show(data) {
-                this.isModalShow = true;
-                this.permissionData = data;
-            },
-            goToApply() {
-                if (this.loading) {
-                    return;
-                }
-                if (this.hasClicked) {
-                    window.location.reload();
-                } else {
-                    this.hasClicked = true;
-                    window.open(this.url, '__blank');
-                }
-            },
-            onCloseDialog() {
-                this.isModalShow = false;
-            },
-        },
-    };
+  import { errorHandler } from '@/utils/errorHandler.js';
+  import PermissionContent from '../layout/PermissionContent.vue';
+  export default {
+    name: 'permissionModal',
+    components: {
+      PermissionContent,
+    },
+    data() {
+      return {
+        isModalShow: false,
+        hasClicked: false,
+        permissionData: {},
+        loading: false,
+        lock: require('../../../images/lock-radius.svg'),
+      };
+    },
+    watch: {
+      isModalShow(val) {
+        if (val) {
+          this.loadPermissionUrl();
+        }
+      },
+    },
+    methods: {
+      async loadPermissionUrl() {
+        try {
+          this.loading = true;
+          const res = await this.$store.dispatch('common/getIamUrl', this.permissionData);
+          if (res.result) {
+            this.url = res.data.url;
+          } else {
+            errorHandler(res, this);
+          }
+        } catch (err) {
+          errorHandler(err, this);
+        } finally {
+          this.loading = false;
+        }
+      },
+      show(data) {
+        this.isModalShow = true;
+        this.permissionData = data;
+      },
+      goToApply() {
+        if (this.loading) {
+          return;
+        }
+        if (this.hasClicked) {
+          window.location.reload();
+        } else {
+          this.hasClicked = true;
+          window.open(this.url, '__blank');
+        }
+      },
+      onCloseDialog() {
+        this.isModalShow = false;
+      },
+    },
+  };
 </script>
 <style lang="scss" scoped>
     .button-group {

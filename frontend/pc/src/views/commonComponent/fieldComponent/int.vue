@@ -40,52 +40,52 @@
 </template>
 
 <script>
-    import mixins from '../../commonMix/field.js';
+  import mixins from '../../commonMix/field.js';
 
-    export default {
-        name: 'INT',
-        mixins: [mixins],
-        props: {
-            item: {
-                type: Object,
-                required: true,
-                default: () => {
-                },
-            },
-            fields: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            isCurrent: {
-                type: Boolean,
-                default: false,
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
+  export default {
+    name: 'INT',
+    mixins: [mixins],
+    props: {
+      item: {
+        type: Object,
+        required: true,
+        default: () => {
         },
-        data() {
-            return {
-                max: Number.MAX_SAFE_INTEGER,
-                isErrMessage: false,
-            };
+      },
+      fields: {
+        type: Array,
+        default() {
+          return [];
         },
-        watch: {
-            'item.val'(val) {
-                this.isErrMessage = val > this.max || false;
-                this.conditionField(this.item, this.fields);
-            },
-        },
-        mounted() {
-            if (this.item.value && !this.item.val) {
-                this.item.val = this.item.value;
-            }
-        },
-        methods: {},
-    };
+      },
+      isCurrent: {
+        type: Boolean,
+        default: false,
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        max: Number.MAX_SAFE_INTEGER,
+        isErrMessage: false,
+      };
+    },
+    watch: {
+      'item.val'(val) {
+        this.isErrMessage = val > this.max || false;
+        this.conditionField(this.item, this.fields);
+      },
+    },
+    mounted() {
+      if (this.item.value && !this.item.val) {
+        this.item.val = this.item.value;
+      }
+    },
+    methods: {},
+  };
 </script>
 
 <style lang='scss' scoped>

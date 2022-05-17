@@ -74,85 +74,85 @@
 </template>
 
 <script>
-    export default {
-        name: 'getRpcParam',
-        components: {},
-        props: {
-            prcTable: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            changeInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
-            stateList: {
-                type: Array,
-                default() {
-                    return [];
-                },
-            },
-            formInfo: {
-                type: Object,
-                default() {
-                    return {};
-                },
-            },
+  export default {
+    name: 'getRpcParam',
+    components: {},
+    props: {
+      prcTable: {
+        type: Array,
+        default() {
+          return [];
         },
-        data() {
-            return {
-                sourceTypeList: [
-                    {
-                        id: 1,
-                        key: 'CUSTOM',
-                        name: this.$t('m.treeinfo["自定义"]'),
-                    },
-                    {
-                        id: 2,
-                        key: 'FIELDS',
-                        name: this.$t('m.treeinfo["引用变量"]'),
-                    },
-                ],
-            };
+      },
+      changeInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        computed: {},
-        watch: {
-            prcTable() {
-                this.initData();
-            },
+      },
+      stateList: {
+        type: Array,
+        default() {
+          return [];
         },
-        async mounted() {
-            await this.changeInfo;
-            this.initData();
+      },
+      formInfo: {
+        type: Object,
+        default() {
+          return {};
         },
-        methods: {
-            initData() {
-                this.prcTable.forEach((item) => {
-                    this.$set(item, 'isCheck', false);
-                    this.$set(item, 'isSatisfied', false);
-                    this.$set(item, 'el', null);
-                    this.$set(item, 'source_type', 'CUSTOM');
-                    this.$set(item, 'value_key', '');
-                    // 赋值
-                    for (const key in this.changeInfo.meta) {
-                        if (item.name === key) {
-                            if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
-                                item.source_type = 'FIELDS';
-                                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0];
-                            } else {
-                                item.source_type = 'CUSTOM';
-                                item.value = this.changeInfo.meta[key];
-                            }
-                        }
-                    }
-                });
-            },
-        },
-    };
+      },
+    },
+    data() {
+      return {
+        sourceTypeList: [
+          {
+            id: 1,
+            key: 'CUSTOM',
+            name: this.$t('m.treeinfo["自定义"]'),
+          },
+          {
+            id: 2,
+            key: 'FIELDS',
+            name: this.$t('m.treeinfo["引用变量"]'),
+          },
+        ],
+      };
+    },
+    computed: {},
+    watch: {
+      prcTable() {
+        this.initData();
+      },
+    },
+    async mounted() {
+      await this.changeInfo;
+      this.initData();
+    },
+    methods: {
+      initData() {
+        this.prcTable.forEach((item) => {
+          this.$set(item, 'isCheck', false);
+          this.$set(item, 'isSatisfied', false);
+          this.$set(item, 'el', null);
+          this.$set(item, 'source_type', 'CUSTOM');
+          this.$set(item, 'value_key', '');
+          // 赋值
+          for (const key in this.changeInfo.meta) {
+            if (item.name === key) {
+              if (this.changeInfo.meta[key].indexOf('{params_') !== -1) {
+                item.source_type = 'FIELDS';
+                item.value_key = this.changeInfo.meta[key].split('${params_')[1].split('}')[0];
+              } else {
+                item.source_type = 'CUSTOM';
+                item.value = this.changeInfo.meta[key];
+              }
+            }
+          }
+        });
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
