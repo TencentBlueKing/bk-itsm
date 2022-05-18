@@ -1398,6 +1398,8 @@ class TicketExportSerializer(serializers.Serializer):
     create_at = serializers.DateTimeField()
     end_at = serializers.DateTimeField()
     service_name = serializers.CharField()
+    stars = serializers.IntegerField()
+    comment = serializers.CharField()
 
     def to_representation(self, instance):
         data = super(TicketExportSerializer, self).to_representation(instance)

@@ -4696,6 +4696,14 @@ class Ticket(Model, BaseTicket):
 
         return fields
 
+    @property
+    def comment(self):
+        return self.comments.comments
+
+    @property
+    def stars(self):
+        return self.comments.stars
+
 
 class TicketOrganization(Model):
     username = models.CharField(_("用户名"), max_length=LEN_LONG)
