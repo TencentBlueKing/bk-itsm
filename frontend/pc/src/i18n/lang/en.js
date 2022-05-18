@@ -2568,5 +2568,8 @@ export const m = {
     '请输入': 'Please enter',
     '已选参数的字段名和值不能为空': 'The field name and value of the selected parameter cannot be empty',
     '以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量': 'Begin with http:// or https:// (reference variables are ignored), enter "{{" to select reference variables',
-    '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable'
+    '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable',
+    '配置数据源': 'Configure the data source',
+    '配置接口数据': 'Configure interface data',
+    '配置自定义数据': 'Configure custom data'
 }

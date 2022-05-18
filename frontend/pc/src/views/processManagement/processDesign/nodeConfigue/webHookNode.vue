@@ -97,16 +97,16 @@
                         :size="'small'">
                         <bk-table-column :label="$t(`m['变量名称']`)">
                             <template slot-scope="props">
-                                <bk-input :behavior="'simplicity'" v-model="props.row.name" :disabled="disable"></bk-input>
+                                <bk-input :behavior="'simplicity'" v-model="props.row.name" :disabled="disable" @change="changeReturnInput(props.row, props.$index)"></bk-input>
                             </template>
                         </bk-table-column>
                         <bk-table-column :label="$t(`m['来源']`)">
                             <template slot-scope="props">
-                                <bk-input :behavior="'simplicity'" v-model="props.row.ref_path" :disabled="disable"></bk-input>
+                                <bk-input :behavior="'simplicity'" v-model="props.row.ref_path" :disabled="disable" @change="changeReturnInput(props.row, props.$index)"></bk-input>
                             </template>
                         </bk-table-column>
                         <bk-table-column :label="$t(`m['操作']`)" width="100">
-                            <template slot-scope="props" v-if="!disable">
+                            <template slot-scope="props" v-if="!disable && isShowDelete !== returnReslut.indexOf(props.row)">
                                 <i class="bk-itsm-icon icon-flow-other-add result-icon" @click="addReturnReslut"></i>
                                 <i class="bk-itsm-icon icon-flow-other-reduc result-icon"
                                     :class="{ 'no-delete': retrunResultIsEmtry }"
@@ -238,7 +238,8 @@
                 returnReslut: [
                     {
                         name: '',
-                        ref_path: ''
+                        ref_path: '',
+                        check: false
                     }
                 ],
                 processorsInfo: {
@@ -276,6 +277,9 @@
                     return list
                 }
                 return []
+            },
+            isShowDelete () {
+                return this.returnReslut.length - 1
             }
         },
         watch: {
@@ -300,7 +304,7 @@
                         this.processorsInfo.type = this.configur.processors_type
                         this.processorsInfo.value = this.configur.processors
     
-                        this.returnReslut = this.configur.variables.outputs.length !== 0 ? this.configur.variables.outputs : [{ name: '', ref_path: '' }]
+                        this.returnReslut = this.configur.variables.outputs.length !== 0 ? [...this.configur.variables.outputs, ...this.returnReslut] : [{ name: '', ref_path: '', check: false }]
                     }
                 } else {
                     const { url, success_exp, method } = this.configur.api_info.webhook_info
@@ -341,8 +345,26 @@
             addReturnReslut () {
                 this.returnReslut.push({
                     name: '',
-                    source: ''
+                    ref_path: '',
+                    check: false
                 })
+            },
+            changeReturnInput (item, index) {
+                if (!item.check) {
+                    item.check = true
+                    this.returnReslut.push({
+                        name: '',
+                        ref_path: '',
+                        check: false
+                    })
+                } else {
+                    const { name, ref_path } = item
+                    const checkList = [name, ref_path]
+                    if (checkList.every(item => item === '')) {
+                        this.returnReslut.pop()
+                        item.check = false
+                    }
+                }
             },
             changeFormStatus (val) {
                 this.errorTip = val

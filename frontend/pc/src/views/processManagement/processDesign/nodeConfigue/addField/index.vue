@@ -199,11 +199,11 @@
                             :desc="node.desc"
                             :required="true"
                             :ext-cls="'bk-mt20-item'">
-                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" title="配置数据源" :outline="true" @click="openDataSource">配置数据源</bk-button>
+                            <bk-button v-if="isShowDataSourcebtn" :disabled="isDisabled" class="configuration-data-source" theme="primary" :title="$t(`m['配置数据源']`)" :outline="true" @click="openDataSource">{{ $t(`m['配置数据源']`)}}</bk-button>
                             <bk-dialog
                                 v-model="isShowDataSource"
                                 width="960"
-                                :title="formInfo.source_type === 'API' ? '配置接口数据' : '配置自定义数据'"
+                                :title="formInfo.source_type === 'API' ? $t(`m['配置接口数据']`) : $t(`m['配置自定义数据']`)"
                                 theme="primary"
                                 :auto-close="false"
                                 :mask-close="false"
@@ -1366,7 +1366,7 @@
     @import '../../../../../scss/mixins/clearfix.scss';
     @import "../../../../../scss/mixins/scroller";
     .configuration-data-source {
-        width: 102px;
+        // width: 102px;
         height: 32px;
         border: 1px solid #3a84ff;
         border-radius: 4px;
