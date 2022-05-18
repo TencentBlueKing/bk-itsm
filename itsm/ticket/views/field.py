@@ -53,7 +53,7 @@ class FieldViewSet(BaseFieldViewSet):
         obj = self.get_object()
         if obj.source_type != "CUSTOM_API":
             return Response([])
-        data = get_custom_api_data(obj.meta.get("api_config"), obj.kv_relation)
+        data = get_custom_api_data(obj.meta.get("api_config"))
         return Response(data)
 
     @action(detail=True, methods=["post"])

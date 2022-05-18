@@ -22,7 +22,6 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import jmespath
 import requests
 from django.utils.translation import ugettext as _
 from mako.template import Template
@@ -130,7 +129,7 @@ def build_message(_notify, task_id, ticket, message, action, **kwargs):
         return None
 
 
-def get_custom_api_data(config, kv_relation):
+def get_custom_api_data(config):
     """
     config:
     {
@@ -153,7 +152,6 @@ def get_custom_api_data(config, kv_relation):
     query_params = config.get("query_params", {})
     headers = config.get("headers", {})
     body = config.get("body", {})
-    ref_path = config.get("ref_path", "")
 
     try:
         response = requests.request(
@@ -173,22 +171,4 @@ def get_custom_api_data(config, kv_relation):
     except Exception as e:
         raise GetCustomApiDataError("请求失败，返回内容非Json，error={}".format(e))
 
-    data = jmespath.search(ref_path, resp_data)
-
-    if data is None:
-        raise GetCustomApiDataError("请求失败，data 为None，请检查路径")
-
-    if not isinstance(data, list):
-        raise GetCustomApiDataError("请求失败，data 非 list，请检查路径")
-
-    kv_data = []
-
-    try:
-        for item in data:
-            kv_data.append(
-                {"key": item[kv_relation["key"]], "name": item[kv_relation["name"]]}
-            )
-
-    except KeyError as e:
-        raise GetCustomApiDataError("kv_relation配置不正确，error={}".format(e))
-    return kv_data
+    return resp_data
