@@ -154,17 +154,6 @@ class Project(Model):
         except BaseException as error:
             print("init_default_project error， error is {}".format(error))
 
-        try:
-            for project_setting in PROJECT_SETTING:
-                ProjectSettings.objects.get_or_create(
-                    type=project_setting[1],
-                    key=project_setting[0],
-                    value=project_setting[2],
-                    project_id="0",
-                )
-        except Exception as error:
-            print("init_default_project settings error， error is {}".format(error))
-
 
 class ProjectSettings(Model):
     type = models.CharField(_("类型"), max_length=LEN_NORMAL, default="FUNCTION")
