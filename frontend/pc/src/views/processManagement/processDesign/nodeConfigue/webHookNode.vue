@@ -350,7 +350,6 @@
                 })
             },
             changeReturnInput (item, index) {
-                console.log(item, index)
                 if (!item.check) {
                     item.check = true
                     this.returnReslut.push({
