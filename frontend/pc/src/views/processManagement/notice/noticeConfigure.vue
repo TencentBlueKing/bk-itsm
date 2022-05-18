@@ -31,9 +31,9 @@
         <div class="itsm-page-content">
             <!-- tab -->
             <ul class="bk-notice-tab">
-                <li v-for="(item, index) in remindWayList"
-                    :key="item.id"
-                    :class="{ 'bk-check-notice': checkId === item.id }"
+                <li v-for="(item, index) in noticeType"
+                    :key="item.typeName"
+                    :class="{ 'bk-check-notice': checkId === item.typeName }"
                     @click="changeNotice(item, index)">
                     <span>{{ item.name }}</span>
                 </li>
@@ -88,6 +88,7 @@
     import { errorHandler } from '../../../utils/errorHandler'
     import editorNotice from './editorNotice.vue'
     import permission from '@/mixins/permission.js'
+    import { mapState } from 'vuex'
 
     export default {
         name: 'noticeConfigure',
@@ -116,7 +117,11 @@
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
+            ...mapState({
+                noticeType: state => state.common.configurInfo.notify_type
+            })
+            
         },
         mounted () {
             this.getNoticeList()
@@ -137,7 +142,7 @@
                 })
             },
             changeNotice (item, index) {
-                this.checkId = item.id
+                this.checkId = item.typeName
                 this.getNoticeList()
             },
             editorInfo (item) {

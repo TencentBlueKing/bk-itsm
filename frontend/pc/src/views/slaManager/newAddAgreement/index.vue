@@ -55,7 +55,7 @@
                 </bk-form>
             </div>
             <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["服务承诺设定"]') }}</p>
+                <p class="bk-group-title">{{ $t('m["服务承诺设定"]') }}</p>
                 <priority-configur
                     ref="priorityConfigur"
                     :model-list="modelList"
@@ -64,25 +64,23 @@
                 </priority-configur>
             </div>
             <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["预警提醒"]') }}</p>
+                <p class="bk-group-title">{{ $t('m["预警提醒"]') }}</p>
                 <event-remind
                     ref="eventRemind1"
                     :model-list="modelList"
                     :model-priority="testPriority1"
                     :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
+                    :notify-event-list="notifyEventList"
                     :change-info="changeInfo">
                 </event-remind>
             </div>
             <div class="bk-content-group">
-                <p class="bk-group-title">{{ $t('m.slaContent["超时提醒"]') }}</p>
+                <p class="bk-group-title">{{ $t('m["超时提醒"]') }}</p>
                 <event-remind
                     ref="eventRemind3"
                     :model-list="modelList"
                     :has-check-box="changeInfo.is_reply_need"
-                    :email-notify-event-list="emailNotifyEventList"
-                    :weixin-notify-event-list="weixinNotifyEventList"
+                    :notify-event-list="notifyEventList"
                     :model-priority="testPriority3"
                     :change-info="changeInfo">
                 </event-remind>
@@ -133,16 +131,10 @@
                     return []
                 }
             },
-            emailNotifyEventList: {
-                type: Array,
+            notifyEventList: {
+                type: Object,
                 default () {
-                    return []
-                }
-            },
-            weixinNotifyEventList: {
-                type: Array,
-                default () {
-                    return []
+                    return {}
                 }
             },
             modelPriority: {
@@ -163,10 +155,10 @@
                 testPriority1: [
                     {
                         type: 1,
-                        eventName: this.$t(`m.slaContent['响应提醒']`),
+                        eventName: this.$t(`m['响应提醒']`),
                         hasCheckBox: true,
                         isCheck: false,
-                        remindRuleText: '响应时长达到协议标准的',
+                        remindRuleText: this.$t(`m['响应时长达到协议标准的']`),
                         remindRuleValue: 20,
                         remindRuleUnit: '%',
                         receivers: '',
@@ -179,10 +171,10 @@
                     },
                     {
                         type: 3,
-                        eventName: '处理提醒',
+                        eventName: this.$t(`m['处理提醒']`),
                         hasCheckBox: false,
                         isCheck: false,
-                        remindRuleText: '处理时长达到协议标准的',
+                        remindRuleText: this.$t(`m['处理时长达到协议标准的']`),
                         remindRuleValue: 20,
                         remindRuleUnit: '%',
                         receivers: '',
@@ -197,10 +189,10 @@
                 testPriority3: [
                     {
                         type: 2,
-                        eventName: '超时响应提醒',
+                        eventName: this.$t(`m['超时响应提醒']`),
                         hasCheckBox: true,
                         isCheck: false,
-                        remindRuleText: '响应时长超出协议标准还未响应时',
+                        remindRuleText: this.$t(`m['响应时长超出协议标准还未响应时']`),
                         receivers: '',
                         notify_type_list: ['email', 'weixin'],
                         email_notify: '',
@@ -211,10 +203,10 @@
                     },
                     {
                         type: 4,
-                        eventName: '超时处理提醒',
+                        eventName: this.$t(`m['超时处理提醒']`),
                         hasCheckBox: false,
                         isCheck: false,
-                        remindRuleText: '处理时长超出协议标准还未解决时',
+                        remindRuleText: this.$t(`m['处理时长超出协议标准还未解决时']`),
                         receivers: '',
                         notify_type_list: ['email', 'weixin'],
                         email_notify: '',

@@ -30,9 +30,14 @@ export default {
             basic: '',
             lines: '',
             timeOut: ''
+        },
+        nodeList: []
+    },
+    mutations: {
+        setNodeList (state, value) {
+            state.nodeList = value || []
         }
     },
-    mutations: {},
     actions: {
         // 获取线条流转颜色
         getLineStatus ({ commit, state, dispatch }, { basicId }) {

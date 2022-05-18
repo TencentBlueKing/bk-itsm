@@ -37,9 +37,11 @@ def app_ready_handler(sender, **kwargs):
     from itsm.iadmin.models import CustomNotice, SystemSettings, ReleaseVersionLog
     from itsm.postman.models import RemoteApi, RemoteSystem
     from itsm.service.models import Service
-    from itsm.workflow.models import TemplateField, Table, Workflow
+    from itsm.workflow.models import TemplateField, Table, Workflow, Notify
     from itsm.component.constants import DEFAULT_TEMPLATE_FIELDS, DEFAULT_TABLE
-
+    
+    print("update notify type")
+    Notify.init_builtin_notify()
     print("update notify template")
     CustomNotice.init_default_template()
     print("update notify system_settings")

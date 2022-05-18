@@ -3,4 +3,4 @@
 # 请确保指定的包和版本号，通过pip安装
 
 #blueapps
-blueapps-open==4.0.2rc0
+blueapps==4.4.2

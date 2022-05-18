@@ -55,7 +55,7 @@
         <div class="field-information">
             <div class="field-content" v-for="(field, fIndex) in historyInfo.fields" :key="fIndex">
                 <div class="field-content-box" v-if="field.key === 'sub_message_component'">
-                    <bk-tab :active="activeName" @tab-change="changPanel">
+                    <bk-tab :active="activeName" @tab-change="changPanel" type="border-card">
                         <bk-tab-panel
                             v-for="(panel, index) in field.value"
                             v-bind="panel"
@@ -424,6 +424,7 @@
                     }
                     /deep/.bk-tab-label-item{
                         min-width: 130px;
+                        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
                     }
                     /deep/ .bk-tab-border-card{
                         width: 100%;
@@ -445,5 +446,9 @@
     .field-value{
         width: calc(100% - 125px);
         word-break: break-all;
+    }
+    /deep/ .bk-tab > .bk-tab-section {
+        border: 1px solid #dcdee5;
+        border-top: none;
     }
 </style>

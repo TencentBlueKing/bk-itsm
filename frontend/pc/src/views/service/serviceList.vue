@@ -137,14 +137,15 @@
                                 {{ props.row.name }}
                             </span>
                             <template v-else>
-                                <span
-                                    v-if="props.row.id !== changeFrom.name"
-                                    class="bk-lable-primary"
-                                    :title="props.row.name"
-                                    @click="changeEntry(props.row, 'edit')">
-                                    {{ props.row.name }}
+                                <div v-if="props.row.id !== changeFrom.name" class="bk-lable-display">
+                                    <span
+                                        class="bk-lable-primary"
+                                        :title="props.row.name"
+                                        @click="changeEntry(props.row, 'edit')">
+                                        {{ props.row.name }}
+                                    </span>
                                     <i v-show="tableHoverId === props.row.id" @click.stop="handleChange('name', props.row)" class="bk-itsm-icon icon-itsm-icon-six"></i>
-                                </span>
+                                </div>
                                 <div v-else class="hover-show-icon">
                                     <bk-input v-model="editValue"></bk-input>
                                     <div class="operation">
@@ -1071,6 +1072,12 @@
     margin-left: 150px;
     margin-top: 10px;
     color: red;
+}
+.bk-lable-display {
+    height: 16px;
+    display: flex;
+    overflow: hidden;
+    max-width: calc(100% - 20px);
 }
 
 </style>

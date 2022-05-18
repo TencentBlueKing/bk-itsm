@@ -106,6 +106,11 @@
                         :api-info="item.api_info"
                         :node-info="item">
                     </devopsNodeInfo>
+                    <web-hook-info
+                        v-else-if="item.type === 'WEBHOOK'"
+                        :api-info="item.api_info"
+                        :node-info="item">
+                    </web-hook-info>
                     <sopsNodeInfo
                         v-else
                         :api-info="item.api_info"
@@ -137,6 +142,7 @@
     import devopsNodeInfo from './devopsNodeInfo.vue'
     import signNodeInfo from './signNodeInfo'
     import approvalNodeInfo from './approvalNodeInfo'
+    import webHookInfo from './webHookInfo.vue'
     import { errorHandler } from '@/utils/errorHandler'
 
     export default {
@@ -148,7 +154,8 @@
             sopsNodeInfo,
             signNodeInfo,
             approvalNodeInfo,
-            devopsNodeInfo
+            devopsNodeInfo,
+            webHookInfo
         },
         props: {
             readOnly: Boolean,
