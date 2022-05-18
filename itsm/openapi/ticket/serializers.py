@@ -22,6 +22,9 @@ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import random
+import string
+
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
@@ -33,7 +36,7 @@ from itsm.component.constants import (
     LEN_NORMAL,
 )
 from itsm.component.exceptions import ParamError
-from itsm.component.utils.basic import get_pinyin_key
+from itsm.component.utils.basic import get_random_key
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
 from itsm.ticket.validators import ticket_fields_validate
 
@@ -322,7 +325,13 @@ class DynamicFieldSerializer(serializers.Serializer):
     key = serializers.CharField(required=False, read_only=True)
 
     def validate(self, attrs):
-        attrs["key"] = get_pinyin_key(attrs["name"])
+        key = get_random_key(attrs["name"])
+        if key[0].isdigit():
+            # 开头为数字，重新生成
+            first_letter = random.choice(string.ascii_letters)
+            key = first_letter + key[1:]
+
+        attrs["key"] = key
         return attrs
 
 
