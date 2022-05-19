@@ -69,6 +69,7 @@ class Action(TriggerBaseModel):
         "component_name",
         "end_time",
         "ex_data",
+        "component_type",
     )
 
     signal = models.CharField(
@@ -236,6 +237,10 @@ class Action(TriggerBaseModel):
     @property
     def need_refresh(self):
         return self.action_schema.component_class.need_refresh
+
+    @property
+    def component_type(self):
+        return self.action_schema.component_type
 
     @property
     def component_name(self):
