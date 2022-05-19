@@ -215,7 +215,6 @@
                         used_by: val
                     }
                     const res = await this.$store.dispatch('project/getAction', parmas)
-                    console.log(res)
                     if (res.data && res.result) {
                         const list = res.data
                         for (const item in list) {
@@ -224,7 +223,6 @@
                                 name: list[item]
                             })
                         }
-                        console.log(this.actionList)
                     }
                 } catch (e) {
                     console.log(e)

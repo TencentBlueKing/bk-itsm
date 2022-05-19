@@ -2571,5 +2571,6 @@ export const m = {
     '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable',
     '配置数据源': 'Configure the data source',
     '配置接口数据': 'Configure interface data',
-    '配置自定义数据': 'Configure custom data'
+    '配置自定义数据': 'Configure custom data',
+    '内容': 'Content'
 }
