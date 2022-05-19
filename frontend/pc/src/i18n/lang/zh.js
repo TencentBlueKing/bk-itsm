@@ -2640,5 +2640,8 @@ export const m = {
     '提单节点字段信息：': '提单节点字段信息：',
     '基础字段信息：': '基础字段信息：',
     '输入你所要的条件，如： resp.result==ture 或者 false': '输入你所要的条件，如： resp.result==ture 或者 false',
-    '输入变量来源，如：resp.message': '输入变量来源，如：resp.message'
+    '输入变量来源，如：resp.message': '输入变量来源，如：resp.message',
+    '配置数据源': '配置数据源',
+    '配置接口数据': '配置接口数据',
+    '配置自定义数据': '配置自定义数据'
 }

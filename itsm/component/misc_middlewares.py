@@ -37,6 +37,7 @@ from pyinstrument import Profiler
 
 from common.log import logger
 from common.mymako import render_mako_context
+from itsm.component.constants import EXEMPT_HTTPS_REDIRECT
 from itsm.iadmin.contants import SERVICE_SWITCH
 from itsm.iadmin.models import SystemSettings
 from itsm.auth_iam.utils import IamRequest
@@ -257,13 +258,9 @@ class HttpResponseIndexRedirect(HttpResponseRedirect):
 
 class HttpsMiddleware(MiddlewareMixin):
     def process_request(self, request):
-
         if settings.RUN_VER == "ieod":
             # 对于openapi 跳转豁免
-            if request.path.startswith("/openapi/"):
-                return None
-
-            if request.path.startswith("/api/iam/resources/v1"):
+            if request.path.startswith(EXEMPT_HTTPS_REDIRECT):
                 return None
 
         # 如果发现不是woa过来的域名

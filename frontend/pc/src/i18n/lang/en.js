@@ -2570,5 +2570,8 @@ export const m = {
     '以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量': 'Begin with http:// or https:// (reference variables are ignored), enter "{{" to select reference variables',
     '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable',
     '输入你所要的条件，如： resp.result==ture 或者 false': 'Enter the condition you want, such as: resp.result==ture or false',
-    '输入变量来源，如：resp.message': 'Input variable source, such as: resp.message.message'
+    '输入变量来源，如：resp.message': 'Input variable source, such as: resp.message.message',
+    '配置数据源': 'Configure the data source',
+    '配置接口数据': 'Configure interface data',
+    '配置自定义数据': 'Configure custom data'
 }
