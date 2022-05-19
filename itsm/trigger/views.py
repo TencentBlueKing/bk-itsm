@@ -383,3 +383,8 @@ class ActionViewSet(component_viewsets.ModelViewSet):
                 "code": ResponseCodeStatus.OK,
             }
         )
+
+    @action(methods=["get"], detail=True)
+    def fields(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response(instance.fields)
