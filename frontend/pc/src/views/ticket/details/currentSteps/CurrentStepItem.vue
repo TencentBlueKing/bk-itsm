@@ -234,7 +234,7 @@
                 <div class="bk-processor-span" style="background: none;">{{ tipsProcessorsInfo.extend }}</div>
             </div>
         </div>
-        <ticket-trigger-dialog ref="triggerDialog" @init-info="successFn"></ticket-trigger-dialog>
+        <ticket-trigger-dialog ref="triggerDialog" :item="triggerInfo" @init-info="successFn"></ticket-trigger-dialog>
         <node-deal-dialog
             :node-info="nodeInfo"
             :submitting="submitting"
@@ -331,6 +331,7 @@
                 unfold: false, // 是否展开
                 isFullScreen: false,
                 submitting: false,
+                isDropdownShow: false,
                 ignoreOperations: ['SUSPEND', 'TERMINATE'],
                 validatePopInfo: {
                     openShow: false,
@@ -355,7 +356,9 @@
                     color: '',
                     isTimeOut: false
                 },
-                workflow: ''
+                workflow: '',
+                // 触发器
+                triggerInfo: {}
             }
         },
         computed: {
@@ -696,7 +699,120 @@
                 this.openFormInfo.isShow = false
             },
             openTriggerDialog (trigger) {
-                this.$refs.triggerDialog.openDialog(trigger)
+                const getTriggerContent = this.$store.dispatch('trigger/getTriggerContent', trigger.id)
+                const getResponseList = this.$store.dispatch('trigger/getResponseList')
+                Promise.all([getTriggerContent, getResponseList]).then(res => {
+                    const curTrigger = res[0].data[0]
+                    console.log(curTrigger)
+                    // const type = curTrigger.value.split(':')[0]
+                    // const val = curTrigger.value.split(':')[1]
+                    // console.log(type, val)
+
+                    this.triggerInfo = res[1].data.find(item => item.name === trigger.component_name)
+                    if (this.triggerInfo.key === 'api') {
+                        this.item.field_schema.forEach(schema => {
+                            if (schema.key === 'api_source') {
+                                this.$set(schema, 'systemId', '')
+                                this.$set(schema, 'apiId', '')
+                            } else {
+                                this.$set(schema, 'apiContent', {})
+                            }
+                        })
+                    } else {
+                        this.triggerInfo.field_schema.forEach(schema => {
+                            console.log(schema)
+                            // if ('value' in curTrigger) {
+
+                            // } else {
+
+                            // }
+                            curTrigger.value.forEach(cur => {
+                                let valueInfo = cur.value || ''
+                                if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
+                                    valueInfo = []
+                                    if (schema.value) {
+                                        schema.value.forEach(schemaValue => {
+                                            if (schemaValue.value) {
+                                                const itemValue = {
+                                                    key: schemaValue.value.member_type,
+                                                    value: schemaValue.value.members,
+                                                    secondLevelList: [],
+                                                    isLoading: false
+                                                }
+                                                valueInfo.push(itemValue)
+                                            }
+                                        })
+                                    } else {
+                                        const itemValue = {
+                                            key: '',
+                                            value: '',
+                                            secondLevelList: [],
+                                            isLoading: false
+                                        }
+                                        valueInfo.push(itemValue)
+                                    }
+                                }
+                                this.$set(schema, 'value', valueInfo)
+                                // 对于发通知的数据格式
+                                if (schema.type === 'SUBCOMPONENT' && schema.sub_components && schema.sub_components.length) {
+                                    schema.sub_components.forEach(subComponent => {
+                                        // console.log(subComponent)
+                                        if (subComponent.key === cur.code) {
+                                            subComponent.checked = true
+                                            if (subComponent.field_schema.length) {
+                                                subComponent.field_schema.forEach(subField => {
+                                                    let subFieldValue = subField.value || ''
+                                                    if (subField.type === 'MEMBERS' || subField.type === 'MULTI_MEMBERS') {
+                                                        subFieldValue = []
+                                                        if (Array.isArray(subField.value)) {
+                                                            subField.value.forEach(schemaValue => {
+                                                                const itemValue = {
+                                                                    key: schemaValue.value.member_type,
+                                                                    value: schemaValue.value.members,
+                                                                    secondLevelList: [],
+                                                                    isLoading: false
+                                                                }
+                                                                subFieldValue.push(itemValue)
+                                                            })
+                                                        } else {
+                                                            subFieldValue = [
+                                                                {
+                                                                    key: '',
+                                                                    value: '',
+                                                                    secondLevelList: [],
+                                                                    isLoading: false
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                    this.$set(subField, 'value', subFieldValue)
+                                                })
+                                            }
+                                        } else {
+                                            // 没选中的通知方式
+                                            subComponent.field_schema.forEach(subField => {
+                                                let subFieldValue = subField.value || ''
+                                                if (subField.type === 'MEMBERS' || subField.type === 'MULTI_MEMBERS') {
+                                                    subFieldValue = [
+                                                        {
+                                                            key: '',
+                                                            value: '',
+                                                            secondLevelList: [],
+                                                            isLoading: false
+                                                        }
+                                                    ]
+                                                }
+                                                this.$set(subField, 'value', subFieldValue)
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                    }
+                }).finally(() => {
+                    this.$refs.triggerDialog.openDialog(trigger)
+                })
             },
             // 提交按钮 loading 状态
             isBtnLoading (item) {

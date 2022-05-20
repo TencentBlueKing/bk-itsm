@@ -21,30 +21,89 @@
   -->
 
 <template>
-    <div class="trigger-dialog-box"></div>
+    <div class="trigger-dialog-box">
+        <bk-dialog v-model="isTrigger"
+            width="800"
+            theme="primary"
+            :mask-close="false"
+            :auto-close="false"
+            header-position="left"
+            :title="trigger.component_name"
+            @confirm="confirmTrigger">
+            <p style="margin-bottom: 10px"> 触发器名称：{{ trigger.display_name }}</p>
+            <bk-form :form-type="'horizontal'"
+                :label-width="100"
+                ref="conductorForm">
+                <template v-if="item.key === 'api'">
+                    <api-call :item="item">
+                    </api-call>
+                </template>
+                <template v-else-if="item.key === 'modify_field'">
+                    <modify-field :field-schema="item.field_schema"></modify-field>
+                </template>
+                <template v-else>
+                    <template v-for="(itemInfo, index) in item.field_schema">
+                        <!-- 对于多层嵌套和单层嵌套的区别 -->
+                        <template v-if="itemInfo.type === 'SUBCOMPONENT'">
+                            <send-message :key="index"
+                                :item-info="itemInfo">
+                            </send-message>
+                        </template>
+                        <template v-else>
+                            <bk-form-item :ext-cls="itemInfo.required ? 'bk-field-schema mb20' : 'bk-field-schema no-require-item mb20'"
+                                :label="itemInfo.name"
+                                :required="itemInfo.required"
+                                :key="index"
+                                :desc="itemInfo.tips">
+                                <change-conductor
+                                    :item-info="itemInfo">
+                                </change-conductor>
+                            </bk-form-item>
+                        </template>
+                    </template>
+                </template>
+            </bk-form>
+        </bk-dialog>
+    </div>
 </template>
 <script>
     import { errorHandler } from '../../utils/errorHandler'
+    import sendMessage from '../../views/processManagement/publicTrigger/components/sendMessage.vue'
+    import apiCall from '../../views/processManagement/publicTrigger/components/apiCall.vue'
+    import changeConductor from '../../views/processManagement/publicTrigger/components/changeConductor.vue'
     export default {
         name: 'TicketTriggerDialog',
+        components: {
+            sendMessage,
+            apiCall,
+            changeConductor
+        },
+        props: {
+            item: Object
+        },
         data () {
             return {
-                triggerId: ''
+                isTrigger: false,
+                trigger: ''
             }
         },
         methods: {
             openDialog (trigger) {
-                this.triggerId = trigger.id
-                this.$bkInfo({
-                    title: this.$t('m.common["确定执行该操作？"]'),
-                    subTitle: trigger.display_name,
-                    confirmFn: () => {
-                        this.executeTrigger(trigger)
-                    }
-                })
+                this.isTrigger = true
+                this.trigger = trigger
             },
             executeTrigger (trigger) {
-                this.$store.dispatch('trigger/executeHandleTriggers', this.triggerId).then(() => {
+                const params = {}
+                const paramsItem = {}
+                paramsItem.name = this.item.name
+                
+                // paramsItem.display_name = response.performData.displayName
+                // paramsItem.operate_type = response.performData.runMode
+                // paramsItem.can_repeat = response.performData.repeat === 'more'
+                // 内容
+                // paramsItem.component_type = response.wayInfo.key
+                paramsItem.params = []
+                this.$store.dispatch('trigger/executeTrigger', { params, id: this.trigger.id }).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
                         theme: 'success'
@@ -56,6 +115,10 @@
                 }).catch((res) => {
                     errorHandler(res, this)
                 })
+            },
+            confirmTrigger () {
+                this.executeTrigger()
+                this.trigger = false
             }
         }
     }
