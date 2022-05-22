@@ -30,6 +30,7 @@ import jsonfield
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from mako.template import Template
 
 from itsm.component.utils.client_backend_query import get_bk_users
 from itsm.component.constants import (
@@ -194,6 +195,23 @@ class Action(TriggerBaseModel):
     @property
     def operate_type(self):
         return self.action_schema.get_operate_type_display()
+
+    def render_params(self, template_value):
+        if isinstance(template_value, str):
+            return Template(template_value).render(**self.context)
+        if isinstance(template_value, dict):
+            render_value = {}
+            for key, value in template_value.items():
+                render_value[key] = self.render_params(value)
+            return render_value
+        if isinstance(template_value, list):
+            return [self.render_params(value) for value in template_value]
+        return template_value
+
+    @property
+    def params(self):
+        self.update_context()
+        return self.render_params(self.action_schema.params)
 
     @property
     def trigger_name(self):
