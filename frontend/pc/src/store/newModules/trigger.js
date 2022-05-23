@@ -87,6 +87,10 @@ export default {
         getTriggerContent ({ commit, state, dispatch }, id) {
             return ajax.get(`/trigger/actions/${id}/fields/`).then(response => response.data)
         },
+        // 获取触发器的内容
+        getTriggerParams ({ commit, state, dispatch }, id) {
+            return ajax.get(`/trigger/actions/${id}/params/`).then(response => response.data)
+        },
         executeTrigger ({ commit, state, dispatch }, { params, id }) {
             return ajax.post(`/trigger/actions/${id}/run/`, params).then(response => response.data)
         },
