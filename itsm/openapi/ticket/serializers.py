@@ -34,9 +34,14 @@ from itsm.component.constants import (
     LEN_LONG,
     APPROVAL_CHOICES,
     LEN_NORMAL,
+    TASK_STATE,
+    NORMAL_STATE,
+    APPROVAL_STATE,
+    SIGN_STATE,
 )
 from itsm.component.exceptions import ParamError
 from itsm.component.utils.basic import get_random_key
+from itsm.ticket.models import Status
 from itsm.ticket.serializers import TicketSerializer, TicketStateOperateSerializer
 from itsm.ticket.validators import ticket_fields_validate
 
@@ -200,6 +205,15 @@ class TicketLogsSerializer(serializers.Serializer):
     creator = serializers.CharField(read_only=True)
     logs = serializers.JSONField(read_only=True, source="ticket_logs")
 
+    def to_representation(self, instance):
+        data = super(TicketLogsSerializer, self).to_representation(instance)
+
+        return data
+
+
+class TicketComplexLogsSerializer(TicketLogsSerializer):
+    logs = serializers.JSONField(read_only=True, source="ticket_complex_logs")
+
 
 class SimpleLogsSerializer(serializers.Serializer):
     """
@@ -213,6 +227,50 @@ class SimpleLogsSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super(SimpleLogsSerializer, self).to_representation(instance)
+        data["message"] = data["message"].format(
+            operator=instance.operator,
+            name=instance.from_state_name,
+            detail_message=instance.detail_message,
+            action=instance.action,
+        )
+        return data
+
+
+class ComplexLogsSerializer(serializers.Serializer):
+    operator = serializers.CharField(read_only=True)
+    operate_at = serializers.DateTimeField(read_only=True)
+    message = serializers.CharField(read_only=True)
+    source = serializers.CharField(read_only=True)
+    form_data = serializers.JSONField(read_only=True)
+
+    def to_representation(self, instance):
+        data = super(ComplexLogsSerializer, self).to_representation(instance)
+        # 返回form data 数据，由于API节点的 form data 太过于庞大，故只返回输出变量
+        node_status = Status.objects.filter(
+            ticket_id=instance.ticket_id, state_id=instance.from_state_id
+        ).first()
+
+        from_state_type = getattr(node_status, "type", "")
+        data["from_state_type"] = from_state_type
+
+        if from_state_type in [NORMAL_STATE, APPROVAL_STATE, SIGN_STATE]:
+            data["form_data"] = TicketFieldSerializer(
+                instance.form_data, many=True
+            ).data
+
+        if from_state_type == TASK_STATE:
+            form_data = []
+            if isinstance(instance.form_data, list) and instance.form_data:
+                for item in instance.form_data:
+                    form_data.append(
+                        {
+                            "output_variables": item.get("value", {}).get(
+                                "output_variables", []
+                            )
+                        }
+                    )
+            data["form_data"] = form_data
+
         data["message"] = data["message"].format(
             operator=instance.operator,
             name=instance.from_state_name,
