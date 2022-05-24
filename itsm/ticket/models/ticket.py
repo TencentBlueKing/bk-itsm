@@ -1956,6 +1956,16 @@ class Ticket(Model, BaseTicket):
         return SimpleLogsSerializer(self.logs.all(), many=True).data
 
     @property
+    def ticket_complex_logs(self):
+        """
+        复杂单据日志
+        """
+
+        from itsm.openapi.ticket.serializers import ComplexLogsSerializer
+
+        return ComplexLogsSerializer(self.logs.all(), many=True).data
+
+    @property
     def task_operators(self):
         tasks = Task.objects.filter(ticket_id=self.id)
 

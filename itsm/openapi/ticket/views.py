@@ -75,6 +75,7 @@ from itsm.openapi.ticket.serializers import (
     TicketFilterSerializer,
     ProceedApprovalSerializer,
     DynamicFieldSerializer,
+    TicketComplexLogsSerializer,
 )
 from itsm.openapi.ticket.validators import (
     openapi_operate_validate,
@@ -323,7 +324,7 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
 
         return Response(self.serializer_class(ticket).data)
 
-    @action(detail=False, methods=["get"], serializer_class=TicketLogsSerializer)
+    @action(detail=False, methods=["get"])
     @custom_apigw_required
     def get_ticket_logs(self, request):
         """
@@ -342,7 +343,12 @@ class TicketViewSet(ApiGatewayMixin, component_viewsets.ModelViewSet):
                 }
             )
 
-        return Response(self.serializer_class(ticket).data)
+        show_type = request.query_params.get("show_type", "simple")
+        serializer_class = TicketLogsSerializer
+        if show_type == "complex":
+            serializer_class = TicketComplexLogsSerializer
+
+        return Response(serializer_class(ticket).data)
 
     @action(detail=False, methods=["post"])
     @catch_openapi_exception
