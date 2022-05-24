@@ -35,7 +35,7 @@ class FieldViewSet(BaseFieldViewSet):
 
     @custom_apigw_required
     def retrieve(self, request, *args, **kwargs):
-        return super(FieldViewSet, self).retrieve(self, request, *args, **kwargs)
+        return super(FieldViewSet, self).retrieve(request, *args, **kwargs)
 
     @custom_apigw_required
     def update(self, request, *args, **kwargs):

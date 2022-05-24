@@ -46,7 +46,7 @@ class TransitionViewSet(viewsets.ModelViewSet):
 
     @custom_apigw_required
     def retrieve(self, request, *args, **kwargs):
-        return super(TransitionViewSet, self).retrieve(self, request, *args, **kwargs)
+        return super(TransitionViewSet, self).retrieve(request, *args, **kwargs)
 
     @custom_apigw_required
     def update(self, request, *args, **kwargs):
