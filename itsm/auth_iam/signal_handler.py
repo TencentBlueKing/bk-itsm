@@ -25,14 +25,22 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf import settings
 from itsm.auth_iam.utils import grant_instance_creator_related_actions
+from itsm.trigger.models import Trigger
 
 
-def grant_related_action_after_instance_created(sender, instance, created, *args, **kwargs):
+def grant_related_action_after_instance_created(
+    sender, instance, created, *args, **kwargs
+):
+    # 流程内的触发器取消关联授权
+    if isinstance(instance, Trigger):
+        if instance.source_type != "basic":
+            return
+
     if not (created and getattr(sender, "need_auth_grant", False)):
         return
 
-    if settings.ENVIRONMENT == 'dev':
+    if settings.ENVIRONMENT == "dev":
         # dev 环境不走权限中心
-        return 
+        return
 
     grant_instance_creator_related_actions(instance)
