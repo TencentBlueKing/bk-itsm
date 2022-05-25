@@ -25,15 +25,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf import settings
 from itsm.auth_iam.utils import grant_instance_creator_related_actions
+from itsm.component.constants import SOURCE_TICKET
 from itsm.trigger.models import Trigger
 
 
 def grant_related_action_after_instance_created(
     sender, instance, created, *args, **kwargs
 ):
-    # 流程内的触发器取消关联授权
+    # 对于生成的流程版本的触发器，将不再关联授权
     if isinstance(instance, Trigger):
-        if instance.source_type != "basic":
+        if instance.source_type == SOURCE_TICKET:
             return
 
     if not (created and getattr(sender, "need_auth_grant", False)):

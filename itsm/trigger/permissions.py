@@ -62,15 +62,6 @@ class WorkflowTriggerPermit(IamAuthPermit):
 
         return True
 
-    # def has_object_permission(self, request, view, obj):
-    #     if not obj.source_type == SOURCE_WORKFLOW:
-    #         # 非流程来源的，更新做流程元素管理的权限
-    #         return self.iam_auth(request, apply_actions=[], obj=obj)
-    #
-    #     # 与流程相关的，走流程的权限
-    #     apply_action = ["workflow_manage"]
-    #     return self.iam_auth(request, apply_action, self.get_flow_or_raise_error(obj.source_id))
-
     def has_object_permission(self, request, view, obj, **kwargs):
         # 关联实例的请求，需要针对对象进行鉴权
         if view.action in getattr(view, "permission_free_actions", []):
