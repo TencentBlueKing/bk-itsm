@@ -234,7 +234,7 @@
                 <div class="bk-processor-span" style="background: none;">{{ tipsProcessorsInfo.extend }}</div>
             </div>
         </div>
-        <ticket-trigger-dialog ref="triggerDialog" :item="triggerInfo" @init-info="successFn"></ticket-trigger-dialog>
+        <ticket-trigger-dialog ref="triggerDialog" :item="triggerInfo" @init-info="reloadTicket"></ticket-trigger-dialog>
         <node-deal-dialog
             :node-info="nodeInfo"
             :submitting="submitting"

@@ -93,23 +93,55 @@
                 this.trigger = trigger
             },
             executeTrigger (trigger) {
-                const params = {}
                 const paramsItem = {}
-                paramsItem.name = this.item.name
-                
-                // paramsItem.display_name = response.performData.displayName
-                // paramsItem.operate_type = response.performData.runMode
-                // paramsItem.can_repeat = response.performData.repeat === 'more'
-                // 内容
-                // paramsItem.component_type = response.wayInfo.key
                 paramsItem.params = []
-                this.$store.dispatch('trigger/executeTrigger', { params, id: this.trigger.id }).then(() => {
+                // console.log(params)
+                if (this.item.way === 'api') {
+                    console.log('测试')
+                } else {
+                    this.item.field_schema.forEach(field => {
+                        if (field.type === 'SUBCOMPONENT') {
+                            const subContent = {
+                                key: field.key,
+                                sub_components: []
+                            }
+                            field.sub_components.forEach(subItem => {
+                                if (subItem.checked) {
+                                    const subInfo = {
+                                        key: subItem.key,
+                                        params: []
+                                    }
+                                    subItem.field_schema.forEach(subField => {
+                                        const paramsContent = {
+                                            key: subField.key,
+                                            value: subField.value,
+                                            ref_type: subField.referenceType
+                                        }
+                                        subInfo.params.push(paramsContent)
+                                    })
+                                    subContent.sub_components.push(subInfo)
+                                }
+                            })
+                            paramsItem.params.push(subContent)
+                        } else {
+                            const paramsContent = {
+                                key: field.key,
+                                value: field.value,
+                                ref_type: field.referenceType
+                            }
+                            paramsItem.params.push(paramsContent)
+                        }
+                        // params.push(paramsItem)
+                    })
+                }
+                console.log(paramsItem)
+                this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
                         theme: 'success'
                     })
                     this.$store.commit('taskHistoryRefreshFunc')
-                    if (trigger.need_refresh || !trigger.can_repeat) {
+                    if (this.trigger.need_refresh || !this.trigger.can_repeat) {
                         this.$emit('init-info')
                     }
                 }).catch((res) => {
@@ -118,7 +150,7 @@
             },
             confirmTrigger () {
                 this.executeTrigger()
-                this.trigger = false
+                this.isTrigger = false
             }
         }
     }
