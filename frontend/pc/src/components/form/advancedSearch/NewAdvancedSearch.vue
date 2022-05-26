@@ -95,6 +95,7 @@
                                     :list="item.list"
                                     :check-any-level="true"
                                     clearable
+                                    @change="onFormChange($event, item)"
                                     :ext-popover-cls="'custom-cls'">
                                 </bk-cascade>
                             </bk-form-item>
@@ -308,7 +309,7 @@
                 const res = await this.$store.dispatch('serviceCatalog/getTreeData', params)
                 const result = res.data[0] ? res.data[0]['children'] : []
                 const formItem = this.searchForms.find(item => item.key === 'catalog_id')
-                if (this.isfilter) {
+                if (this.isfilter && 'conditions' in this.curServcie) {
                     const list = [this.getTreebyId(result, this.curServcie.conditions.catalog_id[0])]
                     formItem.list = list
                 }

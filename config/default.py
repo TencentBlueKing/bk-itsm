@@ -28,6 +28,10 @@ from urllib.parse import urljoin
 
 from blueapps.conf.default_settings import *  # noqa
 from blueapps.conf.log import get_logging_config_dict
+from blueapps.opentelemetry.utils import inject_logging_trace_info
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from config import (
     APP_CODE,
     BASE_DIR,
@@ -36,7 +40,7 @@ from config import (
     BK_PAAS_HOST,
     BK_PAAS_INNER_HOST,
 )
-from itsm.monitor.opentelemetry.utils import inject_logging_trace_info
+
 
 # 标准运维页面服务地址
 SITE_URL_SOPS = "/o/bk_sops/"
@@ -88,7 +92,6 @@ INSTALLED_APPS += (
     "corsheaders",
     "django_filters",
     # "autofixture",
-    "requests_tracker",
     # wiki
     "django.contrib.humanize.apps.HumanizeConfig",
     "django_nyt.apps.DjangoNytConfig",
@@ -100,6 +103,7 @@ INSTALLED_APPS += (
     # 'flower',
     # 'monitors',
     "itsm.monitor",
+    "blueapps.opentelemetry.instrument_app",
 )
 
 # IAM 开启开关
@@ -111,11 +115,11 @@ if USE_IAM:
         "itsm.auth_iam",
     )
 
-
 # 这里是默认的中间件，大部分情况下，不需要改动
 # 如果你已经了解每个默认 MIDDLEWARE 的作用，确实需要去掉某些 MIDDLEWARE，或者改动先后顺序，请去掉下面的注释，然后修改
 MIDDLEWARE = (
     # 手动关闭服务中间件，需要到admin里设置key='SERVICE_SWITCH'这条数据的value
+    "itsm.component.misc_middlewares.HttpsMiddleware",
     "itsm.component.misc_middlewares.ServiceSwitchCheck",
     # api网关接口豁免
     "itsm.component.misc_middlewares.ApiIgnoreCheck",
@@ -150,10 +154,7 @@ MIDDLEWARE = (
     # 'itsm.component.misc_middlewares.NginxAuthProxy',
     "itsm.component.misc_middlewares.InstrumentProfilerMiddleware",
     # 'pyinstrument.middleware.ProfilerMiddleware',
-    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
-
-MIDDLEWARE = ("django_prometheus.middleware.PrometheusBeforeMiddleware",) + MIDDLEWARE
 
 # 所有环境的日志级别可以在这里配置
 # LOG_LEVEL = 'DEBUG'
@@ -204,7 +205,6 @@ inject_formatters = ("verbose",)
 # 日志中添加trace_id
 ENABLE_OTEL_TRACE = True if os.getenv("BKAPP_ENABLE_OTEL_TRACE", "0") == "1" else False
 if ENABLE_OTEL_TRACE:
-    INSTALLED_APPS += ("itsm.monitor.opentelemetry.instrument_app",)
     trace_format = "[trace_id]: %(otelTraceID)s [span_id]: %(otelSpanID)s [resource.service.name]: %(otelServiceName)s"
     inject_logging_trace_info(LOGGING, inject_formatters, trace_format)
 
@@ -832,7 +832,6 @@ DEVOPS_BASE_URL = os.environ.get("DEVOPS_BASE_URL", "")
 api_public_key = os.environ.get("APIGW_PUBLIC_KEY", "")
 APIGW_PUBLIC_KEY = base64.b64decode(api_public_key)
 
-
 # show.py 敏感信息处理, 内部白皮书地址，内部登陆地址
 BK_IEOD_DOC_URL = os.environ.get("BK_IEOD_DOC_URL", "")
 BK_IEOD_LOGIN_URL = os.environ.get("BK_IEOD_LOGIN_URL", "")
@@ -848,3 +847,23 @@ if USE_BKCHAT:
     BKCHAT_URL = os.environ.get("BKCHAT_URL", "")
     BKCHAT_APPID = os.environ.get("BKCHAT_APPID", "")
     BKCHAT_APPKEY = os.environ.get("BKCHAT_APPKEY", "")
+
+
+def redirect_func(request):
+    login_page_url = reverse("account:login_page")
+    next_url = "{}?refer_url={}".format(login_page_url, request.path)
+    return HttpResponseRedirect(next_url)
+
+
+BLUEAPPS_PAGE_401_RESPONSE_FUNC = redirect_func
+
+try:
+    # 自动过单时间，默认为20
+    AUTO_APPROVE_TIME = int(os.environ.get("AUTO_APPROVE_TIME", 20))
+except Exception:
+    AUTO_APPROVE_TIME = 20
+
+
+OPEN_VOICE_NOTICE = (
+    True if os.getenv("BKAPP_OPEN_VOICE_NOTICE", "false").lower() == "true" else False
+)

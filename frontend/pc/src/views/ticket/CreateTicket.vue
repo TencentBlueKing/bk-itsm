@@ -97,11 +97,11 @@
                     {{$t(`m.common['提交']`)}}
                 </bk-button>
                 <bk-button :theme="'default'"
-                    :title="$t(`m.common['取消']`)"
+                    :title="$t(`m['取消']`)"
                     :disabled="submitting"
                     class="mr10"
                     @click="onBackIconClick">
-                    {{$t(`m.common['取消']`)}}
+                    {{$t(`m['取消']`)}}
                 </bk-button>
                 <!-- 模板 -->
                 <bk-popover

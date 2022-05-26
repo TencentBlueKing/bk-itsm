@@ -7,9 +7,9 @@
         </div>
         <div class="itsm-page-content">
             <ul class="bk-notice-tab">
-                <li v-for="(item, index) in remindWayList"
-                    :key="item.id"
-                    :class="{ 'bk-check-notice': acticeTab === item.id }"
+                <li v-for="(item, index) in noticeType"
+                    :key="item.typeName"
+                    :class="{ 'bk-check-notice': acticeTab === item.typeName }"
                     @click="changeNotice(item, index)">
                     <span>{{ item.name }}</span>
                 </li>
@@ -64,21 +64,21 @@
                 :mask-close="false"
                 :auto-close="false"
                 :header-position="'left'"
-                :title="isEdit ? '编辑' : '新建'"
+                :title="isEdit ? $t(`m['编辑']`) : $t(`m['新建']`) "
                 @confirm="submitNotice"
                 @cancel="closeNotice">
                 <div class="notice-forms">
-                    <bk-form ref="basicFrom" :model="formData" width="700" form-type="vertical" :rules="rules">
-                        <bk-form-item label="通知方式" :required="true" :property="'noticeType'">
+                    <bk-form ref="basicFrom" :model="formData" :label-width="300" width="700" form-type="vertical" :rules="rules">
+                        <bk-form-item :label="$t(`m['通知方式']`)" :required="true" :property="'noticeType'">
                             <bk-select :disabled="true" v-model="formData.noticeType" searchable>
-                                <bk-option v-for="option in noticeTypeLIST"
-                                    :key="option.id"
-                                    :id="option.id"
+                                <bk-option v-for="option in noticeType"
+                                    :key="option.typeName"
+                                    :id="option.typeName"
                                     :name="option.name">
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知场景" :required="true" :property="'noticeUserBy'">
+                        <bk-form-item :label="$t(`m['通知场景']`)" :required="true" :property="'noticeUserBy'">
                             <bk-select :disabled="false" v-model="formData.noticeUserBy" searchable @selected="handleSelectUserBy">
                                 <bk-option v-for="option in userByList"
                                     :key="option.id"
@@ -87,7 +87,7 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知类型" :required="true" :property="'noticeAction'">
+                        <bk-form-item :label="$t(`m['通知类型']`)" :required="true" :property="'noticeAction'">
                             <bk-select v-model="formData.noticeAction" searchable :loading="actionLoading">
                                 <bk-option v-for="option in actionList"
                                     :key="option.id"
@@ -115,6 +115,7 @@
 <script>
     import editorNotice from '../processManagement/notice/editorNotice.vue'
     import permission from '@/mixins/permission.js'
+    import { mapState } from 'vuex'
     export default {
         name: 'Notice',
         components: {
@@ -128,16 +129,16 @@
                 isEdit: false,
                 editNoticeId: '',
                 remindWayList: [
-                    { id: 'WEIXIN', name: '企业微信' },
-                    { id: 'EMAIL', name: '邮件' },
-                    { id: 'SMS', name: '手机短信' }
+                    { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
+                    { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
                 ],
                 noticeList: [],
                 // 先写死，后续添加自定义
                 noticeTypeLIST: [
-                    { id: 'WEIXIN', name: '企业微信' },
-                    { id: 'EMAIL', name: '邮件' },
-                    { id: 'SMS', name: '手机短信' }
+                    { id: 'WEIXIN', name: this.$t('m.treeinfo["企业微信"]') },
+                    { id: 'EMAIL', name: this.$t('m.treeinfo["邮件"]') },
+                    { id: 'SMS', name: this.$t('m.treeinfo["手机短信"]') }
                 ],
                 userByList: [
                     { id: 'TICKET', name: '单据' },
@@ -184,7 +185,10 @@
         computed: {
             sliderStatus () {
                 return this.$store.state.common.slideStatus
-            }
+            },
+            ...mapState({
+                noticeType: state => state.common.configurInfo.notify_type
+            })
         },
         watch: {
             acticeTab: {
@@ -199,7 +203,7 @@
         },
         methods: {
             changeNotice (item, index) {
-                this.acticeTab = item.id
+                this.acticeTab = item.typeName
                 this.getNoticeList()
             },
             async handleSelectUserBy (val) {

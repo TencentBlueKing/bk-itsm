@@ -81,6 +81,7 @@ from itsm.component.constants import (
     OPEN,
     GENERAL,
     ORGANIZATION,
+    FAST_APPROVAL_MESSAGE,
 )
 from itsm.component.constants.flow import EXPORT_SUPPORTED_TYPE
 from itsm.component.dlls.component import ComponentLibrary
@@ -707,10 +708,10 @@ class TicketModelViewSet(ModelViewSet):
             if not service_fields:
                 return []
 
-            started_states = [
-                service_inst.first_state_id
-                for service_inst in Service.objects.filter(id__in=service_fields.keys())
-            ]
+            # started_states = [
+            #     service_inst.first_state_id
+            #     for service_inst in Service.objects.filter(id__in=service_fields.keys())
+            # ]
 
             # 获取导出的所有字段内容 -- 当前的id如果较多，这里大量拉取，估计有点问题
             all_service_field_keys.append("bk_biz_id")
@@ -720,7 +721,7 @@ class TicketModelViewSet(ModelViewSet):
                         service_id__in=service_fields.keys()
                     ).values_list("id", flat=True),
                     type__in=EXPORT_SUPPORTED_TYPE,
-                    state_id__in=started_states,
+                    # state_id__in=started_states,
                     key__in=all_service_field_keys,
                 ),
                 many=True,
@@ -874,6 +875,8 @@ class TicketModelViewSet(ModelViewSet):
             request=request,
         )
         node_status = ticket.node_status.get(state_id=state_id)
+
+        # 单据审批新增事务控制
         if node_status.type in [SIGN_STATE, APPROVAL_STATE]:
             SignTask.objects.update_or_create(
                 status_id=node_status.id,
@@ -893,6 +896,7 @@ class TicketModelViewSet(ModelViewSet):
                 % (state_id, res.message)
             )
             ticket.node_status.filter(state_id=state_id).update(status=RUNNING)
+
         return Response(
             {
                 "code": ResponseCodeStatus.OK
@@ -1081,7 +1085,19 @@ class TicketModelViewSet(ModelViewSet):
         message = request.data.get("message") or Template(SUPERVISE_MESSAGE).render(
             **{"title": ticket.title}
         )
+        # 构造快速审批通知信息
+        fast_approval_message = FAST_APPROVAL_MESSAGE.format(
+            **ticket.get_fast_approval_message_params()
+        )
         for step in ticket.current_steps:
+            # 快速审批通知
+            ticket.notify_fast_approval(
+                step["state_id"],
+                step["processors"],
+                fast_approval_message,
+                action=SUPERVISE_OPERATE,
+                kwargs=kwargs,
+            )
             ticket.notify(
                 state_id=step["state_id"],
                 receivers=step["processors"],

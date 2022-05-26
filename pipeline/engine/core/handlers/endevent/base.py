@@ -37,7 +37,11 @@ class EndEventHandler(FlowElementHandler):
             Status.objects.finish(sub_process_node)
             # extract subprocess output
             process.top_pipeline.context.extract_output(sub_process_node)
-            return self.HandleResult(next_node=sub_process_node.next(), should_return=False, should_sleep=False)
+            return self.HandleResult(
+                next_node=sub_process_node.next(),
+                should_return=False,
+                should_sleep=False,
+            )
         else:
             with Status.objects.lock(pipeline.id):
                 # save data and destroy process
@@ -45,12 +49,16 @@ class EndEventHandler(FlowElementHandler):
                 Data.objects.write_node_data(pipeline)
                 Status.objects.finish(element)
 
-                Status.objects.transit(pipeline.id, to_state=states.FINISHED, is_pipeline=True)
+                Status.objects.transit(
+                    pipeline.id, to_state=states.FINISHED, is_pipeline=True
+                )
                 # PipelineInstance.objects.set_finished(process.root_pipeline.id)
-                element.pipeline_finish(process.root_pipeline.id)
-                for act in pipeline.spec.activities:
-                    if isinstance(act, activity.SubProcess):
-                        act.pipeline.context.clear()
-                pipeline.context.clear()
-                process.destroy()
-                return self.HandleResult(next_node=None, should_return=True, should_sleep=False)
+            element.pipeline_finish(process.root_pipeline.id)
+            for act in pipeline.spec.activities:
+                if isinstance(act, activity.SubProcess):
+                    act.pipeline.context.clear()
+            pipeline.context.clear()
+            process.destroy()
+            return self.HandleResult(
+                next_node=None, should_return=True, should_sleep=False
+            )

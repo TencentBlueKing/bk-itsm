@@ -153,6 +153,7 @@
                 <bk-button :theme="'primary'"
                     data-test-id="autoNode-button-submit"
                     :title="$t(`m.treeinfo['确定']`)"
+                    :loading="secondClick"
                     :disabled="!formInfo.api_info.remote_api_id"
                     class="mr10"
                     @click="submitNode">
@@ -303,7 +304,6 @@
                 apiSysList: [],
                 secondClick: false,
                 stateList: [],
-                clickSecond: false,
                 sliderInfo: {
                     title: this.$t(`m.treeinfo["添加变量"]`),
                     show: false,
@@ -412,10 +412,10 @@
                     params.processors = data.value
                 }
                 const id = this.configur.id
-                if (this.clickSecond) {
+                if (this.secondClick) {
                     return
                 }
-                this.clickSecond = true
+                this.secondClick = true
                 this.$store.dispatch('deployCommon/updateNode', { params, id }).then((res) => {
                     this.$bkMessage({
                         message: this.$t(`m.treeinfo["保存成功"]`),
@@ -425,7 +425,7 @@
                 }, (res) => {
                     errorHandler(res, this)
                 }).finally(() => {
-                    this.clickSecond = false
+                    this.secondClick = false
                 })
             },
             // 获取以前的字段/引用变量

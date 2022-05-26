@@ -40,6 +40,7 @@
 </template>
 <script>
     import Chart from '@blueking/bkcharts'
+    import i18n from '@/i18n/index.js'
 
     export default {
         name: 'LineChart',
@@ -62,19 +63,19 @@
                     return [
                         {
                             key: 'days',
-                            name: '天'
+                            name: i18n.t(`m['天']`)
                         },
                         {
                             key: 'weeks',
-                            name: '周'
+                            name: i18n.t(`m['周']`)
                         },
                         {
                             key: 'months',
-                            name: '月'
+                            name: i18n.t(`m['月']`)
                         },
                         {
                             key: 'years',
-                            name: '年'
+                            name: i18n.t(`m['年']`)
                         }
                     ]
                 }

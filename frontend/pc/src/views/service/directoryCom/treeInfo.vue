@@ -25,7 +25,7 @@
         <div class="bk-tree-content" v-bkloading="{ isLoading: isTreeLoading }">
             <div style="overflow: hidden">
                 <div class="bk-tree-addService">
-                    <span>服务目录</span>
+                    <span>{{ $t(`m['服务目录']`) }}</span>
                     <i class="bk-itsm-icon icon-jia-2" @click="openAdd('root')"></i>
                 </div>
                 <div class="bk-tree-search">

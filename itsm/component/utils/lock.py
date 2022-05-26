@@ -24,9 +24,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import functools
+import pickle
 import time
+from hashlib import md5
 
 from django.core.cache import cache
+
+from common.log import logger
 
 
 def share_lock(ttl=300, identify=None):
@@ -36,9 +40,30 @@ def share_lock(ttl=300, identify=None):
             token = str(time.time())
             # 防止函数重名导致方法失效，增加一个ID参数，可以通过ID参数屏蔽多模块函数名重复的问题
             # 例如，可以为`${module}_${method_used_for}`
-            cache_key = 'celery_%s' % func.__name__ if identify is None else identify
+
+            if identify is None:
+                try:
+                    logger.info("[share_lock] 正在解析参数 -> args={}".format(args))
+                    args_key = md5(str(pickle.dumps(args)).encode("utf-8")).hexdigest()
+                    logger.info("[share_lock] 正在解析参数 -> kwargs={}".format(kwargs))
+                    kwargs_key = md5(
+                        str(pickle.dumps(kwargs)).encode("utf-8")
+                    ).hexdigest()
+                    cache_key = args_key + kwargs_key
+                except Exception as e:
+                    logger.info(
+                        "[share_lock] 解析参数出现异常 -> error={}, kwargs={}".format(e, kwargs)
+                    )
+                    cache_key = "celery_%s" % func.__name__
+            else:
+                cache_key = identify
+
+            logger.info("[share_lock] cache_key -> cache_key={}".format(cache_key))
 
             if cache.get(cache_key):
+                logger.info(
+                    "[share_lock] 发现重复执行 -> key={}, kwargs={}".format(cache_key, kwargs)
+                )
                 return
             cache.set(cache_key, token, ttl)
 
