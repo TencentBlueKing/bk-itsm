@@ -23,15 +23,17 @@
 <template>
     <div class="trigger-dialog-box">
         <bk-dialog v-model="isTrigger"
-            width="800"
+            width="930"
             theme="primary"
             :mask-close="false"
             :auto-close="false"
             header-position="left"
             :title="trigger.component_name"
             @confirm="confirmTrigger">
-            <p style="margin-bottom: 10px"> 触发器名称：{{ trigger.display_name }}</p>
-            <bk-form :form-type="'horizontal'"
+            <p style="margin-bottom: 10px">{{ $t(`m['触发器名称：']`) + trigger.display_name }}</p>
+            <bk-form
+                :key="new Date().getTime()"
+                :form-type="'horizontal'"
                 :label-width="100"
                 ref="conductorForm">
                 <template v-if="item.key === 'api'">
@@ -46,6 +48,7 @@
                         <!-- 对于多层嵌套和单层嵌套的区别 -->
                         <template v-if="itemInfo.type === 'SUBCOMPONENT'">
                             <send-message :key="index"
+                                :is-show-var="false"
                                 :item-info="itemInfo">
                             </send-message>
                         </template>
@@ -56,6 +59,7 @@
                                 :key="index"
                                 :desc="itemInfo.tips">
                                 <change-conductor
+                                    :is-show-var="false"
                                     :item-info="itemInfo">
                                 </change-conductor>
                             </bk-form-item>
@@ -95,9 +99,25 @@
             executeTrigger (trigger) {
                 const paramsItem = {}
                 paramsItem.params = []
-                // console.log(params)
-                if (this.item.way === 'api') {
-                    console.log('测试')
+                if (this.item.key === 'api') {
+                    this.item.wayInfo.field_schema.forEach(wayItem => {
+                        if (wayItem.key === 'api_source') {
+                            paramsItem.params.push({
+                                key: wayItem.key,
+                                value: wayItem.apiId
+                            })
+                        } else {
+                            const valueInfo = {
+                                key: wayItem.key,
+                                value: {}
+                            }
+                            valueInfo.value = this.treeToJson(wayItem.apiContent.bodyTableData.filter(
+                                item => (!item.level)
+                            ))
+                            paramsItem.params.push(valueInfo)
+                        }
+                    })
+                    // paramsItem.params.push(valueList)
                 } else {
                     this.item.field_schema.forEach(field => {
                         if (field.type === 'SUBCOMPONENT') {
@@ -112,9 +132,21 @@
                                         params: []
                                     }
                                     subItem.field_schema.forEach(subField => {
+                                        let valueItem = []
+                                        if (subField.type === 'MULTI_MEMBERS' || subField.type === 'MEMBERS') {
+                                            const value = {}
+                                            value.ref_type = subField.referenceType
+                                            value.value = {
+                                                member_type: subField.value[0].key,
+                                                members: subField.value[0].value[0]
+                                            }
+                                            valueItem.push(value)
+                                        } else {
+                                            valueItem = subField.value
+                                        }
                                         const paramsContent = {
                                             key: subField.key,
-                                            value: subField.value,
+                                            value: valueItem,
                                             ref_type: subField.referenceType
                                         }
                                         subInfo.params.push(paramsContent)
@@ -124,9 +156,21 @@
                             })
                             paramsItem.params.push(subContent)
                         } else {
+                            let valueItem = []
+                            if (field.type === 'MEMBERS') {
+                                const value = {}
+                                value.ref_type = field.referenceType
+                                value.value = {
+                                    member_type: field.value[0].key,
+                                    members: field.value[0].value[0]
+                                }
+                                valueItem.push(value)
+                            } else {
+                                valueItem = field.value
+                            }
                             const paramsContent = {
                                 key: field.key,
-                                value: field.value,
+                                value: valueItem,
                                 ref_type: field.referenceType
                             }
                             paramsItem.params.push(paramsContent)
@@ -134,7 +178,6 @@
                         // params.push(paramsItem)
                     })
                 }
-                console.log(paramsItem)
                 this.$store.dispatch('trigger/executeTrigger', { params: paramsItem, id: this.trigger.id }).then(() => {
                     this.$bkMessage({
                         message: '执行成功',
@@ -148,6 +191,75 @@
                     errorHandler(res, this)
                 })
             },
+            treeToJson (listData) {
+                const jsonDataDict = {}
+                const treeToJsonStep = function (jsonDataDict, item, level, lastType) {
+                    if (!item.key) {
+                        return
+                    }
+                    if (item.type === 'array') {
+                        const baseItem = []
+                        if (lastType === 'array') {
+                            jsonDataDict.push(baseItem)
+                            for (const j in item['children']) {
+                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'array')
+                            }
+                        }
+                        if (lastType === 'object') {
+                            const baseItem = {}
+                            baseItem[item.key] = []
+                            Object.assign(jsonDataDict, baseItem)
+                            for (const j in item['children']) {
+                                treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'array')
+                            }
+                        }
+                    } else if (item.type === 'object') {
+                        const baseItem = {}
+                        if (lastType === 'array') {
+                            jsonDataDict.push(baseItem)
+                            for (const j in item['children']) {
+                                treeToJsonStep(jsonDataDict[jsonDataDict.length - 1], item['children'][j], 1, 'object')
+                            }
+                        }
+                        if (lastType === 'object') {
+                            baseItem[item.key] = {}
+                            Object.assign(jsonDataDict, baseItem)
+                            for (const j in item['children']) {
+                                treeToJsonStep(jsonDataDict[item.key], item['children'][j], 1, 'object')
+                            }
+                        }
+                    } else {
+                        if (item.type === 'number') {
+                            item.value = Number(item.value)
+                        }
+                        if (lastType === 'array') {
+                            const baseItem = {
+                                is_leaf: ((item.type !== 'object') && (item.type !== 'array')),
+                                ref_type: item.source_type === 'CUSTOM' ? 'custom' : 'reference',
+                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key
+                            }
+                            // item.source_type === 'CUSTOM' ? item.value
+                            //     : `\$\{params\_${item.value_key}\}`
+                            jsonDataDict.push(baseItem)
+                        }
+                        if (lastType === 'object') {
+                            const baseItem = {}
+                            baseItem[item.key] = {
+                                is_leaf: ((item.type !== 'object') && (item.type !== 'array')),
+                                ref_type: item.source_type === 'CUSTOM' ? 'custom' : 'reference',
+                                value: item.source_type === 'CUSTOM' ? item.value : item.value_key
+                            }
+                            // item.source_type === 'CUSTOM' ? item.value
+                            //     : `\$\{params\_${item.value_key}\}`
+                            Object.assign(jsonDataDict, baseItem)
+                        }
+                    }
+                }
+                for (const i in listData) {
+                    treeToJsonStep(jsonDataDict, listData[i], 0, 'object')
+                }
+                return jsonDataDict
+            },
             confirmTrigger () {
                 this.executeTrigger()
                 this.isTrigger = false
@@ -156,5 +268,11 @@
     }
 </script>
 <style lang='scss' scoped>
-
+/deep/ .bk-dialog-wrapper .bk-dialog-body {
+    max-height: 600px;
+    overflow: auto;
+}
+/deep/ .bk-send-message {
+    border: 1px solid #dcdee5;
+}
 </style>

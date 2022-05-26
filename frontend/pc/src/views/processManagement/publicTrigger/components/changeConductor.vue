@@ -100,7 +100,7 @@
             </bk-input>
         </template>
         <!-- 引用变量 -->
-        <template v-if="itemInfo.type === 'STRING' || itemInfo.type === 'TEXT'">
+        <template v-if="isShowVar && (itemInfo.type === 'STRING' || itemInfo.type === 'TEXT')">
             <div class="bk-select-btn">
                 <bk-button
                     theme="default"
@@ -122,7 +122,7 @@
             </div>
         </template>
         <!-- 下拉框引用变量 -->
-        <template v-if="itemInfo.value === 'VARIABLE'">
+        <template v-if="isShowVar && itemInfo.value === 'VARIABLE'">
             <bk-select style="width: 260px;"
                 v-model="itemInfo.insertValue"
                 ext-cls="bk-insert-info"
@@ -161,6 +161,10 @@
             },
             index: {
                 type: Number
+            },
+            isShowVar: {
+                type: Boolean,
+                default: () => true
             }
         },
         data () {

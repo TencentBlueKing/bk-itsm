@@ -549,7 +549,6 @@
                 }
             },
             submitFormAjax (submitFormData) {
-                console.log(submitFormData)
                 const id = this.nodeInfo.ticket_id
                 // 终止
                 if (this.openFormInfo.btnInfo.key === 'TERMINATE') {
@@ -623,7 +622,6 @@
                     }
                     this.submitAjax('newAssignDeliver', params, id)
                 }
-                console.log(this.openFormInfo.btnInfo.key)
                 if (this.openFormInfo.btnInfo.key === 'EXCEPTION_DISTRIBUTE') {
                     const params = {
                         state_id: this.nodeInfo.state_id,
@@ -707,22 +705,21 @@
                     if (this.triggerInfo.key === 'api') {
                         const wayInfo = {
                             contentStatus: false,
-                            id: 73,
                             isLoading: false,
-                            performData: {},
-                            way: 'api',
+                            key: 'api',
                             wayInfo: this.triggerInfo
                         }
                         this.triggerInfo = wayInfo
-                        console.log(this.triggerInfo)
                         this.triggerInfo.wayInfo.field_schema.forEach(schema => {
+                            const cur = curTrigger.find(item => item.key === schema.key)
                             if (schema.key === 'api_source') {
                                 this.$set(schema, 'systemId', '')
                                 this.$set(schema, 'apiId', '')
+                                this.$set(schema, 'value', cur.value)
                             } else {
                                 this.$set(schema, 'apiContent', {})
+                                this.$set(schema, 'value', cur.value)
                             }
-                            console.log(schema)
                         })
                     } else {
                         this.triggerInfo.field_schema.forEach(schema => {
@@ -769,7 +766,6 @@
                                                 const subCur = cur.params.find(ite => ite.key === subField.key)
                                                 if (Array.isArray(subField.value)) {
                                                     subField.value.forEach(schemaValue => {
-                                                        // console.log(schemaValue)
                                                         const itemValue = {
                                                             key: schemaValue.value.member_type,
                                                             value: schemaValue.value.members,
