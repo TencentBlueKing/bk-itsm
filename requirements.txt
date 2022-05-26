@@ -100,6 +100,8 @@ django-prometheus==2.1.0
 # grpcio
 grpcio==1.27.2
 
+protobuf==3.19.4
+
 # opentelemetry
 opentelemetry-api==1.6.2
 opentelemetry-sdk==1.6.2
