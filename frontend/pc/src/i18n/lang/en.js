@@ -2569,5 +2569,7 @@ export const m = {
     '已选参数的字段名和值不能为空': 'The field name and value of the selected parameter cannot be empty',
     '以http://或https://开头(引用变量忽略), 输入“{{”可选择引用变量': 'Begin with http:// or https:// (reference variables are ignored), enter "{{" to select reference variables',
     '输入“{{”可选择引用变量': 'Enter "{{" to select a reference variable',
-    '触发器名称：': 'Trigger name:'
+    '触发器名称：': 'Trigger name:',
+    '至少勾选一项': 'Check at least one',
+    '带*的表单项不能为空！': 'Form items with * cannot be empty!'
 }

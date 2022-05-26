@@ -67,6 +67,10 @@
                     </template>
                 </template>
             </bk-form>
+            <p v-if="errorTip" class="error-tip" style="color: red; margin-top: 4px">
+                <i class="bk-itsm-icon icon-itsm-icon-square-one"></i>
+                {{ $t(`m['带*的表单项不能为空！']`)}}
+            </p>
         </bk-dialog>
     </div>
 </template>
@@ -88,7 +92,9 @@
         data () {
             return {
                 isTrigger: false,
-                trigger: ''
+                trigger: '',
+                checkedbox: false,
+                errorTip: false
             }
         },
         methods: {
@@ -96,7 +102,69 @@
                 this.isTrigger = true
                 this.trigger = trigger
             },
-            executeTrigger (trigger) {
+            checkInfo () {
+                let status = false
+                if (this.item.key === 'api') {
+                    this.item.wayInfo.field_schema.forEach(schema => {
+                        if (schema.key === 'req_params') {
+                            for (const key in schema.value) {
+                                if (Array.isArray(schema.value[key])) {
+                                    schema.value[key].forEach(schemaValue => {
+                                        if (schemaValue.value === '') status = true
+                                    })
+                                } else {
+                                    if (schema.value === '') status = true
+                                }
+                            }
+                        } else {
+                            if (schema.value === '') status = true
+                        }
+                    })
+                } else {
+                    this.item.field_schema.forEach(schema => {
+                        if (schema.type === 'SUBCOMPONENT') {
+                            const checked = schema.sub_components.some(check => check.checked)
+                            if (!checked) this.checkedbox = this.$t(`m['至少勾选一项']`)
+                            schema.sub_components.forEach(schemaItem => {
+                                if (schemaItem.checked) {
+                                    schemaItem.field_schema.forEach(field => {
+                                        if (field.type === 'MEMBERS' || field.type === 'MULTI_MEMBERS') {
+                                            if (field.value[0].value.length === 0 || field.key === '') {
+                                                status = true
+                                            }
+                                        } else {
+                                            if (field.value === '') {
+                                                status = true
+                                            }
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            if (schema.required) {
+                                if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
+                                    schema.value.forEach(schemaValue => {
+                                        if (schemaValue.value[0].value.length === 0 || schemaValue.key === '') {
+                                            status = true
+                                        }
+                                    })
+                                } else {
+                                    if (schema.value === '') {
+                                        status = true
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }
+                return status
+            },
+            executeTrigger () {
+                this.errorTip = false
+                if (this.checkInfo() || this.checkedbox) {
+                    this.errorTip = true
+                    return
+                }
                 const paramsItem = {}
                 paramsItem.params = []
                 if (this.item.key === 'api') {
@@ -189,6 +257,8 @@
                     }
                 }).catch((res) => {
                     errorHandler(res, this)
+                }).finally(() => {
+                    this.isTrigger = false
                 })
             },
             treeToJson (listData) {
@@ -262,7 +332,6 @@
             },
             confirmTrigger () {
                 this.executeTrigger()
-                this.isTrigger = false
             }
         }
     }
