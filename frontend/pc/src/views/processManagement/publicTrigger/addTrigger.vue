@@ -764,6 +764,7 @@
             // 创建多个触发器规则（响应条件）
             createRespond (value) {
                 const params = value
+                console.log(value)
                 const id = this.originInfoToTrigger.id
                 this.$store.dispatch('trigger/createRespond', { id, params }).then((res) => {
                     this.backInfo.responseList = res.data
