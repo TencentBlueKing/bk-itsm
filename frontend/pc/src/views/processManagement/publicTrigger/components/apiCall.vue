@@ -120,6 +120,7 @@
                 this.apiId = ''
             },
             getApiTableList (id) {
+                console.log(id)
                 const params = {
                     remote_system: id || ''
                 }

@@ -53,6 +53,7 @@
                             :index="index"
                             :item-info="field"
                             :origin="'message'"
+                            :is-show-var="isShowVar"
                             @change-panel-status="changePanelStatus(panel, fieldIndex)">
                         </change-conductor>
                     </bk-form-item>
@@ -76,6 +77,10 @@
                 default () {
                     return {}
                 }
+            },
+            isShowVar: {
+                type: Boolean,
+                default: () => true
             }
         },
         data () {
