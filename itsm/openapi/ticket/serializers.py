@@ -468,18 +468,18 @@ class CommentSerializer(serializers.Serializer):
         try:
             ticket = Ticket.objects.get(sn=sn)
         except Ticket.DoesNotExist:
-            raise serializers.ValidationError(_("sn={}对应的单据不存在!".format(sn)))
+            raise ParamError(_("sn={}对应的单据不存在!".format(sn)))
 
         if ticket.current_status != "FINISHED":
-            raise serializers.ValidationError(_("单据未结束，不允许评价!"))
+            raise ParamError(_("单据未结束，不允许评价!"))
 
         try:
             ticket_comment = TicketComment.objects.get(ticket_id=ticket.id)
         except TicketComment.DoesNotExist:
-            raise serializers.ValidationError(_("单据评价记录未存在，无法评价!"))
+            raise ParamError(_("单据评价记录未存在，无法评价!"))
 
         if ticket_comment.stars != 0:
-            raise serializers.ValidationError(_("该单据已经被评论，请勿重复评论"))
+            raise ParamError(_("该单据已经被评论，请勿重复评论"))
 
         attrs["ticket_id"] = ticket.id
 
