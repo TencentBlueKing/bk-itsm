@@ -43,7 +43,7 @@ class StateViewSet(BaseWorkflowElementViewSet):
 
     @custom_apigw_required
     def retrieve(self, request, *args, **kwargs):
-        return super(StateViewSet, self).retrieve(self, request, *args, **kwargs)
+        return super(StateViewSet, self).retrieve(request, *args, **kwargs)
 
     @custom_apigw_required
     def update(self, request, *args, **kwargs):
