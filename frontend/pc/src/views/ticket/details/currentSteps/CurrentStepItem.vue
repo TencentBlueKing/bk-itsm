@@ -775,15 +775,16 @@
                                                         subFieldValue.push(itemValue)
                                                     })
                                                 } else {
+                                                    subFieldValue = []
                                                     subCur.value.forEach(item => {
-                                                        subFieldValue = [
+                                                        subFieldValue.push(
                                                             {
                                                                 key: item.value.member_type,
                                                                 value: item.value.members,
                                                                 secondLevelList: [],
                                                                 isLoading: false
                                                             }
-                                                        ]
+                                                        )
                                                     })
                                                 }
                                             } else {
@@ -959,7 +960,7 @@
                 .icon-angle-down {
                     font-size: 22px;
                 }
-                
+
             }
             .sla-time-info {
                 height: 32px;
@@ -1005,7 +1006,7 @@
                     }
                 }
             }
-            
+
             .bk-node-cursor {
                 cursor: pointer;
             }

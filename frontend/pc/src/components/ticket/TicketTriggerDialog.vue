@@ -144,7 +144,7 @@
                             if (schema.required) {
                                 if (schema.type === 'MEMBERS' || schema.type === 'MULTI_MEMBERS') {
                                     schema.value.forEach(schemaValue => {
-                                        if (schemaValue.value[0].value.length === 0 || schemaValue.key === '') {
+                                        if (schemaValue.value.length === 0 || schemaValue.key === '') {
                                             status = true
                                         }
                                     })
@@ -202,13 +202,15 @@
                                     subItem.field_schema.forEach(subField => {
                                         let valueItem = []
                                         if (subField.type === 'MULTI_MEMBERS' || subField.type === 'MEMBERS') {
-                                            const value = {}
-                                            value.ref_type = subField.referenceType
-                                            value.value = {
-                                                member_type: subField.value[0].key,
-                                                members: subField.value[0].value[0]
-                                            }
-                                            valueItem.push(value)
+                                            subField.value.forEach((item) => {
+                                                const value = {}
+                                                value.ref_type = subField.referenceType
+                                                value.value = {
+                                                    member_type: item.key,
+                                                    members: item.value[0]
+                                                }
+                                                valueItem.push(value)
+                                            })
                                         } else {
                                             valueItem = subField.value
                                         }

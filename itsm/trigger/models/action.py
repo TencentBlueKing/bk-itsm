@@ -113,6 +113,8 @@ class Action(TriggerBaseModel):
         _("执行错误信息"), help_text=_("状态为失败的时候记录的错误日志"), default=EMPTY_DICT
     )
 
+    params = jsonfield.JSONField(_("执行的参数"), help_text=_("手动触发器实际执行的参数信息"), default={})
+
     objects = ActionManagers()
 
     temporary_params = None
@@ -173,9 +175,9 @@ class Action(TriggerBaseModel):
     @property
     def component_obj(self):
         self.context.update(self.outputs if self.outputs else EMPTY_DICT)
-        if self.temporary_params is not None:
+        if self.params:
             return self.action_schema.component_class(
-                self.context, self.temporary_params, self.id, self.count_down
+                self.context, self.params, self.id, self.count_down
             )
         return self.action_schema.component_class(
             self.context, self.action_schema.params, self.id, self.count_down
@@ -209,7 +211,7 @@ class Action(TriggerBaseModel):
         return template_value
 
     @property
-    def params(self):
+    def action_params(self):
         self.update_context()
         return self.render_params(self.action_schema.params)
 

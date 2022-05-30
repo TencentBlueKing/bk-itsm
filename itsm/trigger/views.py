@@ -368,7 +368,8 @@ class ActionViewSet(component_viewsets.ModelViewSet):
     def run(self, request, *args, **kwargs):
         self.queryset = self.queryset.filter(status=ACTION_STATUS_CREATED)
         instance = self.get_object()
-        instance.temporary_params = request.data.get("params")
+        instance.params = request.data.get("params", {})
+        instance.save()
         instance.execute(operator=request.user.username, need_update_context=True)
         result = False if instance.status == ACTION_STATUS_FAILED else True
         instance.refresh_from_db()
@@ -387,4 +388,4 @@ class ActionViewSet(component_viewsets.ModelViewSet):
     @action(methods=["get"], detail=True)
     def params(self, request, *args, **kwargs):
         instance = self.get_object()
-        return Response(instance.params)
+        return Response(instance.action_params)
