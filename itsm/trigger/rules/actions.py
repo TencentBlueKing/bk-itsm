@@ -50,7 +50,7 @@ class ResponseActions(BaseActions):
         """
         tasks = []
         for action in rule.actions:
-            action_obj = self.check_and_create(source_type, source_id, action, rule)
+            action_obj = self.can_repeat(source_type, source_id, action, rule)
             if action_obj:
                 tasks.append(
                     Action.objects.create(
@@ -70,7 +70,11 @@ class ResponseActions(BaseActions):
                 task.execute()
 
     @share_lock()
-    def check_and_create(self, source_type, source_id, action, rule):
+    def can_repeat(self, source_type, source_id, action, rule):
+
+        if action.can_repeat:
+            return True
+
         action_count = Action.objects.filter(
             signal=self.trigger.signal,
             sender=self.trigger.sender,
@@ -81,10 +85,11 @@ class ResponseActions(BaseActions):
             trigger_id=self.trigger.id,
         ).count()
         logger.info(
-            "[check_and_create] source_type={}, source_id={}. action={}, rule={}, action_count={}".format(
+            "[can_repeat] source_type={}, source_id={}. action={}, rule={}, action_count={}".format(
                 source_type, source_id, action.id, rule.id, action_count
             )
         )
         if action_count == 0:
             return True
+
         return False
